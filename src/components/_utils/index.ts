@@ -1,4 +1,4 @@
-import { withDefaults, defineProps, type CSSProperties, Fragment } from 'vue'
+import { withDefaults, defineProps, Fragment } from 'vue'
 import { createTypes } from 'vue-types'
 import type { propTypes } from '../_types/utils'
 export function useDefaultPorps<T>(defaultProps) {

@@ -13,7 +13,7 @@
   </el-select>
 </template>
 
-<script>
+<script lang="ts">
 import { isType } from '../../utils';
 
 import {defineComponent} from 'vue'

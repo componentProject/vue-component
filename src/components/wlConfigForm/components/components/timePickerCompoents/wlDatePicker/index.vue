@@ -8,7 +8,7 @@
   <el-date-picker v-else-if="show" v-model="model[prop]" v-bind="Options" v-on="Event" />
 </template>
 
-<script>
+<script lang="ts">
 import { isType } from '../../../utils';
 import yearDatePicker from '../yearDatePicker/index.vue';
 import {defineComponent} from 'vue'

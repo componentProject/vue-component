@@ -2,7 +2,7 @@
   <el-input-number v-if="show" v-model="model[prop]" v-bind="Options" v-on="Event" />
 </template>
 
-<script>
+<script lang="ts">
 import { isType } from '../../../utils';
 import {defineComponent} from 'vue'
 export default defineComponent({

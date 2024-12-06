@@ -31,7 +31,7 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { computed, inject, ref } from 'vue'
+import { computed } from 'vue'
 import dayjs, { Dayjs } from 'dayjs'
 import allLocales from '../locale'
 

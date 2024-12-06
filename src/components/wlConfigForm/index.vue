@@ -1,7 +1,7 @@
 <script lang="jsx">
 import wlComponent from './components/components.js';
 import wlPopComponent from './components/popComponents.js';
-import { isType, deepClone, getType } from './components/utils';
+import {  deepClone, getType } from './components/utils/index.js';
 import { defineAsyncComponent} from 'vue'
 import {defineComponent} from 'vue'
 export default defineComponent({
@@ -126,7 +126,8 @@ export default defineComponent({
     /**
      * 根据type等获取每一列的组件
      * @param type 类型
-     * @param formItemProps
+     * @param config 配置
+     * @param prop 传递给组件的prop
      * @param model 表单数据
      * @return {{}}
      */

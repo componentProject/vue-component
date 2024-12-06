@@ -9,7 +9,7 @@
   </el-cascader>
 </template>
 
-<script>
+<script lang="ts">
 import { isType } from '../../utils';
 import {defineComponent} from 'vue'
 export default defineComponent({

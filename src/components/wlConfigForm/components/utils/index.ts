@@ -50,10 +50,9 @@ export function deepClone(obj, Attr = null, replaceAttr = null, hash = new WeakM
 
   // 遍历对象的属性
   for (const key in obj) {
-    // eslint-disable-next-line no-prototype-builtins
+
     if (obj.hasOwnProperty(key)) {
       // 否则，递归复制属性值
-      // @ts-ignore
       clone[key] = deepClone(obj[key], Attr, replaceAttr, hash);
     }
   }

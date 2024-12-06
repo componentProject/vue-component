@@ -1,5 +1,4 @@
 import WlConfigForm from '../index.vue'
-import { ref } from 'vue'
 
 export default {
   title: '配置化表单',

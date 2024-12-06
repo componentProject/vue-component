@@ -2,7 +2,7 @@
   <el-tag v-if="show" v-bind="Options" v-on="Event" />
 </template>
 
-<script>
+<script lang="ts">
 import { isType } from '../../../utils';
 
 import {defineComponent} from 'vue'

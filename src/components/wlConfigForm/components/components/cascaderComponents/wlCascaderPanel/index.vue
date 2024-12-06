@@ -7,7 +7,7 @@
   </el-cascader-panel>
 </template>
 
-<script>
+<script lang="ts">
 import { isType } from '../../../utils';
 
 import {defineComponent} from 'vue'
@@ -58,7 +58,7 @@ export default defineComponent({
       deep: true
     }
   }
-};
+})
 </script>
 
 <style scoped lang="scss"></style>

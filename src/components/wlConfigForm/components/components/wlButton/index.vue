@@ -8,7 +8,7 @@
   </component>
 </template>
 
-<script>
+<script lang="ts">
 import { isType } from '../../utils';
 import components from './components.js';
 

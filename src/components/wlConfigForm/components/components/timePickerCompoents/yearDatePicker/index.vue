@@ -91,7 +91,7 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 const SELECT_STATE = {
   unselect: 0,
   selecting: 1,
@@ -170,7 +170,7 @@ export default defineComponent({
     },
     changeYear() {
       if (this.startYear > this.endYear) {
-        let tmp = this.endYear;
+        const tmp = this.endYear;
         this.endYear = this.startYear;
         this.startYear = tmp;
       }
@@ -193,7 +193,7 @@ export default defineComponent({
         return;
       }
       if (this.curState === SELECT_STATE.selecting) {
-        let tmpStart = this.curSelectedYear;
+        const tmpStart = this.curSelectedYear;
         this.endYear = Math.max(tmpStart, iYear);
         this.startYear = Math.min(tmpStart, iYear);
       }

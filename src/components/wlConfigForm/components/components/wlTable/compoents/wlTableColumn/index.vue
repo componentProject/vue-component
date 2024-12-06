@@ -1,4 +1,4 @@
-<script lang="jsx">
+<script lang="tsx">
 import {defineComponent} from 'vue'
 export default defineComponent({
   name: 'wlTableColumn',
@@ -15,8 +15,9 @@ export default defineComponent({
     const { render, slots, ...attrs } = column;
     const scopedSlots = {};
     if (render) {
-      scopedSlots.default = scope => render.bind(this)(scope, h);
+      scopedSlots.default = scope => render.bind(this)(scope);
     }
+
     return [<el-table-column v-slots={slots} {...attrs} />];
   }
 });

@@ -1,4 +1,4 @@
-import type { App, PropType, Plugin, Ref, VNode, SlotsType, CSSProperties } from 'vue'
+import type {  VNode, CSSProperties } from 'vue'
 import type { VueTypesInterface, VueTypeValidableDef } from 'vue-types'
 
 declare type VNodeChildAtom = VNode | string | number | boolean | null | undefined | void;
