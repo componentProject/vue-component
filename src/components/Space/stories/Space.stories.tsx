@@ -10,7 +10,8 @@ const meta = {
     size: 'small',
     direction: 'horizontal',
     align: 'start',
-    wrap: false
+    wrap: false,
+    height: '200px',
   },
   parameters: {
     docs: {
@@ -21,6 +22,14 @@ const meta = {
     direction: {
       control: 'radio',
       options: ['horizontal', 'vertical']
+    },
+    align: {
+      control: 'radio',
+      options: ['start', 'end', 'center', 'baseline']
+    },
+    size: {
+      control: 'radio',
+      options: ['small', 'middle', 'large']
     }
   },
   tags: ['autodocs']

@@ -44,7 +44,7 @@ function getNumberSize(size: SizeType) {
 
 
 const styles = computed(() => {
-  const { size, wrap } = props
+  const { size, wrap, height, width } = props
   const [horizontalSize, verticalSize] = ((Array.isArray(size) ? size : [size, size]) as [SizeType, SizeType]).map(item =>
     getNumberSize(item)
   )
@@ -53,10 +53,13 @@ const styles = computed(() => {
   otherStyles.rowGap = verticalSize + 'px'
 
 
+  function getHeightOrWidth(str:string|undefined) {
+    return Number.isNaN(+str) ? str : str + 'px'
+  }
   if (wrap) {
     otherStyles.flexWrap = 'wrap'
   }
-  return { ...otherStyles, ...props.style }
+  return { height: getHeightOrWidth(height), width: getHeightOrWidth(width), ...otherStyles, ...props.style }
 
 })
 
