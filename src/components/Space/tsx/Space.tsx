@@ -29,12 +29,6 @@ export default defineComponent({
     //   align: 'start',
     //   wrap: false
     // })
-    // const props = useDefaultPorps<SpaceProps>({
-    //   size: 'small',
-    //   direction: 'horizontal',
-    //   align: 'start',
-    //   wrap: false
-    // })
     const classes = computed(() => {
       const { align, direction, className } = props
       const mergedAlign = direction === 'horizontal' && align === undefined ? 'center' : align

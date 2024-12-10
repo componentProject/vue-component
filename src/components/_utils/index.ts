@@ -1,10 +1,6 @@
-import { withDefaults, defineProps, Fragment } from 'vue'
+import { Fragment } from 'vue'
 import { createTypes } from 'vue-types'
 import type { propTypes } from '../_types/utils'
-export function useDefaultPorps<T>(defaultProps) {
-  return withDefaults(defineProps<T>(), defaultProps)
-}
-
 
 export const PropTypes = createTypes({
   func: undefined,

@@ -1,7 +1,7 @@
 <script lang="jsx">
 import wlComponent from './components/components.js';
 import wlPopComponent from './components/popComponents.js';
-import {  deepClone, getType } from './components/utils/index.js';
+import {  deepClone, getType } from './components/utils/index.ts';
 import { defineAsyncComponent} from 'vue'
 import {defineComponent} from 'vue'
 export default defineComponent({
