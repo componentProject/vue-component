@@ -1,4 +1,4 @@
-import CopyToClipboard from '../CopyToClipboard.vue'
+import CopyToClipboard from '../index.vue'
 
 /**
  * 点击时复制传入的text到剪切板,
