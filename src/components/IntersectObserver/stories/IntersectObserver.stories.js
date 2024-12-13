@@ -1,5 +1,5 @@
 import IntersectObserver from '../index.vue'
-import './index.css'
+import './index.scss'
 import { ref } from 'vue'
 
 export default {
@@ -77,7 +77,7 @@ export const intersectObserver = () => ({
                 <span class="radio">·</span>
                 <span class="content">个人信息</span>
               </span>
-              <el-row class="mt16">
+              <el-row class="mt-4">
                 <!-- 姓名-->
                 <el-col :xs="24" :sm="24" :md="24" :lg="8" :xl="6">
                   <el-form-item prop="name" label="姓名">
@@ -252,7 +252,7 @@ export const intersectObserver = () => ({
                 <span class="radio">·</span>
                 <span class="content">工作信息</span>
               </span>
-              <el-row class="mt16">
+              <el-row class="mt-4">
                 <!--  选择职业类型-->
                 <el-col :xs="24" :sm="24" :md="24" :lg="8" :xl="6">
                   <el-form-item prop="occupationType" label="职业类型">
@@ -296,7 +296,7 @@ export const intersectObserver = () => ({
                 <span class="radio">·</span>
                 <span class="content">联系人信息</span>
               </span>
-              <el-row class="mt16">
+              <el-row class="mt-4">
                 <!-- 联系人 -->
                 <el-col :xs="24" :sm="24" :md="24" :lg="8" :xl="6">
                   <el-form-item prop="contactPerson" label="联系人">
@@ -350,7 +350,7 @@ export const intersectObserver = () => ({
                 <span class="radio">·</span>
                 <span class="content">建档信息</span>
               </span>
-              <el-row class="mt16">
+              <el-row class="mt-4">
                 <!--  建档时间-->
                 <el-col :xs="24" :sm="24" :md="24" :lg="8" :xl="6">
                   <el-form-item prop="createTime" label="建档时间">
@@ -402,7 +402,7 @@ export const intersectObserver = () => ({
                 <el-button>刷新</el-button>
               </div>
             </div>
-            <el-row class="mt16">
+            <el-row class="mt-4">
               <!-- 住院号-->
               <el-col :xs="24" :sm="24" :md="24" :lg="8" :xl="6">
                 <el-form-item prop="inHospitalNo" label="住院号">

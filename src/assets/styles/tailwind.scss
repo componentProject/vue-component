@@ -4,3 +4,27 @@
 @tailwind components;
 /*实用程序样式*/
 @tailwind utilities;
+
+@layer base {
+  //  .your-custom-class {
+  //    @apply ...;
+  //  }
+}
+
+@layer components {
+  //  .your-custom-class {
+  //    @apply ...;
+  //  }
+  .flex-between {
+    @apply flex justify-between;
+  }
+  .align-center{
+    @apply flex items-center;
+  }
+}
+
+@layer utilities {
+  //  .your-custom-class {
+  //    @apply ...;
+  //  }
+}

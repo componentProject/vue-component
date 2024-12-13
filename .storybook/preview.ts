@@ -17,7 +17,7 @@ const preview: Preview = {
     (Story) => ({
       components: { Story },
       template: `
-        <div class="flex-col" style="max-height: 100%;overflow: hidden">
+        <div class="flex flex-col" style="max-height: 100%;overflow: hidden">
           <story />
         </div>
       `
