@@ -1,6 +1,7 @@
 @import './base.css';
-@import './custom.scss';
-
+/*@import "custom.scss";*/
+@import './tailwind.scss';
+@import "./element/index.scss";
 #app {
   margin: 0;
   padding: 0;

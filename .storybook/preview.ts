@@ -1,7 +1,4 @@
-import '@/assets/styles/element/index.scss'
 import '@/assets/styles/main.css'
-import '@/assets/styles/custom.scss'
-
 
 import elementPlus from 'element-plus'
 import { setup } from '@storybook/vue3'

@@ -1,6 +1,5 @@
-import '@/assets/styles/element/index.scss'
 import '@/assets/styles/main.css'
-import '@/assets/styles/custom.scss'
+
 import { createApp } from 'vue'
 import stores from '@/stores'
 
