@@ -6,6 +6,10 @@ export default {
   argTypes: {
     modelValue: {
       control: 'date'
+    },
+    locale: {
+      control: 'radio',
+      options: ['zh-CN', 'en-US']
     }
   },
   args: {
@@ -20,6 +24,9 @@ const Template = (args) => ({
 })
 
 export const 日历 = Template.bind({})
+日历.args = {
+  locale: 'en-US'
+}
 
 export const jsx版日历 = (props)=>{
   return <Calendar type="month" {...props}></Calendar>

@@ -5,9 +5,10 @@
 </template>
 
 <script lang="ts" setup>
-import type { CSSProperties } from 'vue'
+import { type CSSProperties, inject } from 'vue'
 import { computed } from 'vue'
 import type { SizeType, SpaceProps } from './types/Space'
+import type { ConfigProviderPropsType } from '@/components/ConfigProvider/types/index.ts'
 import classNames from 'classnames'
 
 
@@ -20,7 +21,7 @@ const props = withDefaults(defineProps<SpaceProps>(), {
 
 const classes = computed(() => {
   const { align, direction, className } = props
-  const mergedAlign = direction === 'horizontal' && align === undefined ? 'center' : align
+  const mergedAlign = direction === 'horizontal' && align == undefined ? 'center' : align
 
   return classNames('space',
     `space-${direction}`,
@@ -32,20 +33,25 @@ const classes = computed(() => {
 })
 
 
-const spaceSize = {
+const spaceSizeMap = {
   small: 8,
   middle: 16,
   large: 24
 }
 
 function getNumberSize(size: SizeType) {
-  return +size ? size : spaceSize[size] || 0
+  if (typeof size === 'string') {
+    return spaceSizeMap[size]
+  } else {
+    return size || 0
+  }
 }
 
-
+const configProvider: ConfigProviderPropsType = inject('configProvider', {})
 const styles = computed(() => {
   const { size, wrap, height, width } = props
-  const [horizontalSize, verticalSize] = ((Array.isArray(size) ? size : [size, size]) as [SizeType, SizeType]).map(item =>
+  const spaceSize = configProvider.space || size
+  const [horizontalSize, verticalSize] = ((Array.isArray(spaceSize) ? spaceSize : [spaceSize, spaceSize]) as [SizeType, SizeType]).map(item =>
     getNumberSize(item)
   )
   const otherStyles: CSSProperties = {}
@@ -53,9 +59,11 @@ const styles = computed(() => {
   otherStyles.rowGap = verticalSize + 'px'
 
 
-  function getHeightOrWidth(str:string|undefined) {
+  function getHeightOrWidth(str: string | undefined) {
+    if(!str) return;
     return Number.isNaN(+str) ? str : str + 'px'
   }
+
   if (wrap) {
     otherStyles.flexWrap = 'wrap'
   }

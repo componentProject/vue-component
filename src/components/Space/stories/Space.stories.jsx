@@ -29,7 +29,7 @@ const meta = {
     },
     size: {
       control: 'radio',
-      options: ['small', 'middle', 'large']
+      options: ['small', 'middle', 'large', 32]
     }
   },
   tags: ['autodocs']

@@ -31,7 +31,7 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { computed } from 'vue'
+import { computed, watch } from 'vue'
 import dayjs, { Dayjs } from 'dayjs'
 import allLocales from '../locale'
 
@@ -50,8 +50,7 @@ const props = defineProps({
     default: () => ({ locale: 'zh-CN' })
   }
 })
-const CalendarLocale = allLocales[props.localeContext.locale as string]
-
+const CalendarLocale = computed(() => allLocales[props.localeContext.locale])
 function getAllDays(date: Dayjs) {
   const startDate = date.startOf('month')
   const day = startDate.day()
@@ -85,7 +84,6 @@ function getAllDays(date: Dayjs) {
   }
   return rows
 }
-
 
 const allDays = computed(() => getAllDays(props.modelValue))
 

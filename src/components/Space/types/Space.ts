@@ -1,6 +1,6 @@
 import '../tsx/Space.scss'
 
-import { CSSProperties } from 'vue'
+import type { CSSProperties } from 'vue'
 
 export type SizeType = 'small' | 'middle' | 'large' | number | undefined;
 

@@ -1,5 +1,6 @@
 <template>
   <div class="calendar" :class="props.className">
+    {{localeContext.locale}}
     <CalendarHeader :localeContext="localeContext" v-model="curDate" @change="monthChange" />
     <CalendarMonth :localeContext="localeContext" v-model="curDate" @change="dateChange">
       <template #date="{ date }">
@@ -17,35 +18,23 @@
 import CalendarHeader from './components/CalendarHeader.vue'
 import CalendarMonth from './components/CalendarMonth.vue'
 import dayjs, { Dayjs } from 'dayjs'
-import { inject, ref, watch } from 'vue'
+import { computed, inject, ref, watch } from 'vue'
+import type {propsType} from './types'
+import type { ConfigProviderPropsType} from '@/components/ConfigProvider/types/index.ts'
 
-interface propsType {
-  /**
-   * 默认展示的日期
-   * */
-  modelValue?: number | Date | Dayjs,
-  style?: object,
-  className?: string | string[],
-  /**
-   * 国际化相关
-   * */
-  locale?: 'zh-CN' | 'en-US',
-
-
-}
 const props = withDefaults(defineProps<propsType>(), {
   modelValue: Date.now(),
-  locale: 'zh-CN',
+  locale: 'zh-CN'
 })
-
-const localeContext = inject('calendarLocale', {
-  locale: 'zh-CN',
-  formatMonth: 'YYYY年MM月',
-  today: '今天'
+const configProvider: ConfigProviderPropsType = inject('configProvider',{})
+const localeContext = computed(()=>{
+  console.log('configProvider', configProvider.locale)
+  return {
+    ...props,
+    locale: configProvider.locale||props.locale
+  }
 })
-
-
-const curDate = ref<Dayjs>(null)
+const curDate = ref<Dayjs>()
 
 watch(() => {
   return props.modelValue

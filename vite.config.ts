@@ -10,19 +10,21 @@ import tailwindcss from 'tailwindcss'
 
 // https://vite.dev/config/
 export default defineConfig({
+
   plugins: [
     vue(),
     vueJsx(),
-    vueDevTools(),
+    vueDevTools()
   ],
-  css:{
-    postcss:{
+  css: {
+    postcss: {
       plugins: [tailwindcss, autoprefixer()]
     }
   },
   resolve: {
+    extensions: ['.js','jsx', '.ts', '.tsx', '.vue'], // 确保 .vue 在列表中
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))
-    },
-  },
+    }
+  }
 })

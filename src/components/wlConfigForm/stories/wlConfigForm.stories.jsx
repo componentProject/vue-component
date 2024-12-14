@@ -1,5 +1,8 @@
 import WlConfigForm from '../index.vue'
 
+/**
+ * 配置化表单,目前只支持el-row布局,未来准备支持flex,grid布局,分别用 layout flex grid区分
+ */
 export default {
   title: '配置化表单',
   component: WlConfigForm,
@@ -46,7 +49,10 @@ export const 基础用法 = Template.bind({})
           type: 'input',
           prop: 'input',
           label: '输入框',
-          config: {}
+          config: {},
+          colConfig: {
+            span: 8
+          }
         },
         {
           type: 'switch',
@@ -55,6 +61,12 @@ export const 基础用法 = Template.bind({})
           config: {
             'active-value': 1,
             'inactive-value': 0
+          },
+          colConfig: {
+            span:8,
+            style:{
+              width:'40px'
+            }
           }
         },
         {
@@ -75,6 +87,9 @@ export const 基础用法 = Template.bind({})
               placement: 'top'
             },
             placeholder: '请输入排序'
+          },
+          colConfig: {
+            span: 8
           }
         },
         {
