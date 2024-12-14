@@ -8,7 +8,6 @@ import CopyToClipboard from '../index.vue'
 const meta = {
   title: 'CopyToClipboard',
   component: CopyToClipboard,
-  tags: ['autodocs'],
   args: {
   },
   parameters: {

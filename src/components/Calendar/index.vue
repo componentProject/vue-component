@@ -1,6 +1,5 @@
 <template>
   <div class="calendar" :class="props.className">
-    {{localeContext.locale}}
     <CalendarHeader :localeContext="localeContext" v-model="curDate" @change="monthChange" />
     <CalendarMonth :localeContext="localeContext" v-model="curDate" @change="dateChange">
       <template #date="{ date }">

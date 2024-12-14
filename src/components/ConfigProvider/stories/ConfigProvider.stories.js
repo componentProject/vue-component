@@ -1,5 +1,5 @@
 import ConfigProvider from '@/components/ConfigProvider/index.vue'
-import './ConfigProvider.css'
+import './Space.css'
 import Calendar from '@/components/Calendar/index.vue'
 import Space from '@/components/Space/index.vue'
 
@@ -7,16 +7,17 @@ export default {
   title: 'ConfigProvider',
   component:ConfigProvider,
   args:{},
-  argTypes: {
-    locale: {
-      control: 'radio',
-      options: ['zh-CN', 'en-US']
-    },
-    space:{
-      control: 'radio',
-      options: ['small', 'middle', 'large',32]
-    }
-  },
+  tags: ['!autodocs'],
+  // argTypes: {
+  //   locale: {
+  //     control: 'radio',
+  //     options: ['zh-CN', 'en-US']
+  //   },
+  //   space:{
+  //     control: 'radio',
+  //     options: ['small', 'middle', 'large',32]
+  //   }
+  // },
 }
 
 export const calendar = (args) => ({
@@ -30,6 +31,12 @@ export const calendar = (args) => ({
     return { args }
   }
 })
+calendar.argTypes = {
+  locale: {
+    control: 'radio',
+    options: ['zh-CN', 'en-US']
+  }
+}
 
 export const space = (args) => ({
   template: `
@@ -46,4 +53,10 @@ export const space = (args) => ({
     return { args }
   }
 })
+space.argTypes = {
+  space: {
+    control: 'radio',
+    options: ['small', 'middle', 'large',32]
+  }
+}
 
