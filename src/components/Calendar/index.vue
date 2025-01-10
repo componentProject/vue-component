@@ -18,30 +18,38 @@ import CalendarHeader from './components/CalendarHeader.vue'
 import CalendarMonth from './components/CalendarMonth.vue'
 import dayjs, { Dayjs } from 'dayjs'
 import { computed, inject, ref, watch } from 'vue'
-import type {propsType} from './types'
-import type { ConfigProviderPropsType} from '@/components/ConfigProvider/types/index.ts'
+import type { propsType } from './types'
+import type { ConfigProviderPropsType } from '@/components/ConfigProvider/types/index.ts'
+
+defineOptions({
+  name: 'Calendar',
+})
 
 const props = withDefaults(defineProps<propsType>(), {
   modelValue: Date.now(),
-  locale: 'zh-CN'
+  locale: 'zh-CN',
 })
-const configProvider: ConfigProviderPropsType = inject('configProvider',{})
-const localeContext = computed(()=>{
+const configProvider: ConfigProviderPropsType = inject('configProvider', {})
+const localeContext = computed(() => {
   console.log('configProvider', configProvider.locale)
   return {
     ...props,
-    locale: configProvider.locale||props.locale
+    locale: configProvider.locale || props.locale,
   }
 })
 const curDate = ref<Dayjs>()
 
-watch(() => {
-  return props.modelValue
-}, (val) => {
-  curDate.value = dayjs(val)
-}, {
-  immediate: true
-})
+watch(
+  () => {
+    return props.modelValue
+  },
+  (val) => {
+    curDate.value = dayjs(val)
+  },
+  {
+    immediate: true,
+  },
+)
 
 const emits = defineEmits(['update:modelValue'])
 const dateChange = (date: Dayjs) => {

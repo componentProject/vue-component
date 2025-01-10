@@ -2420,10 +2420,6 @@ packages:
     resolution: {integrity: sha512-+oDTluR6WEjdXEJMnC2z6A4FRwFoYuvShVVEGsS7ewc0UTi2QtAKMDJuL4BDEVt+5T7MjFo12RP8ghOM75oKJw==}
     engines: {node: '>=8'}
 
-  is-typed-array@1.1.13:
-    resolution: {integrity: sha512-uZ25/bUAlUY5fR4OKT4rZQEBrzQWYV9ZJYGGsUmEJ6thodVJ1HX64ePQ6Z0qPWP+m+Uq6e9UugrE38jeYsDSMw==}
-    engines: {node: '>= 0.4'}
-
   is-typed-array@1.1.15:
     resolution: {integrity: sha512-p3EcsicXjit7SaskXHs1hA91QxgTw46Fv6EFKKGS5DRFLD8yKnohjF3hxoju94b/OcMZoQukzpPpBE9uLVKzgQ==}
     engines: {node: '>= 0.4'}
@@ -3982,10 +3978,6 @@ packages:
 
   which-collection@1.0.2:
     resolution: {integrity: sha512-K4jVyjnBdgvc86Y6BkaLZEN933SwYOuBFkdmBu9ZfkcAbdVbpITnDmjvZ/aQjRXQrv5EPkTnD1s39GiiqbngCw==}
-    engines: {node: '>= 0.4'}
-
-  which-typed-array@1.1.16:
-    resolution: {integrity: sha512-g+N+GAWiRj66DngFwHvISJd+ITsyphZvD1vChfVg6cEdnzy53GzB3oy0fUNlvhz7H7+MiqhYr26qxQShCpKTTQ==}
     engines: {node: '>= 0.4'}
 
   which-typed-array@1.1.18:
@@ -5909,7 +5901,7 @@ snapshots:
 
   esbuild-register@3.6.0(esbuild@0.24.0):
     dependencies:
-      debug: 4.3.7
+      debug: 4.4.0
       esbuild: 0.24.0
     transitivePeerDependencies:
       - supports-color
@@ -6595,10 +6587,6 @@ snapshots:
   is-text-path@2.0.0:
     dependencies:
       text-extensions: 2.4.0
-
-  is-typed-array@1.1.13:
-    dependencies:
-      which-typed-array: 1.1.16
 
   is-typed-array@1.1.15:
     dependencies:
@@ -8007,8 +7995,8 @@ snapshots:
       inherits: 2.0.4
       is-arguments: 1.1.1
       is-generator-function: 1.0.10
-      is-typed-array: 1.1.13
-      which-typed-array: 1.1.16
+      is-typed-array: 1.1.15
+      which-typed-array: 1.1.18
 
   uuid@9.0.1: {}
 
@@ -8199,14 +8187,6 @@ snapshots:
       is-set: 2.0.3
       is-weakmap: 2.0.2
       is-weakset: 2.0.4
-
-  which-typed-array@1.1.16:
-    dependencies:
-      available-typed-arrays: 1.0.7
-      call-bind: 1.0.8
-      for-each: 0.3.3
-      gopd: 1.2.0
-      has-tostringtag: 1.0.2
 
   which-typed-array@1.1.18:
     dependencies:

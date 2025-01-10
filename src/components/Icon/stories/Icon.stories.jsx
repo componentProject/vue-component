@@ -12,52 +12,40 @@ export default {
     size: '1em',
     color: '',
     scriptUrl: '',
-    type: ''
+    type: '',
   },
   argTypes: {
     style: {
-      control: 'object'
+      control: 'object',
     },
     spin: {
-      control: 'boolean'
+      control: 'boolean',
     },
     size: {
-      control: 'text'
+      control: 'text',
     },
     color: {
-      control: 'color'
+      control: 'color',
     },
     scriptUrl: {
-      control: 'text'
+      control: 'text',
     },
     type: {
-      control: 'text'
-    }
-  }
-}
-
-const Template = (args) => ({
-  components: { Icon },
-  setup () {
-    return { args }
+      control: 'text',
+    },
   },
-  template: `
-    <Icon v-bind="args"></Icon>
-  `
-})
-
-
-export const icon = Template.bind({})
-icon.args = {
-  icon: checkIcon
 }
 
-export const 使用url注册icon = Template.bind({})
+export const icon = {}
+icon.args = {
+  icon: checkIcon,
+}
+
+export const 使用url注册icon = {}
 使用url注册icon.args = {
   scriptUrl: '//at.alicdn.com/t/c/font_3590692_mp9kgduugne.js',
-  type: 'icon-zhangshangcaifuyemianshoujiban345'
+  type: 'icon-zhangshangcaifuyemianshoujiban345',
 }
-
 
 export const 直接传递svg作为插槽 = () => ({
   template: `
@@ -68,9 +56,15 @@ export const 直接传递svg作为插槽 = () => ({
     </Icon>
   `,
   components: { Icon },
-  setup () {
+  setup() {
     return {}
-  }
+  },
 })
-
-
+// export const 直接传递svg作为插槽 = {
+//   args: {
+//     // default: () => (<svg viewBox="0 0 24 24" aria-hidden="true" fill="currentColor">
+//     //   <use xlink:href="#icon-zhangshangcaifuyemianshoujiban345" />
+//     // </svg>)
+//     default: () => (checkIcon)
+//   }
+// }
