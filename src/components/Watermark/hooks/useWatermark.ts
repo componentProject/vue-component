@@ -161,7 +161,6 @@ const getCanvasData = async (
     ctx.fillStyle = color!
     ctx.font = `${fontWeight} ${realFontSize}px ${fontFamily}`
     ctx.textBaseline = 'top'
-
     ;[...content].forEach((item, index) => {
       const { height: lineHeight, width: lineWidth } = measureSize.lineSize[index]
 
@@ -205,7 +204,11 @@ const getCanvasData = async (
 
   return image ? drawImage() : drawText()
 }
-
+/**
+ * 创建水印
+ * 1. 可以选择传入挂载水印的容器元素，默认是 body
+ * 2. 做了水印防御，能有效防御别人打开控制台删除或隐藏水印
+ */
 export default function useWatermark(params: WatermarkOptions = {}) {
   const options = ref<WatermarkOptions>(params || {})
 
