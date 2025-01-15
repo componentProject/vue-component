@@ -1,4 +1,4 @@
-import DragTable from '../index.vue'
+import DragTable from '@/components/DragTable'
 
 /**
  *

@@ -8,5 +8,11 @@ export default {
   rules: {
     // 在这里可以自定义的规则，覆盖默认的规则
     'selector-class-pattern': null,
+    'selector-pseudo-class-no-unknown': [
+      true,
+      {
+        ignorePseudoClasses: ['deep'],
+      },
+    ],
   },
 }

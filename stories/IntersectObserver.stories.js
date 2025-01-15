@@ -1,5 +1,5 @@
-import IntersectObserver from '../index.vue'
-import './index.scss'
+import IntersectObserver from '@/components/IntersectObserver'
+import './assets/styles/IntersectObserver.scss'
 import { ref } from 'vue'
 
 export default {
@@ -10,21 +10,21 @@ export default {
   argTypes: {
     isIntersecting: {
       control: 'boolean',
-      default: true
+      default: true,
     },
     rootMargin: {
-      control: 'array'
+      control: 'array',
     },
     threshold: {
-      control: 'number'
+      control: 'number',
     },
     observers: {
-      control: 'array'
+      control: 'array',
     },
     observerIds: {
-      control: 'array'
+      control: 'array',
     },
-  }
+  },
 }
 
 export const intersectObserver = () => ({
@@ -809,17 +809,17 @@ export const intersectObserver = () => ({
   components: {
     IntersectObserver,
   },
-  setup () {
+  setup() {
     //#region data
     const labelWidth = ref('120px')
     const disabledObj = ref({
-                              baseInfo: true,
-                              hospitalInfo: true,
-                              inAreaHealth: true,
-                              allergy: true,
-                              price: true,
-                              isolationMark: true
-                            })
+      baseInfo: true,
+      hospitalInfo: true,
+      inAreaHealth: true,
+      allergy: true,
+      price: true,
+      isolationMark: true,
+    })
     // 基本信息
     const patientBaseInfo = ref({})
     const idTypeOptions = ref([{ label: '身份证', value: '1' }])
@@ -835,48 +835,48 @@ export const intersectObserver = () => ({
     const inAreaHealthInfo = ref({})
     // 过敏信息
     const allergyColumns = ref([
-                                 { label: '过敏类型', prop: 'allergyType' },
-                                 { label: '过敏原名称', prop: 'allergyOrigin' },
-                                 { label: '过敏物/过敏药品', prop: 'allergyDrug' },
-                                 { label: '过敏症状', prop: 'allergySymptom' },
-                                 { label: '严重程度', prop: 'allergyDegree' },
-                                 { label: '首次发现时间', prop: 'allergyTime', type: 'date' },
-                                 { label: '首次发现机构', prop: 'firstDiscoverUnit' },
-                                 { label: '记录时间', prop: 'recordTime', type: 'date' },
-                                 { label: '记录人', prop: 'recordName' }
-                               ])
+      { label: '过敏类型', prop: 'allergyType' },
+      { label: '过敏原名称', prop: 'allergyOrigin' },
+      { label: '过敏物/过敏药品', prop: 'allergyDrug' },
+      { label: '过敏症状', prop: 'allergySymptom' },
+      { label: '严重程度', prop: 'allergyDegree' },
+      { label: '首次发现时间', prop: 'allergyTime', type: 'date' },
+      { label: '首次发现机构', prop: 'firstDiscoverUnit' },
+      { label: '记录时间', prop: 'recordTime', type: 'date' },
+      { label: '记录人', prop: 'recordName' },
+    ])
     const allergyList = ref([
-                              {
-                                allergyType: '过敏类型',
-                                allergyOrigin: '过敏原名称',
-                                allergyDrug: '过敏物/过敏药品',
-                                allergySymptom: '过敏症状',
-                                allergyDegree: '严重程度',
-                                allergyTime: '首次发现时间',
-                                firstDiscoverUnit: '首次发现机构',
-                                recordTime: '记录时间',
-                                recordName: '记录人'
-                              }
-                            ])
+      {
+        allergyType: '过敏类型',
+        allergyOrigin: '过敏原名称',
+        allergyDrug: '过敏物/过敏药品',
+        allergySymptom: '过敏症状',
+        allergyDegree: '严重程度',
+        allergyTime: '首次发现时间',
+        firstDiscoverUnit: '首次发现机构',
+        recordTime: '记录时间',
+        recordName: '记录人',
+      },
+    ])
     // 费用信息
     const patientPriceInfo = ref({})
     // 隔离标识
     const markList = ref([
-                           { label: '飞沫隔离', value: '1' },
-                           { label: '接触隔离', value: '2' },
-                           { label: '空气隔离', value: '3' }
-                         ])
+      { label: '飞沫隔离', value: '1' },
+      { label: '接触隔离', value: '2' },
+      { label: '空气隔离', value: '3' },
+    ])
     const isolationMark = ref([])
 
     // list
     const list = ref([
-                       { name: '基本信息', id: 'baseInfo', target: null },
-                       { name: '住院信息', id: 'hospitalInfo', target: null },
-                       { name: '入区健康信息', id: 'inAreaHealth', target: null },
-                       { name: '过敏信息', id: 'allergy', target: null },
-                       { name: '费用信息', id: 'price', target: null },
-                       { name: '隔离标识', id: 'isolationMark', target: null }
-                     ])
+      { name: '基本信息', id: 'baseInfo', target: null },
+      { name: '住院信息', id: 'hospitalInfo', target: null },
+      { name: '入区健康信息', id: 'inAreaHealth', target: null },
+      { name: '过敏信息', id: 'allergy', target: null },
+      { name: '费用信息', id: 'price', target: null },
+      { name: '隔离标识', id: 'isolationMark', target: null },
+    ])
     let timer = null
     let rootElement = null
     let observer, resizeObserver
@@ -891,9 +891,9 @@ export const intersectObserver = () => ({
         hasScroll.value = false
       }, 1000)
       element.scrollIntoView({
-                               block: 'start',
-                               behavior: 'smooth'
-                             })
+        block: 'start',
+        behavior: 'smooth',
+      })
     }
     //#endregion
 
@@ -905,7 +905,7 @@ export const intersectObserver = () => ({
       disabledObj.value[saveKey] = true
     }
     const getTargets = (targets) => {
-      list.value.forEach(item => {
+      list.value.forEach((item) => {
         item.target = targets[item.id]
       })
     }
@@ -942,7 +942,7 @@ export const intersectObserver = () => ({
       getTargets,
       mutate,
       editHandler,
-      saveHandler
+      saveHandler,
     }
-  }
+  },
 })

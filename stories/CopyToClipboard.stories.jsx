@@ -1,4 +1,4 @@
-import CopyToClipboard from '../index.vue'
+import CopyToClipboard from '@/components/CopyToClipboard'
 
 /**
  * 点击时复制传入的text到剪切板,
@@ -8,15 +8,13 @@ import CopyToClipboard from '../index.vue'
 const meta = {
   title: 'CopyToClipboard',
   component: CopyToClipboard,
-  args: {
-  },
+  args: {},
   parameters: {
     docs: {
-      description: {}
-    }
+      description: {},
+    },
   },
-  argTypes: {
-  },
+  argTypes: {},
 }
 export default meta
 
@@ -28,13 +26,10 @@ const Template = (args) => ({
   components: { CopyToClipboard },
   setup() {
     return { args }
-  }
-
+  },
 })
 
 export const copyToClipboard = Template.bind({})
 copyToClipboard.args = {
   text: 'hello world',
 }
-
-

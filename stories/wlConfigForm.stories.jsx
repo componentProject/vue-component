@@ -1,4 +1,4 @@
-import WlConfigForm from '../index.vue'
+import WlConfigForm from '@/components/wlConfigForm'
 
 /**
  * 配置化表单,目前只支持el-row布局,未来准备支持flex,grid布局,分别用 layout flex grid区分
@@ -10,34 +10,29 @@ export default {
   args: {},
   argTypes: {
     rows: {
-      control: 'array'
+      control: 'array',
     },
     formOptions: {
-      control: 'object'
-    }
-  }
+      control: 'object',
+    },
+  },
 }
 
-const Template = (
-  {
-    rows,
-    formOptions
-  }
-) => ({
+const Template = ({ rows, formOptions }) => ({
   template: `
     <div style="padding-left: 40px" class="flex-1 overflow-auto">
       <wl-config-form :form-options="formOptions" v-model:rows="rows" />
     </div>
   `,
   components: {
-    WlConfigForm
+    WlConfigForm,
   },
-  setup () {
+  setup() {
     return {
       rows,
-      formOptions
+      formOptions,
     }
-  }
+  },
 })
 
 export const 基础用法 = Template.bind({})
@@ -51,8 +46,8 @@ export const 基础用法 = Template.bind({})
           label: '输入框',
           config: {},
           colConfig: {
-            span: 8
-          }
+            span: 8,
+          },
         },
         {
           type: 'switch',
@@ -60,14 +55,14 @@ export const 基础用法 = Template.bind({})
           label: 'switch',
           config: {
             'active-value': 1,
-            'inactive-value': 0
+            'inactive-value': 0,
           },
           colConfig: {
-            span:8,
-            style:{
-              width:'40px'
-            }
-          }
+            span: 8,
+            style: {
+              width: '40px',
+            },
+          },
         },
         {
           type: 'InputNumber',
@@ -84,13 +79,13 @@ export const 基础用法 = Template.bind({})
             min: 0,
             tooltipConfig: {
               content: '数值越大越靠前',
-              placement: 'top'
+              placement: 'top',
             },
-            placeholder: '请输入排序'
+            placeholder: '请输入排序',
           },
           colConfig: {
-            span: 8
-          }
+            span: 8,
+          },
         },
         {
           type: 'input',
@@ -101,8 +96,8 @@ export const 基础用法 = Template.bind({})
             type: 'textarea',
             title: '描述',
             titleWidth: 80,
-            placeholder: '请输入描述'
-          }
+            placeholder: '请输入描述',
+          },
         },
         {
           type: 'select',
@@ -113,9 +108,9 @@ export const 基础用法 = Template.bind({})
             options: [
               { label: '1', value: '1' },
               { label: '2', value: '2' },
-              { label: '3', value: '3' }
-            ]
-          }
+              { label: '3', value: '3' },
+            ],
+          },
         },
         {
           type: 'table',
@@ -124,13 +119,12 @@ export const 基础用法 = Template.bind({})
             columns: [
               { label: '名称', prop: 'name' },
               { label: '年龄', prop: 'age' },
-              { label: '性别', prop: 'sex' }
-            ]
-
-          }
-        }
-      ]
-    }
+              { label: '性别', prop: 'sex' },
+            ],
+          },
+        },
+      ],
+    },
   ],
   formOptions: {
     labelWidth: `80px`,
@@ -141,11 +135,13 @@ export const 基础用法 = Template.bind({})
       InputNumber: 0,
       textarea: '',
       select: '',
-      table: [{
-        name: '1',
-        age: '12',
-        sex: '男'
-      }]
-    }
-  }
+      table: [
+        {
+          name: '1',
+          age: '12',
+          sex: '男',
+        },
+      ],
+    },
+  },
 }

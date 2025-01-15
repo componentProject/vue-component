@@ -32,5 +32,5 @@ export interface WatermarkProps {
    * x轴和y轴的偏移量
    */
   offset?: [number, number]
-  container: HTMLElement
+  container?: HTMLElement
 }

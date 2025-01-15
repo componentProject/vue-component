@@ -1,5 +1,5 @@
-import Space from '../index.vue'
-import './Space.css'
+import Space from '@/components/Space'
+import './assets/styles/Space.css'
 
 const meta = {
   title: 'Space',
@@ -15,24 +15,24 @@ const meta = {
   },
   parameters: {
     docs: {
-      description: {}
-    }
+      description: {},
+    },
   },
   argTypes: {
     direction: {
       control: 'radio',
-      options: ['horizontal', 'vertical']
+      options: ['horizontal', 'vertical'],
     },
     align: {
       control: 'radio',
-      options: ['start', 'end', 'center', 'baseline']
+      options: ['start', 'end', 'center', 'baseline'],
     },
     size: {
       control: 'radio',
-      options: ['small', 'middle', 'large', 32]
-    }
+      options: ['small', 'middle', 'large', 32],
+    },
   },
-  tags: ['autodocs']
+  tags: ['autodocs'],
 }
 export default meta
 
@@ -46,17 +46,14 @@ const Template = (args) => ({
   components: { Space },
   setup() {
     return { args }
-  }
-
+  },
 })
 
 export const horizontal = Template.bind({})
 horizontal.args = {
-  direction: 'horizontal'
+  direction: 'horizontal',
 }
 export const vertical = Template.bind({})
 vertical.args = {
-  direction: 'vertical'
+  direction: 'vertical',
 }
-
-

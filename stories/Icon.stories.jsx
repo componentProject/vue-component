@@ -1,6 +1,6 @@
 // Icon.stories.js
-import Icon from '../index.vue'
-import checkIcon from '../icons/check.svg'
+import Icon from '@/components/Icon'
+import checkIcon from './assets/icons/check.svg'
 
 export default {
   title: '图标',

@@ -1,4 +1,4 @@
-import Watermark from '../index.vue'
+import Watermark from '@/components/Watermark/index.vue'
 import type { StoryFn } from '@storybook/vue3'
 
 /**

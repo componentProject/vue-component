@@ -1,7 +1,7 @@
-import ConfigProvider from '@/components/ConfigProvider/index.vue'
-import './Space.css'
-import Calendar from '@/components/Calendar/index.vue'
-import Space from '@/components/Space/index.vue'
+import ConfigProvider from '@/components/ConfigProvider'
+import './assets/styles/Space.css'
+import Calendar from '@/components/Calendar'
+import Space from '@/components/Space'
 
 export default {
   title: 'ConfigProvider',
