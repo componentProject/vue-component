@@ -11,6 +11,8 @@ export default {
     'selector-class-pattern': null,
     // 禁用 双斜杠注释不应该有空格 规则
     'scss/double-slash-comment-whitespace-inside': null,
+    // 禁用 空源文件
+    'no-empty-source': null,
     // 使 deep 可用
     'selector-pseudo-class-no-unknown': [
       true,

@@ -11,12 +11,16 @@ import 'vxe-table/lib/style.css'
 import VxeUI from 'vxe-pc-ui'
 import 'vxe-pc-ui/lib/style.css'
 
+import '@/assets/styles/main.css'
+import elementPlus from 'element-plus'
+
 import App from './App.vue'
 
 const app = createApp(App)
 
 app.use(stores)
 app.use(router)
+app.use(elementPlus)
 app.use(VxeUITable)
 app.use(VxeUI)
 

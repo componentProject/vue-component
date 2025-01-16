@@ -9,8 +9,7 @@ interface modulesTypes {
 }
 const modules: modulesTypes[] = []
 const routesChildrens = Object.keys(componentFiles).reduce((modules = [], modulePath) => {
-  // const name = modulePath.split('/').at(-2)
-  const name = modulePath.split('/')[modulePath.length - 2]
+  const name = modulePath.split('/').at(-2)
   const component = componentFiles[modulePath]
   if (!component) return modules
   modules.push({
@@ -25,6 +24,7 @@ const router = createRouter({
   routes: [
     {
       path: '/',
+      component: () => import('../layout/Index.vue'),
       redirect: routesChildrens[0] ? routesChildrens[0].path : '',
       children: routesChildrens,
     },
