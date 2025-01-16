@@ -1,6 +1,6 @@
 @import './base.css';
-@import './tailwind';
-@import "./element/index";
+@import './tailwind.scss';
+@import "./element/index.scss";
 
 #app {
   margin: 0;
