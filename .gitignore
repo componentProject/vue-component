@@ -1,33 +1,27 @@
-# user
-.vitepress/dist
-.vitepress/cache
-# Logs
-logs
+# 日志文件
 *.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
+*-debug.log*
+*-error.log*
 
+# 依赖
 node_modules
-.DS_Store
+*-lock.*
+
+# 打包文件
 dist
 dist-ssr
-coverage
+
+#本地配置
 *.local
 
-/cypress/videos/
-/cypress/screenshots/
-
-# Editor directories and files
+# 编辑器文件
 .vscode/*
 !.vscode/extensions.json
 .idea
+.DS_Store
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
-
 *.tsbuildinfo
