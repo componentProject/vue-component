@@ -5,7 +5,6 @@ export default defineConfig({
   title: 'vueComponent',
   description: '一个vue组件库',
   base: '/vue-component/',
-  lang: 'zh-CN',
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
     // 标题
@@ -58,8 +57,8 @@ export default defineConfig({
       //#region algolia
       provider: 'algolia',
       options: {
-        appId: '9GNRODL24Y',
-        apiKey: '414346dc02446336fcb8d82571a8a991',
+        appId: 'DDD3D6CGWQ',
+        apiKey: '3b7df1c9bcf3d1c31fa74e9707936af5',
         indexName: 'vueComponent',
       },
       //#endregion
