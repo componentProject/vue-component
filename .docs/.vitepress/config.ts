@@ -4,12 +4,14 @@ import { defineConfig } from 'vitepress'
 export default defineConfig({
   title: 'vueComponent',
   description: '一个vue组件库',
+  base: '/vue-component/',
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
     // 标题
     siteTitle: 'vueComponent',
     // logo
     logo: `https://vuejs.org/images/logo.png`,
+    logoLink: 'https://vuejs.org/',
     // 导航栏
     nav: [
       // 单层级
@@ -47,7 +49,7 @@ export default defineConfig({
       },
     ],
 
-    socialLinks: [{ icon: 'github', link: 'https://github.com/vuejs/vitepress' }],
+    socialLinks: [{ icon: 'github', link: 'https://github.com/componentProject/vue-component' }],
     // 搜索配置
     search: {
       // local or algolia
@@ -55,8 +57,8 @@ export default defineConfig({
       //#region algolia
       provider: 'algolia',
       options: {
-        appId: 'U30ELOTLE6',
-        apiKey: 'b6db2a4a0256519acf2e1d3408781856',
+        appId: '9GNRODL24Y',
+        apiKey: '414346dc02446336fcb8d82571a8a991',
         indexName: 'vueComponent',
       },
       //#endregion
