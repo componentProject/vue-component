@@ -1,6 +1,7 @@
 import { defineConfig } from 'vitepress'
 // https://github.com/mingyuLi97/blog
 // https://vitepress.dev/reference/site-config
+
 export default defineConfig({
   title: 'vueComponent',
   description: '一个vue组件库',
