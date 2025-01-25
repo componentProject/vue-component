@@ -1,5 +1,5 @@
-# 构建 VitePress 站点并将其部署到 GitHub Pages 的示例工作流程
-name: 发布vitepress
+# 构建 storybook 站点并将其部署到 GitHub Pages 的示例工作流程
+name: 发布storybook
 
 on:
   # 在针对 `main` 分支的推送上运行。如果你
@@ -53,14 +53,14 @@ jobs:
         uses: actions/configure-pages@v4
       - name: 下载依赖
         # npm ci / pnpm install / yarn install / bun install
-        run: pnpm add -D vitepress
+        run: pnpm install
       - name: 打包vitepress
         # npm run docs:build / pnpm docs:build / yarn docs:build / bun run docs:build
         run: pnpm storybook:build
       - name: 上传打包文件
         uses: actions/upload-pages-artifact@v3
         with:
-          path: .docs/.vitepress/dist
+          path: .storybook/dist
 
   # 部署工作
   deploy:
