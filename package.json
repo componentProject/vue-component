@@ -14,7 +14,7 @@
     "installAll": "installAll.sh",
     "prepare": "husky",
     "storybook:dev": "storybook dev -p 6006",
-    "storybook:build": "storybook build",
+    "storybook:build": "storybook build -o .storybook/dist",
     "docs:dev": "vitepress dev .docs",
     "docs:build": "vitepress build .docs",
     "docs:preview": "vitepress preview .docs"
@@ -28,6 +28,7 @@
     "husky": "^9.1.7",
     "lodash-es": "^4.17.21",
     "pinia": "^2.2.6",
+    "postcss-html": "^1.8.0",
     "radash": "^12.1.0",
     "sass-embedded": "^1.82.0",
     "sortablejs": "^1.15.6",

@@ -4,7 +4,7 @@ import { defineConfig } from 'vitepress'
 export default defineConfig({
   title: 'vueComponent',
   description: '一个vue组件库',
-  base: '/vue-component/',
+  base: '/vue-component/vitepress/',
   lang: 'zh-CN',
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
