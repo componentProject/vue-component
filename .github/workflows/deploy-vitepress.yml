@@ -63,7 +63,7 @@ jobs:
           path: .docs/.vitepress/dist
 
   # 部署工作
-  deploy-vitepress:
+  deploy:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -74,17 +74,6 @@ jobs:
       - name: 发布到GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-
-  deploy-storybook:
-    needs: build
-    runs-on: ubuntu-latest
-    name: 发布
-    steps:
-      - name: 推送到其他仓库
-        run: |
-          git remote add origin1 https://github.com/componentProject/vue-component-storybook.git
-          git push origin1 main
-
 
   # 重新推送数据到algolia
   algolia:
