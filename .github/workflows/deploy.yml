@@ -1,12 +1,12 @@
 
-# 构建 storybook 站点并将其部署到 GitHub Pages 的示例工作流程
-name: 发布storybook
+# 构建 静态 站点并将其部署到 GitHub Pages 的示例工作流程
+name: 发布storybook&vitepress
 
 on:
   # 在针对 `docs` 分支的推送上运行。如果你
   # 使用 `master` 分支作为默认分支，请将其更改为 `master`
   push:
-    branches: [ docs ]
+    branches: [ main ]
 
   # 允许你从 Actions 选项卡手动运行此工作流程
   workflow_dispatch:
@@ -31,7 +31,7 @@ jobs:
       - name: 检出main分支代码
         uses: actions/checkout@v4
         with:
-          ref: docs
+          ref: main
           # 如果未启用 lastUpdated，则不需要
           fetch-depth: 0
       # 如果使用 pnpm，请取消此区域注释
@@ -69,7 +69,9 @@ jobs:
   deploy:
     environment:
       name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+      url: |
+        ${{ steps.deployment.outputs.page_url }}vitepress
+        ${{ steps.deployment.outputs.page_url }}storybook
     needs: build
     runs-on: ubuntu-latest
     name: 发布
