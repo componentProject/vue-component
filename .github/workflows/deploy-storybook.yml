@@ -57,9 +57,6 @@ jobs:
       - name: 打包storybook
         # npm run docs:build / pnpm docs:build / yarn docs:build / bun run docs:build
         run: pnpm storybook:build
-  push:
-    runs-on: ubuntu-latest
-    steps:
       - name: 推送代码
         run: |
           cd /.storybook/dist
