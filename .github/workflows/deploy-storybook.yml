@@ -57,6 +57,14 @@ jobs:
       - name: 打包storybook
         # npm run docs:build / pnpm docs:build / yarn docs:build / bun run docs:build
         run: pnpm storybook:build
-      - name: 推送到另一个仓库
-        run: pnpm storybook:deploy
-
+      - name: 推送代码
+        run: |
+          cd .storybook/dist
+          git init
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .
+          git commit -m "deploy"
+          git remote add origin https://github.com/componentProject/vue-component-storybook.git
+          git push -f origin main
+               
