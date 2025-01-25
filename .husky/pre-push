@@ -3,8 +3,19 @@
 
 # 设置远程仓库的名称和URL
 REMOTE_URL="https://github.com/componentProject/vue-component-vite.git"
+MAIN_BRANCH="main"
 BRANCH_NAME="docs"
 REMOTE_NAME="vitepress"
+# 获取当前分支名称
+CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+
+# 判断当前分支并执行相应操作
+if [ "$CURRENT_BRANCH" = "$BRANCH_NAME" ]; then
+    echo "当前分支是 $BRANCH_NAME，正在切换到 $MAIN_BRANCH 分支并终止脚本..."
+    git checkout $MAIN_BRANCH
+    exit 0
+fi
+
 
 # 检查远程仓库是否存在
 if ! git remote | grep -qx "$REMOTE_NAME"; then
