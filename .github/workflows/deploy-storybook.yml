@@ -54,7 +54,7 @@ jobs:
       - name: 下载依赖
         # npm ci / pnpm install / yarn install / bun install
         run: pnpm install
-      - name: 打包vitepress
+      - name: 打包storybook
         # npm run docs:build / pnpm docs:build / yarn docs:build / bun run docs:build
         run: pnpm storybook:build
       - name: 上传打包文件
@@ -65,7 +65,7 @@ jobs:
   # 部署工作
   deploy:
     environment:
-      name: storybook
+      name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     needs: build
     runs-on: ubuntu-latest
