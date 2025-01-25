@@ -1,6 +1,8 @@
 import { defineConfig } from 'vitepress'
+import { fileURLToPath, URL } from 'node:url'
 // https://github.com/mingyuLi97/blog
 // https://vitepress.dev/reference/site-config
+import { getSidebar } from './utils'
 
 export default defineConfig({
   title: 'vueComponent',
@@ -8,6 +10,13 @@ export default defineConfig({
   base: '/vue-component/vitepress/',
   lang: 'zh-CN',
   outDir: '../docs/vitepress',
+  vite: {
+    resolve: {
+      alias: {
+        '@': fileURLToPath(new URL('../../src', import.meta.url)),
+      },
+    },
+  },
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
     // 标题
@@ -18,39 +27,46 @@ export default defineConfig({
     // 导航栏
     nav: [
       // 单层级
-      { text: 'Home', link: '/' },
+      { text: '首页', link: '/' },
       // 多层级
       {
-        text: 'examples',
-        items: [
-          {
-            text: 'markdown-examples',
-            items: [{ text: 'markdown-examples', link: '/markdown-examples' }],
-          },
-        ],
+        text: '基础组件',
+        items: getSidebar('examples'),
       },
     ],
 
     // 侧边栏,配置基本同导航栏
-    sidebar: [
-      // 单层级
-      {
-        text: 'Home',
-        link: '/',
-        // 是否可折叠
-        collapsed: false,
-      },
-      // 多层级
-      {
-        text: 'examples',
-        items: [
-          {
-            text: 'markdown-examples',
-            items: [{ text: 'markdown-examples', link: '/markdown-examples' }],
-          },
-        ],
-      },
-    ],
+    sidebar: {
+      '/guild/': [
+        {
+          text: '指南',
+          items: getSidebar('guild'),
+        },
+      ],
+      '/examples/': [
+        {
+          text: '基础组件',
+          items: getSidebar('examples'),
+        },
+      ],
+    },
+    // sidebar: [
+    //   {
+    //     text: '指南',
+    //     link: '/guild/',
+    //     items: [
+    //       {
+    //         text: '配置化表单',
+    //         link: '/guild/configForm',
+    //       },
+    //     ],
+    //   },
+    //   {
+    //     text: '基础组件',
+    //     link: '/examples/',
+    //     items: [{}],
+    //   },
+    // ],
 
     socialLinks: [{ icon: 'github', link: 'https://github.com/componentProject/vue-component' }],
     // 搜索配置

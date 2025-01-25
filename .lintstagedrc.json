@@ -1,6 +1,6 @@
 {
   "src/**/*.{js,jsx,ts,tsx,vue,md}": [
-    "eslint --fix",
+    "eslint --fix --ignore-pattern 'src/components/ConfigForm/**/*.{js,jsx,ts,tsx,vue}'",
     "prettier --write"
   ],
   "src/**/*.{css,scss,less,vue}": [

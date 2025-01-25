@@ -1,6 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
 // import { defineComponent } from 'vue'
-
 const componentFiles = import.meta.glob('../components/*/index.vue')
 interface modulesTypes {
   path: string

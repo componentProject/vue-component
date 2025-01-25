@@ -1,13 +1,14 @@
 import '@/assets/styles/main.css'
 import elementPlus from 'element-plus'
 
-import stores from '../src/stores'
+import stores from '@/stores'
 
 import VxeUITable from 'vxe-table'
 import 'vxe-table/lib/style.css'
 
 import VxeUI from 'vxe-pc-ui'
 import 'vxe-pc-ui/lib/style.css'
+
 
 import { setup } from '@storybook/vue3'
 import type { Preview } from '@storybook/vue3'
