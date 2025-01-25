@@ -75,20 +75,3 @@ jobs:
       - name: 发布到GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-
-
-  push-to-target-repo:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout source repository
-        uses: actions/checkout@v4
-
-      - name: Push to target repository
-        uses: ad-m/github-action-push-to-another-repository@v2
-        env:
-          API_TOKEN_GITHUB: ${{ secrets.PAT }}  # 你的 GitHub 个人访问令牌
-          SOURCE_REPOSITORY: ${{ github.repository }}
-          SOURCE_BRANCH: main
-          TARGET_REPOSITORY: https://github.com/componentProject/vue-component-vite.git  # 目标仓库地址
-          TARGET_BRANCH: docs  # 目标分支
-          COMMIT_MESSAGE: "Update from source repository"
