@@ -61,9 +61,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: 推送代码
-        with:
-          path: .storybook/dist
         run: |
+          cd /.storybook/dist
           git init
           git config --global user.name "wanglun"
           git config --global user.email "1983531544@qq.com"
