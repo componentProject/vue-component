@@ -6,6 +6,14 @@ REMOTE_URL="https://github.com/componentProject/vue-component-vite.git"
 BRANCH_NAME="docs"
 REMOTE_NAME="vitepress"
 
+# 检查远程仓库是否存在
+if ! git remote | grep -qx "$REMOTE_NAME"; then
+    # 远程仓库不存在，添加它
+    echo "Remote '$REMOTE_NAME' not found. Adding it now."
+    git remote add "$REMOTE_NAME" "$REMOTE_URL"
+else
+    echo "Remote '$REMOTE_NAME' already exists."
+fi
 
 # 判断分支是否存在
 if git show-ref --verify --quiet refs/heads/$BRANCH_NAME; then
@@ -14,14 +22,6 @@ if git show-ref --verify --quiet refs/heads/$BRANCH_NAME; then
 else
     echo "分支 $BRANCH_NAME 不存在，正在创建并切换到该分支..."
     git checkout -b $BRANCH_NAME
-fi
-# 检查远程仓库是否存在
-if ! git remote | grep -qx "$REMOTE_NAME"; then
-    # 远程仓库不存在，添加它
-    echo "Remote '$REMOTE_NAME' not found. Adding it now."
-    git remote add "$REMOTE_NAME" "$REMOTE_URL"
-else
-    echo "Remote '$REMOTE_NAME' already exists."
 fi
 
 # 推送更改到另一个远程仓库的指定分支
