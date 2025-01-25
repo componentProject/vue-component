@@ -57,10 +57,15 @@ jobs:
       - name: 打包storybook
         # npm run docs:build / pnpm docs:build / yarn docs:build / bun run docs:build
         run: pnpm storybook:build
+  push:
+    runs-on: ubuntu-latest
+    steps:
       - name: 推送代码
         run: |
           cd .storybook/dist
           git init
+          git config --global user.name "wanglun"
+          git config --global user.email "1983531544@qq.com"
           git add .
           git commit -m "deploy"
           git remote add origin https://github.com/componentProject/vue-component-storybook.git
