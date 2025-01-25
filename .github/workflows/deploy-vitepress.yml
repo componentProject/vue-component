@@ -28,10 +28,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: 检出main分支代码
+      - name: 检出docs分支代码
         uses: actions/checkout@v4
         with:
-          ref: main
+          ref: docs
           # 如果未启用 lastUpdated，则不需要
           fetch-depth: 0
       # 如果使用 pnpm，请取消此区域注释
