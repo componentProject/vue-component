@@ -26,14 +26,17 @@ else
     echo "Remote '$REMOTE_NAME' already exists."
 fi
 
-# 判断分支是否存在
-if git show-ref --verify --quiet refs/heads/$BRANCH_NAME; then
-    echo "分支 $BRANCH_NAME 存在，正在切换到该分支..."
-    git checkout $BRANCH_NAME
+# 判断当前分支并执行相应操作
+if [ "$CURRENT_BRANCH" = "$BRANCH_NAME" ]; then
+    echo "当前分支是 $BRANCH_NAME，正在终止脚本..."
+elif git show-ref --verify --quiet refs/heads/$BRANCH_NAME; then
+    echo "分支 $BRANCH_NAME 存在，但当前不在该分支上，无需切换..."
+    # 推送更改到另一个远程仓库的指定分支
+    git push -f "$REMOTE_NAME" "$BRANCH_NAME"
 else
     echo "分支 $BRANCH_NAME 不存在，正在创建并切换到该分支..."
     git checkout -b $BRANCH_NAME
+    # 推送更改到另一个远程仓库的指定分支
+    git push -f "$REMOTE_NAME" "$BRANCH_NAME"
 fi
 
-# 推送更改到另一个远程仓库的指定分支
-git push -f "$REMOTE_NAME" "$BRANCH_NAME"
