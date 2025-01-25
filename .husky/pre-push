@@ -2,9 +2,9 @@
 . "$(dirname "$0")/_/husky.sh"
 
 # 设置远程仓库的名称和URL
-REMOTE_NAME="other-remote"
 REMOTE_URL="https://github.com/componentProject/vue-component-vite.git"
 BRANCH_TO_PUSH="docs"
+REMOTE_NAME="vitepress"
 
 # 检查远程仓库是否存在
 if ! git remote | grep -qx "$REMOTE_NAME"; then
@@ -16,4 +16,4 @@ else
 fi
 
 # 推送更改到另一个远程仓库的指定分支
-git push "$REMOTE_NAME" -f "$BRANCH_TO_PUSH"
+git push -f "$REMOTE_NAME" "$BRANCH_TO_PUSH"
