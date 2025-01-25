@@ -1,9 +1,9 @@
 {
-  "*.{js,jsx,ts,tsx,vue,md}": [
+  "src/**/*.{js,jsx,ts,tsx,vue,md}": [
     "eslint --fix",
     "prettier --write"
   ],
-  "*.{css,scss,less,vue}": [
+  "src/**/*.{css,scss,less,vue}": [
     "stylelint --fix"
   ]
 }

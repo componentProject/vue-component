@@ -7,6 +7,7 @@ export default defineConfig({
   description: '一个vue组件库',
   base: '/vue-component/',
   lang: 'zh-CN',
+  outDir: '../../docs/vitepress',
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
     // 标题

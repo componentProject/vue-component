@@ -14,7 +14,7 @@
     "installAll": "installAll.sh",
     "prepare": "husky",
     "storybook:dev": "storybook dev -p 6006",
-    "storybook:build": "storybook build -o .storybook/dist",
+    "storybook:build": "storybook build -o docs/storybook",
     "docs:dev": "vitepress dev .docs",
     "docs:build": "vitepress build .docs",
     "docs:preview": "vitepress preview .docs"

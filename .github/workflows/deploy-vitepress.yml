@@ -60,7 +60,7 @@ jobs:
       - name: 上传打包文件
         uses: actions/upload-pages-artifact@v3
         with:
-          path: .docs/.vitepress/dist
+          path: docs
 
   # 部署工作
   deploy:
