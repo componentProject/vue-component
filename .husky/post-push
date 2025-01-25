@@ -3,9 +3,18 @@
 
 # 设置远程仓库的名称和URL
 REMOTE_URL="https://github.com/componentProject/vue-component-vite.git"
-BRANCH_TO_PUSH="docs"
+BRANCH_NAME="docs"
 REMOTE_NAME="vitepress"
 
+
+# 判断分支是否存在
+if git show-ref --verify --quiet refs/heads/$BRANCH_NAME; then
+    echo "分支 $BRANCH_NAME 存在，正在切换到该分支..."
+    git checkout $BRANCH_NAME
+else
+    echo "分支 $BRANCH_NAME 不存在，正在创建并切换到该分支..."
+    git checkout -b $BRANCH_NAME
+fi
 # 检查远程仓库是否存在
 if ! git remote | grep -qx "$REMOTE_NAME"; then
     # 远程仓库不存在，添加它
@@ -16,4 +25,4 @@ else
 fi
 
 # 推送更改到另一个远程仓库的指定分支
-git push -f "$REMOTE_NAME" "$BRANCH_TO_PUSH"
+git push -f "$REMOTE_NAME" "$BRANCH_NAME"
