@@ -44,3 +44,12 @@
 .VPDocOutlineDropdown {
   display: none !important;
 }
+
+
+.demoblock-custom{
+  background-color: white;
+  .demoblock-control{
+    background-color: white;
+  }
+}
+

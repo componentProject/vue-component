@@ -16,7 +16,6 @@ export async function getPosts() {
       }
     }),
   )
-  console.log('posts', posts)
   posts.sort(_compareDate)
   return posts
 }

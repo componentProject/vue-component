@@ -3,6 +3,9 @@ import { buildBlogRSS } from './theme/rss'
 import { transformerTwoslash } from '@shikijs/vitepress-twoslash'
 import mathjax3 from 'markdown-it-mathjax3'
 
+import { demoblockPlugin, demoblockVitePlugin } from 'vitepress-theme-demoblock'
+import vueJsx from '@vitejs/plugin-vue-jsx'
+
 import { fileURLToPath, URL } from 'node:url'
 // https://github.com/mingyuLi97/blog
 // https://vitepress.dev/reference/site-config
@@ -19,7 +22,6 @@ async function config() {
       items: getSidebar('components'),
     },
   ]
-  console.log('components', getSidebar('components'))
   return {
     title: 'vueComponent',
     description: '一个vue组件库',
@@ -32,6 +34,7 @@ async function config() {
           '@': fileURLToPath(new URL('../../src', import.meta.url)),
         },
       },
+      plugins: [demoblockVitePlugin(), vueJsx()],
     },
     head: [
       [
@@ -73,6 +76,9 @@ async function config() {
       codeTransformers: [transformerTwoslash()],
       config: (md) => {
         md.use(mathjax3)
+        md.use(demoblockPlugin, {
+          customClass: 'demoblock-custom'
+        })
       },
     },
     themeConfig: {

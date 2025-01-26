@@ -1,16 +1,14 @@
+import { defineAsyncComponent } from 'vue'
+import type { Plugin, AsyncComponentLoader } from 'vue'
+
 const componentFiles = import.meta.glob('./*/index.vue')
-interface modulesTypes {
-  name?: string
-  component?: () => Promise<unknown>
-  install?: (app: any) => void
-}
-const components: modulesTypes = Object.keys(componentFiles).reduce((modules = {}, modulePath) => {
+const components: Plugin = Object.keys(componentFiles).reduce((modules = {}, modulePath) => {
   const name = modulePath.split('/').at(-2)
-  const component = componentFiles[modulePath]
+  const component: AsyncComponentLoader = componentFiles[modulePath]
   if (!component) return modules
-  modules[name] = component
+  modules[name] = defineAsyncComponent(component)
   return modules
-}, {})
+}, {}) as Plugin
 components.install = function (app) {
   const componentNames = Object.keys(components)
   componentNames.forEach((name) => {
