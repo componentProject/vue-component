@@ -16,12 +16,6 @@ async function config() {
   const pageSize = 5
   const postLength = await getPostLength()
 
-  const components = [
-    {
-      text: '基础组件',
-      items: getSidebar('components'),
-    },
-  ]
   return {
     title: 'vueComponent',
     description: '一个vue组件库',
@@ -42,7 +36,7 @@ async function config() {
         {
           rel: 'icon',
           type: 'image/svg',
-          href: '/horse.svg',
+          href: '/vue-component/vitepress/horse.svg',
         },
       ],
       [
@@ -83,6 +77,7 @@ async function config() {
     },
     themeConfig: {
       // https://vitepress.dev/reference/default-theme-config
+      avator: "/vue-component/vitepress/avator.png",
       // 标题
       siteTitle: 'vueComponent',
       // logo
@@ -113,11 +108,7 @@ async function config() {
       ],
 
       // 侧边栏,配置基本同导航栏
-      sidebar: {
-        '/components': components,
-        '/posts/components': components,
-        "/navs/components": components,
-      },
+      sidebar: {},
       socialLinks: [{ icon: 'github', link: 'https://github.com/componentProject/vue-component' }],
       // 搜索配置
       search: {
