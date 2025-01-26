@@ -1,1 +1,0 @@
-<demo vue="../demos/ConfigForm/base.vue" />
