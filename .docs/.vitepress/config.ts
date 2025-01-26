@@ -99,6 +99,10 @@ async function config() {
           text: '🏡Blogs',
           link: '/',
         },
+        {
+          text: "storybook组件库",
+          link: "https://componentproject.github.io/vue-component/storybook/",
+        },
         ...getSidebar('navs'),
       ],
 
@@ -106,6 +110,7 @@ async function config() {
       sidebar: {
         '/components': components,
         '/posts/components': components,
+        "/navs/components": components,
       },
       socialLinks: [{ icon: 'github', link: 'https://github.com/componentProject/vue-component' }],
       // 搜索配置
