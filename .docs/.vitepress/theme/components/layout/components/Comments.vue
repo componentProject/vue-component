@@ -21,11 +21,13 @@ onContentUpdated(() => {
     return;
   }
   deleteChild(element);
-  // TODO:需要配置git
+  // 需要去这个网站注册 https://github.com/settings/developers
   const gitalk = new Gitalk({
     clientID: "Ov23liUBqWy6qVA3BaRO",
     clientSecret: "bc0ebf91365d6be3ba26570266c2800be2b7c603",
+    // 仓库名
     repo: "vue-component",
+    // 所属用户或组织名
     owner: "componentProject",
     admin: ["moluoxixi"],
     id: location.pathname.substring(0, 50), // Ensure uniqueness and length less than 50
