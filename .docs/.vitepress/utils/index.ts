@@ -49,6 +49,5 @@ export function getSidebar(fileName: string) {
   }
 
   const sidebar = getSidebarItems(sidebarStructure, fileName)
-  console.log('sidebar', sidebar)
   return sidebar
 }

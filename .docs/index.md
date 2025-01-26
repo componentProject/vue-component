@@ -20,7 +20,7 @@ hero:
       # 按钮文字
       text: 指南
       # 按钮跳转的链接
-      link: /guild/
+      link: /guide/
     - theme: brand
       text: 组件
       link: /examples/

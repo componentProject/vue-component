@@ -3,13 +3,18 @@ import { fileURLToPath, URL } from 'node:url'
 // https://github.com/mingyuLi97/blog
 // https://vitepress.dev/reference/site-config
 import { getSidebar } from './utils'
-
+import { vitepressDemoPlugin } from 'vitepress-demo-plugin';
 export default defineConfig({
   title: 'vueComponent',
   description: '一个vue组件库',
   base: '/vue-component/vitepress/',
   lang: 'zh-CN',
   outDir: '../docs/vitepress',
+  markdown: {
+    config(md) {
+      md.use(vitepressDemoPlugin)
+    }
+  },
   vite: {
     resolve: {
       alias: {
@@ -37,10 +42,10 @@ export default defineConfig({
 
     // 侧边栏,配置基本同导航栏
     sidebar: {
-      '/guild/': [
+      '/guide/': [
         {
           text: '指南',
-          items: getSidebar('guild'),
+          items: getSidebar('guide'),
         },
       ],
       '/examples/': [
@@ -53,11 +58,11 @@ export default defineConfig({
     // sidebar: [
     //   {
     //     text: '指南',
-    //     link: '/guild/',
+    //     link: '/guide/',
     //     items: [
     //       {
     //         text: '配置化表单',
-    //         link: '/guild/configForm',
+    //         link: '/guide/configForm',
     //       },
     //     ],
     //   },

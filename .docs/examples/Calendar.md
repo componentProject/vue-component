@@ -1,0 +1,1 @@
+<demo vue="../demos/Calendar/base.vue" />
