@@ -1,4 +1,4 @@
-import { getPosts, getPostLength } from './theme/serverUtils'
+import { getComponents } from "./utils/serverUtils";
 import { buildBlogRSS } from './theme/rss'
 import { transformerTwoslash } from '@shikijs/vitepress-twoslash'
 import mathjax3 from 'markdown-it-mathjax3'
@@ -12,10 +12,13 @@ import { fileURLToPath, URL } from 'node:url'
 import { getSidebar } from './utils'
 
 async function config() {
-  const posts = await getPosts()
-  const pageSize = 5
-  const postLength = await getPostLength()
+  const componentPath = "/components";
+  const posts = await getComponents(componentPath);
+  const pageSize = 5;
+  const postLength = posts.length;
 
+  const components = await getSidebar("components");
+  const navs = await getSidebar("navs");
   return {
     title: 'vueComponent',
     description: '一个vue组件库',
@@ -104,11 +107,13 @@ async function config() {
           text: "storybook组件库",
           link: "https://componentproject.github.io/vue-component/storybook/",
         },
-        ...getSidebar('navs'),
+        ...navs
       ],
 
       // 侧边栏,配置基本同导航栏
-      sidebar: {},
+      sidebar: {
+        '/components/': components
+      },
       socialLinks: [{ icon: 'github', link: 'https://github.com/componentProject/vue-component' }],
       // 搜索配置
       search: {
