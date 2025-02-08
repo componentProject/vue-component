@@ -13,6 +13,7 @@ import 'vitepress-theme-demoblock/dist/theme/styles/index.css'
 import Demo from 'vitepress-theme-demoblock/dist/client/components/Demo.vue'
 import DemoBlock from 'vitepress-theme-demoblock/dist/client/components/DemoBlock.vue'
 
+import Components from './components'
 
 export default {
   extends: Theme,
@@ -24,5 +25,8 @@ export default {
 
     app.component('Demo', Demo)
     app.component('DemoBlock', DemoBlock)
+    Object.entries(Components).forEach(([name, component]) => {
+      app.component(name, component)
+    })
   },
 };
