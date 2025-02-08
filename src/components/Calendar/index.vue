@@ -16,7 +16,8 @@
 <script lang="ts" setup>
 import CalendarHeader from './components/CalendarHeader.vue'
 import CalendarMonth from './components/CalendarMonth.vue'
-import dayjs, { Dayjs } from 'dayjs'
+import dayjs from 'dayjs'
+import type { Dayjs } from 'dayjs'
 import { computed, inject, ref, watch } from 'vue'
 import type { propsType } from './types'
 import type { ConfigProviderPropsType } from '@/components/ConfigProvider/types/index.ts'

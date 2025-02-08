@@ -9,16 +9,21 @@
     <div class="calendar-month-body">
       <div v-for="row in allDays" class="calendar-month-body-row">
         <div
-          v-for="day in row" class="calendar-month-body-cell"
+          v-for="day in row"
+          class="calendar-month-body-cell"
           @click="emits('change', day.date)"
-          :class="{'calendar-month-body-cell-current': day.currentMonth}"
+          :class="{ 'calendar-month-body-cell-current': day.currentMonth }"
         >
           <slot name="date" :date="day.date">
             <div class="calendar-month-body-cell-date">
               <div
                 class="calendar-month-body-cell-date-value"
-                :class="{'calendar-month-body-cell-date-selected':props.modelValue?.format('YYYY-MM-DD') === day.date.format('YYYY-MM-DD')}"
-              >{{ day.date.date() }}
+                :class="{
+                  'calendar-month-body-cell-date-selected':
+                    props.modelValue?.format('YYYY-MM-DD') === day.date.format('YYYY-MM-DD'),
+                }"
+              >
+                {{ day.date.date() }}
               </div>
               <div class="calendar-month-body-cell-date-content">
                 <slot name="dateContent" :date="day.date"></slot>
@@ -31,36 +36,33 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { computed, watch } from 'vue'
-import dayjs, { Dayjs } from 'dayjs'
+import { computed } from 'vue'
+import dayjs from 'dayjs'
+import type { Dayjs } from 'dayjs'
 import allLocales from '../locale'
+import type { CalendarHeaderPropsType } from '../types'
 
+const props = withDefaults(defineProps<CalendarHeaderPropsType>(), {
+  localeContext: () => ({
+    locale: 'zh-CN',
+  }),
+  modelValue: () => dayjs(),
+})
 const weekList = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday']
-
 
 const emits = defineEmits(['change'])
 
-const props = defineProps({
-  modelValue: {
-    type: Dayjs,
-    default: dayjs()
-  },
-  localeContext: {
-    type: Object,
-    default: () => ({ locale: 'zh-CN' })
-  }
-})
 const CalendarLocale = computed(() => allLocales[props.localeContext.locale])
 function getAllDays(date: Dayjs) {
   const startDate = date.startOf('month')
   const day = startDate.day()
 
-  const daysInfo: Array<{ date: Dayjs, currentMonth: boolean }> = new Array(6 * 7)
+  const daysInfo: Array<{ date: Dayjs; currentMonth: boolean }> = new Array(6 * 7)
 
   for (let i = 0; i < day; i++) {
     daysInfo[i] = {
       date: startDate.subtract(day - i, 'day'),
-      currentMonth: false
+      currentMonth: false,
     }
   }
 
@@ -69,10 +71,9 @@ function getAllDays(date: Dayjs) {
 
     daysInfo[i] = {
       date: calcDate,
-      currentMonth: calcDate.month() === date.month()
+      currentMonth: calcDate.month() === date.month(),
     }
   }
-
 
   const rows: Array<typeof daysInfo> = []
   for (let i = 0; i < 6; i++) {
@@ -86,9 +87,7 @@ function getAllDays(date: Dayjs) {
 }
 
 const allDays = computed(() => getAllDays(props.modelValue))
-
 </script>
-
 
 <style lang="scss" scoped>
 .calendar-month {
@@ -138,7 +137,6 @@ const allDays = computed(() => getAllDays(props.modelValue))
         }
       }
     }
-
   }
 }
 </style>
