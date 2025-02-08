@@ -1,4 +1,4 @@
-import Space from '@/components/Space'
+import Space from '@/components/Space/index.vue'
 import './assets/styles/Space.css'
 
 const meta = {

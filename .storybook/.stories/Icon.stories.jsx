@@ -1,5 +1,5 @@
 // Icon.stories.js
-import Icon from '@/components/Icon'
+import Icon from '@/components/Icon/index.vue'
 import checkIcon from './assets/icons/check.svg'
 
 export default {

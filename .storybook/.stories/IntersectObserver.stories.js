@@ -1,4 +1,4 @@
-import IntersectObserver from '@/components/IntersectObserver'
+import IntersectObserver from '@/components/IntersectObserver/index.vue'
 import './assets/styles/IntersectObserver.scss'
 import { ref } from 'vue'
 
