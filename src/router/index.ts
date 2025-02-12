@@ -1,16 +1,14 @@
 import { createRouter, createWebHistory } from 'vue-router'
-// import { defineComponent } from 'vue'
-const componentFiles = import.meta.glob('../components/*/index.vue')
+import components from '@/components'
 interface modulesTypes {
   path: string
   name: string
   component: () => Promise<unknown>
 }
 const modules: modulesTypes[] = []
-const routesChildrens = Object.keys(componentFiles).reduce((modules = [], modulePath) => {
-  const name = modulePath.split('/').at(-2)
-  const component = componentFiles[modulePath]
-  if (!component) return modules
+const routesChildrens = Object.keys(components).reduce((modules = [], name) => {
+  const component = components[name]
+  if (!component || name == 'install') return modules
   modules.push({
     path: `/${name}`,
     name,

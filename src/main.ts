@@ -14,14 +14,16 @@ import 'vxe-pc-ui/lib/style.css'
 import '@/assets/styles/main.css'
 import elementPlus from 'element-plus'
 
+import components from '@/components'
 import App from './App.vue'
 
 const app = createApp(App)
-
+console.log('components', components)
 app.use(stores)
 app.use(router)
 app.use(elementPlus)
 app.use(VxeUITable)
 app.use(VxeUI)
+app.use(components)
 
 app.mount('#app')
