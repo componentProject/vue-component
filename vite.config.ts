@@ -200,6 +200,9 @@ export default defineConfig((mode) => {
           autoprefixer(),
         ],
       },
+      preprocessorOptions: {
+        scss: { api: 'modern-compiler' },
+      }
     },
     resolve: {
       extensions: ['.js', 'jsx', '.ts', '.tsx', '.vue'], // 确保 .vue 在列表中
