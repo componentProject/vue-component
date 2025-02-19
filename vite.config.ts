@@ -10,10 +10,15 @@ import importToCDN from 'vite-plugin-cdn-import';
 import vue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
 import vueDevTools from 'vite-plugin-vue-devtools'
+import AutoImport from 'unplugin-auto-import/vite'
+import Components from 'unplugin-vue-components/vite'
+import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
 
 // 其余vite插件
+import { createHtmlPlugin } from 'vite-plugin-html'
 import autoprefixer from 'autoprefixer'
 import tailwindcss from 'tailwindcss'
+import path from 'path'
 
 /**
  * 将环境变量中的字符串值转换为对应的 JavaScript 数据类型
@@ -58,6 +63,17 @@ export default defineConfig((mode) => {
       vue(),
       vueJsx(),
       vueDevTools(),
+      // 自动引入
+      AutoImport({
+        imports: ["vue"],
+        resolvers: [ElementPlusResolver()],
+        dts: path.resolve(__dirname, "./src/types/auto-imports.d.ts"),
+      }),
+      Components({
+        resolvers: [ElementPlusResolver()],
+        dts: path.resolve(__dirname, "./src/types/components.d.ts"),
+      }),
+
       // 是否生成包预览
       viteEnv.VITE_REPORT && visualizer(),
       // 代码压缩
@@ -77,10 +93,33 @@ export default defineConfig((mode) => {
       }),
       // 图片压缩
       viteImagemin({
-        gifsicle: { optimizationLevel: 3 }, // GIF 压缩
-        mozjpeg: { quality: 75 }, // JPEG 压缩
-        pngquant: { quality: [0.8, 0.9] }, // PNG 压缩
-        svgo: { plugins: [{ removeViewBox: false }] }, // SVG 压缩
+        // gif压缩
+        gifsicle: {
+          optimizationLevel: 7,
+          interlaced: false
+        },
+        optipng: {
+          optimizationLevel: 7
+        },
+        mozjpeg: {
+          quality: 20
+        },
+        pngquant: {
+          quality: [0.8, 0.9],
+          speed: 4
+        },
+        // svg压缩
+        svgo: {
+          plugins: [
+            {
+              name: 'removeViewBox'
+            },
+            {
+              name: 'removeEmptyAttrs',
+              active: false
+            }
+          ]
+        }
       }),
       // CDN加速
       importToCDN({
@@ -112,6 +151,13 @@ export default defineConfig((mode) => {
             path: 'https://unpkg.com/radash@11.0.0/dist/index.umd.js',
           },
         ],
+      }),
+      createHtmlPlugin({
+        inject: {
+          data: {
+            title: viteEnv.VITE_GLOB_APP_TITLE
+          }
+        }
       }),
     ],
     build: {
