@@ -1,7 +1,7 @@
 import ConfigForm from '@/components/ConfigForm/index.vue'
 
 /**
- * 配置化表单,目前只支持el-row布局,未来准备支持flex,grid布局,分别用 layout flex grid区分
+ * 基于element-plus的配置化表单,目前只支持el-row布局,未来准备支持flex,grid布局,分别用 layout flex grid区分
  */
 export default {
   title: '配置化表单',

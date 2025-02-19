@@ -1,4 +1,3 @@
-import { fileURLToPath, URL } from 'node:url'
 import { defineConfig, loadEnv } from 'vite'
 // 性能优化模块
 import { visualizer } from 'rollup-plugin-visualizer'
@@ -205,7 +204,7 @@ export default defineConfig((mode) => {
     resolve: {
       extensions: ['.js', 'jsx', '.ts', '.tsx', '.vue'], // 确保 .vue 在列表中
       alias: {
-        '@': fileURLToPath(new URL('./src', import.meta.url)),
+        '@': path.resolve(__dirname, "./src"),
       },
     },
     // 代理配置
