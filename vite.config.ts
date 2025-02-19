@@ -150,7 +150,7 @@ export default defineConfig((mode) => {
     css: {
       postcss: {
         plugins: [
-          tailwindcss,
+          tailwindcss(),
           // 自动添加厂商前缀
           autoprefixer(),
         ],
