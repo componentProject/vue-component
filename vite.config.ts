@@ -3,7 +3,7 @@ import { defineConfig, loadEnv } from 'vite'
 import { visualizer } from 'rollup-plugin-visualizer'
 import viteCompression from 'vite-plugin-compression'
 import viteImagemin from 'vite-plugin-imagemin'
-import importToCDN from 'vite-plugin-cdn-import';
+import importToCDN from 'vite-plugin-cdn-import'
 
 // vite vue插件
 import vue from '@vitejs/plugin-vue'
@@ -64,13 +64,13 @@ export default defineConfig((mode) => {
       vueDevTools(),
       // 自动引入
       AutoImport({
-        imports: ["vue"],
+        imports: ['vue'],
         resolvers: [ElementPlusResolver()],
-        dts: path.resolve(__dirname, "./src/types/auto-imports.d.ts"),
+        dts: path.resolve(__dirname, './src/types/auto-imports.d.ts'),
       }),
       Components({
         resolvers: [ElementPlusResolver()],
-        dts: path.resolve(__dirname, "./src/types/components.d.ts"),
+        dts: path.resolve(__dirname, './src/types/components.d.ts'),
       }),
 
       // 是否生成包预览
@@ -95,30 +95,30 @@ export default defineConfig((mode) => {
         // gif压缩
         gifsicle: {
           optimizationLevel: 7,
-          interlaced: false
+          interlaced: false,
         },
         optipng: {
-          optimizationLevel: 7
+          optimizationLevel: 7,
         },
         mozjpeg: {
-          quality: 20
+          quality: 20,
         },
         pngquant: {
           quality: [0.8, 0.9],
-          speed: 4
+          speed: 4,
         },
         // svg压缩
         svgo: {
           plugins: [
             {
-              name: 'removeViewBox'
+              name: 'removeViewBox',
             },
             {
               name: 'removeEmptyAttrs',
-              active: false
-            }
-          ]
-        }
+              active: false,
+            },
+          ],
+        },
       }),
       // CDN加速
       importToCDN({
@@ -154,9 +154,9 @@ export default defineConfig((mode) => {
       createHtmlPlugin({
         inject: {
           data: {
-            title: viteEnv.VITE_GLOB_APP_TITLE
-          }
-        }
+            title: viteEnv.VITE_GLOB_APP_TITLE,
+          },
+        },
       }),
     ],
     build: {
@@ -202,12 +202,12 @@ export default defineConfig((mode) => {
       },
       preprocessorOptions: {
         scss: { api: 'modern-compiler' },
-      }
+      },
     },
     resolve: {
       extensions: ['.js', 'jsx', '.ts', '.tsx', '.vue'], // 确保 .vue 在列表中
       alias: {
-        '@': path.resolve(__dirname, "./src"),
+        '@': path.resolve(__dirname, './src'),
       },
     },
     // 代理配置
