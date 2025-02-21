@@ -6,10 +6,10 @@ import mathjax3 from 'markdown-it-mathjax3'
 import { demoblockPlugin, demoblockVitePlugin } from 'vitepress-theme-demoblock'
 import vueJsx from '@vitejs/plugin-vue-jsx'
 
-import { fileURLToPath, URL } from 'node:url'
 // https://github.com/mingyuLi97/blog
 // https://vitepress.dev/reference/site-config
 import { getSidebar } from './utils'
+import path from 'path'
 
 async function config() {
   const componentPath = "/components";
@@ -28,7 +28,7 @@ async function config() {
     vite: {
       resolve: {
         alias: {
-          '@': fileURLToPath(new URL('../../src', import.meta.url)),
+          '@': path.resolve(__dirname, "../../src"),
         },
       },
       plugins: [demoblockVitePlugin(), vueJsx()],
@@ -71,7 +71,7 @@ async function config() {
         dark: 'vitesse-dark',
       },
       codeTransformers: [transformerTwoslash()],
-      config: (md) => {
+      config: (md:any) => {
         md.use(mathjax3)
         md.use(demoblockPlugin, {
           customClass: 'demoblock-custom'

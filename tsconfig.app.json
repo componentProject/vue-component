@@ -5,7 +5,8 @@
     "src/**/*",
     "src/**/*.vue",
     ".storybook/.stories/*",
-    ".storybook/*"
+    ".storybook/*",
+    ".docs/.vitepress/*"
   ],
   "exclude": [
     "src/**/__tests__/*"

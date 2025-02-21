@@ -71,7 +71,7 @@
     "eslint-plugin-vue": "^9.32.0",
     "fast-glob": "^3.3.2",
     "feed": "^4.2.2",
-    "fs-extra": "^11.2.0",
+    "fs-extra": "^11.3.0",
     "globby": "14.0.0",
     "gray-matter": "^4.0.3",
     "lint-staged": "^15.3.0",
