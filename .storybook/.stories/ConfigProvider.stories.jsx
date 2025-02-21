@@ -25,7 +25,7 @@ export const space = {
   },
   argTypes: {
     default: {
-      control: 'disabled',
+      control: false,
     },
     space: {
       control: 'radio',
@@ -41,7 +41,7 @@ export const calendar = {
   },
   argTypes: {
     default: {
-      control: 'disabled',
+      control: false,
     },
     locale: {
       control: 'radio',

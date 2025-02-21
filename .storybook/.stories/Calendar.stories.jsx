@@ -7,9 +7,18 @@ export default {
     modelValue: {
       control: 'date',
     },
+    className: {
+      control: 'text',
+    },
     locale: {
       control: 'radio',
       options: ['zh-CN', 'en-US'],
+    },
+    date: {
+      control: false,
+    },
+    dateContent: {
+      control: false,
     },
   },
   args: {},

@@ -30,9 +30,14 @@ const props = withDefaults(defineProps<propsType>(), {
   modelValue: Date.now(),
   locale: 'zh-CN',
 })
+
+defineSlots<{
+  date: (props: { date: Dayjs }) => any
+  dateContent: (props: { date: Dayjs }) => any
+}>()
+
 const configProvider: ConfigProviderPropsType = inject('configProvider', {})
 const localeContext = computed(() => {
-  console.log('configProvider', configProvider.locale)
   return {
     ...props,
     locale: configProvider.locale || props.locale,
