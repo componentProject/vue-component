@@ -5,11 +5,11 @@
 </template>
 <script setup lang="ts">
 import { provide } from 'vue'
+import type { Component } from 'vue'
 import type { ConfigProviderPropsType } from './types'
 const props = withDefaults(defineProps<ConfigProviderPropsType>(), {})
-const slots = defineSlots<{
-  default(): any
+defineSlots<{
+  default: Component
 }>()
-console.log('slots', slots)
 provide('configProvider', props)
 </script>

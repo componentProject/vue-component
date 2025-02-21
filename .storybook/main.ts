@@ -12,12 +12,11 @@ const config: StorybookConfig = {
     '@storybook/addon-interactions',
     '@storybook/addon-storysource',
   ],
-  docs: {
-    autodocs: true,
-  },
   framework: {
     name: '@storybook/vue3-vite',
-    options: {},
+    options: {
+      docgen: 'vue-component-meta',
+    },
   },
 }
 export default config
