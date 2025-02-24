@@ -1,5 +1,6 @@
 import Watermark from '@/components/Watermark/index.vue'
-import type { StoryFn } from '@storybook/vue3'
+import type { propsType } from '@/components/Watermark/types'
+import type { Meta, StoryFn } from '@storybook/vue3'
 
 /**
  * 利用父元素会被子元素撑开的特点,将子组件包裹在relative的父元素内,
@@ -11,7 +12,7 @@ import type { StoryFn } from '@storybook/vue3'
  *
  * 通过mutationObserver监视dom元素变化,重新绘制水印
  */
-const meta = {
+const meta: Meta<propsType> = {
   title: '水印',
   component: Watermark,
   args: {},

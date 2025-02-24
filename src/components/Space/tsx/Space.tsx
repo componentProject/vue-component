@@ -2,11 +2,11 @@ import './Space.scss'
 import { useSlots } from 'vue'
 import type { CSSProperties, PropType } from 'vue'
 import { computed, defineComponent } from 'vue'
-import type { SizeType } from '../types/Space.ts'
+import type { SizeType } from '../types'
 import classNames from 'classnames'
 import { booleanType, filterEmpty, PropTypes, tuple } from '../../_utils'
 
-export const spaceProps = () => ({})
+export const propsType = () => ({})
 export default defineComponent({
   name: 'Space',
   props: {
@@ -23,7 +23,7 @@ export default defineComponent({
     wrap: booleanType(),
   },
   setup(props) {
-    // const props = withDefaults(defineProps<SpaceProps>(), {
+    // const props = withDefaults(defineProps<propsType>(), {
     //   size: 'small',
     //   direction: 'horizontal',
     //   align: 'start',

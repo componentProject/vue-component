@@ -19,6 +19,7 @@
 import { computed, watch } from 'vue'
 import iconfontStore from '@/stores/iconfont.ts'
 
+import type { propsType } from './types'
 interface propsType {
   style?: object
   spin?: boolean

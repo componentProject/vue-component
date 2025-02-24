@@ -7,14 +7,14 @@
 <script lang="ts" setup>
 import { type CSSProperties, inject } from 'vue'
 import { computed } from 'vue'
-import type { SizeType, SpaceProps } from './types/Space'
-import type { ConfigProviderPropsType } from '@/components/ConfigProvider/types/index.ts'
+import type { SizeType, propsType } from './types'
+import type { propsType as ConfigProviderPropsType } from '@/components/ConfigProvider/types/index.ts'
 import classNames from 'classnames'
 
 defineOptions({
   name: 'Space',
 })
-const props = withDefaults(defineProps<SpaceProps>(), {
+const props = withDefaults(defineProps<propsType>(), {
   size: 'small',
   direction: 'horizontal',
   align: 'start',

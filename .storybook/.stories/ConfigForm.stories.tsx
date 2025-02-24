@@ -1,24 +1,26 @@
 import ConfigForm from '@/components/ConfigForm/index.vue'
+import type { Meta, StoryFn } from '@storybook/vue3'
 
 /**
  * 基于element-plus的配置化表单,目前只支持el-row布局,未来准备支持flex,grid布局,分别用 layout flex grid区分
  */
-export default {
+const meta: Meta = {
   title: '配置化表单',
   component: ConfigForm,
   // tags: ['!autodocs'],
   args: {},
   argTypes: {
     rows: {
-      control: 'array',
+      control: 'object',
     },
     formOptions: {
       control: 'object',
     },
   },
 }
+export default meta
 
-const Template = ({ rows, formOptions }) => ({
+const Template: StoryFn = ({ rows, formOptions }) => ({
   template: `
     <div style="padding-left: 40px" class="flex-1 overflow-auto">
       <config-form :form-options="formOptions" v-model:rows="rows" />
@@ -35,8 +37,8 @@ const Template = ({ rows, formOptions }) => ({
   },
 })
 
-export const 基础用法 = Template.bind({})
-基础用法.args = {
+export const configForm = Template.bind({})
+configForm.args = {
   rows: [
     {
       formItems: [

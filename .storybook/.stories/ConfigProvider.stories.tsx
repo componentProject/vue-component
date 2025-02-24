@@ -1,17 +1,20 @@
 import ConfigProvider from '@/components/ConfigProvider/index.vue'
-import './assets/styles/Space.css'
+import type { propsType } from '@/components/ConfigProvider/types'
+import type { Meta } from '@storybook/vue3'
+
 import Calendar from '@/components/Calendar/index.vue'
 import Space from '@/components/Space/index.vue'
+import './assets/styles/Space.css'
 
-export default {
+const meta: Meta<propsType> = {
   title: 'ConfigProvider',
   component: ConfigProvider,
   args: {},
-  // tags: ['!autodocs']
+  tags: ['!autodocs']
 }
-
+export default meta
 //#region 直接args传值,好处是docs里示例代码正常
-export const space = {
+export const space: StoryObj = {
   args: {
     space: 'small',
     // 默认插槽
@@ -33,7 +36,7 @@ export const space = {
     },
   },
 }
-export const calendar = {
+export const calendar: StoryObj = {
   args: {
     locale: 'zh-CN',
     // 默认插槽

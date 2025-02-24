@@ -1,8 +1,10 @@
 // Icon.stories.js
 import Icon from '@/components/Icon/index.vue'
+import type { propTypes } from '@/components/Icon/types'
 import checkIcon from './assets/icons/check.svg'
+import { Meta, StoryObj } from '@storybook/vue3'
 
-export default {
+const meta: Meta<propTypes> = {
   title: '图标',
   component: Icon,
   // tags: ['!autodocs'],
@@ -12,39 +14,40 @@ export default {
     size: '1em',
     color: '',
     scriptUrl: '',
-    type: '',
+    type: ''
   },
   argTypes: {
     style: {
-      control: 'object',
+      control: 'object'
     },
     spin: {
-      control: 'boolean',
+      control: 'boolean'
     },
     size: {
-      control: 'text',
+      control: 'text'
     },
     color: {
-      control: 'color',
+      control: 'color'
     },
     scriptUrl: {
-      control: 'text',
+      control: 'text'
     },
     type: {
-      control: 'text',
-    },
-  },
+      control: 'text'
+    }
+  }
 }
+export default meta
 
-export const icon = {}
+export const icon: StoryObj = {}
 icon.args = {
-  icon: checkIcon,
+  icon: checkIcon
 }
 
-export const 使用url注册icon = {}
+export const 使用url注册icon: StoryObj = {}
 使用url注册icon.args = {
   scriptUrl: '//at.alicdn.com/t/c/font_3590692_mp9kgduugne.js',
-  type: 'icon-zhangshangcaifuyemianshoujiban345',
+  type: 'icon-zhangshangcaifuyemianshoujiban345'
 }
 
 export const 直接传递svg作为插槽 = () => ({
@@ -58,8 +61,10 @@ export const 直接传递svg作为插槽 = () => ({
   components: { Icon },
   setup() {
     return {}
-  },
+  }
 })
+直接传递svg作为插槽.args = {}
+
 // export const 直接传递svg作为插槽 = {
 //   args: {
 //     // default: () => (<svg viewBox="0 0 24 24" aria-hidden="true" fill="currentColor">

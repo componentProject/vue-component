@@ -2,7 +2,9 @@ import IntersectObserver from '@/components/IntersectObserver/index.vue'
 import './assets/styles/IntersectObserver.scss'
 import { ref } from 'vue'
 
-export default {
+import { Meta, StoryFn } from '@storybook/vue3'
+
+const meta: Meta<any> = {
   title: '可视化容器',
   component: IntersectObserver,
   // tags: ['!autodocs'],
@@ -26,8 +28,9 @@ export default {
     },
   },
 }
+export default meta
 
-export const intersectObserver = () => ({
+export const intersectObserver: StoryFn = () => ({
   template: `
     <div style="max-height: 400px" class="flex flex-1 overflow-hidden">
       <div class="list">
@@ -878,7 +881,7 @@ export const intersectObserver = () => ({
       { name: '隔离标识', id: 'isolationMark', target: null },
     ])
     let timer = null
-    let rootElement = null
+    const rootElement = null
     let observer, resizeObserver
     const hasScroll = ref(false)
     const activeListItem = ref('baseInfo')
@@ -946,3 +949,4 @@ export const intersectObserver = () => ({
     }
   },
 })
+intersectObserver.args = {}

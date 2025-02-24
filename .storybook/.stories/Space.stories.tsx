@@ -1,7 +1,9 @@
 import Space from '@/components/Space/index.vue'
 import './assets/styles/Space.css'
+import type { propsType } from '@/components/Space/types'
+import type { Meta, StoryFn } from '@storybook/vue3'
 
-const meta = {
+const meta: Meta<propsType> = {
   title: 'Space',
   component: Space,
   args: {
@@ -11,32 +13,32 @@ const meta = {
     direction: 'horizontal',
     align: 'start',
     wrap: false,
-    height: '200px',
+    height: '200px'
   },
   parameters: {
     docs: {
-      description: {},
-    },
+      description: {}
+    }
   },
   argTypes: {
     direction: {
       control: 'radio',
-      options: ['horizontal', 'vertical'],
+      options: ['horizontal', 'vertical']
     },
     align: {
       control: 'radio',
-      options: ['start', 'end', 'center', 'baseline'],
+      options: ['start', 'end', 'center', 'baseline']
     },
     size: {
       control: 'radio',
-      options: ['small', 'middle', 'large', 32],
-    },
+      options: ['small', 'middle', 'large', 32]
+    }
   },
-  tags: ['autodocs'],
+  tags: ['autodocs']
 }
 export default meta
 
-const Template = (args) => ({
+const Template: StoryFn = (args) => ({
   template: `
     <Space v-bind="args">
       <div class="box"></div>
@@ -44,16 +46,16 @@ const Template = (args) => ({
       <div class="box"></div>
     </Space>`,
   components: { Space },
-  setup() {
+  setup () {
     return { args }
-  },
+  }
 })
 
 export const horizontal = Template.bind({})
 horizontal.args = {
-  direction: 'horizontal',
+  direction: 'horizontal'
 }
 export const vertical = Template.bind({})
 vertical.args = {
-  direction: 'vertical',
+  direction: 'vertical'
 }

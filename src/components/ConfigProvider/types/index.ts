@@ -1,4 +1,4 @@
-export interface ConfigProviderPropsType {
+export interface propsType {
   /**
    * 组件的语言
    */

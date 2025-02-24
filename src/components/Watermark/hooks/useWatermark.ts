@@ -1,8 +1,8 @@
 import { watch, ref, computed, type ComputedRef } from 'vue'
-import type { WatermarkProps } from '../types'
+import type { propsType } from '../types'
 import { assign } from 'radash'
 
-export type WatermarkType = Omit<WatermarkProps, 'className' | 'style' | 'children' | 'container'>
+export type WatermarkType = Omit<propsType, 'className' | 'style' | 'children' | 'container'>
 interface WatermarkOptions extends WatermarkType {
   container?: ComputedRef<HTMLElement | undefined> | HTMLElement
 }

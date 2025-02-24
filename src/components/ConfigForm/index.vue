@@ -1,4 +1,4 @@
-<script lang="tsx">
+<script lang="jsx">
 import wlComponent from './components/components.js'
 import wlPopComponent from './components/popComponents.js'
 import { deepClone, getType } from './components/utils/index.ts'
@@ -179,7 +179,7 @@ export default defineComponent({
         model,
         slots,
       }
-      const Component: vueComponent = defineAsyncComponent(wlComponent[getComponentName(type)])
+      const Component = defineAsyncComponent(wlComponent[getComponentName(type)])
       const component = <Component ref={ref} {...props} v-slots={slots} />
       let _component
 

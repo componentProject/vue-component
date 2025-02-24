@@ -1,5 +1,8 @@
 import Calendar from '@/components/Calendar/index.vue'
-export default {
+import type { propsType } from '@/components/Calendar/types'
+import type { Meta, StoryFn } from '@storybook/vue3'
+
+const meta: Meta<propsType> = {
   title: '日历',
   component: Calendar,
   // tags: ['!autodocs'],
@@ -23,7 +26,8 @@ export default {
   },
   args: {},
 }
-const Template = (args) => ({
+export default meta
+const Template: StoryFn = (args: propsType) => ({
   template: '<Calendar v-bind="args" />',
   components: { Calendar },
   setup() {

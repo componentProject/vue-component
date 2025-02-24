@@ -1,6 +1,6 @@
 import type { CSSProperties } from 'vue'
 
-export interface WatermarkProps {
+export interface propsType {
   style?: CSSProperties
   className?: string
   zIndex?: string | number

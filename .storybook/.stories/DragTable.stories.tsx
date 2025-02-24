@@ -1,9 +1,9 @@
 import DragTable from '@/components/DragTable/index.vue'
-
+import type { Meta, StoryFn } from '@storybook/vue3'
 /**
  *
  */
-const meta = {
+const meta: Meta<any> = {
   title: 'DragTable',
   component: DragTable,
   args: {},
@@ -16,7 +16,7 @@ const meta = {
 }
 export default meta
 
-const Template = (args) => ({
+const Template :StoryFn= (args) => ({
   template: `
     <DragTable v-bind="args" />`,
   components: { DragTable },
@@ -25,7 +25,7 @@ const Template = (args) => ({
   },
 })
 
-export const dragTable = Template.bind({})
+export const dragTable: StoryFn = Template.bind({})
 dragTable.args = {
   rowSort: true,
   colSort: true,

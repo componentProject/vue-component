@@ -2,13 +2,13 @@ import '../tsx/Space.scss'
 
 import type { CSSProperties } from 'vue'
 
-export type SizeType = 'small' | 'middle' | 'large' | number | undefined;
+export type SizeType = 'small' | 'middle' | 'large' | number | undefined
 
-export interface SpaceProps {
-  height?: string;
-  width?: string;
-  className?: string;
-  style?: CSSProperties;
+export interface propsType {
+  height?: string
+  width?: string
+  className?: string
+  style?: CSSProperties
   /**
    * 子元素的间距,
    *
@@ -18,19 +18,17 @@ export interface SpaceProps {
    *
    * 也可以使用'small' | 'middle' | 'large'
    */
-  size?: SizeType | [SizeType, SizeType];
+  size?: SizeType | [SizeType, SizeType]
   /**
    * flex主轴方向: horizontal横向 | vertical纵向
    */
-  direction?: 'horizontal' | 'vertical';
+  direction?: 'horizontal' | 'vertical'
   /**
    * flex副轴方向: start | end | center | baseline
    */
-  align?: 'start' | 'end' | 'center' | 'baseline';
+  align?: 'start' | 'end' | 'center' | 'baseline'
   /**
    * 是否换行,默认否
    */
-  wrap?: boolean;
+  wrap?: boolean
 }
-
-

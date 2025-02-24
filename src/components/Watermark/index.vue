@@ -5,10 +5,10 @@
 </template>
 <script setup lang="ts">
 import { computed, ref, watch, withDefaults } from 'vue'
-import type { WatermarkProps } from './types'
+import type { propsType } from './types'
 import useWatermark from './hooks/useWatermark'
 
-const props = withDefaults(defineProps<WatermarkProps>(), {})
+const props = withDefaults(defineProps<propsType>(), {})
 const { className, style, zIndex, width, height, rotate, image, content, fontStyle, gap, offset } =
   props
 const containerRef = ref<HTMLElement>()

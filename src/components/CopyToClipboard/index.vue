@@ -5,9 +5,9 @@
 </template>
 <script setup lang="ts">
 import copy from 'copy-to-clipboard'
-import type { PropTypes } from './types'
-const props=withDefaults(defineProps<PropTypes>(),{
-  text: ''
+import type { propsType } from './types'
+const props = withDefaults(defineProps<propsType>(), {
+  text: '',
 })
 const clickHandler = () => {
   console.log('props', props)
@@ -17,10 +17,6 @@ const clickHandler = () => {
     onCopy(text, result)
   }
 }
-
 </script>
 
-
-<style scoped lang="scss">
-
-</style>
+<style scoped lang="scss"></style>

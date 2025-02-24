@@ -7,58 +7,58 @@
 import { onBeforeUnmount, onMounted } from 'vue'
 
 const props = defineProps({
-                            /**
-                             * 元素是否进入视口
-                             * */
-                            isIntersecting: {
-                              type: Boolean,
-                              default: true
-                            },
-                            /**
-                             * 进入或离开视口的比例
-                             * */
-                            threshold: {
-                              type: Number,
-                              default: 1.0
-                            },
-                            /**
-                             * 默认进入或离开容器触发监听,
-                             * 如果设置了rootMargin，分别对应容器上右下左收缩的比例
-                             * 例如[0,0,0.8,0] 代表仅监听0-20%高度部分
-                             */
-                            rootMargin: {
-                              type: Array,
-                              default: () => [0, 0, 0, 0]
-                            },
-                            /**
-                             * 需要监听进入/离开容器的元素列表
-                             * */
-                            observers: {
-                              type: Array,
-                              default: () => []
-                            },
-                            /**
-                             * 需要监听进入/离开容器的元素id列表
-                             * */
-                            observerIds: {
-                              type: Array,
-                              default: () => []
-                            }
-                          })
+  /**
+   * 元素是否进入视口
+   * */
+  isIntersecting: {
+    type: Boolean,
+    default: true,
+  },
+  /**
+   * 进入或离开视口的比例
+   * */
+  threshold: {
+    type: Number,
+    default: 1.0,
+  },
+  /**
+   * 默认进入或离开容器触发监听,
+   * 如果设置了rootMargin，分别对应容器上右下左收缩的比例
+   * 例如[0,0,0.8,0] 代表仅监听0-20%高度部分
+   */
+  rootMargin: {
+    type: Array,
+    default: () => [0, 0, 0, 0],
+  },
+  /**
+   * 需要监听进入/离开容器的元素列表
+   * */
+  observers: {
+    type: Array,
+    default: () => [],
+  },
+  /**
+   * 需要监听进入/离开容器的元素id列表
+   * */
+  observerIds: {
+    type: Array,
+    default: () => [],
+  },
+})
 /**
  * mutate接受根据isIntersecting判断的进入或离开视口的元素
  * getTargets接受根据observerIds获取到的元素组成的{id:target} 隐射对象
  * */
 const emits = defineEmits([
-                            /**
-                             * 根据isIntersecting判断的进入或离开视口的元素
-                             */
-                            'mutate',
-                            /**
-                             * 根据observerIds获取到的元素组成的{id:target} 隐射对象
-                             */
-                            'getTargets'
-                          ])
+  /**
+   * 根据isIntersecting判断的进入或离开视口的元素
+   */
+  'mutate',
+  /**
+   * 根据observerIds获取到的元素组成的{id:target} 隐射对象
+   */
+  'getTargets',
+])
 
 let rootElement = null
 let observer, resizeObserver
@@ -92,8 +92,8 @@ onMounted(() => {
           {
             root: rootElement,
             rootMargin,
-            threshold: [threshold]
-          }
+            threshold: [threshold],
+          },
         )
         observers.forEach((domItem) => {
           observer.observe(domItem)
@@ -110,7 +110,7 @@ onMounted(() => {
     }
   })
   resizeObserver.observe(rootElement, {
-    box: 'content-box'
+    box: 'content-box',
   })
 })
 onBeforeUnmount(() => {

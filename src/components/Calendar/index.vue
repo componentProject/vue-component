@@ -20,7 +20,7 @@ import dayjs from 'dayjs'
 import type { Dayjs } from 'dayjs'
 import { computed, inject, ref, watch } from 'vue'
 import type { propsType } from './types'
-import type { ConfigProviderPropsType } from '@/components/ConfigProvider/types/index.ts'
+import type { propsType as ConfigProviderPropsType } from '@/components/ConfigProvider/types/index.ts'
 
 defineOptions({
   name: 'Calendar',
