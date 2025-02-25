@@ -19,7 +19,7 @@
   </el-input>
 </template>
 
-<script lang="ts">
+<script lang="js">
 import { isType } from '../../../utils'
 
 import { defineComponent } from 'vue'

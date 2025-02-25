@@ -2,7 +2,7 @@
   <el-rate v-if="show" v-model="model[prop]" v-bind="Options" v-on="Event" />
 </template>
 
-<script lang="ts">
+<script lang="js">
 import { isType } from '../../../utils'
 import { defineComponent } from 'vue'
 export default defineComponent({

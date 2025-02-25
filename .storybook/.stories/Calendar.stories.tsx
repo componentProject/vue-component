@@ -1,8 +1,8 @@
 import Calendar from '@/components/Calendar/index.vue'
-import type { propsType } from '@/components/Calendar/types'
+import type { propsType, slotsType } from '@/components/Calendar/types'
 import type { Meta, StoryFn } from '@storybook/vue3'
 
-const meta: Meta<propsType> = {
+const meta: Meta<propsType& slotsType> = {
   title: '日历',
   component: Calendar,
   // tags: ['!autodocs'],

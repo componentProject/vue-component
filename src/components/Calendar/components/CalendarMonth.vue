@@ -51,13 +51,16 @@ const props = withDefaults(defineProps<CalendarHeaderPropsType>(), {
 const weekList = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday']
 
 const emits = defineEmits(['change'])
-
+interface daysType {
+  date: Dayjs
+  currentMonth: boolean
+}
 const CalendarLocale = computed(() => allLocales[props.localeContext.locale])
 function getAllDays(date: Dayjs) {
   const startDate = date.startOf('month')
   const day = startDate.day()
 
-  const daysInfo: Array<{ date: Dayjs; currentMonth: boolean }> = new Array(6 * 7)
+  const daysInfo: Array<daysType> = new Array(6 * 7)
 
   for (let i = 0; i < day; i++) {
     daysInfo[i] = {
@@ -75,9 +78,9 @@ function getAllDays(date: Dayjs) {
     }
   }
 
-  const rows: Array<typeof daysInfo> = []
+  const rows: Array<daysType[]> = []
   for (let i = 0; i < 6; i++) {
-    const row = []
+    const row: daysType[] = []
     for (let j = 0; j < 7; j++) {
       row[j] = daysInfo[i * 7 + j]
     }

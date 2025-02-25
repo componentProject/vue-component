@@ -1,10 +1,10 @@
 // Icon.stories.js
 import Icon from '@/components/Icon/index.vue'
-import type { propTypes } from '@/components/Icon/types'
+import type { propsType } from '@/components/Icon/types'
 import checkIcon from './assets/icons/check.svg'
-import { Meta, StoryObj } from '@storybook/vue3'
+import type { Meta, StoryObj, StoryFn } from '@storybook/vue3'
 
-const meta: Meta<propTypes> = {
+const meta: Meta<propsType> = {
   title: '图标',
   component: Icon,
   // tags: ['!autodocs'],
@@ -50,7 +50,7 @@ export const 使用url注册icon: StoryObj = {}
   type: 'icon-zhangshangcaifuyemianshoujiban345'
 }
 
-export const 直接传递svg作为插槽 = () => ({
+export const 直接传递svg作为插槽: StoryFn = () => ({
   template: `
     <Icon>
       <svg viewBox="0 0 24 24" aria-hidden="true" fill="currentColor">

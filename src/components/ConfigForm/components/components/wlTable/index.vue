@@ -37,7 +37,7 @@
     </div>
   </div>
 </template>
-<script lang="ts">
+<script lang="js">
 import { isType } from '../../utils'
 import components from './components'
 

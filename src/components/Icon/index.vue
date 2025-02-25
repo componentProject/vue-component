@@ -9,7 +9,7 @@
   />
   <i v-else class="icon" :class="{ 'icon-spin': props.spin }" :style="style">
     <svg viewBox="0 0 24 24" aria-hidden="true" v-if="props.type" fill="currentColor">
-      <use :xlink:href="`#${props.type}`" />
+      <use :href="`#${props.type}`" />
     </svg>
     <slot v-else name="default"></slot>
   </i>
@@ -20,25 +20,13 @@ import { computed, watch } from 'vue'
 import iconfontStore from '@/stores/iconfont.ts'
 
 import type { propsType } from './types'
-interface propsType {
-  style?: object
-  spin?: boolean
-  size?: string | string[]
-  color?: string
-  type?: string
-  /**
-   * 只能传svg
-   */
-  icon: SVGAElement
-  scriptUrl: string
-}
 
 const props = withDefaults(defineProps<propsType>(), {
   spin: false,
   size: '1em',
   color: 'currentColor',
   type: 'icon-zhangshangcaifuyemianshoujiban345',
-  icon: null,
+  icon: '',
   scriptUrl: '//at.alicdn.com/t/c/font_3590692_mp9kgduugne.js',
 })
 

@@ -7,6 +7,6 @@ export interface propsType {
   /**
    * 只能传svg
    */
-  icon: SVGAElement
+  icon?: string
   scriptUrl: string
 }

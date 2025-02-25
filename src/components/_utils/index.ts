@@ -9,7 +9,7 @@ export const PropTypes = createTypes({
   number: undefined,
   array: undefined,
   object: undefined,
-  integer: undefined
+  integer: undefined,
 }) as propTypes
 
 export function tuple<T extends string[]>(...args: T) {
@@ -17,19 +17,19 @@ export function tuple<T extends string[]>(...args: T) {
 }
 
 export function booleanType(defaultVal?: boolean) {
-  return { type: Boolean, default: defaultVal as boolean };
+  return { type: Boolean, default: defaultVal as boolean }
 }
 
 export function filterEmpty(children = []) {
-  const res = [];
-  children.forEach(child => {
+  const res: any[] = []
+  children.forEach((child: any) => {
     if (Array.isArray(child)) {
-      res.push(...child);
+      res.push(...child)
     } else if (child?.type === Fragment) {
-      res.push(...filterEmpty(child.children));
+      res.push(...filterEmpty(child.children))
     } else {
-      res.push(child);
+      res.push(child)
     }
-  });
-  return res;
+  })
+  return res
 }

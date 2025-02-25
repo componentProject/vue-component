@@ -5,12 +5,12 @@
 </template>
 
 <script lang="ts" setup>
-import { type CSSProperties, inject } from 'vue'
+import { inject } from 'vue'
 import { computed } from 'vue'
 import type { SizeType, propsType } from './types'
 import type { propsType as ConfigProviderPropsType } from '@/components/ConfigProvider/types/index.ts'
 import classNames from 'classnames'
-
+import type { CSSProperties } from 'vue'
 defineOptions({
   name: 'Space',
 })
@@ -50,7 +50,7 @@ function getNumberSize(size: SizeType) {
 }
 
 const configProvider: ConfigProviderPropsType = inject('configProvider', {})
-const styles = computed(() => {
+const styles = computed<CSSProperties>(() => {
   const { size, wrap, height, width } = props
   const spaceSize = configProvider.space || size
   const [horizontalSize, verticalSize] = (

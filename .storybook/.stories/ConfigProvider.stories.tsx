@@ -1,6 +1,6 @@
 import ConfigProvider from '@/components/ConfigProvider/index.vue'
 import type { propsType } from '@/components/ConfigProvider/types'
-import type { Meta } from '@storybook/vue3'
+import type { Meta, StoryObj } from '@storybook/vue3'
 
 import Calendar from '@/components/Calendar/index.vue'
 import Space from '@/components/Space/index.vue'

@@ -1,4 +1,5 @@
 import type { Dayjs } from 'dayjs'
+
 export interface propsType {
   /**
    * 默认展示的日期
@@ -12,9 +13,14 @@ export interface propsType {
   locale?: 'zh-CN' | 'en-US'
 }
 
+export interface slotsType {
+  date: (props: { date: Dayjs }) => any
+  dateContent: (props: { date: Dayjs }) => any
+}
+
 export interface CalendarHeaderPropsType {
   localeContext?: {
     locale: 'zh-CN' | 'en-US'
   }
-  modelValue: Dayjs
+  modelValue?: Dayjs
 }

@@ -38,7 +38,7 @@ export async function getSidebar(fileName: string, excludePaths: string[] = []) 
 
 	// 转换sidebarStructure为适合VitePress侧边栏的格式
 	function getSidebarItems(sidebarStructure:object, fileName:string) {
-		return Object.entries(sidebarStructure).reduce((modules, [text, value]) => {
+		return Object.entries(sidebarStructure).reduce((modules:any[], [text, value]) => {
 			if (typeof value === "object") {
 				modules.push({
 					text,

@@ -19,7 +19,7 @@ import CalendarMonth from './components/CalendarMonth.vue'
 import dayjs from 'dayjs'
 import type { Dayjs } from 'dayjs'
 import { computed, inject, ref, watch } from 'vue'
-import type { propsType } from './types'
+import type { propsType, slotsType } from './types'
 import type { propsType as ConfigProviderPropsType } from '@/components/ConfigProvider/types/index.ts'
 
 defineOptions({
@@ -31,10 +31,7 @@ const props = withDefaults(defineProps<propsType>(), {
   locale: 'zh-CN',
 })
 
-defineSlots<{
-  date: (props: { date: Dayjs }) => any
-  dateContent: (props: { date: Dayjs }) => any
-}>()
+defineSlots<slotsType>()
 
 const configProvider: ConfigProviderPropsType = inject('configProvider', {})
 const localeContext = computed(() => {
@@ -43,7 +40,7 @@ const localeContext = computed(() => {
     locale: configProvider.locale || props.locale,
   }
 })
-const curDate = ref<Dayjs>()
+const curDate = ref<Dayjs | undefined>()
 
 watch(
   () => {
@@ -67,7 +64,7 @@ const monthChange = (type = 'subtract') => {
   if (type == 'today') {
     curDate.value = dayjs(Date.now())
   } else {
-    curDate.value = curDate.value[type](1, 'month')
+    curDate.value = curDate.value?.[type](1, 'month')
   }
   emits('update:modelValue', curDate.value)
 }

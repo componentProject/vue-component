@@ -1,8 +1,9 @@
-import { getComponents } from "./utils/serverUtils";
+import { getComponents } from './utils/serverUtils'
 import { buildBlogRSS } from './theme/rss'
 import { transformerTwoslash } from '@shikijs/vitepress-twoslash'
 import mathjax3 from 'markdown-it-mathjax3'
 
+import type { UserConfig } from 'vitepress'
 import { demoblockPlugin, demoblockVitePlugin } from 'vitepress-theme-demoblock'
 import vueJsx from '@vitejs/plugin-vue-jsx'
 
@@ -11,14 +12,14 @@ import vueJsx from '@vitejs/plugin-vue-jsx'
 import { getSidebar } from './utils'
 import path from 'path'
 
-async function config() {
-  const componentPath = "/components";
-  const posts = await getComponents(componentPath);
-  const pageSize = 5;
-  const postLength = posts.length;
+async function config(): Promise<Awaited<UserConfig>> {
+  const componentPath = '/components'
+  const posts = await getComponents(componentPath)
+  const pageSize = 5
+  const postLength = posts.length
 
-  const components = await getSidebar("components");
-  const navs = await getSidebar("navs");
+  const components = await getSidebar('components')
+  const navs = await getSidebar('navs')
   return {
     title: 'vueComponent',
     description: '一个vue组件库',
@@ -28,10 +29,10 @@ async function config() {
     vite: {
       resolve: {
         alias: {
-          '@': path.resolve(__dirname, "../../src"),
+          '@': path.resolve(__dirname, '../../src'),
         },
       },
-      plugins: [demoblockVitePlugin(), vueJsx()],
+      plugins: [demoblockVitePlugin() as any , vueJsx() as any],
     },
     head: [
       [
@@ -71,16 +72,16 @@ async function config() {
         dark: 'vitesse-dark',
       },
       codeTransformers: [transformerTwoslash()],
-      config: (md:any) => {
+      config: (md: any) => {
         md.use(mathjax3)
         md.use(demoblockPlugin, {
-          customClass: 'demoblock-custom'
+          customClass: 'demoblock-custom',
         })
       },
     },
     themeConfig: {
       // https://vitepress.dev/reference/default-theme-config
-      avator: "/vue-component/vitepress/avator.png",
+      avator: '/vue-component/vitepress/avator.png',
       // 标题
       siteTitle: 'vueComponent',
       // logo
@@ -104,15 +105,15 @@ async function config() {
           link: '/',
         },
         {
-          text: "storybook组件库",
-          link: "https://componentproject.github.io/vue-component/storybook/",
+          text: 'storybook组件库',
+          link: 'https://componentproject.github.io/vue-component/storybook/',
         },
-        ...navs
+        ...navs,
       ],
 
       // 侧边栏,配置基本同导航栏
       sidebar: {
-        '/components/': components
+        '/components/': components,
       },
       socialLinks: [{ icon: 'github', link: 'https://github.com/componentProject/vue-component' }],
       // 搜索配置
@@ -134,4 +135,5 @@ async function config() {
   }
 }
 
-export default config()
+const viteConfig = await config()
+export default viteConfig

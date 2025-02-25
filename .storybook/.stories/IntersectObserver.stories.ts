@@ -1,8 +1,10 @@
 import IntersectObserver from '@/components/IntersectObserver/index.vue'
 import './assets/styles/IntersectObserver.scss'
-import { ref } from 'vue'
 
-import { Meta, StoryFn } from '@storybook/vue3'
+import { ref } from 'vue'
+import { ElRow, ElCol, ElForm, ElFormItem, ElSelect, ElOption, ElCheckboxGroup } from 'element-plus'
+
+import type { Meta, StoryFn } from '@storybook/vue3'
 
 const meta: Meta<any> = {
   title: '可视化容器',
@@ -15,16 +17,16 @@ const meta: Meta<any> = {
       default: true,
     },
     rootMargin: {
-      control: 'array',
+      control: false,
     },
     threshold: {
       control: 'number',
     },
     observers: {
-      control: 'array',
+      control: false,
     },
     observerIds: {
-      control: 'array',
+      control: false,
     },
   },
 }
@@ -810,6 +812,13 @@ export const intersectObserver: StoryFn = () => ({
     </div>
   `,
   components: {
+    ElRow,
+    ElCol,
+    ElSelect,
+    ElOption,
+    ElForm,
+    ElFormItem,
+    ElCheckboxGroup,
     IntersectObserver,
   },
   setup() {
@@ -837,7 +846,7 @@ export const intersectObserver: StoryFn = () => ({
     // 入区健康信息
     const inAreaHealthInfo = ref({})
     // 过敏信息
-    const allergyColumns = ref([
+    const allergyColumns = ref<Array<{ label: string; prop: string; type?: string }>>([
       { label: '过敏类型', prop: 'allergyType' },
       { label: '过敏原名称', prop: 'allergyOrigin' },
       { label: '过敏物/过敏药品', prop: 'allergyDrug' },
@@ -862,7 +871,57 @@ export const intersectObserver: StoryFn = () => ({
       },
     ])
     // 费用信息
-    const patientPriceInfo = ref({})
+    const patientPriceInfo = ref({
+      drugCostRatio: '',
+      drugCost: '',
+      reimbursementRatio:'',
+      unsettledAmount: '',
+      medicalInsuranceReimbursement:'',
+      guaranteeMoney:'',
+      totalCost:'',
+      advancePayment:'',
+      balance:'',
+      lifeStatus:'',
+      pathologyStatus:'',
+      spo2:'',
+      temperature:'',
+      pulse:'',
+      respiratoryRate:'',
+      bloodPressure:'',
+      rhBloodType:'',
+      bloodType:'',
+      bmi:'',
+      outDiagnosis:'',
+      inDiagnosis:'',
+      inDepartment:'',
+      inArea:'',
+      chiefDoctor:'',
+      doctor:'',
+      responsibleNurse:'',
+      medicalGroup:'',
+      inAreaTime:'',
+      inHospitalTime:'',
+      inHospitalNo:'',
+      createUser:'',
+      createUnit:'',
+      contactPersonPostalCode:'',
+      contactPersonAddress:'',
+      contactPersonPhone:'',
+      contactPersonRelation:'',
+      contactPerson:'',
+      workUnitPhone:'',
+      workUnit:'',
+      occupationType:'',
+      healthCardNumber:'',
+      healthRecordNumber:'',
+      nation:'',
+      nationality:'',
+      insuranceType:'',
+      maritalStatus:'',
+      idNumber:'',
+      idType:'',
+      birthday:'',
+    })
     // 隔离标识
     const markList = ref([
       { label: '飞沫隔离', value: '1' },
@@ -872,7 +931,7 @@ export const intersectObserver: StoryFn = () => ({
     const isolationMark = ref([])
 
     // list
-    const list = ref([
+    const list = ref<{ name: string; id: string; target: Element | null }[]>([
       { name: '基本信息', id: 'baseInfo', target: null },
       { name: '住院信息', id: 'hospitalInfo', target: null },
       { name: '入区健康信息', id: 'inAreaHealth', target: null },
@@ -880,20 +939,23 @@ export const intersectObserver: StoryFn = () => ({
       { name: '费用信息', id: 'price', target: null },
       { name: '隔离标识', id: 'isolationMark', target: null },
     ])
-    let timer = null
+    let timer: undefined | NodeJS.Timeout
     const rootElement = null
-    let observer, resizeObserver
+    let observer: any, resizeObserver: any
     const hasScroll = ref(false)
-    const activeListItem = ref('baseInfo')
-    const scrollToHandler = (ref) => {
-      const element = list.value.find((item) => item.id === ref).target
+    const activeListItem = ref<string>('baseInfo')
+    const scrollToHandler = (ref: string) => {
+      const findItem: { target: Element | null } | undefined = list.value.find(
+        (item) => item.id === ref,
+      )
+      const element: Element | undefined | null = findItem?.target
       activeListItem.value = ref
       hasScroll.value = true
       clearTimeout(timer)
       timer = setTimeout(() => {
         hasScroll.value = false
       }, 1000)
-      element.scrollIntoView({
+      element?.scrollIntoView({
         block: 'start',
         behavior: 'smooth',
       })
@@ -901,19 +963,22 @@ export const intersectObserver: StoryFn = () => ({
     //#endregion
 
     //#region methods
-    const editHandler = (editKey) => {
+    const editHandler = (editKey: string) => {
       disabledObj.value[editKey] = false
     }
-    const saveHandler = (saveKey) => {
+    const saveHandler = (saveKey: string) => {
       disabledObj.value[saveKey] = true
     }
-    const getTargets = (targets) => {
+    const getTargets = (targets: { target: Element }) => {
       list.value.forEach((item) => {
         item.target = targets[item.id]
       })
     }
-    const mutate = (entry) => {
-      if (!hasScroll.value) activeListItem.value = entry.target.getAttribute('id')
+    const mutate = (entry: { target: Element }) => {
+      const id = entry.target.getAttribute('id')
+      if (!hasScroll.value && id) {
+        activeListItem.value = id
+      }
     }
     //#endregion
 

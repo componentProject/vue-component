@@ -2,7 +2,7 @@
   <el-backtop v-if="show" v-bind="Options" v-on="Event" />
 </template>
 
-<script lang="ts">
+<script lang="js">
 import { isType } from '../../../utils'
 import { defineComponent } from 'vue'
 export default defineComponent({

@@ -91,7 +91,7 @@
   </div>
 </template>
 
-<script lang="ts">
+<script lang="js">
 const SELECT_STATE = {
   unselect: 0,
   selecting: 1,

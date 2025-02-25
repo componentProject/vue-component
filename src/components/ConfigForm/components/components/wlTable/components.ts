@@ -1,8 +1,6 @@
-import type { Plugin } from 'vue'
-
 import wlTableColumn from './compoents/wlTableColumn/index.vue'
 
-const components: Plugin = {
+const components: { [key: string]: any } = {
   wlTableColumn,
 }
 

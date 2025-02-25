@@ -6,10 +6,12 @@
     "src/**/*.vue",
     ".storybook/.stories/*",
     ".storybook/*",
-    ".docs/.vitepress/*"
+    "./.docs/.vitepress/*",
+    "./.docs/.vitepress/**/*",
   ],
   "exclude": [
-    "src/**/__tests__/*"
+    "src/**/__tests__/*",
+    ".docs/.vitepress/cache/**/*"
   ],
   "compilerOptions": {
     "composite": true,

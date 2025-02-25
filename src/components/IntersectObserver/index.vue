@@ -27,21 +27,21 @@ const props = defineProps({
    * 例如[0,0,0.8,0] 代表仅监听0-20%高度部分
    */
   rootMargin: {
-    type: Array,
+    type: Array<any>,
     default: () => [0, 0, 0, 0],
   },
   /**
    * 需要监听进入/离开容器的元素列表
    * */
   observers: {
-    type: Array,
+    type: Array<any>,
     default: () => [],
   },
   /**
    * 需要监听进入/离开容器的元素id列表
    * */
   observerIds: {
-    type: Array,
+    type: Array<any>,
     default: () => [],
   },
 })
@@ -60,8 +60,8 @@ const emits = defineEmits([
   'getTargets',
 ])
 
-let rootElement = null
-let observer, resizeObserver
+let rootElement: Element | null = null
+let observer: IntersectionObserver | undefined, resizeObserver: ResizeObserver | undefined
 onMounted(() => {
   rootElement = document.getElementById('intersection-observer-box')
   resizeObserver = new ResizeObserver((entries) => {
@@ -77,7 +77,7 @@ onMounted(() => {
         const { threshold, isIntersecting, observers, observerIds } = props
 
         let rootMargin = ''
-        props.rootMargin.forEach((item, index) => {
+        props.rootMargin.forEach((item: number, index: number) => {
           rootMargin += `${index % 2 ? -inlineSize * item : -blockSize * item}px `
         })
         observer = new IntersectionObserver(
@@ -96,26 +96,31 @@ onMounted(() => {
           },
         )
         observers.forEach((domItem) => {
-          observer.observe(domItem)
+          observer?.observe(domItem)
         })
-        const targets = observerIds.reduce((p, id) => {
-          p[id] = document.getElementById(id)
-          return p
-        }, {})
+        const targets: { [key: string]: Element } = observerIds.reduce(
+          (p: { id: string }, id: string) => {
+            p[id] = document.getElementById(id)
+            return p
+          },
+          {},
+        )
         Object.values(targets).forEach((domItem) => {
-          observer.observe(domItem)
+          observer?.observe(domItem)
         })
         emits('getTargets', targets)
       }
     }
   })
-  resizeObserver.observe(rootElement, {
-    box: 'content-box',
-  })
+  if (rootElement) {
+    resizeObserver?.observe(rootElement, {
+      box: 'content-box',
+    })
+  }
 })
 onBeforeUnmount(() => {
-  resizeObserver.disconnect()
-  observer.disconnect()
+  resizeObserver?.disconnect()
+  observer?.disconnect()
 })
 </script>
 
