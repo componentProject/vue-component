@@ -19,16 +19,15 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { useData, onContentUpdated } from "vitepress";
+import {  onContentUpdated } from "vitepress";
 import { shallowRef, ref } from "vue";
 import { getHeaders } from "../../../../utils/utils";
 
-const { frontmatter, theme } = useData();
 const headers = shallowRef<any>([]);
 const showIndent = ref(false);
 onContentUpdated(() => {
-  headers.value = getHeaders(frontmatter.value.outline ?? theme.value.outline);
-  showIndent.value = headers.value.some((header) => {
+  headers.value = getHeaders();
+  showIndent.value = headers.value.some((header:any) => {
     return header.level === 2;
   });
 });
@@ -51,9 +50,6 @@ onContentUpdated(() => {
   box-sizing: border-box;
 }
 
-.showIndent {
-  padding-left: 1rem;
-}
 ul {
   list-style-type: none;
 }
