@@ -1,10 +1,10 @@
-import zhCN from "./zh-CN";
-import enUS from "./en-US";
-import type { CalendarType } from "./interface.ts";
+import zhCN from './zh-CN'
+import enUS from './en-US'
+import type { CalendarType } from './interface.ts'
 
-const allLocales : Record<string, CalendarType>= {
-    'zh-CN': zhCN,
-    'en-US': enUS
+const allLocales: Record<string, CalendarType> = {
+  'zh-CN': zhCN,
+  'en-US': enUS,
 }
 
-export default allLocales;
+export default allLocales

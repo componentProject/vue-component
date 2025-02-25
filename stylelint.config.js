@@ -15,7 +15,7 @@ export default {
     'no-empty-source': null,
     // 禁用 scss 的 扩展检测
     'scss/load-partial-extension': null,
-    "no-descending-specificity": null,
+    'no-descending-specificity': null,
     // 使 deep 可用
     'selector-pseudo-class-no-unknown': [
       true,
@@ -27,14 +27,14 @@ export default {
     'at-rule-no-unknown': [
       true,
       {
-        ignoreAtRules: ['tailwind']
-      }
+        ignoreAtRules: ['tailwind', 'forward', 'use','each'],
+      },
     ],
     'scss/at-rule-no-unknown': [
       true,
       {
-        ignoreAtRules: ['tailwind']
-      }
+        ignoreAtRules: ['tailwind', 'forward', 'use','each'],
+      },
     ],
   },
 }

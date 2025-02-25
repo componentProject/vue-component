@@ -1,5 +1,5 @@
 .el-button {
-  font-family: PingFangSC-Regular;
+  font-family: PingFangSC-Regular, serif;
 }
 
 /* dialog全局样式 */
@@ -14,12 +14,12 @@
   line-height: 47px;
   padding-left: 16px;
   font-size: 16px;
-  font-family: PingFangSC-Semibold;
+  font-family: PingFangSC-Semibold, serif;
+
   /* font-weight: 600; */
 }
 
 .el-dialog__body {
-  padding: 0;
   min-height: 10px;
   padding: 16px;
   height: calc(100% - 47px);
@@ -77,38 +77,38 @@
     .el-table__cell {
       padding: 4px 2px !important;
       cursor: pointer;
-      font-family: PingFangSC-Regular;
+      font-family: PingFangSC-Regular, serif;
     }
 
-    .el-table__cell:first-child {
-      /* border-left: 1px solid var(--border-color-1) !important; */
+    tr {
+      /* 高亮选中行 */
+      &:hover,
+      &.selected {
+        td {
+          background-color: #ccdeff !important;
+        }
+      }
     }
   }
+
 
   .el-table__header-wrapper {
     thead {
       color: #29354f !important;
       font-size: 12px !important;
+
       /* font-weight: 600; */
-      font-family: PingFangSC-Semibold;
+      font-family: PingFangSC-Semibold, serif;
 
       th {
         background: #f5f7fa !important;
         border-top: 1px solid var(--border-color-1) !important;
       }
 
-      th.el-table__cell > .cell {
-        /* top:-4px */
-        /* font-weight: 600; */
-      }
     }
 
     .el-table__cell {
       padding: 4px 2px !important;
-    }
-
-    .el-table__cell:first-child {
-
     }
 
     .el-table__cell:first-child .cell {
@@ -120,16 +120,28 @@
   .el-table__fixed-body-wrapper {
     .el-table__cell {
       padding: 4px 2px !important;
+
       /* border-color: var(--border-color-1) !important; */
-      font-family: PingFangSC-Regular;
+      font-family: PingFangSC-Regular, serif;
     }
+
+    tr {
+      /* 高亮选中行 */
+      &:hover,
+      &.selected {
+        td {
+          background-color: #ccdeff !important;
+        }
+      }
+    }
+
   }
 
   .el-table__fixed-header-wrapper {
     thead {
       color: #29354f !important;
       font-size: 14px !important;
-      font-family: PingFangSC-Semibold;
+      font-family: PingFangSC-Semibold, serif;
 
       th {
         /* border-top: 1px solid var(--border-color-1) !important; */
@@ -144,33 +156,11 @@
 
     th.el-table__cell > .cell {
       /* top:-4px */
+
       /* font-weight: 600; */
     }
   }
 
-  .el-table__body-wrapper {
-    tr {
-      /* 高亮选中行 */
-      &:hover,
-      &.selected {
-        td {
-          background-color: #ccdeff !important;
-        }
-      }
-    }
-  }
-
-  .el-table__fixed-body-wrapper {
-    tr {
-      /* 高亮选中行 */
-      &:hover,
-      &.selected {
-        td {
-          background-color: #ccdeff !important;
-        }
-      }
-    }
-  }
 }
 
 .el-input__inner,

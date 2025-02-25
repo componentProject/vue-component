@@ -1,10 +1,6 @@
 @import './base.css';
-
-/* tailwind和它二选一 */
-
-/* @import "custom.scss"; */
 @import './tailwind.scss';
-@import "./element/index.scss";
+@import './element/index.scss';
 
 #app {
   margin: 0;
