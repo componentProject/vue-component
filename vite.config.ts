@@ -61,7 +61,7 @@ export default defineConfig((mode) => {
     plugins: [
       vue(),
       vueJsx(),
-      vueDevTools(),
+      env.VITE_DEVTOOLS && vueDevTools(),
       // 自动引入
       AutoImport({
         imports: ['vue'],
@@ -76,81 +76,84 @@ export default defineConfig((mode) => {
       // 是否生成包预览
       viteEnv.VITE_REPORT && visualizer(),
       // 代码压缩
-      viteCompression({
-        // gzip压缩需要服务器nginx配置以下内容:
-        // http {
-        //   gzip_static on;
-        //   gzip_proxied any;
-        // }
-        // 可选 'brotliCompress' 或 'gzip'
-        algorithm: viteEnv.VITE_BUILD_GZIP ? 'gzip' : 'brotliCompress',
-        verbose: true, //输出日志信息
-        disable: false, //是否禁用
-        ext: '.gz', // 压缩文件后缀
-        threshold: 10240, // 仅压缩大于 10KB 的文件
-        deleteOriginFile: false, // 是否删除原始文件
-      }),
+      viteEnv.VITE_COMPRESS &&
+        viteCompression({
+          // gzip压缩需要服务器nginx配置以下内容:
+          // http {
+          //   gzip_static on;
+          //   gzip_proxied any;
+          // }
+          // 可选 'brotliCompress' 或 'gzip'
+          algorithm: viteEnv.VITE_BUILD_GZIP ? 'gzip' : 'brotliCompress',
+          verbose: true, //输出日志信息
+          disable: false, //是否禁用
+          ext: '.gz', // 压缩文件后缀
+          threshold: 10240, // 仅压缩大于 10KB 的文件
+          deleteOriginFile: false, // 是否删除原始文件
+        }),
       // 图片压缩
-      viteImagemin({
-        // gif压缩
-        gifsicle: {
-          optimizationLevel: 7,
-          interlaced: false,
-        },
-        optipng: {
-          optimizationLevel: 7,
-        },
-        mozjpeg: {
-          quality: 20,
-        },
-        pngquant: {
-          quality: [0.8, 0.9],
-          speed: 4,
-        },
-        // svg压缩
-        svgo: {
-          plugins: [
+      viteEnv.VITE_IMAGEMIN &&
+        viteImagemin({
+          // gif压缩
+          gifsicle: {
+            optimizationLevel: 7,
+            interlaced: false,
+          },
+          optipng: {
+            optimizationLevel: 7,
+          },
+          mozjpeg: {
+            quality: 20,
+          },
+          pngquant: {
+            quality: [0.8, 0.9],
+            speed: 4,
+          },
+          // svg压缩
+          svgo: {
+            plugins: [
+              {
+                name: 'removeViewBox',
+              },
+              {
+                name: 'removeEmptyAttrs',
+                active: false,
+              },
+            ],
+          },
+        }),
+      // CDN加速
+      viteEnv.VITE_USE_CDN &&
+        importToCDN({
+          modules: [
             {
-              name: 'removeViewBox',
+              name: 'vue',
+              var: 'Vue',
+              path: 'https://unpkg.com/vue@3/dist/vue.esm-browser.js',
             },
             {
-              name: 'removeEmptyAttrs',
-              active: false,
+              name: 'vue-router',
+              var: 'VueRouter',
+              path: 'https://unpkg.com/vue-router@4/dist/vue-router.global.js',
+            },
+            {
+              name: 'element-plus',
+              var: 'ElementPlus',
+              path: 'https://unpkg.com/element-plus@2.3.8/dist/index.full.min.js',
+              css: 'https://unpkg.com/element-plus@2.3.8/dist/index.css',
+            },
+            {
+              name: 'moment',
+              var: 'moment',
+              path: 'https://unpkg.com/moment@2.29.4/min/moment.min.js',
+            },
+            {
+              name: 'radash',
+              var: 'radash',
+              path: 'https://unpkg.com/radash@11.0.0/dist/index.umd.js',
             },
           ],
-        },
-      }),
-      // CDN加速
-      importToCDN({
-        modules: [
-          {
-            name: 'vue',
-            var: 'Vue',
-            path: 'https://unpkg.com/vue@3/dist/vue.esm-browser.js',
-          },
-          {
-            name: 'vue-router',
-            var: 'VueRouter',
-            path: 'https://unpkg.com/vue-router@4/dist/vue-router.global.js',
-          },
-          {
-            name: 'element-plus',
-            var: 'ElementPlus',
-            path: 'https://unpkg.com/element-plus@2.3.8/dist/index.full.min.js',
-            css: 'https://unpkg.com/element-plus@2.3.8/dist/index.css',
-          },
-          {
-            name: 'moment',
-            var: 'moment',
-            path: 'https://unpkg.com/moment@2.29.4/min/moment.min.js',
-          },
-          {
-            name: 'radash',
-            var: 'radash',
-            path: 'https://unpkg.com/radash@11.0.0/dist/index.umd.js',
-          },
-        ],
-      }),
+        }),
       createHtmlPlugin({
         inject: {
           data: {
@@ -168,7 +171,9 @@ export default defineConfig((mode) => {
       chunkSizeWarningLimit: 1500,
       rollupOptions: {
         // 移除cdn引入的包
-        external: ['vue', 'vue-router', 'element-plus', 'axios', 'moment', 'radash'],
+        external: viteEnv.VITE_USE_CDN
+          ? ['vue', 'vue-router', 'element-plus', 'axios', 'moment', 'radash']
+          : [],
         output: {
           paths: {
             vue: 'https://unpkg.com/vue@3/dist/vue.esm-browser.js',
@@ -186,10 +191,12 @@ export default defineConfig((mode) => {
         },
       },
       terserOptions: {
-        compress: {
-          drop_console: true,
-          drop_debugger: true,
-        },
+        compress: viteEnv.VITE_DROP_CONSOLE
+          ? {
+              drop_console: true,
+              drop_debugger: true,
+            }
+          : {},
       },
     },
     css: {
