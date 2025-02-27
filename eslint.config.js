@@ -11,7 +11,7 @@
 import pluginVue from 'eslint-plugin-vue'
 import { defineConfigWithVueTs, vueTsConfigs } from '@vue/eslint-config-typescript'
 import skipFormatting from '@vue/eslint-config-prettier/skip-formatting'
-import pluginStorybook from 'eslint-plugin-storybook'
+import storybook from 'eslint-plugin-storybook'
 export default [
   {
     name: 'app/files-to-lint',
@@ -30,8 +30,5 @@ export default [
       'vue/block-lang': 'off',
     },
   },
-  {
-    files: ['**/*.stories.@(ts|tsx|js|jsx|mjs|cjs|vue)'],
-    ...pluginStorybook.configs.recommended,
-  },
+  ...storybook.configs['flat/recommended']
 ]
