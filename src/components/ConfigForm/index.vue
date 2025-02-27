@@ -13,7 +13,9 @@ import type {
   FormItemConfig,
   FormRuleProps,
   ComponentPropsType,
+  configType,
 } from './types'
+import type { ColProps } from 'element-plus'
 
 export default defineComponent({
   name: 'wlConfigForm',
@@ -64,13 +66,13 @@ export default defineComponent({
 
     const refs = reactive({})
 
-    function setRefs(el: any, key: string) {
+    function setRefs(el: Element, key: string) {
       refs[key] = el
     }
 
     const setConfigByProp = (
       prop: string,
-      value: any,
+      value: configType[keyof configType] | configType,
       defaultKeyOrKey: boolean | string = true,
     ) => {
       const rows = deepClone(props.rows)
@@ -92,7 +94,11 @@ export default defineComponent({
       emit('update:rows', rows)
     }
 
-    const setColConfigByProp = (prop: string, value: any, key: string | null = null) => {
+    const setColConfigByProp = (
+      prop: string,
+      value: ColProps[keyof ColProps] | ColProps,
+      key: string | null = null,
+    ) => {
       const rows = deepClone(props.rows)
       rows?.forEach((row: rowConfig) => {
         const formItem = row.formItems?.find((item: FormItemConfig) => item.prop === prop)
@@ -107,7 +113,11 @@ export default defineComponent({
       emit('update:rows', rows)
     }
 
-    const setFormItemByProp = (prop: string, value: any, key: string | null = null) => {
+    const setFormItemByProp = (
+      prop: string,
+      value: FormItemConfig[keyof FormItemConfig] | FormItemConfig,
+      key: string | null = null,
+    ) => {
       const rows = deepClone(props.rows)
       rows?.forEach((row: rowConfig) => {
         const index = row.formItems?.findIndex((item: FormItemConfig) => item.prop === prop)

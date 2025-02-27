@@ -16,6 +16,12 @@ import storybook from 'eslint-plugin-storybook'
 export default [
   {
     name: 'app/files-to-lint',
+    parserOptions: {
+      ecmaVersion: 2020,
+      ecmaFeatures: {
+        jsx: true,
+      },
+    },
     languageOptions: {
       parserOptions: {
         ecmaVersion: 2020,

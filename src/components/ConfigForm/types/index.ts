@@ -37,12 +37,19 @@ export interface ComponentPropsType {
   prop?: string
   model?: FormModelProps
   slots?: string
-  config: configType[]
+  config: configType
 
   [key: string]: any
 }
 
 export interface configType {
+  show?: false
+  event?: { [key: string]: any }
+  buttonType?: string
+  text?: string
+  slots?: { [key: string]: any }
+  options?: any[]
+
   [key: string]: any
 }
 
