@@ -132,7 +132,7 @@ configForm.args = {
     labelWidth: `80px`,
     required: true,
     model: {
-      input: '',
+      input: '1231313',
       switch: 1,
       InputNumber: 0,
       textarea: '',
