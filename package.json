@@ -105,11 +105,6 @@
     "vitepress-theme-demoblock": "^3.0.7",
     "vue-tsc": "^2.1.10"
   },
-  "eslintConfig": {
-    "extends": [
-      "plugin:storybook/recommended"
-    ]
-  },
   "husky": {
     "hooks": {
       "prepare-commit-msg": "exec < /dev/tty && npx cz --hook || true"

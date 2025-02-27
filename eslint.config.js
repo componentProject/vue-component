@@ -1,19 +1,27 @@
+/*
+ * @Author: moluoxixi 1983531544@qq.com
+ * @Date: 2025-01-25 14:59:50
+ * @LastEditors: moluoxixi 1983531544@qq.com
+ * @LastEditTime: 2025-02-27 11:42:39
+ * @FilePath: \vue-component\eslint.config.js
+ * @Description:
+ *
+ * Copyright (c) 2025 by ${git_name_email}, All Rights Reserved.
+ */
 import pluginVue from 'eslint-plugin-vue'
-import vueTsEslintConfig from '@vue/eslint-config-typescript'
+import { defineConfigWithVueTs, vueTsConfigs } from '@vue/eslint-config-typescript'
 import skipFormatting from '@vue/eslint-config-prettier/skip-formatting'
-
+import pluginStorybook from 'eslint-plugin-storybook'
 export default [
   {
     name: 'app/files-to-lint',
     files: ['**/*.{ts,mts,tsx,vue}'],
   },
-
   {
     name: 'app/files-to-ignore',
     ignores: ['**/dist/**', '**/dist-ssr/**', '**/coverage/**'],
   },
-  ...pluginVue.configs['flat/base'],
-  ...vueTsEslintConfig(),
+  ...defineConfigWithVueTs(pluginVue.configs['flat/base'], vueTsConfigs.recommended),
   skipFormatting,
   {
     rules: {
@@ -21,5 +29,9 @@ export default [
       '@typescript-eslint/no-unused-expressions': 'off',
       'vue/block-lang': 'off',
     },
+  },
+  {
+    files: ['**/*.stories.@(ts|tsx|js|jsx|mjs|cjs|vue)'],
+    ...pluginStorybook.configs.recommended,
   },
 ]
