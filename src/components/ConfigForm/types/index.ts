@@ -66,7 +66,7 @@ export interface FormItemConfig extends FormItemProps {
   render?: (scope?: Record<string, unknown>) => import('vue').VNode | any
   slots?: Record<string, (scope: Record<string, unknown>) => import('vue').VNode>
   message?: string
-  config?: Record<string, any>
+  config?: configType
 
   prop?: string
 
@@ -105,12 +105,12 @@ export interface formOptionsConfig extends FormProps {
 export interface rowConfig extends RowProps {
   hidden?: boolean | ((params?: any) => boolean)
   render?: (scope?: Record<string, unknown>) => import('vue').VNode | any
-  formItems?: Array<FormItemConfig>
+  formItems?: FormItemConfig[]
 
   [key: string]: any
 }
 
 export interface ConfigFormProps {
   formOptions?: formOptionsConfig
-  rows?: Array<rowConfig>
+  rows?: rowConfig[]
 }
