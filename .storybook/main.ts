@@ -1,8 +1,12 @@
 import type { StorybookConfig } from '@storybook/vue3-vite'
 import { mergeConfig } from 'vite'
+import type { PluginOption } from "vite";
 import viteConfig from '../vite.config'
 import type { modeType } from '../vite.config'
 
+type PluginOptionType = PluginOption & {
+  name?: string;
+};
 const config: StorybookConfig = {
   stories: [
     './.stories/*.stories.@(js|jsx|mjs|ts|tsx|mdx)',
@@ -20,10 +24,14 @@ const config: StorybookConfig = {
   },
   async viteFinal(config, { configType }) {
     const { plugins, build } = viteConfig({ mode: configType,type: 'storybook' } as modeType)
-    return mergeConfig(config, {
+    const mergeconfig = mergeConfig(config, {
       build,
-      plugins
-    })
+      plugins,
+    });
+    mergeconfig.plugins = mergeconfig.plugins.filter((plugin: PluginOptionType) => {
+      return plugin?.name != "vite-plugin-cdn-import";
+    });
+    return mergeconfig
   },
   docs: {
     autodocs: true,
