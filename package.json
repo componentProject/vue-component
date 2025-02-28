@@ -46,10 +46,6 @@
     "vxe-table": "^4.10.5"
   },
   "devDependencies": {
-    "@babel/core": "^7.26.9",
-    "@babel/node": "^7.26.0",
-    "@babel/preset-env": "^7.26.9",
-    "@babel/preset-typescript": "^7.26.0",
     "@chromatic-com/storybook": "3.2.2",
     "@commitlint/config-conventional": "^19.6.0",
     "@shikijs/vitepress-twoslash": "^1.26.1",
@@ -77,7 +73,6 @@
     "eslint-plugin-import": "^2.31.0",
     "eslint-plugin-storybook": "^0.11.1",
     "eslint-plugin-vue": "^9.32.0",
-    "esm": "^3.2.25",
     "fast-glob": "^3.3.2",
     "feed": "^4.2.2",
     "fs-extra": "^11.3.0",
@@ -101,7 +96,6 @@
     "stylelint-config-standard-vue": "^1.0.0",
     "stylelint-config-tailwindcss": "^0.0.7",
     "tailwindcss": "^3.4.16",
-    "ts-node": "^10.9.2",
     "typescript": "^5.7.3",
     "unplugin-auto-import": "^19.1.0",
     "unplugin-vue-components": "^28.3.0",
