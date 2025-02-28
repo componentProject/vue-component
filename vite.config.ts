@@ -75,10 +75,15 @@ export default defineConfig((mode) => {
       dts: path.resolve(__dirname, './src/typings/components.d.ts'),
     }),
   ]
+  // CDN加速
+  const importToCDNPlugins = viteEnv.VITE_USE_CDN
+    ? importToCDN({
+        modules,
+      })
+    : []
   return {
     plugins: [
       ...vuePlugins,
-
       createHtmlPlugin({
         inject: {
           data: {
@@ -86,6 +91,7 @@ export default defineConfig((mode) => {
           },
         },
       }),
+      ...importToCDNPlugins,
       // 是否生成包预览
       viteEnv.VITE_REPORT && visualizer(),
       // 代码压缩
@@ -136,10 +142,6 @@ export default defineConfig((mode) => {
           },
         }),
       // CDN加速
-      viteEnv.VITE_USE_CDN &&
-        importToCDN({
-          modules,
-        }),
     ],
     build: {
       // 启用 CSS 代码拆分,使加载模块时,仅加载对应css,而不是打包为一个样式文件
