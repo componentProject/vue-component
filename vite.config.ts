@@ -7,7 +7,7 @@ import viteImagemin from 'vite-plugin-imagemin'
 import importToCDN from 'vite-plugin-cdn-import'
 
 // vite vue插件
-import vue from '@vitejs/plugin-vue'
+import pluginVue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
 import vueDevTools from 'vite-plugin-vue-devtools'
 import AutoImport from 'unplugin-auto-import/vite'
@@ -64,21 +64,28 @@ export default defineConfig((mode: modeType) => {
   const viteEnv = wrapperEnv(env)
 
   const isStorybook = mode.type === 'storybook'
-  const vuePlugins = isStorybook ? [] : [vue(), vueJsx(), env.VITE_DEVTOOLS && vueDevTools()]
+  const vuePlugins = isStorybook
+    ? []
+    : [
+        pluginVue(),
+        vueJsx(),
+        env.VITE_DEVTOOLS && vueDevTools(),
+        // 自动引入
+        AutoImport({
+          imports: ['vue'],
+          resolvers: [ElementPlusResolver()],
+          dts: path.resolve(__dirname, './src/types/auto-imports.d.ts'),
+        }),
+        Components({
+          resolvers: [ElementPlusResolver()],
+          dts: path.resolve(__dirname, './src/types/components.d.ts'),
+        }),
+      ]
   viteEnv.VITE_USE_CDN = isStorybook ? false : viteEnv.VITE_USE_CDN
   return {
     plugins: [
       ...vuePlugins,
-      // 自动引入
-      AutoImport({
-        imports: ['vue'],
-        resolvers: [ElementPlusResolver()],
-        dts: path.resolve(__dirname, './src/types/auto-imports.d.ts'),
-      }),
-      Components({
-        resolvers: [ElementPlusResolver()],
-        dts: path.resolve(__dirname, './src/types/components.d.ts'),
-      }),
+
       createHtmlPlugin({
         inject: {
           data: {
