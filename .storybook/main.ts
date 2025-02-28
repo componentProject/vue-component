@@ -1,6 +1,5 @@
 import type { StorybookConfig } from '@storybook/vue3-vite'
 import { mergeConfig } from 'vite'
-import type { ConfigEnv } from 'vite'
 import viteConfig from '../vite.config'
 import type { modeType } from '../vite.config'
 
