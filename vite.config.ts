@@ -1,5 +1,6 @@
 import { defineConfig, loadEnv } from 'vite'
-import type { ConfigEnv } from 'vite'
+import { external, modules } from './src/constants'
+
 // 性能优化模块
 import { visualizer } from 'rollup-plugin-visualizer'
 import viteCompression from 'vite-plugin-compression'
@@ -54,27 +55,26 @@ function wrapperEnv(env: Record<string, string>) {
   return result
 }
 
-
 // https://vite.dev/config/
 export default defineConfig((mode) => {
   const env = loadEnv(mode.mode, process.cwd())
   const viteEnv = wrapperEnv(env)
 
   const vuePlugins = [
-        pluginVue(),
-        vueJsx(),
-        env.VITE_DEVTOOLS && vueDevTools(),
-        // 自动引入
-        AutoImport({
-          imports: ['vue'],
-          resolvers: [ElementPlusResolver()],
-          dts: path.resolve(__dirname, './src/types/auto-imports.d.ts'),
-        }),
-        Components({
-          resolvers: [ElementPlusResolver()],
-          dts: path.resolve(__dirname, './src/types/components.d.ts'),
-        }),
-      ]
+    pluginVue(),
+    vueJsx(),
+    env.VITE_DEVTOOLS && vueDevTools(),
+    // 自动引入
+    AutoImport({
+      imports: ['vue'],
+      resolvers: [ElementPlusResolver()],
+      dts: path.resolve(__dirname, './src/typings/auto-imports.d.ts'),
+    }),
+    Components({
+      resolvers: [ElementPlusResolver()],
+      dts: path.resolve(__dirname, './src/typings/components.d.ts'),
+    }),
+  ]
   return {
     plugins: [
       ...vuePlugins,
@@ -138,34 +138,7 @@ export default defineConfig((mode) => {
       // CDN加速
       viteEnv.VITE_USE_CDN &&
         importToCDN({
-          modules: [
-            {
-              name: 'vue',
-              var: 'Vue',
-              path: 'https://unpkg.com/vue@3/dist/vue.esm-browser.js',
-            },
-            {
-              name: 'vue-router',
-              var: 'VueRouter',
-              path: 'https://unpkg.com/vue-router@4/dist/vue-router.global.js',
-            },
-            {
-              name: 'element-plus',
-              var: 'ElementPlus',
-              path: 'https://unpkg.com/element-plus@2.3.8/dist/index.full.min.js',
-              css: 'https://unpkg.com/element-plus@2.3.8/dist/index.css',
-            },
-            {
-              name: 'moment',
-              var: 'moment',
-              path: 'https://unpkg.com/moment@2.29.4/min/moment.min.js',
-            },
-            {
-              name: 'radash',
-              var: 'radash',
-              path: 'https://unpkg.com/radash@11.0.0/dist/index.umd.js',
-            },
-          ],
+          modules,
         }),
     ],
     build: {
@@ -177,9 +150,7 @@ export default defineConfig((mode) => {
       chunkSizeWarningLimit: 1500,
       rollupOptions: {
         // 移除cdn引入的包
-        external: viteEnv.VITE_USE_CDN
-          ? ['vue', 'vue-router', 'element-plus', 'axios', 'moment', 'radash']
-          : [],
+        external: viteEnv.VITE_USE_CDN ? external : [],
         output: {
           // 静态资源打包做处理
           chunkFileNames: 'static/js/[name]-[hash].js',
