@@ -22,8 +22,7 @@ const config: StorybookConfig = {
   core: {
     builder: '@storybook/builder-vite',
   },
-  async viteFinal(config) {
-    const existingPlugins = [importToCDN].map((item) => item.name)
+  async viteFinal(config, { configType }) {
     const mergePluginNames: string[] = []
     const mergePlugins: PluginOptionType[] = []
     config.plugins.forEach((item?: PluginOptionType) => {
@@ -33,12 +32,15 @@ const config: StorybookConfig = {
         mergePlugins.push(item)
       }
     })
-    config.plugins = mergePlugins.filter((plugin: PluginOptionType) => {
-      return !existingPlugins.includes(plugin?.name)
-    })
-    config.build.rollupOptions.external = config.build.rollupOptions.external.filter(
-      (item:string) => !external.includes(item),
-    )
+    if (configType === 'PRODUCTION') {
+      const existingPlugins = [importToCDN].map((item) => item.name)
+      config.plugins = mergePlugins.filter((plugin: PluginOptionType) => {
+        return !existingPlugins.includes(plugin?.name)
+      })
+      config.build.rollupOptions.external = config.build.rollupOptions.external.filter(
+        (item: string) => !external.includes(item),
+      )
+    }
     return config
   },
   docs: {
