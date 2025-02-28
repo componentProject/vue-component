@@ -50,7 +50,6 @@ const config: StorybookConfig = {
     mergeconfig.build.rollupOptions.external = mergeconfig.build.rollupOptions.external.filter(
       (item:string) => !external.includes(item),
     )
-    console.log('mergeconfig', mergeconfig.build)
     return mergeconfig
   },
   docs: {
