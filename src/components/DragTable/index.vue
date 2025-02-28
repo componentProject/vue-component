@@ -75,24 +75,24 @@
           <template #default="scope">
             <slot :name="item.slots.default !== undefined" :data="scope.row">
               <template v-if="$refs.xTable.isUpdateByRow(scope.row) && item.btnGroup.isDepatSave">
-                <el-button type="text">局部保存</el-button>
+                <el-button text>局部保存</el-button>
               </template>
-              <el-button v-if="item.btnGroup.isCheck" type="text" icon="icon-chakan"></el-button>
+              <el-button v-if="item.btnGroup.isCheck" text icon="icon-chakan"></el-button>
               <el-button
                 v-if="item.btnGroup.isEdit"
-                type="text"
+                text
                 icon="icon-bianji1"
                 @click.stop="editRowEvent(scope.row)"
               ></el-button>
               <el-button
                 v-if="item.btnGroup.isDelete"
-                type="text"
+                text
                 icon="icon-shanchu"
                 @click.stop="removeRowEvent(scope.row)"
               ></el-button>
               <el-button
                 v-if="item.btnGroup.isReset"
-                type="text"
+                text
                 icon="icon-chexiao"
                 @click.stop="resetRowEvent(scope.row)"
               ></el-button>

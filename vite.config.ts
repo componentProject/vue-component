@@ -1,4 +1,5 @@
 import { defineConfig, loadEnv } from 'vite'
+import type { ConfigEnv } from 'vite'
 // 性能优化模块
 import { visualizer } from 'rollup-plugin-visualizer'
 import viteCompression from 'vite-plugin-compression'
@@ -53,16 +54,20 @@ function wrapperEnv(env: Record<string, string>) {
   return result
 }
 
+export interface modeType extends ConfigEnv {
+  type?: string
+}
+
 // https://vite.dev/config/
-export default defineConfig((mode) => {
+export default defineConfig((mode: modeType) => {
   const env = loadEnv(mode.mode, process.cwd())
   const viteEnv = wrapperEnv(env)
-  console.log('viteEnv', viteEnv)
+
+  const isStorybook = mode.type === 'storybook'
+  const vuePlugins = isStorybook ? [] : [vue(), vueJsx(), env.VITE_DEVTOOLS && vueDevTools()]
   return {
     plugins: [
-      vue(),
-      vueJsx(),
-      env.VITE_DEVTOOLS && vueDevTools(),
+      ...vuePlugins,
       // 自动引入
       AutoImport({
         imports: ['vue'],
@@ -73,7 +78,13 @@ export default defineConfig((mode) => {
         resolvers: [ElementPlusResolver()],
         dts: path.resolve(__dirname, './src/types/components.d.ts'),
       }),
-
+      createHtmlPlugin({
+        inject: {
+          data: {
+            title: viteEnv.VITE_GLOB_APP_TITLE,
+          },
+        },
+      }),
       // 是否生成包预览
       viteEnv.VITE_REPORT && visualizer(),
       // 代码压缩
@@ -155,13 +166,6 @@ export default defineConfig((mode) => {
             },
           ],
         }),
-      createHtmlPlugin({
-        inject: {
-          data: {
-            title: viteEnv.VITE_GLOB_APP_TITLE,
-          },
-        },
-      }),
     ],
     build: {
       // 启用 CSS 代码拆分,使加载模块时,仅加载对应css,而不是打包为一个样式文件

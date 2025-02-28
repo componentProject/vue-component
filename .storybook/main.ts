@@ -1,6 +1,8 @@
 import type { StorybookConfig } from '@storybook/vue3-vite'
 import { mergeConfig } from 'vite'
-import viteConfig from '../vite.config.ts'
+import type { ConfigEnv } from 'vite'
+import viteConfig from '../vite.config'
+import type { modeType } from '../vite.config'
 
 const config: StorybookConfig = {
   stories: [
@@ -14,8 +16,15 @@ const config: StorybookConfig = {
     '@storybook/addon-interactions',
     '@storybook/addon-storysource',
   ],
-  async viteFinal(config) {
-    return mergeConfig(config, viteConfig)
+  core: {
+    builder: '@storybook/builder-vite',
+  },
+  async viteFinal(config, { configType }) {
+    const { plugins, build } = viteConfig({ mode: configType,type: 'storybook' } as modeType)
+    return mergeConfig(config, {
+      build,
+      plugins
+    })
   },
   docs: {
     autodocs: true,
