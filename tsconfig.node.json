@@ -1,6 +1,7 @@
 {
   "extends": "@tsconfig/node22/tsconfig.json",
   "include": [
+    ".storybook/*",
     "./vite.config.*",
     "/src/utils/getEnv.ts",
     "vitest.config.*",
