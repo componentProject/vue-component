@@ -17,10 +17,9 @@ import globals from 'globals'
 export default [
   {
     name: 'app/files-to-lint',
-    parser: "vue-eslint-parser",
-    languageOptions:{
+    languageOptions: {
       parserOptions: {
-        parser: "@typescript-eslint/parser",
+        parser: '@typescript-eslint/parser',
         ecmaVersion: 2020,
         ecmaFeatures: {
           jsx: true,
