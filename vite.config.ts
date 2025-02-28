@@ -54,19 +54,13 @@ function wrapperEnv(env: Record<string, string>) {
   return result
 }
 
-export interface modeType extends ConfigEnv {
-  type?: string
-}
 
 // https://vite.dev/config/
-export default defineConfig((mode: modeType) => {
+export default defineConfig((mode) => {
   const env = loadEnv(mode.mode, process.cwd())
   const viteEnv = wrapperEnv(env)
 
-  const isStorybook = mode.type === 'storybook'
-  const vuePlugins = isStorybook
-    ? []
-    : [
+  const vuePlugins = [
         pluginVue(),
         vueJsx(),
         env.VITE_DEVTOOLS && vueDevTools(),
@@ -81,7 +75,6 @@ export default defineConfig((mode: modeType) => {
           dts: path.resolve(__dirname, './src/types/components.d.ts'),
         }),
       ]
-  viteEnv.VITE_USE_CDN = isStorybook ? false : viteEnv.VITE_USE_CDN
   return {
     plugins: [
       ...vuePlugins,
