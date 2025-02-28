@@ -65,6 +65,7 @@ export default defineConfig((mode: modeType) => {
 
   const isStorybook = mode.type === 'storybook'
   const vuePlugins = isStorybook ? [] : [vue(), vueJsx(), env.VITE_DEVTOOLS && vueDevTools()]
+  viteEnv.VITE_USE_CDN = isStorybook ? false : viteEnv.VITE_USE_CDN
   return {
     plugins: [
       ...vuePlugins,
