@@ -82,6 +82,7 @@ export default defineConfig((mode: modeType) => {
         }),
       ]
   viteEnv.VITE_USE_CDN = isStorybook ? false : viteEnv.VITE_USE_CDN
+  console.log('VITE_USE_CDN', viteEnv.VITE_USE_CDN)
   return {
     plugins: [
       ...vuePlugins,
@@ -188,9 +189,6 @@ export default defineConfig((mode: modeType) => {
           ? ['vue', 'vue-router', 'element-plus', 'axios', 'moment', 'radash']
           : [],
         output: {
-          paths: {
-            vue: 'https://unpkg.com/vue@3/dist/vue.esm-browser.js',
-          },
           // 静态资源打包做处理
           chunkFileNames: 'static/js/[name]-[hash].js',
           entryFileNames: 'static/js/[name]-[hash].js',
