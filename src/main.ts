@@ -11,8 +11,6 @@ import 'vxe-table/lib/style.css'
 import VxeUI from 'vxe-pc-ui'
 import 'vxe-pc-ui/lib/style.css'
 
-import '@/assets/styles/main.css'
-
 import components from '@/components'
 
 import i18n from '@/locales'
