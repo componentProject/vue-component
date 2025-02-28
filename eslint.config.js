@@ -12,22 +12,23 @@ import pluginVue from 'eslint-plugin-vue'
 import { defineConfigWithVueTs, vueTsConfigs } from '@vue/eslint-config-typescript'
 import skipFormatting from '@vue/eslint-config-prettier/skip-formatting'
 import storybook from 'eslint-plugin-storybook'
-
+import globals from "globals";
 export default [
   {
     name: 'app/files-to-lint',
-    parserOptions: {
-      ecmaVersion: 2020,
-      ecmaFeatures: {
-        jsx: true,
-      },
-    },
     languageOptions: {
+      ecmaVersion: 2022,
+      sourceType: "module",
       parserOptions: {
         ecmaVersion: 2020,
         ecmaFeatures: {
           jsx: true,
         },
+        globals: {
+          ...globals.browser,
+          ...globals.node,
+          myCustomGlobal: "readonly"
+        }
       },
     },
     files: ['**/*.{ts,mts,tsx,vue}'],

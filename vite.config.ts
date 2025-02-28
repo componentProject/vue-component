@@ -57,6 +57,7 @@ function wrapperEnv(env: Record<string, string>) {
 export default defineConfig((mode) => {
   const env = loadEnv(mode.mode, process.cwd())
   const viteEnv = wrapperEnv(env)
+  console.log('viteEnv', viteEnv)
   return {
     plugins: [
       vue(),
