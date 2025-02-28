@@ -82,7 +82,6 @@ export default defineConfig((mode: modeType) => {
         }),
       ]
   viteEnv.VITE_USE_CDN = isStorybook ? false : viteEnv.VITE_USE_CDN
-  console.log('VITE_USE_CDN', viteEnv.VITE_USE_CDN)
   return {
     plugins: [
       ...vuePlugins,
