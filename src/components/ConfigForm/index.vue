@@ -106,7 +106,7 @@ export default defineComponent({
           if (key) {
             formItem.colConfig[key] = value
           } else {
-            formItem.colConfig = value
+            formItem.colConfig = value as ColProps
           }
         }
       })

@@ -59,6 +59,7 @@
     "@storybook/vue3-vite": "8.4.7",
     "@tsconfig/node22": "^22.0.0",
     "@types/node": "^22.9.3",
+    "@typescript-eslint/parser": "^8.25.0",
     "@vitejs/plugin-vue": "^5.2.1",
     "@vitejs/plugin-vue-jsx": "^4.1.1",
     "@vue/eslint-config-prettier": "^10.1.0",
@@ -106,6 +107,7 @@
     "vite-plugin-vue-devtools": "^7.6.5",
     "vitepress": "1.6.3",
     "vitepress-theme-demoblock": "^3.0.7",
+    "vue-eslint-parser": "^9.4.3",
     "vue-tsc": "^2.1.10"
   },
   "husky": {
