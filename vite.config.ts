@@ -21,8 +21,8 @@ import path from 'path'
 
 /**
  * 将环境变量中的字符串值转换为对应的 JavaScript 数据类型
- * @param {Record<string, string>} env - 环境变量对象
- * @returns {Record<string, any>} - 转换后的环境变量对象
+ * @param env
+ * @returns - 转换后的环境变量对象
  */
 function wrapperEnv(env: Record<string, string>) {
   const result: Record<string, any> = {}

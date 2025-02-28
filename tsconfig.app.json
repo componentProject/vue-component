@@ -1,13 +1,14 @@
 {
   "extends": "@vue/tsconfig/tsconfig.dom.json",
   "include": [
+    ".storybook/*",
+    "./vite.config.ts",
     "env.d.ts",
     "src/**/*",
     "src/**/*.vue",
     ".storybook/.stories/*",
-    ".storybook/*",
     "./.docs/.vitepress/*",
-    "./.docs/.vitepress/**/*",
+    "./.docs/.vitepress/**/*"
   ],
   "exclude": [
     "src/**/__tests__/*",
