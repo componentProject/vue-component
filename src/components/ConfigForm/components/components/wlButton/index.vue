@@ -10,7 +10,7 @@
 
 <script lang="js">
 import { isType } from '../../utils'
-import components from './components.js'
+import components from './components.ts'
 
 import { defineComponent } from 'vue'
 export default defineComponent({

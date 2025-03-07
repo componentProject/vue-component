@@ -75,7 +75,7 @@ declare module 'vue' {
     ElUpload: typeof import('element-plus/es')['ElUpload']
     Excel: typeof import('./../components/aother/excel.vue')['default']
     Icon: typeof import('./../components/Icon/index.vue')['default']
-    ImportButton: typeof import('./../components/ConfigForm/components/components/wlButton/components/importButton/index.vue')['default']
+    ImportButton: typeof import('@/components/ConfigForm/components/components/wlButton/components/importFileButton/index.vue')['default']
     IntersectObserver: typeof import('./../components/IntersectObserver/index.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']

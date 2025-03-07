@@ -13,7 +13,7 @@
 <script lang="js">
 import { defineComponent } from 'vue'
 export default defineComponent({
-  name: 'importButton',
+  name: 'importFileButton',
   props: {
     accept: { type: String, default: '' },
     title: { type: String, default: '' },

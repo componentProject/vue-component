@@ -6,43 +6,79 @@
     </template>
   </el-button>
 </template>
+
 <script lang="js">
 import { defineComponent } from 'vue'
+/**
+ *  throttleButton
+ *  一个debounce,throttle,async,depValue的el-button组件
+ *  可以单独或组合使用这些功能
+ *  @see https://github.com/pikax/vue-throttle-debounce
+ */
 export default defineComponent({
   name: 'throttleButton',
   props: {
+    /**
+     *  按钮的title
+     */
     title: { type: String, default: '' },
+    /**
+     *  防抖
+     */
     debounce: {
       type: Boolean,
       default: false,
     },
-
+    /**
+     *  节流
+     */
     throttle: {
       type: Boolean,
       default: false,
     },
+    /**
+     *  等待时间
+     */
     wait: {
       type: [String, Number],
       default: 200,
     },
+    /**
+     *  是否异步
+     */
     async: {
       type: Boolean,
       default: false,
     },
+    /**
+     *  是否loading
+     */
     isLoad: {
       type: Boolean,
       default: false,
     },
 
+    /**
+     *  依赖的值
+     */
     depValue: {
       type: [Array, Object, String, Number, Boolean, undefined, null],
       default: '依赖',
     },
+    /**
+     *  是否深度监听
+     */
     isDeep: {
       type: Boolean,
       default: false,
     },
+    /**
+     *  信息
+     */
     message: undefined,
+    /**
+     *  事件配置
+     */
     eventConfig: {
       type: Object,
       default: () => {
