@@ -27,13 +27,13 @@ export default {
     'at-rule-no-unknown': [
       true,
       {
-        ignoreAtRules: ['tailwind', 'forward', 'use','each'],
+        ignoreAtRules: ['tailwind', 'forward', 'use', 'each'],
       },
     ],
     'scss/at-rule-no-unknown': [
       true,
       {
-        ignoreAtRules: ['tailwind', 'forward', 'use','each'],
+        ignoreAtRules: ['tailwind', 'forward', 'use', 'each'],
       },
     ],
   },
