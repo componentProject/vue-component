@@ -68,8 +68,8 @@ export const watermark = Template.bind({})
 watermark.args = {
   content: ['测试水印', '小汪的水印'],
   gap: [20, 0],
-  // offset: [50, 100],
-  // fontStyle: {
-  // 	color: 'green'
-  // }
+  offset: [50, 100],
+  fontStyle: {
+    color: 'green',
+  },
 }

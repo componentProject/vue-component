@@ -45,6 +45,8 @@ export default [
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-unused-expressions': 'off',
       'vue/block-lang': 'off',
+      '@typescript-eslint/no-unused-vars': 'off',
+      'storybook/prefer-pascal-case': 'off',
     },
   },
 ]
