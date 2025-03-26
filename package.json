@@ -1,5 +1,16 @@
 {
   "name": "vuecomponent",
+  "packageManager": "pnpm@8.6.0",
+  "keywords": [
+    "electron",
+    "nest",
+    "elementPlus",
+    "vue3",
+    "typescript",
+    "vite",
+    "pinia",
+    "template"
+  ],
   "version": "0.0.0",
   "private": true,
   "type": "module",
