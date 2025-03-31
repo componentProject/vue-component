@@ -8,12 +8,24 @@
  *
  * Copyright (c) 2025 by ${git_name_email}, All Rights Reserved.
  */
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+import { FlatCompat } from '@eslint/eslintrc'
+import js from "@eslint/js";
 import pluginVue from 'eslint-plugin-vue'
-import { defineConfigWithVueTs, vueTsConfigs } from '@vue/eslint-config-typescript'
+import { defineConfigWithVueTs,vueTsConfigs} from '@vue/eslint-config-typescript'
 import skipFormatting from '@vue/eslint-config-prettier/skip-formatting'
 import storybook from 'eslint-plugin-storybook'
 import globals from 'globals'
 
+// 兼容层（用于转换旧式配置到 Flat Config）
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
+const compat = new FlatCompat({
+  baseDirectory: __dirname,
+  recommendedConfig: js.configs.recommended,
+})
 export default [
   {
     name: 'app/files-to-lint',
@@ -37,8 +49,11 @@ export default [
     name: 'app/files-to-ignore',
     ignores: ['**/dist/**', '**/dist-ssr/**', '**/coverage/**'],
   },
+  // Vue + TypeScript 配置（通过兼容层转换）
+  js.configs.recommended,
+  ...pluginVue.configs["flat/essential"],
   ...defineConfigWithVueTs(pluginVue.configs['flat/base'], vueTsConfigs.recommended),
-  skipFormatting,
+  ...compat.extends("@vue/eslint-config-prettier/skip-formatting"),
   ...storybook.configs['flat/recommended'],
   {
     rules: {
