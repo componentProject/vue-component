@@ -31,6 +31,7 @@ declare module 'vue' {
     Icon: typeof import('./../components/Icon/index.vue')['default']
     ImportFileButton: typeof import('./../components/ConfigForm/components/components/wlButton/components/importFileButton/index.vue')['default']
     IntersectObserver: typeof import('./../components/IntersectObserver/index.vue')['default']
+    MarkdownEditor: typeof import('./../components/MarkdownEditor/index.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     Space: typeof import('./../components/Space/index.vue')['default']
