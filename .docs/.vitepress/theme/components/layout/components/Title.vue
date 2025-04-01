@@ -3,18 +3,19 @@
   <div class="date">🕒 Published at: {{ publishDate }}</div>
 </template>
 <script lang="ts" setup>
-import { useData, onContentUpdated } from "vitepress";
-import { ref } from "vue";
+import { useData, onContentUpdated } from 'vitepress'
+import { ref } from 'vue'
 
-import dayjs from "dayjs";
-import relativeTime from "dayjs/plugin/relativeTime";
-const pageData = useData().page;
-const publishDate = ref("");
-dayjs.extend(relativeTime);
+import dayjs from 'dayjs'
+import relativeTime from 'dayjs/plugin/relativeTime'
+
+const pageData = useData().page
+const publishDate = ref('')
+dayjs.extend(relativeTime)
 onContentUpdated(() => {
-  const { frontmatter } = pageData.value;
-  publishDate.value = dayjs().to(dayjs(frontmatter.date || Date.now()));
-});
+  const { frontmatter } = pageData.value
+  publishDate.value = dayjs().to(dayjs(frontmatter.date || Date.now()))
+})
 </script>
 <style scoped>
 .title {
@@ -24,10 +25,22 @@ onContentUpdated(() => {
   margin-top: 0.3em;
   margin-bottom: 0.3em;
   line-height: 1.3;
-  font-family: Dosis, ui-sans-serif, system-ui, -apple-system,
-    BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans",
-    sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
-    "Noto Color Emoji";
+  font-family:
+    Dosis,
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Roboto,
+    'Helvetica Neue',
+    Arial,
+    'Noto Sans',
+    sans-serif,
+    'Apple Color Emoji',
+    'Segoe UI Emoji',
+    'Segoe UI Symbol',
+    'Noto Color Emoji';
 }
 .date {
   font-size: 0.875rem;

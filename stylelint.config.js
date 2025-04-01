@@ -5,6 +5,9 @@ export default {
     'stylelint-config-standard-less',
     'stylelint-config-standard-vue',
   ],
+  ignoreFiles: [
+    '.docs/**', // 忽略整个目录
+  ],
   // 自定义的规则，覆盖默认的规则
   rules: {
     // 禁用 是否应该满足小驼峰 规则

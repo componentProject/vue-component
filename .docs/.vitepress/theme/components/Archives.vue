@@ -1,6 +1,6 @@
 <template>
   <div class="main">
-    <div v-for="yearList in data" class="yearItem">
+    <div v-for="(yearList, index) in data" class="yearItem" :key="index">
       <div class="year">
         {{ yearList[0].frontMatter.date?.split('-')[0] }}
       </div>
@@ -27,7 +27,6 @@ import { useYearSort } from '../../utils/utils'
 import type { PostType } from '../../utils/utils'
 
 const { theme } = useData()
-
 
 const data = computed<PostType[][]>(() => useYearSort(theme.value.posts))
 watch(

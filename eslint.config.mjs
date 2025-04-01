@@ -47,7 +47,7 @@ export default [
   },
   {
     name: 'app/files-to-ignore',
-    ignores: ['**/dist/**', '**/dist-ssr/**', '**/coverage/**'],
+    ignores: ['.docs/**','**/dist/**', '**/dist-ssr/**', '**/coverage/**'],
   },
   // Vue + TypeScript 配置（通过兼容层转换）
   js.configs.recommended,
@@ -59,9 +59,11 @@ export default [
     rules: {
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-unused-expressions': 'off',
-      'vue/block-lang': 'off',
       '@typescript-eslint/no-unused-vars': 'off',
       'storybook/prefer-pascal-case': 'off',
+      'vue/block-lang': 'off',
+      "vue/multi-word-component-names": "off",
+      "no-duplicate-selectors": "off",
     },
   },
 ]

@@ -1,46 +1,84 @@
 export interface PostType {
   frontMatter: {
-    date?: string;
-    title?: string;
-    tags?: string[];
-    description?: string;
-  };
-  regularPath: string;
+    date?: string
+    title?: string
+    tags?: string[]
+    description?: string
+    top?: string | number
+    hidden?: boolean
+  }
+  hidden?: boolean
+  regularPath: string
+}
+
+export interface PostTypes {
+  [key: string]: PostType[]
+}
+
+interface otherType {
+  childrenTags?: PostTypes
+  hasPTag?: boolean
+}
+
+export interface TagsType {
+  [key: string]: PostType[] & otherType
 }
 
 export function initTags(post: PostType[]) {
-  const data: any = {};
+  const data: TagsType = {}
   for (let i = 0; i < post.length; i++) {
-    const element = post[i];
-    const tags = element.frontMatter.tags;
+    const element = post[i]
+    const tags = element.frontMatter.tags
     // tags是数组，需要tags按照数组语法的格式书写
     if (Array.isArray(tags)) {
       tags.forEach((item) => {
-        if (!data[item]) {
-          data[item] = [];
+        if (!data[item]) data[item] = []
+        if (element.hidden && element.frontMatter.hidden) {
+          return
         }
-        data[item].push(element);
-      });
+        data[item].push(element)
+      })
     }
   }
-  return data;
+  const tags = Object.keys(data)
+  tags.forEach((tag) => {
+    data[tag].forEach((item: any) => {
+      const ptags = item.frontMatter.ptags
+      if (Array.isArray(ptags)) {
+        ptags.forEach((ptag) => {
+          if (ptag !== tag) {
+            data[tag].hasPTag = true
+          }
+          if (!data[ptag]) data[ptag] = []
+          if (!data[ptag].childrenTags) data[ptag].childrenTags = {}
+          if (!data[ptag].childrenTags[tag]) data[ptag].childrenTags[tag] = []
+          data[ptag].childrenTags[tag].push(item)
+        })
+      } else {
+        if (!data[tag].childrenTags) data[tag].childrenTags = {}
+        if (!data[tag].childrenTags[tag]) data[tag].childrenTags[tag] = []
+        data[tag].childrenTags[tag].push(item)
+      }
+    })
+  })
+  return data
 }
 
 export function useYearSort(post: PostType[]): PostType[][] {
-  const data: PostType[][] = [];
-  let year = "0";
-  let num = -1;
+  const data: PostType[][] = []
+  let year = '0'
+  let num = -1
   for (let index = 0; index < post.length; index++) {
-    const element = post[index];
+    const element = post[index]
     if (element.frontMatter.date) {
-      const y = element.frontMatter.date?.split("-")[0];
+      const y = element.frontMatter.date?.split('-')[0]
       if (y === year) {
-        data[num].push(element);
+        data[num].push(element)
       } else {
-        num++;
-        data[num] = [];
-        data[num].push(element);
-        year = y;
+        num++
+        data[num] = []
+        data[num].push(element)
+        year = y
       }
     }
   }
@@ -48,78 +86,32 @@ export function useYearSort(post: PostType[]): PostType[][] {
 }
 
 export function getHeaders() {
-  return [...document.querySelectorAll(".VPDoc h2,h3,h4,h5,h6")]
+  return [...document.querySelectorAll('.VPDoc h2,h3,h4,h5,h6')]
     .filter((el) => el.id && el.hasChildNodes())
     .map((el) => {
-      const level = Number(el.tagName[1]);
+      const level = Number(el.tagName[1])
       return {
         title: serializeHeader(el),
-        link: "#" + el.id,
+        link: '#' + el.id,
         level,
-      };
-    });
+      }
+    })
 }
 
 function serializeHeader(h: Element): string {
-  let ret = "";
+  let ret = ''
   for (const node of h.childNodes) {
     if (node.nodeType === 1) {
       if (
-        (node as Element).classList.contains("VPBadge") ||
-        (node as Element).classList.contains("header-anchor")
+        (node as Element).classList.contains('VPBadge') ||
+        (node as Element).classList.contains('header-anchor')
       ) {
-        continue;
+        continue
       }
-      ret += node.textContent;
+      ret += node.textContent
     } else if (node.nodeType === 3) {
-      ret += node.textContent;
+      ret += node.textContent
     }
   }
-  return ret.trim();
+  return ret.trim()
 }
-
-export function resolveHeaders(headers: any, range?: any): any {
-  if (range === false) {
-    return [];
-  }
-  let minLevel = 3;
-  headers.map((header:any) => {
-    minLevel = Math.min(header.level, minLevel);
-  });
-  const levelsRange =
-    (typeof range === "object" && !Array.isArray(range)
-      ? range.level
-      : range) || minLevel;
-
-  console.log(levelsRange, "levelsRange");
-  const [high, low]: [number, number] =
-    typeof levelsRange === "number"
-      ? [levelsRange, levelsRange]
-      : levelsRange === "deep"
-      ? [2, 6]
-      : levelsRange;
-
-  console.log(high, low, "loooww");
-  headers = headers.filter((h:any) => h.level >= high && h.level <= low);
-
-  const ret: any = [];
-  outer: for (let i = 0; i < headers.length; i++) {
-    const cur = headers[i];
-    if (i === 0) {
-      ret.push(cur);
-    } else {
-      for (let j = i - 1; j >= 0; j--) {
-        const prev = headers[j];
-        if (prev.level < cur.level) {
-          (prev.children || (prev.children = [])).push(cur);
-          continue outer;
-        }
-      }
-      ret.push(cur);
-    }
-  }
-
-  return ret;
-}
-
-console.log('resolveHeaders', resolveHeaders)

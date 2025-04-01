@@ -2,18 +2,27 @@
   <FireWorksAnimation />
   <ShareCard />
   <h1 class="blog-title">Blogs</h1>
-  <div class="blogList">
-    <a class="blog" v-for="item in posts" :href="withBase(item.regularPath)">
-      <div class="title">{{ item.frontMatter.title }}</div>
-      <div class="date">{{ transDate(item.frontMatter.date) }}</div>
-    </a>
-  </div>
-  <div class="pagination">
-    <button class="left" v-if="pageCurrent > 1" @click="go(pageCurrent - 1)">Previous page</button>
-    <div v-if="pagesNum > 1">{{ `${pageCurrent}/${pagesNum}` }}</div>
-    <button class="right" v-if="pageCurrent < pagesNum" @click="go(pageCurrent + 1)">
-      Next page
-    </button>
+  <div class="flex flex-col flex-1-hidden">
+    <div class="blogList flex flex-1-auto">
+      <a
+        class="blog"
+        v-for="(item, index) in posts"
+        :key="index"
+        :href="withBase(item.regularPath)"
+      >
+        <div class="title">{{ item.frontMatter.title }}</div>
+        <div class="date">{{ transDate(item.frontMatter.date) }}</div>
+      </a>
+    </div>
+    <div class="pagination">
+      <button class="left" v-if="pageCurrent > 1" @click="go(pageCurrent - 1)">
+        Previous page
+      </button>
+      <div v-if="pagesNum > 1">{{ `${pageCurrent}/${pagesNum}` }}</div>
+      <button class="right" v-if="pageCurrent < pagesNum" @click="go(pageCurrent + 1)">
+        Next page
+      </button>
+    </div>
   </div>
 </template>
 <script lang="ts" setup>
@@ -62,13 +71,13 @@ for (let i = 0; i < postsAll.length; i++) {
 const posts = ref<PostType[]>([])
 posts.value = allMap[pageCurrent.value - 1]
 // click pagination
-const go = (i:number) => {
+const go = (i: number) => {
   pageCurrent.value = i
   posts.value = allMap[pageCurrent.value - 1]
 }
 // timestamp transform
 const transDate = (date?: string) => {
-  const dateArray = date?.split('-')||[]
+  const dateArray = date?.split('-') || []
   const year = dateArray[0]
   const day = dateArray[2]
   let month: string
