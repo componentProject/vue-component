@@ -83,8 +83,6 @@
     "zod": "^3.24.2"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "^3.3.1",
-    "@eslint/js": "^9.23.0",
     "@chromatic-com/storybook": "3.2.2",
     "@commitlint/config-conventional": "^19.6.0",
     "@eslint/eslintrc": "^3.3.1",
@@ -97,6 +95,7 @@
     "@storybook/test": "8.4.7",
     "@storybook/vue3": "8.4.7",
     "@storybook/vue3-vite": "8.4.7",
+    "@tailwindcss/postcss": "^4.0.17",
     "@tsconfig/node22": "^22.0.0",
     "@types/node": "^22.9.3",
     "@typescript-eslint/parser": "^8.25.0",
