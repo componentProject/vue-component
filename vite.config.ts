@@ -18,7 +18,7 @@ import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
 // 其余vite插件
 import { createHtmlPlugin } from 'vite-plugin-html'
 import autoprefixer from 'autoprefixer'
-import tailwindcss from '@tailwindcss/postcss'
+import tailwindcss from '@tailwindcss/vite'
 import path from 'path'
 
 /**

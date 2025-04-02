@@ -7,10 +7,10 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
-    Accordion: typeof import('./../components/ui/accordion/Accordion.vue')['default']
-    AccordionContent: typeof import('./../components/ui/accordion/AccordionContent.vue')['default']
-    AccordionItem: typeof import('./../components/ui/accordion/AccordionItem.vue')['default']
-    AccordionTrigger: typeof import('./../components/ui/accordion/AccordionTrigger.vue')['default']
+    Accordion: typeof import('@/ui/accordion/Accordion.vue')['default']
+    AccordionContent: typeof import('@/ui/accordion/AccordionContent.vue')['default']
+    AccordionItem: typeof import('@/ui/accordion/AccordionItem.vue')['default']
+    AccordionTrigger: typeof import('@/ui/accordion/AccordionTrigger.vue')['default']
     Calendar: typeof import('./../components/Calendar/index.vue')['default']
     CalendarHeader: typeof import('./../components/Calendar/components/CalendarHeader.vue')['default']
     CalendarMonth: typeof import('./../components/Calendar/components/CalendarMonth.vue')['default']
