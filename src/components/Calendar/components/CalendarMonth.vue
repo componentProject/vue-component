@@ -7,9 +7,10 @@
     </div>
 
     <div class="calendar-month-body">
-      <div v-for="row in allDays" class="calendar-month-body-row">
+      <div v-for="(row, i) in allDays" :key="i" class="calendar-month-body-row">
         <div
-          v-for="day in row"
+          v-for="(day, index) in row"
+          :key="index"
           class="calendar-month-body-cell"
           @click="emits('change', day.date)"
           :class="{ 'calendar-month-body-cell-current': day.currentMonth }"

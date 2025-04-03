@@ -1,5 +1,5 @@
 <template>
-  <el-collapse v-model="model[prop]" v-if="show" v-bind="Options" v-on="Event">
+  <el-collapse v-model="computedModel" v-if="show" v-bind="Options" v-on="Event">
     <el-collapse-item v-bind="item" v-for="(item, index) in config.items" :key="index">
       <template v-if="slots.title" #title="scope">
         <slot name="title" v-bind="scope"></slot>
@@ -9,8 +9,9 @@
 </template>
 
 <script lang="js">
-import { isType } from '../../utils'
+import { deepClone, isType } from '../../utils'
 import { defineComponent } from 'vue'
+
 export default defineComponent({
   name: 'wlCarousel',
   props: {
@@ -37,6 +38,16 @@ export default defineComponent({
       },
     },
   },
+  computed: {
+    computedModel: {
+      get() {
+        return this.model
+      },
+      set(value) {
+        this.$emit('update:modelValue', value)
+      },
+    },
+  },
   data() {
     return {
       show: true,
@@ -47,11 +58,10 @@ export default defineComponent({
   watch: {
     config: {
       handler(v) {
-        const { show, event, slots = {}, ...Options } = v
+        const { show, event, ...Options } = v
         if (isType(show, 'boolean')) {
           this.show = !!show
         }
-        this.slots = slots
         this.Options = Options
         if (!v.items) v.items = []
         this.Event = event || {}

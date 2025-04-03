@@ -1,10 +1,11 @@
 <template>
-  <el-switch v-if="show" v-model="model[prop]" v-bind="Options" v-on="Event" />
+  <el-switch v-if="show" v-model="computedModel" v-bind="Options" v-on="Event" />
 </template>
 
 <script lang="js">
 import { isType } from '../../utils'
 import { defineComponent } from 'vue'
+
 export default defineComponent({
   name: 'wlSwitch',
   props: {
@@ -22,6 +23,16 @@ export default defineComponent({
       type: Object,
       default: () => {
         return {}
+      },
+    },
+  },
+  computed: {
+    computedModel: {
+      get() {
+        return this.model
+      },
+      set(value) {
+        this.$emit('update:modelValue', value)
       },
     },
   },

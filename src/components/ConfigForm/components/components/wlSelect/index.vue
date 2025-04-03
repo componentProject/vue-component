@@ -1,5 +1,5 @@
 <template>
-  <el-select v-if="show" v-model="model[prop]" v-bind="Options" v-on="Event">
+  <el-select v-if="show" v-model="computedModel" v-bind="Options" v-on="Event">
     <!-- default	Option 组件列表-->
     <el-option v-bind="option" v-for="(option, index) in config.options" :key="index" />
     <!-- prefix Select 组件头部内容-->
@@ -17,6 +17,7 @@
 import { isType } from '../../utils'
 
 import { defineComponent } from 'vue'
+
 export default defineComponent({
   name: 'wlSelect',
   props: {
@@ -40,6 +41,16 @@ export default defineComponent({
       type: Object,
       default: () => {
         return {}
+      },
+    },
+  },
+  computed: {
+    computedModel: {
+      get() {
+        return this.model
+      },
+      set(value) {
+        this.$emit('update:modelValue', value)
       },
     },
   },

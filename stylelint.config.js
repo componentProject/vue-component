@@ -5,9 +5,9 @@ export default {
     'stylelint-config-standard-less',
     'stylelint-config-standard-vue',
   ],
-  ignoreFiles: [
-    '.docs/**', // 忽略整个目录
-  ],
+  ignoreFiles: ['src/components/ConfigForm/**'],
+  // 明确要检查的文件扩展名（会覆盖其他配置）
+  files: ['src/components/**/*.{css,scss,less,vue}'],
   // 自定义的规则，覆盖默认的规则
   rules: {
     // 禁用 是否应该满足小驼峰 规则
@@ -26,13 +26,14 @@ export default {
         ignorePseudoClasses: ['deep'],
       },
     ],
+    'at-rule-no-unknown': null,
     // 使 tailwind 可用
-    'at-rule-no-unknown': [
-      true,
-      {
-        ignoreAtRules: ['tailwind', 'forward', 'use', 'each'],
-      },
-    ],
+    // 'at-rule-no-unknown': [
+    //   true,
+    //   {
+    //     ignoreAtRules: ['tailwind', 'forward', 'use', 'each'],
+    //   },
+    // ],
     'scss/at-rule-no-unknown': [
       true,
       {

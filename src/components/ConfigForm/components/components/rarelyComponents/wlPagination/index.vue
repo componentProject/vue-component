@@ -1,5 +1,5 @@
 <template>
-  <el-pagination v-if="show" v-model="model[prop]" v-bind="Options" v-on="Event">
+  <el-pagination v-if="show" v-model="computedModel" v-bind="Options" v-on="Event">
     <!-- — 自定义内容，需要在 layout 中列出 slot-->
     <template v-if="slots.default" #default>
       <slot name="default"></slot>
@@ -11,6 +11,7 @@
 import { isType } from '../../../utils'
 
 import { defineComponent } from 'vue'
+
 export default defineComponent({
   name: 'wlPagination',
   props: {
@@ -34,6 +35,16 @@ export default defineComponent({
       type: Object,
       default: () => {
         return {}
+      },
+    },
+  },
+  computed: {
+    computedModel: {
+      get() {
+        return this.model
+      },
+      set(value) {
+        this.$emit('update:modelValue', value)
       },
     },
   },

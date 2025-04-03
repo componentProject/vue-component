@@ -1,5 +1,5 @@
 <template>
-  <el-radio-group v-if="show" v-model="model[prop]" v-bind="Options" v-on="Event">
+  <el-radio-group v-if="show" v-model="computedModel" v-bind="Options" v-on="Event">
     <el-radio v-bind="radio" v-for="radio in config.radios" :key="radio.label" />
     <el-radio-button v-bind="button" v-for="button in config.buttons" :key="button.label" />
   </el-radio-group>
@@ -8,6 +8,7 @@
 <script lang="js">
 import { isType } from '../../../utils'
 import { defineComponent } from 'vue'
+
 export default defineComponent({
   name: 'wlRadioGroup',
   props: {
@@ -25,6 +26,16 @@ export default defineComponent({
       type: Object,
       default: () => {
         return {}
+      },
+    },
+  },
+  computed: {
+    computedModel: {
+      get() {
+        return this.model
+      },
+      set(value) {
+        this.$emit('update:modelValue', value)
       },
     },
   },

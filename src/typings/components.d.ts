@@ -7,10 +7,6 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
-    Accordion: typeof import('@/ui/accordion/Accordion.vue')['default']
-    AccordionContent: typeof import('@/ui/accordion/AccordionContent.vue')['default']
-    AccordionItem: typeof import('@/ui/accordion/AccordionItem.vue')['default']
-    AccordionTrigger: typeof import('@/ui/accordion/AccordionTrigger.vue')['default']
     Calendar: typeof import('./../components/Calendar/index.vue')['default']
     CalendarHeader: typeof import('./../components/Calendar/components/CalendarHeader.vue')['default']
     CalendarMonth: typeof import('./../components/Calendar/components/CalendarMonth.vue')['default']
@@ -76,7 +72,6 @@ declare module 'vue' {
     ElTransfer: typeof import('element-plus/es')['ElTransfer']
     ElTree: typeof import('element-plus/es')['ElTree']
     ElUpload: typeof import('element-plus/es')['ElUpload']
-    Excel: typeof import('./../components/aother/excel.vue')['default']
     Icon: typeof import('./../components/Icon/index.vue')['default']
     ImportFileButton: typeof import('./../components/ConfigForm/components/components/wlButton/components/importFileButton/index.vue')['default']
     IntersectObserver: typeof import('./../components/IntersectObserver/index.vue')['default']

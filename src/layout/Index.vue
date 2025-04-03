@@ -5,13 +5,17 @@
     <el-aside width="200px" class="h-full">
       <el-scrollbar class="h-full">
         <el-menu class="h-screen" :default-active="defaultTab" router>
-          <div v-for="(route, index) in routes">
+          <div v-for="(route, index) in routes" :key="index">
             <el-menu-item v-if="!route.children?.length" :index="`${route.path}`">
               <span>{{ route.meta?.title || route.name }}</span>
             </el-menu-item>
             <el-sub-menu v-else :index="index + ''">
               <template #title>{{ route.name }}</template>
-              <el-menu-item v-for="child in route.children" :index="`${route.path}${child.path}`">
+              <el-menu-item
+                v-for="(child, i) in route.children"
+                :key="i"
+                :index="`${route.path}${child.path}`"
+              >
                 {{ child.meta?.title || child.name }}
               </el-menu-item>
             </el-sub-menu>

@@ -1,5 +1,5 @@
 <template>
-  <el-cascader v-if="show" v-model="model[prop]" v-bind="Options" v-on="Event">
+  <el-cascader v-if="show" v-model="computedModel" v-bind="Options" v-on="Event">
     <!-- default 自定义备选项的节点内容，参数为 { node, data }，分别为当前节点的 Node 对象和数据-->
     <template v-if="slots.default" #default="scope">
       <slot name="default" v-bind="scope" />
@@ -15,6 +15,7 @@
 import { isType } from '../../../utils'
 
 import { defineComponent } from 'vue'
+
 export default defineComponent({
   name: 'wlCascader',
   props: {
@@ -38,6 +39,16 @@ export default defineComponent({
       type: Object,
       default: () => {
         return {}
+      },
+    },
+  },
+  computed: {
+    computedModel: {
+      get() {
+        return this.model
+      },
+      set(value) {
+        this.$emit('update:modelValue', value)
       },
     },
   },

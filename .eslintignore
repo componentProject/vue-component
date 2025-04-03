@@ -1,0 +1,16 @@
+public
+.husky
+.vscode
+node_modules
+dist
+index.html
+.gitignore
+*.sh
+*.md
+.docs
+dist-ssr
+coverage
+
+
+src/assets
+src/components/ConfigForm

@@ -1,11 +1,11 @@
 <template>
   <yearDatePicker
     v-if="show && Options.rangeType === 'yearrange'"
-    v-model="model[prop]"
+    v-model="computedModel"
     v-bind="Options"
     v-on="Event"
   />
-  <el-date-picker v-else-if="show" v-model="model[prop]" v-bind="Options" v-on="Event" />
+  <el-date-picker v-else-if="show" v-model="computedModel" v-bind="Options" v-on="Event" />
 </template>
 
 <script lang="js">
@@ -30,6 +30,16 @@ export default defineComponent({
       type: Object,
       default: () => {
         return {}
+      },
+    },
+  },
+  computed: {
+    computedModel: {
+      get() {
+        return this.model
+      },
+      set(value) {
+        this.$emit('update:modelValue', value)
       },
     },
   },

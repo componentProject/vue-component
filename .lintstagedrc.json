@@ -1,9 +1,10 @@
 {
+  "!src/components/ConfigForm/**/*.{js,jsx,ts,tsx,vue}": [],
   "*.{js,jsx,ts,tsx,vue}": [
-    "eslint --fix --no-warn-ignored *.{js,jsx,ts,tsx,vue} --ignore-pattern 'src/components/ConfigForm/**/*.{js,jsx,ts,tsx,vue}'",
+    "eslint --fix",
     "prettier --write *.{js,jsx,ts,tsx,vue}"
   ],
   "*.{css,scss,less,vue}": [
-    "stylelint --fix *.{css,scss,less,vue} --ignore-pattern '.docs/**'"
+    "stylelint --fix"
   ]
 }

@@ -66,7 +66,7 @@
           </vxe-tooltip>
         </template>
       </vxe-column>
-      <template v-for="(item, index) in thData">
+      <template v-for="(item, index) in thData" :key="index">
         <vxe-column
           v-if="item.type === 'opt'"
           v-bind="item"
@@ -290,12 +290,15 @@ export default defineComponent({
   },
   watch: {
     columnConfig(val) {
+      // eslint-disable-next-line vue/no-mutating-props
       this.columnConfig = Object.assign(this.columnConfig, val)
     },
     rowConfig(val) {
+      // eslint-disable-next-line vue/no-mutating-props
       this.rowConfig = Object.assign(this.rowConfig, val)
     },
     radioConfig(val) {
+      // eslint-disable-next-line vue/no-mutating-props
       this.radioConfig = Object.assign(this.radioConfig, val)
     },
     theadData: {

@@ -8,14 +8,13 @@
  *
  * Copyright (c) 2025 by ${git_name_email}, All Rights Reserved.
  */
-import path from "node:path";
-import { fileURLToPath } from "node:url";
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 
 import { FlatCompat } from '@eslint/eslintrc'
-import js from "@eslint/js";
+import js from '@eslint/js'
 import pluginVue from 'eslint-plugin-vue'
-import { defineConfigWithVueTs,vueTsConfigs} from '@vue/eslint-config-typescript'
-import skipFormatting from '@vue/eslint-config-prettier/skip-formatting'
+import { defineConfigWithVueTs, vueTsConfigs } from '@vue/eslint-config-typescript'
 import storybook from 'eslint-plugin-storybook'
 import globals from 'globals'
 
@@ -43,17 +42,13 @@ export default [
         },
       },
     },
-    files: ['**/*.{ts,mts,tsx,vue}'],
-  },
-  {
-    name: 'app/files-to-ignore',
-    ignores: ['.docs/**','**/dist/**', '**/dist-ssr/**', '**/coverage/**'],
+    files: ['src/components/**/*.{ts,mts,tsx,vue}'],
   },
   // Vue + TypeScript 配置（通过兼容层转换）
   js.configs.recommended,
-  ...pluginVue.configs["flat/essential"],
+  ...pluginVue.configs['flat/essential'],
   ...defineConfigWithVueTs(pluginVue.configs['flat/base'], vueTsConfigs.recommended),
-  ...compat.extends("@vue/eslint-config-prettier/skip-formatting"),
+  ...compat.extends('@vue/eslint-config-prettier/skip-formatting'),
   ...storybook.configs['flat/recommended'],
   {
     rules: {
@@ -62,8 +57,8 @@ export default [
       '@typescript-eslint/no-unused-vars': 'off',
       'storybook/prefer-pascal-case': 'off',
       'vue/block-lang': 'off',
-      "vue/multi-word-component-names": "off",
-      "no-duplicate-selectors": "off",
+      'vue/multi-word-component-names': 'off',
+      'no-duplicate-selectors': 'off',
     },
   },
 ]

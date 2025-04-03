@@ -1,5 +1,5 @@
 <template>
-  <el-autocomplete v-if="show" v-model="model[prop]" v-bind="Options" v-on="Event">
+  <el-autocomplete v-if="show" v-model="computedModel" v-bind="Options" v-on="Event">
     <!-- prefix 输入框头部内容，只对 type="text" 有效-->
     <template v-if="slots.prefix" #prefix="scope">
       <slot name="prefix" v-bind="scope"></slot>
@@ -23,6 +23,7 @@
 import { isType } from '../../../utils'
 
 import { defineComponent } from 'vue'
+
 export default defineComponent({
   name: 'wlAutocomplete',
   props: {
@@ -46,6 +47,16 @@ export default defineComponent({
       type: Object,
       default: () => {
         return {}
+      },
+    },
+  },
+  computed: {
+    computedModel: {
+      get() {
+        return this.model
+      },
+      set(value) {
+        this.$emit('update:modelValue', value)
       },
     },
   },
