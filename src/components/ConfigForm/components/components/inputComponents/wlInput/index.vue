@@ -1,5 +1,5 @@
 <template>
-  <el-input v-if="show" v-model="computedModel" v-bind="Options" v-on="Event">
+  <el-input v-if="show" v-model="model[prop]" v-bind="Options" v-on="Event">
     <!-- prefix 输入框头部内容，只对 type="text" 有效-->
     <template v-if="slots.prefix" #prefix="scope">
       <slot name="prefix" v-bind="scope"></slot>
@@ -46,16 +46,6 @@ export default defineComponent({
       type: Object,
       default: () => {
         return {}
-      },
-    },
-  },
-  computed: {
-    computedModel: {
-      get() {
-        return this.model
-      },
-      set(value) {
-        this.$emit('update:modelValue', value)
       },
     },
   },

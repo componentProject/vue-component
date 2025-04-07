@@ -1,5 +1,6 @@
 {
-  "!src/components/ConfigForm/**/*.{js,jsx,ts,tsx,vue}": [],
+  "!src/components/ConfigForm/**/*": [],
+  "!src/components/DragTable/**/*": [],
   "*.{js,jsx,ts,tsx,vue}": [
     "eslint --fix",
     "prettier --write *.{js,jsx,ts,tsx,vue}"

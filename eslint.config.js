@@ -59,6 +59,7 @@ export default [
       'vue/block-lang': 'off',
       'vue/multi-word-component-names': 'off',
       'no-duplicate-selectors': 'off',
+      'vue/no-mutating-props': 'off',
     },
   },
 ]

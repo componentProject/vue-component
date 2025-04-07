@@ -1,5 +1,5 @@
 <template>
-  <el-transfer v-if="show" v-model="computedModel" v-bind="Options" v-on="Event">
+  <el-transfer v-if="show" v-model="model[prop]" v-bind="Options" v-on="Event">
     <!-- default 自定义数据项的内容，参数为 { option }-->
     <template v-if="slots.default" #default="scope">
       <slot name="default" v-bind="scope"></slot>
@@ -18,7 +18,6 @@
 <script lang="js">
 import { isType } from '../../utils'
 import { defineComponent } from 'vue'
-
 export default defineComponent({
   name: 'wlTransfer',
   props: {
@@ -42,16 +41,6 @@ export default defineComponent({
       type: Object,
       default: () => {
         return {}
-      },
-    },
-  },
-  computed: {
-    computedModel: {
-      get() {
-        return this.model
-      },
-      set(value) {
-        this.$emit('update:modelValue', value)
       },
     },
   },

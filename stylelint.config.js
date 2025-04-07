@@ -26,14 +26,13 @@ export default {
         ignorePseudoClasses: ['deep'],
       },
     ],
-    'at-rule-no-unknown': null,
     // 使 tailwind 可用
-    // 'at-rule-no-unknown': [
-    //   true,
-    //   {
-    //     ignoreAtRules: ['tailwind', 'forward', 'use', 'each'],
-    //   },
-    // ],
+    'at-rule-no-unknown': [
+      true,
+      {
+        ignoreAtRules: ['tailwind', 'forward', 'use', 'each'],
+      },
+    ],
     'scss/at-rule-no-unknown': [
       true,
       {

@@ -1,5 +1,5 @@
 <template>
-  <el-radio v-if="show" v-model="computedModel" v-bind="Options" v-on="Event">
+  <el-radio v-if="show" v-model="model[prop]" v-bind="Options" v-on="Event">
     <template v-if="slots.default" #default>
       <slot name="default"></slot>
     </template>
@@ -33,16 +33,6 @@ export default defineComponent({
       type: Object,
       default: () => {
         return {}
-      },
-    },
-  },
-  computed: {
-    computedModel: {
-      get() {
-        return this.model
-      },
-      set(value) {
-        this.$emit('update:modelValue', value)
       },
     },
   },
