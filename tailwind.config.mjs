@@ -6,10 +6,11 @@ export default {
   prefix: '',
 
   content: [
-    './pages/**/*.{ts,tsx,vue}',
-    './components/**/*.{ts,tsx,vue}',
-    './app/**/*.{ts,tsx,vue}',
-    './src/**/*.{ts,tsx,vue}',
+    './pages/**/*.{js,jsx,ts,tsx,vue}',
+    './components/**/*.{js,jsx,ts,tsx,vue}',
+    './app/**/*.{js,jsx,ts,tsx,vue}',
+    './src/**/*.{js,jsx,ts,tsx,vue}',
+    './.storybook/**/*.{js,jsx,ts,tsx,vue}',
   ],
 
   theme: {
@@ -21,6 +22,10 @@ export default {
       },
     },
     extend: {
+      padding: {
+        4: '16px',
+        10: '10px'
+      },
       colors: {
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',
