@@ -102,7 +102,7 @@
         </vxe-column>
         <vxe-column
           v-else-if="item.type === 'slot'"
-          :key="index"
+          :key="index + 1"
           v-bind="item"
           :edit-render="{ autofocus: '.myinput' }"
         >
@@ -133,7 +133,7 @@
             <slot :name="item.slots.filter" :data="{ $panel, column }" />
           </template>
         </vxe-column>
-        <vxe-column :key="index" v-else v-bind="item" />
+        <vxe-column :key="index + 2" v-else v-bind="item" />
       </template>
       <template #empty v-if="!emptyText">
         <slot name="empty">
