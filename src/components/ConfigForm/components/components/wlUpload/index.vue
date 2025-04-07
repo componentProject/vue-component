@@ -1,68 +1,46 @@
 <template>
   <el-upload v-if="show" v-bind="Options" v-on="Event">
-    <!-- trigger 触发文件选择框的内容-->
-    <template v-if="slots.trigger" #trigger="scope">
-      <slot name="trigger" v-bind="scope"></slot>
-    </template>
-    <!-- tip 提示说明文字-->
-    <template v-if="slots.tip" #tip="scope">
-      <slot name="tip" v-bind="scope"></slot>
-    </template>
+    <slot name="default">
+      <el-button>点击上传</el-button>
+    </slot>
   </el-upload>
 </template>
 
-<script lang="js">
+<script setup lang="ts">
+import { ref, watch } from 'vue'
 import { isType } from '../../utils'
-import { defineComponent } from 'vue'
-export default defineComponent({
-  name: 'wlUpload',
-  props: {
-    prop: {
-      type: String,
-      default: '',
-    },
-    slots: {
-      type: Object,
-      default: () => {
-        return {}
-      },
-    },
-    model: {
-      type: Object,
-      default: () => {
-        return {}
-      },
-    },
-    config: {
-      type: Object,
-      default: () => {
-        return {}
-      },
-    },
+
+const props = withDefaults(
+  defineProps<{
+    prop: string
+    slots: Record<string, any>
+    model: Record<string, any>
+    config: Record<string, any>
+  }>(),
+  {
+    prop: '',
+    slots: () => ({}),
+    model: () => ({}),
+    config: () => ({}),
   },
-  data() {
-    return {
-      names: ['a', 'b', 'c'],
-      show: true,
-      Event: {},
-      Options: {},
+)
+
+const show = ref(true)
+const Event = ref({})
+const Options = ref({})
+
+watch(
+  () => props.config,
+  (v) => {
+    const { show: showVal, event, ...rest } = v
+    if (isType(showVal, 'boolean')) {
+      show.value = !!showVal
     }
+    Options.value = rest
+    Event.value = event || {}
   },
-  watch: {
-    config: {
-      handler(v) {
-        const { show, event, ...Options } = v
-        if (isType(show, 'boolean')) {
-          this.show = !!show
-        }
-        this.Options = Options
-        this.Event = event || {}
-      },
-      immediate: true,
-      deep: true,
-    },
-  },
-})
+  { immediate: true, deep: true },
+)
 </script>
 
 <style scoped lang="scss"></style>
