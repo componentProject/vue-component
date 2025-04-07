@@ -1,52 +1,42 @@
 <template>
-  <el-rate v-if="show" v-model="model[prop]" v-bind="Options" v-on="Event" />
+  <el-rate v-if="show" v-model="computedModel" v-bind="Options" v-on="Event" />
 </template>
 
-<script lang="js">
+<script setup lang="ts">
+import { ref, watch, computed } from 'vue'
 import { isType } from '../../../utils'
-import { defineComponent } from 'vue'
-export default defineComponent({
-  name: 'wlRate',
-  props: {
-    prop: {
-      type: String,
-      default: '',
-    },
-    model: {
-      type: Object,
-      default: () => {
-        return {}
-      },
-    },
-    config: {
-      type: Object,
-      default: () => {
-        return {}
-      },
-    },
-  },
-  data() {
-    return {
-      show: true,
-      Event: {},
-      Options: {},
-    }
-  },
-  watch: {
-    config: {
-      handler(v) {
-        const { show, event, ...Options } = v
-        if (isType(show, 'boolean')) {
-          this.show = !!show
-        }
-        this.Options = Options
-        this.Event = event || {}
-      },
-      immediate: true,
-      deep: true,
-    },
+
+const props = defineProps<{
+  prop: string
+  model: Record<string, any>
+  config: Record<string, any>
+}>()
+
+const show = ref(true)
+const Event = ref({})
+const Options = ref({})
+
+const emit = defineEmits(['update:model'])
+const computedModel = computed({
+  get: () => props.model[props.prop],
+  set: (v) => {
+    console.log('v', v)
+    emit('update:model', v)
   },
 })
+
+watch(
+  () => props.config,
+  (v) => {
+    const { show: showVal, event, ...rest } = v
+    if (isType(showVal, 'boolean')) {
+      show.value = !!showVal
+    }
+    Options.value = rest
+    Event.value = event || {}
+  },
+  { immediate: true, deep: true },
+)
 </script>
 
 <style scoped lang="scss"></style>
