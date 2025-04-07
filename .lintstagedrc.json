@@ -1,4 +1,5 @@
 {
+  "!src/components/ConfigForm/*": [],
   "!src/components/ConfigForm/**/*": [],
   "!src/components/DragTable/**/*": [],
   "*.{js,jsx,ts,tsx,vue}": [
