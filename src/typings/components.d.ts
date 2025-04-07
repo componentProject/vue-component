@@ -29,7 +29,6 @@ declare module 'vue' {
     ElTable: typeof import('element-plus/es')['ElTable']
     ElTableColumn: typeof import('element-plus/es')['ElTableColumn']
     ElTooltip: typeof import('element-plus/es')['ElTooltip']
-    Excel: typeof import('./../components/aother/excel.vue')['default']
     Icon: typeof import('./../components/Icon/index.vue')['default']
     ImportFileButton: typeof import('./../components/ConfigForm/components/components/wlButton/components/importFileButton/index.vue')['default']
     IntersectObserver: typeof import('./../components/IntersectObserver/index.vue')['default']

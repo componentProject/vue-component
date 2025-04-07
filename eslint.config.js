@@ -46,7 +46,7 @@ export default [
   },
   // Vue + TypeScript 配置（通过兼容层转换）
   js.configs.recommended,
-  ...pluginVue.configs['flat/essential'],
+  // ...pluginVue.configs['flat/essential'],
   ...defineConfigWithVueTs(pluginVue.configs['flat/base'], vueTsConfigs.recommended),
   ...compat.extends('@vue/eslint-config-prettier/skip-formatting'),
   ...storybook.configs['flat/recommended'],
