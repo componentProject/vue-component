@@ -1,5 +1,5 @@
 <script lang="tsx">
-import { defineComponent } from 'vue'
+import { reactive, defineComponent, defineAsyncComponent } from 'vue'
 import type { PropType } from 'vue'
 import wlComponent from './components/components.ts'
 import wlPopComponent from './components/popComponents.ts'
@@ -132,7 +132,7 @@ export default defineComponent({
       emit('update:rows', rows)
     }
 
-    const validate = async (callback?: (valid: boolean) => void) => {
+    const validate = async (callback?: Function) => {
       const formRef = refs['form']
       if (!formRef) return
       return formRef.validate(callback)
@@ -199,7 +199,14 @@ export default defineComponent({
       const Component = defineAsyncComponent(wlComponent[getComponentName(type)]) as ComponentType
 
       const component = (
-        <Component ref={componentRef} {...componentProps} v-slots={componentSlots} />
+        <Component
+          ref={componentRef}
+          {...componentProps}
+          onUpdate:model={(val: any) => {
+            model[prop] = val
+          }}
+          v-slots={componentSlots}
+        ></Component>
       )
 
       // 使组件支持popconfirm
