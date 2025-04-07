@@ -1,6 +1,10 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+//tailwind v3
+//@tailwind base;
+//@tailwind components;
+//@tailwind utilities;
+
+//tailwind v4
+@use "tailwindcss";
 
 @layer base {
   :root {

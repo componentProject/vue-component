@@ -42,7 +42,7 @@ export function deepClone(obj, Attr = null, replaceAttr = null, hash = new WeakM
 
   // 遍历对象的属性
   for (const key in obj) {
-    if (obj.hasOwnProperty(key)) {
+    if (Object.prototype.hasOwnProperty.call(obj, key)) {
       // 否则，递归复制属性值
       clone[key] = deepClone(obj[key], Attr, replaceAttr, hash)
     }

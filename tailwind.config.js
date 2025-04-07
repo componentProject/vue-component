@@ -5,13 +5,7 @@ export default {
   safelist: ['dark'],
   prefix: '',
 
-  content: [
-    './pages/**/*.{js,jsx,ts,tsx,vue}',
-    './components/**/*.{js,jsx,ts,tsx,vue}',
-    './app/**/*.{js,jsx,ts,tsx,vue}',
-    './src/**/*.{js,jsx,ts,tsx,vue}',
-    './.storybook/**/*.{js,jsx,ts,tsx,vue}',
-  ],
+  content: ['./src/components/**/*.{js,jsx,ts,tsx,vue}', './.storybook/**/*.{js,jsx,ts,tsx,vue}'],
 
   theme: {
     container: {
@@ -24,7 +18,7 @@ export default {
     extend: {
       padding: {
         4: '16px',
-        10: '10px'
+        10: '10px',
       },
       colors: {
         border: 'hsl(var(--border))',
