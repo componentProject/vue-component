@@ -1,6 +1,6 @@
 <template>
-  <el-select v-if="show" v-model="model[prop]" v-bind="Options" v-on="Event">
-    <!-- default	Option 组件列表-->
+  <el-select v-if="show" v-model="computedModel" v-bind="Options" v-on="Event">
+    <!-- default Option 组件列表-->
     <el-option v-bind="option" v-for="(option, index) in config.options" :key="index" />
     <!-- prefix Select 组件头部内容-->
     <template v-if="slots.prefix" #prefix="scope">
@@ -13,59 +13,57 @@
   </el-select>
 </template>
 
-<script lang="js">
+<script setup>
+import { computed, watch, ref, toRefs } from 'vue'
 import { isType } from '../../utils'
 
-import { defineComponent } from 'vue'
-export default defineComponent({
-  name: 'wlSelect',
-  props: {
-    prop: {
-      type: String,
-      default: '',
-    },
-    slots: {
-      type: Object,
-      default: () => {
-        return {}
-      },
-    },
-    model: {
-      type: Object,
-      default: () => {
-        return {}
-      },
-    },
-    config: {
-      type: Object,
-      default: () => {
-        return {}
-      },
-    },
+const props = defineProps({
+  prop: {
+    type: String,
+    default: '',
   },
-  data() {
-    return {
-      show: true,
-      Event: {},
-      Options: {},
-    }
+  slots: {
+    type: Object,
+    default: () => ({}),
   },
-  watch: {
-    config: {
-      handler(v) {
-        const { show, options, event, ...Options } = v
-        if (isType(show, 'boolean')) {
-          this.show = !!show
-        }
-        this.Options = Options
-        this.Event = event || {}
-        if (!options) v.options = []
-      },
-      immediate: true,
-      deep: true,
-    },
+  model: {
+    type: Object,
+    default: () => ({}),
+  },
+  config: {
+    type: Object,
+    default: () => ({}),
   },
 })
+
+const show = ref(true)
+const Event = ref({})
+const Options = ref({})
+
+const { config } = toRefs(props)
+
+const emit = defineEmits(['update:model'])
+const computedModel = computed({
+  get: () => props.model[props.prop],
+  set: (v) => {
+    console.log('v', v)
+    emit('update:model', v)
+  },
+})
+
+watch(
+  config,
+  (v) => {
+    const { show: showValue, options, event, ...restOptions } = v
+    if (isType(showValue, 'boolean')) {
+      show.value = !!showValue
+    }
+    Options.value = restOptions
+    Event.value = event || {}
+    if (!options) props.config.options = []
+  },
+  { immediate: true, deep: true },
+)
 </script>
 
 <style scoped lang="scss"></style>
