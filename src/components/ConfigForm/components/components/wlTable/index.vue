@@ -4,11 +4,11 @@
     class="wflex wflex-col wlTable"
     :class="{ tableExpandContainer: config.isExpand }"
   >
-    <el-table :data="model[prop]" v-bind="Options" v-on="Event" height="100%" border>
+    <el-table class="flex-1" :data="model[prop]" v-bind="Options" v-on="Event" height="100%" border>
       <template #default>
         <wl-table-column
           v-bind="column"
-          v-for="(column, index) in config.columns"
+          v-for="(column, index) in columns"
           :column="column"
           :key="index"
         >
@@ -37,77 +37,63 @@
     </div>
   </div>
 </template>
-<script lang="js">
+
+<script setup lang="ts">
+import { ref, watch, computed, onBeforeMount } from 'vue'
 import { isType } from '../../utils'
 import components from './components'
 
-import { defineComponent } from 'vue'
-export default defineComponent({
-  name: 'wlTable',
-  components,
-  props: {
-    prop: {
-      type: String,
-      default: '',
-    },
-    slots: {
-      type: Object,
-      default: () => {
-        return {}
-      },
-    },
-    model: {
-      type: Object,
-      default: () => {
-        return {}
-      },
-    },
-    config: {
-      type: Object,
-      default: () => {
-        return {}
-      },
-    },
+const props = withDefaults(
+  defineProps<{
+    prop: string
+    slots: Record<string, any>
+    model: Record<string, any>
+    config: Record<string, any>
+  }>(),
+  {
+    prop: '',
+    slots: () => ({}),
+    model: () => ({}),
+    config: () => ({}),
   },
-  data() {
-    return {
-      show: true,
-      Event: {},
-      Options: {},
-      pageConfig: {},
-    }
-  },
-  watch: {
-    config: {
-      handler(v) {
-        const { columns, show, event, pageConfig, ...Options } = v
-        if (isType(show, 'boolean')) {
-          this.show = !!show
-        }
-        this.pageConfig = pageConfig
-        this.Options = Options
-        this.Event = event || {}
-        if (!columns) v.columns = []
-      },
-      immediate: true,
-      deep: true,
-    },
-  },
-  methods: {
-    sizeChange(pageSize) {
-      this.$emit('change', { ...this.pageConfig, pageSize })
-    },
-    currentChange(pageNo) {
-      this.$emit('change', { ...this.pageConfig, pageNo, currentPage: pageNo })
-    },
-  },
-  beforeMount() {
-    const { model, prop } = this
-    if (!model[prop]) {
-      console.error('表格数据不能为空', prop, model)
-    }
-  },
+)
+
+const emit = defineEmits(['change', 'update:model'])
+
+const show = ref(true)
+const Event = ref({})
+const Options = ref({})
+const columns = ref([])
+const pageConfig = ref({})
+
+onBeforeMount(() => {
+  const { model, prop } = props
+  if (!model[prop]) {
+    console.error('表格数据不能为空', prop, model)
+  }
 })
+watch(
+  () => props.config,
+  (v) => {
+    const { show: showVal, event, columns: columnsVal = [], ...rest } = v
+    if (isType(showVal, 'boolean')) {
+      show.value = !!showVal
+    }
+    columns.value = columnsVal
+    Options.value = rest
+    Event.value = event || {}
+    pageConfig.value = v.pageConfig || {}
+  },
+  { immediate: true, deep: true },
+)
+
+const sizeChange = (pageSize) => {
+  emit('change', { ...pageConfig.value, pageSize })
+}
+
+const currentChange = (pageNo) => {
+  emit('change', { ...pageConfig.value, pageNo })
+}
 </script>
 
 <style scoped lang="scss">
