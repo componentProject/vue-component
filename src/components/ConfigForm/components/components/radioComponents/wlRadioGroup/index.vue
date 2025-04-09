@@ -1,58 +1,64 @@
 <template>
-  <el-radio-group v-if="show" v-model="model[prop]" v-bind="Options" v-on="Event">
-    <el-radio v-bind="radio" v-for="radio in config.radios" :key="radio.label" />
-    <el-radio-button v-bind="button" v-for="button in config.buttons" :key="button.label" />
+  <el-radio-group v-if="show" v-model="computedModel" v-bind="Options" v-on="Event">
+    <el-radio v-for="radio in radios" :key="radio.label" v-bind="radio" />
+    <el-radio-button v-for="button in buttons" :key="button.label" v-bind="button" />
   </el-radio-group>
 </template>
 
-<script lang="js">
-import { isType } from '../../../utils'
-import { defineComponent } from 'vue'
-export default defineComponent({
-  name: 'wlRadioGroup',
-  props: {
-    prop: {
-      type: String,
-      default: '',
-    },
-    model: {
-      type: Object,
-      default: () => {
-        return {}
-      },
-    },
-    config: {
-      type: Object,
-      default: () => {
-        return {}
-      },
-    },
-  },
-  data() {
-    return {
-      show: true,
-      Event: {},
-      Options: {},
-    }
-  },
-  watch: {
-    config: {
-      handler(v) {
-        const { show, event, ...Options } = v
-        if (isType(show, 'boolean')) {
-          this.show = !!show
-        }
-        this.Options = Options
-        this.Event = event || {}
+<script setup lang="ts">
+import { ref, watch, computed } from 'vue'
+import { isType } from '@/components/ConfigForm/utils'
+import type { FormModelProps, configType } from '@/components/ConfigForm/types'
 
-        if (!v.buttons) v.buttons = []
-        if (!v.radios) v.radios = []
-      },
-      immediate: true,
-      deep: true,
-    },
+interface RadioItem {
+  label: string
+  [key: string]: any
+}
+
+const props = withDefaults(
+  defineProps<{
+    prop: string
+    slots: Record<string, any>
+    model: FormModelProps
+    config: configType
+  }>(),
+  {
+    prop: '',
+    slots: () => ({}),
+    model: () => ({}),
+    config: () => ({}),
+  },
+)
+
+const emit = defineEmits(['update:model'])
+
+const show = ref(true)
+const Event = ref({})
+const Options = ref({})
+const radios = ref<RadioItem[]>([])
+const buttons = ref<RadioItem[]>([])
+
+const computedModel = computed({
+  get: () => props.model[props.prop],
+  set: (val) => {
+    emit('update:model', val)
   },
 })
+
+watch(
+  () => props.config,
+  (v) => {
+    const { show: showVal, event, radios: radiosVal = [], buttons: buttonsVal = [], ...rest } = v
+    if (isType(showVal, 'boolean')) {
+      show.value = !!showVal
+    }
+    radios.value = radiosVal
+    buttons.value = buttonsVal
+    Options.value = rest
+    Event.value = event || {}
+  },
+  { immediate: true, deep: true },
+)
 </script>
 
 <style scoped lang="scss"></style>

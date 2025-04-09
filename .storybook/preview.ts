@@ -9,7 +9,6 @@ import 'vxe-table/lib/style.css'
 import VxeUI from 'vxe-pc-ui'
 import 'vxe-pc-ui/lib/style.css'
 
-
 import { setup } from '@storybook/vue3'
 import type { Preview } from '@storybook/vue3'
 
@@ -26,7 +25,7 @@ const preview: Preview = {
     (Story) => ({
       components: { Story },
       template: `
-        <div class="flex flex-col" style="max-height: 100%;overflow: hidden">
+        <div class="flex flex-col overflow-hidden w-full h-full">
           <story />
         </div>
       `,

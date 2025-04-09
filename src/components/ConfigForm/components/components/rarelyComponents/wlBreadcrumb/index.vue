@@ -1,23 +1,42 @@
 <template>
   <el-breadcrumb v-if="show" v-bind="Options" v-on="Event">
-    <el-breadcrumb-item v-for="item in items" :key="item.name" v-bind="item" />
+    <el-breadcrumb-item v-for="item in items" :key="item.to" v-bind="item">
+      <template v-if="slots.default" #default>
+        <slot name="default" />
+      </template>
+    </el-breadcrumb-item>
   </el-breadcrumb>
 </template>
 
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import { isType } from '../../../utils'
+import { isType } from '@/components/ConfigForm/utils'
+import type { FormModelProps, configType } from '@/components/ConfigForm/types'
 
-const props = defineProps<{
-  prop: string
-  model: Record<string, any>
-  config: Record<string, any>
-}>()
+interface BreadcrumbItem {
+  to: string
+  [key: string]: any
+}
+
+const props = withDefaults(
+  defineProps<{
+    prop: string
+    slots: Record<string, any>
+    model: FormModelProps
+    config: configType
+  }>(),
+  {
+    prop: '',
+    slots: () => ({}),
+    model: () => ({}),
+    config: () => ({}),
+  },
+)
 
 const show = ref(true)
 const Event = ref({})
 const Options = ref({})
-const items = ref([])
+const items = ref<BreadcrumbItem[]>([])
 
 watch(
   () => props.config,

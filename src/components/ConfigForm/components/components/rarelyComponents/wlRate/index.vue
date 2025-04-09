@@ -1,27 +1,41 @@
 <template>
-  <el-rate v-if="show" v-model="computedModel" v-bind="Options" v-on="Event" />
+  <el-rate v-if="show" v-model="computedModel" v-bind="Options" v-on="Event">
+    <template v-if="slots.default" #default>
+      <slot name="default" />
+    </template>
+  </el-rate>
 </template>
 
 <script setup lang="ts">
 import { ref, watch, computed } from 'vue'
-import { isType } from '../../../utils'
+import { isType } from '@/components/ConfigForm/utils'
+import type { FormModelProps, configType } from '@/components/ConfigForm/types'
 
-const props = defineProps<{
-  prop: string
-  model: Record<string, any>
-  config: Record<string, any>
-}>()
+const props = withDefaults(
+  defineProps<{
+    prop: string
+    slots: Record<string, any>
+    model: FormModelProps
+    config: configType
+  }>(),
+  {
+    prop: '',
+    slots: () => ({}),
+    model: () => ({}),
+    config: () => ({}),
+  },
+)
+
+const emit = defineEmits(['update:model'])
 
 const show = ref(true)
 const Event = ref({})
 const Options = ref({})
 
-const emit = defineEmits(['update:model'])
 const computedModel = computed({
   get: () => props.model[props.prop],
-  set: (v) => {
-    console.log('v', v)
-    emit('update:model', v)
+  set: (val) => {
+    emit('update:model', val)
   },
 })
 

@@ -1,75 +1,55 @@
 <template>
   <el-descriptions v-if="show" v-bind="Options" v-on="Event">
-    <!-- title 自定义标题，显示在左上方-->
-    <template v-if="slots.title" #title="scope">
-      <slot name="title" v-bind="scope"></slot>
+    <template v-if="slots.title" #title>
+      <slot name="title" />
     </template>
-    <!-- extra 自定义操作区，显示在右上方-->
-    <template v-if="slots.extra" #extra="scope">
-      <slot name="extra" v-bind="scope"></slot>
+    <template v-if="slots.extra" #extra>
+      <slot name="extra" />
     </template>
-    <el-descriptions-item v-bind="item" v-for="(item, index) in config.items" :key="index">
-      <!-- label	自定义标签文本-->
-      <template v-if="slots.label" #label="scope">
-        <slot name="label" v-bind="scope"></slot>
-      </template>
-    </el-descriptions-item>
+    <template v-if="slots.default" #default>
+      <slot />
+    </template>
   </el-descriptions>
 </template>
 
-<script lang="js">
-import { isType } from '../../../utils'
+<script setup lang="ts">
+import { ref, watch } from 'vue'
+import { isType } from '@/components/ConfigForm/utils'
+import type { FormModelProps, configType } from '@/components/ConfigForm/types'
 
-import { defineComponent } from 'vue'
-export default defineComponent({
-  name: 'wlDescriptions',
-  props: {
-    prop: {
-      type: String,
-      default: '',
-    },
-    slots: {
-      type: Object,
-      default: () => {
-        return {}
-      },
-    },
-    model: {
-      type: Object,
-      default: () => {
-        return {}
-      },
-    },
-    config: {
-      type: Object,
-      default: () => {
-        return {}
-      },
-    },
+const props = withDefaults(
+  defineProps<{
+    prop: string
+    slots: Record<string, any>
+    model: FormModelProps
+    config: configType
+  }>(),
+  {
+    prop: '',
+    slots: () => ({}),
+    model: () => ({}),
+    config: () => ({}),
   },
-  data() {
-    return {
-      show: true,
-      Event: {},
-      Options: {},
+)
+
+const emit = defineEmits(['update:model'])
+
+const show = ref(true)
+const Event = ref({})
+const Options = ref({})
+
+watch(
+  () => props.config,
+  (v) => {
+    const { show: showVal, event, ...rest } = v
+    if (isType(showVal, 'boolean')) {
+      show.value = !!showVal
     }
+    Options.value = rest
+    Event.value = event || {}
   },
-  watch: {
-    config: {
-      handler(v) {
-        const { items, show, event, ...Options } = v
-        if (isType(show, 'boolean')) {
-          this.show = !!show
-        }
-        this.Options = Options
-        this.Event = event || {}
-        if (!items) v.items = []
-      },
-      immediate: true,
-      deep: true,
-    },
-  },
-})
+  { immediate: true, deep: true },
+)
 </script>
 
 <style scoped lang="scss"></style>

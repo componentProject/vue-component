@@ -1,77 +1,71 @@
 <template>
-  <el-input v-if="show" v-model="model[prop]" v-bind="Options" v-on="Event">
+  <el-input v-if="show" v-model="computedModel" v-bind="Options" v-on="Event">
     <!-- prefix 输入框头部内容，只对 type="text" 有效-->
     <template v-if="slots.prefix" #prefix="scope">
-      <slot name="prefix" v-bind="scope"></slot>
+      <slot name="prefix" v-bind="scope" />
     </template>
     <!-- suffix 输入框尾部内容，只对 type="text" 有效-->
     <template v-if="slots.suffix" #suffix="scope">
-      <slot name="suffix" v-bind="scope"></slot>
+      <slot name="suffix" v-bind="scope" />
     </template>
     <!-- prepend 输入框前置内容，只对 type="text" 有效-->
     <template v-if="slots.prepend" #prepend="scope">
-      <slot name="prepend" v-bind="scope"></slot>
+      <slot name="prepend" v-bind="scope" />
     </template>
     <!-- append 输入框后置内容，只对 type="text" 有效-->
     <template v-if="slots.append" #append="scope">
-      <slot name="append" v-bind="scope"></slot>
+      <slot name="append" v-bind="scope" />
     </template>
   </el-input>
 </template>
 
-<script lang="js">
-import { isType } from '../../../utils'
+<script setup lang="ts">
+import { ref, watch, computed } from 'vue'
+import type { FormItemConfig } from '@/components/ConfigForm/types'
 
-import { defineComponent } from 'vue'
-export default defineComponent({
-  name: 'wlInput',
-  props: {
-    prop: {
-      type: String,
-      default: '',
-    },
-    slots: {
-      type: Object,
-      default: () => {
-        return {}
-      },
-    },
-    model: {
-      type: Object,
-      default: () => {
-        return {}
-      },
-    },
-    config: {
-      type: Object,
-      default: () => {
-        return {}
-      },
-    },
+const props = withDefaults(
+  defineProps<{
+    prop: string
+    slots?: Record<string, any>
+    model: Record<string, any>
+    config: FormItemConfig['config']
+  }>(),
+  {
+    slots: () => ({}),
+    config: () => ({}),
   },
-  data() {
-    return {
-      show: true,
-      Event: {},
-      Options: {},
-    }
-  },
-  watch: {
-    config: {
-      handler(v) {
-        const { show, event, ...Options } = v
-        if (isType(show, 'boolean')) {
-          this.show = !!show
-        }
-        // type : "textarea"|"text"|"button"|...
-        this.Options = Options
-        this.Event = event || {}
-      },
-      immediate: true,
-      deep: true,
-    },
+)
+
+defineOptions({
+  name: 'WlInput',
+})
+
+const show = ref(true)
+const Event = ref({})
+const Options = ref({})
+
+const computedModel = computed({
+  get: () => props.model[props.prop],
+  set: (val) => {
+    props.model[props.prop] = val
   },
 })
+
+watch(
+  () => props.config,
+  (val) => {
+    if (val) {
+      show.value = val.show !== false
+      if (val.Event) {
+        Event.value = val.Event
+      }
+      if (val.Options) {
+        Options.value = val.Options
+      }
+    }
+  },
+  { immediate: true, deep: true },
+)
 </script>
 
 <style scoped lang="scss"></style>
