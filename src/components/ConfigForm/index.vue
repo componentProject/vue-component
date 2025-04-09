@@ -1,9 +1,9 @@
 <script lang="tsx">
 import { reactive, defineComponent, defineAsyncComponent } from 'vue'
 import type { PropType } from 'vue'
-import wlComponent from './components/components.ts'
-import wlPopComponent from './components/popComponents.ts'
-import { deepClone, getType } from './components/utils'
+import wlComponent from '@/components/ConfigForm/components/components.ts'
+import wlPopComponent from '@/components/ConfigForm/components/popComponents.ts'
+import { deepClone, getType } from '@/components/ConfigForm/utils'
 import type {
   ConfigFormProps,
   FormModelProps,
@@ -19,7 +19,7 @@ import type { ColProps } from 'element-plus'
 
 export default defineComponent({
   name: 'wlConfigForm',
-  components: { ...wlComponent, ...wlPopComponent },
+  components: { ...wlComponent },
   props: {
     formOptions: {
       type: Object as PropType<formOptionsConfig>,
