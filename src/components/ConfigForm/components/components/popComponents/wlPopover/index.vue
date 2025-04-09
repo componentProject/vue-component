@@ -4,9 +4,9 @@
  * @LastEditors: moluoxixi 1983531544@qq.com
  * @LastEditTime: 2025-04-09 10:44:37
  * @FilePath: \vue-component\src\components\ConfigForm\components\components\popComponents\wlPopover\index.vue
- * @Description: 
- * 
- * Copyright (c) 2025 by ${git_name_email}, All Rights Reserved. 
+ * @Description:
+ *
+ * Copyright (c) 2025 by ${git_name_email}, All Rights Reserved.
 -->
 <template>
   <el-popover v-bind="options" v-on="event">
@@ -35,13 +35,10 @@ const props = withDefaults(defineProps<Props>(), {
   config: () => ({}),
 })
 
-//  — Popover 内嵌 HTML 文本
-const defaultSlot = defineSlots<{
+defineSlots<{
+  //  — Popover 内嵌 HTML 文本
   default?: (props: any) => any
-}>()
-
-// reference 触发 Popover 显示的 HTML 元素
-const referenceSlot = defineSlots<{
+  // reference 触发 Popover 显示的 HTML 元素
   reference?: (props: any) => any
 }>()
 
