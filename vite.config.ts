@@ -65,15 +65,17 @@ export default defineConfig((mode) => {
     vueJsx(),
     env.VITE_DEVTOOLS && vueDevTools(),
     // 自动引入
-    AutoImport({
-      imports: ['vue'],
-      resolvers: [ElementPlusResolver()],
-      dts: path.resolve(__dirname, './src/typings/auto-imports.d.ts'),
-    }),
-    Components({
-      resolvers: [ElementPlusResolver()],
-      dts: path.resolve(__dirname, './src/typings/components.d.ts'),
-    }),
+    mode.mode === 'development' &&
+      AutoImport({
+        imports: ['vue'],
+        resolvers: [ElementPlusResolver()],
+        dts: path.resolve(__dirname, './src/typings/auto-imports.d.ts'),
+      }),
+    mode.mode === 'development' &&
+      Components({
+        resolvers: [ElementPlusResolver()],
+        dts: path.resolve(__dirname, './src/typings/components.d.ts'),
+      }),
   ]
   // CDN加速
   const importToCDNPlugins = viteEnv.VITE_USE_CDN
