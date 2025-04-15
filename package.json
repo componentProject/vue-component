@@ -1,6 +1,6 @@
 {
   "name": "vuecomponent",
-  "packageManager": "pnpm@8.6.0",
+  "packageManager": "pnpm@10.8.0",
   "engines": {
     "node": ">=20.0.0"
   },
@@ -52,7 +52,7 @@
     "@vavt/v3-extension": "^3.0.0",
     "@vee-validate/zod": "^4.15.0",
     "@vueuse/core": "^13.0.0",
-    "axios": "^1.8.1",
+    "axios": "1.8.2",
     "class-variance-authority": "^0.7.1",
     "classnames": "^2.5.1",
     "clsx": "^2.1.1",
