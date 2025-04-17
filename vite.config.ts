@@ -20,6 +20,7 @@ import { createHtmlPlugin } from 'vite-plugin-html'
 import autoprefixer from 'autoprefixer'
 import tailwindcss from '@tailwindcss/postcss'
 import path from 'path'
+import type { Plugin } from 'postcss'
 
 /**
  * 将环境变量中的字符串值转换为对应的 JavaScript 数据类型
@@ -56,8 +57,8 @@ function wrapperEnv(env: Record<string, string>) {
 }
 
 // https://vite.dev/config/
-export default defineConfig((mode) => {
-  const env = loadEnv(mode.mode, process.cwd())
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, process.cwd())
   const viteEnv = wrapperEnv(env)
 
   const vuePlugins = [
@@ -65,13 +66,13 @@ export default defineConfig((mode) => {
     vueJsx(),
     env.VITE_DEVTOOLS && vueDevTools(),
     // 自动引入
-    mode.mode === 'development' &&
+    mode === 'development' &&
       AutoImport({
         imports: ['vue'],
         resolvers: [ElementPlusResolver()],
         dts: path.resolve(__dirname, './src/typings/auto-imports.d.ts'),
       }),
-    mode.mode === 'development' &&
+    mode === 'development' &&
       Components({
         resolvers: [ElementPlusResolver()],
         dts: path.resolve(__dirname, './src/typings/components.d.ts'),
@@ -83,6 +84,7 @@ export default defineConfig((mode) => {
         modules,
       })
     : []
+
   return {
     plugins: [
       ...vuePlugins,
@@ -93,6 +95,7 @@ export default defineConfig((mode) => {
           },
         },
       }),
+      // CDN加速
       ...importToCDNPlugins,
       // 是否生成包预览
       viteEnv.VITE_REPORT && visualizer(),
@@ -143,7 +146,6 @@ export default defineConfig((mode) => {
             ],
           },
         }),
-      // CDN加速
     ],
     build: {
       // 启用 CSS 代码拆分,使加载模块时,仅加载对应css,而不是打包为一个样式文件
@@ -180,9 +182,9 @@ export default defineConfig((mode) => {
     css: {
       postcss: {
         plugins: [
-          tailwindcss(),
+          tailwindcss() as Plugin,
           // 自动添加厂商前缀
-          autoprefixer(),
+          autoprefixer() as Plugin,
         ],
       },
       preprocessorOptions: {
