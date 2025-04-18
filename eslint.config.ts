@@ -9,7 +9,7 @@ import skipFormatting from '@vue/eslint-config-prettier/skip-formatting'
 import pluginVitest from '@vitest/eslint-plugin'
 import pluginCypress from 'eslint-plugin-cypress/flat'
 
-export default defineConfigWithVueTs([
+export default defineConfigWithVueTs(
   {
     name: 'app/files-to-lint',
     files: ['**/*.{js,mjs,jsx,ts,mts,tsx,vue}'],
@@ -79,4 +79,4 @@ export default defineConfigWithVueTs([
       'vue/no-mutating-props': 'off',
     },
   },
-])
+)
