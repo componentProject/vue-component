@@ -1,54 +1,41 @@
-/*
- * @Author: moluoxixi 1983531544@qq.com
- * @Date: 2025-01-25 14:59:50
- * @LastEditors: moluoxixi 1983531544@qq.com
- * @LastEditTime: 2025-02-27 11:42:39
- * @FilePath: \vue-component\eslint.config.js
- * @Description:
- *
- * Copyright (c) 2025 by ${git_name_email}, All Rights Reserved.
- */
-import path from 'node:path'
-import { fileURLToPath } from 'node:url'
-
-import { FlatCompat } from '@eslint/eslintrc'
+import { globalIgnores } from 'eslint/config'
+import { defineConfigWithVueTs, vueTsConfigs } from '@vue/eslint-config-typescript'
+import globals from 'globals'
 import js from '@eslint/js'
 import pluginVue from 'eslint-plugin-vue'
-import { defineConfigWithVueTs, vueTsConfigs } from '@vue/eslint-config-typescript'
-import storybook from 'eslint-plugin-storybook'
-import globals from 'globals'
+import pluginOxlint from 'eslint-plugin-oxlint'
+import skipFormatting from '@vue/eslint-config-prettier/skip-formatting'
 
-// 兼容层（用于转换旧式配置到 Flat Config）
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
-const compat = new FlatCompat({
-  baseDirectory: __dirname,
-  recommendedConfig: js.configs.recommended,
-})
-export default [
-  {
-    name: 'app/files-to-ignore',
-    ignores: [
-      '**/servers/**',
-      '**/src/components/ConfigForm/**',
-      '**/node_modules/**',
-      '**/dist/**',
-      '**/public/**',
-      '**/package-lock.json',
-      '**/yarn.lock',
-      '**/pnpm-lock.yaml',
-      '**/.history/**',
-      '**/CHANGELOG*.md',
-      '**/*.min.*',
-      '**/LICENSE*',
-      '**/__snapshots__/**',
-      '**/auto-import?(s).d.ts',
-      '**/components.d.ts',
-    ],
-    // 其他配置...
-  },
+import pluginVitest from '@vitest/eslint-plugin'
+import pluginCypress from 'eslint-plugin-cypress/flat'
+
+export default defineConfigWithVueTs([
   {
     name: 'app/files-to-lint',
+    files: ['**/*.{js,mjs,jsx,ts,mts,tsx,vue}'],
+  },
+
+  globalIgnores([
+    '**/dist/**',
+    '**/dist-ssr/**',
+    '**/coverage/**',
+    '**/servers/**',
+    '**/src/components/ConfigForm/**',
+    '**/node_modules/**',
+    '**/public/**',
+    '**/package-lock.json',
+    '**/yarn.lock',
+    '**/pnpm-lock.yaml',
+    '**/.history/**',
+    '**/CHANGELOG*.md',
+    '**/*.min.*',
+    '**/LICENSE*',
+    '**/__snapshots__/**',
+    '**/auto-import?(s).d.ts',
+    '**/components.d.ts',
+  ]),
+  vueTsConfigs.recommended,
+  {
     languageOptions: {
       parserOptions: {
         parser: '@typescript-eslint/parser',
@@ -65,21 +52,31 @@ export default [
     },
     files: ['src/components/**/*.{ts,mts,tsx,vue}'],
   },
-  // Vue + TypeScript 配置（通过兼容层转换）
   js.configs.recommended,
-  ...defineConfigWithVueTs(pluginVue.configs['flat/base'], vueTsConfigs.recommended),
-  ...compat.extends('@vue/eslint-config-prettier/skip-formatting'),
-  ...storybook.configs['flat/recommended'],
+  pluginVue.configs['flat/essential'],
+  ...pluginOxlint.configs['flat/recommended'],
+  skipFormatting,
+
   {
+    ...pluginVitest.configs.recommended,
+    files: ['src/**/__tests__/*'],
+  },
+
+  {
+    ...pluginCypress.configs.recommended,
+    files: ['cypress/e2e/**/*.{cy,spec}.{js,ts,jsx,tsx}', 'cypress/support/**/*.{js,ts,jsx,tsx}'],
+  },
+
+  {
+    name: 'ignores-rules',
     rules: {
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-unused-expressions': 'off',
       '@typescript-eslint/no-unused-vars': 'off',
-      'storybook/prefer-pascal-case': 'off',
       'vue/block-lang': 'off',
       'vue/multi-word-component-names': 'off',
       'no-duplicate-selectors': 'off',
       'vue/no-mutating-props': 'off',
     },
   },
-]
+])
