@@ -73,6 +73,10 @@
 import { ref, watch } from 'vue'
 import type { ExcelConfig, ColumnConfig } from './types'
 
+defineOptions({
+  name: 'ConfigTable'
+})
+
 const props = defineProps<{
   modelValue: ExcelConfig
 }>()
