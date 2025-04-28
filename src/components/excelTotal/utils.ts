@@ -321,42 +321,43 @@ export const generateStatData = (
 
   // 生成统计数据
   return dateRange.map(date => {
-    // 当日进车记录
-    const dayEnterRecords = enterRecords.filter(record => record.date === date);
+    // 1. 入库/台：进车情况总表中指定进站日期的入库车辆数
+    const enterCount = enterRecords.filter(record => record.date === date).length;
 
-    // 当日出库记录
-    const dayExitRecords = feeRecords.filter(record => record.date === date);
+    // 2. 出库/台：收费明细总表中指定出站日期的出库车辆数
+    const exitRecords = feeRecords.filter(record => record.date === date);
+    const exitCount = exitRecords.length;
 
-    // 当日已收费记录
-    const dayPaidRecords = dayExitRecords.filter(record => record.isPaid);
+    // 3. 金额：收费明细总表中指定出站日期的出库车辆数一共收了多少钱
+    const totalAmount = exitRecords.reduce((sum, record) => sum + record.fee, 0);
 
-    // 当日未收费记录
-    const dayUnpaidRecords = dayExitRecords.filter(record => !record.isPaid);
+    // 4. 收费台数：收费明细总表中指定出站日期的收了钱的车辆台数
+    const paidRecords = exitRecords.filter(record => record.isPaid);
+    const paidCount = paidRecords.length;
 
-    // 出库占比 = 收费台数 / 入库台数 (格式化为百分比)
-    const enterCount = dayEnterRecords.length;
-    const paidCount = dayPaidRecords.length;
+    // 5. 未收台数：收费明细总表中指定出站日期的没收钱的车辆台数
+    const unpaidRecords = exitRecords.filter(record => !record.isPaid);
+    const unpaidCount = unpaidRecords.length;
+
+    // 6. 出库占比：收费台数除入库台数得来百分比
     const exitRatio = enterCount > 0
       ? `${((paidCount / enterCount) * 100).toFixed(2)}%`
       : '0.00%';
-
-    // 计算总金额
-    const totalAmount = dayPaidRecords.reduce((sum, record) => sum + record.fee, 0);
 
     return {
       date,
       weekday: getWeekday(date),
       enterCount,
-      exitCount: dayExitRecords.length,
+      exitCount,
       totalAmount,
       paidCount,
-      unpaidCount: dayUnpaidRecords.length,
+      unpaidCount,
       exitRatio,
       // 记录源数据用于悬浮显示
-      enterRecords: dayEnterRecords,
-      exitRecords: dayExitRecords,
-      paidRecords: dayPaidRecords,
-      unpaidRecords: dayUnpaidRecords
+      enterRecords: enterRecords.filter(record => record.date === date),
+      exitRecords,
+      paidRecords,
+      unpaidRecords
     };
   });
 };
