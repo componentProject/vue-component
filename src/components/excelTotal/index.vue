@@ -76,7 +76,7 @@
       width="80%"
     >
       <el-table :data="sourceData" border style="width: 100%">
-        <el-table-column prop="rowIndex" label="行号" width="80" />
+        <el-table-column prop="number" label="编号" width="120" />
         <el-table-column prop="carNumber" label="车牌" width="120" />
         <el-table-column prop="enterTime" label="进站时间" width="180" />
         <el-table-column v-if="showExitTime" prop="exitTime" label="出站时间" width="180" />

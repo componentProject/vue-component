@@ -12,6 +12,7 @@ export interface EnterRecord {
   date: string;
   carNumber: string;
   enterTime: string;
+  number: string;
   id: string;
   rowIndex: number;
 }
@@ -23,6 +24,7 @@ export interface FeeRecord {
   exitTime: string;
   fee: number;
   isPaid: boolean;
+  number: string;
   id: string;
   rowIndex: number;
 }
@@ -57,10 +59,12 @@ export interface ExcelConfig {
 
 export const defaultExcelConfig: ExcelConfig = {
   enterColumns: [
+    { key: 'number', label: '编号', required: true, searchText: '编号' },
     { key: 'carNumber', label: '车牌', required: true, searchText: '车牌' },
     { key: 'enterTime', label: '进站时间', required: true, searchText: '进站时间' }
   ],
   feeColumns: [
+    { key: 'number', label: '编号', required: true, searchText: '编号' },
     { key: 'carNumber', label: '车牌', required: true, searchText: '车牌' },
     { key: 'enterTime', label: '进站时间', required: true, searchText: '进站时间' },
     { key: 'exitTime', label: '出站时间', required: true, searchText: '出站时间' },

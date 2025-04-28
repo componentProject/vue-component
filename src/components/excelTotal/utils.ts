@@ -128,6 +128,7 @@ export const parseEnterRecords = (file: File, config: ExcelConfig): Promise<Ente
             date,
             carNumber: String(row[columnIndices.carNumber] || ''),
             enterTime: String(enterTime),
+            number: String(row[columnIndices.number] || ''),
             id: `enter_${i}`,
             rowIndex: i + 1
           });
@@ -220,6 +221,7 @@ export const parseFeeRecords = (file: File, config: ExcelConfig): Promise<FeeRec
             exitTime: String(row[columnIndices.exitTime] || ''),
             fee: Number(row[columnIndices.fee]) || 0,
             isPaid,
+            number: String(row[columnIndices.number] || ''),
             id: `fee_${i}`,
             rowIndex: i + 1
           });
