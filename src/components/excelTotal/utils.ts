@@ -1,4 +1,5 @@
 import * as XLSX from 'xlsx';
+import moment from 'moment';
 import type { EnterRecord, FeeRecord, StatRow, ExcelConfig, ColumnConfig } from './types';
 
 // 添加必要的类型声明
@@ -8,6 +9,68 @@ declare global {
     FileReader: typeof FileReader;
   }
 }
+
+/**
+ * 解析日期字符串
+ * @param dateStr 日期字符串
+ * @returns 标准化的日期字符串 (YYYY-MM-DD)
+ */
+const parseDate = (dateStr: string | Date): string => {
+  if (dateStr instanceof Date) {
+    return moment(dateStr).format('YYYY-MM-DD');
+  }
+
+  // 尝试多种日期格式
+  const formats = [
+    'YYYY-MM-DD HH:mm:ss',
+    'YYYY-MM-DD',
+    'MM/DD/YYYY',
+    'MM/DD',
+    'YYYY/MM/DD',
+    'YYYY.MM.DD',
+    'MM.DD.YYYY'
+  ];
+
+  for (const format of formats) {
+    const date = moment(dateStr, format);
+    if (date.isValid()) {
+      return date.format('YYYY-MM-DD');
+    }
+  }
+
+  // 如果所有格式都失败，返回原始字符串
+  return String(dateStr);
+};
+
+/**
+ * 解析时间字符串
+ * @param timeStr 时间字符串
+ * @returns 标准化的时间字符串 (HH:mm:ss)
+ */
+const parseTime = (timeStr: string | Date): string => {
+  if (timeStr instanceof Date) {
+    return moment(timeStr).format('HH:mm:ss');
+  }
+
+  // 尝试多种时间格式
+  const formats = [
+    'HH:mm:ss',
+    'HH:mm',
+    'HH:mm:ss.SSS',
+    'h:mm:ss A',
+    'h:mm A'
+  ];
+
+  for (const format of formats) {
+    const time = moment(timeStr, format);
+    if (time.isValid()) {
+      return time.format('HH:mm:ss');
+    }
+  }
+
+  // 如果所有格式都失败，返回原始字符串
+  return String(timeStr);
+};
 
 /**
  * 解析进车情况总表Excel文件
@@ -59,28 +122,10 @@ export const parseEnterRecords = (file: File, config: ExcelConfig): Promise<Ente
           const row = jsonData[i];
           if (!row || !row[columnIndices.date]) continue;
 
-          let dateString = '';
-          if (row[columnIndices.date] instanceof Date) {
-            const date = row[columnIndices.date] as Date;
-            dateString = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
-          } else {
-            const dateValue = String(row[columnIndices.date]);
-            if (dateValue.includes('/')) {
-              const parts = dateValue.split('/');
-              if (parts.length === 3) {
-                dateString = `${parts[0]}-${String(parts[1]).padStart(2, '0')}-${String(parts[2]).padStart(2, '0')}`;
-              }
-            } else if (dateValue.includes('-')) {
-              dateString = dateValue;
-            } else {
-              dateString = dateValue;
-            }
-          }
-
           records.push({
-            date: dateString,
+            date: parseDate(row[columnIndices.date]),
             carNumber: String(row[columnIndices.carNumber] || ''),
-            enterTime: String(row[columnIndices.enterTime] || ''),
+            enterTime: parseTime(row[columnIndices.enterTime] || ''),
             id: `enter_${i}`,
             rowIndex: i + 1
           });
@@ -150,24 +195,6 @@ export const parseFeeRecords = (file: File, config: ExcelConfig): Promise<FeeRec
           const row = jsonData[i];
           if (!row || !row[columnIndices.date]) continue;
 
-          let dateString = '';
-          if (row[columnIndices.date] instanceof Date) {
-            const date = row[columnIndices.date] as Date;
-            dateString = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
-          } else {
-            const dateValue = String(row[columnIndices.date]);
-            if (dateValue.includes('/')) {
-              const parts = dateValue.split('/');
-              if (parts.length === 3) {
-                dateString = `${parts[0]}-${String(parts[1]).padStart(2, '0')}-${String(parts[2]).padStart(2, '0')}`;
-              }
-            } else if (dateValue.includes('-')) {
-              dateString = dateValue;
-            } else {
-              dateString = dateValue;
-            }
-          }
-
           // 处理是否收费
           let isPaid = false;
           if (columnIndices.isPaid !== undefined) {
@@ -179,9 +206,9 @@ export const parseFeeRecords = (file: File, config: ExcelConfig): Promise<FeeRec
           }
 
           records.push({
-            date: dateString,
+            date: parseDate(row[columnIndices.date]),
             carNumber: String(row[columnIndices.carNumber] || ''),
-            exitTime: String(row[columnIndices.exitTime] || ''),
+            exitTime: parseTime(row[columnIndices.exitTime] || ''),
             fee: Number(row[columnIndices.fee]) || 0,
             isPaid,
             id: `fee_${i}`,
@@ -210,8 +237,8 @@ export const parseFeeRecords = (file: File, config: ExcelConfig): Promise<FeeRec
  */
 export const getWeekday = (dateStr: string): string => {
   const weekdays = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
-  const date = new Date(dateStr);
-  return weekdays[date.getDay()];
+  const date = moment(dateStr);
+  return weekdays[date.day()];
 };
 
 /**
