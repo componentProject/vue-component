@@ -18,16 +18,6 @@
               <el-input v-model="row.searchText" />
             </template>
           </el-table-column>
-          <el-table-column prop="required" label="必填" width="80">
-            <template #default="{ row }">
-              <el-switch v-model="row.required" />
-            </template>
-          </el-table-column>
-          <el-table-column label="操作" width="100">
-            <template #default="{ $index }">
-              <el-button type="danger" link @click="removeEnterColumn($index)">删除</el-button>
-            </template>
-          </el-table-column>
         </el-table>
         <div class="table-actions">
           <el-button type="primary" @click="addEnterColumn">添加列</el-button>
@@ -48,16 +38,6 @@
           <el-table-column prop="searchText" label="搜索关键词" width="150">
             <template #default="{ row }">
               <el-input v-model="row.searchText" />
-            </template>
-          </el-table-column>
-          <el-table-column prop="required" label="必填" width="80">
-            <template #default="{ row }">
-              <el-switch v-model="row.required" />
-            </template>
-          </el-table-column>
-          <el-table-column label="操作" width="100">
-            <template #default="{ $index }">
-              <el-button type="danger" link @click="removeFeeColumn($index)">删除</el-button>
             </template>
           </el-table-column>
         </el-table>
