@@ -73,6 +73,41 @@ const parseTime = (timeStr: string | Date): string => {
 };
 
 /**
+ * 从时间字符串中提取日期
+ * @param timeStr 时间字符串
+ * @returns 标准化的日期字符串 (YYYY-MM-DD)
+ */
+const extractDateFromTime = (timeStr: string | Date): string => {
+  if (timeStr instanceof Date) {
+    return moment(timeStr).format('YYYY-MM-DD');
+  }
+
+  // 尝试多种日期时间格式
+  const formats = [
+    'YYYY-MM-DD HH:mm:ss',
+    'YYYY-MM-DD HH:mm',
+    'MM/DD/YYYY HH:mm:ss',
+    'MM/DD/YYYY HH:mm',
+    'YYYY/MM/DD HH:mm:ss',
+    'YYYY/MM/DD HH:mm',
+    'YYYY.MM.DD HH:mm:ss',
+    'YYYY.MM.DD HH:mm',
+    'MM.DD.YYYY HH:mm:ss',
+    'MM.DD.YYYY HH:mm'
+  ];
+
+  for (const format of formats) {
+    const date = moment(timeStr, format);
+    if (date.isValid()) {
+      return date.format('YYYY-MM-DD');
+    }
+  }
+
+  // 如果所有格式都失败，返回当前日期
+  return moment().format('YYYY-MM-DD');
+};
+
+/**
  * 解析进车情况总表Excel文件
  * @param file Excel文件
  * @param config 列配置
@@ -120,12 +155,15 @@ export const parseEnterRecords = (file: File, config: ExcelConfig): Promise<Ente
         // 解析数据行
         for (let i = 1; i < jsonData.length; i++) {
           const row = jsonData[i];
-          if (!row || !row[columnIndices.date]) continue;
+          if (!row || !row[columnIndices.enterTime]) continue;
+
+          const enterTime = parseTime(row[columnIndices.enterTime]);
+          const date = extractDateFromTime(enterTime);
 
           records.push({
-            date: parseDate(row[columnIndices.date]),
+            date,
             carNumber: String(row[columnIndices.carNumber] || ''),
-            enterTime: parseTime(row[columnIndices.enterTime] || ''),
+            enterTime,
             id: `enter_${i}`,
             rowIndex: i + 1
           });
@@ -193,7 +231,10 @@ export const parseFeeRecords = (file: File, config: ExcelConfig): Promise<FeeRec
         // 解析数据行
         for (let i = 1; i < jsonData.length; i++) {
           const row = jsonData[i];
-          if (!row || !row[columnIndices.date]) continue;
+          if (!row || !row[columnIndices.enterTime]) continue;
+
+          const enterTime = parseTime(row[columnIndices.enterTime]);
+          const date = extractDateFromTime(enterTime);
 
           // 处理是否收费
           let isPaid = false;
@@ -206,8 +247,9 @@ export const parseFeeRecords = (file: File, config: ExcelConfig): Promise<FeeRec
           }
 
           records.push({
-            date: parseDate(row[columnIndices.date]),
+            date,
             carNumber: String(row[columnIndices.carNumber] || ''),
+            enterTime,
             exitTime: parseTime(row[columnIndices.exitTime] || ''),
             fee: Number(row[columnIndices.fee]) || 0,
             isPaid,
@@ -260,15 +302,13 @@ export const generateStatData = (
 
   if (startDate && endDate) {
     // 如果提供了开始和结束日期，生成这个范围内的所有日期
-    const start = new Date(startDate);
-    const end = new Date(endDate);
-    const dayDiff = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+    const start = moment(startDate);
+    const end = moment(endDate);
+    const dayDiff = end.diff(start, 'days') + 1;
 
     for (let i = 0; i < dayDiff; i++) {
-      const date = new Date(start);
-      date.setDate(date.getDate() + i);
-      const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
-      dateRange.push(dateStr);
+      const date = moment(start).add(i, 'days');
+      dateRange.push(date.format('YYYY-MM-DD'));
     }
   } else {
     // 否则从记录中提取所有唯一日期

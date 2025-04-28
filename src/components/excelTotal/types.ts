@@ -57,12 +57,10 @@ export interface ExcelConfig {
 
 export const defaultExcelConfig: ExcelConfig = {
   enterColumns: [
-    { key: 'date', label: '日期', required: true, searchText: '日期' },
     { key: 'carNumber', label: '车牌', required: true, searchText: '车牌' },
     { key: 'enterTime', label: '进站时间', required: true, searchText: '进站时间' }
   ],
   feeColumns: [
-    { key: 'date', label: '日期', required: true, searchText: '日期' },
     { key: 'carNumber', label: '车牌', required: true, searchText: '车牌' },
     { key: 'enterTime', label: '进站时间', required: true, searchText: '进站时间' },
     { key: 'exitTime', label: '出站时间', required: true, searchText: '出站时间' },
