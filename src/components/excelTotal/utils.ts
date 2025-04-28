@@ -323,7 +323,7 @@ export const generateStatData = (
       paidCount,
       unpaidCount,
       exitRatio,
-      // 记录源数据用于悬浮显示
+      // 记录源数据用于查看详情
       enterRecords: dayEnterRecords,
       exitRecords: dayExitRecords,
       paidRecords,

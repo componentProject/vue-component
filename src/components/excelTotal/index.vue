@@ -118,7 +118,7 @@ const filteredStatData = computed(() => {
   const [start, end] = dateRange.value
   return statData.value.filter(row => {
     const date = moment(row.date)
-    return date.isSameOrAfter(moment(start).format('YYYY-MM-DD')) &&
+    return date.isSameOrAfter(moment(start).format('YYYY-MM-DD')) && 
            date.isSameOrBefore(moment(end).format('YYYY-MM-DD'))
   })
 })
@@ -230,8 +230,8 @@ const exportStatData = () => {
   }
   const [start, end] = dateRange.value
   exportExcel(
-    statData.value,
-    moment(start).format('YYYY-MM-DD'),
+    filteredStatData.value,  // 使用筛选后的数据
+    moment(start).format('YYYY-MM-DD'), 
     moment(end).format('YYYY-MM-DD')
   )
 }
