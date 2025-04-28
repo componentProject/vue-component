@@ -90,7 +90,7 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import type { UploadFile } from 'element-plus'
-import { parseEnterRecords, parseFeeRecords, generateStatData, exportExcel } from './utils'
+import { parseEnterRecords, parseFeeRecords, generateStatData, exportExcel, getDefaultDateRange } from './utils'
 import type { ExcelConfig, EnterRecord, FeeRecord, StatRow } from './types'
 import { defaultExcelConfig } from './types'
 import ConfigTable from './ConfigTable.vue'
@@ -112,13 +112,20 @@ const statData = computed<StatRow[]>(() => {
   return generateStatData(enterRecords.value, feeRecords.value)
 })
 
+// 设置默认日期范围
+const setDefaultDateRange = () => {
+  if (enterRecords.value.length > 0 && feeRecords.value.length > 0) {
+    dateRange.value = getDefaultDateRange(enterRecords.value, feeRecords.value)
+  }
+}
+
 // 根据日期范围过滤数据
 const filteredStatData = computed(() => {
   if (!dateRange.value) return statData.value
   const [start, end] = dateRange.value
   return statData.value.filter(row => {
     const date = moment(row.date)
-    return date.isSameOrAfter(moment(start).format('YYYY-MM-DD')) && 
+    return date.isSameOrAfter(moment(start).format('YYYY-MM-DD')) &&
            date.isSameOrBefore(moment(end).format('YYYY-MM-DD'))
   })
 })
@@ -148,6 +155,7 @@ const handleEnterFileChange = async (uploadFile: UploadFile) => {
     enterRecords.value = records;
     if (feeRecords.value.length > 0) {
       ElMessage.success('进车记录导入成功，统计表已更新');
+      setDefaultDateRange();
     }
   } catch (error: any) {
     ElMessage.error(error?.message || '解析文件失败');
@@ -160,6 +168,7 @@ const handleFeeFileChange = async (uploadFile: UploadFile) => {
     feeRecords.value = records;
     if (enterRecords.value.length > 0) {
       ElMessage.success('收费记录导入成功，统计表已更新');
+      setDefaultDateRange();
     }
   } catch (error: any) {
     ElMessage.error(error?.message || '解析文件失败');
@@ -231,7 +240,7 @@ const exportStatData = () => {
   const [start, end] = dateRange.value
   exportExcel(
     filteredStatData.value,  // 使用筛选后的数据
-    moment(start).format('YYYY-MM-DD'), 
+    moment(start).format('YYYY-MM-DD'),
     moment(end).format('YYYY-MM-DD')
   )
 }

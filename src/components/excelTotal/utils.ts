@@ -267,7 +267,7 @@ export const generateStatData = (
   endDate?: string
 ): StatRow[] => {
   // 获取日期范围
-  let dateRange: string[] = [];
+  let dateRange: (string | null)[] = [];
 
   if (startDate && endDate) {
     // 如果提供了开始和结束日期，生成这个范围内的所有日期
@@ -282,8 +282,8 @@ export const generateStatData = (
   } else {
     // 否则从记录中提取所有唯一日期
     const allDates = new Set([
-      ...enterRecords.map(record => record.date),
-      ...feeRecords.map(record => record.date)
+      ...enterRecords.map(record => extractDateFromTime(record.enterTime)),
+      ...feeRecords.map(record => extractDateFromTime(record.exitTime))
     ]);
     dateRange = Array.from(allDates).sort();
   }
@@ -291,11 +291,11 @@ export const generateStatData = (
   // 生成统计数据
   return dateRange.map(date => {
     // 1. 入库/台：进车情况总表中指定进站日期的入库车辆数
-    const dayEnterRecords = enterRecords.filter(record => record.date === date);
+    const dayEnterRecords = enterRecords.filter(record => extractDateFromTime(record.enterTime) === date);
     const enterCount = dayEnterRecords.length;
 
     // 2. 出库/台：收费明细总表中指定出站日期的出库车辆数
-    const dayExitRecords = feeRecords.filter(record => record.date === date);
+    const dayExitRecords = feeRecords.filter(record => extractDateFromTime(record.exitTime) === date);
     const exitCount = dayExitRecords.length;
 
     // 3. 金额：收费明细总表中指定出站日期的出库车辆数一共收了多少钱
@@ -324,12 +324,40 @@ export const generateStatData = (
       unpaidCount,
       exitRatio,
       // 记录源数据用于查看详情
-      enterRecords: dayEnterRecords,
-      exitRecords: dayExitRecords,
-      paidRecords,
-      unpaidRecords
+      enterRecords: dayEnterRecords, // 进车情况总表的指定进站日期数据
+      exitRecords: dayExitRecords,   // 收费明细总表的指定出站日期数据
+      paidRecords,                   // 收费明细总表的指定出站日期数据
+      unpaidRecords                  // 收费明细总表的指定出站日期数据
     };
   });
+};
+
+/**
+ * 获取默认日期范围
+ * @param enterRecords 进车记录
+ * @param feeRecords 收费记录
+ * @returns [开始日期, 结束日期]
+ */
+export const getDefaultDateRange = (
+  enterRecords: EnterRecord[],
+  feeRecords: FeeRecord[]
+): [Date, Date] => {
+  // 获取所有日期
+  const allDates = [
+    ...enterRecords.map(record => record.date),
+    ...feeRecords.map(record => record.date)
+  ];
+
+  if (allDates.length === 0) {
+    return [new Date(), new Date()];
+  }
+
+  // 排序并获取最早和最晚日期
+  const sortedDates = allDates.sort();
+  const startDate = moment(sortedDates[0]).toDate();
+  const endDate = moment(sortedDates[sortedDates.length - 1]).toDate();
+
+  return [startDate, endDate];
 };
 
 /**
