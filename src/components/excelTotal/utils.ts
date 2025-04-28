@@ -10,101 +10,62 @@ declare global {
   }
 }
 
+// 日期格式配置
+const DATE_FORMATS = [
+  'YYYY-MM-DD',
+  'YYYY/MM/DD',
+  'YYYY.MM.DD',
+  'MM/DD/YYYY',
+  'MM.DD.YYYY',
+  'MM/DD',
+  'MM.DD'
+];
+
 /**
  * 解析日期字符串
  * @param dateStr 日期字符串
- * @returns 标准化的日期字符串 (YYYY-MM-DD)
+ * @returns 标准化的日期字符串 (YYYY-MM-DD) 或 null（如果解析失败）
  */
-const parseDate = (dateStr: string | Date): string => {
+const parseDate = (dateStr: string | Date): string | null => {
   if (dateStr instanceof Date) {
     return moment(dateStr).format('YYYY-MM-DD');
   }
 
-  // 尝试多种日期格式
-  const formats = [
-    'YYYY-MM-DD HH:mm:ss',
-    'YYYY-MM-DD',
-    'MM/DD/YYYY',
-    'MM/DD',
-    'YYYY/MM/DD',
-    'YYYY.MM.DD',
-    'MM.DD.YYYY'
-  ];
+  // 获取当前年月
+  const currentYear = moment().year();
+  const currentMonth = moment().month() + 1;
 
-  for (const format of formats) {
-    const date = moment(dateStr, format);
-    if (date.isValid()) {
+  for (const format of DATE_FORMATS) {
+    let date = moment(dateStr, format);
+
+    // 如果格式不包含年份，使用当前年份
+    if (!format.includes('YYYY') && date.isValid()) {
+      date = date.year(currentYear);
+    }
+
+    // 如果格式不包含月份，使用当前月份
+    if (!format.includes('MM') && date.isValid()) {
+      date = date.month(currentMonth - 1);
+    }
+
+    // 检查年份是否在合理范围内（2000-2100）
+    if (date.isValid() && date.year() >= 2000 && date.year() <= 2100) {
       return date.format('YYYY-MM-DD');
     }
   }
 
-  // 如果所有格式都失败，返回原始字符串
-  return String(dateStr);
-};
-
-/**
- * 解析时间字符串
- * @param timeStr 时间字符串
- * @returns 标准化的时间字符串 (HH:mm:ss)
- */
-const parseTime = (timeStr: string | Date): string => {
-  if (timeStr instanceof Date) {
-    return moment(timeStr).format('HH:mm:ss');
-  }
-
-  // 尝试多种时间格式
-  const formats = [
-    'HH:mm:ss',
-    'HH:mm',
-    'HH:mm:ss.SSS',
-    'h:mm:ss A',
-    'h:mm A'
-  ];
-
-  for (const format of formats) {
-    const time = moment(timeStr, format);
-    if (time.isValid()) {
-      return time.format('HH:mm:ss');
-    }
-  }
-
-  // 如果所有格式都失败，返回原始字符串
-  return String(timeStr);
+  // 如果所有格式都失败，打印日志并返回 null
+  console.warn('无法解析的日期格式:', dateStr);
+  return null;
 };
 
 /**
  * 从时间字符串中提取日期
  * @param timeStr 时间字符串
- * @returns 标准化的日期字符串 (YYYY-MM-DD)
+ * @returns 标准化的日期字符串 (YYYY-MM-DD) 或 null（如果解析失败）
  */
-const extractDateFromTime = (timeStr: string | Date): string => {
-  if (timeStr instanceof Date) {
-    return moment(timeStr).format('YYYY-MM-DD');
-  }
-
-  // 尝试多种日期时间格式
-  const formats = [
-    'YYYY-MM-DD HH:mm:ss',
-    'YYYY-MM-DD HH:mm',
-    'MM/DD/YYYY HH:mm:ss',
-    'MM/DD/YYYY HH:mm',
-    'YYYY/MM/DD HH:mm:ss',
-    'YYYY/MM/DD HH:mm',
-    'YYYY.MM.DD HH:mm:ss',
-    'YYYY.MM.DD HH:mm',
-    'MM.DD.YYYY HH:mm:ss',
-    'MM.DD.YYYY HH:mm'
-  ];
-
-  for (const format of formats) {
-    const date = moment(timeStr, format);
-    if (date.isValid()) {
-      return date.format('YYYY-MM-DD');
-    }
-  }
-
-  // 如果所有格式都失败，返回当前日期
-  return moment().format('YYYY-MM-DD');
+const extractDateFromTime = (timeStr: string | Date): string | null => {
+  return parseDate(timeStr);
 };
 
 /**
@@ -157,13 +118,16 @@ export const parseEnterRecords = (file: File, config: ExcelConfig): Promise<Ente
           const row = jsonData[i];
           if (!row || !row[columnIndices.enterTime]) continue;
 
-          const enterTime = parseTime(row[columnIndices.enterTime]);
+          const enterTime = row[columnIndices.enterTime];
           const date = extractDateFromTime(enterTime);
+
+          // 如果日期解析失败，跳过该记录
+          if (!date) continue;
 
           records.push({
             date,
             carNumber: String(row[columnIndices.carNumber] || ''),
-            enterTime,
+            enterTime: String(enterTime),
             id: `enter_${i}`,
             rowIndex: i + 1
           });
@@ -233,8 +197,11 @@ export const parseFeeRecords = (file: File, config: ExcelConfig): Promise<FeeRec
           const row = jsonData[i];
           if (!row || !row[columnIndices.enterTime]) continue;
 
-          const enterTime = parseTime(row[columnIndices.enterTime]);
+          const enterTime = row[columnIndices.enterTime];
           const date = extractDateFromTime(enterTime);
+
+          // 如果日期解析失败，跳过该记录
+          if (!date) continue;
 
           // 处理是否收费
           let isPaid = false;
@@ -249,8 +216,8 @@ export const parseFeeRecords = (file: File, config: ExcelConfig): Promise<FeeRec
           records.push({
             date,
             carNumber: String(row[columnIndices.carNumber] || ''),
-            enterTime,
-            exitTime: parseTime(row[columnIndices.exitTime] || ''),
+            enterTime: String(enterTime),
+            exitTime: String(row[columnIndices.exitTime] || ''),
             fee: Number(row[columnIndices.fee]) || 0,
             isPaid,
             id: `fee_${i}`,
