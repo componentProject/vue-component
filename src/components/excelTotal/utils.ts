@@ -289,21 +289,22 @@ export const generateStatData = (
   // 生成统计数据
   return dateRange.map(date => {
     // 1. 入库/台：进车情况总表中指定进站日期的入库车辆数
-    const enterCount = enterRecords.filter(record => record.date === date).length;
+    const dayEnterRecords = enterRecords.filter(record => record.date === date);
+    const enterCount = dayEnterRecords.length;
 
     // 2. 出库/台：收费明细总表中指定出站日期的出库车辆数
-    const exitRecords = feeRecords.filter(record => record.date === date);
-    const exitCount = exitRecords.length;
+    const dayExitRecords = feeRecords.filter(record => record.date === date);
+    const exitCount = dayExitRecords.length;
 
     // 3. 金额：收费明细总表中指定出站日期的出库车辆数一共收了多少钱
-    const totalAmount = exitRecords.reduce((sum, record) => sum + record.fee, 0);
+    const totalAmount = dayExitRecords.reduce((sum, record) => sum + record.fee, 0);
 
-    // 4. 收费台数：收费明细总表中指定出站日期的收了钱的车辆台数
-    const paidRecords = exitRecords.filter(record => record.isPaid);
+    // 4. 收费台数：收费明细总表中指定出站日期的金额不为空或0的车辆台数
+    const paidRecords = dayExitRecords.filter(record => record.fee > 0);
     const paidCount = paidRecords.length;
 
-    // 5. 未收台数：收费明细总表中指定出站日期的没收钱的车辆台数
-    const unpaidRecords = exitRecords.filter(record => !record.isPaid);
+    // 5. 未收台数：收费明细总表中指定出站日期的金额为空或0的车辆台数
+    const unpaidRecords = dayExitRecords.filter(record => record.fee <= 0);
     const unpaidCount = unpaidRecords.length;
 
     // 6. 出库占比：收费台数除入库台数得来百分比
@@ -321,8 +322,8 @@ export const generateStatData = (
       unpaidCount,
       exitRatio,
       // 记录源数据用于悬浮显示
-      enterRecords: enterRecords.filter(record => record.date === date),
-      exitRecords,
+      enterRecords: dayEnterRecords,
+      exitRecords: dayExitRecords,
       paidRecords,
       unpaidRecords
     };
@@ -332,8 +333,18 @@ export const generateStatData = (
 /**
  * 导出统计表为Excel
  * @param stats 统计数据
+ * @param startDate 开始日期
+ * @param endDate 结束日期
  */
-export const exportExcel = (stats: StatRow[]) => {
+export const exportExcel = (stats: StatRow[], startDate?: string, endDate?: string) => {
+  // 如果提供了日期范围，只导出筛选后的数据
+  const filteredStats = startDate && endDate
+    ? stats.filter(stat => {
+        const date = moment(stat.date);
+        return date.isSameOrAfter(startDate) && date.isSameOrBefore(endDate);
+      })
+    : stats;
+
   const worksheet = XLSX.utils.json_to_sheet([]);
 
   // 添加表头
@@ -342,7 +353,7 @@ export const exportExcel = (stats: StatRow[]) => {
   ], { origin: 'A1' });
 
   // 添加数据行
-  const data = stats.map(row => [
+  const data = filteredStats.map(row => [
     row.date,
     row.weekday,
     row.enterCount,
