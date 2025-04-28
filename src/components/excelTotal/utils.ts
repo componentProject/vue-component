@@ -31,13 +31,18 @@ export const parseEnterRecords = (file: File): Promise<EnterRecord[]> => {
           reject(new Error('进车情况总表格式不正确，找不到必要的列'));
           return;
         }
-        console.log('进车总表',headerRow);
+
+        const missingColumns: string[] = [];
         const dateColIndex = headerRow.findIndex((col: string) => col.includes('日期'));
         const carNumColIndex = headerRow.findIndex((col: string) => col.includes('车牌'));
         const enterTimeColIndex = headerRow.findIndex((col: string) => col.includes('入库时间'));
 
-        if (dateColIndex === -1 || carNumColIndex === -1 || enterTimeColIndex === -1) {
-          reject(new Error('进车情况总表格式不正确，找不到必要的列'));
+        if (dateColIndex === -1) missingColumns.push('日期');
+        if (carNumColIndex === -1) missingColumns.push('车牌');
+        if (enterTimeColIndex === -1) missingColumns.push('入库时间');
+
+        if (missingColumns.length > 0) {
+          reject(new Error(`进车情况总表格式不正确，缺少以下必填列：${missingColumns.join('、')}`));
           return;
         }
 
@@ -117,18 +122,18 @@ export const parseFeeRecords = (file: File): Promise<FeeRecord[]> => {
 
         // 查找关键列的索引
         const headerRow = jsonData.find(row => row.some(col => col.includes('编号')));
-        console.log('收费总表',headerRow);
         if(!headerRow){
           reject(new Error('收费明细总表格式不正确，表头不存在编号'));
           return;
         }
+
+        const missingColumns: string[] = [];
         const dateColIndex = headerRow.findIndex((col: string) => col.includes('日期'));
         const carNumColIndex = headerRow.findIndex((col: string) => col.includes('车牌'));
         const exitTimeColIndex = headerRow.findIndex((col: string) => col.includes('出库时间'));
         const feeColIndex = headerRow.findIndex((col: string) => col.includes('金额') || col.includes('收费'));
         const paidColIndex = headerRow.findIndex((col: string) => col.includes('是否') && col.includes('收费'));
 
-        const missingColumns = [];
         if (dateColIndex === -1) missingColumns.push('日期');
         if (carNumColIndex === -1) missingColumns.push('车牌');
         if (exitTimeColIndex === -1) missingColumns.push('出库时间');
