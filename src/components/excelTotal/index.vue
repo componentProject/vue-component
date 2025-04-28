@@ -1,6 +1,18 @@
 <template>
   <div class="excel-total">
-    <el-button @click="editConfig">编辑配置</el-button>
+    <el-dialog
+      v-model="configDialogVisible"
+      title="Excel列配置"
+      width="800px"
+    >
+      <config-table v-model="excelConfig" />
+      <template #footer>
+        <el-button @click="configDialogVisible = false">取消</el-button>
+        <el-button type="primary" @click="saveConfig">保存</el-button>
+      </template>
+    </el-dialog>
+
+    <el-button @click="configDialogVisible = true">编辑配置</el-button>
     <el-upload
       class="upload-demo"
       action="#"
@@ -19,17 +31,20 @@
     </el-upload>
   </div>
 </template>
+
 <script setup lang="ts">
 import { ref } from 'vue'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { ElMessage } from 'element-plus'
 import type { UploadFile } from 'element-plus'
 import { parseEnterRecords, parseFeeRecords } from './utils'
 import type { ExcelConfig, EnterRecord, FeeRecord } from './types'
 import { defaultExcelConfig } from './types'
+import ConfigTable from './ConfigTable.vue'
 
-const excelConfig = ref<ExcelConfig>(defaultExcelConfig);
-const enterRecords = ref<EnterRecord[]>([]);
-const feeRecords = ref<FeeRecord[]>([]);
+const configDialogVisible = ref(false)
+const excelConfig = ref<ExcelConfig>({ ...defaultExcelConfig })
+const enterRecords = ref<EnterRecord[]>([])
+const feeRecords = ref<FeeRecord[]>([])
 
 // 更新文件解析函数
 const handleEnterFileChange = async (uploadFile: UploadFile) => {
@@ -50,28 +65,12 @@ const handleFeeFileChange = async (uploadFile: UploadFile) => {
   }
 };
 
-// 添加配置编辑功能
-const editConfig = () => {
-  ElMessageBox.prompt('请输入配置JSON', '编辑配置', {
-    inputValue: JSON.stringify(excelConfig.value, null, 2),
-    inputType: 'textarea',
-    beforeClose: (action, instance, done) => {
-      if (action === 'confirm') {
-        try {
-          const newConfig = JSON.parse(instance.inputValue);
-          excelConfig.value = newConfig;
-          done();
-        } catch {
-          ElMessage.error('配置格式错误');
-          return false;
-        }
-      } else {
-        done();
-      }
-    }
-  });
-};
+const saveConfig = () => {
+  configDialogVisible.value = false
+  ElMessage.success('配置已保存')
+}
 </script>
+
 <style scoped lang="scss">
 .excel-total {
   padding: 20px;
