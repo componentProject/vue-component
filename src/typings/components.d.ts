@@ -46,7 +46,7 @@ declare module 'vue' {
     ElTabs: typeof import('element-plus/es')['ElTabs']
     ElTooltip: typeof import('element-plus/es')['ElTooltip']
     ElUpload: typeof import('element-plus/es')['ElUpload']
-    ExcelTotal: typeof import('./../components/excelTotal/ExcelTotal.vue')['default']
+    ExcelTotal: typeof import('./../components/excelTotal/index.vue')['default']
     Icon: typeof import('./../components/Icon/index.vue')['default']
     ImportFileButton: typeof import('./../components/ConfigForm/components/components/rarelyComponents/wlButton/components/importFileButton/index.vue')['default']
     IntersectObserver: typeof import('./../components/IntersectObserver/index.vue')['default']

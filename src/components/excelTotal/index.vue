@@ -1,13 +1,13 @@
 <template>
   <div class="excel-total">
-    <div class="config-section">
+    <div v-show="addNewTable || !statData.length" class="config-section">
       <h3>Excel列配置</h3>
       <config-table v-model="excelConfig" />
     </div>
 
-    <div class="upload-section">
+    <div v-show="addNewTable || !statData.length" class="upload-section flex">
       <el-upload
-        class="upload-demo"
+        class="upload-demo mr-2"
         action="#"
         :auto-upload="false"
         :on-change="handleEnterFileChange"
@@ -15,7 +15,7 @@
         <el-button type="primary">上传进车记录</el-button>
       </el-upload>
       <el-upload
-        class="upload-demo"
+        class="upload-demo ml-2"
         action="#"
         :auto-upload="false"
         :on-change="handleFeeFileChange"
@@ -24,7 +24,7 @@
       </el-upload>
     </div>
 
-    <div class="stat-table" v-if="statData.length > 0">
+    <div class="stat-table" v-if="statData.length > 0 && !addNewTable">
       <div class="table-header">
         <h3>车辆数据统计周表</h3>
         <div class="date-range">
@@ -36,6 +36,7 @@
             end-placeholder="结束日期"
             @change="handleDateRangeChange"
           />
+          <el-button class="mr2" type="primary" @click="addNewTable = true">添加新周表</el-button>
           <el-button type="primary" @click="exportStatData">导出统计表</el-button>
         </div>
       </div>
@@ -100,7 +101,7 @@ import moment from 'moment'
 const excelConfig = ref<ExcelConfig>({ ...defaultExcelConfig })
 const enterRecords = ref<EnterRecord[]>([])
 const feeRecords = ref<FeeRecord[]>([])
-
+const addNewTable= ref(false)
 // 日期范围
 const dateRange = ref<[Date, Date] | undefined>(undefined)
 
@@ -265,6 +266,7 @@ const exportStatData = () => {
 
     .upload-demo {
       margin-top: 20px;
+      margin-right: 12px;
     }
   }
 
