@@ -1,12 +1,21 @@
 import * as XLSX from 'xlsx';
-import type { EnterRecord, FeeRecord, StatRow } from './types';
+import type { EnterRecord, FeeRecord, StatRow, ExcelConfig, ColumnConfig } from './types';
+
+// 添加必要的类型声明
+declare global {
+  interface Window {
+    File: typeof File;
+    FileReader: typeof FileReader;
+  }
+}
 
 /**
  * 解析进车情况总表Excel文件
  * @param file Excel文件
+ * @param config 列配置
  * @returns 处理后的EnterRecord数组
  */
-export const parseEnterRecords = (file: File): Promise<EnterRecord[]> => {
+export const parseEnterRecords = (file: File, config: ExcelConfig): Promise<EnterRecord[]> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = (e: ProgressEvent<FileReader>) => {
@@ -17,29 +26,28 @@ export const parseEnterRecords = (file: File): Promise<EnterRecord[]> => {
         }
 
         const workbook = XLSX.read(e.target.result, { type: 'binary' });
-        const sheetName = workbook.SheetNames[0]; // 假设数据在第一个工作表
+        const sheetName = workbook.SheetNames[0];
         const worksheet = workbook.Sheets[sheetName];
-
-        // 转换为对象数组，从第2行开始（跳过表头）
         const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 }) as any[];
 
         const records: EnterRecord[] = [];
-
-        // 查找关键列的索引
         const headerRow = jsonData.find(row => row.some(col => col.includes('编号')));
         if(!headerRow){
           reject(new Error('进车情况总表格式不正确，找不到必要的列'));
           return;
         }
 
+        // 检查必填列
         const missingColumns: string[] = [];
-        const dateColIndex = headerRow.findIndex((col: string) => col.includes('日期'));
-        const carNumColIndex = headerRow.findIndex((col: string) => col.includes('车牌'));
-        const enterTimeColIndex = headerRow.findIndex((col: string) => col.includes('入库时间'));
+        const columnIndices: Record<string, number> = {};
 
-        if (dateColIndex === -1) missingColumns.push('日期');
-        if (carNumColIndex === -1) missingColumns.push('车牌');
-        if (enterTimeColIndex === -1) missingColumns.push('入库时间');
+        config.enterColumns.forEach(col => {
+          const index = headerRow.findIndex((header: string) => header.includes(col.searchText));
+          columnIndices[col.key] = index;
+          if (col.required && index === -1) {
+            missingColumns.push(col.label);
+          }
+        });
 
         if (missingColumns.length > 0) {
           reject(new Error(`进车情况总表格式不正确，缺少以下必填列：${missingColumns.join('、')}`));
@@ -49,17 +57,14 @@ export const parseEnterRecords = (file: File): Promise<EnterRecord[]> => {
         // 解析数据行
         for (let i = 1; i < jsonData.length; i++) {
           const row = jsonData[i];
-
-          if (!row || !row[dateColIndex]) continue; // 跳过空行
+          if (!row || !row[columnIndices.date]) continue;
 
           let dateString = '';
-          // 处理日期，可能是Date对象或字符串
-          if (row[dateColIndex] instanceof Date) {
-            const date = row[dateColIndex] as Date;
+          if (row[columnIndices.date] instanceof Date) {
+            const date = row[columnIndices.date] as Date;
             dateString = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
           } else {
-            // 尝试将字符串标准化为YYYY-MM-DD格式
-            const dateValue = String(row[dateColIndex]);
+            const dateValue = String(row[columnIndices.date]);
             if (dateValue.includes('/')) {
               const parts = dateValue.split('/');
               if (parts.length === 3) {
@@ -68,17 +73,16 @@ export const parseEnterRecords = (file: File): Promise<EnterRecord[]> => {
             } else if (dateValue.includes('-')) {
               dateString = dateValue;
             } else {
-              // 其他格式，可能需要更多处理...
               dateString = dateValue;
             }
           }
 
           records.push({
             date: dateString,
-            carNumber: String(row[carNumColIndex] || ''),
-            enterTime: String(row[enterTimeColIndex] || ''),
+            carNumber: String(row[columnIndices.carNumber] || ''),
+            enterTime: String(row[columnIndices.enterTime] || ''),
             id: `enter_${i}`,
-            rowIndex: i + 1 // Excel是从1开始计数的
+            rowIndex: i + 1
           });
         }
 
@@ -99,9 +103,10 @@ export const parseEnterRecords = (file: File): Promise<EnterRecord[]> => {
 /**
  * 解析收费明细总表Excel文件
  * @param file Excel文件
+ * @param config 列配置
  * @returns 处理后的FeeRecord数组
  */
-export const parseFeeRecords = (file: File): Promise<FeeRecord[]> => {
+export const parseFeeRecords = (file: File, config: ExcelConfig): Promise<FeeRecord[]> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = (e: ProgressEvent<FileReader>) => {
@@ -112,32 +117,28 @@ export const parseFeeRecords = (file: File): Promise<FeeRecord[]> => {
         }
 
         const workbook = XLSX.read(e.target.result, { type: 'binary' });
-        const sheetName = workbook.SheetNames[0]; // 假设数据在第一个工作表
+        const sheetName = workbook.SheetNames[0];
         const worksheet = workbook.Sheets[sheetName];
-
-        // 转换为对象数组，从第2行开始（跳过表头）
         const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 }) as any[];
 
         const records: FeeRecord[] = [];
-
-        // 查找关键列的索引
         const headerRow = jsonData.find(row => row.some(col => col.includes('编号')));
         if(!headerRow){
           reject(new Error('收费明细总表格式不正确，表头不存在编号'));
           return;
         }
 
+        // 检查必填列
         const missingColumns: string[] = [];
-        const dateColIndex = headerRow.findIndex((col: string) => col.includes('日期'));
-        const carNumColIndex = headerRow.findIndex((col: string) => col.includes('车牌'));
-        const exitTimeColIndex = headerRow.findIndex((col: string) => col.includes('出库时间'));
-        const feeColIndex = headerRow.findIndex((col: string) => col.includes('金额') || col.includes('收费'));
-        const paidColIndex = headerRow.findIndex((col: string) => col.includes('是否') && col.includes('收费'));
+        const columnIndices: Record<string, number> = {};
 
-        if (dateColIndex === -1) missingColumns.push('日期');
-        if (carNumColIndex === -1) missingColumns.push('车牌');
-        if (exitTimeColIndex === -1) missingColumns.push('出库时间');
-        if (feeColIndex === -1) missingColumns.push('金额/收费');
+        config.feeColumns.forEach(col => {
+          const index = headerRow.findIndex((header: string) => header.includes(col.searchText));
+          columnIndices[col.key] = index;
+          if (col.required && index === -1) {
+            missingColumns.push(col.label);
+          }
+        });
 
         if (missingColumns.length > 0) {
           reject(new Error(`收费明细总表格式不正确，缺少以下必填列：${missingColumns.join('、')}`));
@@ -147,17 +148,14 @@ export const parseFeeRecords = (file: File): Promise<FeeRecord[]> => {
         // 解析数据行
         for (let i = 1; i < jsonData.length; i++) {
           const row = jsonData[i];
-
-          if (!row || !row[dateColIndex]) continue; // 跳过空行
+          if (!row || !row[columnIndices.date]) continue;
 
           let dateString = '';
-          // 处理日期，可能是Date对象或字符串
-          if (row[dateColIndex] instanceof Date) {
-            const date = row[dateColIndex] as Date;
+          if (row[columnIndices.date] instanceof Date) {
+            const date = row[columnIndices.date] as Date;
             dateString = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
           } else {
-            // 尝试将字符串标准化为YYYY-MM-DD格式
-            const dateValue = String(row[dateColIndex]);
+            const dateValue = String(row[columnIndices.date]);
             if (dateValue.includes('/')) {
               const parts = dateValue.split('/');
               if (parts.length === 3) {
@@ -172,26 +170,22 @@ export const parseFeeRecords = (file: File): Promise<FeeRecord[]> => {
 
           // 处理是否收费
           let isPaid = false;
-          if (paidColIndex !== -1) {
-            const paidValue = row[paidColIndex];
+          if (columnIndices.isPaid !== undefined) {
+            const paidValue = row[columnIndices.isPaid];
             isPaid = paidValue === '是' || paidValue === 'Y' || paidValue === 'yes' || paidValue === true || Number(paidValue) > 0;
           } else {
-            // 如果没有明确的收费列，则根据金额来判断
-            const fee = Number(row[feeColIndex]) || 0;
+            const fee = Number(row[columnIndices.fee]) || 0;
             isPaid = fee > 0;
           }
 
-          // 处理金额
-          const fee = Number(row[feeColIndex]) || 0;
-
           records.push({
             date: dateString,
-            carNumber: String(row[carNumColIndex] || ''),
-            exitTime: String(row[exitTimeColIndex] || ''),
-            fee,
+            carNumber: String(row[columnIndices.carNumber] || ''),
+            exitTime: String(row[columnIndices.exitTime] || ''),
+            fee: Number(row[columnIndices.fee]) || 0,
             isPaid,
             id: `fee_${i}`,
-            rowIndex: i + 1 // Excel是从1开始计数的
+            rowIndex: i + 1
           });
         }
 

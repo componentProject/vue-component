@@ -41,3 +41,30 @@ export interface StatRow {
   paidRecords: FeeRecord[];
   unpaidRecords: FeeRecord[];
 }
+
+export interface ColumnConfig {
+  key: string;
+  label: string;
+  required: boolean;
+  searchText: string;
+}
+
+export interface ExcelConfig {
+  enterColumns: ColumnConfig[];
+  feeColumns: ColumnConfig[];
+}
+
+export const defaultExcelConfig: ExcelConfig = {
+  enterColumns: [
+    { key: 'date', label: '日期', required: true, searchText: '日期' },
+    { key: 'carNumber', label: '车牌', required: true, searchText: '车牌' },
+    { key: 'enterTime', label: '入库时间', required: true, searchText: '入库时间' }
+  ],
+  feeColumns: [
+    { key: 'date', label: '日期', required: true, searchText: '日期' },
+    { key: 'carNumber', label: '车牌', required: true, searchText: '车牌' },
+    { key: 'exitTime', label: '出库时间', required: true, searchText: '出库时间' },
+    { key: 'fee', label: '金额', required: true, searchText: '金额' },
+    { key: 'isPaid', label: '是否收费', required: false, searchText: '是否收费' }
+  ]
+};
