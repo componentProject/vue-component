@@ -2,7 +2,6 @@
   "extends": "@vue/tsconfig/tsconfig.dom.json",
   "include": [
     ".storybook/*",
-    "./vite.config.*",
     "env.d.ts",
     "src/**/*",
     "src/**/*.vue",

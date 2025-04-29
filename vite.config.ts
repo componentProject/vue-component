@@ -206,6 +206,6 @@ export default defineConfig(({ mode }) => {
       // https: false,
       // 代理跨域（mock 不需要配置，这里只是个事列）
       proxy: {},
-    }
+    },
   }
 })

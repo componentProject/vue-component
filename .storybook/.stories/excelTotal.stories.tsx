@@ -9,7 +9,9 @@ const meta: Meta<any> = {
 export default meta
 export const excelTotalDemo: StoryFn = (args: any) => ({
   template: `
-    <div><excelTotal /> </div>
+    <div>
+      <excelTotal />
+    </div>
   `,
   components: { excelTotal },
   setup() {
