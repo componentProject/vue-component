@@ -23,6 +23,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "tcb:deploy": "tcb framework deploy",
     "dev": "vite",
     "build": "run-p type-check \"build-only {@}\" --",
     "build-only": "vite build",
