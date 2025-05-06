@@ -14,7 +14,7 @@ import vueDevTools from 'vite-plugin-vue-devtools'
 import AutoImport from 'unplugin-auto-import/vite'
 import Components from 'unplugin-vue-components/vite'
 import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
-
+import scopedCssPrefixPlugin from './plugins/addScopedAndReplacePrefix'
 // 其余vite插件
 import { createHtmlPlugin } from 'vite-plugin-html'
 import autoprefixer from 'autoprefixer'
@@ -60,9 +60,16 @@ function wrapperEnv(env: Record<string, string>) {
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd())
   const viteEnv = wrapperEnv(env)
+  const systemCode = viteEnv.VITE_GLOB_APP_CODE;
+  const appTitle = viteEnv.VITE_GLOB_APP_TITLE
 
   const vuePlugins = [
     pluginVue(),
+    scopedCssPrefixPlugin({
+      prefixScoped: `div[data-qiankun='${systemCode}']`,
+      oldPrefix: 'el',
+      newPrefix: systemCode,
+    }), // 传入你想要添加的前缀
     vueJsx(),
     env.VITE_DEVTOOLS && vueDevTools(),
     // 自动引入
@@ -91,7 +98,7 @@ export default defineConfig(({ mode }) => {
       createHtmlPlugin({
         inject: {
           data: {
-            title: viteEnv.VITE_GLOB_APP_TITLE,
+            title: appTitle,
           },
         },
       }),
@@ -179,6 +186,9 @@ export default defineConfig(({ mode }) => {
           : {},
       },
     },
+    define: {
+      __SYSTEM_CODE__: JSON.stringify(systemCode)
+    },
     css: {
       postcss: {
         plugins: [
@@ -188,7 +198,16 @@ export default defineConfig(({ mode }) => {
         ],
       },
       preprocessorOptions: {
-        scss: { api: 'modern-compiler' },
+        scss: {
+          api: 'modern-compiler',
+          additionalData(content: string, filename: string) {
+            if (filename.includes('element')) {
+              const addStr = `$namespace: ${systemCode};`
+              return `${addStr}\n${content}`
+            }
+            return content
+          }
+        },
       },
     },
     resolve: {

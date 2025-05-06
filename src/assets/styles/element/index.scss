@@ -1,25 +1,26 @@
-$el-colors: (
+$--colors: (
   'primary': (
-    'base': #3a77ff,
+    'base': #3a77ff
   ),
   'success': (
-    'base': #0eb67f,
+    'base': #0eb67f
   ),
   'warning': (
-    'base': #f5ab01,
+    'base': #f5ab01
   ),
   'danger': (
-    'base': #ef6b53,
+    'base': #ef6b53
   ),
   'error': (
-    'base': #db2828,
-  ),
+    'base': #db2828
+  )
 );
-
+@forward 'element-plus/theme-chalk/src/mixins/config.scss' with (
+  $namespace: $namespace
+);
 @forward 'element-plus/theme-chalk/src/common/var.scss' with (
   // do not use same name, it will override.
-  $colors: $el-colors
+  $colors: $--colors
 );
-
+//无法使用,会污染其他样式
 @use 'element-plus/theme-chalk/src/index.scss' as *;
-@use './custom.scss';
