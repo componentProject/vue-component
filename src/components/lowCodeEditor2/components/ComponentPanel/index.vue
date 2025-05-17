@@ -30,14 +30,128 @@
               <div
                 v-for="component in group.components"
                 :key="component.id"
-                class="component-item p-2 bg-white rounded border border-gray-200 cursor-grab hover:border-blue-500 hover:shadow-sm transition-all flex flex-col items-center justify-center"
+                class="component-item p-2 bg-white rounded border border-gray-200 cursor-grab hover:border-blue-500 hover:shadow-sm transition-all"
                 :draggable="draggable"
                 @dragstart="handleDragStart($event, component)"
               >
-                <el-icon class="text-gray-500 text-lg mb-1">
-                  <component :is="component.icon" />
-                </el-icon>
-                <span class="text-xs text-gray-700">{{ component.name }}</span>
+                <!-- 基础组件预览 -->
+                <div v-if="component.type === 'basic'" class="component-preview mb-2">
+                  <!-- 按钮预览 -->
+                  <el-button 
+                    v-if="component.id === 'el-button'" 
+                    size="small" 
+                    :type="component.defaultProps.type"
+                  >
+                    {{ component.defaultProps.text }}
+                  </el-button>
+
+                  <!-- 输入框预览 -->
+                  <el-input 
+                    v-else-if="component.id === 'el-input'" 
+                    size="small" 
+                    :placeholder="component.defaultProps.placeholder"
+                    class="w-full"
+                    disabled
+                  />
+
+                  <!-- 选择器预览 -->
+                  <el-select
+                    v-else-if="component.id === 'el-select'"
+                    size="small"
+                    :placeholder="component.defaultProps.placeholder"
+                    class="w-full"
+                    disabled
+                  />
+
+                  <!-- 开关预览 -->
+                  <el-switch
+                    v-else-if="component.id === 'el-switch'"
+                    disabled
+                  />
+
+                  <!-- 日期选择器预览 -->
+                  <el-date-picker
+                    v-else-if="component.id === 'el-date-picker'"
+                    size="small"
+                    :placeholder="component.defaultProps.placeholder"
+                    class="w-full"
+                    disabled
+                  />
+
+                  <!-- 默认图标 -->
+                  <el-icon v-else class="text-lg">
+                    <component :is="component.icon" />
+                  </el-icon>
+                </div>
+
+                <!-- 布局组件预览 -->
+                <div v-else-if="component.type === 'layout'" class="component-preview mb-2 bg-gray-50 border border-dashed border-gray-300 p-1 rounded">
+                  <!-- 容器预览 -->
+                  <div v-if="component.id === 'el-container'" class="bg-white h-10 w-full flex items-center justify-center text-xs text-gray-500">
+                    容器
+                  </div>
+
+                  <!-- 行预览 -->
+                  <div v-else-if="component.id === 'el-row'" class="bg-white h-8 w-full flex flex-row items-center justify-between p-1 text-xs text-gray-500">
+                    <div class="bg-gray-100 w-4 h-4"></div>
+                    <div class="bg-gray-100 w-4 h-4"></div>
+                    <div class="bg-gray-100 w-4 h-4"></div>
+                  </div>
+
+                  <!-- 列预览 -->
+                  <div v-else-if="component.id === 'el-col'" class="bg-white h-10 w-full flex items-center justify-center text-xs text-gray-500">
+                    列
+                  </div>
+
+                  <!-- 默认图标 -->
+                  <el-icon v-else class="text-lg">
+                    <component :is="component.icon" />
+                  </el-icon>
+                </div>
+
+                <!-- 图表组件预览 -->
+                <div v-else-if="component.type === 'chart'" class="component-preview mb-2">
+                  <!-- 柱状图预览 -->
+                  <img 
+                    v-if="component.id === 'echarts-bar'" 
+                    src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgNjAiPjxyZWN0IHg9IjEwIiB5PSIxMCIgd2lkdGg9IjEwIiBoZWlnaHQ9IjQwIiBmaWxsPSIjNDA5RUZGIi8+PHJlY3QgeD0iMzAiIHk9IjIwIiB3aWR0aD0iMTAiIGhlaWdodD0iMzAiIGZpbGw9IiM0MDlFRkYiLz48cmVjdCB4PSI1MCIgeT0iNSIgd2lkdGg9IjEwIiBoZWlnaHQ9IjQ1IiBmaWxsPSIjNDA5RUZGIi8+PHJlY3QgeD0iNzAiIHk9IjE1IiB3aWR0aD0iMTAiIGhlaWdodD0iMzUiIGZpbGw9IiM0MDlFRkYiLz48bGluZSB4MT0iNSIgeTE9IjUwIiB4Mj0iOTUiIHkyPSI1MCIgc3Ryb2tlPSIjMDAwIiBzdHJva2Utd2lkdGg9IjEiLz48L3N2Zz4="
+                    alt="柱状图"
+                    class="w-full h-16 object-contain"
+                  />
+
+                  <!-- 折线图预览 -->
+                  <img 
+                    v-else-if="component.id === 'echarts-line'" 
+                    src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgNjAiPjxwYXRoIGQ9Ik01LDQwIEwyNSwyMCBMNDUsMzAgTDY1LDE1IEw4NSwyNSBMOTUsNSIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNDA5RUZGIiBzdHJva2Utd2lkdGg9IjIiLz48bGluZSB4MT0iNSIgeTE9IjUwIiB4Mj0iOTUiIHkyPSI1MCIgc3Ryb2tlPSIjMDAwIiBzdHJva2Utd2lkdGg9IjEiLz48L3N2Zz4="
+                    alt="折线图"
+                    class="w-full h-16 object-contain"
+                  />
+
+                  <!-- 饼图预览 -->
+                  <img 
+                    v-else-if="component.id === 'echarts-pie'" 
+                    src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cGF0aCBkPSJNNTAsNTAgTDUwLDEwIEE0MCw0MCAwIDAsMSA5MCw1MCBaIiBmaWxsPSIjNDA5RUZGIi8+PHBhdGggZD0iTTUwLDUwIEw5MCw1MCBBNDM0MCAwIDAsMSA3MCw4NSBaIiBmaWxsPSIjNjdDMjNBIi8+PHBhdGggZD0iTTUwLDUwIEw3MCw4NSBBNDA0MCAwIDAsMSAyMCw2MCBaIiBmaWxsPSIjRTZBMjNDIi8+PHBhdGggZD0iTTUwLDUwIEwyMCw2MCBBNDM0MCAwIDAsMSA1MCwxMCBaIiBmaWxsPSIjRjU2QzZDIi8+PC9zdmc+"
+                    alt="饼图"
+                    class="w-full h-16 object-contain"
+                  />
+
+                  <!-- 散点图预览 -->
+                  <img 
+                    v-else-if="component.id === 'g2-scatter'" 
+                    src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgNjAiPjxjaXJjbGUgY3g9IjEwIiBjeT0iMTAiIHI9IjMiIGZpbGw9IiM0MDlFRkYiLz48Y2lyY2xlIGN4PSIzMCIgY3k9IjIwIiByPSI0IiBmaWxsPSIjNDA5RUZGIi8+PGNpcmNsZSBjeD0iNTAiIGN5PSIzMCIgcj0iMyIgZmlsbD0iIzQwOUVGRiIvPjxjaXJjbGUgY3g9IjcwIiBjeT0iMTUiIHI9IjUiIGZpbGw9IiM0MDlFRkYiLz48Y2lyY2xlIGN4PSIyMCIgY3k9IjQwIiByPSIzIiBmaWxsPSIjNDA5RUZGIi8+PGNpcmNsZSBjeD0iODAiIGN5PSI0MCIgcj0iNCIgZmlsbD0iIzQwOUVGRiIvPjxjaXJjbGUgY3g9IjQwIiBjeT0iNDUiIHI9IjMiIGZpbGw9IiM0MDlFRkYiLz48bGluZSB4MT0iNSIgeTE9IjUwIiB4Mj0iOTUiIHkyPSI1MCIgc3Ryb2tlPSIjMDAwIiBzdHJva2Utd2lkdGg9IjEiLz48L3N2Zz4="
+                    alt="散点图"
+                    class="w-full h-16 object-contain"
+                  />
+
+                  <!-- 默认图标 -->
+                  <el-icon v-else class="text-lg">
+                    <component :is="component.icon" />
+                  </el-icon>
+                </div>
+
+                <div class="component-info flex flex-col items-center">
+                  <span class="text-xs text-gray-700">{{ component.name }}</span>
+                </div>
               </div>
             </div>
           </div>

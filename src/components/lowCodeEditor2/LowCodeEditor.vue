@@ -66,6 +66,7 @@
               <el-icon>
                 <component :is="editorMode === 'edit' ? 'View' : 'Edit'" />
               </el-icon>
+              {{ editorMode === 'edit' ? '预览' : '编辑' }}
             </el-button>
           </el-tooltip>
           
@@ -99,25 +100,27 @@
       
       <!-- 中间画布区域 -->
       <div class="editor-center flex-1 bg-gray-100 overflow-auto p-4" ref="canvasContainerRef">
-        <div class="canvas-wrapper flex justify-center items-start min-h-full">
-          <canvas-editor
-            :components="canvasComponents"
-            :component-definitions="componentDefinitions"
-            :selected-component-ids="selectedComponentIds"
-            :canvas-width="canvasWidth"
-            :canvas-height="canvasHeight"
-            :scale="canvasScale"
-            :show-grid="showGrid"
-            :snap-to-grid="snapToGrid"
-            :grid-size="gridSize"
-            :canvas-background="canvasBackground"
-            :mode="editorMode"
-            @add-component="handleAddComponent"
-            @select-component="handleSelectComponent"
-            @update:props="handleUpdateComponentProps"
-            @update:style="handleUpdateComponentStyle"
-            @delete-component="handleDeleteComponent"
-          />
+        <div class="canvas-wrapper flex justify-center items-start min-h-full" :class="{ 'preview-mode': editorMode === 'preview' }">
+          <div class="canvas-wrapper-inner">
+            <canvas-editor
+              :components="canvasComponents"
+              :component-definitions="componentDefinitions"
+              :selected-component-ids="selectedComponentIds"
+              :canvas-width="canvasWidth"
+              :canvas-height="canvasHeight"
+              :scale="canvasScale"
+              :show-grid="showGrid"
+              :snap-to-grid="snapToGrid"
+              :grid-size="gridSize"
+              :canvas-background="canvasBackground"
+              :mode="editorMode"
+              @add-component="handleAddComponent"
+              @select-component="handleSelectComponent"
+              @update:props="handleUpdateComponentProps"
+              @update:style="handleUpdateComponentStyle"
+              @delete-component="handleDeleteComponent"
+            />
+          </div>
         </div>
       </div>
       
@@ -226,6 +229,11 @@ const editorRef = ref<HTMLElement | null>(null);
  * 画布容器DOM引用
  */
 const canvasContainerRef = ref<HTMLElement | null>(null);
+
+/**
+ * 保存前一个网格状态（用于预览模式切换）
+ */
+const previousGridState = ref<{ showGrid: boolean; snapToGrid: boolean } | null>(null);
 
 /**
  * 编辑器store实例
@@ -463,6 +471,28 @@ const toggleEditorMode = () => {
   try {
     const newMode = editorMode.value === 'edit' ? 'preview' : 'edit';
     editorStore.setEditorMode(newMode);
+    
+    // 在预览模式下隐藏网格
+    if (newMode === 'preview') {
+      // 保存当前网格状态
+      previousGridState.value = {
+        showGrid: editorStore.state.canvas.showGrid,
+        snapToGrid: editorStore.state.canvas.snapToGrid
+      };
+      
+      // 关闭网格显示
+      editorStore.setCanvasConfig({
+        showGrid: false
+      });
+    } else {
+      // 恢复之前的网格状态
+      if (previousGridState.value) {
+        editorStore.setCanvasConfig({
+          showGrid: previousGridState.value.showGrid,
+          snapToGrid: previousGridState.value.snapToGrid
+        });
+      }
+    }
   } catch (error) {
     console.error('切换编辑器模式失败:', error);
   }
@@ -728,6 +758,20 @@ onUnmounted(() => {
 .canvas-wrapper {
   min-height: 100%;
   padding: 40px;
+  
+  &.preview-mode {
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f0f2f5;
+    transition: all 0.3s ease;
+    
+    .canvas-wrapper-inner {
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+      transition: all 0.3s ease;
+    }
+  }
 }
 
 .scale-value {

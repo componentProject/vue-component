@@ -6,6 +6,8 @@
       'selected': isSelected,
       'preview-mode': mode === 'preview',
       'layout-component': isLayoutComponent,
+      'chart-component': isChartComponent,
+      'basic-component': isBasicComponent
     }"
     :style="componentStyle"
     :data-component-id="component.id"
@@ -81,12 +83,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, reactive, watch, onMounted, onUnmounted } from 'vue';
+import { ref, computed, reactive, watch, onMounted, onUnmounted, nextTick } from 'vue';
 import { Delete, CopyDocument } from '@element-plus/icons-vue';
 import { useDraggable } from '../../hooks/useDraggable';
 import { useEditorStore } from '../../store/editorStore';
 import { getMousePosition, snapToGridPosition, calculateAlignmentGuides } from '../../utils/dragUtils';
 import type { ComponentDefinition, CanvasComponent } from '../../types';
+import * as echarts from 'echarts';
 
 /**
  * 组件属性
@@ -168,13 +171,49 @@ const renderComponent = computed(() => {
 });
 
 /**
+ * 计算属性 - 是否是布局组件
+ */
+const isLayoutComponent = computed(() => {
+  try {
+    return props.componentDefinition?.type === 'layout';
+  } catch (error) {
+    console.error('判断是否是布局组件失败:', error);
+    return false;
+  }
+});
+
+/**
+ * 计算属性 - 是否是图表组件
+ */
+const isChartComponent = computed(() => {
+  try {
+    return props.componentDefinition?.type === 'chart';
+  } catch (error) {
+    console.error('判断是否是图表组件失败:', error);
+    return false;
+  }
+});
+
+/**
+ * 计算属性 - 是否是基础组件
+ */
+const isBasicComponent = computed(() => {
+  try {
+    return props.componentDefinition?.type === 'basic';
+  } catch (error) {
+    console.error('判断是否是基础组件失败:', error);
+    return false;
+  }
+});
+
+/**
  * 组件样式
  */
 const componentStyle = computed(() => {
   try {
     const { top, left, width, height, zIndex, ...otherStyles } = props.component.style;
     
-    return {
+    const styles = {
       position: 'absolute',
       top: `${top}px`,
       left: `${left}px`,
@@ -183,21 +222,27 @@ const componentStyle = computed(() => {
       zIndex: zIndex,
       ...otherStyles,
     };
+    
+    // 为布局组件添加白色背景和边框
+    if (isLayoutComponent.value && !otherStyles.backgroundColor) {
+      styles.backgroundColor = '#ffffff';
+      if (!otherStyles.border) {
+        styles.border = '1px solid #e4e7ed';
+      }
+      if (!otherStyles.borderRadius) {
+        styles.borderRadius = '4px';
+      }
+    }
+    
+    // 添加网格布局
+    if (isLayoutComponent.value) {
+      Object.assign(styles, getLayoutGridStyle());
+    }
+    
+    return styles;
   } catch (error) {
     console.error('计算组件样式失败:', error);
     return {};
-  }
-});
-
-/**
- * 是否是布局组件
- */
-const isLayoutComponent = computed(() => {
-  try {
-    return props.componentDefinition?.allowChildren === true;
-  } catch (error) {
-    console.error('判断是否是布局组件失败:', error);
-    return false;
   }
 });
 
@@ -345,6 +390,11 @@ const startMousePosition = reactive({ x: 0, y: 0 });
 const isResizing = ref(false);
 const resizeDirection = ref<string | null>(null);
 const startSize = reactive({ width: 0, height: 0 });
+
+/**
+ * 图表实例ref
+ */
+const chartInstance = ref<echarts.ECharts | null>(null);
 
 /**
  * 处理鼠标按下
@@ -538,19 +588,226 @@ const handleResizeEnd = () => {
   }
 };
 
+/**
+ * 初始化图表
+ */
+const initChart = () => {
+  try {
+    if (!componentRef.value || !isChartComponent.value) return;
+    
+    // 如果已经有图表实例，先销毁
+    if (chartInstance.value) {
+      chartInstance.value.dispose();
+    }
+    
+    // 初始化图表实例
+    chartInstance.value = echarts.init(componentRef.value);
+    
+    // 获取图表配置
+    const options = generateChartOptions();
+    
+    // 设置图表配置
+    if (options) {
+      chartInstance.value.setOption(options);
+    }
+    
+    // 监听窗口大小变化
+    window.addEventListener('resize', handleResize);
+  } catch (error) {
+    console.error('初始化图表失败:', error);
+  }
+};
+
+/**
+ * 处理窗口大小变化
+ */
+const handleResize = () => {
+  try {
+    if (chartInstance.value) {
+      chartInstance.value.resize();
+    }
+  } catch (error) {
+    console.error('处理窗口大小变化失败:', error);
+  }
+};
+
+/**
+ * 生成图表配置
+ */
+const generateChartOptions = () => {
+  try {
+    if (!props.component || !props.component.componentId) return null;
+    
+    const chartType = props.component.componentId;
+    const chartProps = props.component.props || {};
+    
+    // 根据图表类型生成不同的配置
+    switch (chartType) {
+      case 'echarts-bar': // 柱状图
+        return {
+          title: {
+            text: chartProps.title || '柱状图'
+          },
+          tooltip: {
+            trigger: 'axis',
+            axisPointer: {
+              type: 'shadow'
+            }
+          },
+          xAxis: {
+            type: 'category',
+            data: chartProps.data?.map((item: any) => item.name) || [],
+            name: chartProps.xAxisName
+          },
+          yAxis: {
+            type: 'value',
+            name: chartProps.yAxisName
+          },
+          legend: {
+            show: chartProps.showLegend,
+            bottom: 0
+          },
+          series: [
+            {
+              name: chartProps.title,
+              type: 'bar',
+              data: chartProps.data?.map((item: any) => item.value) || [],
+              animationDuration: 300,
+            }
+          ]
+        };
+        
+      case 'echarts-line': // 折线图
+        return {
+          title: {
+            text: chartProps.title || '折线图'
+          },
+          tooltip: {
+            trigger: 'axis'
+          },
+          xAxis: {
+            type: 'category',
+            data: chartProps.data?.map((item: any) => item.name) || [],
+            name: chartProps.xAxisName
+          },
+          yAxis: {
+            type: 'value',
+            name: chartProps.yAxisName
+          },
+          legend: {
+            show: chartProps.showLegend,
+            bottom: 0
+          },
+          series: [
+            {
+              name: chartProps.title,
+              type: 'line',
+              data: chartProps.data?.map((item: any) => item.value) || [],
+              smooth: chartProps.smooth,
+              showSymbol: chartProps.showSymbol,
+              areaStyle: chartProps.areaStyle ? {} : undefined,
+              animationDuration: 300,
+            }
+          ]
+        };
+        
+      case 'echarts-pie': // 饼图
+        return {
+          title: {
+            text: chartProps.title || '饼图'
+          },
+          tooltip: {
+            trigger: 'item',
+            formatter: '{a} <br/>{b}: {c} ({d}%)'
+          },
+          legend: {
+            show: chartProps.showLegend,
+            bottom: 0
+          },
+          series: [
+            {
+              name: chartProps.title,
+              type: 'pie',
+              radius: chartProps.radius || '60%',
+              data: chartProps.data || [],
+              animationDuration: 300,
+              label: {
+                show: true,
+                formatter: '{b}: {d}%'
+              }
+            }
+          ]
+        };
+        
+      case 'g2-scatter': // 散点图
+        return {
+          title: {
+            text: chartProps.title || '散点图'
+          },
+          tooltip: {
+            trigger: 'item'
+          },
+          xAxis: {},
+          yAxis: {},
+          series: [
+            {
+              symbolSize: 10,
+              data: chartProps.data || [],
+              type: 'scatter'
+            }
+          ]
+        };
+        
+      default:
+        return null;
+    }
+  } catch (error) {
+    console.error('生成图表配置失败:', error);
+    return null;
+  }
+};
+
+// 监听组件属性变化，更新图表
+watch(() => props.component.props, () => {
+  try {
+    if (isChartComponent.value && chartInstance.value) {
+      // 获取图表配置
+      const options = generateChartOptions();
+      
+      // 更新图表配置
+      if (options) {
+        chartInstance.value.setOption(options);
+      }
+    }
+  } catch (error) {
+    console.error('监听组件属性变化失败:', error);
+  }
+}, { deep: true });
+
 // 组件挂载
 onMounted(() => {
   try {
-    // 可以添加其他初始化逻辑
+    // 如果是图表组件，初始化图表
+    if (isChartComponent.value) {
+      nextTick(() => {
+        initChart();
+      });
+    }
   } catch (error) {
-    console.error('组件挂载失败:', error);
+    console.error('组件挂载处理失败:', error);
   }
 });
 
 // 组件卸载
 onUnmounted(() => {
   try {
-    // 清理事件监听
+    // 清理资源
+    if (chartInstance.value) {
+      chartInstance.value.dispose();
+    }
+    window.removeEventListener('resize', handleResize);
+    
+    // 移除事件监听
     document.removeEventListener('mousemove', handleMouseMove);
     document.removeEventListener('mouseup', handleMouseUp);
     document.removeEventListener('mousemove', handleResizeMove);
@@ -559,6 +816,41 @@ onUnmounted(() => {
     console.error('组件卸载失败:', error);
   }
 });
+
+/**
+ * 布局组件获取网格样式
+ */
+const getLayoutGridStyle = () => {
+  try {
+    // 只为布局组件提供网格样式
+    if (!isLayoutComponent.value) return {};
+    
+    const componentId = props.component.componentId;
+    
+    if (componentId === 'el-row') {
+      return {
+        display: 'grid',
+        gridTemplateColumns: `repeat(24, 1fr)`,
+        gap: `${props.component.props?.gutter || 0}px`,
+        height: '100%'
+      };
+    } else if (componentId === 'el-container') {
+      const direction = props.component.props?.direction || 'vertical';
+      return {
+        display: 'grid',
+        gridTemplateRows: direction === 'vertical' ? 'auto 1fr auto' : 'none',
+        gridTemplateColumns: direction === 'horizontal' ? 'auto 1fr auto' : 'none',
+        gap: '8px',
+        height: '100%'
+      };
+    }
+    
+    return {};
+  } catch (error) {
+    console.error('获取布局网格样式失败:', error);
+    return {};
+  }
+};
 </script>
 
 <style scoped>
@@ -568,6 +860,45 @@ onUnmounted(() => {
   cursor: move;
   border: 1px dashed transparent;
   overflow: visible;
+}
+
+/* 布局组件样式 */
+.layout-component {
+  background-color: #ffffff;
+  border: 1px solid #e4e7ed;
+  border-radius: 4px;
+  padding: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+/* 布局组件内部的子组件样式 */
+.layout-component > .component-content {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(50px, 1fr));
+  gap: 8px;
+  width: 100%;
+  height: 100%;
+}
+
+/* 行组件内的列组件样式 */
+.layout-component[data-component-id="el-row"] > .component-content > .canvas-component[data-component-id^="el-col"] {
+  position: relative;
+  grid-column: span attr(data-span number, 12);
+  top: 0 !important;
+  left: 0 !important;
+}
+
+/* 图表组件样式 */
+.chart-component {
+  background-color: #ffffff;
+  border: 1px solid #e4e7ed;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+/* 基础组件样式 */
+.basic-component {
+  /* 基础组件样式可以根据需要调整 */
 }
 
 .canvas-component.selected {
@@ -659,5 +990,11 @@ onUnmounted(() => {
   bottom: -4px;
   right: -4px;
   cursor: se-resize;
+}
+
+/* 预览模式下隐藏所有控件 */
+.preview-mode .resize-handle,
+.preview-mode .component-controls {
+  display: none;
 }
 </style> 
