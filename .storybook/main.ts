@@ -10,7 +10,7 @@ type PluginOptionType = PluginOption & {
 const config: StorybookConfig = {
   stories: [
     './.stories/*.stories.@(js|jsx|mjs|ts|tsx|mdx)',
-    '../src/components/**/stories/*.stories.@(js|jsx|mjs|ts|tsx|mdx)',
+    '../src/components/**/*.stories.@(js|jsx|mjs|ts|tsx|mdx)',
   ],
   addons: [
     '@storybook/addon-onboarding',
