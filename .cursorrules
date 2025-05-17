@@ -1,0 +1,16 @@
+{
+  "rules": [
+    {
+      "name": "CommentMandatory",
+      "description": "每段函数或代码块须附带功能说明",
+      "pattern": "/*...*/",
+      "effect": "确保代码可理解，便于追踪错误"
+    },
+    {
+      "name": "ErrorHandling",
+      "description": "每个函数必须包含错误捕获和日志记录",
+      "pattern": "try-catch",
+      "effect": "方便定位异常信息和追踪错误来源"
+    }
+  ]
+}
