@@ -1,4 +1,4 @@
-import type { ComponentDefinition } from '../types';
+import type { ComponentDefinition } from '../types'
 import {
   Check,
   Edit,
@@ -14,7 +14,7 @@ import {
   PieChart,
   TrendCharts,
   DataAnalysis,
-} from '@element-plus/icons-vue';
+} from '@element-plus/icons-vue'
 
 /**
  * 基础组件配置常量定义
@@ -324,7 +324,7 @@ export const BASIC_COMPONENTS: ComponentDefinition[] = [
       },
     ],
   },
-];
+]
 
 /**
  * 布局组件配置常量定义
@@ -339,7 +339,7 @@ export const LAYOUT_COMPONENTS: ComponentDefinition[] = [
     component: 'ElContainer',
     allowChildren: true,
     allowedChildTypes: ['basic', 'layout', 'chart'],
-    initialSize: { width: 500, height: 300 },
+    initialSize: { width: 1200, height: 600 },
     defaultProps: {
       direction: 'vertical',
       background: '#ffffff',
@@ -381,11 +381,11 @@ export const LAYOUT_COMPONENTS: ComponentDefinition[] = [
     component: 'ElRow',
     allowChildren: true,
     allowedChildTypes: ['basic', 'layout', 'chart'],
-    initialSize: { width: 500, height: 100 },
+    initialSize: { width: 1200, height: 100 },
     defaultProps: {
       gutter: 0,
-      justify: 'start',
-      align: 'top',
+      justify: 'center',
+      align: 'middle',
     },
     propsSchema: [
       {
@@ -399,7 +399,7 @@ export const LAYOUT_COMPONENTS: ComponentDefinition[] = [
         name: 'justify',
         label: '水平排列',
         type: 'select',
-        default: 'start',
+        default: 'center',
         options: [
           { label: '左对齐', value: 'start' },
           { label: '右对齐', value: 'end' },
@@ -413,7 +413,7 @@ export const LAYOUT_COMPONENTS: ComponentDefinition[] = [
         name: 'align',
         label: '垂直排列',
         type: 'select',
-        default: 'top',
+        default: 'middle',
         options: [
           { label: '顶部对齐', value: 'top' },
           { label: '居中对齐', value: 'middle' },
@@ -465,7 +465,7 @@ export const LAYOUT_COMPONENTS: ComponentDefinition[] = [
       },
     ],
   },
-];
+]
 
 /**
  * 图表组件配置常量定义
@@ -730,9 +730,9 @@ export const CHART_COMPONENTS: ComponentDefinition[] = [
       },
     ],
   },
-];
+]
 
 /**
  * 所有组件类型的集合
  */
-export const ALL_COMPONENTS = [...BASIC_COMPONENTS, ...LAYOUT_COMPONENTS, ...CHART_COMPONENTS]; 
+export const ALL_COMPONENTS = [...BASIC_COMPONENTS, ...LAYOUT_COMPONENTS, ...CHART_COMPONENTS]

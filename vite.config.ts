@@ -60,7 +60,7 @@ function wrapperEnv(env: Record<string, string>) {
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd())
   const viteEnv = wrapperEnv(env)
-  const systemCode = viteEnv.VITE_GLOB_APP_CODE;
+  const systemCode = viteEnv.VITE_GLOB_APP_CODE
   const appTitle = viteEnv.VITE_GLOB_APP_TITLE
 
   const vuePlugins = [
@@ -187,7 +187,7 @@ export default defineConfig(({ mode }) => {
       },
     },
     define: {
-      __SYSTEM_CODE__: JSON.stringify(systemCode)
+      __SYSTEM_CODE__: JSON.stringify(systemCode),
     },
     css: {
       postcss: {
@@ -206,7 +206,7 @@ export default defineConfig(({ mode }) => {
               return `${addStr}\n${content}`
             }
             return content
-          }
+          },
         },
       },
     },
