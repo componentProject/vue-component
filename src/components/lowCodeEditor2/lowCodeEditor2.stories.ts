@@ -1,14 +1,14 @@
-import type { Meta, StoryObj } from '@storybook/vue3';
-import LowCodeEditor from './LowCodeEditor.vue';
-import type { PageSchema } from './types';
+import type { Meta, StoryObj } from '@storybook/vue3'
+import LowCodeEditor from './LowCodeEditor.vue'
+import type { PageSchema } from './types'
 
 /**
  * 低代码编辑器组件
- * 
+ *
  * 提供拖拽式页面构建能力，支持基础组件、布局组件和图表组件。
  */
 const meta: Meta<typeof LowCodeEditor> = {
-  title: '组件库/低代码编辑器',
+  title: '低代码编辑器',
   component: LowCodeEditor,
   tags: ['autodocs'],
   argTypes: {
@@ -35,18 +35,19 @@ const meta: Meta<typeof LowCodeEditor> = {
     layout: 'fullscreen',
     docs: {
       description: {
-        component: '低代码编辑器组件，支持拖拽添加组件、调整大小和位置、设置属性等，可用于快速搭建页面。',
+        component:
+          '低代码编辑器组件，支持拖拽添加组件、调整大小和位置、设置属性等，可用于快速搭建页面。',
       },
     },
   },
-};
+}
 
-export default meta;
-type Story = StoryObj<typeof LowCodeEditor>;
+export default meta
+type Story = StoryObj<typeof LowCodeEditor>
 
 /**
  * 默认空白示例
- * 
+ *
  * 展示一个空白的低代码编辑器，可以从左侧组件面板拖拽组件到画布上。
  */
 export const Empty: Story = {
@@ -57,15 +58,16 @@ export const Empty: Story = {
   parameters: {
     docs: {
       description: {
-        story: '空白编辑器示例，从左侧组件面板拖拽组件到画布中，可以调整组件大小、位置，在右侧设置属性面板修改组件属性。',
+        story:
+          '空白编辑器示例，从左侧组件面板拖拽组件到画布中，可以调整组件大小、位置，在右侧设置属性面板修改组件属性。',
       },
     },
   },
-};
+}
 
 /**
  * 布局示例
- * 
+ *
  * 展示一个包含基础布局结构的低代码编辑器页面。
  */
 export const LayoutExample: Story = {
@@ -256,11 +258,11 @@ export const LayoutExample: Story = {
       },
     },
   },
-};
+}
 
 /**
  * 仪表盘示例
- * 
+ *
  * 展示一个包含数据可视化图表的仪表盘页面。
  */
 export const DashboardExample: Story = {
@@ -559,4 +561,4 @@ export const DashboardExample: Story = {
       },
     },
   },
-}; 
+}
