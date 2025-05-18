@@ -213,7 +213,7 @@ const componentStyle = computed(() => {
   try {
     const { top, left, width, height, zIndex, ...otherStyles } = props.component.style;
     
-    const styles = {
+    const styles: Record<string, any> = {
       position: 'absolute',
       top: `${top}px`,
       left: `${left}px`,
@@ -223,19 +223,40 @@ const componentStyle = computed(() => {
       ...otherStyles,
     };
     
-    // 为布局组件添加白色背景和边框
-    if (isLayoutComponent.value && !otherStyles.backgroundColor) {
-      styles.backgroundColor = '#ffffff';
-      if (!otherStyles.border) {
-        styles.border = '1px solid #e4e7ed';
-      }
-      if (!otherStyles.borderRadius) {
-        styles.borderRadius = '4px';
-      }
-    }
-    
-    // 添加网格布局
+    // 根据组件类型应用特定样式
     if (isLayoutComponent.value) {
+      // 布局组件样式处理
+      const componentId = props.component.componentId;
+      
+      if (componentId === 'el-container') {
+        // 容器组件: 占满父容器宽高或画布宽高的100%
+        styles.width = '100%';
+        styles.height = '100%';
+        styles.backgroundColor = otherStyles.backgroundColor || '#ffffff';
+        styles.border = otherStyles.border !== false ? '1px solid #e4e7ed' : 'none';
+        styles.borderRadius = otherStyles.borderRadius || '4px';
+        styles.padding = otherStyles.padding || '12px';
+        styles.boxSizing = 'border-box';
+      } 
+      else if (componentId === 'el-row') {
+        // 行组件: 宽度占满父容器100%，高度根据内容自适应
+        styles.width = '100%';
+        styles.height = 'auto';
+        styles.minHeight = '40px'; // 确保有最小高度以便于选择
+        styles.backgroundColor = otherStyles.backgroundColor || 'transparent';
+        styles.padding = otherStyles.padding || '4px';
+        styles.boxSizing = 'border-box';
+      } 
+      else if (componentId === 'el-col') {
+        // 列组件: 高度根据内容自适应
+        styles.height = 'auto';
+        styles.minHeight = '40px'; // 确保有最小高度以便于选择
+        styles.backgroundColor = otherStyles.backgroundColor || 'transparent';
+        styles.padding = otherStyles.padding || '4px';
+        styles.boxSizing = 'border-box';
+      }
+      
+      // 添加网格布局
       Object.assign(styles, getLayoutGridStyle());
     }
     
@@ -301,13 +322,50 @@ const handleComponentClick = (e: MouseEvent) => {
     // 如果是预览模式，则不处理点击事件
     if (props.mode === 'preview') return;
     
-    // 发送选择事件
-    emit('select', props.component.id, e.ctrlKey || e.metaKey);
+    // 检查组件ID是否有效
+    if (!props.component || !props.component.id) {
+      console.warn('无效的组件ID, 无法选择组件');
+      return;
+    }
+    
+    // 对于图表组件，需要特殊处理，因为可能会包含echarts绑定的事件
+    if (isChartComponent.value) {
+      // 阻止事件冒泡，但不立即执行选中操作，避免与图表内部事件冲突
+      e.stopPropagation();
+      
+      // 延迟选中操作，确保DOM已更新且其他事件已处理完毕
+      setTimeout(() => {
+        try {
+          // 执行选中操作前再次检查组件ID的有效性
+          if (props.component && props.component.id) {
+            emit('select', props.component.id, false); // 图表点击时不支持多选
+          }
+        } catch (selectError) {
+          console.error('选择图表组件时发生错误:', selectError);
+        }
+      }, 50); // 使用较长的延迟以确保DOM稳定
+      
+      return;
+    }
+    
+    // 其他非图表组件的处理
+    // 使用setTimeout避免可能的DOM操作冲突
+    setTimeout(() => {
+      try {
+        // 发送选择事件
+        emit('select', props.component.id, e.ctrlKey || e.metaKey);
+      } catch (selectError) {
+        console.error('选择组件时发生错误:', selectError);
+      }
+    }, 0);
     
     // 阻止事件冒泡
     e.stopPropagation();
   } catch (error) {
     console.error('处理组件点击失败:', error);
+    // 防止错误传播
+    e.stopPropagation();
+    e.preventDefault();
   }
 };
 
@@ -593,28 +651,54 @@ const handleResizeEnd = () => {
  */
 const initChart = () => {
   try {
+    // 确保组件引用和类型有效
     if (!componentRef.value || !isChartComponent.value) return;
     
-    // 如果已经有图表实例，先销毁
+    // 确保组件DOM仍然附加在文档中
+    if (!document.body.contains(componentRef.value)) {
+      console.warn('尝试初始化已从DOM移除的图表组件');
+      return;
+    }
+    
+    // 安全地销毁现有实例
     if (chartInstance.value) {
-      chartInstance.value.dispose();
+      try {
+        chartInstance.value.dispose();
+        chartInstance.value = null;
+      } catch (disposeError) {
+        console.warn('销毁旧图表实例失败:', disposeError);
+      }
     }
     
-    // 初始化图表实例
-    chartInstance.value = echarts.init(componentRef.value);
-    
-    // 获取图表配置
-    const options = generateChartOptions();
-    
-    // 设置图表配置
-    if (options) {
-      chartInstance.value.setOption(options);
+    // 使用try-catch包装echarts初始化操作
+    try {
+      // 初始化图表实例
+      chartInstance.value = echarts.init(componentRef.value);
+      
+      // 获取图表配置
+      const options = generateChartOptions();
+      
+      // 设置图表配置
+      if (options && chartInstance.value) {
+        chartInstance.value.setOption(options);
+        
+        // 注册图表点击事件时阻止冒泡，防止与组件选择冲突
+        chartInstance.value.getZr().on('click', (e: any) => {
+          if (e && e.event) {
+            e.event.stopPropagation();
+          }
+        });
+      }
+      
+      // 监听窗口大小变化
+      window.addEventListener('resize', handleResize);
+    } catch (initError) {
+      console.error('初始化echarts实例失败:', initError);
+      chartInstance.value = null;
     }
-    
-    // 监听窗口大小变化
-    window.addEventListener('resize', handleResize);
   } catch (error) {
     console.error('初始化图表失败:', error);
+    chartInstance.value = null;
   }
 };
 
@@ -623,11 +707,22 @@ const initChart = () => {
  */
 const handleResize = () => {
   try {
-    if (chartInstance.value) {
+    // 确保图表实例存在且组件DOM依然存在于文档中
+    if (chartInstance.value && componentRef.value && document.body.contains(componentRef.value)) {
       chartInstance.value.resize();
+    } else if (chartInstance.value) {
+      // 如果DOM已不存在但图表实例仍然存在，则安全销毁图表实例
+      try {
+        chartInstance.value.dispose();
+        chartInstance.value = null;
+      } catch (disposeError) {
+        console.error('销毁图表实例失败:', disposeError);
+      }
     }
   } catch (error) {
     console.error('处理窗口大小变化失败:', error);
+    // 移除事件监听以防止继续出错
+    window.removeEventListener('resize', handleResize);
   }
 };
 
@@ -784,6 +879,26 @@ watch(() => props.component.props, () => {
   }
 }, { deep: true });
 
+// 添加一个手动事件处理函数来捕获ECharts图表的点击事件
+const handleChartClick = (e: MouseEvent) => {
+  try {
+    // 如果是图表组件，处理点击事件
+    if (!isChartComponent.value || props.mode === 'preview') return;
+    
+    // 阻止事件冒泡防止DOM错误
+    e.stopPropagation();
+    
+    // 延时执行选择操作以确保DOM稳定
+    setTimeout(() => {
+      if (props.component && props.component.id) {
+        emit('select', props.component.id, false);
+      }
+    }, 100);
+  } catch (error) {
+    console.error('处理图表点击事件失败:', error);
+  }
+};
+
 // 组件挂载
 onMounted(() => {
   try {
@@ -791,6 +906,11 @@ onMounted(() => {
     if (isChartComponent.value) {
       nextTick(() => {
         initChart();
+        
+        // 为图表组件添加点击事件监听
+        if (componentRef.value) {
+          componentRef.value.addEventListener('click', handleChartClick);
+        }
       });
     }
   } catch (error) {
@@ -801,15 +921,37 @@ onMounted(() => {
 // 组件卸载
 onUnmounted(() => {
   try {
-    // 清理资源
+    // 安全地清理图表资源
     if (chartInstance.value) {
-      chartInstance.value.dispose();
+      try {
+        // 移除所有事件监听
+        if (chartInstance.value.getZr) {
+          const zr = chartInstance.value.getZr();
+          if (zr) {
+            zr.off('click');
+          }
+        }
+        // 销毁图表实例
+        chartInstance.value.dispose();
+        chartInstance.value = null;
+      } catch (disposeError) {
+        console.warn('销毁图表实例失败:', disposeError);
+      }
     }
+    
+    // 移除图表点击事件监听
+    if (isChartComponent.value && componentRef.value) {
+      componentRef.value.removeEventListener('click', handleChartClick);
+    }
+    
+    // 移除窗口事件监听
     window.removeEventListener('resize', handleResize);
     
-    // 移除事件监听
+    // 移除拖拽相关事件监听
     document.removeEventListener('mousemove', handleMouseMove);
     document.removeEventListener('mouseup', handleMouseUp);
+    
+    // 移除调整大小相关事件监听
     document.removeEventListener('mousemove', handleResizeMove);
     document.removeEventListener('mouseup', handleResizeEnd);
   } catch (error) {
@@ -832,16 +974,25 @@ const getLayoutGridStyle = () => {
         display: 'grid',
         gridTemplateColumns: `repeat(24, 1fr)`,
         gap: `${props.component.props?.gutter || 0}px`,
-        height: '100%'
+        justifyContent: props.component.props?.justify || 'start',
+        alignItems: props.component.props?.align || 'top',
+        width: '100%',
       };
     } else if (componentId === 'el-container') {
       const direction = props.component.props?.direction || 'vertical';
       return {
-        display: 'grid',
-        gridTemplateRows: direction === 'vertical' ? 'auto 1fr auto' : 'none',
-        gridTemplateColumns: direction === 'horizontal' ? 'auto 1fr auto' : 'none',
+        display: 'flex',
+        flexDirection: direction === 'vertical' ? 'column' : 'row',
         gap: '8px',
-        height: '100%'
+        width: '100%',
+        height: '100%',
+      };
+    } else if (componentId === 'el-col') {
+      const span = props.component.props?.span || 12;
+      return {
+        gridColumn: `span ${span}`,
+        display: 'flex',
+        flexDirection: 'column',
       };
     }
     
@@ -871,21 +1022,58 @@ const getLayoutGridStyle = () => {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
+/* 容器组件特殊样式 */
+.layout-component[data-component-id="el-container"] {
+  width: 100%;
+  height: 100%;
+  background-color: #ffffff;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 行组件特殊样式 */
+.layout-component[data-component-id="el-row"] {
+  width: 100%;
+  min-height: 40px;
+  margin-bottom: 8px;
+  padding: 8px;
+  background-color: rgba(240, 240, 240, 0.3);
+  display: flex;
+  flex-wrap: wrap;
+  box-sizing: border-box;
+}
+
+/* 列组件特殊样式 */
+.layout-component[data-component-id="el-col"] {
+  min-height: 40px;
+  padding: 8px;
+  background-color: rgba(230, 230, 230, 0.3);
+  box-sizing: border-box;
+}
+
 /* 布局组件内部的子组件样式 */
 .layout-component > .component-content {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(50px, 1fr));
+  display: flex;
+  flex-wrap: wrap;
   gap: 8px;
   width: 100%;
   height: 100%;
 }
 
-/* 行组件内的列组件样式 */
-.layout-component[data-component-id="el-row"] > .component-content > .canvas-component[data-component-id^="el-col"] {
-  position: relative;
-  grid-column: span attr(data-span number, 12);
-  top: 0 !important;
-  left: 0 !important;
+/* 行组件内的内容样式 */
+.layout-component[data-component-id="el-row"] > .component-content {
+  display: grid;
+  grid-template-columns: repeat(24, 1fr);
+  gap: var(--row-gutter, 0px);
+  width: 100%;
+}
+
+/* 列组件内的内容 */
+.layout-component[data-component-id="el-col"] > .component-content {
+  flex-direction: column;
+  height: 100%;
+  align-items: stretch;
 }
 
 /* 图表组件样式 */
@@ -894,6 +1082,7 @@ const getLayoutGridStyle = () => {
   border: 1px solid #e4e7ed;
   border-radius: 4px;
   overflow: hidden;
+  cursor: pointer; /* 确保图表组件更容易点击 */
 }
 
 /* 基础组件样式 */

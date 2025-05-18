@@ -344,6 +344,8 @@ export const LAYOUT_COMPONENTS: ComponentDefinition[] = [
       direction: 'vertical',
       background: '#ffffff',
       border: true,
+      width: '100%',
+      height: '100%'
     },
     propsSchema: [
       {
@@ -371,6 +373,20 @@ export const LAYOUT_COMPONENTS: ComponentDefinition[] = [
         default: true,
         group: 'style',
       },
+      {
+        name: 'width',
+        label: '宽度',
+        type: 'string',
+        default: '100%',
+        group: 'style',
+      },
+      {
+        name: 'height',
+        label: '高度',
+        type: 'string',
+        default: '100%',
+        group: 'style',
+      },
     ],
   },
   {
@@ -381,11 +397,13 @@ export const LAYOUT_COMPONENTS: ComponentDefinition[] = [
     component: 'ElRow',
     allowChildren: true,
     allowedChildTypes: ['basic', 'layout', 'chart'],
-    initialSize: { width: 1200, height: 100 },
+    initialSize: { width: 1200, height: 60 },
     defaultProps: {
       gutter: 0,
       justify: 'center',
       align: 'middle',
+      width: '100%',
+      autoHeight: true
     },
     propsSchema: [
       {
@@ -421,6 +439,20 @@ export const LAYOUT_COMPONENTS: ComponentDefinition[] = [
         ],
         group: 'basic',
       },
+      {
+        name: 'width',
+        label: '宽度',
+        type: 'string',
+        default: '100%',
+        group: 'style',
+      },
+      {
+        name: 'autoHeight',
+        label: '自适应高度',
+        type: 'boolean',
+        default: true,
+        group: 'style',
+      },
     ],
   },
   {
@@ -436,6 +468,7 @@ export const LAYOUT_COMPONENTS: ComponentDefinition[] = [
       span: 12,
       offset: 0,
       background: 'transparent',
+      autoHeight: true
     },
     propsSchema: [
       {
@@ -461,6 +494,13 @@ export const LAYOUT_COMPONENTS: ComponentDefinition[] = [
         label: '背景颜色',
         type: 'color',
         default: 'transparent',
+        group: 'style',
+      },
+      {
+        name: 'autoHeight',
+        label: '自适应高度',
+        type: 'boolean',
+        default: true,
         group: 'style',
       },
     ],

@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/vue3'
-import LowCodeEditor from './LowCodeEditor.vue'
-import type { PageSchema } from './types'
+import LowCodeEditor from '@/components/lowCodeEditor2/LowCodeEditor.vue'
+import type { PageSchema } from '@/components/lowCodeEditor2/types'
 
 /**
  * 低代码编辑器组件

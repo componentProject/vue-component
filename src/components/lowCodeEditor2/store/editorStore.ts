@@ -190,12 +190,23 @@ export const useEditorStore = defineStore('lowCodeEditor2', () => {
         // 添加到父组件的children中
         const parentIndex = state.value.canvasComponents.findIndex(c => c.id === parentId);
         if (parentIndex !== -1) {
+          // 安全检查：确保父组件有children数组
           if (!state.value.canvasComponents[parentIndex].children) {
             state.value.canvasComponents[parentIndex].children = [];
           }
-          state.value.canvasComponents[parentIndex].children?.push(newComponent);
+          
+          // 防止对null引用，先确认children存在
+          const parentChildren = state.value.canvasComponents[parentIndex].children;
+          if (parentChildren) {
+            parentChildren.push(newComponent);
+          } else {
+            // 如果children数组仍然不存在，添加到根级别
+            console.warn(`父组件 ${parentId} 的children数组无法访问，组件将添加到根级别`);
+            state.value.canvasComponents.push(newComponent);
+          }
         } else {
           // 如果找不到父组件，则添加到根级别
+          console.warn(`未找到父组件 ${parentId}，组件将添加到根级别`);
           state.value.canvasComponents.push(newComponent);
         }
       } else {
@@ -285,8 +296,22 @@ export const useEditorStore = defineStore('lowCodeEditor2', () => {
    */
   const selectComponent = (id: string | null, isMultiSelect = false) => {
     try {
+      if (id === undefined) return; // 防止undefined传入
+      
       if (!id) {
-        state.value.selectedComponentIds = [];
+        // 安全地清空选择
+        try {
+          state.value.selectedComponentIds = [];
+        } catch (error) {
+          console.error('清空组件选择失败:', error);
+        }
+        return;
+      }
+
+      // 检查组件是否存在
+      const { component } = findComponent(id);
+      if (!component) {
+        console.warn(`尝试选择不存在的组件: ${id}`);
         return;
       }
 
@@ -294,19 +319,37 @@ export const useEditorStore = defineStore('lowCodeEditor2', () => {
         // 多选模式
         if (state.value.selectedComponentIds.includes(id)) {
           // 如果已经选中，则取消选中
-          state.value.selectedComponentIds = state.value.selectedComponentIds.filter(
-            selectedId => selectedId !== id
-          );
+          try {
+            state.value.selectedComponentIds = state.value.selectedComponentIds.filter(
+              selectedId => selectedId !== id
+            );
+          } catch (error) {
+            console.error('取消选择组件失败:', error);
+          }
         } else {
           // 添加到选中列表
-          state.value.selectedComponentIds.push(id);
+          try {
+            state.value.selectedComponentIds.push(id);
+          } catch (error) {
+            console.error('添加组件到选中列表失败:', error);
+          }
         }
       } else {
         // 单选模式
-        state.value.selectedComponentIds = [id];
+        try {
+          state.value.selectedComponentIds = [id];
+        } catch (error) {
+          console.error('设置选中组件失败:', error);
+        }
       }
     } catch (error) {
       console.error('选择组件失败:', error);
+      // 出现异常时尝试清空选择，避免不一致状态
+      try {
+        state.value.selectedComponentIds = [];
+      } catch (secondaryError) {
+        console.error('尝试清空选择失败:', secondaryError);
+      }
     }
   };
 

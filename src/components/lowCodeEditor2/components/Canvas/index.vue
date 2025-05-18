@@ -253,12 +253,45 @@ const isComponentSelected = (id: string): boolean => {
  */
 const handleCanvasClick = (e: MouseEvent) => {
   try {
-    // 如果点击的是画布本身（而不是组件），则清除选择
-    if (e.target === canvasRef.value || e.target === canvasRef.value?.firstElementChild) {
-      emit('select-component', null, false)
+    // 防止点击冒泡引起的可能问题
+    if (!canvasRef.value) return;
+    
+    // 如果编辑器是预览模式，不做任何操作
+    if (props.mode === 'preview') return;
+
+    // 使用更安全的方法检查点击的是否是画布本身或画布网格（而不是组件）
+    const clickTarget = e.target as HTMLElement;
+    
+    // 检查是否点击在画布或画布网格上
+    let isCanvas = false;
+    
+    // 检查点击的是否是画布本身
+    if (canvasRef.value === clickTarget) {
+      isCanvas = true;
+    }
+    
+    // 检查是否是画布的网格元素（第一个子元素）
+    if (!isCanvas && canvasRef.value.children && canvasRef.value.children.length > 0) {
+      isCanvas = clickTarget === canvasRef.value.children[0] || 
+                canvasRef.value.children[0].contains(clickTarget);
+    }
+    
+    if (isCanvas) {
+      // 使用 setTimeout 延迟执行清除选择，避免可能的DOM冲突
+      setTimeout(() => {
+        try {
+          emit('select-component', null, false);
+        } catch (error) {
+          console.error('清除组件选择失败:', error);
+        }
+      }, 10); // 增加延时以确保DOM已更新
     }
   } catch (error) {
-    console.error('处理画布点击失败:', error)
+    console.error('处理画布点击失败:', error);
+    
+    // 出错时不执行任何选择操作，避免可能的DOM错误
+    e.stopPropagation();
+    e.preventDefault();
   }
 }
 
@@ -278,23 +311,23 @@ const handleSelectComponent = (componentId: string, isMultiSelect: boolean) => {
  */
 const handleDragOver = (event: DragEvent) => {
   try {
-    if (props.mode === 'preview') return
+    if (props.mode === 'preview') return;
 
-    event.preventDefault()
-    event.stopPropagation()
+    event.preventDefault();
+    event.stopPropagation();
 
     // 设置放置效果
     if (event.dataTransfer) {
-      event.dataTransfer.dropEffect = 'copy'
+      event.dataTransfer.dropEffect = 'copy';
     }
 
-    isDraggingOver.value = true
+    isDraggingOver.value = true;
 
     // 获取拖拽位置相对于画布的坐标
     if (canvasRef.value && event.dataTransfer) {
-      const rect = canvasRef.value.getBoundingClientRect()
-      const x = (event.clientX - rect.left) / props.scale
-      const y = (event.clientY - rect.top) / props.scale
+      const rect = canvasRef.value.getBoundingClientRect();
+      const x = (event.clientX - rect.left) / props.scale;
+      const y = (event.clientY - rect.top) / props.scale;
 
       // 查找可能的容器组件
       const containerComponent = findContainerAtPosition(
@@ -302,218 +335,278 @@ const handleDragOver = (event: DragEvent) => {
         props.components,
         componentDefinitionsMap.value,
         dragComponentId.value || undefined,
-      )
+      );
 
       if (containerComponent) {
-        dropTargetId.value = containerComponent.id
+        dropTargetId.value = containerComponent.id;
 
         // 检查是否可以放入该容器
         if (dragComponentId.value) {
-          const draggedComponent = getComponentDefinition(dragComponentId.value)
+          const draggedComponent = getComponentDefinition(dragComponentId.value);
           if (draggedComponent) {
             // 检查组件放置规则
             validDropTarget.value = checkDropRules(
               draggedComponent.type,
+              dragComponentId.value,
               containerComponent,
               componentDefinitionsMap.value,
-            )
+            );
           }
         }
       } else {
-        dropTargetId.value = null
-        // 只有布局组件可以直接放在画布上，基础组件和图表组件必须放在容器内
+        dropTargetId.value = null;
+        // 只有容器组件可以直接放在画布上
         if (dragComponentId.value) {
-          const draggedComponent = getComponentDefinition(dragComponentId.value)
-          validDropTarget.value = draggedComponent?.type === 'layout'
+          const draggedComponent = getComponentDefinition(dragComponentId.value);
+          validDropTarget.value = draggedComponent?.type === 'layout' && 
+                                 draggedComponent.id === 'el-container';
         } else {
-          validDropTarget.value = false
+          validDropTarget.value = false;
         }
       }
     }
   } catch (error) {
-    console.error('处理拖拽经过失败:', error)
+    console.error('处理拖拽经过失败:', error);
   }
-}
+};
 
 /**
  * 检查组件放置规则
  * 1. 基础组件只能放置在布局组件中
  * 2. 图表组件只能放置在容器组件中
- * 3. 布局组件可以放置在画布上或其他布局组件中
+ * 3. 行组件只能放置在容器组件中
+ * 4. 列组件只能放置在行组件中
+ * 5. 容器组件可以放置在画布上或其他容器组件中
  */
 const checkDropRules = (
   componentType: string,
-  containerComponent: typeof CanvasComponent,
-  componentDefinitions: Record<string, ComponentDefinition>,
+  componentId: string,
+  containerComponent: any,
+  componentDefinitions: Record<string, ComponentDefinition>
 ): boolean => {
   try {
     // 获取容器组件定义
-    const containerDef = getComponentDefinition(containerComponent.componentId)
-    if (!containerDef) return false
+    const containerDef = getComponentDefinition(containerComponent.componentId);
+    if (!containerDef) return false;
 
     // 检查是否允许包含子组件
-    if (!containerDef.allowChildren) return false
+    if (!containerDef.allowChildren) return false;
+
+    // 特殊规则检查
+    // 1. 行组件只能放在容器组件中
+    if (componentId === 'el-row') {
+      return containerComponent.componentId === 'el-container';
+    }
+    
+    // 2. 列组件只能放在行组件中
+    if (componentId === 'el-col') {
+      return containerComponent.componentId === 'el-row';
+    }
 
     // 如果容器是布局组件，检查是否允许放置当前类型
     if (containerDef.type === 'layout') {
-      // 布局组件可以放置任何类型的组件
+      // 布局组件类型检查
       if (componentType === 'basic') {
         // 基础组件可以放在任何布局组件中
-        return true
+        return true;
       } else if (componentType === 'chart') {
         // 图表组件只能放在容器(el-container)组件中
-        return containerComponent.componentId === 'el-container'
+        return containerComponent.componentId === 'el-container';
       } else if (componentType === 'layout') {
-        // 布局组件可以放在其他布局组件中
-        return true
+        // 布局组件可以放在其他布局组件中，但要遵循特殊规则
+        return true;
       }
     }
 
     // 默认不允许
-    return false
+    return false;
   } catch (error) {
-    console.error('检查组件放置规则失败:', error)
-    return false
+    console.error('检查组件放置规则失败:', error);
+    return false;
   }
-}
+};
 
 /**
  * 处理拖拽放置
  */
 const handleDrop = (event: DragEvent) => {
   try {
-    if (props.mode === 'preview') return
+    if (props.mode === 'preview') return;
 
-    event.preventDefault()
-    event.stopPropagation()
+    event.preventDefault();
+    event.stopPropagation();
 
-    isDraggingOver.value = false
+    isDraggingOver.value = false;
 
     // 解析拖拽数据
     if (event.dataTransfer && canvasRef.value) {
-      const data = event.dataTransfer.getData('application/json')
-      if (!data) return
+      const data = event.dataTransfer.getData('application/json');
+      if (!data) return;
 
       try {
-        const dropData = JSON.parse(data)
+        const dropData = JSON.parse(data);
         if (dropData.type === 'component' && dropData.componentId) {
           // 获取组件定义
-          const componentDef = getComponentDefinition(dropData.componentId)
-          if (!componentDef) return
+          const componentDef = getComponentDefinition(dropData.componentId);
+          if (!componentDef) return;
 
           // 获取放置位置相对于画布的坐标
-          const rect = canvasRef.value.getBoundingClientRect()
-          let left = (event.clientX - rect.left) / props.scale
-          let top = (event.clientY - rect.top) / props.scale
+          const rect = canvasRef.value.getBoundingClientRect();
+          let left = (event.clientX - rect.left) / props.scale;
+          let top = (event.clientY - rect.top) / props.scale;
 
           // 获取组件定义以获取初始尺寸
           if (componentDef && componentDef.initialSize) {
             // 将组件居中放置到鼠标位置
-            left -= componentDef.initialSize.width / 2
-            top -= componentDef.initialSize.height / 2
+            left -= componentDef.initialSize.width / 2;
+            top -= componentDef.initialSize.height / 2;
           }
 
           // 吸附到网格
           if (props.snapToGrid) {
-            const snapped = snapToGridPosition({ x: left, y: top }, props.gridSize)
-            left = snapped.x
-            top = snapped.y
+            const snapped = snapToGridPosition({ x: left, y: top }, props.gridSize);
+            left = snapped.x;
+            top = snapped.y;
           }
 
           // 确保组件不会被放置到画布之外
           left = Math.max(
             0,
             Math.min(left, props.canvasWidth - (componentDef?.initialSize?.width || 100)),
-          )
+          );
           top = Math.max(
             0,
             Math.min(top, props.canvasHeight - (componentDef?.initialSize?.height || 40)),
-          )
+          );
 
           // 检查放置规则
-          let canAdd = true
-          let targetParentId = undefined
+          let canAdd = true;
+          let targetParentId = null;
+          let message = '';
 
-          // 判断组件类型
-          if (componentDef.type === 'layout') {
-            // 布局组件可以放在画布上或其他布局组件中
-            // 如果有目标容器，检查是否可以放入
+          const componentId = dropData.componentId;
+          const componentType = componentDef.type;
+
+          // 根据组件类型和目标容器进行规则检查
+          if (componentId === 'el-container') {
+            // 容器组件可以放在画布上或其他容器组件中
             if (dropTargetId.value) {
-              const containerComponent = props.components.find((c) => c.id === dropTargetId.value)
+              const containerComponent = props.components.find((c) => c.id === dropTargetId.value);
               if (containerComponent) {
-                const containerDef = getComponentDefinition(containerComponent.componentId)
-                canAdd = !!containerDef?.allowChildren
-                if (canAdd) {
-                  targetParentId = dropTargetId.value
+                if (containerComponent.componentId === 'el-container') {
+                  targetParentId = dropTargetId.value;
+                } else {
+                  canAdd = false;
+                  message = '容器组件只能放置在其他容器组件中';
                 }
               } else {
-                canAdd = false
+                canAdd = false;
               }
             }
-            // 否则可以放在画布上
-          } else if (componentDef.type === 'basic') {
+            // 容器可以直接放在画布上
+          } 
+          else if (componentId === 'el-row') {
+            // 行组件只能放在容器组件中
+            if (!dropTargetId.value) {
+              canAdd = false;
+              message = '行组件必须放置在容器组件中';
+            } else {
+              const containerComponent = props.components.find((c) => c.id === dropTargetId.value);
+              if (containerComponent && containerComponent.componentId === 'el-container') {
+                targetParentId = dropTargetId.value;
+              } else {
+                canAdd = false;
+                message = '行组件只能放置在容器组件中';
+              }
+            }
+          } 
+          else if (componentId === 'el-col') {
+            // 列组件只能放在行组件中
+            if (!dropTargetId.value) {
+              canAdd = false;
+              message = '列组件必须放置在行组件中';
+            } else {
+              const containerComponent = props.components.find((c) => c.id === dropTargetId.value);
+              if (containerComponent && containerComponent.componentId === 'el-row') {
+                targetParentId = dropTargetId.value;
+              } else {
+                canAdd = false;
+                message = '列组件只能放置在行组件中';
+              }
+            }
+          } 
+          else if (componentType === 'basic') {
             // 基础组件必须放在布局组件中
             if (!dropTargetId.value) {
-              canAdd = false
-              ElMessage.warning('基础组件必须放置在布局组件中')
+              canAdd = false;
+              message = '基础组件必须放置在布局组件中';
             } else {
-              const containerComponent = props.components.find((c) => c.id === dropTargetId.value)
+              const containerComponent = props.components.find((c) => c.id === dropTargetId.value);
               if (containerComponent) {
-                const containerDef = getComponentDefinition(containerComponent.componentId)
-                canAdd = containerDef?.type === 'layout' && !!containerDef.allowChildren
+                const containerDef = getComponentDefinition(containerComponent.componentId);
+                canAdd = containerDef?.type === 'layout' && !!containerDef.allowChildren;
                 if (canAdd) {
-                  targetParentId = dropTargetId.value
+                  targetParentId = dropTargetId.value;
+                } else {
+                  message = '基础组件必须放置在布局组件中';
                 }
               } else {
-                canAdd = false
+                canAdd = false;
               }
             }
-          } else if (componentDef.type === 'chart') {
+          } 
+          else if (componentType === 'chart') {
             // 图表组件只能放在容器组件中
             if (!dropTargetId.value) {
-              canAdd = false
-              ElMessage.warning('图表组件必须放置在容器(Container)组件中')
+              canAdd = false;
+              message = '图表组件必须放置在容器(Container)组件中';
             } else {
-              const containerComponent = props.components.find((c) => c.id === dropTargetId.value)
+              const containerComponent = props.components.find((c) => c.id === dropTargetId.value);
               if (containerComponent) {
                 // 只有el-container可以放置图表组件
-                canAdd = containerComponent.componentId === 'el-container'
+                canAdd = containerComponent.componentId === 'el-container';
                 if (!canAdd) {
-                  ElMessage.warning('图表组件只能放置在容器(Container)组件中，不能放在行或列组件中')
+                  message = '图表组件只能放置在容器(Container)组件中，不能放在行或列组件中';
                 } else {
-                  targetParentId = dropTargetId.value
+                  targetParentId = dropTargetId.value;
                 }
               } else {
-                canAdd = false
+                canAdd = false;
               }
             }
           }
 
           // 只有验证通过才添加组件
           if (canAdd) {
-            // 添加组件到画布
-            emit('add-component', dropData.componentId, { left, top }, targetParentId)
+            try {
+              // 添加组件到画布
+              emit('add-component', dropData.componentId, { left, top }, targetParentId);
+            } catch (emitError) {
+              console.error('添加组件到画布失败:', emitError);
+            }
+          } else if (message) {
+            ElMessage.warning(message);
           }
         }
       } catch (error) {
-        console.error('解析拖拽数据失败:', error)
+        console.error('解析拖拽数据失败:', error);
       }
     }
 
     // 重置拖拽状态
-    dropTargetId.value = null
-    validDropTarget.value = false
+    dropTargetId.value = null;
+    validDropTarget.value = false;
 
     // 清除对齐辅助线
-    alignmentGuides.value = []
+    alignmentGuides.value = [];
   } catch (error) {
-    console.error('处理拖拽放置失败:', error)
+    console.error('处理拖拽放置失败:', error);
     // 防止insertBefore错误
-    dropTargetId.value = null
-    validDropTarget.value = false
-    alignmentGuides.value = []
+    dropTargetId.value = null;
+    validDropTarget.value = false;
+    alignmentGuides.value = [];
   }
-}
+};
 
 /**
  * 切换是否显示网格

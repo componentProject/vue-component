@@ -328,13 +328,25 @@ const handleDragStart = (event: DragEvent, component: ComponentDefinition) => {
     ghostElement.textContent = component.name
     ghostElement.style.position = 'absolute'
     ghostElement.style.top = '-9999px'
+    ghostElement.style.padding = '8px'
+    ghostElement.style.background = '#f5f7fa'
+    ghostElement.style.border = '1px solid #dcdfe6'
+    ghostElement.style.borderRadius = '4px'
+    ghostElement.style.zIndex = '9999'
     document.body.appendChild(ghostElement)
-    event.dataTransfer.setDragImage(ghostElement, 0, 0)
+    
+    try {
+      event.dataTransfer.setDragImage(ghostElement, 0, 0)
+    } catch (dragErr) {
+      console.warn('设置拖拽图像失败:', dragErr)
+    }
 
     // 创建一个延时函数移除ghost元素
     setTimeout(() => {
-      document.body.removeChild(ghostElement)
-    }, 0)
+      if (document.body.contains(ghostElement)) {
+        document.body.removeChild(ghostElement)
+      }
+    }, 100)
 
     // 触发事件
     emit('component-drag-start', component)
