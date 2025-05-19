@@ -10,7 +10,7 @@
         <el-input
           v-model="searchText"
           placeholder="搜索组件"
-          prefix-icon="el-icon-search"
+          :prefix-icon="Search"
           clearable
           @input="filterComponents"
         />
@@ -60,6 +60,7 @@
 
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted } from 'vue'
+import { Search } from '@element-plus/icons-vue'
 import { COMPONENT_LIST } from '../constants/components'
 import { ComponentCategory } from '../types'
 import type { Component } from '../types'
