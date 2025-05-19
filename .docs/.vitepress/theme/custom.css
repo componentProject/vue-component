@@ -1,4 +1,4 @@
-@import "../../../node_modules/tailwindcss";
+@import "tailwindcss";
 @import "https://cdn.jsdelivr.net/npm/lxgw-wenkai-lite-webfont@1.6.0/style.min.css";
 
 :root {
@@ -30,8 +30,10 @@
 }
 
 #app {
-    min-height: 100vh;
+    height: 100vh;
     position: relative;
+    display: flex;
+    flex-direction: column;
 }
 
 .theme {
@@ -47,11 +49,6 @@
     display: none !important;
 }
 
-#app {
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-}
 
 .Layout {
     flex: 1;
