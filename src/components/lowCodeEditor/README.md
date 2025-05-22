@@ -1,75 +1,61 @@
-# 低代码编辑器Plus组件
+# Vue低代码编辑器组件
 
-这是一个基于Vue3的低代码编辑器组件，允许用户通过拖拽方式快速构建页面，无需编写代码。
-
-## 功能特点
-
-- **组件面板**：直接展示Element Plus的真实组件和图表组件
-- **拖拽编辑**：支持组件的拖拽放置与组件嵌套
-- **磁吸对齐**：自动对齐功能，使布局更加整齐
-- **属性编辑**：实时调整组件属性并预览效果
-- **JSON导入导出**：保存和恢复页面配置
-
-## 技术栈
-
-- Vue 3 Composition API
-- TypeScript
-- Tailwind CSS
-- Element Plus
-- ECharts 和 AntV/G2
-- Pinia 状态管理
-
-## 组件结构
-
-低代码编辑器由以下主要部分组成：
-
-1. **ComponentPanel**：左侧组件面板，展示可用组件
-2. **ComponentRenderer**：中间编辑区域，用于组件拖拽和布局
-3. **ComponentPropertyPanel**：右侧属性编辑面板，用于调整组件属性
-
-## 使用方法
-
-```vue
-<template>
-  <LowCodeEditor />
-</template>
-
-<script setup>
-import LowCodeEditor from '@/components/lowCodeEditor/index.vue'
-</script>
-```
-
-## 组件交互
-
-### 拖拽组件
-
-从左侧组件面板拖拽组件到中间编辑区域即可添加组件。
-
-### 组件嵌套规则
-
-- el-col组件只能放在el-row中
-- 基础组件和图表组件只能放在布局组件中
-- el-row宽度默认100%
-- el-container宽高默认100%
-
-### 编辑组件属性
-
-点击选中组件后，在右侧属性面板可以编辑组件的属性、样式和事件。
-
-### 保存和导出
-
-支持将页面配置导出为JSON Schema，也可以从JSON Schema导入页面配置。
-
-## 开发者指南
-
-### 添加新组件
-
-要添加新组件，需要在`constants/components.ts`文件中的相应分类数组中添加组件定义。
-
-### 自定义组件规则
-
-在组件定义中的`rules`属性中添加嵌套规则，控制组件的嵌套行为。
-
-### 扩展图表类型
-
-在`constants/components.ts`的`CHART_COMPONENTS`数组中添加新的图表类型，并在`ComponentItem.vue`中添加相应的预览配置。 
+## 项目结构
+每个文件仅存描述注释，其余内容都不要
+src/components/lowCodeEditor/
+ ComponentPanel/             # 左侧组件面板
+    ComponentCategory/      # 组件分类
+    ComponentSearch/        # 组件搜索
+   ─ DraggableComponent/     # 可拖拽组件
+    ComponentPreview/       # 组件预览
+ EditorCanvas/               # 中间编辑区域
+    GridCanvas/             # 网格画布
+    ComponentContainer/     # 组件容器
+    DragHelper/             # 拖拽辅助
+    SelectionManager/       # 选择管理
+    AlignmentGuides/        # 对齐辅助
+    ContextMenu/            # 右键菜单
+    CanvasToolbar/          # 画布工具栏
+ PropertyPanel/              # 右侧属性编辑面板
+    PropertyForm/           # 属性表单
+    StyleEditor/            # 样式编辑器
+    EventEditor/            # 事件编辑器
+    DataBindingPanel/       # 数据绑定面板
+    TemplateManager/        # 模板管理
+ Renderer/                   # 组件渲染器
+    ComponentRenderer/      # 组件渲染核心
+    ContainerRenderer/      # 容器渲染
+    ChartRenderer/          # 图表渲染
+    FormRenderer/           # 表单渲染
+ DataManager/                # 数据管理
+    DataModeler/            # 数据模型设计
+    ApiConfigurator/        # API配置
+    MockDataGenerator/      # Mock数据生成
+    DataTransformer/        # 数据转换
+ types/                      # 类型定义
+    component.ts            # 组件类型
+    schema.ts               # Schema类型
+    editor.ts               # 编辑器类型
+    data.ts                 # 数据类型
+ constants/                  # 常量定义
+ hooks/                      # 自定义hooks
+    useDrag.ts              # 拖拽hook
+    useComponentRenderer.ts # 渲染hook
+    usePropertyEditor.ts    # 属性编辑hook
+    useHistory.ts           # 历史记录hook
+ utils/                      # 工具函数
+    schemaUtils.ts          # Schema工具
+    styleUtils.ts           # 样式工具
+    eventUtils.ts           # 事件工具
+    exportUtils.ts          # 导出工具
+ stores/                      # Pinia状态管理
+    components.ts           # 组件store
+    editor.ts               # 编辑器store
+    history.ts              # 历史记录store
+    data.ts                 # 数据store
+    settings.ts             # 设置store
+ services/                   # 服务
+     renderService.ts        # 渲染服务
+     exportService.ts        # 导出服务
+     importService.ts        # 导入服务
+     historyService.ts       # 历史记录服务
