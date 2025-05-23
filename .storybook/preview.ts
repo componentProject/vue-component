@@ -48,11 +48,6 @@ setup((app) => {
     locale: zhCn,
   })
 
-  app.config.globalProperties.$message = ElMessage
-  app.config.globalProperties.$msgbox = ElMessageBox
-  app.config.globalProperties.$notify = ElNotification
-  app.config.globalProperties.$loading = ElLoading.service
-
   app.use(VxeUI)
   app.use(VxeUITable)
   app.use(stores)
