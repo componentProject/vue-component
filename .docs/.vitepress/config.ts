@@ -54,6 +54,10 @@ async function config(): Promise<Awaited<UserConfig>> {
           dts: path.resolve(__dirname, './typings/components.d.ts'),
         }),
       ],
+      // 添加 SSR 配置，解决 CSS 文件扩展名问题
+      ssr: {
+        noExternal: ['element-plus'],
+      },
       css: {
         postcss: {
           plugins: [

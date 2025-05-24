@@ -15,6 +15,8 @@ import components from '@/components'
 
 import i18n from '@/locales'
 
+import ElementPlus from 'element-plus'
+
 import App from './App.vue'
 
 const app = createApp(App)
@@ -24,5 +26,6 @@ app.use(VxeUITable)
 app.use(VxeUI)
 app.use(components)
 app.use(i18n)
+app.use(ElementPlus)
 
 app.mount('#app')
