@@ -2,12 +2,21 @@
   <div class="category" v-if="headers.length > 0">
     <ul class="list">
       <li class="header" v-for="(item, index) in headers" :key="index">
-        <a :href="item.link" class="header-h2" v-if="item.level === 2">{{ item.title }}</a>
+        <a
+          @click.prevent="scrollTo(item)"
+          :href="item.link"
+          class="header-h2"
+          v-if="item.level === 2"
+          >{{ item.title }}</a
+        >
         <ul v-if="item.level === 3">
           <li class="header">
-            <a :href="item.link" :class="['header-h3', { showIndent: showIndent }]">{{
-              item.title
-            }}</a>
+            <a
+              @click.prevent="scrollTo(item)"
+              :href="item.link"
+              :class="['header-h3', { showIndent: showIndent }]"
+              >{{ item.title }}</a
+            >
           </li>
         </ul>
       </li>
@@ -21,6 +30,18 @@ import { getHeaders } from '../../../../utils/utils'
 
 const headers = shallowRef<any>([])
 const showIndent = ref(false)
+
+function scrollTo(item) {
+  console.log('item', item)
+  const VPContent = document.querySelector('.VPContent')
+  const currentTitle = VPContent?.querySelector(item.link)
+  currentTitle?.scrollIntoView({
+    behavior: 'smooth',
+    block: 'start',
+  })
+  console.log('currentTitle', currentTitle)
+}
+
 onContentUpdated(() => {
   headers.value = getHeaders()
   showIndent.value = headers.value.some((header: any) => {
@@ -57,19 +78,19 @@ ul {
   white-space: nowrap;
 }
 
-@media (min-width: 768px) {
+@media (width >= 768px) {
   .category {
     max-height: 400px;
   }
 }
 
-@media (min-width: 1024px) {
+@media (width >= 1024px) {
   .category {
     max-height: 450px;
   }
 }
 
-@media (min-width: 1400px) {
+@media (width >= 1400px) {
   .category {
     position: fixed;
     right: 20px;
