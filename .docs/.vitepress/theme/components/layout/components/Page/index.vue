@@ -2,8 +2,8 @@
   <FireWorksAnimation />
   <ShareCard />
   <h1 class="blog-title">Blogs</h1>
-  <div class="flex flex-col flex-1-hidden">
-    <div class="blogList flex flex-1-auto">
+  <div class="flex-col flex-1-hidden">
+    <div class="blogList flex flex-col items-center flex-1-auto">
       <a
         class="blog"
         v-for="(item, index) in posts"
@@ -144,10 +144,6 @@ const transDate = (date?: string) => {
 
 .blogList {
   padding: 30px 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
 }
 
 .blog {

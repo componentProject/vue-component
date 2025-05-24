@@ -12,8 +12,9 @@ const { theme } = useData();
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 300px;
+  height: 220px;
 }
+
 .avator {
   border-radius: 50%;
   border: 5px solid var(--vp-avator-border);
@@ -23,10 +24,12 @@ const { theme } = useData();
   from {
     transform: rotate(0);
   }
+
   to {
     transform: rotate(360deg);
   }
 }
+
 .avator:hover {
   animation: 5s linear 0s infinite avator-transform;
 }
