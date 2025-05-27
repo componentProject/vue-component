@@ -13,17 +13,14 @@
     <!-- 使用DraggableTable组件 -->
     <DraggableTable
       ref="draggableTableRef"
-      :tableData="tableData"
+      v-model="tableData"
       :columns="columns"
       :rowDraggable="rowDraggable"
       :columnDraggable="columnDraggable"
       :loading="loading"
       :height="500"
-      :border="true"
       :stripe="true"
-      :showHeader="true"
-      :tableProps="tableProps"
-      @update:tableData="handleDataUpdate"
+      v-bind="tableProps"
       @row-drop="handleRowDrop"
       @column-drop="handleColumnDrop"
     >
@@ -222,12 +219,6 @@ const toggleRowDrag = () => {
 const toggleColumnDrag = () => {
   columnDraggable.value = !columnDraggable.value
   ElMessage.info(`列拖拽已${columnDraggable.value ? '启用' : '禁用'}`)
-}
-
-// 处理数据更新
-const handleDataUpdate = (newData) => {
-  tableData.value = newData
-  console.log('表格数据已更新:', newData)
 }
 
 // 处理行拖拽事件

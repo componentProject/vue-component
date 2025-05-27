@@ -15,7 +15,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, reactive, watch, nextTick, onBeforeUnmount, useSlots } from 'vue'
+import { ref, computed, onMounted, watch, nextTick, onBeforeUnmount, useSlots, useAttrs } from 'vue'
 import Sortable from 'sortablejs'
 import { cloneDeep } from 'lodash'
 import { ElMessage } from 'element-plus'
@@ -27,45 +27,18 @@ const props = defineProps({
     type: String,
     required: true,
   },
-  // 表格数据
-  tableData: {
-    type: Array,
-    default: () => [],
+  border: {
+    type: Boolean,
+    default: true,
+  },
+  resizable: {
+    type: Boolean,
+    default: true,
   },
   // 列配置
   columns: {
     type: Array,
     default: () => [],
-  },
-  // 表格高度
-  height: {
-    type: [String, Number],
-    default: null,
-  },
-  // 是否显示边框
-  border: {
-    type: Boolean,
-    default: true,
-  },
-  // 是否显示斑马纹
-  stripe: {
-    type: Boolean,
-    default: true,
-  },
-  // 是否加载中
-  loading: {
-    type: Boolean,
-    default: false,
-  },
-  // 是否显示表头
-  showHeader: {
-    type: Boolean,
-    default: true,
-  },
-  // 表格配置项
-  tableProps: {
-    type: Object,
-    default: () => ({}),
   },
   // 行拖拽配置
   rowDraggable: {
@@ -78,7 +51,7 @@ const props = defineProps({
     default: false,
   },
 })
-
+const attrs = useAttrs()
 // 组件事件
 const emit = defineEmits(['update:tableData', 'column-drop', 'row-drop'])
 
@@ -204,20 +177,18 @@ const compareColumns = (sourceColumns, targetColumns) => {
     return requiredDiff || defaultDiff
   })
 }
-
+const tableData = defineModel({
+  type: Array,
+  default: [],
+})
 // 计算表格配置属性
 const gridProps = computed(() => {
   return {
-    // 合并用户配置的表格属性
-    ...props.tableProps,
     // 基本配置
-    data: props.tableData,
-    height: props.height,
     border: props.border,
-    stripe: props.stripe,
-    loading: props.loading,
-    showHeader: props.showHeader,
-    resizable: true,
+    resizable: props.resizable,
+    data: tableData.value,
+    ...attrs,
     // 使用计算后的列配置
     columns: localColumns.value,
   }
@@ -265,13 +236,13 @@ const initRowDraggable = () => {
       if (oldIndex === newIndex) return
 
       // 获取源数据副本
-      const tableData = [...props.tableData]
+      const tableDataCopy = [...tableData.value]
       // 移动行数据
-      const rowData = tableData.splice(oldIndex, 1)[0]
-      tableData.splice(newIndex, 0, rowData)
+      const rowData = tableDataCopy.splice(oldIndex, 1)[0]
+      tableDataCopy.splice(newIndex, 0, rowData)
 
       // 更新数据并发送事件
-      emit('update:tableData', tableData)
+      tableData.value = tableDataCopy
       emit('row-drop', { oldIndex, newIndex, row: rowData })
 
       // 更新表格key，强制重新渲染
