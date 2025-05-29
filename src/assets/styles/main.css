@@ -1,4 +1,4 @@
-@import 'tailwindcss';
+@import "tailwind.scss";
 @import './base.css';
 @import './element/index.scss';
 @import "./element/custom.scss";
