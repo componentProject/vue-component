@@ -4,7 +4,6 @@ export default {
   darkMode: ['class'],
   safelist: ['dark'],
   prefix: '',
-
   content: ['./src/components/**/*.{js,jsx,ts,tsx,vue}', './.storybook/**/*.{js,jsx,ts,tsx,vue}'],
 
   theme: {
@@ -16,10 +15,6 @@ export default {
       },
     },
     extend: {
-      padding: {
-        4: '16px',
-        10: '10px',
-      },
       colors: {
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',
