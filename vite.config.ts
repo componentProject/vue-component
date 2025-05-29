@@ -12,12 +12,15 @@ import pluginVue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
 import vueDevTools from 'vite-plugin-vue-devtools'
 import AutoImport from 'unplugin-auto-import/vite'
+import Components from 'unplugin-vue-components/vite'
 import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
 import scopedCssPrefixPlugin from './plugins/addScopedAndReplacePrefix'
 // 其余vite插件
 import { createHtmlPlugin } from 'vite-plugin-html'
-import tailwindcss from '@tailwindcss/vite'
+import autoprefixer from 'autoprefixer'
+import tailwindcss from '@tailwindcss/postcss'
 import path from 'path'
+import type { Plugin } from 'postcss'
 
 /**
  * 将环境变量中的字符串值转换为对应的 JavaScript 数据类型
@@ -91,7 +94,6 @@ export default defineConfig(({ mode }) => {
   return {
     plugins: [
       ...vuePlugins,
-      tailwindcss(),
       createHtmlPlugin({
         inject: {
           data: {
@@ -187,6 +189,13 @@ export default defineConfig(({ mode }) => {
       __SYSTEM_CODE__: JSON.stringify(systemCode),
     },
     css: {
+      postcss: {
+        plugins: [
+          tailwindcss() as Plugin,
+          // 自动添加厂商前缀
+          autoprefixer() as Plugin,
+        ],
+      },
       preprocessorOptions: {
         scss: {
           api: 'modern-compiler',
