@@ -14,9 +14,7 @@ import { useRoute } from 'vue-router'
 const props = defineProps({
   defaultKeepAlive: {
     type: Function,
-    default: () => {
-      return () => true
-    },
+    default: null,
   },
 })
 
@@ -26,15 +24,18 @@ const wrapperMap = new Map()
 const include = ref([])
 const route = useRoute()
 
+function isType(value, type) {
+  return Object.prototype.toString.call(value).slice(8, -1).toLowerCase() === type.toLowerCase()
+}
+
 // 监听路由变化
 watch(
   () => route,
   (route) => {
     // 根据query参数中keepAlive的值或默认值决定是否缓存该路由
-    const shouldCache =
-      route.query.keepAlive !== undefined
-        ? route.query.keepAlive === 'true'
-        : props.defaultKeepAlive?.(route)
+    const shouldCache = isType(props.defaultKeepAlive, 'function')
+      ? props.defaultKeepAlive(route)
+      : route.query.keepAlive === 'true' || route.meta.keepAlive
     const routePath = route.fullPath
 
     // 检查是否已经在缓存列表中
