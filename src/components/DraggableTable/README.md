@@ -46,8 +46,8 @@ app.mount('#app')
     :columnDraggable="true"
     @update:tableData="handleDataUpdate"
     @update:columns="handleColumnsUpdate"
-    @row-drop="handleRowDrop"
-    @column-drop="handleColumnDrop"
+    @row-dragend="handleRowDrop"
+    @column-dragend="handleColumnDrop"
   >
     <!-- 自定义插槽 -->
     <template #操作="{ row }">
@@ -165,8 +165,8 @@ const handleDelete = (row) => {
 | ------ | ---- | ---- |
 | update:tableData | (newData: Array) | 表格数据更新事件 |
 | update:columns | (newColumns: Array) | 列配置更新事件 |
-| row-drop | ({ oldIndex, newIndex, row }) | 行拖拽完成事件 |
-| column-drop | ({ oldIndex, newIndex, column }) | 列拖拽完成事件 |
+| row-dragend | ({ oldIndex, newIndex, row }) | 行拖拽完成事件 |
+| column-dragend | ({ oldIndex, newIndex, column }) | 列拖拽完成事件 |
 
 ## 插槽（Slots）
 

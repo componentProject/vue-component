@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/vue3'
 import { ref, computed } from 'vue'
 import ExportExcel from '@/components/ExportExcel/index.vue'
-import DragTable from '@/components/DragTable/index.vue'
+import DragTable from '@/components/DraggableTable/index.vue'
 
 // 定义元数据
 const meta: Meta<typeof ExportExcel> = {

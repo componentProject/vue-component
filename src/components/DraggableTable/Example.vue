@@ -1,0 +1,634 @@
+<template>
+  <div class="draggable-table-demo">
+    <h2>可拖拽表格演示</h2>
+
+    <el-table
+      @keyup.stop="EnterGo"
+      ref="prescriptionTableRef"
+      row-key="id"
+      :data="form.tableData"
+      @row-contextmenu="showMouseMenu"
+      highlight-current-row
+      @selection-change="handleSelectionChange"
+      :max-height="600"
+    >
+      <el-table-column
+        :disabled="isEdit"
+        type="selection"
+        width="55"
+        align="center"
+        :reserve-selection="true"
+      />
+      <el-table-column prop="orderItemName" label="医嘱内容" width="300" align="center">
+        <template #default="scope">
+          <!-- 检索医嘱编辑状态 -->
+          <div style="display: flex; position: relative">
+            <div
+              v-if="scope.row.place"
+              :class="
+                scope.row.place == 'start'
+                  ? 'startLine'
+                  : scope.row.place == 'end'
+                    ? 'endLines'
+                    : scope.row.place == 'middle'
+                      ? 'line'
+                      : ''
+              "
+            ></div>
+            <el-form-item
+              v-if="scope.row.isEdit"
+              :prop="'tableData.' + scope.$index + '.orderItemName'"
+              :rules="rules.orderItemName"
+              :style="scope.row.place && !scope.row.customFlag ? 'padding-left: 20px' : ''"
+            >
+              <el-input
+                size="mini"
+                :ref="
+                  (el) => {
+                    scope.row.Ref = el
+                  }
+                "
+                @focus="showPop(scope.row)"
+                @input="searchCom"
+                v-model.trim="scope.row.orderItemName"
+                style="width: 270px"
+              />
+            </el-form-item>
+            <template v-else>
+              <div v-if="scope.row.customFlag" :style="scope.row.place ? 'padding-left: 20px' : ''">
+                <span
+                  :style="{
+                    color: shareData.customFlagEnum[scope.row.customFlag].color,
+                  }"
+                >
+                  【{{ shareData.customFlagEnum[scope.row.customFlag].title }}】
+                </span>
+              </div>
+              <div
+                :style="scope.row.place && !scope.row.customFlag ? 'padding-left: 20px' : ''"
+                class="ellipsis-line"
+              >
+                {{ formatterOrderName(scope.row) || '' }}
+              </div>
+            </template>
+          </div>
+        </template>
+      </el-table-column>
+      <el-table-column
+        prop="orderItemSpec"
+        label="规格"
+        align="center"
+        show-overflow-tooltip
+        width="120"
+      >
+        <template #default="scope">
+          <div class="rowText">{{ scope.row.orderItemSpec || '' }}</div>
+        </template>
+      </el-table-column>
+      <el-table-column prop="dosage" label="剂量" align="center" width="80">
+        <template #default="scope">
+          <el-form-item :prop="'tableData.' + scope.$index + '.dosage'" :rules="rules.dosage">
+            <el-input
+              v-model="scope.row.dosage"
+              v-if="(scope.row.isEdit || false) && isEdit"
+            ></el-input>
+            <div v-else style="font-size: 12px" class="rowText">
+              {{ scope.row.dosage || '' }}
+            </div>
+          </el-form-item>
+        </template>
+      </el-table-column>
+      <el-table-column prop="dosageUnitName" label="剂量单位" align="center">
+        <template #default="scope">
+          <el-form-item
+            :prop="'tableData.' + scope.$index + '.dosageUnitName'"
+            :rules="rules.dosageUnitName"
+          >
+            <el-select
+              size="mini"
+              v-if="(scope.row.isEdit || false) && isEdit"
+              v-model="scope.row.dosageUnitName"
+              @change="
+                (e) => {
+                  scope.row.dosageUnitId = scope.row.doseUnitOps.find(
+                    (it) => it.unitName == e,
+                  )?.unitId
+                }
+              "
+              placeholder="请选择"
+            >
+              <el-option
+                v-for="item in scope.row.doseUnitOps"
+                :label="item.unitName"
+                :value="item.unitName"
+                :key="item.unitId"
+              ></el-option>
+            </el-select>
+            <div v-else class="rowText">
+              {{ scope.row.dosageUnitName || '' }}
+            </div>
+          </el-form-item>
+        </template>
+      </el-table-column>
+      <el-table-column
+        label="频次"
+        align="center"
+        prop="frequencyName"
+        width="100"
+        show-overflow-tooltip
+      >
+        <template #default="scope">
+          <el-form-item
+            :prop="'tableData.' + scope.$index + '.frequencyId'"
+            :rules="rules.frequencyId"
+          >
+            <el-select
+              clearable
+              filterable
+              remote
+              @change="
+                (e) => {
+                  scope.row.frequencyName = allArr.frequencyOptions.find((it) => it.id == e)?.name
+                }
+              "
+              :remote-method="
+                (e) => {
+                  getFrequencyDict(e)
+                }
+              "
+              size="mini"
+              v-if="(scope.row.isEdit || false) && isEdit"
+              v-model="scope.row.frequencyId"
+              placeholder="请选择"
+            >
+              <el-option
+                v-for="item in allArr.frequencyOptions"
+                :label="item.name"
+                :value="item.id"
+                :key="item.id"
+              ></el-option>
+            </el-select>
+            <div v-else class="rowText">
+              {{ scope.row.frequencyName || '' }}
+            </div>
+          </el-form-item>
+        </template>
+      </el-table-column>
+      <el-table-column prop="usageName" label="用法" align="center" show-overflow-tooltip>
+        <template #default="scope">
+          <el-form-item :prop="'tableData.' + scope.$index + '.usageId'" :rules="rules.usageId">
+            <el-select
+              clearable
+              filterable
+              remote
+              :remote-method="
+                (e) => {
+                  getUsageDict(e)
+                }
+              "
+              size="mini"
+              v-if="(scope.row.isEdit || false) && isEdit"
+              v-model="scope.row.usageId"
+              @change="
+                (e) => {
+                  scope.row.usageName = allArr.useOptions.find((it) => it.id == e)?.name
+                }
+              "
+              placeholder="请选择"
+            >
+              <el-option
+                v-for="item in allArr.useOptions"
+                :label="item.name"
+                :value="item.id"
+                :key="item.id"
+              ></el-option>
+            </el-select>
+            <div v-else class="rowText">
+              {{ scope.row.usageName || '' }}
+            </div>
+          </el-form-item>
+        </template>
+      </el-table-column>
+      <el-table-column prop="days" label="天数" align="center" width="80">
+        <template #default="scope">
+          <el-form-item :prop="'tableData.' + scope.$index + '.days'" :rules="rules.days">
+            <el-input
+              size="mini"
+              class="inp-short"
+              v-if="(scope.row.isEdit || false) && isEdit"
+              v-model="scope.row.days"
+            ></el-input>
+            <div v-else>
+              {{ scope.row.days || '' }}
+            </div>
+          </el-form-item>
+        </template>
+      </el-table-column>
+
+      <el-table-column prop="price" label="单价" align="center" width="80"></el-table-column>
+      <el-table-column prop="num" label="数量" align="center" width="80">
+        <template #default="scope">
+          <el-form-item :prop="'tableData.' + scope.$index + '.num'" :rules="rules.num">
+            <el-input
+              size="mini"
+              class="inp-short"
+              v-if="(scope.row.isEdit || false) && isEdit"
+              v-model="scope.row.num"
+            ></el-input>
+            <div v-else class="rowText">
+              {{ scope.row.num || '' }}
+            </div>
+          </el-form-item>
+        </template>
+      </el-table-column>
+      <el-table-column prop="unitName" label="单位" align="center" show-overflow-tooltip>
+        <template #default="scope">
+          <el-form-item :prop="'tableData.' + scope.$index + '.unitName'" :rules="rules.unitName">
+            <el-select
+              size="mini"
+              clearable
+              v-if="(scope.row.isEdit || false) && isEdit"
+              v-model="scope.row.unitName"
+              @change="
+                (e) => {
+                  scope.row.unitId = scope.row.numUnitOps.find((it) => it.unitName == e)?.unitId
+                }
+              "
+              placeholder="请选择"
+            >
+              <el-option
+                v-for="item in scope.row.numUnitOps"
+                :label="item.unitName"
+                :value="item.unitName"
+                :key="item.unitId"
+              ></el-option>
+            </el-select>
+            <div v-else class="rowText">
+              {{ scope.row.unitName }}
+            </div>
+          </el-form-item>
+        </template>
+      </el-table-column>
+      <el-table-column prop="money" label="金额" align="center" width="80"></el-table-column>
+      <el-table-column prop="orderItemType" label="医嘱类型" align="center">
+        <template #default="scope">
+          <div class="rowText">
+            {{ shareData.orderTypeEnum[Number(scope.row.orderItemType)] || '' }}
+          </div>
+        </template>
+      </el-table-column>
+      <el-table-column prop="execDeptId" label="执行科室" align="center" show-overflow-tooltip>
+        <template #default="scope">
+          <el-select
+            size="mini"
+            v-if="(scope.row.isEdit || false) && isEdit"
+            v-model="scope.row.execDeptId"
+            @change="selectExecDept"
+            placeholder="请选择"
+          >
+            <el-option
+              v-for="item in scope.row.execDeptLOptions"
+              :label="item.execDeptName"
+              :value="item.execDeptId"
+              :key="item.execDeptId"
+            ></el-option>
+          </el-select>
+          <div v-else class="rowText">
+            {{ scope.row.execDeptName }}
+          </div>
+        </template>
+      </el-table-column>
+      <el-table-column prop="exhortation" label="嘱托" align="center" show-overflow-tooltip>
+        <template #default="scope">
+          <el-form-item prop="exhortation">
+            <el-select
+              size="mini"
+              v-if="(scope.row.isEdit || false) && isEdit"
+              v-model="scope.row.exhortation"
+              clearable
+              @focus="getExhortaOptions"
+              placeholder="请选择"
+            >
+              <el-option
+                v-for="item in allArr.exhortaOptions"
+                :label="item.name"
+                :value="item.name"
+                :key="item.id"
+              ></el-option>
+            </el-select>
+            <div v-else class="rowText">
+              {{ scope.row.exhortation }}
+            </div>
+          </el-form-item>
+        </template>
+      </el-table-column>
+      <el-table-column label="操作" width="100" align="center" v-if="!isFromDialog">
+        <template #default="scope">
+          <el-button type="text" :disabled="!isEdit" @click="handleRowEdit(scope.row)">
+            <span class="icon-bianjitubiao"></span>
+            编辑
+          </el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+    <div class="demo-actions">
+      <el-button @click="addRow">添加行</el-button>
+      <el-button @click="toggleRowDrag">{{ rowDraggable ? '禁用行拖拽' : '启用行拖拽' }}</el-button>
+      <el-button @click="toggleColumnDrag">{{
+        columnDraggable ? '禁用列拖拽' : '启用列拖拽'
+      }}</el-button>
+    </div>
+
+    <!-- 使用DraggableTable组件 -->
+    <DraggableTable
+      ref="draggableTableRef"
+      v-model="tableData"
+      :columns="columns"
+      :rowDraggableHandle="handleRowDraggable"
+      :rowDraggable="rowDraggable"
+      :columnDraggable="columnDraggable"
+      :loading="loading"
+      :height="500"
+      :border="true"
+      :stripe="true"
+      :showHeader="true"
+      :tableProps="tableProps"
+      @row-dragend="handleRowDrop"
+      @column-dragend="handleColumnDrop"
+    >
+      <!-- 自定义操作列插槽 -->
+      <template #aaa="{ row }">
+        <el-button type="primary" size="small" @click="handleEdit(row)">编辑</el-button>
+        <el-button type="danger" size="small" @click="handleDelete(row)">删除</el-button>
+      </template>
+    </DraggableTable>
+  </div>
+</template>
+
+<script setup>
+import { ref, reactive, onMounted } from 'vue'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import DraggableTable from './index.vue'
+import shareData from '@/utils/shareVar.js'
+
+// 表格加载状态
+const loading = ref(false)
+
+// 拖拽开关状态
+const rowDraggable = ref(true)
+const columnDraggable = ref(true)
+
+// 表格引用
+const draggableTableRef = ref(null)
+
+// 表格基础配置
+const tableProps = reactive({
+  showOverflow: true,
+  highlightHoverRow: true,
+  highlightCurrentRow: true,
+  showHeaderOverflow: true,
+  size: 'medium',
+  resizable: true,
+  // VXE表格的配置项
+  editConfig: {
+    trigger: 'click',
+    mode: 'cell',
+    showStatus: true,
+  },
+  // 设置序号和复选框
+  seq: { width: 60 },
+  checkbox: { width: 50 },
+})
+
+// 表格数据
+const tableData = ref([
+  {
+    id: 1,
+    name: '张三',
+    age: 28,
+    address: '北京市朝阳区',
+    phone: '13800000001',
+    email: 'zhangsan@example.com',
+    status: 1,
+    createTime: '2023-01-01',
+  },
+  {
+    id: 2,
+    name: '李四',
+    age: 32,
+    address: '上海市浦东新区',
+    phone: '13800000002',
+    email: 'lisi@example.com',
+    status: 2,
+    createTime: '2023-01-02',
+  },
+  {
+    id: 3,
+    name: '王五',
+    age: 45,
+    address: '广州市天河区',
+    phone: '13800000003',
+    email: 'wangwu@example.com',
+    status: 3,
+    createTime: '2023-01-03',
+  },
+  {
+    id: 4,
+    name: '赵六',
+    age: 36,
+    address: '深圳市南山区',
+    phone: '13800000004',
+    email: 'zhaoliu@example.com',
+    status: 1,
+    createTime: '2023-01-04',
+  },
+  {
+    id: 5,
+    name: '孙七',
+    age: 29,
+    address: '杭州市西湖区',
+    phone: '13800000005',
+    email: 'sunqi@example.com',
+    status: 2,
+    createTime: '2023-01-05',
+  },
+])
+function handleRowDraggable(oldRow, newRow) {
+  console.log(oldRow, newRow)
+  return true
+}
+// 列配置
+const columns = ref([
+  {
+    field: 'id',
+    title: 'ID',
+    width: '120px',
+    sortable: true,
+    fixed: 'left',
+  },
+  {
+    field: 'name',
+    title: '姓名',
+    width: 120,
+    sortable: true,
+    fixed: 'left',
+  },
+  {
+    field: 'age',
+    title: '年龄',
+    width: 100,
+    sortable: true,
+  },
+  {
+    field: 'address',
+    title: '地址',
+    minWidth: 200,
+  },
+  {
+    field: 'phone',
+    title: '电话',
+    width: 150,
+  },
+  {
+    field: 'email',
+    title: '邮箱',
+    minWidth: 200,
+  },
+  {
+    field: 'status',
+    title: '状态',
+    width: 100,
+  },
+  {
+    field: 'createTime',
+    title: '创建时间',
+    width: 150,
+    sortable: true,
+  },
+  {
+    field: 'operation',
+    title: '操作',
+    width: 150,
+    fixed: 'right',
+    slots: {
+      default: 'aaa',
+    },
+  },
+])
+
+// 组件挂载时的初始化
+onMounted(() => {
+  // 模拟加载数据过程
+  loading.value = true
+  setTimeout(() => {
+    loading.value = false
+  }, 800)
+})
+
+// 添加新行
+const addRow = () => {
+  const newId =
+    tableData.value.length > 0 ? Math.max(...tableData.value.map((item) => item.id)) + 1 : 1
+
+  const newRow = {
+    id: newId,
+    name: `新用户${newId}`,
+    age: Math.floor(Math.random() * 40) + 20,
+    address: '待填写',
+    phone: '13800000000',
+    email: `user${newId}@example.com`,
+    status: Math.floor(Math.random() * 3) + 1,
+    createTime: new Date().toISOString().split('T')[0],
+  }
+
+  tableData.value.push(newRow)
+  ElMessage.success('已添加新行')
+}
+
+// 切换行拖拽
+const toggleRowDrag = () => {
+  rowDraggable.value = !rowDraggable.value
+  ElMessage.info(`行拖拽已${rowDraggable.value ? '启用' : '禁用'}`)
+}
+
+// 切换列拖拽
+const toggleColumnDrag = () => {
+  columnDraggable.value = !columnDraggable.value
+  ElMessage.info(`列拖拽已${columnDraggable.value ? '启用' : '禁用'}`)
+}
+
+// 处理行拖拽事件
+const handleRowDrop = ({ oldIndex, newIndex, row }) => {
+  console.log('行拖拽完成:', { oldIndex, newIndex, row })
+  ElMessage.success(`行已从第${oldIndex + 1}行移动到第${newIndex + 1}行`)
+}
+
+// 处理列拖拽事件
+const handleColumnDrop = ({ oldIndex, newIndex }) => {
+  console.log('列拖拽完成:', { oldIndex, newIndex })
+  ElMessage.success(`列已从第${oldIndex + 1}列移动到第${newIndex + 1}列`)
+}
+
+// 编辑行
+const handleEdit = (row) => {
+  ElMessageBox.alert(`正在编辑: ${row.name}`, '编辑', {
+    confirmButtonText: '确定',
+  })
+}
+
+// 删除行
+const handleDelete = (row) => {
+  ElMessageBox.confirm(`确定要删除 ${row.name} 吗?`, '警告', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'warning',
+  })
+    .then(() => {
+      tableData.value = tableData.value.filter((item) => item.id !== row.id)
+      ElMessage.success('删除成功')
+    })
+    .catch(() => {
+      ElMessage.info('已取消删除')
+    })
+}
+
+// 获取状态标签类型
+const getStatusType = (status) => {
+  const types = {
+    1: 'success',
+    2: 'warning',
+    3: 'danger',
+  }
+  return types[status] || 'info'
+}
+
+// 获取状态文本
+const getStatusText = (status) => {
+  const texts = {
+    1: '正常',
+    2: '警告',
+    3: '异常',
+  }
+  return texts[status] || '未知'
+}
+</script>
+
+<style scoped>
+.draggable-table-demo {
+  padding: 20px;
+  background-color: #f5f7fa;
+  border-radius: 4px;
+}
+
+.demo-actions {
+  margin-bottom: 20px;
+  display: flex;
+  gap: 10px;
+}
+
+h2 {
+  margin-top: 0;
+  margin-bottom: 20px;
+  color: #303133;
+}
+</style>

@@ -49,10 +49,11 @@ async function config(): Promise<Awaited<UserConfig>> {
           resolvers: [ElementPlusResolver()],
           dts: path.resolve(__dirname, './typings/auto-imports.d.ts'),
         }),
-        Components({
-          resolvers: [ElementPlusResolver()],
-          dts: path.resolve(__dirname, './typings/components.d.ts'),
-        }),
+        // 与自定义element组件冲突
+        // Components({
+        //   resolvers: [ElementPlusResolver()],
+        //   dts: path.resolve(__dirname, './typings/components.d.ts'),
+        // }),
       ],
       // 添加 SSR 配置，解决 CSS 文件扩展名问题
       ssr: {

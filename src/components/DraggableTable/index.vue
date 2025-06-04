@@ -1,11 +1,18 @@
 <template>
   <div class="draggable-table">
+    <!--  :key="tableKey"  -->
     <vxe-grid
       ref="xTable"
       v-bind="gridProps"
-      :key="tableKey"
+      @column-dragend="columnDragEnd"
       @resizable-change="handleColumnResizableChange"
     >
+      <!--      <template #empty>-->
+      <!--        <span style="color: red;">-->
+      <!--          <img src="https://vxeui.com/resource/img/546.gif">-->
+      <!--          <p>不用再看了，没有更多数据了！</p>-->
+      <!--        </span>-->
+      <!--      </template>-->
       <!-- 使用插槽方式渲染自定义内容 -->
       <template #[name]="slotParams" v-for="(_, name) in slots" :key="name">
         <slot :name="name" v-bind="slotParams" />
@@ -15,10 +22,14 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch, nextTick, onBeforeUnmount, useSlots, useAttrs } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, useAttrs, useSlots, watch } from 'vue'
 import Sortable from 'sortablejs'
 import { cloneDeep } from 'lodash'
 import { ElMessage } from 'element-plus'
+
+function columnDragEnd(params) {
+  console.log('params', params)
+}
 
 // 定义组件属性
 const props = defineProps({
@@ -35,25 +46,131 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
-  // 列配置
-  columns: {
-    type: Array,
-    default: () => [],
+  autoResize: {
+    type: Boolean,
+    default: true,
   },
-  // 行拖拽配置
+  resizableConfig: {
+    type: Object,
+    default: () => ({}),
+  },
+  dragType: {
+    type: String,
+    // default: () => 'vxe'
+    default: () => 'default',
+  },
+  //#region 行相关配置
+  /**
+   * 行的唯一标识字段
+   * @default '_X_ROW_KEY'
+   */
+  rowId: {
+    type: [String, Number],
+    default: () => '_X_ROW_KEY',
+  },
+  /**
+   * 行配置对象
+   * @default {}
+   */
+  rowConfig: {
+    type: Object,
+    default: () => ({}),
+  },
+  rowDisabledClass: {
+    type: String,
+    default: () => '',
+  },
+  /**
+   * 行拖拽禁用方法
+   */
+  rowDragDisabledMethod: {
+    type: Function,
+  },
+  /**
+   * 行拖拽结束回调方法
+   */
+  rowDragEndMethod: {
+    type: Function,
+  },
+  /**
+   * 行拖拽配置对象
+   * @default {}
+   */
+  rowDragConfig: {
+    type: Object,
+    default: () => ({}),
+  },
+  /**
+   * 是否启用行拖拽
+   * @default false
+   */
   rowDraggable: {
     type: Boolean,
     default: false,
   },
-  // 列拖拽配置
+  //#endregion
+  //#region 列相关配置
+  /**
+   * 列配置数组
+   * @default []
+   */
+  columns: {
+    type: Array,
+    default: () => [],
+  },
+  /**
+   * 列配置对象
+   * @type {Object}
+   * @default {}
+   */
+  columnConfig: {
+    type: Object,
+    default: () => ({}),
+  },
+  /**
+   * 列拖拽禁用方法
+   */
+  columnDragDisabledMethod: {
+    type: Function,
+  },
+  /**
+   * 列拖拽结束回调方法
+   */
+  columnDragEndMethod: {
+    type: Function,
+  },
+  /**
+   * 列拖拽配置对象
+   * @type {Object}
+   * @default {}
+   */
+  columnDragConfig: {
+    type: Object,
+    default: () => ({}),
+  },
+  /**
+   * 是否启用列拖拽
+   * @default false
+   */
   columnDraggable: {
     type: Boolean,
     default: false,
   },
+  //#endregion
+  //#region 虚拟列表配置
+  virtualXConfig: {
+    type: Object,
+    default: () => ({}),
+  },
+  virtualYConfig: {
+    type: Object,
+    default: () => ({}),
+  },
+  //#endregion
 })
 const attrs = useAttrs()
 // 组件事件
-const emit = defineEmits(['update:tableData', 'column-drop', 'row-drop'])
+const emit = defineEmits(['update:tableData', 'column-dragend', 'row-dragend', 'resizable-change'])
 
 // 表格引用
 const xTable = ref(null)
@@ -94,6 +211,7 @@ const saveColumnsToStorage = () => {
     const columns = fullColumn
       .map((item) => {
         const {
+          type,
           fixed,
           sortable,
           align,
@@ -106,8 +224,9 @@ const saveColumnsToStorage = () => {
           resizeWidth,
           slots,
         } = item
-        console.log('resizeWidth || width', resizeWidth, width)
+        // console.log('resizeWidth || width', resizeWidth, width, type)
         return {
+          type,
           fixed,
           sortable,
           align,
@@ -120,11 +239,29 @@ const saveColumnsToStorage = () => {
           slots,
         }
       })
-      .filter((item) => item.title)
+      .filter((item) => item.title || item.type)
     localStorage.setItem(getStorageKey(), JSON.stringify(columns))
   } catch (error) {
     console.error('保存列配置到本地存储失败:', error)
   }
+}
+
+// 没有本地存储的列配置，使用props.columns
+function savePropsColumns() {
+  const types = new Set([])
+  localColumns.value = cloneDeep(props.columns).filter((i) => {
+    if (i.type && types.has(i.type)) {
+      return false
+    }
+    types.add(i.type)
+    return true
+  })
+  // 等表格实例加载后再保存配置
+  nextTick(() => {
+    if (xTable.value) {
+      saveColumnsToStorage()
+    }
+  })
 }
 
 // 初始化本地列配置
@@ -135,45 +272,54 @@ const initLocalColumns = () => {
     // 对比本地存储的列配置和props.columns
     // 检查每列的field, title, fixed, sortable是否变化
     const shouldUseStored = compareColumns(props.columns, storedColumns)
-    console.log('shouldUseStored', shouldUseStored, storedColumns)
+    // console.log('shouldUseStored', shouldUseStored, storedColumns)
     if (shouldUseStored) {
-      localColumns.value = cloneDeep(props.columns)
-      nextTick(() => {
-        if (xTable.value) {
-          saveColumnsToStorage()
-        }
-      })
+      savePropsColumns()
     } else {
       // 使用props.columns并保存到本地
       localColumns.value = storedColumns
-      xTable.value.loadColumn(localColumns.value)
-      console.log('localColumns', localColumns.value)
+      xTable.value?.loadColumn(localColumns.value)
+      // console.log('localColumns', localColumns.value)
     }
   } else {
-    // 没有本地存储的列配置，使用props.columns
-    localColumns.value = cloneDeep(props.columns)
-    // 等表格实例加载后再保存配置
-    nextTick(() => {
-      if (xTable.value) {
-        console.log('initLocalColumns2')
-        saveColumnsToStorage()
-      }
-    })
+    savePropsColumns()
   }
+}
+
+function getType(obj, type) {
+  if (type) {
+    return Object.prototype.toString.call(obj).slice(8, -1).toLowerCase() === type.toLowerCase()
+  } else {
+    return Object.prototype.toString.call(obj).slice(8, -1).toLowerCase()
+  }
+}
+
+function getStringObj(obj) {
+  if (getType(obj, 'object')) {
+    return JSON.stringify(obj)
+  }
+  return obj
 }
 
 // 对比columns是否一致（基于field, title, fixed, sortable字段）
 const compareColumns = (sourceColumns, targetColumns) => {
-  const requiredFields = ['title', 'field', 'sortable', 'align', 'slots']
+  // console.log('sourceColumns', [...sourceColumns], [...targetColumns])
+  const requiredFields = ['title', 'field', 'sortable', 'align', 'slots', 'fixed', 'type']
   const requiredAndDefaultFields = ['visible']
   return sourceColumns.some((source) => {
     const target = targetColumns.find((item) => item.field == source.field)
-    if (!target) return true
+    if (!target) {
+      // console.log('requiredDiff', source)
+      return true
+    }
     const defaultDiff = requiredAndDefaultFields.some((field) => {
       const sourceField = source[field] === undefined ? true : source[field]
       return target[field] != sourceField
     })
-    const requiredDiff = requiredFields.some((field) => target[field] != source[field])
+    const requiredDiff = requiredFields.some((field) => {
+      return getStringObj(target[field]) != getStringObj(source[field])
+    })
+    // console.log('requiredDiff', requiredDiff, defaultDiff, target)
     return requiredDiff || defaultDiff
   })
 }
@@ -187,7 +333,64 @@ const gridProps = computed(() => {
     // 基本配置
     border: props.border,
     resizable: props.resizable,
+    autoResize: props.autoResize,
     data: tableData.value,
+    height: '100%',
+    rowConfig: {
+      useKey: true,
+      drag: props.dragType == 'vxe' && props.rowDraggable,
+      keyField: props.rowId,
+      isCurrent: true,
+      isHover: true,
+      ...props.rowConfig,
+    },
+    rowDragConfig: {
+      showGuidesStatus: true,
+      showIcon: false,
+      trigger: 'row',
+      dragEndMethod: props.rowDragEndMethod,
+      disabledMethod(params) {
+        const currentRowDom = xTable.value?.$el.querySelector(`tr[rowid="${params.rowid}"]`)
+        return (
+          props.rowDragDisabledMethod?.(params) ||
+          [...(currentRowDom?.classList.values() || [])].includes(getClass(props.rowDisabledClass))
+        )
+      },
+      ...props.rowDragConfig,
+    },
+    columnConfig: {
+      useKey: true,
+      drag: props.dragType == 'vxe' && props.columnDraggable,
+      dragEndMethod: (params) => {
+        saveColumnsToStorage()
+        props.columnDragEndMethod?.(params)
+      },
+      ...props.columnConfig,
+    },
+    columnDragConfig: {
+      isCrossDrag: true,
+      showGuidesStatus: true,
+      showIcon: false,
+      trigger: 'cell',
+      disabledMethod(params) {
+        return props.columnDragDisabledMethod?.(params)
+      },
+      ...props.columnDragConfig,
+    },
+    resizableConfig: {
+      minWidth: 50,
+      ...props.resizableConfig,
+    },
+    virtualXConfig: {
+      enabled: true,
+      gt: 20,
+      ...props.virtualXConfig,
+    },
+    virtualYConfig: {
+      enabled: true,
+      gt: 60,
+      ...props.virtualYConfig,
+    },
     ...attrs,
     // 使用计算后的列配置
     columns: localColumns.value,
@@ -198,6 +401,7 @@ const gridProps = computed(() => {
 const handleColumnResizableChange = () => {
   // 保存到本地存储
   saveColumnsToStorage()
+  emit('resizable-change')
 }
 
 // 销毁行拖拽实例
@@ -218,6 +422,14 @@ const destroyColumnSortable = () => {
   }
 }
 
+function getClass(className, hasPrefix) {
+  if (className.startsWith('.')) {
+    return hasPrefix ? className : className.slice(1)
+  } else {
+    return hasPrefix ? `.${className}` : className
+  }
+}
+
 // 初始化行拖拽
 const initRowDraggable = () => {
   // 先销毁旧实例
@@ -232,18 +444,51 @@ const initRowDraggable = () => {
   rowSortableInstance.value = Sortable.create(tableBody, {
     animation: 150,
     handle: 'tr',
-    onEnd: ({ oldIndex, newIndex }) => {
+    filter: getClass(props.rowDisabledClass, true),
+    onEnd: ({ oldIndex, newIndex, item }) => {
       if (oldIndex === newIndex) return
-
       // 获取源数据副本
       const tableDataCopy = [...tableData.value]
       // 移动行数据
       const rowData = tableDataCopy.splice(oldIndex, 1)[0]
       tableDataCopy.splice(newIndex, 0, rowData)
-
+      const dragPos = oldIndex > newIndex ? 'top' : 'bottom'
+      const flag = props.rowDragEndMethod?.({
+        oldIndex,
+        newIndex,
+        newRow: tableDataCopy[oldIndex],
+        oldRow: tableDataCopy[newIndex],
+        dragRow: rowData,
+        dragPos,
+        dragToChild: false,
+      })
+      if (flag) {
+        // 更新表格key，强制重新渲染
+        const wrapperElem = item.parentNode
+        const nodeList = [...wrapperElem.childNodes]
+        console.log('aa', wrapperElem, nodeList, newIndex, oldIndex)
+        if (dragPos == 'top') {
+          wrapperElem.insertBefore(nodeList[newIndex], nodeList[oldIndex + 1])
+        } else {
+          wrapperElem.insertBefore(nodeList[newIndex], nodeList[oldIndex])
+        }
+        // tableKey.value ++
+        return
+      }
       // 更新数据并发送事件
       tableData.value = tableDataCopy
-      emit('row-drop', { oldIndex, newIndex, row: rowData })
+
+      // 构造vxe格式的事件参数
+      const eventParams = {
+        $event: item,
+        type: 'dragend',
+        row: rowData,
+        targetRow: tableDataCopy[newIndex === tableDataCopy.length ? newIndex - 1 : newIndex + 1],
+        insertType: oldIndex > newIndex ? 'before' : 'after',
+        offsetIndex: Math.abs(newIndex - oldIndex),
+        _index: { newIndex, oldIndex },
+      }
+      emit('row-dragend', eventParams)
 
       // 更新表格key，强制重新渲染
       tableKey.value++
@@ -299,11 +544,38 @@ const initColumnDraggable = () => {
       // 将修改后的列配置保存到本地
       localColumns.value = fullColumn
 
+      // 构造vxe格式的事件参数
+      const dragColumn = tableColumn[oldIndex]
+      const oldColumn = tableColumn[oldIndex]
+      const dragPos = newIndex > oldIndex ? 'right' : 'left'
+      const dragToChild = false
+
       xTable.value.loadColumn(fullColumn)
-      emit('column-drop', { oldIndex, newIndex })
+
+      const eventParams = {
+        $event: item,
+        type: 'dragend',
+        dragColumn,
+        dragPos,
+        dragToChild,
+        newColumn: tableColumn[newIndex],
+        offsetIndex: Math.abs(newIndex - oldIndex),
+        oldColumn,
+        _index: { newIndex, oldIndex },
+      }
+
+      // 发送与vxe格式相同的事件参数
+      emit('column-dragend', eventParams)
+      // 调用用户自定义的拖拽结束方法
+      props.columnDragEndMethod?.({
+        newColumn: tableColumn[newIndex],
+        oldColumn: tableColumn[oldIndex],
+        dragColumn,
+        dragPos,
+        dragToChild,
+      })
 
       // 表格key更新后，需要在DOM更新后重新初始化拖拽
-      console.log('drag cloumn')
       saveColumnsToStorage()
       tableKey.value++
     },
@@ -318,6 +590,7 @@ watch(
   () => {
     // 当表格key变化时，需要等待DOM更新后重新初始化拖拽
     nextTick(() => {
+      if (props.dragType !== 'default') return
       if (props.rowDraggable) {
         initRowDraggable()
       }
@@ -358,7 +631,7 @@ onMounted(() => {
   if (props.columns.length > 0) {
     initLocalColumns()
   }
-
+  if (props.dragType !== 'default') return
   if (props.rowDraggable) {
     // 行拖拽需要等待表格渲染完成
     setTimeout(() => {
@@ -384,6 +657,7 @@ onBeforeUnmount(() => {
 watch(
   () => props.rowDraggable,
   (newVal) => {
+    if (props.dragType !== 'default') return
     if (newVal) {
       setTimeout(() => {
         initRowDraggable()
@@ -397,6 +671,7 @@ watch(
 watch(
   () => props.columnDraggable,
   (newVal) => {
+    if (props.dragType !== 'default') return
     if (newVal) {
       setTimeout(() => {
         initColumnDraggable()
@@ -430,5 +705,6 @@ defineExpose({
 <style scoped>
 .draggable-table {
   width: 100%;
+  height: 100%;
 }
 </style>

@@ -45,7 +45,6 @@ export default defineConfigWithVueTs(
     '**/LICENSE*',
     '**/__snapshots__/**',
     '**/auto-import?(s).d.ts',
-    '**/components.d.ts',
   ]),
 
   pluginVue.configs['flat/essential'],
