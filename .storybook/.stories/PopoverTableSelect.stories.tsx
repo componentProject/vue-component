@@ -4,7 +4,7 @@ import { ref } from 'vue'
 import { ElInput } from 'element-plus'
 
 const meta: Meta<typeof PopoverTableSelect> = {
-  title: 'Components/PopoverTableSelect',
+  title: 'PopoverTableSelect',
   component: PopoverTableSelect,
   tags: ['autodocs'],
   argTypes: {
