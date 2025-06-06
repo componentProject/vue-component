@@ -306,80 +306,78 @@ export default defineComponent({
         >
           {slots.default
             ? slots.default()
-            : [
-                ...(props.rows || []).map((row: rowConfig) => {
-                  //代表这一行隐藏
-                  if (
-                    row.hidden &&
-                    typeof row.hidden === 'function' &&
-                    row.hidden(props.formOptions?.model)
-                  ) {
-                    return <span />
-                  }
-                  //代表这一行自定义渲染
-                  if (row.render) {
-                    return row.render()
-                  }
-                  // 根据formItems配置项渲染
-                  const { formItems, ...rowProps } = row
-                  const _formItems: FormItemConfig[] = (formItems || []).map((i) => ({
-                    ...i,
-                    render: () => i.render?.(props.formOptions?.model),
-                  }))
+            : (props.rows || []).map((row: rowConfig) => {
+                //代表这一行隐藏
+                if (
+                  row.hidden &&
+                  typeof row.hidden === 'function' &&
+                  row.hidden(props.formOptions?.model)
+                ) {
+                  return <span />
+                }
+                //代表这一行自定义渲染
+                if (row.render) {
+                  return row.render()
+                }
+                // 根据formItems配置项渲染
+                const { formItems, ...rowProps } = row
+                const _formItems: FormItemConfig[] = (formItems || []).map((i) => ({
+                  ...i,
+                  render: () => i.render?.(props.formOptions?.model),
+                }))
 
-                  return (
-                    <el-row {...rowProps}>
-                      {_formItems.map((formItem: FormItemConfig) => {
-                        const {
-                          render,
-                          renderSlot,
-                          colConfig,
+                return (
+                  <el-row {...rowProps}>
+                    {_formItems.map((formItem: FormItemConfig) => {
+                      const {
+                        render,
+                        renderSlot,
+                        colConfig,
+                        type,
+                        config,
+                        renderLabel,
+                        ...formItemProps
+                      } = formItem
+
+                      // 传递render函数使用jsx渲染
+                      let component = render?.()
+
+                      // 传递type使用内置组件
+                      if (type) {
+                        const { _component } = getComponent(
                           type,
                           config,
-                          renderLabel,
-                          ...formItemProps
-                        } = formItem
-
-                        // 传递render函数使用jsx渲染
-                        let component = render?.()
-
-                        // 传递type使用内置组件
-                        if (type) {
-                          const { _component } = getComponent(
-                            type,
-                            config,
-                            formItemProps.prop,
-                            props.formOptions?.model,
-                          )
-                          component = _component
-                        }
-
-                        // 传递renderSlot 使用自定义插槽
-                        else if (renderSlot && slots[renderSlot]) {
-                          component = slots[renderSlot]({
-                            model: props.formOptions?.model,
-                            formItem,
-                            cellValue: props.formOptions?.model?.[formItemProps.prop!],
-                          })
-                        }
-
-                        return (
-                          <el-col {...colConfig}>
-                            <el-form-item
-                              {...formItemProps}
-                              v-slots={{
-                                label: renderLabel ? (scope: any) => renderLabel(scope) : undefined,
-                              }}
-                            >
-                              {component}
-                            </el-form-item>
-                          </el-col>
+                          formItemProps.prop,
+                          props.formOptions?.model,
                         )
-                      })}
-                    </el-row>
-                  )
-                }),
-              ]}
+                        component = _component
+                      }
+
+                      // 传递renderSlot 使用自定义插槽
+                      else if (renderSlot && slots[renderSlot]) {
+                        component = slots[renderSlot]({
+                          model: props.formOptions?.model,
+                          formItem,
+                          cellValue: props.formOptions?.model?.[formItemProps.prop!],
+                        })
+                      }
+
+                      return (
+                        <el-col {...colConfig}>
+                          <el-form-item
+                            {...formItemProps}
+                            v-slots={{
+                              label: renderLabel ? (scope: any) => renderLabel(scope) : undefined,
+                            }}
+                          >
+                            {component}
+                          </el-form-item>
+                        </el-col>
+                      )
+                    })}
+                  </el-row>
+                )
+              })}
         </el-form>
       )
     }

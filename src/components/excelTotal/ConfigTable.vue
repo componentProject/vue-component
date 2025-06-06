@@ -54,7 +54,7 @@ import { ref, watch } from 'vue'
 import type { ExcelConfig, ColumnConfig } from './types'
 
 defineOptions({
-  name: 'ConfigTable'
+  name: 'ConfigTable',
 })
 
 const props = defineProps<{
@@ -74,7 +74,7 @@ const addEnterColumn = () => {
     key: '',
     label: '',
     searchText: '',
-    required: false
+    required: false,
   })
 }
 
@@ -87,7 +87,7 @@ const addFeeColumn = () => {
     key: '',
     label: '',
     searchText: '',
-    required: false
+    required: false,
   })
 }
 
@@ -96,9 +96,13 @@ const removeFeeColumn = (index: number) => {
 }
 
 // 监听配置变化
-watch(config, (newVal) => {
-  emit('update:modelValue', newVal)
-}, { deep: true })
+watch(
+  config,
+  (newVal) => {
+    emit('update:modelValue', newVal)
+  },
+  { deep: true },
+)
 </script>
 
 <style scoped lang="scss">

@@ -1,7 +1,7 @@
 function changeHtmlClassPrefix(htmlString, oldPrefix, newPrefix) {
   const regex = new RegExp(
     `(class|style)\\s*:\\s*((["']((${oldPrefix}\\b)-).*["'])|((_normalizeClass|_normalizeStyle)\\(.*(${oldPrefix}\\b)-.*\\)))`,
-    'g'
+    'g',
   )
   return htmlString.replace(regex, (match, p1, offset, string) => {
     return match.replace(oldPrefix, newPrefix)
@@ -9,7 +9,7 @@ function changeHtmlClassPrefix(htmlString, oldPrefix, newPrefix) {
 }
 
 function changeSelectorPrefix(cssString, oldPrefix, newPrefix) {
-  const regex = new RegExp(`(\\.${oldPrefix}\\b|\#${oldPrefix}\\b|\--${oldPrefix}\\b)`, 'g')
+  const regex = new RegExp(`(\\.${oldPrefix}\\b|#${oldPrefix}\\b|--${oldPrefix}\\b)`, 'g')
   return cssString.replace(regex, (match, p1, offset, string) => {
     return match.replace(oldPrefix, newPrefix)
   })
@@ -38,6 +38,6 @@ export default function addScopedAndReplacePrefixPlugin({ prefixScoped, oldPrefi
         return newCode
       }
       return newCode
-    }
+    },
   }
 }

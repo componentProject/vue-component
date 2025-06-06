@@ -71,11 +71,7 @@
     </div>
 
     <!-- 数据来源弹窗 -->
-    <el-dialog
-      :title="sourceDialogTitle"
-      v-model="showSourceDialog"
-      width="80%"
-    >
+    <el-dialog :title="sourceDialogTitle" v-model="showSourceDialog" width="80%">
       <el-table :data="sourceData" border style="width: 100%">
         <el-table-column prop="number" label="编号" width="120" />
         <el-table-column prop="carNumber" label="车牌" width="120" />
@@ -91,7 +87,13 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import type { UploadFile } from 'element-plus'
-import { parseEnterRecords, parseFeeRecords, generateStatData, exportExcel, getDefaultDateRange } from './utils'
+import {
+  parseEnterRecords,
+  parseFeeRecords,
+  generateStatData,
+  exportExcel,
+  getDefaultDateRange,
+} from './utils'
 import type { ExcelConfig, EnterRecord, FeeRecord, StatRow } from './types'
 import { defaultExcelConfig } from './types'
 import ConfigTable from './ConfigTable.vue'
@@ -101,7 +103,7 @@ import moment from 'moment'
 const excelConfig = ref<ExcelConfig>({ ...defaultExcelConfig })
 const enterRecords = ref<EnterRecord[]>([])
 const feeRecords = ref<FeeRecord[]>([])
-const addNewTable= ref(false)
+const addNewTable = ref(false)
 // 日期范围
 const dateRange = ref<[Date, Date] | undefined>(undefined)
 
@@ -124,10 +126,12 @@ const setDefaultDateRange = () => {
 const filteredStatData = computed(() => {
   if (!dateRange.value) return statData.value
   const [start, end] = dateRange.value
-  return statData.value.filter(row => {
+  return statData.value.filter((row) => {
     const date = moment(row.date)
-    return date.isSameOrAfter(moment(start).format('YYYY-MM-DD')) &&
-           date.isSameOrBefore(moment(end).format('YYYY-MM-DD'))
+    return (
+      date.isSameOrAfter(moment(start).format('YYYY-MM-DD')) &&
+      date.isSameOrBefore(moment(end).format('YYYY-MM-DD'))
+    )
   })
 })
 
@@ -152,85 +156,85 @@ const showFee = ref(false)
 // 更新文件解析函数
 const handleEnterFileChange = async (uploadFile: UploadFile) => {
   try {
-    const records = await parseEnterRecords(uploadFile.raw!, excelConfig.value);
-    enterRecords.value = records;
+    const records = await parseEnterRecords(uploadFile.raw!, excelConfig.value)
+    enterRecords.value = records
     if (feeRecords.value.length > 0) {
-      ElMessage.success('进车记录导入成功，统计表已更新');
-      setDefaultDateRange();
+      ElMessage.success('进车记录导入成功，统计表已更新')
+      setDefaultDateRange()
     }
   } catch (error: any) {
-    ElMessage.error(error?.message || '解析文件失败');
+    ElMessage.error(error?.message || '解析文件失败')
   }
-};
+}
 
 const handleFeeFileChange = async (uploadFile: UploadFile) => {
   try {
-    const records = await parseFeeRecords(uploadFile.raw!, excelConfig.value);
-    feeRecords.value = records;
+    const records = await parseFeeRecords(uploadFile.raw!, excelConfig.value)
+    feeRecords.value = records
     if (enterRecords.value.length > 0) {
-      ElMessage.success('收费记录导入成功，统计表已更新');
-      setDefaultDateRange();
+      ElMessage.success('收费记录导入成功，统计表已更新')
+      setDefaultDateRange()
     }
   } catch (error: any) {
-    ElMessage.error(error?.message || '解析文件失败');
+    ElMessage.error(error?.message || '解析文件失败')
   }
-};
+}
 
 // 处理右键菜单
 const handleRowContextMenu = (row: StatRow, column: any, event: globalThis.MouseEvent) => {
-  event.preventDefault();
-  currentRow.value = row;
-  contextMenuX.value = event.clientX;
-  contextMenuY.value = event.clientY;
-  showContextMenu.value = true;
-};
+  event.preventDefault()
+  currentRow.value = row
+  contextMenuX.value = event.clientX
+  contextMenuY.value = event.clientY
+  showContextMenu.value = true
+}
 
 // 点击其他地方关闭右键菜单
 const handleDocumentClick = () => {
-  showContextMenu.value = false;
-};
+  showContextMenu.value = false
+}
 
 // 生命周期钩子
 onMounted(() => {
   if (typeof window !== 'undefined') {
-    window.addEventListener('click', handleDocumentClick);
+    window.addEventListener('click', handleDocumentClick)
   }
-});
+})
 
 onUnmounted(() => {
   if (typeof window !== 'undefined') {
-    window.removeEventListener('click', handleDocumentClick);
+    window.removeEventListener('click', handleDocumentClick)
   }
-});
+})
 
 // 显示数据来源
 const showSourceData = (type: 'enter' | 'exit' | 'paid' | 'unpaid') => {
-  if (!currentRow.value) return;
+  if (!currentRow.value) return
 
-  showContextMenu.value = false;
-  showSourceDialog.value = true;
-  showExitTime.value = type !== 'enter';
-  showFee.value = type === 'paid' || type === 'unpaid';
+  showContextMenu.value = false
+  showSourceDialog.value = true
+  showExitTime.value = type !== 'enter'
+  showFee.value = type === 'paid' || type === 'unpaid'
 
   switch (type) {
     case 'enter':
-      sourceDialogTitle.value = `入库数据 (${currentRow.value.date})`;
-      sourceData.value = currentRow.value.enterRecords;
-      break;
+      sourceDialogTitle.value = `入库数据 (${currentRow.value.date})`
+      sourceData.value = currentRow.value.enterRecords
+      break
     case 'exit':
-      sourceDialogTitle.value = `出库数据 (${currentRow.value.date})`;
-      sourceData.value = currentRow.value.exitRecords;
-      break;
+      sourceDialogTitle.value = `出库数据 (${currentRow.value.date})`
+      sourceData.value = currentRow.value.exitRecords
+      break
     case 'paid':
-      sourceDialogTitle.value = `收费数据 (${currentRow.value.date})`;
-      sourceData.value = currentRow.value.paidRecords;
-      break;
+      sourceDialogTitle.value = `收费数据 (${currentRow.value.date})`
+      sourceData.value = currentRow.value.paidRecords
+      break
     case 'unpaid':
-      sourceDialogTitle.value = `未收费数据 (${currentRow.value.date})`;
-      sourceData.value = currentRow.value.unpaidRecords;
-      break;
+      sourceDialogTitle.value = `未收费数据 (${currentRow.value.date})`
+      sourceData.value = currentRow.value.unpaidRecords
+      break
   }
-};
+}
 
 // 导出统计表
 const exportStatData = () => {
@@ -240,9 +244,9 @@ const exportStatData = () => {
   }
   const [start, end] = dateRange.value
   exportExcel(
-    filteredStatData.value,  // 使用筛选后的数据
+    filteredStatData.value, // 使用筛选后的数据
     moment(start).format('YYYY-MM-DD'),
-    moment(end).format('YYYY-MM-DD')
+    moment(end).format('YYYY-MM-DD'),
   )
 }
 </script>
@@ -300,7 +304,7 @@ const exportStatData = () => {
     background: white;
     border: 1px solid #dcdfe6;
     border-radius: 4px;
-    box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 12px 0 rgb(0 0 0 / 10%);
     z-index: 2000;
 
     .menu-item {

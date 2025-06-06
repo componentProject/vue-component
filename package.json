@@ -168,5 +168,29 @@
     "vitest": "^3.1.1",
     "vue-eslint-parser": "^9.4.3",
     "vue-tsc": "^2.1.10"
+  },
+  "prettier": {
+    "$schema": "https://json.schemastore.org/prettierrc",
+    "semi": false,
+    "singleQuote": true,
+    "printWidth": 100
+  },
+  "lint-staged": {
+    "!src/components/ConfigForm/*": [],
+    "!src/components/ConfigForm/**/*": [],
+    "!src/components/DragTable/**/*": [],
+    "*.{js,jsx,ts,tsx,vue}": [
+      "eslint --fix",
+      "prettier --write *.{js,jsx,ts,tsx,vue}"
+    ],
+    "*.{css,scss,less,vue}": [
+      "stylelint --fix"
+    ]
+  },
+  "postcss": {
+    "plugins": {
+      "tailwindcss": {},
+      "autoprefixer": {}
+    }
   }
 }
