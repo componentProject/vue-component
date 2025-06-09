@@ -5,7 +5,7 @@ import DragTable from '@/components/DraggableTable/index.vue'
 
 // 定义元数据
 const meta: Meta<typeof ExportExcel> = {
-  title: '组件/ExportExcel',
+  title: 'ExportExcel',
   component: ExportExcel,
   tags: ['autodocs'],
   argTypes: {
