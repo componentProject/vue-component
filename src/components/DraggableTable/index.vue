@@ -4,6 +4,7 @@
     <vxe-grid
       ref="xTable"
       v-bind="gridProps"
+      @checkbox-all="checkboxAll"
       @column-dragend="columnDragEnd"
       @resizable-change="handleColumnResizableChange"
     >
@@ -170,7 +171,19 @@ const props = defineProps({
 })
 const attrs = useAttrs()
 // 组件事件
-const emit = defineEmits(['update:tableData', 'column-dragend', 'row-dragend', 'resizable-change'])
+const emit = defineEmits([
+  'update:tableData',
+  'column-dragend',
+  'row-dragend',
+  'resizable-change',
+  'checkbox-change',
+  'checkbox-all',
+])
+
+function checkboxAll(params) {
+  emit('checkbox-change', params)
+  emit('checkbox-all', params)
+}
 
 // 表格引用
 const xTable = ref(null)
@@ -307,7 +320,10 @@ const compareColumns = (sourceColumns, targetColumns) => {
   const requiredFields = ['title', 'field', 'sortable', 'align', 'slots', 'fixed', 'type']
   const requiredAndDefaultFields = ['visible']
   return sourceColumns.some((source) => {
-    const target = targetColumns.find((item) => item.field == source.field)
+    const target = targetColumns.find(
+      (item) =>
+        item.field == source.field && item.type == source.type && item.title == source.title,
+    )
     if (!target) {
       // console.log('requiredDiff', source)
       return true
@@ -319,7 +335,7 @@ const compareColumns = (sourceColumns, targetColumns) => {
     const requiredDiff = requiredFields.some((field) => {
       return getStringObj(target[field]) != getStringObj(source[field])
     })
-    // console.log('requiredDiff', requiredDiff, defaultDiff, target)
+    // console.log('requiredDiff', requiredDiff, defaultDiff, source,target)
     return requiredDiff || defaultDiff
   })
 }
@@ -397,11 +413,22 @@ const gridProps = computed(() => {
   }
 })
 
+function dispatchEvents(target, events) {
+  if (Array.isArray(events)) {
+    events.forEach((event) => {
+      target.dispatchEvent(new Event(event))
+    })
+  } else {
+    target.dispatchEvent(new Event(events))
+  }
+}
+
 // 监听列宽变化
-const handleColumnResizableChange = () => {
+const handleColumnResizableChange = (params) => {
   // 保存到本地存储
   saveColumnsToStorage()
-  emit('resizable-change')
+  dispatchEvents(document, ['mousedown', 'mouseup', 'click'])
+  emit('resizable-change', params)
 }
 
 // 销毁行拖拽实例
@@ -466,7 +493,7 @@ const initRowDraggable = () => {
         // 更新表格key，强制重新渲染
         const wrapperElem = item.parentNode
         const nodeList = [...wrapperElem.childNodes]
-        console.log('aa', wrapperElem, nodeList, newIndex, oldIndex)
+        // console.log('aa', wrapperElem, nodeList, newIndex, oldIndex)
         if (dragPos == 'top') {
           wrapperElem.insertBefore(nodeList[newIndex], nodeList[oldIndex + 1])
         } else {
@@ -477,16 +504,18 @@ const initRowDraggable = () => {
       }
       // 更新数据并发送事件
       tableData.value = tableDataCopy
-
+      //{ newRow, oldRow, dragRow, dragPos, dragToChild, offsetIndex, $event }
       // 构造vxe格式的事件参数
       const eventParams = {
         $event: item,
         type: 'dragend',
-        row: rowData,
-        targetRow: tableDataCopy[newIndex === tableDataCopy.length ? newIndex - 1 : newIndex + 1],
-        insertType: oldIndex > newIndex ? 'before' : 'after',
+        dragRow: rowData,
+        newRow: tableDataCopy[oldIndex],
+        oldRow: tableDataCopy[newIndex],
+        dragPos,
         offsetIndex: Math.abs(newIndex - oldIndex),
         _index: { newIndex, oldIndex },
+        dragToChild: false,
       }
       emit('row-dragend', eventParams)
 

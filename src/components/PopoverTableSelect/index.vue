@@ -22,7 +22,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, watch, onUnmounted, nextTick, defineProps, defineEmits, defineModel } from 'vue'
+import { ref, watch, onUnmounted, nextTick } from 'vue'
 import { ElPopover } from 'element-plus'
 import { VxeGrid } from 'vxe-table'
 import type { VxeGridInstance, VxeTableDefines } from 'vxe-table'
@@ -163,6 +163,8 @@ function handleOutsideClick(e: MouseEvent) {
     !virtualEl.contains(e.target as Node)
   ) {
     popoverVisible.value = false
+    props.virtualRef?.blur?.()
+    props.virtualRef?.$el?.blur?.()
   }
 }
 
