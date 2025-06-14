@@ -132,9 +132,9 @@ function handleRowDraggable(oldRow, newRow) {
 // 列配置
 const columns = ref([
   { type: 'seq', width: 70 },
-  { field: 'name', title: 'Name', editRender: { name: 'VxeInput' } },
-  { field: 'sex', title: 'Sex', editRender: { name: 'VxeInput' } },
-  { field: 'age', title: 'Age', editRender: { name: 'VxeInput' } },
+  { field: 'name', title: 'Name' },
+  { field: 'sex', title: 'Sex' },
+  { field: 'age', title: 'Age' },
   { field: 'aaa', title: '操作' },
 ])
 

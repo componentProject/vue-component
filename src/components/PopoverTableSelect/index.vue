@@ -2,18 +2,19 @@
   <el-popover
     :visible="popoverVisible"
     virtual-triggering
-    :virtual-ref="virtualRef"
-    :width="width"
-    placement="bottom"
+    :virtual-ref="props.virtualRef"
+    :width="props.width"
+    :placement="props.placement"
   >
     <div ref="popoverRef">
       <slot name="default" />
-      <vxe-grid
+      <DraggableTable
+        :id="props.id"
         ref="gridRef"
         border
         highlight-current-row
         :columns="columns"
-        :data="data"
+        :modelValue="data"
         :height="height"
         @cell-click="handleCellClick"
       />
@@ -22,29 +23,25 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, watch, onUnmounted, nextTick } from 'vue'
+import { ref, watch, onUnmounted, nextTick, useTemplateRef } from 'vue'
+import type { ComponentPublicInstance } from 'vue'
 import { ElPopover } from 'element-plus'
-import { VxeGrid } from 'vxe-table'
-import type { VxeGridInstance, VxeTableDefines } from 'vxe-table'
+import type { VxeTablePropTypes } from 'vxe-table'
+import DraggableTable from '@/components/DraggableTable/index.vue'
 
-interface TableRowData {
-  [key: string]: any
-}
+type TableRowData = VxeTablePropTypes.Row
 
-type ColumnType = VxeTableDefines.ColumnOptions
+type ColumnType = VxeTablePropTypes.ColumnConfig
 
 const props = defineProps({
+  //#region 透传给popover
   virtualRef: {
-    type: [Object, HTMLElement],
+    type: Object as () => ComponentPublicInstance | HTMLElement,
     required: true,
   },
-  columns: {
-    type: Array as () => ColumnType[],
-    default: () => [],
-  },
-  data: {
-    type: Array as () => TableRowData[],
-    default: () => [],
+  placement: {
+    type: String,
+    default: 'bottom',
   },
   width: {
     type: [String, Number],
@@ -54,6 +51,21 @@ const props = defineProps({
     type: [String, Number],
     default: 300,
   },
+  //#endregion
+  //#region 透传给DraggableTable
+  id: {
+    type: String,
+    default: '',
+  },
+  columns: {
+    type: Array as () => ColumnType[],
+    default: () => [],
+  },
+  data: {
+    type: Array as () => VxeTablePropTypes.Data,
+    default: () => [],
+  },
+  //#endregion
 })
 
 const emit = defineEmits<{
@@ -61,8 +73,8 @@ const emit = defineEmits<{
 }>()
 
 const popoverVisible = defineModel<boolean>()
-const popoverRef = ref()
-const gridRef = ref<VxeGridInstance>()
+const popoverRef = useTemplateRef('popoverRef')
+const gridRef = useTemplateRef('gridRef')
 const currentRowIndex = ref(0)
 let virtualElement: HTMLElement | null = null
 
@@ -83,7 +95,7 @@ watch(
 // 监听virtualRef的变化
 watch(
   () => props.virtualRef,
-  (newRef, oldRef) => {
+  () => {
     // 移除旧元素的事件监听
     cleanupEventListeners()
 
@@ -119,7 +131,7 @@ watch(
  * 设置事件监听器
  */
 function setupEventListeners() {
-  virtualElement = (props.virtualRef as any)?.$el || props.virtualRef
+  virtualElement = (props.virtualRef as ComponentPublicInstance)?.$el || props.virtualRef
   if (virtualElement) {
     virtualElement.addEventListener('keydown', handleKeydown)
     virtualElement.addEventListener('focus', handleFocus)
@@ -150,7 +162,7 @@ function handleOutsideClick(e: MouseEvent) {
   // 获取popover元素
   const popoverEl = popoverRef.value
   // 获取virtualRef元素
-  const virtualEl = (props.virtualRef as any)?.$el || props.virtualRef
+  const virtualEl = (props.virtualRef as ComponentPublicInstance)?.$el || props.virtualRef
   // console.log("popoverEl", popoverEl)
   // console.log('virtualEl', virtualEl)
   // console.log(popoverEl.contains(e.target as Node))
@@ -163,8 +175,8 @@ function handleOutsideClick(e: MouseEvent) {
     !virtualEl.contains(e.target as Node)
   ) {
     popoverVisible.value = false
-    props.virtualRef?.blur?.()
-    props.virtualRef?.$el?.blur?.()
+    ;(props.virtualRef as HTMLElement)?.blur?.()
+    ;(props.virtualRef as ComponentPublicInstance)?.$el?.blur?.()
   }
 }
 
@@ -192,8 +204,8 @@ function selectRow(index: number) {
   if (!props.data.length) return
   currentRowIndex.value = index
   const row = props.data[index]
-  gridRef.value?.setCurrentRow(row)
-  gridRef.value?.scrollToRow(row)
+  gridRef.value?.getTable()?.setCurrentRow(row)
+  gridRef.value?.getTable()?.scrollToRow(row)
 }
 
 /**
@@ -250,9 +262,4 @@ onUnmounted(() => {
 })
 </script>
 
-<style scoped>
-.vxe-table--body-wrapper {
-  max-height: 100%;
-  overflow-y: auto;
-}
-</style>
+<style scoped></style>

@@ -1,24 +1,7 @@
 import { Fragment } from 'vue'
-import { createTypes } from 'vue-types'
-import type { propTypes } from '../_types/utils'
+import moment from 'moment'
 
-export const PropTypes = createTypes({
-  func: undefined,
-  bool: undefined,
-  string: undefined,
-  number: undefined,
-  array: undefined,
-  object: undefined,
-  integer: undefined,
-}) as propTypes
-
-export function tuple<T extends string[]>(...args: T) {
-  return args as T
-}
-
-export function booleanType(defaultVal?: boolean) {
-  return { type: Boolean, default: defaultVal as boolean }
-}
+export type DateType = string | Date | moment.Moment
 
 export function filterEmpty(children = []) {
   const res: any[] = []
@@ -33,3 +16,175 @@ export function filterEmpty(children = []) {
   })
   return res
 }
+
+/**
+ * 获取类型
+ * @param obj
+ * @param type
+ */
+export function getType(obj: any, type: string) {
+  if (type) {
+    return Object.prototype.toString.call(obj).slice(8, -1).toLowerCase() === type.toLowerCase()
+  } else {
+    return Object.prototype.toString.call(obj).slice(8, -1).toLowerCase()
+  }
+}
+
+/**
+ * 获取类型默认值，当不符合当前类型时，返回该类型的默认值
+ * @param obj
+ * @param type
+ */
+export function getTypeDefault(obj: any, type: string) {
+  if (getType(obj, type) !== type) {
+    const typeDefefaultValueMap = {
+      string: '',
+      number: 0,
+      boolean: false,
+      undefined: undefined,
+      null: null,
+      date: new Date(),
+      regexp: new RegExp(''),
+      symbol: Symbol(),
+      object: {},
+      array: [],
+      function: () => {},
+      set: new Set(),
+      map: new Map(),
+      weakmap: new WeakMap(),
+      weakset: new WeakSet(),
+      error: new Error(),
+    }
+    return typeDefefaultValueMap[type]
+  } else {
+    return obj
+  }
+}
+
+/**
+ * 获取JSON化后的对象
+ * @param obj
+ */
+export function getStringObj(obj: any) {
+  if (getType(obj, 'object')) {
+    return JSON.stringify(obj)
+  }
+  return obj
+}
+
+/**
+ * 获取类名字符串
+ * @param className
+ * @param hasPrefix
+ */
+export function getClass(className: string, hasPrefix?: boolean) {
+  if (className.startsWith('.')) {
+    return hasPrefix ? className : className.slice(1)
+  } else {
+    return hasPrefix ? `.${className}` : className
+  }
+}
+
+/**
+ * 派发事件
+ * @param target 触发事件的目标dom
+ * @param events 事件数组
+ */
+export function dispatchEvents(target: HTMLElement, events: string | string[]) {
+  if (Array.isArray(events)) {
+    events.forEach((event) => {
+      target.dispatchEvent(new Event(event))
+    })
+  } else {
+    target.dispatchEvent(new Event(events))
+  }
+}
+
+//#region 日期相关
+/**
+ * 判断date1是否在date2之前
+ * @param date1 日期1
+ * @param date2 日期2
+ */
+export function dateIsBefore(date1: DateType, date2: DateType) {
+  return date1 && date2 ? moment(date1).isBefore(moment(date2)) : false
+}
+
+/**
+ * 判断一个日期是否满足某个moment格式，如果满足返回moment对象，否则返回false
+ * @param dateStr 日期
+ * @param format moment格式
+ * @param strictType 强制校验的类型
+ */
+export function getMomentIsValid(dateStr: DateType, format: string, strictType?: string) {
+  if (!dateStr || (strictType && !getType(dateStr, strictType))) return false
+  const momentDate = moment(dateStr, format, true)
+  return momentDate.isValid() ? momentDate : false
+}
+
+/**
+ * 校验日期范围格式
+ * @param date 日期
+ * @param format moment格式
+ * @param strictType 强制校验的类型
+ */
+export function validateDate(date: DateType, format: string, strictType: string) {
+  if (!date) return false
+
+  if (Array.isArray(date)) {
+    return date.every((date) => getMomentIsValid(date, format, strictType))
+  } else {
+    // 单个日期值 xxx
+    return getMomentIsValid(date, format, strictType)
+  }
+}
+
+/**
+ * 判断一个日期字符串是否满足某个moment格式
+ * @param dateStr 日期
+ * @param format moment格式
+ * @param type startOf\endOf
+ * @param dateType day\month\year
+ * @param onlyFormat 是否只返回格式化后的日期
+ */
+export function getFormatDate(
+  dateStr: DateType,
+  format: string,
+  type = 'startOf',
+  dateType = 'day',
+  onlyFormat = false,
+) {
+  const momentDate = getMomentIsValid(dateStr, format)
+  if (!momentDate) return false
+
+  const formatDateStr = momentDate.format(format)
+  if (formatDateStr === dateStr || onlyFormat) return formatDateStr
+  return momentDate[type](dateType).format(format)
+}
+
+/**
+ * 格式化返回的日期范围
+ * @param date 日期
+ * @param format moment格式
+ * @param dateType day\month\year
+ * @param onlyFormat 是否只返回格式化后的日期
+ */
+export function formatDateRange(
+  date: DateType,
+  format: string,
+  dateType = 'day',
+  onlyFormat: boolean,
+) {
+  if (!date) return []
+  const [start, end] = Array.isArray(date) ? date : [date, date]
+  const startDate = getFormatDate(start, format, 'startOf', dateType, onlyFormat)
+  const endDate = getFormatDate(end, format, 'endOf', dateType, onlyFormat)
+  if (startDate && endDate) {
+    return [startDate, endDate]
+  } else {
+    console.error('日期格式不正确')
+    return []
+  }
+}
+
+//#endregion

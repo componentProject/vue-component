@@ -1,5 +1,5 @@
 <template>
-  <div class="date-range-picker">
+  <div class="w-full inline-block">
     <el-date-picker
       ref="datePicker"
       v-bind="$attrs"
@@ -12,27 +12,27 @@
       :type="props.type"
       :disabledDate="disabledDateFn"
       @change="handleDateChange"
-      :shortcuts="quickOptions ? shortcuts : []"
+      :shortcuts="computedShortcuts"
     />
   </div>
 </template>
 
-<script setup>
-import { computed, ref, watch } from 'vue'
-import moment from 'moment'
+<script lang="ts" setup>
+import { computed, ref, useTemplateRef, watch } from 'vue'
+import moment, { unitOfTime, Moment } from 'moment'
+import { ElDatePicker } from 'element-plus'
+import type { DatePickerProps } from 'element-plus'
+import { dateIsBefore, formatDateRange, validateDate, getTypeDefault } from '@/components/_utils'
+import { isEmpty } from 'radash'
 
 // 组件属性
 const props = defineProps({
-  // 绑定值
-  modelValue: {
-    type: Array,
-    default: () => [],
-  },
+  //#region 透传给el-date-picker
   // 日期选择类型，支持 date(单日期) 和 daterange(日期范围)
   type: {
-    type: String,
+    type: String as () => DatePickerProps['type'],
     default: 'date',
-    validator: (val) =>
+    validator: (val: string) =>
       ['year', 'month', 'date', 'datetime', 'week', 'datetimerange', 'daterange'].includes(val),
   },
   // 显示在输入框中的格式
@@ -64,6 +64,13 @@ const props = defineProps({
     type: String,
     default: '至',
   },
+  //#endregion
+  //#region 默认值相关
+  // 绑定值
+  modelValue: {
+    type: Array,
+    default: () => [],
+  },
   // date类型是否默认返回 [YYYY-MM-DD 00:00:00，YYYY-MM-DD 23:59:59] 格式，没有则取当前时间
   defaultDatetimeRange: {
     type: Boolean,
@@ -74,27 +81,42 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
-  // 设置日期范围
-  // 可以是数字或数组
-  // 正数表示当前日期往后n天
-  // 负数表示往前n天
-  // 数组[n,m]表示从前n天到后m天
+  /**
+   * 日期范围，可以是数字或数组
+   * 正数表示当前日期往后n天（dateRangeType）
+   * 负数表示往前n天（dateRangeType）
+   * 数组[n,m]表示从前n天到后m天（dateRangeType）
+   */
   dateRange: {
     type: [Number, Array],
     default: null,
   },
+  /**
+   * 日期范围类型
+   * @default day
+   */
   dateRangeType: {
-    type: String,
+    type: String as () => unitOfTime.DurationConstructor,
     default: 'day',
   },
+  /**
+   * 日期范围的基准日期
+   * @default 当前日期
+   */
+  dateRangeBaseDate: {
+    type: [String, Object],
+    default: moment(),
+  },
+  //#endregion
+  //#region 禁用相关
   // 最小可选日期
   minDate: {
-    type: String,
+    type: [String, Object],
     default: null,
   },
   // 最大可选日期
   maxDate: {
-    type: String,
+    type: [String, Object],
     default: null,
   },
   // 禁用日期范围，格式为 [minDate, maxDate]
@@ -102,9 +124,10 @@ const props = defineProps({
     type: Array,
     default: null,
   },
+  //#endregion
   // 是否显示快速选择选项
-  quickOptions: {
-    type: Boolean,
+  shortcuts: {
+    type: [Boolean, Array],
     default: false,
   },
 })
@@ -117,80 +140,49 @@ const localDateValue = ref(null)
 
 /**
  * 日期选择器引用
- * @type {Element||import('element-plus').ElDatePicker}
  */
-const datePicker = ref(null)
-
-// 校验日期格式是否符合valueFormat
-function isValidDateFormat(dateStr) {
-  if (!dateStr || typeof dateStr !== 'string') return false
-  return moment(dateStr, props.valueFormat, true).isValid()
-}
-
-// 校验日期范围格式
-function validateDateRange(dateRange) {
-  if (!dateRange) return false
-
-  if (Array.isArray(dateRange)) {
-    // 数组形式 [xxx, xxx]
-    return dateRange.every((date) => isValidDateFormat(date))
-  } else {
-    // 单个日期值 xxx
-    return isValidDateFormat(dateRange)
-  }
-}
+const datePicker = useTemplateRef<typeof ElDatePicker>('datePicker')
 
 // 禁用日期函数
-function disabledDateFn(time) {
-  const date = moment(time).format('YYYY-MM-DD')
-
+function disabledDateFn(time: any) {
   // 优先使用disabledDateRange
-  if (props.disabledDateRange && props.disabledDateRange.length === 2) {
-    const [min, max] = props.disabledDateRange
-    if (min && moment(date).isBefore(moment(min).format('YYYY-MM-DD'))) {
-      return true
-    }
-    if (max && moment(date).isAfter(moment(max).format('YYYY-MM-DD'))) {
-      return true
-    }
-  } else {
-    // 使用单独的minDate和maxDate
-    if (props.minDate && moment(date).isBefore(moment(props.minDate).format('YYYY-MM-DD'))) {
-      return true
-    }
-    if (props.maxDate && moment(date).isAfter(moment(props.maxDate).format('YYYY-MM-DD'))) {
-      return true
-    }
-  }
-
-  return false
+  const [min = props.minDate, max = props.maxDate] = getTypeDefault(
+    props.disabledDateRange,
+    'array',
+  )
+  return dateIsBefore(time, min) || dateIsBefore(max, time)
 }
 
 // 根据dateRange生成初始日期范围
 function generateDateRangeByConfig() {
   if (props.dateRange !== null) {
-    let startDate, endDate
-
-    if (Array.isArray(props.dateRange) && props.dateRange.length === 2) {
+    const baseDate = props.dateRangeBaseDate ? moment(props.dateRangeBaseDate) : moment()
+    let startDate: Moment, endDate: Moment
+    if (Array.isArray(props.dateRange)) {
       // 数组形式 [n, m]
       const [startOffset, endOffset] = props.dateRange
-      startDate = moment().add(+startOffset, props.dateRangeType)
-      endDate = moment().add(+endOffset, props.dateRangeType)
+      startDate = moment(baseDate).add(+startOffset, props.dateRangeType)
+      endDate = moment(baseDate).add(+endOffset, props.dateRangeType)
     } else {
       // 数字形式
       if (+props.dateRange >= 0) {
         // 正数表示当前日期往后n天
-        startDate = moment()
-        endDate = moment().add(+props.dateRange, props.dateRangeType)
+        startDate = moment(baseDate)
+        endDate = moment(baseDate).add(+props.dateRange, props.dateRangeType)
       } else {
         // 负数表示往前n天
-        startDate = moment().add(+props.dateRange, props.dateRangeType)
-        endDate = moment()
+        startDate = moment(baseDate).add(+props.dateRange, props.dateRangeType)
+        endDate = moment(baseDate)
       }
     }
 
     if (startDate && endDate) {
-      const range = formatDateRange([startDate, endDate])
+      const range = formatDateRange(
+        [startDate, endDate],
+        props.valueFormat,
+        'day',
+        !computedDefaultDatetimeRange.value,
+      )
       emit('update:modelValue', range)
       return range
     }
@@ -199,8 +191,8 @@ function generateDateRangeByConfig() {
   return null
 }
 
-// 快速选择选项
-const shortcuts = [
+// 默认快速选择选项
+const defaultShortcuts = [
   {
     text: '今天',
     value: () => {
@@ -216,77 +208,41 @@ const shortcuts = [
   {
     text: '一周',
     value: () => {
-      return [moment().subtract(6, 'days'), moment()]
+      return [moment().subtract(1, 'week'), moment()]
     },
   },
   {
     text: '一个月',
     value: () => {
-      return [moment().subtract(29, 'days'), moment()]
+      return [moment().subtract(1, 'month'), moment()]
     },
   },
 ]
+const computedShortcuts = computed(() => {
+  return props.shortcuts === true ? defaultShortcuts : props.shortcuts || []
+})
+
 const computedDefaultDatetimeRange = computed(() => {
   return props.defaultDatetimeRange ?? props.type !== 'datetime'
 })
-// 判断一个日期字符串是否满足某个moment格式
-function isValidMomentFormat(dateStr, format, type = 'startOf', dateType = 'day') {
-  const momentDate = moment(dateStr, format, true)
-  if (!momentDate.isValid()) return false
 
-  const formatDateStr = momentDate.format(format)
-  if (formatDateStr === dateStr || !computedDefaultDatetimeRange.value) return formatDateStr
-  console.log('aaaaaaaaaaaaaa', momentDate[type](dateType).format(format))
-  return momentDate[type](dateType).format(format)
-}
-
-// 格式化返回的日期范围
-function formatDateRange(date) {
-  if (Array.isArray(date) && date.length > 1) {
-    const startDate = isValidMomentFormat(date[0], props.valueFormat)
-    const endDate = isValidMomentFormat(date[1], props.valueFormat, 'endOf')
-    if (startDate && endDate) {
-      return [startDate, endDate]
-    } else {
-      console.error('日期格式不正确')
-      return []
-    }
-  } else {
-    const startDate = isValidMomentFormat(date, props.valueFormat)
-    const endDate = isValidMomentFormat(date, props.valueFormat, 'endOf')
-
-    if (startDate && endDate) {
-      return [startDate, endDate]
-    } else {
-      console.error('日期格式不正确')
-      return []
-    }
-  }
-}
-const singleDateTypes = ['date', 'datetime']
+/**
+ * value不为数组的日期类型
+ */
+const singleDateTypes: string[] = ['date', 'datetime']
 // 处理日期变化事件
-const handleDateChange = (val) => {
-  let formattedDates
-
-  if (val) {
-    formattedDates = formatDateRange(val)
-  } else {
-    formattedDates = []
-  }
-
+const handleDateChange = (val: any) => {
+  const formattedDates = formatDateRange(
+    val,
+    props.valueFormat,
+    'day',
+    !computedDefaultDatetimeRange.value,
+  )
   emit('update:modelValue', formattedDates)
   emit('change', singleDateTypes.includes(props.type) ? formattedDates[0] : formattedDates)
 }
 
-function isEmpty(val) {
-  if (Array.isArray(val)) {
-    return val.length === 0
-  } else {
-    return !val
-  }
-}
-
-function getLocalDateValue(date) {
+function getLocalDateValue(date: any[] | any) {
   return singleDateTypes.includes(props.type) ? date[0] : date
 }
 
@@ -307,19 +263,29 @@ watch(
       }
       // 如果defaultToday为true，则使用今天的日期
       else if (props.defaultToday) {
-        const today = formatDateRange([moment(), moment()])
+        const today = formatDateRange(
+          [moment(), moment()],
+          props.valueFormat,
+          'day',
+          !computedDefaultDatetimeRange.value,
+        )
         emit('update:modelValue', today)
       } else {
         localDateValue.value = null
       }
     } else {
       // 如果满足日期格式，则更新localDateValue
-      if (validateDateRange(newVal)) {
+      if (validateDate(newVal, props.valueFormat, 'string')) {
         localDateValue.value = getLocalDateValue(newVal)
       }
       // 如果不满足日期格式，则格式化日期
       else {
-        const formattedDates = formatDateRange(newVal)
+        const formattedDates = formatDateRange(
+          newVal,
+          props.valueFormat,
+          'day',
+          !computedDefaultDatetimeRange.value,
+        )
         console.log('formattedDates', formattedDates)
         emit('update:modelValue', formattedDates)
       }
@@ -335,9 +301,4 @@ defineExpose({
 })
 </script>
 
-<style scoped>
-.date-range-picker {
-  display: inline-flex;
-  width: 100%;
-}
-</style>
+<style scoped></style>
