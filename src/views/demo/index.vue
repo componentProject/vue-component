@@ -1,16 +1,14 @@
 <template>
-<div>hello 狗子</div>
+  <div>hello 狗子</div>
 </template>
 <script lang="ts">
+import { defineComponent } from 'vue'
 export default defineComponent({
-  data(){
+  data() {
     return {}
   },
-  methods:{},
-  computed:{},
-  mounted(){}
+  methods: {},
+  computed: {},
 })
 </script>
-<style scoped lang="scss">
-
-</style>
+<style scoped lang="scss"></style>

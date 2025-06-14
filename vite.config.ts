@@ -1,5 +1,5 @@
 import { defineConfig, loadEnv } from 'vite'
-import { external, modules } from './src/constants'
+import path from 'path'
 
 // 性能优化模块
 import { visualizer } from 'rollup-plugin-visualizer'
@@ -11,16 +11,54 @@ import importToCDN from 'vite-plugin-cdn-import'
 import pluginVue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
 import vueDevTools from 'vite-plugin-vue-devtools'
-import AutoImport from 'unplugin-auto-import/vite'
-import Components from 'unplugin-vue-components/vite'
-import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
-import scopedCssPrefixPlugin from './plugins/addScopedAndReplacePrefix'
 // 其余vite插件
 import { createHtmlPlugin } from 'vite-plugin-html'
 import autoprefixer from 'autoprefixer'
 import tailwindcss from '@tailwindcss/postcss'
-import path from 'path'
 import type { Plugin } from 'postcss'
+
+function getCamelCase(str: string): string {
+  return str
+    .replace(/[-_]+/g, ' ') // 将连字符或下划线替换为空格
+    .replace(/(?:^|\s)\w/g, (match) => match.toUpperCase()) // 每个单词首字母大写
+    .replace(/\s+/g, '') // 移除所有空格
+}
+
+interface CdnModule {
+  name: string
+  var?: string
+  css?: string
+  path?: string
+  alias?: string
+}
+
+function getCdnModules(modules: Array<string | CdnModule>): any {
+  function getPath(str: string | undefined) {
+    if (!str) return ''
+    return str.startsWith('/') ? str : `/${str}`
+  }
+
+  return modules
+    .map((item) => {
+      if (typeof item === 'string') {
+        return {
+          name: item,
+          var: getCamelCase(item),
+          path: '',
+        }
+      } else {
+        return item
+      }
+    })
+    .map((item) => {
+      return {
+        name: item.name,
+        var: item.var || getCamelCase(item.name),
+        path: getPath(item.path),
+        css: getPath(item.css),
+      }
+    })
+}
 
 /**
  * 将环境变量中的字符串值转换为对应的 JavaScript 数据类型
@@ -62,116 +100,140 @@ export default defineConfig(({ mode }) => {
   const viteEnv = wrapperEnv(env)
   const systemCode = viteEnv.VITE_GLOB_APP_CODE
   const appTitle = viteEnv.VITE_GLOB_APP_TITLE
+  const isDev = mode === 'development'
 
-  const vuePlugins = [
-    pluginVue(),
-    scopedCssPrefixPlugin({
-      prefixScoped: `div[data-qiankun='${systemCode}']`,
-      oldPrefix: 'el',
-      newPrefix: systemCode,
-    }), // 传入你想要添加的前缀
-    vueJsx(),
-    env.VITE_DEVTOOLS && vueDevTools(),
-    // 自动引入
-    AutoImport({
-      imports: ['vue'],
-      resolvers: [ElementPlusResolver()],
-      dts: path.resolve(__dirname, './src/typings/auto-imports.d.ts'),
+  const vuePlugins = [pluginVue(), vueJsx(), isDev && vueDevTools()].filter((i) => !!i)
+
+  const cdnModules = getCdnModules([
+    'vue',
+    'vue-router',
+    {
+      name: 'lodash',
+      var: '_',
+    },
+    {
+      name: 'element-plus',
+      css: 'dist/index.css',
+    },
+    {
+      name: '@element-plus/icons-vue',
+      var: 'ElementPlusIconsVue',
+    },
+  ])
+
+  const performancePlugins = [
+    createHtmlPlugin({
+      inject: {
+        data: {
+          title: appTitle,
+        },
+      },
     }),
-    // 与自定义element组件冲突
-    // Components({
-    //   resolvers: [ElementPlusResolver()],
-    //   dts: path.resolve(__dirname, './src/typings/components.d.ts'),
-    // }),
-  ]
-  // CDN加速
-  const importToCDNPlugins = viteEnv.VITE_USE_CDN
-    ? importToCDN({
-        modules,
-      })
-    : []
-
-  return {
-    plugins: [
-      ...vuePlugins,
-      createHtmlPlugin({
-        inject: {
-          data: {
-            title: appTitle,
-          },
+    // 代码压缩
+    viteEnv.VITE_COMPRESS &&
+      viteCompression({
+        algorithm: viteEnv.VITE_BUILD_GZIP ? 'gzip' : 'brotliCompress',
+        verbose: true, //输出日志信息
+        disable: false, //是否禁用
+        ext: '.gz', // 压缩文件后缀
+        threshold: 10240, // 仅压缩大于 10KB 的文件
+        deleteOriginFile: false, // 是否删除原始文件
+      }),
+    // 图片压缩
+    viteEnv.VITE_IMAGEMIN &&
+      viteImagemin({
+        // gif压缩
+        gifsicle: {
+          optimizationLevel: 7,
+          interlaced: false,
+        },
+        optipng: {
+          optimizationLevel: 7,
+        },
+        mozjpeg: {
+          quality: 20,
+        },
+        pngquant: {
+          quality: [0.8, 0.9],
+          speed: 4,
+        },
+        // svg压缩
+        svgo: {
+          plugins: [
+            {
+              name: 'removeViewBox',
+            },
+            {
+              name: 'removeEmptyAttrs',
+              active: false,
+            },
+          ],
         },
       }),
-      // CDN加速
-      ...importToCDNPlugins,
-      // 是否生成包预览
-      viteEnv.VITE_REPORT && visualizer(),
-      // 代码压缩
-      viteEnv.VITE_COMPRESS &&
-        viteCompression({
-          // gzip压缩需要服务器nginx配置以下内容:
-          // http {
-          //   gzip_static on;
-          //   gzip_proxied any;
-          // }
-          // 可选 'brotliCompress' 或 'gzip'
-          algorithm: viteEnv.VITE_BUILD_GZIP ? 'gzip' : 'brotliCompress',
-          verbose: true, //输出日志信息
-          disable: false, //是否禁用
-          ext: '.gz', // 压缩文件后缀
-          threshold: 10240, // 仅压缩大于 10KB 的文件
-          deleteOriginFile: false, // 是否删除原始文件
-        }),
-      // 图片压缩
-      viteEnv.VITE_IMAGEMIN &&
-        viteImagemin({
-          // gif压缩
-          gifsicle: {
-            optimizationLevel: 7,
-            interlaced: false,
-          },
-          optipng: {
-            optimizationLevel: 7,
-          },
-          mozjpeg: {
-            quality: 20,
-          },
-          pngquant: {
-            quality: [0.8, 0.9],
-            speed: 4,
-          },
-          // svg压缩
-          svgo: {
-            plugins: [
-              {
-                name: 'removeViewBox',
-              },
-              {
-                name: 'removeEmptyAttrs',
-                active: false,
-              },
-            ],
-          },
-        }),
-    ],
+    viteEnv.VITE_USE_CDN &&
+      importToCDN({
+        prodUrl: `${viteEnv.VITE_CDN_BASE_URL}/{name}@{version}{path}`,
+        modules: cdnModules,
+      }),
+  ].filter((i) => !!i)
+
+  const monitorPlugins = [
+    // 是否生成包预览
+    viteEnv.VITE_REPORT &&
+      visualizer({
+        open: true,
+      }),
+  ].filter((i) => !!i)
+
+  return {
+    base: `/${systemCode}`,
+    plugins: [...vuePlugins, ...performancePlugins, ...monitorPlugins],
+    esbuild: {
+      pure:
+        !isDev && viteEnv.VITE_PURE_CONSOLE_AND_DEBUGGER
+          ? ['console.log', 'console.info', 'console.debug']
+          : [],
+    },
+    // 预构建相关
+    optimizeDeps: {
+      include: [],
+      exclude: [],
+    },
     build: {
-      // 启用 CSS 代码拆分,使加载模块时,仅加载对应css,而不是打包为一个样式文件
+      sourcemap: isDev,
+      outDir: `${systemCode}`,
       cssCodeSplit: true,
-      // 关闭 sourcemap
-      sourcemap: false,
-      // 大资源拆分
       chunkSizeWarningLimit: 1500,
+      minify: 'esbuild',
       rollupOptions: {
-        // 移除cdn引入的包
-        external: viteEnv.VITE_USE_CDN ? external : [],
+        external: [],
         output: {
-          // 静态资源打包做处理
+          globals: {},
           chunkFileNames: 'static/js/[name]-[hash].js',
           entryFileNames: 'static/js/[name]-[hash].js',
           assetFileNames: 'static/[ext]/[name]-[hash].[ext]',
-          // 依赖拆分
-          manualChunks(id) {
+          manualChunks: (id: string) => {
+            // 优化拆分策略
             if (id.includes('node_modules')) {
-              return id.toString().split('node_modules/')[1].split('/')[0].toString()
+              const moduleName = id.toString().split('node_modules/')[1].split('/')[0].toString()
+
+              if (
+                ['vue', 'vue-router', 'vue-demi', '@vue'].some((item) => moduleName.includes(item))
+              ) {
+                return 'vue-vendor'
+              }
+              if (['element-plus', '@element-plus'].some((item) => moduleName.includes(item))) {
+                return 'element-vendor'
+              }
+              return 'vendor-' + moduleName
+            }
+
+            if (id.includes('src/components/')) {
+              return 'components'
+            }
+
+            if (id.includes('src/utils/')) {
+              return 'utils'
             }
           },
         },
@@ -196,6 +258,7 @@ export default defineConfig(({ mode }) => {
           autoprefixer() as Plugin,
         ],
       },
+      devSourcemap: isDev,
       preprocessorOptions: {
         scss: {
           api: 'modern-compiler',
@@ -210,7 +273,7 @@ export default defineConfig(({ mode }) => {
       },
     },
     resolve: {
-      extensions: ['.js', 'jsx', '.ts', '.tsx', '.vue'], // 确保 .vue 在列表中
+      extensions: ['.js', '.jsx', '.ts', '.tsx', '.vue'], // 确保 .vue 在列表中
       alias: {
         '@': path.resolve(__dirname, './src'),
       },

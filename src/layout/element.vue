@@ -1,34 +1,30 @@
+<!--
+ * @Author: moluoxixi 1983531544@qq.com
+ * @Date: 2025-05-07 14:08:20
+ * @LastEditors: moluoxixi 1983531544@qq.com
+ * @LastEditTime: 2025-05-09 19:32:19
+ * @FilePath: \vue-template\src\layout\element.vue
+ * @Description:
+ *
+ * Copyright (c) 2025 by ${git_name_email}, All Rights Reserved.
+-->
 <template>
   <el-config-provider :locale="zhCn" :namespace="systemCode" :empty-values="[undefined]">
-    <div class="height-100" :style="`--el-color-primary: ${themeColor || '#3A77FF'};`">
+    <div
+      class="h-full"
+      :class="{ 'h-screen': !qiankunWindow.__POWERED_BY_QIANKUN__ }"
+      :style="`--el-color-primary: ${themeColor || '#3A77FF'};`"
+    >
       <el-container class="w-full h-full">
-        <el-header>
-          <div class="w-dvw h-full overflow-x-auto bg-[#327bff] flex justify-center">
-              <el-menu :default-active="defaultTab" :ellipsis="false" mode="horizontal" router>
-                <template v-for="(route, index) in routes" :key="index">
-                  <el-menu-item v-if="!route.children?.length" :index="route.path">{{ route.name }}
-                  </el-menu-item>
-                  <template v-else>
-                    <el-sub-menu v-for="(route, index) in routes" :key="index" :index="route.path">
-                      <template #title>{{ route.name }}</template>
-                      <template>
-                        <el-menu-item
-                          v-for="(child, i) in route.children"
-                          :key="i"
-                          :index="`${route.path}${child.path}`"
-                        >
-                          {{ child.meta?.title || child.name }}
-                        </el-menu-item>
-                      </template>
-                    </el-sub-menu>
-                  </template>
-                </template>
-
-              </el-menu>
+        <el-header v-if="!qiankunWindow.__POWERED_BY_QIANKUN__" height="30">
+          <div class="w-full h-full bg-primary flex justify-center">
+            <el-menu :default-active="defaultTab" :ellipsis="false" mode="horizontal" router>
+              <subMenu :routes="routes" />
+            </el-menu>
           </div>
         </el-header>
         <el-main>
-          <el-container>
+          <el-container class="h-full w-full bg-white">
             <el-main>
               <transition name="fade">
                 <router-view v-slot="{ Component, route }">
@@ -47,12 +43,15 @@
 </template>
 <script setup>
 import zhCn from 'element-plus/dist/locale/zh-cn.mjs'
+import subMenu from '@/components/subMenu.vue'
+import { qiankunWindow } from 'vite-plugin-qiankun/dist/helper'
 import { computed, reactive } from 'vue'
 import { RouterView, useRouter } from 'vue-router'
-import { useSystemStore } from '@/stores/system'
+import { useSystemStore } from '@/stores/modules/system.js'
 
 const router = useRouter()
 const routes = reactive(router.options.routes[0].children)
+console.log('routes', routes)
 const systemStore = useSystemStore()
 const themeColor = computed(() => systemStore.themeColor)
 const systemCode = computed(() => {

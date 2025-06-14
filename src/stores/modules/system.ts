@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import store from './index.ts'
+import { store } from '../index.ts'
 
 /**
  * 系统对象
@@ -21,7 +21,7 @@ const systemStore = defineStore('system', {
      * 系统编码
      * @type {string}
      */
-    systemCode: __SYSTEM_CODE__
+    systemCode: __SYSTEM_CODE__,
   }),
   actions: {
     setSystemCode(systemCode: string) {
@@ -42,8 +42,8 @@ const systemStore = defineStore('system', {
     setTheme(color: string) {
       // 将当前的主题颜色设置为传入的颜色
       this.themeColor = color
-    }
-  }
+    },
+  },
 })
 
 export function useSystemStore() {

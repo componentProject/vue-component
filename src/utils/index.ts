@@ -1,23 +1,12 @@
-interface modulesTypes {
-  path: string
-  name: string
-  component: () => Promise<unknown>
-}
+export * from './modules/route.ts'
+export * from './modules/modifyComponent.tsx'
 
-
-
-export function getRoutes(files) {
-  const modules: modulesTypes[] = []
-  return Object.keys(files).reduce((modules = [], name) => {
-    const component = files[name]
-    if (!component || name == 'install') return modules
-    modules.push({
-      path: `/${name}`,
-      name,
-      component,
-    })
-    return modules
-  }, modules)
+export function getType(obj: any, type?: string) {
+  if (type) {
+    return Object.prototype.toString.call(obj).slice(8, -1).toLowerCase() === type.toLowerCase()
+  } else {
+    return Object.prototype.toString.call(obj).slice(8, -1).toLowerCase()
+  }
 }
 
 /**

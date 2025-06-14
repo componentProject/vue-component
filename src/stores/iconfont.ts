@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
-import strore from './index.ts'
-const useIconfontStore = defineStore('iconfont', {
+import { store } from './index.ts'
+
+export const iconfontStore = defineStore('iconfont', {
   state: () => ({
     loaded: new Set(),
   }),
@@ -17,5 +18,9 @@ const useIconfontStore = defineStore('iconfont', {
     },
   },
 })
-const iconfontStore = useIconfontStore(strore)
-export default iconfontStore
+
+export function useIconfontStore() {
+  return iconfontStore(store)
+}
+
+export default useIconfontStore()

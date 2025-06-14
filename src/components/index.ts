@@ -2,19 +2,21 @@ import type { Plugin, Component } from 'vue'
 
 const componentFiles = import.meta.glob('./**/index.vue', { eager: true, import: 'default' })
 const components: Plugin = Object.keys(componentFiles).reduce((modules = {}, modulePath) => {
-  const nameArr: string[] = modulePath.split('/')
-  if (nameArr.length > 3) return modules
-  const name: string | undefined =
-    nameArr.at(-1) === 'index.vue' ? nameArr.at(-2) : nameArr?.at(-1)?.slice(0, -4)
+  const name: string | undefined = modulePath
   const component: Component = componentFiles[modulePath] as Component
   if (!component) return modules
   if (name) {
-    modules[name] = component
+    modules[name as string] = component
   }
   return modules
-}, {}) as Plugin
+}, {} as any) as Plugin
 components.install = function (app) {
-  const componentNames = Object.keys(components)
+  const componentNames: string[] = Object.keys(components)
+    .map((name) => {
+      const nameArr = name.split('/')
+      return nameArr.at(-1) || ''
+    })
+    .filter((i) => i)
   componentNames.forEach((name) => {
     app.component(name, components[name])
   })
