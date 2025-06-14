@@ -18,7 +18,7 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import moment from 'moment'
 
 // 组件属性
@@ -67,6 +67,7 @@ const props = defineProps({
   // date类型是否默认返回 [YYYY-MM-DD 00:00:00，YYYY-MM-DD 23:59:59] 格式，没有则取当前时间
   defaultDatetimeRange: {
     type: Boolean,
+    default: null,
   },
   // 当无选定值时，是否默认返回今天的日期范围
   defaultToday: {
@@ -235,6 +236,7 @@ function isValidMomentFormat(dateStr, format, type = 'startOf', dateType = 'day'
 
   const formatDateStr = momentDate.format(format)
   if (formatDateStr === dateStr || !computedDefaultDatetimeRange.value) return formatDateStr
+  console.log('aaaaaaaaaaaaaa', momentDate[type](dateType).format(format))
   return momentDate[type](dateType).format(format)
 }
 

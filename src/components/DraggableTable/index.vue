@@ -1,11 +1,12 @@
 <template>
-  <div class="draggable-table">
+  <!--  <DraggableTable />-->
+  <div class="h-full w-full">
     <!--  :key="tableKey"  -->
     <vxe-grid
       ref="xTable"
       v-bind="gridProps"
       @checkbox-all="checkboxAll"
-      @column-dragend="columnDragEnd"
+      @checkbox-change="checkboxChange"
       @resizable-change="handleColumnResizableChange"
     >
       <!--      <template #empty>-->
@@ -15,25 +16,33 @@
       <!--        </span>-->
       <!--      </template>-->
       <!-- 使用插槽方式渲染自定义内容 -->
-      <template #[name]="slotParams" v-for="(_, name) in slots" :key="name">
+      <template #[name]="slotParams" v-for="name in slotNames" :key="name">
         <slot :name="name" v-bind="slotParams" />
       </template>
     </vxe-grid>
   </div>
 </template>
 
-<script setup>
-import { computed, nextTick, onBeforeUnmount, onMounted, ref, useAttrs, useSlots, watch } from 'vue'
+<script lang="jsx" setup>
+import {
+  computed,
+  useTemplateRef,
+  nextTick,
+  onBeforeUnmount,
+  onMounted,
+  ref,
+  useAttrs,
+  useSlots,
+  watch,
+} from 'vue'
 import Sortable from 'sortablejs'
 import { cloneDeep } from 'lodash'
 import { ElMessage } from 'element-plus'
-
-function columnDragEnd(params) {
-  console.log('params', params)
-}
+import { diff } from 'radash'
 
 // 定义组件属性
 const props = defineProps({
+  //#region 其他原始配置加默认值
   // 表格唯一ID，用于本地存储识别
   id: {
     type: String,
@@ -55,27 +64,21 @@ const props = defineProps({
     type: Object,
     default: () => ({}),
   },
-  dragType: {
-    type: String,
-    // default: () => 'vxe'
-    default: () => 'default',
-  },
-  //#region 行相关配置
-  /**
-   * 行的唯一标识字段
-   * @default '_X_ROW_KEY'
-   */
-  rowId: {
-    type: [String, Number],
-    default: () => '_X_ROW_KEY',
-  },
-  /**
-   * 行配置对象
-   * @default {}
-   */
-  rowConfig: {
+  //#endregion
+  //#region 编辑相关
+  editConfig: {
     type: Object,
     default: () => ({}),
+  },
+  //#endregion
+  //#region 行列拖拽
+  /**
+   * 拖拽模式
+   */
+  dragType: {
+    type: String,
+    default: () => 'vxe',
+    // default: () => 'default',
   },
   rowDisabledClass: {
     type: String,
@@ -109,25 +112,6 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
-  //#endregion
-  //#region 列相关配置
-  /**
-   * 列配置数组
-   * @default []
-   */
-  columns: {
-    type: Array,
-    default: () => [],
-  },
-  /**
-   * 列配置对象
-   * @type {Object}
-   * @default {}
-   */
-  columnConfig: {
-    type: Object,
-    default: () => ({}),
-  },
   /**
    * 列拖拽禁用方法
    */
@@ -158,6 +142,43 @@ const props = defineProps({
     default: false,
   },
   //#endregion
+  //#region 行相关配置
+  /**
+   * 行的唯一标识字段
+   * @default '_X_ROW_KEY'
+   */
+  rowId: {
+    type: [String, Number],
+    default: () => '_X_ROW_KEY',
+  },
+  /**
+   * 行配置对象
+   * @default {}
+   */
+  rowConfig: {
+    type: Object,
+    default: () => ({}),
+  },
+  //#endregion
+  //#region 列相关配置
+  /**
+   * 列配置数组
+   * @default []
+   */
+  columns: {
+    type: Array,
+    default: () => [],
+  },
+  /**
+   * 列配置对象
+   * @type {Object}
+   * @default {}
+   */
+  columnConfig: {
+    type: Object,
+    default: () => ({}),
+  },
+  //#endregion
   //#region 虚拟列表配置
   virtualXConfig: {
     type: Object,
@@ -169,6 +190,36 @@ const props = defineProps({
   },
   //#endregion
 })
+
+const computedColumns = computed(() => {
+  const columns = cloneDeep(props.columns)
+  if (!getType(columns, 'array')) return []
+  const columnsSlotsNames = []
+  columns.forEach((item) => {
+    if (item?.slots) {
+      columnsSlotsNames.push(...Object.values(item.slots).filter((i) => getType(i, 'string')))
+    }
+  })
+  const slotsDiff = [...diff(slotNames.value, columnsSlotsNames)] || []
+  columns.forEach((item) => {
+    // 添加默认插槽，当columns中没有该插槽时，edit-${field}开头的为edit插槽，field为默认插槽
+    const defaultField = item.field
+    const editField = `edit-${defaultField}`
+    const defaultSlots = {}
+    if (defaultField && slotsDiff.includes(defaultField)) {
+      defaultSlots.default = defaultField
+    }
+    if (editField && slotsDiff.includes(editField)) {
+      defaultSlots.edit = editField
+    }
+    item.slots = {
+      ...defaultSlots,
+      ...item.slots,
+    }
+  })
+  return columns
+})
+
 const attrs = useAttrs()
 // 组件事件
 const emit = defineEmits([
@@ -185,8 +236,12 @@ function checkboxAll(params) {
   emit('checkbox-all', params)
 }
 
+function checkboxChange(params) {
+  emit('checkbox-change', params)
+}
+
 // 表格引用
-const xTable = ref(null)
+const xTable = useTemplateRef('xTable')
 // 表格唯一key，用于强制更新表格
 const tableKey = ref(0)
 
@@ -196,7 +251,7 @@ const columnSortableInstance = ref(null)
 
 // 获取插槽
 const slots = useSlots()
-
+const slotNames = computed(() => Object.keys(slots))
 // 本地保存的列配置
 const localColumns = ref([])
 // 本地存储键名
@@ -262,7 +317,7 @@ const saveColumnsToStorage = () => {
 // 没有本地存储的列配置，使用props.columns
 function savePropsColumns() {
   const types = new Set([])
-  localColumns.value = cloneDeep(props.columns).filter((i) => {
+  localColumns.value = cloneDeep(computedColumns.value).filter((i) => {
     if (i.type && types.has(i.type)) {
       return false
     }
@@ -284,12 +339,11 @@ const initLocalColumns = () => {
   if (storedColumns && Array.isArray(storedColumns) && storedColumns.length > 0) {
     // 对比本地存储的列配置和props.columns
     // 检查每列的field, title, fixed, sortable是否变化
-    const shouldUseStored = compareColumns(props.columns, storedColumns)
-    // console.log('shouldUseStored', shouldUseStored, storedColumns)
+    const shouldUseStored = compareColumns(computedColumns.value, storedColumns)
+    // 使用props.columns并保存到本地
     if (shouldUseStored) {
       savePropsColumns()
     } else {
-      // 使用props.columns并保存到本地
       localColumns.value = storedColumns
       xTable.value?.loadColumn(localColumns.value)
       // console.log('localColumns', localColumns.value)
@@ -314,10 +368,19 @@ function getStringObj(obj) {
   return obj
 }
 
-// 对比columns是否一致（基于field, title, fixed, sortable字段）
+// 对比columns是否不一致（基于field, title, fixed, sortable字段）
 const compareColumns = (sourceColumns, targetColumns) => {
   // console.log('sourceColumns', [...sourceColumns], [...targetColumns])
-  const requiredFields = ['title', 'field', 'sortable', 'align', 'slots', 'fixed', 'type']
+  const requiredFields = [
+    'title',
+    'field',
+    'sortable',
+    'align',
+    'slots',
+    'fixed',
+    'type',
+    'editRender',
+  ]
   const requiredAndDefaultFields = ['visible']
   return sourceColumns.some((source) => {
     const target = targetColumns.find(
@@ -352,6 +415,12 @@ const gridProps = computed(() => {
     autoResize: props.autoResize,
     data: tableData.value,
     height: '100%',
+    editConfig: {
+      enabled: true,
+      trigger: 'click',
+      mode: 'row',
+      ...props.editConfig,
+    },
     rowConfig: {
       useKey: true,
       drag: props.dragType == 'vxe' && props.rowDraggable,
@@ -364,7 +433,10 @@ const gridProps = computed(() => {
       showGuidesStatus: true,
       showIcon: false,
       trigger: 'row',
-      dragEndMethod: props.rowDragEndMethod,
+      dragEndMethod: (params) => {
+        console.log('params', params)
+        return props.rowDragEndMethod ? props.rowDragEndMethod(params) : true
+      },
       disabledMethod(params) {
         const currentRowDom = xTable.value?.$el.querySelector(`tr[rowid="${params.rowid}"]`)
         return (
@@ -379,7 +451,7 @@ const gridProps = computed(() => {
       drag: props.dragType == 'vxe' && props.columnDraggable,
       dragEndMethod: (params) => {
         saveColumnsToStorage()
-        props.columnDragEndMethod?.(params)
+        props.columnDragEndMethod ? props.columnDragEndMethod(params) : true
       },
       ...props.columnConfig,
     },
@@ -480,10 +552,15 @@ const initRowDraggable = () => {
       const rowData = tableDataCopy.splice(oldIndex, 1)[0]
       tableDataCopy.splice(newIndex, 0, rowData)
       const dragPos = oldIndex > newIndex ? 'top' : 'bottom'
+      console.log(
+        'newRow',
+        dragPos == 'top' ? tableDataCopy[newIndex + 1] : tableDataCopy[newIndex - 1],
+        tableDataCopy[newIndex],
+      )
       const flag = props.rowDragEndMethod?.({
         oldIndex,
         newIndex,
-        newRow: tableDataCopy[oldIndex],
+        newRow: dragPos == 'top' ? tableDataCopy[newIndex + 1] : tableDataCopy[newIndex - 1],
         oldRow: tableDataCopy[newIndex],
         dragRow: rowData,
         dragPos,
@@ -632,7 +709,7 @@ watch(
 
 // 监听props.columns的变化
 watch(
-  () => props.columns,
+  () => computedColumns.value,
   (newColumns) => {
     if (newColumns.length > 0) {
       // 检查列配置是否发生了关键变化
@@ -657,7 +734,7 @@ watch(
 // 初始化表格和拖拽功能
 onMounted(() => {
   // 初始化本地列配置
-  if (props.columns.length > 0) {
+  if (computedColumns.value.length > 0) {
     initLocalColumns()
   }
   if (props.dragType !== 'default') return
@@ -713,27 +790,28 @@ watch(
 
 // 暴露给父组件的方法和属性
 defineExpose({
-  // 暴露本地列配置
-  getLocalColumns: () => localColumns.value,
   // 暴露表格实例
   getTable: () => xTable.value,
-  // 重置表格列配置
-  resetColumns: () => {
-    localColumns.value = cloneDeep(props.columns)
-    nextTick(() => {
-      if (xTable.value) {
-        console.log('resetColumns')
-        saveColumnsToStorage()
-        tableKey.value++
-      }
-    })
-  },
 })
+// watch(
+//   () => localColumns.value,
+//   (newVal) => {
+//     console.log('newVal', newVal)
+//   },
+// )
+// // 定义 render 函数
+// const DraggableTable = () => {
+//   return [
+//     <div class="h-full w-full">
+//       <vxe-grid
+//         ref="xTable"
+//         v-slots={slots}
+//         {...gridProps.value}
+//         onCheckboxAll={checkboxAll}
+//         onCheckboxChange={checkboxChange}
+//         onResizableChange={handleColumnResizableChange}
+//       />
+//     </div>
+//   ]
+// }
 </script>
-
-<style scoped>
-.draggable-table {
-  width: 100%;
-  height: 100%;
-}
-</style>
