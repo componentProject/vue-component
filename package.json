@@ -91,7 +91,11 @@
     "vxe-pc-ui": "4.6.21",
     "vxe-table": "4.13.39",
     "xlsx": "^0.18.5",
-    "zod": "^3.24.2"
+    "zod": "^3.24.2",
+    "fs-extra": "^11.3.0",
+    "globby": "^14.1.0",
+    "gray-matter": "^4.0.3",
+    "markdown-it-mathjax3": "^4.3.2"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.8.0",
@@ -121,13 +125,9 @@
     "eslint": "^9.22.0",
     "eslint-plugin-oxlint": "^0.16.0",
     "eslint-plugin-vue": "~10.0.0",
-    "fs-extra": "^11.3.0",
-    "globby": "^14.1.0",
-    "gray-matter": "^4.0.3",
     "husky": "^9.1.7",
     "jiti": "^2.4.2",
     "lint-staged": "^15.5.1",
-    "markdown-it-mathjax3": "^4.3.2",
     "npm-run-all2": "^7.0.2",
     "oxlint": "^0.16.0",
     "postcss": "^8.5.3",
