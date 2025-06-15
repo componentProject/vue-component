@@ -8,7 +8,7 @@
     "cypress.config.*",
     "nightwatch.conf.*",
     "playwright.config.*",
-    "./plugins/addScopedAndReplacePrefix.ts",
+    "./plugins/*"
   ],
   "compilerOptions": {
     "composite": true,

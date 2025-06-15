@@ -104,22 +104,7 @@ export default defineConfig(({ mode }) => {
 
   const vuePlugins = [pluginVue(), vueJsx(), isDev && vueDevTools()].filter((i) => !!i)
 
-  const cdnModules = getCdnModules([
-    'vue',
-    'vue-router',
-    {
-      name: 'lodash',
-      var: '_',
-    },
-    {
-      name: 'element-plus',
-      css: 'dist/index.css',
-    },
-    {
-      name: '@element-plus/icons-vue',
-      var: 'ElementPlusIconsVue',
-    },
-  ])
+  const cdnModules = getCdnModules([])
 
   const performancePlugins = [
     createHtmlPlugin({
@@ -172,6 +157,7 @@ export default defineConfig(({ mode }) => {
       }),
     viteEnv.VITE_USE_CDN &&
       importToCDN({
+        enableInDevMode: viteEnv.VITE_USE_CDN_IS_DEV,
         prodUrl: `${viteEnv.VITE_CDN_BASE_URL}/{name}@{version}{path}`,
         modules: cdnModules,
       }),

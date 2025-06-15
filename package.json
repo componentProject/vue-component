@@ -24,6 +24,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "CICD": "node ./scripts/CICD.mjs",
     "build": "vite build --mode production",
     "preview": "vite preview",
     "type-check": "vue-tsc --build",

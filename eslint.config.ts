@@ -1,55 +1,23 @@
 import { globalIgnores } from 'eslint/config'
 import { defineConfigWithVueTs, vueTsConfigs } from '@vue/eslint-config-typescript'
-import globals from 'globals'
 import pluginVue from 'eslint-plugin-vue'
 import pluginOxlint from 'eslint-plugin-oxlint'
 import skipFormatting from '@vue/eslint-config-prettier/skip-formatting'
 
+// To allow more languages other than `ts` in `.vue` files, uncomment the following lines:
+// import { configureVueProject } from '@vue/eslint-config-typescript'
+// configureVueProject({ scriptLangs: ['ts', 'tsx'] })
+// More info at https://github.com/vuejs/eslint-config-typescript/#advanced-setup
+
 export default defineConfigWithVueTs(
-  {
-    languageOptions: {
-      parserOptions: {
-        parser: '@typescript-eslint/parser',
-        ecmaVersion: 2020,
-        ecmaFeatures: {
-          jsx: true,
-        },
-        globals: {
-          ...globals.browser,
-          ...globals.node,
-          myCustomGlobal: 'readonly',
-        },
-      },
-    },
-    files: ['src/components/**/*.{ts,mts,tsx,vue}'],
-  },
   {
     name: 'app/files-to-lint',
     files: ['**/*.{ts,mts,tsx,vue}'],
   },
-
-  globalIgnores([
-    '**/dist/**',
-    '**/dist-ssr/**',
-    '**/coverage/**',
-    '**/servers/**',
-    '**/src/components/ConfigForm/**',
-    '**/node_modules/**',
-    '**/public/**',
-    '**/package-lock.json',
-    '**/yarn.lock',
-    '**/pnpm-lock.yaml',
-    '**/.history/**',
-    '**/CHANGELOG*.md',
-    '**/*.min.*',
-    '**/LICENSE*',
-    '**/__snapshots__/**',
-    '**/auto-import?(s).d.ts',
-  ]),
-
+  globalIgnores(['**/dist/**', '**/dist-ssr/**', '**/coverage/**']) as any,
   pluginVue.configs['flat/essential'],
   vueTsConfigs.recommended,
-  ...pluginOxlint.configs['flat/recommended'],
+  ...(pluginOxlint.configs['flat/recommended'] as any),
   skipFormatting,
 
   {
