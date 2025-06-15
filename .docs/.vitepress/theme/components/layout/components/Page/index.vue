@@ -2,8 +2,8 @@
   <FireWorksAnimation />
   <ShareCard />
   <h1 class="blog-title">Blogs</h1>
-  <div class="flex-col items-center flex-1-hidden">
-    <div class="max-w-[700px]! blogList flex flex-col items-center flex-1-auto">
+  <div class="flex flex-col items-center flex-1-hidden">
+    <div class="w-full blogList flex flex-col items-center flex-1-auto">
       <a
         class="blog"
         v-for="(item, index) in posts"

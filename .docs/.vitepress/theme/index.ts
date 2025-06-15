@@ -27,7 +27,7 @@ export default {
 
     app.component('Archives', Archives)
     app.component('Tags', Tags)
-    app.use(TwoslashFloatingVue)
+    app.use(TwoslashFloatingVue as any)
 
     app.component('Demo', Demo)
     app.component('DemoBlock', DemoBlock)

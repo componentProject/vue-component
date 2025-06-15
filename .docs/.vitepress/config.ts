@@ -6,11 +6,9 @@ import mathjax3 from 'markdown-it-mathjax3'
 import type { UserConfig } from 'vitepress'
 import { demoblockPlugin, demoblockVitePlugin } from 'vitepress-theme-demoblock'
 // vite vue插件
+import importToCDN from 'vite-plugin-cdn-import'
 import vueJsx from '@vitejs/plugin-vue-jsx'
-import AutoImport from 'unplugin-auto-import/vite'
-import Components from 'unplugin-vue-components/vite'
-import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
-
+import { visualizer } from 'rollup-plugin-visualizer'
 // 其余vite插件
 import autoprefixer from 'autoprefixer'
 import tailwindcss from '@tailwindcss/postcss'
@@ -20,12 +18,56 @@ import tailwindcss from '@tailwindcss/postcss'
 import { getSidebar } from './utils'
 import path from 'path'
 
+function getCamelCase(str: string): string {
+  return str
+    .replace(/[-_]+/g, ' ') // 将连字符或下划线替换为空格
+    .replace(/(?:^|\s)\w/g, (match) => match.toUpperCase()) // 每个单词首字母大写
+    .replace(/\s+/g, '') // 移除所有空格
+}
+
+interface CdnModule {
+  name: string
+  var?: string
+  css?: string
+  path?: string
+  alias?: string
+}
+
+function getCdnModules(modules: Array<string | CdnModule>): any {
+  function getPath(str: string | undefined) {
+    if (!str) return ''
+    return str.startsWith('/') ? str : `/${str}`
+  }
+
+  return modules
+    .map((item) => {
+      if (typeof item === 'string') {
+        return {
+          name: item,
+          var: getCamelCase(item),
+          path: '',
+        }
+      } else {
+        return item
+      }
+    })
+    .map((item) => {
+      return {
+        name: item.name,
+        var: item.var || getCamelCase(item.name),
+        path: getPath(item.path),
+        css: getPath(item.css),
+      }
+    })
+}
+
 async function config(): Promise<Awaited<UserConfig>> {
   const componentPath = '/components'
   const posts = await getComponents(componentPath)
   const pageSize = 5
   const postLength = posts.length
-
+  // 不支持，打包会报错
+  const cdnModules = getCdnModules([])
   const components = await getSidebar('components')
   const navs = await getSidebar('navs')
   return {
@@ -43,17 +85,13 @@ async function config(): Promise<Awaited<UserConfig>> {
       plugins: [
         demoblockVitePlugin() as any,
         vueJsx(),
-        // 自动引入
-        AutoImport({
-          imports: ['vue'],
-          resolvers: [ElementPlusResolver()],
-          dts: path.resolve(__dirname, './typings/auto-imports.d.ts'),
+        importToCDN({
+          prodUrl: `https://unpkg.com/{name}@{version}{path}`,
+          modules: cdnModules,
         }),
-        // 与自定义element组件冲突
-        // Components({
-        //   resolvers: [ElementPlusResolver()],
-        //   dts: path.resolve(__dirname, './typings/components.d.ts'),
-        // }),
+        visualizer({
+          open: true,
+        }),
       ],
       // 添加 SSR 配置，解决 CSS 文件扩展名问题
       ssr: {
@@ -109,7 +147,7 @@ async function config(): Promise<Awaited<UserConfig>> {
         light: 'vitesse-light',
         dark: 'vitesse-dark',
       },
-      codeTransformers: [transformerTwoslash()],
+      codeTransformers: [transformerTwoslash() as any],
       config: (md: any) => {
         md.use(mathjax3)
         md.use(demoblockPlugin, {
