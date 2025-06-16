@@ -85,18 +85,20 @@ export function getClass(className: string, hasPrefix?: boolean) {
   }
 }
 
+type EventType = string | Event
+
 /**
  * 派发事件
  * @param target 触发事件的目标dom
  * @param events 事件数组
  */
-export function dispatchEvents(target: Document, events: string | string[]) {
+export function dispatchEvents(target: Document, events: EventType | EventType[]) {
   if (Array.isArray(events)) {
-    events.forEach((event) => {
-      target.dispatchEvent(new Event(event))
+    events.forEach((event: EventType) => {
+      target.dispatchEvent(typeof event === 'string' ? new Event(event) : event)
     })
   } else {
-    target.dispatchEvent(new Event(events))
+    target.dispatchEvent(typeof events === 'string' ? new Event(events) : events)
   }
 }
 
