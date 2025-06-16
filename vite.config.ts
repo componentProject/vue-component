@@ -59,7 +59,8 @@ export default defineConfig(({ mode }) => {
   const viteEnv = wrapperEnv(env)
   const appTitle = viteEnv.VITE_GLOB_APP_TITLE
   const isDev = mode === 'development'
-  const systemCode = isDev ? 'el' : viteEnv.VITE_GLOB_APP_CODE
+  const systemCode = viteEnv.VITE_GLOB_APP_CODE
+  const envSystemCode = isDev ? 'el' : viteEnv.VITE_GLOB_APP_CODE
 
   const vuePlugins = [pluginVue(), vueJsx(), isDev && vueDevTools()].filter((i) => !!i)
 
@@ -189,7 +190,7 @@ export default defineConfig(({ mode }) => {
           api: 'modern-compiler',
           additionalData(content: string, filename: string) {
             if (filename.includes('element')) {
-              const addStr = `$namespace: ${systemCode};`
+              const addStr = `$namespace: ${envSystemCode};`
               return `${addStr}\n${content}`
             }
             return content
