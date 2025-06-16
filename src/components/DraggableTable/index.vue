@@ -43,6 +43,9 @@ import { getType, getStringObj, getClass, dispatchEvents } from '@/components/_u
 import type { VxeTablePropTypes, VxeTableDefines, VxeTableConstructor } from 'vxe-table'
 
 type ColumnType = VxeTableDefines.ColumnOptions
+defineOptions({
+  name: 'DraggableTable',
+})
 // 定义组件属性
 const props = defineProps({
   //#region 其他原始配置加默认值

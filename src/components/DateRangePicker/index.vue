@@ -27,6 +27,9 @@ import type { DatePickerProps } from 'element-plus'
 import { dateIsBefore, formatDateRange, validateDate, getTypeDefault } from '@/components/_utils'
 import { isEmpty } from 'radash'
 
+defineOptions({
+  name: 'DateRangePicker',
+})
 // 组件属性
 const props = defineProps({
   //#region 透传给el-date-picker

@@ -32,7 +32,9 @@ import DraggableTable from '@/components/DraggableTable/index.vue'
 type TableRowData = VxeTablePropTypes.Row
 
 type ColumnType = VxeTablePropTypes.ColumnConfig
-
+defineOptions({
+  name: 'PopoverTableSelect',
+})
 const props = defineProps({
   //#region 透传给popover
   virtualRef: {
