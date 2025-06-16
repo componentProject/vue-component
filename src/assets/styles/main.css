@@ -1,5 +1,6 @@
-@import "tailwind.scss";
+@import 'tailwind.scss';
 @import './base.css';
 @import './element/index.scss';
-@import "./element/custom.scss";
-@import "./element/fixQiankun.scss";
+@import './element/custom.scss';
+@import './element/fixQiankun.scss';
+@import 'vxe-table/lib/style.css';
