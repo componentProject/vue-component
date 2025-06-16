@@ -57,9 +57,9 @@ function wrapperEnv(env: Record<string, string>) {
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd())
   const viteEnv = wrapperEnv(env)
-  const systemCode = viteEnv.VITE_GLOB_APP_CODE
   const appTitle = viteEnv.VITE_GLOB_APP_TITLE
   const isDev = mode === 'development'
+  const systemCode = isDev ? 'el' : viteEnv.VITE_GLOB_APP_CODE
 
   const vuePlugins = [pluginVue(), vueJsx(), isDev && vueDevTools()].filter((i) => !!i)
 
