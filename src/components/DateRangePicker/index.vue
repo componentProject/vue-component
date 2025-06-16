@@ -19,7 +19,9 @@
 
 <script lang="ts" setup>
 import { computed, ref, useTemplateRef, watch } from 'vue'
-import moment, { unitOfTime, Moment } from 'moment'
+import type { PropType } from 'vue'
+import moment from 'moment'
+import type { unitOfTime, Moment } from 'moment'
 import { ElDatePicker } from 'element-plus'
 import type { DatePickerProps } from 'element-plus'
 import { dateIsBefore, formatDateRange, validateDate, getTypeDefault } from '@/components/_utils'
@@ -88,7 +90,7 @@ const props = defineProps({
    * 数组[n,m]表示从前n天到后m天（dateRangeType）
    */
   dateRange: {
-    type: [Number, Array],
+    type: [Array, Number] as PropType<number[] | number>,
     default: null,
   },
   /**
@@ -136,7 +138,7 @@ const props = defineProps({
 const emit = defineEmits(['update:modelValue', 'change'])
 
 // 本地日期值，用于与el-date-picker交互
-const localDateValue = ref(null)
+const localDateValue = ref()
 
 /**
  * 日期选择器引用
@@ -250,7 +252,7 @@ let init = false
 // 监听modelValue变化
 watch(
   () => props.modelValue,
-  (newVal) => {
+  (newVal: any) => {
     // 如果是空值，且是刚初始化
     if (isEmpty(newVal) && !init) {
       init = true

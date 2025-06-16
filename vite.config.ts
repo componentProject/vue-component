@@ -10,11 +10,16 @@ import viteImagemin from 'vite-plugin-imagemin'
 import pluginVue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
 import vueDevTools from 'vite-plugin-vue-devtools'
+import AutoImport from 'unplugin-auto-import/vite'
+import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
+import Components from 'unplugin-vue-components/vite'
+
 // 其余vite插件
 import { createHtmlPlugin } from 'vite-plugin-html'
 import autoprefixer from 'autoprefixer'
 import tailwindcss from '@tailwindcss/postcss'
 import type { Plugin } from 'postcss'
+
 // storybook不支持这种cdn
 // import importToCDN from "vite-plugin-cdn-import";
 // import { modules } from "./src/constants";
@@ -71,6 +76,22 @@ export default defineConfig(({ mode }) => {
           title: appTitle,
         },
       },
+    }),
+    // // 自动引入
+    AutoImport({
+      imports: ['vue'],
+      resolvers: [ElementPlusResolver()],
+      dts: path.resolve(__dirname, './src/typings/auto-imports.d.ts'),
+    }),
+    // 与自定义element组件冲突
+    Components({
+      resolvers: [
+        ElementPlusResolver({
+          exclude: new RegExp(['ElDrawer', 'ElDialog'].map((item) => `^${item}$`).join('|')),
+        }),
+      ],
+      globs: ['src/components/**/index.vue'],
+      dts: path.resolve(__dirname, './src/typings/components.d.ts'),
     }),
     // 代码压缩
     viteEnv.VITE_COMPRESS &&

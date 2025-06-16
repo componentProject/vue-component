@@ -3,17 +3,11 @@ import '@/assets/styles/main.css'
 import { createApp } from 'vue'
 import { store } from '@/stores'
 
-import VxeUITable from 'vxe-table'
-import 'vxe-table/lib/style.css'
-
-import VxeUI from 'vxe-pc-ui'
-import 'vxe-pc-ui/lib/style.css'
-
 import components from '@/components'
 
 import i18n from '@/locales'
 
-import ElementPlus, { ElDrawer, ElTooltip } from 'element-plus'
+import { ElDrawer, ElTooltip } from 'element-plus'
 
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 import moment from 'moment'
@@ -79,11 +73,8 @@ async function render(props: QiankunProps) {
   app = createApp(App)
   app.use(store)
   app.use(router)
-  app.use(VxeUITable)
-  app.use(VxeUI)
   app.use(components)
   app.use(i18n)
-  app.use(ElementPlus)
   // 修改Element的appendToBody默认行为
   modifyComponents(app, [ElDrawer, ElTooltip], 'appendTo', () => container || '#app')
 
