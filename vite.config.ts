@@ -158,25 +158,7 @@ export default defineConfig(({ mode }) => {
           manualChunks: (id: string) => {
             // 优化拆分策略
             if (id.includes('node_modules')) {
-              const moduleName = id.toString().split('node_modules/')[1].split('/')[0].toString()
-
-              if (
-                ['vue', 'vue-router', 'vue-demi', '@vue'].some((item) => moduleName.includes(item))
-              ) {
-                return 'vue-vendor'
-              }
-              if (['element-plus', '@element-plus'].some((item) => moduleName.includes(item))) {
-                return 'element-vendor'
-              }
-              return 'vendor-' + moduleName
-            }
-
-            if (id.includes('src/components/')) {
-              return 'components'
-            }
-
-            if (id.includes('src/utils/')) {
-              return 'utils'
+              return id.toString().split('node_modules/')[1].split('/')[0].toString()
             }
           },
         },
