@@ -5,7 +5,6 @@ import path from 'path'
 import { visualizer } from 'rollup-plugin-visualizer'
 import viteCompression from 'vite-plugin-compression'
 import viteImagemin from 'vite-plugin-imagemin'
-import importToCDN from 'vite-plugin-cdn-import'
 
 // vite vue插件
 import pluginVue from '@vitejs/plugin-vue'
@@ -16,49 +15,9 @@ import { createHtmlPlugin } from 'vite-plugin-html'
 import autoprefixer from 'autoprefixer'
 import tailwindcss from '@tailwindcss/postcss'
 import type { Plugin } from 'postcss'
-
-function getCamelCase(str: string): string {
-  return str
-    .replace(/[-_]+/g, ' ') // 将连字符或下划线替换为空格
-    .replace(/(?:^|\s)\w/g, (match) => match.toUpperCase()) // 每个单词首字母大写
-    .replace(/\s+/g, '') // 移除所有空格
-}
-
-interface CdnModule {
-  name: string
-  var?: string
-  css?: string
-  path?: string
-  alias?: string
-}
-
-function getCdnModules(modules: Array<string | CdnModule>): any {
-  function getPath(str: string | undefined) {
-    if (!str) return ''
-    return str.startsWith('/') ? str : `/${str}`
-  }
-
-  return modules
-    .map((item) => {
-      if (typeof item === 'string') {
-        return {
-          name: item,
-          var: getCamelCase(item),
-          path: '',
-        }
-      } else {
-        return item
-      }
-    })
-    .map((item) => {
-      return {
-        name: item.name,
-        var: item.var || getCamelCase(item.name),
-        path: getPath(item.path),
-        css: getPath(item.css),
-      }
-    })
-}
+// storybook不支持这种cdn
+// import importToCDN from "vite-plugin-cdn-import";
+// import { modules } from "./src/constants";
 
 /**
  * 将环境变量中的字符串值转换为对应的 JavaScript 数据类型
@@ -103,8 +62,6 @@ export default defineConfig(({ mode }) => {
   const isDev = mode === 'development'
 
   const vuePlugins = [pluginVue(), vueJsx(), isDev && vueDevTools()].filter((i) => !!i)
-
-  const cdnModules = getCdnModules([])
 
   const performancePlugins = [
     createHtmlPlugin({
@@ -155,12 +112,12 @@ export default defineConfig(({ mode }) => {
           ],
         },
       }),
-    viteEnv.VITE_USE_CDN &&
-      importToCDN({
-        enableInDevMode: viteEnv.VITE_USE_CDN_IS_DEV,
-        prodUrl: `${viteEnv.VITE_CDN_BASE_URL}/{name}@{version}{path}`,
-        modules: cdnModules,
-      }),
+    // viteEnv.VITE_USE_CDN &&
+    // importToCDN({
+    //   enableInDevMode: viteEnv.VITE_USE_CDN_IS_DEV,
+    //   prodUrl: `${viteEnv.VITE_CDN_BASE_URL}/{name}@{version}{path}`,
+    //   modules,
+    // }),
   ].filter((i) => !!i)
 
   const monitorPlugins = [
