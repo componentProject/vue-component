@@ -2,13 +2,12 @@
   "extends": "@tsconfig/node22/tsconfig.json",
   "include": [
     ".storybook/*",
-    "./vite.config.*",
-    "/src/utils/getEnv.ts",
+    "vite.config.*",
     "vitest.config.*",
     "cypress.config.*",
     "nightwatch.conf.*",
     "playwright.config.*",
-    "./plugins/*"
+    "plugins/*"
   ],
   "compilerOptions": {
     "composite": true,
