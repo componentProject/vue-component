@@ -27,17 +27,17 @@
     </el-select>
   </div>
 </template>
-<script setup>
+<script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import getServerOptions from '@/components/Select/uitls/index.js'
 
-const data = defineModel()
+const data = defineModel<any>()
 /**
  * 定义组件的props
  */
 const props = defineProps({
   tagType: {
-    type: String,
+    type: String as () => 'success' | 'info' | 'warning' | 'danger',
     default: 'primary',
   },
   clearable: {
@@ -121,7 +121,7 @@ const allFilterFields = computed(() => {
     ),
   )
 })
-const serverOrLocalOptions = ref([])
+const serverOrLocalOptions = ref<any[]>([])
 
 watch(
   () => props.serverProps,
@@ -151,7 +151,7 @@ const computedFilterMethod = computed(() => {
   return props.filterMethod || defaultFilterMethod
 })
 
-function defaultFilterMethod(keywordStr) {
+function defaultFilterMethod(keywordStr: string) {
   keyword.value = keywordStr
 }
 
@@ -159,7 +159,7 @@ function defaultDisabledHandler({ label, value }) {
   return props.disabledValues.includes(value) || props.disabledLabels.includes(label)
 }
 
-function getType(param, type) {
+function getType(param: any, type: string) {
   return Object.prototype.toString.call(param).slice(8, -1).toLowerCase() === type.toLowerCase()
 }
 
@@ -174,7 +174,7 @@ const typeDefaultMap = {
   null: null,
 }
 
-function getTypeDefault(param, type) {
+function getTypeDefault(param: any, type: string) {
   return getType(param, type) ? param : typeDefaultMap[type]
 }
 

@@ -40,7 +40,7 @@ watch(
   },
 )
 
-const getSize = (size) => {
+const getSize = (size: any) => {
   if (Array.isArray(size) && size.length === 2) {
     return size
   }
