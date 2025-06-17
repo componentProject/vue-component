@@ -63,7 +63,7 @@ const meta: Meta<typeof DateRangePicker> = {
       description: '禁用日期范围，格式为 [minDate, maxDate]',
       control: 'object',
     },
-    quickOptions: {
+    shortcuts: {
       description: '是否显示快速选择选项',
       control: 'boolean',
     },

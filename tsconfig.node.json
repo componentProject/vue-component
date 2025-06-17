@@ -1,7 +1,8 @@
 {
   "extends": "@tsconfig/node22/tsconfig.json",
   "include": [
-    ".storybook/*",
+    ".storybook/**/*",
+    "./.docs/.vitepress/config.ts",
     "vite.config.*",
     "vitest.config.*",
     "cypress.config.*",
@@ -13,7 +14,6 @@
     "composite": true,
     "noEmit": true,
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.node.tsbuildinfo",
-
     "module": "ESNext",
     "moduleResolution": "Bundler",
     "types": ["node"]

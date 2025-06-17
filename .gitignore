@@ -2,6 +2,8 @@
 test
 test.zip
 
+src/typings
+.docs/.vitepress/typings
 stats.html
 # 日志文件
 *.log
