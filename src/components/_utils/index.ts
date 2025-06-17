@@ -85,20 +85,18 @@ export function getClass(className: string, hasPrefix?: boolean) {
   }
 }
 
-type EventType = string | Event
-
 /**
  * 派发事件
  * @param target 触发事件的目标dom
  * @param events 事件数组
  */
-export function dispatchEvents(target: Document, events: EventType | EventType[]) {
+export function dispatchEvents(target: Document, events: string | string[]) {
   if (Array.isArray(events)) {
-    events.forEach((event: EventType) => {
-      target.dispatchEvent(typeof event === 'string' ? new Event(event) : event)
+    events.forEach((event) => {
+      target.dispatchEvent(new Event(event))
     })
   } else {
-    target.dispatchEvent(typeof events === 'string' ? new Event(events) : events)
+    target.dispatchEvent(new Event(events))
   }
 }
 
@@ -118,7 +116,11 @@ export function dateIsBefore(date1: DateType, date2: DateType) {
  * @param format moment格式
  * @param strictType 强制校验的类型
  */
-export function getMomentIsValid(dateStr: DateType, format: string, strictType?: string) {
+export function getMomentIsValid(
+  dateStr: DateType,
+  format: string = 'YYYY-MM-DD HH:mm:ss',
+  strictType?: string,
+) {
   if (!dateStr || (strictType && !getType(dateStr, strictType))) return false
   const momentDate = moment(dateStr, format, true)
   return momentDate.isValid() ? momentDate : false
@@ -130,7 +132,11 @@ export function getMomentIsValid(dateStr: DateType, format: string, strictType?:
  * @param format moment格式
  * @param strictType 强制校验的类型
  */
-export function validateDate(date: DateType, format: string, strictType: string) {
+export function validateDate(
+  date: DateType,
+  format: string = 'YYYY-MM-DD HH:mm:ss',
+  strictType: string,
+) {
   if (!date) return false
 
   if (Array.isArray(date)) {
@@ -151,7 +157,7 @@ export function validateDate(date: DateType, format: string, strictType: string)
  */
 export function getFormatDate(
   dateStr: DateType,
-  format: string,
+  format: string = 'YYYY-MM-DD HH:mm:ss',
   type = 'startOf',
   dateType = 'day',
   onlyFormat = false,
@@ -173,7 +179,7 @@ export function getFormatDate(
  */
 export function formatDateRange(
   date: DateType | DateType[],
-  format: string,
+  format: string = 'YYYY-MM-DD HH:mm:ss',
   dateType = 'day',
   onlyFormat: boolean,
 ) {
