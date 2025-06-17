@@ -41,7 +41,7 @@ async function serverRequest(url: string, params: any) {
   ]
 }
 
-const serverMap = {
+const serverMap: { [key: string]: string } = {
   // 通用字典
   base: '/ts-pfs-cis-ipt/queryCommonDictDetail',
 }
