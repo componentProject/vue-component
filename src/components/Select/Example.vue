@@ -22,7 +22,7 @@ const data = [
 
 const value = ref('')
 
-const onChangeValue = (a: any) => {
+const onChangeValue = (a) => {
   console.log(a)
   value.value = a
 }
