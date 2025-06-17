@@ -9,6 +9,7 @@
     "nightwatch.conf.*",
     "playwright.config.*",
     ".docs/.vitepress/config.*",
+    ".docs/.vitepress/utils/*",
     "plugins/*"
   ],
   "exclude": [".storybook/.stories/*"],
