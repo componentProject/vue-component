@@ -2,7 +2,6 @@
   "extends": "@tsconfig/node22/tsconfig.json",
   "include": [
     ".storybook/**/*",
-    "./.docs/.vitepress/config.ts",
     "vite.config.*",
     "vitest.config.*",
     "cypress.config.*",
@@ -10,6 +9,7 @@
     "playwright.config.*",
     "plugins/*"
   ],
+  "exclude": [".storybook/.stories/*"],
   "compilerOptions": {
     "composite": true,
     "noEmit": true,
