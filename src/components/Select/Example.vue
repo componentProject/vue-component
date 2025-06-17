@@ -6,7 +6,7 @@
 </template>
 
 <script setup lang="ts">
-import Select from '@/components/Select/Index.vue'
+import Select from '@/components/Select/index.vue'
 import { ref } from 'vue'
 
 const data = [
@@ -22,7 +22,7 @@ const data = [
 
 const value = ref('')
 
-const onChangeValue = (a) => {
+const onChangeValue = (a: any) => {
   console.log(a)
   value.value = a
 }
