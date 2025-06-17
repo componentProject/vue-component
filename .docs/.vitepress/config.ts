@@ -17,49 +17,7 @@ import tailwindcss from '@tailwindcss/postcss'
 // https://vitepress.dev/reference/site-config
 import { getSidebar } from './utils'
 import path from 'path'
-
-function getCamelCase(str: string): string {
-  return str
-    .replace(/[-_]+/g, ' ') // 将连字符或下划线替换为空格
-    .replace(/(?:^|\s)\w/g, (match) => match.toUpperCase()) // 每个单词首字母大写
-    .replace(/\s+/g, '') // 移除所有空格
-}
-
-interface CdnModule {
-  name: string
-  var?: string
-  css?: string
-  path?: string
-  alias?: string
-}
-
-function getCdnModules(modules: Array<string | CdnModule>): any {
-  function getPath(str: string | undefined) {
-    if (!str) return ''
-    return str.startsWith('/') ? str : `/${str}`
-  }
-
-  return modules
-    .map((item) => {
-      if (typeof item === 'string') {
-        return {
-          name: item,
-          var: getCamelCase(item),
-          path: '',
-        }
-      } else {
-        return item
-      }
-    })
-    .map((item) => {
-      return {
-        name: item.name,
-        var: item.var || getCamelCase(item.name),
-        path: getPath(item.path),
-        css: getPath(item.css),
-      }
-    })
-}
+import { modules } from '../../src/constants'
 
 async function config(): Promise<Awaited<UserConfig>> {
   const componentPath = '/components'
@@ -67,7 +25,6 @@ async function config(): Promise<Awaited<UserConfig>> {
   const pageSize = 5
   const postLength = posts.length
   // 不支持，打包会报错
-  const cdnModules = getCdnModules([])
   const components = await getSidebar('components')
   const navs = await getSidebar('navs')
   return {
@@ -87,7 +44,7 @@ async function config(): Promise<Awaited<UserConfig>> {
         vueJsx(),
         importToCDN({
           prodUrl: `https://unpkg.com/{name}@{version}{path}`,
-          modules: cdnModules,
+          modules,
         }),
         visualizer({
           open: true,
