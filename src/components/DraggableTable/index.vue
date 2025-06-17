@@ -673,7 +673,7 @@ const initColumnDraggable = () => {
 }
 // 初始化表格和拖拽功能
 onMounted(() => {
-  if (props.dragType !== 'default') return
+  if (props.dragType !== 'draggable') return
   if (props.rowDraggable) {
     // 行拖拽需要等待表格渲染完成
     setTimeout(() => {
@@ -699,7 +699,7 @@ onBeforeUnmount(() => {
 watch(
   () => props.rowDraggable,
   (newVal) => {
-    if (props.dragType !== 'default') return
+    if (props.dragType !== 'draggable') return
     if (newVal) {
       setTimeout(() => {
         initRowDraggable()
@@ -713,7 +713,7 @@ watch(
 watch(
   () => props.columnDraggable,
   (newVal) => {
-    if (props.dragType !== 'default') return
+    if (props.dragType !== 'draggable') return
     if (newVal) {
       setTimeout(() => {
         initColumnDraggable()
