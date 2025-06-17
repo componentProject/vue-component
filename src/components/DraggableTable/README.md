@@ -42,8 +42,8 @@ app.mount('#app')
   <DraggableTable
     :tableData="tableData"
     :columns="columns"
-    :rowDraggable="true"
-    :columnDraggable="true"
+    :rowdragable="true"
+    :columndragable="true"
     @update:tableData="handleDataUpdate"
     @update:columns="handleColumnsUpdate"
     @row-dragend="handleRowDrop"
@@ -66,13 +66,13 @@ const tableData = ref([
   {
     id: 1,
     name: '张三',
-    age: 28
+    age: 28,
   },
   {
     id: 2,
     name: '李四',
-    age: 32
-  }
+    age: 32,
+  },
 ])
 
 // 列配置
@@ -96,8 +96,8 @@ const columns = ref([
     field: 'operation',
     title: '操作',
     width: 150,
-    slot: '操作'  // 指定插槽名称
-  }
+    slot: '操作', // 指定插槽名称
+  },
 ])
 
 // 数据更新事件处理
@@ -133,46 +133,47 @@ const handleDelete = (row) => {
 
 ## 组件属性（Props）
 
-| 属性名 | 类型 | 默认值 | 说明 |
-| ------ | ---- | ------ | ---- |
-| tableData | Array | [] | 表格数据 |
-| columns | Array | [] | 表格列配置 |
-| height | [String, Number] | null | 表格高度 |
-| border | Boolean | true | 是否显示边框 |
-| stripe | Boolean | true | 是否显示斑马纹 |
-| loading | Boolean | false | 是否显示加载状态 |
-| showHeader | Boolean | true | 是否显示表头 |
-| tableProps | Object | {} | VXE表格配置项 |
-| rowDraggable | Boolean | false | 是否启用行拖拽 |
-| columnDraggable | Boolean | false | 是否启用列拖拽 |
+| 属性名         | 类型             | 默认值 | 说明             |
+| -------------- | ---------------- | ------ | ---------------- |
+| tableData      | Array            | []     | 表格数据         |
+| columns        | Array            | []     | 表格列配置       |
+| height         | [String, Number] | null   | 表格高度         |
+| border         | Boolean          | true   | 是否显示边框     |
+| stripe         | Boolean          | true   | 是否显示斑马纹   |
+| loading        | Boolean          | false  | 是否显示加载状态 |
+| showHeader     | Boolean          | true   | 是否显示表头     |
+| tableProps     | Object           | {}     | VXE表格配置项    |
+| rowdragable    | Boolean          | false  | 是否启用行拖拽   |
+| columndragable | Boolean          | false  | 是否启用列拖拽   |
 
 ## 列配置参数
 
-| 属性名 | 类型 | 说明 |
-| ------ | ---- | ---- |
-| field | String | 字段名，对应数据中的key |
-| title | String | 列标题 |
-| width | [Number, String] | 列宽度 |
-| minWidth | [Number, String] | 最小列宽度 |
-| fixed | String | 列固定位置，可选值: 'left', 'right' |
-| sortable | Boolean | 是否可排序 |
-| align | String | 对齐方式，可选值: 'left', 'center', 'right' |
-| slot | String | 自定义插槽名称 |
+| 属性名   | 类型             | 说明                                        |
+| -------- | ---------------- | ------------------------------------------- |
+| field    | String           | 字段名，对应数据中的key                     |
+| title    | String           | 列标题                                      |
+| width    | [Number, String] | 列宽度                                      |
+| minWidth | [Number, String] | 最小列宽度                                  |
+| fixed    | String           | 列固定位置，可选值: 'left', 'right'         |
+| sortable | Boolean          | 是否可排序                                  |
+| align    | String           | 对齐方式，可选值: 'left', 'center', 'right' |
+| slot     | String           | 自定义插槽名称                              |
 
 ## 事件（Events）
 
-| 事件名 | 参数 | 说明 |
-| ------ | ---- | ---- |
-| update:tableData | (newData: Array) | 表格数据更新事件 |
-| update:columns | (newColumns: Array) | 列配置更新事件 |
-| row-dragend | ({ oldIndex, newIndex, row }) | 行拖拽完成事件 |
-| column-dragend | ({ oldIndex, newIndex, column }) | 列拖拽完成事件 |
+| 事件名           | 参数                             | 说明             |
+| ---------------- | -------------------------------- | ---------------- |
+| update:tableData | (newData: Array)                 | 表格数据更新事件 |
+| update:columns   | (newColumns: Array)              | 列配置更新事件   |
+| row-dragend      | ({ oldIndex, newIndex, row })    | 行拖拽完成事件   |
+| column-dragend   | ({ oldIndex, newIndex, column }) | 列拖拽完成事件   |
 
 ## 插槽（Slots）
 
 组件支持动态插槽，插槽名为列配置中的`slot`属性值。
 
 插槽参数：
+
 - `row`：当前行数据
 - `column`：当前列配置
 - 其他VXE-Grid提供的插槽参数
@@ -181,12 +182,12 @@ const handleDelete = (row) => {
 
 通过ref可以获取到组件实例，调用以下方法：
 
-| 方法名 | 参数 | 返回值 | 说明 |
-| ------ | ---- | ------ | ---- |
-| getTableInstance | 无 | VXE-Grid实例 | 获取VXE表格实例 |
-| refreshTable | 无 | 无 | 刷新表格 |
-| getSelectedRows | 无 | Array | 获取选中行数据 |
+| 方法名           | 参数 | 返回值       | 说明            |
+| ---------------- | ---- | ------------ | --------------- |
+| getTableInstance | 无   | VXE-Grid实例 | 获取VXE表格实例 |
+| refreshTable     | 无   | 无           | 刷新表格        |
+| getSelectedRows  | 无   | Array        | 获取选中行数据  |
 
 ## 示例
 
-参考 `DraggableTableDemo.vue` 文件，该文件展示了组件的完整用法示例。 
+参考 `DraggableTableDemo.vue` 文件，该文件展示了组件的完整用法示例。

@@ -117,7 +117,7 @@ const props = defineProps({
    * 是否启用行拖拽
    * @default false
    */
-  rowDraggable: {
+  rowdragable: {
     type: Boolean,
     default: false,
   },
@@ -145,7 +145,7 @@ const props = defineProps({
    * 是否启用列拖拽
    * @default false
    */
-  columnDraggable: {
+  columndragable: {
     type: Boolean,
     default: false,
   },
@@ -398,7 +398,7 @@ const gridProps = computed(() => {
     },
     rowConfig: {
       useKey: true,
-      drag: props.dragType == 'vxe' && props.rowDraggable,
+      drag: props.dragType == 'vxe' && props.rowdragable,
       keyField: props.rowId,
       isCurrent: true,
       isHover: true,
@@ -427,7 +427,7 @@ const gridProps = computed(() => {
     },
     columnConfig: {
       useKey: true,
-      drag: props.dragType == 'vxe' && props.columnDraggable,
+      drag: props.dragType == 'vxe' && props.columndragable,
       dragEndMethod: (params: VxeTableDefines.ColumnDragendEventParams) => {
         saveColumnsToStorage()
         props.columnDragEndMethod ? props.columnDragEndMethod(params) : true
@@ -519,7 +519,7 @@ const initRowDraggable = () => {
   // 先销毁旧实例
   destroyRowSortable()
 
-  if (!props.rowDraggable || !xTable.value) return
+  if (!props.rowdragable || !xTable.value) return
 
   const tableBody = xTable.value.$el.querySelector('.vxe-table--body tbody')
   if (!tableBody) return
@@ -592,7 +592,7 @@ const initColumnDraggable = () => {
   // 先销毁旧实例
   destroyColumnSortable()
 
-  if (!props.columnDraggable || !xTable.value) return
+  if (!props.columndragable || !xTable.value) return
 
   const headerTr = xTable.value.$el.querySelector(
     '.vxe-table--header-wrapper .vxe-table--header tr',
@@ -674,14 +674,14 @@ const initColumnDraggable = () => {
 // 初始化表格和拖拽功能
 onMounted(() => {
   if (props.dragType !== 'draggable') return
-  if (props.rowDraggable) {
+  if (props.rowdragable) {
     // 行拖拽需要等待表格渲染完成
     setTimeout(() => {
       initRowDraggable()
     }, 100)
   }
 
-  if (props.columnDraggable) {
+  if (props.columndragable) {
     // 列拖拽需要等待表格渲染完成
     setTimeout(() => {
       initColumnDraggable()
@@ -697,7 +697,7 @@ onBeforeUnmount(() => {
 
 // 监听拖拽配置变化，动态更新拖拽功能
 watch(
-  () => props.rowDraggable,
+  () => props.rowdragable,
   (newVal) => {
     if (props.dragType !== 'draggable') return
     if (newVal) {
@@ -711,7 +711,7 @@ watch(
 )
 
 watch(
-  () => props.columnDraggable,
+  () => props.columndragable,
   (newVal) => {
     if (props.dragType !== 'draggable') return
     if (newVal) {

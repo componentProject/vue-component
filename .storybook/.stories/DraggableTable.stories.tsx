@@ -55,7 +55,7 @@ const meta: Meta<any> = {
     },
 
     // 行相关配置
-    rowDraggable: {
+    rowdragable: {
       control: 'boolean',
       description: '是否启用行拖拽',
       defaultValue: true,
@@ -79,7 +79,7 @@ const meta: Meta<any> = {
     },
 
     // 列相关配置
-    columnDraggable: {
+    columndragable: {
       control: 'boolean',
       description: '是否启用列拖拽',
       defaultValue: true,
@@ -132,8 +132,8 @@ const Template: StoryFn = (args) => ({
 
       <div class="demo-actions" style="margin-bottom: 16px;">
         <el-button type="primary" @click="addRow">添加行</el-button>
-        <el-button @click="toggleRowDrag">{{ rowDraggable ? '禁用行拖拽' : '启用行拖拽' }}</el-button>
-        <el-button @click="toggleColumnDrag">{{ columnDraggable ? '禁用列拖拽' : '启用列拖拽' }}</el-button>
+        <el-button @click="toggleRowDrag">{{ rowdragable ? '禁用行拖拽' : '启用行拖拽' }}</el-button>
+        <el-button @click="toggleColumnDrag">{{ columndragable ? '禁用列拖拽' : '启用列拖拽' }}</el-button>
         <el-button @click="resetColumns" v-if="draggableTableRef">重置列设置</el-button>
         <el-button @click="toggleDragType">{{ dragType === 'default' ? '切换到VXE拖拽' : '切换到默认拖拽' }}</el-button>
       </div>
@@ -144,8 +144,8 @@ const Template: StoryFn = (args) => ({
         v-model="tableData"
         :id="id"
         :columns="columns"
-        :rowDraggable="rowDraggable"
-        :columnDraggable="columnDraggable"
+        :rowdragable="rowdragable"
+        :columndragable="columndragable"
         :loading="loading"
         :border="border"
         :resizable="resizable"
@@ -226,8 +226,8 @@ const Template: StoryFn = (args) => ({
     const loading = ref(args.loading !== undefined ? args.loading : false)
 
     // 拖拽开关状态
-    const rowDraggable = ref(args.rowDraggable !== undefined ? args.rowDraggable : true)
-    const columnDraggable = ref(args.columnDraggable !== undefined ? args.columnDraggable : true)
+    const rowdragable = ref(args.rowdragable !== undefined ? args.rowdragable : true)
+    const columndragable = ref(args.columndragable !== undefined ? args.columndragable : true)
 
     // 表格引用
     const draggableTableRef = ref(null)
@@ -402,14 +402,14 @@ const Template: StoryFn = (args) => ({
 
     // 切换行拖拽
     const toggleRowDrag = () => {
-      rowDraggable.value = !rowDraggable.value
-      ElMessage.info(`行拖拽已${rowDraggable.value ? '启用' : '禁用'}`)
+      rowdragable.value = !rowdragable.value
+      ElMessage.info(`行拖拽已${rowdragable.value ? '启用' : '禁用'}`)
     }
 
     // 切换列拖拽
     const toggleColumnDrag = () => {
-      columnDraggable.value = !columnDraggable.value
-      ElMessage.info(`列拖拽已${columnDraggable.value ? '启用' : '禁用'}`)
+      columndragable.value = !columndragable.value
+      ElMessage.info(`列拖拽已${columndragable.value ? '启用' : '禁用'}`)
     }
 
     // 切换拖拽类型
@@ -512,8 +512,8 @@ const Template: StoryFn = (args) => ({
       virtualYConfig,
       tableData,
       columns,
-      rowDraggable,
-      columnDraggable,
+      rowdragable,
+      columndragable,
       loading,
       tableProps,
       draggableTableRef,
@@ -539,8 +539,8 @@ const Template: StoryFn = (args) => ({
 export const Default = Template.bind({})
 Default.args = {
   id: 'default-example',
-  rowDraggable: true,
-  columnDraggable: true,
+  rowdragable: true,
+  columndragable: true,
   dragType: 'default',
 }
 
@@ -548,8 +548,8 @@ Default.args = {
 export const VxeDragMode = Template.bind({})
 VxeDragMode.args = {
   id: 'vxe-drag-example',
-  rowDraggable: true,
-  columnDraggable: true,
+  rowdragable: true,
+  columndragable: true,
   dragType: 'vxe',
 }
 
@@ -557,24 +557,24 @@ VxeDragMode.args = {
 export const DisabledRowDrag = Template.bind({})
 DisabledRowDrag.args = {
   id: 'disabled-row-drag-example',
-  rowDraggable: false,
-  columnDraggable: true,
+  rowdragable: false,
+  columndragable: true,
 }
 
 // 禁用列拖拽的故事
 export const DisabledColumnDrag = Template.bind({})
 DisabledColumnDrag.args = {
   id: 'disabled-column-drag-example',
-  rowDraggable: true,
-  columnDraggable: false,
+  rowdragable: true,
+  columndragable: false,
 }
 
 // 行禁用示例
 export const RowDisabledExample = Template.bind({})
 RowDisabledExample.args = {
   id: 'row-disabled-example',
-  rowDraggable: true,
-  columnDraggable: true,
+  rowdragable: true,
+  columndragable: true,
   rowDisabledClass: 'row-disabled',
   tableData: [
     { id: 1, name: '可拖拽行', age: 28, status: 1, disabled: false },
@@ -587,8 +587,8 @@ RowDisabledExample.args = {
 export const VirtualScrolling = Template.bind({})
 VirtualScrolling.args = {
   id: 'virtual-scrolling-example',
-  rowDraggable: true,
-  columnDraggable: true,
+  rowdragable: true,
+  columndragable: true,
   // 生成大量数据
   tableData: Array.from({ length: 1000 }, (_, index) => ({
     id: index + 1,

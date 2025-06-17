@@ -3,9 +3,9 @@
     <h2>可拖拽表格演示</h2>
     <div class="demo-actions">
       <el-button @click="addRow">添加行</el-button>
-      <el-button @click="toggleRowDrag">{{ rowDraggable ? '禁用行拖拽' : '启用行拖拽' }}</el-button>
+      <el-button @click="toggleRowDrag">{{ rowdragable ? '禁用行拖拽' : '启用行拖拽' }}</el-button>
       <el-button @click="toggleColumnDrag"
-        >{{ columnDraggable ? '禁用列拖拽' : '启用列拖拽' }}
+        >{{ columndragable ? '禁用列拖拽' : '启用列拖拽' }}
       </el-button>
     </div>
 
@@ -15,8 +15,8 @@
       v-model="tableData"
       :columns="columns"
       :rowDraggableHandle="handleRowDraggable"
-      :rowDraggable="rowDraggable"
-      :columnDraggable="columnDraggable"
+      :rowdragable="rowdragable"
+      :columndragable="columndragable"
       :loading="loading"
       :height="500"
       :border="true"
@@ -51,8 +51,8 @@ import DraggableTable from './index.vue'
 const loading = ref(false)
 
 // 拖拽开关状态
-const rowDraggable = ref(true)
-const columnDraggable = ref(true)
+const rowdragable = ref(true)
+const columndragable = ref(true)
 
 // 表格引用
 const draggableTableRef = ref(null)
@@ -169,14 +169,14 @@ const addRow = () => {
 
 // 切换行拖拽
 const toggleRowDrag = () => {
-  rowDraggable.value = !rowDraggable.value
-  ElMessage.info(`行拖拽已${rowDraggable.value ? '启用' : '禁用'}`)
+  rowdragable.value = !rowdragable.value
+  ElMessage.info(`行拖拽已${rowdragable.value ? '启用' : '禁用'}`)
 }
 
 // 切换列拖拽
 const toggleColumnDrag = () => {
-  columnDraggable.value = !columnDraggable.value
-  ElMessage.info(`列拖拽已${columnDraggable.value ? '启用' : '禁用'}`)
+  columndragable.value = !columndragable.value
+  ElMessage.info(`列拖拽已${columndragable.value ? '启用' : '禁用'}`)
 }
 
 // 处理行拖拽事件
