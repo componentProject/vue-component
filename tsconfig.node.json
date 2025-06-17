@@ -2,11 +2,13 @@
   "extends": "@tsconfig/node22/tsconfig.json",
   "include": [
     ".storybook/**/*",
+    "src/constants/*",
     "vite.config.*",
     "vitest.config.*",
     "cypress.config.*",
     "nightwatch.conf.*",
     "playwright.config.*",
+    ".docs/.vitepress/config.*",
     "plugins/*"
   ],
   "exclude": [".storybook/.stories/*"],

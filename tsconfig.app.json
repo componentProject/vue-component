@@ -5,8 +5,7 @@
     "src/**/*",
     "src/**/*.vue",
     ".storybook/preview.ts",
-    ".storybook/.stories/*",
-    ".storybook/.stories/**/*.tsx"
+    ".storybook/.stories/*"
   ],
   "exclude": ["src/**/__tests__/*", ".docs/.vitepress/cache/**/*"],
   "compilerOptions": {
