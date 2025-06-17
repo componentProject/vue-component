@@ -48,38 +48,38 @@ watch(dateRange, (newVal) => {
 
 ## 组件属性（Props）
 
-| 属性名 | 类型 | 默认值 | 说明 |
-| ------ | ---- | ------ | ---- |
-| modelValue | Array | [] | 绑定值，日期范围数组 |
-| type | String | 'date' | 日期选择类型，支持 'date'(单日期) 和 'daterange'(日期范围) |
-| format | String | 'YYYY-MM-DD' | 显示在输入框中的格式 |
-| valueFormat | String | 'YYYY-MM-DD HH:mm:ss' | 可选，绑定值的格式，对显示值无效 |
-| placeholder | String | '请选择日期' | 非范围选择时的占位内容 |
-| startPlaceholder | String | '开始日期' | 范围选择时开始日期的占位内容 |
-| endPlaceholder | String | '结束日期' | 范围选择时结束日期的占位内容 |
-| defaultToday | Boolean | false | 当无选定值时，是否默认返回今天的日期范围 |
-| dateRange | [Number, Array] | null | 设置日期范围，可以是数字或数组。正数表示当前日期往后n天，负数表示往前n天，数组[n,m]表示从前n天到后m天 |
-| minDate | String | null | 最小可选日期 |
-| maxDate | String | null | 最大可选日期 |
-| disabledDateRange | Array | null | 禁用日期范围，格式为 [minDate, maxDate] |
-| quickOptions | Boolean | false | 是否显示快速选择选项（今天、三天、一周、一月） |
-| disabled | Boolean | false | 是否禁用 |
-| clearable | Boolean | true | 是否可清空 |
-| size | String | 'default' | 输入框尺寸 |
+| 属性名            | 类型            | 默认值                | 说明                                                                                                  |
+| ----------------- | --------------- | --------------------- | ----------------------------------------------------------------------------------------------------- |
+| modelValue        | Array           | []                    | 绑定值，日期范围数组                                                                                  |
+| type              | String          | 'date'                | 日期选择类型，支持 'date'(单日期) 和 'daterange'(日期范围)                                            |
+| format            | String          | 'YYYY-MM-DD'          | 显示在输入框中的格式                                                                                  |
+| valueFormat       | String          | 'YYYY-MM-DD HH:mm:ss' | 可选，绑定值的格式，对显示值无效                                                                      |
+| placeholder       | String          | '请选择日期'          | 非范围选择时的占位内容                                                                                |
+| startPlaceholder  | String          | '开始日期'            | 范围选择时开始日期的占位内容                                                                          |
+| endPlaceholder    | String          | '结束日期'            | 范围选择时结束日期的占位内容                                                                          |
+| defaultToday      | Boolean         | false                 | 当无选定值时，是否默认返回今天的日期范围                                                              |
+| dateRange         | [Number, Array] | null                  | 设置日期范围，可以是数字或数组。正数表示当前日期往后n天，负数表示往前n天，数组[n,m]表示从前n天到后m天 |
+| minDate           | String          | null                  | 最小可选日期                                                                                          |
+| maxDate           | String          | null                  | 最大可选日期                                                                                          |
+| disabledDateRange | Array           | null                  | 禁用日期范围，格式为 [minDate, maxDate]                                                               |
+| quickOptions      | Boolean         | false                 | 是否显示快速选择选项（今天、三天、一周、一月）                                                        |
+| disabled          | Boolean         | false                 | 是否禁用                                                                                              |
+| clearable         | Boolean         | true                  | 是否可清空                                                                                            |
+| size              | String          | 'default'             | 输入框尺寸                                                                                            |
 
 ## 事件（Events）
 
-| 事件名 | 参数 | 说明 |
-| ------ | ---- | ---- |
-| update:modelValue | (dateRange: Array) | 日期范围更新事件 |
-| change | (dateRange: Array) | 用户确认选定的值时触发 |
+| 事件名            | 参数               | 说明                   |
+| ----------------- | ------------------ | ---------------------- |
+| update:modelValue | (dateRange: Array) | 日期范围更新事件       |
+| change            | (dateRange: Array) | 用户确认选定的值时触发 |
 
 ## 方法（Methods）
 
-| 方法名 | 参数 | 返回值 | 说明 |
-| ------ | ---- | ------ | ---- |
-| focus | 无 | 无 | 使 input 获取焦点 |
-| blur | 无 | 无 | 使 input 失去焦点 |
+| 方法名 | 参数 | 返回值 | 说明              |
+| ------ | ---- | ------ | ----------------- |
+| focus  | 无   | 无     | 使 input 获取焦点 |
+| blur   | 无   | 无     | 使 input 失去焦点 |
 
 ## 快速选择项
 
@@ -92,4 +92,4 @@ watch(dateRange, (newVal) => {
 
 ## 示例
 
-参考 `DateRangePickerExample.vue` 文件，该文件展示了组件的完整用法示例。 
+参考 `DateRangePickerExample.vue` 文件，该文件展示了组件的完整用法示例。

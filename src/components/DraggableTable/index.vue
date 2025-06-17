@@ -36,11 +36,17 @@ import {
 } from 'vue'
 import Sortable from 'sortablejs'
 import { VxeGrid } from 'vxe-table'
+import type {
+  VxeTablePropTypes,
+  VxeTableDefines,
+  VxeTableConstructor,
+  VxeGridInstance,
+  VxeGridProps,
+} from 'vxe-table'
 import { cloneDeep } from 'lodash'
 import { ElMessage } from 'element-plus'
 import { diff, isEmpty } from 'radash'
 import { getType, getStringObj, getClass, dispatchEvents } from '@/components/_utils'
-import type { VxeTablePropTypes, VxeTableDefines, VxeTableConstructor } from 'vxe-table'
 
 type ColumnType = VxeTableDefines.ColumnOptions
 defineOptions({
@@ -251,11 +257,11 @@ function checkboxChange(params: VxeTableDefines.CheckboxChangeParams) {
 }
 
 // 表格引用
-const xTable = useTemplateRef('xTable')
+const xTable = useTemplateRef<VxeGridInstance>('xTable')
 
 // 保存拖拽实例的引用
-const rowSortableInstance = ref<Sortable>()
-const columnSortableInstance = ref<Sortable>()
+const rowSortableInstance = ref<Sortable | null>()
+const columnSortableInstance = ref<Sortable | null>()
 
 // 获取插槽
 const slots = useSlots()
@@ -343,7 +349,7 @@ function savePropsColumns() {
 // 对比columns是否不一致（基于field, title, fixed, sortable字段）
 const compareColumns = (sourceColumns: ColumnType[] = [], targetColumns: ColumnType[] = []) => {
   // console.log('sourceColumns', [...sourceColumns], [...targetColumns])
-  const requiredFields = [
+  const requiredFields: Array<keyof ColumnType> = [
     'title',
     'field',
     'sortable',
@@ -353,7 +359,7 @@ const compareColumns = (sourceColumns: ColumnType[] = [], targetColumns: ColumnT
     'type',
     'editRender',
   ]
-  const requiredAndDefaultFields = ['visible']
+  const requiredAndDefaultFields: Array<keyof ColumnType> = ['visible']
   return sourceColumns.some((source) => {
     const target = targetColumns.find(
       (item) =>
@@ -381,7 +387,7 @@ const tableData = defineModel({
 })
 
 // 计算表格配置属性
-const gridProps = computed(() => {
+const gridProps = computed<VxeGridProps>(() => {
   console.log('localColumns.value', localColumns.value)
   return {
     // 基本配置
@@ -529,8 +535,8 @@ const initRowDraggable = () => {
     animation: 150,
     handle: 'tr',
     filter: getClass(props.rowDisabledClass, true),
-    onEnd: ({ oldIndex, newIndex, item }) => {
-      if (oldIndex === newIndex) return
+    onEnd: ({ oldIndex = 0, newIndex = 0, item }) => {
+      if (oldIndex === newIndex || !xTable.value) return
       // 获取源数据副本
       const tableDataCopy = [...tableData.value]
       // 移动行数据
@@ -556,12 +562,13 @@ const initRowDraggable = () => {
       if (!flag) {
         // 更新表格key，强制重新渲染
         const wrapperElem = item.parentNode
-        const nodeList = Array.from(wrapperElem.childNodes)
-        // console.log('aa', wrapperElem, nodeList, newIndex, oldIndex)
-        if (dragPos == 'top') {
-          wrapperElem.insertBefore(nodeList[newIndex], nodeList[oldIndex + 1])
-        } else {
-          wrapperElem.insertBefore(nodeList[newIndex], nodeList[oldIndex])
+        if (wrapperElem) {
+          const nodeList = Array.from(wrapperElem.childNodes)
+          if (dragPos == 'top') {
+            wrapperElem.insertBefore(nodeList[newIndex], nodeList[oldIndex + 1])
+          } else {
+            wrapperElem.insertBefore(nodeList[newIndex], nodeList[oldIndex])
+          }
         }
         return
       }
@@ -604,21 +611,23 @@ const initColumnDraggable = () => {
   columnSortableInstance.value = Sortable.create(headerTr, {
     animation: 150,
     handle: 'th',
-    onEnd: ({ oldIndex, newIndex, item }) => {
-      if (oldIndex === newIndex) return
+    onEnd: ({ oldIndex = 0, newIndex = 0, item }) => {
+      if (oldIndex === newIndex || !xTable.value) return
 
       // 获取列配置副本
-      const { fullColumn, tableColumn } = xTable.value.getTableColumn()
-
+      const { fullColumn, tableColumn } = xTable.value.getTableColumn() || {}
+      if (!fullColumn || !tableColumn) return
       const wrapperElem = item.parentNode
       const newColumn = fullColumn[newIndex]
       if (newColumn.fixed) {
         // 错误的移动
-        const oldTrElement = wrapperElem.children[oldIndex]
-        if (newIndex > oldIndex) {
-          wrapperElem.insertBefore(item, oldTrElement)
-        } else {
-          wrapperElem.insertBefore(oldTrElement, item)
+        const oldTrElement = wrapperElem?.children[oldIndex]
+        if (oldTrElement) {
+          if (newIndex > oldIndex) {
+            wrapperElem?.insertBefore(item, oldTrElement)
+          } else {
+            wrapperElem?.insertBefore(oldTrElement, item)
+          }
         }
         return ElMessage.warning('固定列不允许拖动！')
       }
@@ -639,7 +648,7 @@ const initColumnDraggable = () => {
       const dragPos = newIndex > oldIndex ? 'right' : 'left'
       const dragToChild = false
 
-      xTable.value.loadColumn(fullColumn)
+      xTable.value?.loadColumn(fullColumn)
 
       const eventParams = {
         $event: item,

@@ -155,7 +155,7 @@ function defaultFilterMethod(keywordStr: string) {
   keyword.value = keywordStr
 }
 
-function defaultDisabledHandler({ label, value }) {
+function defaultDisabledHandler({ label, value }: { [label: string]: any }) {
   return props.disabledValues.includes(value) || props.disabledLabels.includes(label)
 }
 
@@ -173,8 +173,17 @@ const typeDefaultMap = {
   undefined: undefined,
   null: null,
 }
+type types =
+  | 'string'
+  | 'number'
+  | 'boolean'
+  | 'function'
+  | 'object'
+  | 'array'
+  | 'undefined'
+  | 'null'
 
-function getTypeDefault(param: any, type: string) {
+function getTypeDefault(param: any, type: types) {
   return getType(param, type) ? param : typeDefaultMap[type]
 }
 
