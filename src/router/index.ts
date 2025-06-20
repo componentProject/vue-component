@@ -3,20 +3,21 @@ import { qiankunWindow } from 'vite-plugin-qiankun/dist/helper'
 import { isEmpty, assign } from 'radash'
 import { cloneDeep } from 'lodash'
 import pages from '@/views'
-import components from '@/components'
+import examples from '@/examples'
+import { componentExampleRoutes } from '@/components'
 import { getRoutes, findDefaultRoute } from '@/utils'
 import type { modulesTypes } from '@/utils'
 
 const pagesRoutes = getRoutes(pages, 'views')
-const componentsRoutes = getRoutes(components, 'components')
-
+const examplesRoutes = getRoutes(examples, 'examples')
+console.log('pages', pages, 'examples', examples, 'componentExamples', componentExampleRoutes)
 const customRoutes: modulesTypes[] = [
   //   一些路由
 ]
 const routesChildrens = customRoutes.length
   ? [...customRoutes]
-  : [...pagesRoutes, ...componentsRoutes]
-console.log('routesChildrens', routesChildrens, findDefaultRoute(routesChildrens))
+  : [...pagesRoutes, ...examplesRoutes, componentExampleRoutes]
+
 const Routes = [
   {
     path: '/',
