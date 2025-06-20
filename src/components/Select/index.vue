@@ -1,12 +1,14 @@
 <template>
   <div>
     <el-select
+      append-to="#app"
       v-model="data"
       :clearable="props.clearable"
       :filterable="props.filterable"
       :filter-method="computedFilterMethod"
       :collapse-tags="props.collapseTags"
       :tag-type="props.tagType"
+      :teleported="props.teleported"
       :collapse-tags-tooltip="props.collapseTagsTooltip"
       v-bind="$attrs"
     >
@@ -29,7 +31,7 @@
 </template>
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
-import getServerOptions from '@/components/Select/uitls/index.js'
+import getServerOptions from '@/components/Select/uitls'
 
 const data = defineModel<any>()
 /**
@@ -39,6 +41,10 @@ const props = defineProps({
   tagType: {
     type: String as () => 'success' | 'info' | 'warning' | 'danger',
     default: 'primary',
+  },
+  teleported: {
+    type: Boolean,
+    default: true,
   },
   clearable: {
     type: Boolean,
@@ -122,6 +128,7 @@ const allFilterFields = computed(() => {
   )
 })
 const serverOrLocalOptions = ref<any[]>([])
+const emits = defineEmits([])
 
 watch(
   () => props.serverProps,

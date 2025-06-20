@@ -1,6 +1,7 @@
 <template>
   <div class="w-full inline-block">
     <el-date-picker
+      class="w-full!"
       ref="datePicker"
       v-bind="$attrs"
       v-model="localDateValue"
@@ -248,7 +249,7 @@ const handleDateChange = (val: any) => {
 }
 
 function getLocalDateValue(date: any[] | any) {
-  return singleDateTypes.includes(props.type) ? date[0] : date
+  return singleDateTypes.includes(props.type) ? (Array.isArray(date) ? date[0] : date) : date
 }
 
 let init = false

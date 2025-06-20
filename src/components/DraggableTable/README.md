@@ -8,6 +8,7 @@
 - 支持列拖拽排序
 - 自动同步拖拽后的数据和列配置
 - 支持通过插槽自定义列内容
+- 支持自定义筛选器和编辑器
 - 与VXE-Grid兼容的所有功能
 
 ## 安装和引入
@@ -40,12 +41,11 @@ app.mount('#app')
 ```vue
 <template>
   <DraggableTable
-    :tableData="tableData"
+    v-model="tableData"
     :columns="columns"
-    :rowdragable="true"
-    :columndragable="true"
-    @update:tableData="handleDataUpdate"
-    @update:columns="handleColumnsUpdate"
+    dragable
+    editable
+    filterable
     @row-dragend="handleRowDrop"
     @column-dragend="handleColumnDrop"
   >
@@ -67,11 +67,13 @@ const tableData = ref([
     id: 1,
     name: '张三',
     age: 28,
+    birthday: '1994-05-15',
   },
   {
     id: 2,
     name: '李四',
     age: 32,
+    birthday: '1990-08-22',
   },
 ])
 
@@ -86,11 +88,24 @@ const columns = ref([
     field: 'name',
     title: '姓名',
     width: 120,
+    // 自定义编辑渲染器
+    editRender: {
+      name: 'input', // 使用VXE内置的input渲染器
+      props: {
+        placeholder: '请输入姓名',
+      },
+    },
   },
   {
     field: 'age',
     title: '年龄',
     width: 100,
+  },
+  {
+    field: 'birthday',
+    title: '生日',
+    width: 150,
+    // 无需配置editRender，会根据值的类型自动选择日期选择器
   },
   {
     field: 'operation',
@@ -99,16 +114,6 @@ const columns = ref([
     slot: '操作', // 指定插槽名称
   },
 ])
-
-// 数据更新事件处理
-const handleDataUpdate = (newData) => {
-  tableData.value = newData
-}
-
-// 列配置更新事件处理
-const handleColumnsUpdate = (newColumns) => {
-  columns.value = newColumns
-}
 
 // 行拖拽事件处理
 const handleRowDrop = ({ oldIndex, newIndex, row }) => {
@@ -133,31 +138,76 @@ const handleDelete = (row) => {
 
 ## 组件属性（Props）
 
-| 属性名         | 类型             | 默认值 | 说明             |
-| -------------- | ---------------- | ------ | ---------------- |
-| tableData      | Array            | []     | 表格数据         |
-| columns        | Array            | []     | 表格列配置       |
-| height         | [String, Number] | null   | 表格高度         |
-| border         | Boolean          | true   | 是否显示边框     |
-| stripe         | Boolean          | true   | 是否显示斑马纹   |
-| loading        | Boolean          | false  | 是否显示加载状态 |
-| showHeader     | Boolean          | true   | 是否显示表头     |
-| tableProps     | Object           | {}     | VXE表格配置项    |
-| rowdragable    | Boolean          | false  | 是否启用行拖拽   |
-| columndragable | Boolean          | false  | 是否启用列拖拽   |
+| 属性名         | 类型             | 默认值                | 说明                   |
+| -------------- | ---------------- | --------------------- | ---------------------- |
+| tableData      | Array            | []                    | 表格数据               |
+| columns        | Array            | []                    | 表格列配置             |
+| height         | [String, Number] | null                  | 表格高度               |
+| border         | Boolean          | true                  | 是否显示边框           |
+| stripe         | Boolean          | true                  | 是否显示斑马纹         |
+| loading        | Boolean          | false                 | 是否显示加载状态       |
+| showHeader     | Boolean          | true                  | 是否显示表头           |
+| tableProps     | Object           | {}                    | VXE表格配置项          |
+| rowdragable    | Boolean          | false                 | 是否启用行拖拽         |
+| columndragable | Boolean          | false                 | 是否启用列拖拽         |
+| editable       | Boolean          | false                 | 是否启用单元格编辑功能 |
+| filterable     | Boolean          | false                 | 是否启用列筛选功能     |
+| filterLayout   | Array            | ['input', 'checkbox'] | 筛选器布局配置         |
 
 ## 列配置参数
 
-| 属性名   | 类型             | 说明                                        |
-| -------- | ---------------- | ------------------------------------------- |
-| field    | String           | 字段名，对应数据中的key                     |
-| title    | String           | 列标题                                      |
-| width    | [Number, String] | 列宽度                                      |
-| minWidth | [Number, String] | 最小列宽度                                  |
-| fixed    | String           | 列固定位置，可选值: 'left', 'right'         |
-| sortable | Boolean          | 是否可排序                                  |
-| align    | String           | 对齐方式，可选值: 'left', 'center', 'right' |
-| slot     | String           | 自定义插槽名称                              |
+| 属性名       | 类型             | 说明                                        |
+| ------------ | ---------------- | ------------------------------------------- |
+| field        | String           | 字段名，对应数据中的key                     |
+| title        | String           | 列标题                                      |
+| width        | [Number, String] | 列宽度                                      |
+| minWidth     | [Number, String] | 最小列宽度                                  |
+| fixed        | String           | 列固定位置，可选值: 'left', 'right'         |
+| sortable     | Boolean          | 是否可排序                                  |
+| align        | String           | 对齐方式，可选值: 'left', 'center', 'right' |
+| slot         | String           | 自定义插槽名称                              |
+| editRender   | Object           | 编辑渲染器配置，详见下方说明                |
+| filterRender | Object           | 筛选渲染器配置，详见下方说明                |
+
+### 编辑渲染器配置
+
+当设置 `editable: true` 后，可以为列配置 `editRender` 属性来自定义编辑方式：
+
+```js
+{
+  field: 'name',
+  title: '姓名',
+  editRender: {
+    name: 'input', // 渲染器类型
+    props: {       // 传递给渲染器的属性
+      placeholder: '请输入姓名',
+      type: 'text'
+    }
+  }
+}
+```
+
+如果不配置 `editRender`，组件会根据字段值类型自动选择合适的编辑器：
+
+- 对于日期类型的值，会使用日期选择器
+- 对于其他类型的值，会使用文本输入框
+
+### 筛选渲染器配置
+
+当设置 `filterable: true` 后，可以为列配置 `filterRender` 属性来自定义筛选方式：
+
+```js
+{
+  field: 'status',
+  title: '状态',
+  filterRender: {
+    name: 'filterRenderer', // 使用自定义的筛选渲染器
+    props: {
+      filterLayout: ['input', 'checkbox'] // 筛选器布局配置
+    }
+  }
+}
+```
 
 ## 事件（Events）
 
@@ -170,7 +220,10 @@ const handleDelete = (row) => {
 
 ## 插槽（Slots）
 
-组件支持动态插槽，插槽名为列配置中的`slot`属性值。
+组件支持动态插槽，插槽名为列配置中的`slot`属性值，也可以使用以下特殊插槽：
+
+- `edit-${field}`：列编辑时的自定义内容
+- `filter-${field}`：列筛选时的自定义内容
 
 插槽参数：
 
@@ -190,4 +243,4 @@ const handleDelete = (row) => {
 
 ## 示例
 
-参考 `DraggableTableDemo.vue` 文件，该文件展示了组件的完整用法示例。
+参考 `Example.vue` 文件，该文件展示了组件的完整用法示例。
