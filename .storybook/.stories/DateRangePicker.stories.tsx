@@ -5,7 +5,7 @@ import DateRangePicker from '@/components/DateRangePicker/index.vue'
 
 // 定义元数据
 const meta: Meta<typeof DateRangePicker> = {
-  title: '日期选择器/DateRangePicker',
+  title: 'DateRangePicker',
   component: DateRangePicker,
   tags: ['autodocs'],
   argTypes: {
