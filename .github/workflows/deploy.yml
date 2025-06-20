@@ -75,6 +75,7 @@ jobs:
       url: |
         ${{ steps.deployment.outputs.page_url }}vitepress
         ${{ steps.deployment.outputs.page_url }}storybook
+        ${{ steps.deployment.outputs.page_url }}pages
     needs: build
     runs-on: ubuntu-latest
     name: 发布
