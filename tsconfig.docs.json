@@ -11,5 +11,9 @@
     }
   },
   "include": ["./docs/.vitepress/**/*", "./docs/.vitepress/*"],
-  "exclude": [".docs/.vitepress/cache/**/*", ".docs/.vitepress/config.*"]
+  "exclude": [
+    ".docs/.vitepress/config.*",
+    ".docs/.vitepress/utils/*",
+    ".docs/.vitepress/cache/**/*"
+  ]
 }

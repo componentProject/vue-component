@@ -7,11 +7,7 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 
 import { store } from '@/stores'
 
-import VxeUITable from 'vxe-table'
 import 'vxe-table/lib/style.css'
-
-import VxeUI from 'vxe-pc-ui'
-import 'vxe-pc-ui/lib/style.css'
 
 import i18n from '@/locales'
 
@@ -47,6 +43,7 @@ const preview: Preview = {
         const systemStore = useSystemStore()
         const themeColor = computed(() => systemStore.themeColor || '#3A77FF')
         const systemCode = computed(() => {
+          console.log('systemCode', systemStore.systemCode)
           return systemStore.systemCode
         })
         return {
@@ -65,8 +62,6 @@ setup((app) => {
     locale: zhCn,
   })
 
-  app.use(VxeUI)
-  app.use(VxeUITable)
   app.use(i18n)
   app.use(store)
 })

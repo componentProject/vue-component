@@ -1,10 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/vue3'
-import { ref, watch } from 'vue'
+import { ref } from 'vue'
+import moment from 'moment'
 import DateRangePicker from '@/components/DateRangePicker/index.vue'
 
 // 定义元数据
 const meta: Meta<typeof DateRangePicker> = {
-  title: 'DateRangePicker',
+  title: '日期选择器/DateRangePicker',
   component: DateRangePicker,
   tags: ['autodocs'],
   argTypes: {
@@ -14,42 +15,52 @@ const meta: Meta<typeof DateRangePicker> = {
     },
     type: {
       description: '日期选择类型',
-      control: {
-        type: 'select',
-        options: ['date', 'daterange', 'datetime', 'datetimerange', 'month', 'year', 'week'],
-      },
+      control: { type: 'select', options: ['date', 'daterange'] },
+      defaultValue: 'daterange',
     },
     format: {
       description: '显示在输入框中的格式',
       control: 'text',
+      defaultValue: 'YYYY-MM-DD',
     },
     valueFormat: {
-      description: '绑定值的格式，对显示值无效',
+      description: '可选，绑定值的格式，对显示值无效',
       control: 'text',
+      defaultValue: 'YYYY-MM-DD HH:mm:ss',
     },
     placeholder: {
       description: '非范围选择时的占位内容',
       control: 'text',
+      defaultValue: '请选择日期',
     },
     startPlaceholder: {
       description: '范围选择时开始日期的占位内容',
       control: 'text',
+      defaultValue: '开始日期',
     },
     endPlaceholder: {
       description: '范围选择时结束日期的占位内容',
       control: 'text',
+      defaultValue: '结束日期',
     },
     rangeSeparator: {
       description: '范围分隔符',
       control: 'text',
+      defaultValue: '至',
     },
     defaultToday: {
       description: '当无选定值时，是否默认返回今天的日期范围',
       control: 'boolean',
+      defaultValue: false,
     },
     dateRange: {
       description: '设置日期范围，可以是数字或数组',
       control: 'object',
+    },
+    dateRangeType: {
+      description: '日期范围类型',
+      control: { type: 'select', options: ['day', 'week', 'month', 'year'] },
+      defaultValue: 'day',
     },
     minDate: {
       description: '最小可选日期',
@@ -66,6 +77,7 @@ const meta: Meta<typeof DateRangePicker> = {
     shortcuts: {
       description: '是否显示快速选择选项',
       control: 'boolean',
+      defaultValue: false,
     },
   },
 }
@@ -73,127 +85,51 @@ const meta: Meta<typeof DateRangePicker> = {
 export default meta
 type Story = StoryObj<typeof DateRangePicker>
 
-// 基础用法 - 单个日期选择
+// 基础用法
 export const 基础用法: Story = {
   render: (args) => ({
     components: { DateRangePicker },
     setup() {
-      const dateValue = ref('')
+      const dateRange = ref([])
 
-      watch(dateValue, (newVal) => {
-        console.log('选择的日期:', newVal)
-      })
-
-      return { ...args, dateValue }
+      return { ...args, dateRange }
     },
     template: `
-      <div>
-        <h3>基础日期选择器</h3>
+      <div style="width: 500px; padding: 20px;">
+        <h3>基础用法</h3>
         <DateRangePicker
-          v-model="dateValue"
-          type="date"
-          format="YYYY-MM-DD"
-          placeholder="请选择日期"
+          v-model="dateRange"
+          type="daterange"
+          style="width: 100%"
         />
         <div style="margin-top: 16px;">
-          <p>选择的日期值: {{ dateValue }}</p>
+          <p>选中的值: {{ dateRange }}</p>
         </div>
       </div>
     `,
   }),
 }
 
-// 日期范围选择
-export const 日期范围选择: Story = {
+// 默认返回今天
+export const 默认返回今天: Story = {
   render: (args) => ({
     components: { DateRangePicker },
     setup() {
       const dateRange = ref([])
 
-      watch(dateRange, (newVal) => {
-        console.log('选择的日期范围:', newVal)
-      })
-
       return { ...args, dateRange }
     },
     template: `
-      <div>
-        <h3>日期范围选择器</h3>
+      <div style="width: 500px; padding: 20px;">
+        <h3>默认返回今天</h3>
         <DateRangePicker
           v-model="dateRange"
           type="daterange"
-          format="YYYY-MM-DD"
-          startPlaceholder="开始日期"
-          endPlaceholder="结束日期"
+          :defaultToday="true"
+          style="width: 100%"
         />
         <div style="margin-top: 16px;">
-          <p>选择的日期范围: {{ dateRange }}</p>
-        </div>
-      </div>
-    `,
-  }),
-}
-
-// 带快速选择选项
-export const 快速选择选项: Story = {
-  render: (args) => ({
-    components: { DateRangePicker },
-    setup() {
-      const dateRange = ref([])
-
-      watch(dateRange, (newVal) => {
-        console.log('选择的日期范围:', newVal)
-      })
-
-      return { ...args, dateRange }
-    },
-    template: `
-      <div>
-        <h3>带快速选择选项的日期范围选择器</h3>
-        <DateRangePicker
-          v-model="dateRange"
-          type="daterange"
-          format="YYYY-MM-DD"
-          :quickOptions="true"
-          startPlaceholder="开始日期"
-          endPlaceholder="结束日期"
-        />
-        <div style="margin-top: 16px;">
-          <p>选择的日期范围: {{ dateRange }}</p>
-        </div>
-      </div>
-    `,
-  }),
-}
-
-// 默认日期范围
-export const 默认日期范围: Story = {
-  render: (args) => ({
-    components: { DateRangePicker },
-    setup() {
-      const dateRange = ref([])
-
-      watch(dateRange, (newVal) => {
-        console.log('选择的日期范围:', newVal)
-      })
-
-      return { ...args, dateRange }
-    },
-    template: `
-      <div>
-        <h3>默认日期范围设置</h3>
-        <p>设置dateRange为7，表示默认选择今天到未来7天</p>
-        <DateRangePicker
-          v-model="dateRange"
-          type="daterange"
-          format="YYYY-MM-DD"
-          :dateRange="7"
-          :quickOptions="true"
-          startPlaceholder="开始日期"
-          endPlaceholder="结束日期"
-        />
-        <div style="margin-top: 16px;">
-          <p>选择的日期范围: {{ dateRange }}</p>
+          <p>选中的值: {{ dateRange }}</p>
         </div>
       </div>
     `,
@@ -205,67 +141,194 @@ export const 自定义日期范围: Story = {
   render: (args) => ({
     components: { DateRangePicker },
     setup() {
-      const dateRange = ref([])
+      const dateRange1 = ref([])
+      const dateRange2 = ref([])
+      const dateRange3 = ref([])
+      const dateRange4 = ref([])
 
-      return { ...args, dateRange }
+      return { ...args, dateRange1, dateRange2, dateRange3, dateRange4 }
     },
     template: `
-      <div>
+      <div style="width: 500px; padding: 20px;">
         <h3>自定义日期范围</h3>
-        <p>设置dateRange为[-7, 7]，表示默认选择过去7天到未来7天</p>
-        <DateRangePicker
-          v-model="dateRange"
-          type="daterange"
-          format="YYYY-MM-DD"
-          :dateRange="[-7, 7]"
-          startPlaceholder="开始日期"
-          endPlaceholder="结束日期"
-        />
-        <div style="margin-top: 16px;">
-          <p>选择的日期范围: {{ dateRange }}</p>
+        <div style="margin-bottom: 20px;">
+          <p>dateRange=7（今天到未来7天）</p>
+          <DateRangePicker
+            v-model="dateRange1"
+            type="daterange"
+            :dateRange="7"
+            style="width: 100%"
+          />
+          <div style="margin-top: 8px;">
+            <p>选中的值: {{ dateRange1 }}</p>
+          </div>
+        </div>
+
+        <div style="margin-bottom: 20px;">
+          <p>dateRange=-7（过去7天到今天）</p>
+          <DateRangePicker
+            v-model="dateRange2"
+            type="daterange"
+            :dateRange="-7"
+            style="width: 100%"
+          />
+          <div style="margin-top: 8px;">
+            <p>选中的值: {{ dateRange2 }}</p>
+          </div>
+        </div>
+
+        <div style="margin-bottom: 20px;">
+          <p>dateRange=[-7, 7]（过去7天到未来7天）</p>
+          <DateRangePicker
+            v-model="dateRange3"
+            type="daterange"
+            :dateRange="[-7, 7]"
+            style="width: 100%"
+          />
+          <div style="margin-top: 8px;">
+            <p>选中的值: {{ dateRange3 }}</p>
+          </div>
+        </div>
+
+        <div style="margin-bottom: 20px;">
+          <p>基于昨天的过去7天到今天</p>
+          <DateRangePicker
+            v-model="dateRange4"
+            type="daterange"
+            :dateRangeBaseDate="moment().subtract(1, 'days')"
+            :dateRange="-7"
+            style="width: 100%"
+          />
+          <div style="margin-top: 8px;">
+            <p>选中的值: {{ dateRange4 }}</p>
+          </div>
         </div>
       </div>
     `,
   }),
 }
 
-// 禁用日期范围
-export const 禁用日期范围: Story = {
+// 禁用日期
+export const 禁用日期: Story = {
+  render: (args) => ({
+    components: { DateRangePicker },
+    setup() {
+      const dateRange1 = ref([])
+      const dateRange2 = ref([])
+      const dateRange3 = ref([])
+
+      const today = moment().format('YYYY-MM-DD')
+      const futureWeek = moment().add(7, 'days').format('YYYY-MM-DD')
+
+      return { ...args, dateRange1, dateRange2, dateRange3, today, futureWeek }
+    },
+    template: `
+      <div style="width: 500px; padding: 20px;">
+        <h3>禁用日期</h3>
+        <div style="margin-bottom: 20px;">
+          <p>minDate（今天之前的日期禁用）</p>
+          <DateRangePicker
+            v-model="dateRange1"
+            type="daterange"
+            :minDate="today"
+            style="width: 100%"
+          />
+          <div style="margin-top: 8px;">
+            <p>选中的值: {{ dateRange1 }}</p>
+          </div>
+        </div>
+
+        <div style="margin-bottom: 20px;">
+          <p>maxDate（今天之后的日期禁用）</p>
+          <DateRangePicker
+            v-model="dateRange2"
+            type="daterange"
+            :maxDate="today"
+            style="width: 100%"
+          />
+          <div style="margin-top: 8px;">
+            <p>选中的值: {{ dateRange2 }}</p>
+          </div>
+        </div>
+
+        <div style="margin-bottom: 20px;">
+          <p>disabledDateRange（只允许选择未来7天内的日期）</p>
+          <DateRangePicker
+            v-model="dateRange3"
+            type="daterange"
+            :disabledDateRange="[today, futureWeek]"
+            style="width: 100%"
+          />
+          <div style="margin-top: 8px;">
+            <p>选中的值: {{ dateRange3 }}</p>
+          </div>
+        </div>
+      </div>
+    `,
+  }),
+}
+
+// 快速选择选项
+export const 快速选择选项: Story = {
   render: (args) => ({
     components: { DateRangePicker },
     setup() {
       const dateRange = ref([])
-      const today = new Date()
-      const nextMonth = new Date(today)
-      nextMonth.setMonth(today.getMonth() + 1)
 
-      const minDate = today.toISOString().split('T')[0]
-      const maxDate = nextMonth.toISOString().split('T')[0]
-
-      return {
-        ...args,
-        dateRange,
-        minDate,
-        maxDate,
-      }
+      return { ...args, dateRange }
     },
     template: `
-      <div>
-        <h3>禁用日期范围</h3>
-        <p>只能选择今天到下个月同一天的日期范围</p>
+      <div style="width: 500px; padding: 20px;">
+        <h3>快速选择选项</h3>
         <DateRangePicker
           v-model="dateRange"
           type="daterange"
-          format="YYYY-MM-DD"
-          :minDate="minDate"
-          :maxDate="maxDate"
-          startPlaceholder="开始日期"
-          endPlaceholder="结束日期"
+          :shortcuts="true"
+          style="width: 100%"
         />
         <div style="margin-top: 16px;">
-          <p>选择的日期范围: {{ dateRange }}</p>
-          <p>最小可选日期: {{ minDate }}</p>
-          <p>最大可选日期: {{ maxDate }}</p>
+          <p>选中的值: {{ dateRange }}</p>
+        </div>
+      </div>
+    `,
+  }),
+}
+
+// 尺寸和禁用
+export const 尺寸和禁用: Story = {
+  render: (args) => ({
+    components: { DateRangePicker },
+    setup() {
+      const dateRange1 = ref([])
+      const dateRange2 = ref([])
+
+      return { ...args, dateRange1, dateRange2 }
+    },
+    template: `
+      <div style="width: 500px; padding: 20px;">
+        <h3>尺寸和禁用</h3>
+        <div style="margin-bottom: 20px;">
+          <p>小尺寸</p>
+          <DateRangePicker
+            v-model="dateRange1"
+            type="daterange"
+            size="small"
+            style="width: 100%"
+          />
+        </div>
+
+        <div style="margin-bottom: 20px;">
+          <p>禁用状态</p>
+          <DateRangePicker
+            v-model="dateRange2"
+            type="daterange"
+            :disabled="true"
+            :defaultToday="true"
+            style="width: 100%"
+          />
+          <div style="margin-top: 8px;">
+            <p>选中的值: {{ dateRange2 }}</p>
+          </div>
         </div>
       </div>
     `,

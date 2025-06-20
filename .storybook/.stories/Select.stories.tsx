@@ -237,37 +237,6 @@ export const 自定义字段名: Story = {
   }),
 }
 
-// 远程搜索
-export const 远程搜索: Story = {
-  render: (args) => ({
-    components: { Select },
-    setup() {
-      const selectedValue = ref('')
-      const serverProps = reactive({
-        serverType: 'base',
-        optionsParams: { dictName: 'test' },
-      })
-
-      return { ...args, selectedValue, serverProps }
-    },
-    template: `
-      <div>
-        <h3>远程搜索选择器</h3>
-        <p>从服务器获取选项数据</p>
-        <Select
-          v-model="selectedValue"
-          :serverProps="serverProps"
-          style="width: 240px"
-          placeholder="请选择"
-        />
-        <div style="margin-top: 16px;">
-          <p>选中的值: {{ selectedValue }}</p>
-        </div>
-      </div>
-    `,
-  }),
-}
-
 // 自定义搜索字段
 export const 自定义搜索字段: Story = {
   render: (args) => ({

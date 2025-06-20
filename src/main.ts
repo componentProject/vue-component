@@ -1,4 +1,5 @@
 import '@/assets/styles/main.css'
+import 'vxe-table/lib/style.css'
 
 import { createApp } from 'vue'
 import { store } from '@/stores'

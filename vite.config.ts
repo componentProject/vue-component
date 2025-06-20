@@ -5,6 +5,9 @@ import path from 'path'
 import { visualizer } from 'rollup-plugin-visualizer'
 import viteCompression from 'vite-plugin-compression'
 import viteImagemin from 'vite-plugin-imagemin'
+// storybook不支持这种cdn
+import importToCDN from 'vite-plugin-cdn-import'
+import { modules } from './src/constants'
 
 // vite vue插件
 import pluginVue from '@vitejs/plugin-vue'
@@ -20,9 +23,9 @@ import autoprefixer from 'autoprefixer'
 import tailwindcss from '@tailwindcss/postcss'
 import type { Plugin } from 'postcss'
 
-// storybook不支持这种cdn
-// import importToCDN from "vite-plugin-cdn-import";
-// import { modules } from "./src/constants";
+// qiankun
+import qiankun from 'vite-plugin-qiankun'
+import scopedCssPrefixPlugin from './plugins/addScopedAndReplacePrefix'
 
 /**
  * 将环境变量中的字符串值转换为对应的 JavaScript 数据类型
@@ -66,7 +69,7 @@ export default defineConfig(({ mode }) => {
   const isDev = mode === 'development'
   const systemCode = viteEnv.VITE_GLOB_APP_CODE
   const envSystemCode = isDev ? 'el' : viteEnv.VITE_GLOB_APP_CODE
-
+  console.log('envSystemCode', mode, envSystemCode)
   const vuePlugins = [pluginVue(), vueJsx(), isDev && vueDevTools()].filter((i) => !!i)
 
   const performancePlugins = [
@@ -134,12 +137,12 @@ export default defineConfig(({ mode }) => {
           ],
         },
       }),
-    // viteEnv.VITE_USE_CDN &&
-    // importToCDN({
-    //   enableInDevMode: viteEnv.VITE_USE_CDN_IS_DEV,
-    //   prodUrl: `${viteEnv.VITE_CDN_BASE_URL}/{name}@{version}{path}`,
-    //   modules,
-    // }),
+    viteEnv.VITE_USE_CDN &&
+      importToCDN({
+        enableInDevMode: viteEnv.VITE_USE_CDN_IS_DEV,
+        prodUrl: `${viteEnv.VITE_CDN_BASE_URL}/{name}@{version}{path}`,
+        modules,
+      }),
   ].filter((i) => !!i)
 
   const monitorPlugins = [
@@ -150,9 +153,21 @@ export default defineConfig(({ mode }) => {
       }),
   ].filter((i) => !!i)
 
+  const useDevMode = viteEnv.VITE_QIANKUN_DEV
+  const qianKunPlugins = viteEnv.VITE_USE_QIANKUN
+    ? [
+        qiankun(envSystemCode, { useDevMode }),
+        scopedCssPrefixPlugin({
+          prefixScoped: `div[data-qiankun='${envSystemCode}']`,
+          oldPrefix: 'el',
+          newPrefix: systemCode,
+          useDevMode,
+        }),
+      ]
+    : []
   return {
     base: `/${systemCode}`,
-    plugins: [...vuePlugins, ...performancePlugins, ...monitorPlugins],
+    plugins: [...vuePlugins, ...performancePlugins, ...monitorPlugins, ...qianKunPlugins],
     esbuild: {
       pure:
         !isDev && viteEnv.VITE_PURE_CONSOLE_AND_DEBUGGER
@@ -195,7 +210,7 @@ export default defineConfig(({ mode }) => {
       },
     },
     define: {
-      __SYSTEM_CODE__: JSON.stringify(systemCode),
+      __SYSTEM_CODE__: JSON.stringify(envSystemCode),
     },
     css: {
       postcss: {

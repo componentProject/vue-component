@@ -1,7 +1,7 @@
 {
   "extends": "@tsconfig/node22/tsconfig.json",
   "include": [
-    ".storybook/**/*",
+    ".storybook/main.ts",
     "src/constants/*",
     "vite.config.*",
     "vitest.config.*",
@@ -12,7 +12,7 @@
     ".docs/.vitepress/utils/*",
     "plugins/*"
   ],
-  "exclude": [".storybook/.stories/*"],
+  "exclude": [],
   "compilerOptions": {
     "composite": true,
     "noEmit": true,
