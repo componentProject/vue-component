@@ -1,6 +1,6 @@
 
 # 构建 静态 站点并将其部署到 GitHub Pages 的示例工作流程
-name: 发布storybook&vitepress
+name: 发布storybook&vitepress&pages
 
 on:
   # 在针对 `docs` 分支的推送上运行。如果你
@@ -60,7 +60,7 @@ jobs:
       - name: 打包vitepress
         # npm run docs:build / pnpm docs:build / yarn docs:build / bun run docs:build
         run: pnpm vitepress:build
-      - name: 打包页面
+      - name: 打包pages
         # npm run docs:build / pnpm docs:build / yarn docs:build / bun run docs:build
         run: pnpm build
       - name: 上传打包文件
