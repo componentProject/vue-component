@@ -3,7 +3,7 @@ import type { StorybookConfig } from '@storybook/vue3-vite'
 const config: StorybookConfig = {
   stories: [
     './.stories/*.stories.@(js|jsx|mjs|ts|tsx|mdx)',
-    '../src/components/**/*.stories.@(js|jsx|mjs|ts|tsx|mdx)',
+    '../src/components/**/stories/*.stories.@(js|jsx|mjs|ts|tsx|mdx)',
   ],
   addons: [
     '@storybook/addon-onboarding',
@@ -13,6 +13,9 @@ const config: StorybookConfig = {
   ],
   core: {
     builder: '@storybook/builder-vite',
+  },
+  async viteFinal(config) {
+    return config
   },
   docs: {
     autodocs: true,

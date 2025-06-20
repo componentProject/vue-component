@@ -12,10 +12,12 @@
     ".docs/.vitepress/utils/*",
     "plugins/*",
     "env.d.ts",
-    "src/utils/*"
+    "src/utils/**/*"
   ],
   "exclude": [],
   "compilerOptions": {
+    "allowImportingTsExtensions": true,
+    "jsx": "react-jsx",
     "composite": true,
     "noEmit": true,
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.node.tsbuildinfo",
