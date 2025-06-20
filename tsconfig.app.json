@@ -1,6 +1,6 @@
 {
   "extends": "@vue/tsconfig/tsconfig.dom.json",
-  "include": ["src/**/*", "src/**/*.vue", ".storybook/**/*", ".storybook/*"],
+  "include": ["src/**/*", "src/**/*.vue", ".storybook/**/*", ".storybook/**/*.tsx"],
   "exclude": [".storybook/main.ts", "src/**/__tests__/*"],
   "compilerOptions": {
     "lib": ["ESNext", "DOM", "DOM.Iterable"],
