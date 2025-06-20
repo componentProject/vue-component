@@ -1,4 +1,3 @@
-
 # 构建 静态 站点并将其部署到 GitHub Pages 的示例工作流程
 name: 发布storybook&vitepress&pages
 
@@ -62,7 +61,7 @@ jobs:
         run: pnpm vitepress:build
       - name: 打包pages
         # npm run docs:build / pnpm docs:build / yarn docs:build / bun run docs:build
-        run: pnpm build
+        run: set VITE_USE_GITPAGE=true && pnpm build
       - name: 上传打包文件
         uses: actions/upload-pages-artifact@v3
         with:

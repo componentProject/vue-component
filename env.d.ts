@@ -72,6 +72,10 @@ declare interface ViteEnv {
    * 是否删除生产环境 console
    */
   VITE_DROP_CONSOLE: boolean
+  /**
+   * 是否是gitPages
+   */
+  VITE_USE_GITPAGE: boolean
 }
 
 declare const __SYSTEM_CODE__ = string
