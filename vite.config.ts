@@ -69,17 +69,13 @@ export default defineConfig(({ mode }) => {
   const isDev = mode === 'development'
   const systemCode = viteEnv.VITE_GLOB_APP_CODE
   const envSystemCode = isDev ? 'el' : viteEnv.VITE_GLOB_APP_CODE
-  console.log('envSystemCode', mode, envSystemCode)
-  const vuePlugins = [pluginVue(), vueJsx(), isDev && vueDevTools()].filter((i) => !!i)
 
-  const performancePlugins = [
-    createHtmlPlugin({
-      inject: {
-        data: {
-          title: appTitle,
-        },
-      },
-    }),
+  const useDoc = viteEnv.VITE_USE_DOCUMENT
+
+  const vuePlugins = [
+    pluginVue(),
+    vueJsx(),
+    isDev && viteEnv.VITE_DEVTOOLS && vueDevTools(),
     // // 自动引入
     AutoImport({
       imports: ['vue'],
@@ -95,6 +91,16 @@ export default defineConfig(({ mode }) => {
       ],
       globs: ['src/components/**/index.vue'],
       dts: path.resolve(__dirname, './src/typings/components.d.ts'),
+    }),
+  ].filter((i) => !!i)
+
+  const performancePlugins = [
+    createHtmlPlugin({
+      inject: {
+        data: {
+          title: appTitle,
+        },
+      },
     }),
     // 代码压缩
     viteEnv.VITE_COMPRESS &&
@@ -138,6 +144,7 @@ export default defineConfig(({ mode }) => {
         },
       }),
     viteEnv.VITE_USE_CDN &&
+      !useDoc &&
       importToCDN({
         enableInDevMode: viteEnv.VITE_USE_CDN_IS_DEV,
         prodUrl: `${viteEnv.VITE_CDN_BASE_URL}/{name}@{version}{path}`,
@@ -154,17 +161,18 @@ export default defineConfig(({ mode }) => {
   ].filter((i) => !!i)
 
   const useDevMode = viteEnv.VITE_QIANKUN_DEV
-  const qianKunPlugins = viteEnv.VITE_USE_QIANKUN
-    ? [
-        qiankun(envSystemCode, { useDevMode }),
-        scopedCssPrefixPlugin({
-          prefixScoped: `div[data-qiankun='${envSystemCode}']`,
-          oldPrefix: 'el',
-          newPrefix: systemCode,
-          useDevMode,
-        }),
-      ]
-    : []
+  const qianKunPlugins =
+    viteEnv.VITE_USE_QIANKUN && !useDoc
+      ? [
+          qiankun(envSystemCode, { useDevMode }),
+          scopedCssPrefixPlugin({
+            prefixScoped: `div[data-qiankun='${envSystemCode}']`,
+            oldPrefix: 'el',
+            newPrefix: systemCode,
+            useDevMode,
+          }),
+        ]
+      : []
   return {
     base: `/${systemCode}`,
     plugins: [...vuePlugins, ...performancePlugins, ...monitorPlugins, ...qianKunPlugins],
