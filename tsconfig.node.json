@@ -10,7 +10,8 @@
     "playwright.config.*",
     ".docs/.vitepress/config.*",
     ".docs/.vitepress/utils/*",
-    "plugins/*"
+    "plugins/*",
+    "env.d.ts"
   ],
   "exclude": [],
   "compilerOptions": {
