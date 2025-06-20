@@ -1,14 +1,3 @@
-import { defineConfig, loadEnv } from 'vite'
-import path from 'path'
-
-// 性能优化模块
-import { visualizer } from 'rollup-plugin-visualizer'
-import viteCompression from 'vite-plugin-compression'
-import viteImagemin from 'vite-plugin-imagemin'
-// storybook不支持这种cdn
-import importToCDN from 'vite-plugin-cdn-import'
-import { modules } from './src/constants'
-
 // vite vue插件
 import pluginVue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
@@ -17,66 +6,44 @@ import AutoImport from 'unplugin-auto-import/vite'
 import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
 import Components from 'unplugin-vue-components/vite'
 
-// 其余vite插件
-import { createHtmlPlugin } from 'vite-plugin-html'
-import autoprefixer from 'autoprefixer'
-import tailwindcss from '@tailwindcss/postcss'
-import type { Plugin } from 'postcss'
+// 性能优化模块
+import { visualizer } from 'rollup-plugin-visualizer'
+import viteCompression from 'vite-plugin-compression'
+import viteImagemin from 'vite-plugin-imagemin'
+import importToCDN from 'vite-plugin-cdn-import'
+import { modules } from './src/constants'
 
 // qiankun
 import qiankun from 'vite-plugin-qiankun'
 import scopedCssPrefixPlugin from './plugins/addScopedAndReplacePrefix'
 
-/**
- * 将环境变量中的字符串值转换为对应的 JavaScript 数据类型
- * @param env
- * @returns - 转换后的环境变量对象
- */
-function wrapperEnv(env: Record<string, string>) {
-  const result: Record<string, any> = {}
+// tailwind
+import autoprefixer from 'autoprefixer'
+import tailwindcss from '@tailwindcss/postcss'
 
-  for (const key in env) {
-    if (Object.prototype.hasOwnProperty.call(env, key)) {
-      const value = env[key].trim()
+// 其余vite插件与配置
+import path from 'path'
+import { defineConfig, loadEnv } from 'vite'
+import type { Plugin } from 'postcss'
+import { createHtmlPlugin } from 'vite-plugin-html'
+import { wrapperEnv } from './src/utils'
 
-      // 处理布尔值
-      if (value === 'true' || value === 'false') {
-        result[key] = value === 'true'
-      }
-      // 处理数值
-      else if (!isNaN(Number(value))) {
-        result[key] = Number(value)
-      }
-      // 处理空字符串
-      else if (value === '') {
-        result[key] = null
-      }
-      // 其他情况保留原始字符串
-      else {
-        result[key] = value
-      }
-    }
-  }
-
-  return result
-}
-
-// https://vite.dev/config/
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd())
   const viteEnv = wrapperEnv(env)
   const appTitle = viteEnv.VITE_GLOB_APP_TITLE
   const isDev = mode === 'development'
   const systemCode = viteEnv.VITE_GLOB_APP_CODE
-  const envSystemCode = isDev ? 'el' : viteEnv.VITE_GLOB_APP_CODE
+  const useDevMode = false
+  const envSystemCode = isDev && !useDevMode ? 'el' : viteEnv.VITE_GLOB_APP_CODE
 
   const useDoc = viteEnv.VITE_USE_DOCUMENT
 
   const vuePlugins = [
     pluginVue(),
     vueJsx(),
-    isDev && viteEnv.VITE_DEVTOOLS && vueDevTools(),
-    // // 自动引入
+    isDev && viteEnv.VITE_DEVTOOLS && vueDevTools(), // // 自动引入
+    // 自动引入
     AutoImport({
       imports: ['vue'],
       resolvers: [ElementPlusResolver()],
@@ -106,41 +73,21 @@ export default defineConfig(({ mode }) => {
     viteEnv.VITE_COMPRESS &&
       viteCompression({
         algorithm: viteEnv.VITE_BUILD_GZIP ? 'gzip' : 'brotliCompress',
-        verbose: true, //输出日志信息
-        disable: false, //是否禁用
-        ext: '.gz', // 压缩文件后缀
-        threshold: 10240, // 仅压缩大于 10KB 的文件
-        deleteOriginFile: false, // 是否删除原始文件
+        verbose: true,
+        disable: false,
+        ext: '.gz',
+        threshold: 10240,
+        deleteOriginFile: false,
       }),
     // 图片压缩
     viteEnv.VITE_IMAGEMIN &&
       viteImagemin({
-        // gif压缩
-        gifsicle: {
-          optimizationLevel: 7,
-          interlaced: false,
-        },
-        optipng: {
-          optimizationLevel: 7,
-        },
-        mozjpeg: {
-          quality: 20,
-        },
-        pngquant: {
-          quality: [0.8, 0.9],
-          speed: 4,
-        },
-        // svg压缩
+        gifsicle: { optimizationLevel: 7, interlaced: false },
+        optipng: { optimizationLevel: 7 },
+        mozjpeg: { quality: 20 },
+        pngquant: { quality: [0.8, 0.9], speed: 4 },
         svgo: {
-          plugins: [
-            {
-              name: 'removeViewBox',
-            },
-            {
-              name: 'removeEmptyAttrs',
-              active: false,
-            },
-          ],
+          plugins: [{ name: 'removeViewBox' }, { name: 'removeEmptyAttrs', active: false }],
         },
       }),
     viteEnv.VITE_USE_CDN &&
@@ -160,7 +107,6 @@ export default defineConfig(({ mode }) => {
       }),
   ].filter((i) => !!i)
 
-  const useDevMode = viteEnv.VITE_QIANKUN_DEV
   const qianKunPlugins =
     viteEnv.VITE_USE_QIANKUN && !useDoc
       ? [
@@ -173,6 +119,7 @@ export default defineConfig(({ mode }) => {
           }),
         ]
       : []
+
   return {
     base: `/${systemCode}`,
     plugins: [...vuePlugins, ...performancePlugins, ...monitorPlugins, ...qianKunPlugins],
@@ -208,25 +155,13 @@ export default defineConfig(({ mode }) => {
           },
         },
       },
-      terserOptions: {
-        compress: viteEnv.VITE_DROP_CONSOLE
-          ? {
-              drop_console: true,
-              drop_debugger: true,
-            }
-          : {},
-      },
     },
     define: {
       __SYSTEM_CODE__: JSON.stringify(envSystemCode),
     },
     css: {
       postcss: {
-        plugins: [
-          tailwindcss() as Plugin,
-          // 自动添加厂商前缀
-          autoprefixer() as Plugin,
-        ],
+        plugins: [tailwindcss() as Plugin, autoprefixer() as Plugin],
       },
       devSourcemap: isDev,
       preprocessorOptions: {
@@ -243,19 +178,16 @@ export default defineConfig(({ mode }) => {
       },
     },
     resolve: {
-      extensions: ['.js', '.jsx', '.ts', '.tsx', '.vue'], // 确保 .vue 在列表中
+      extensions: ['.js', '.jsx', '.ts', '.tsx', '.vue'],
       alias: {
         '@': path.resolve(__dirname, './src'),
       },
     },
-    // 代理配置
     server: {
-      host: '0.0.0.0', // 服务器主机名，如果允许外部访问，可设置为"0.0.0.0"
+      host: '0.0.0.0',
       port: viteEnv.VITE_PORT,
       open: viteEnv.VITE_OPEN,
       cors: true,
-      // https: false,
-      // 代理跨域（mock 不需要配置，这里只是个事列）
       proxy: {},
     },
   }

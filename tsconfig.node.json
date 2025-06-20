@@ -11,7 +11,8 @@
     ".docs/.vitepress/config.*",
     ".docs/.vitepress/utils/*",
     "plugins/*",
-    "env.d.ts"
+    "env.d.ts",
+    "src/utils/*"
   ],
   "exclude": [],
   "compilerOptions": {

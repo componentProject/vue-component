@@ -1,5 +1,6 @@
 export * from './modules/route.ts'
 export * from './modules/modifyComponent.tsx'
+export * from './modules/getEnv.ts'
 
 export function getType(obj: any, type?: string) {
   if (type) {
