@@ -61,7 +61,7 @@ jobs:
         run: pnpm vitepress:build
       - name: 打包pages
         # npm run docs:build / pnpm docs:build / yarn docs:build / bun run docs:build
-        run: set VITE_USE_GITPAGE=true && pnpm build
+        run:  pnpm pages:build
       - name: 上传打包文件
         uses: actions/upload-pages-artifact@v3
         with:
