@@ -53,7 +53,9 @@ export default defineConfig(({ mode }) => {
     Components({
       resolvers: [
         ElementPlusResolver({
-          exclude: new RegExp(['ElDrawer', 'ElDialog'].map((item) => `^${item}$`).join('|')),
+          exclude: new RegExp(
+            (useDoc ? [] : ['ElDrawer', 'ElDialog']).map((item) => `^${item}$`).join('|'),
+          ),
         }),
       ],
       globs: ['src/components/**/index.vue'],

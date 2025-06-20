@@ -1,7 +1,7 @@
 import { defineComponent, computed } from 'vue'
 import type { ComponentInstance } from 'vue'
 
-export function withModifiedProps(
+function withModifiedProps(
   OriginalComponent: ComponentInstance<any>,
   propName: string,
   modifier = (v: any) => v,
