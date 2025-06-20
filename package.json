@@ -34,7 +34,7 @@
     "lint:eslint": "eslint --fix src/components/**/*.{js,jsx,ts,tsx,vue}",
     "lint:oxlint": "oxlint . --fix -D correctness --ignore-path .gitignore",
     "prepare": "husky",
-    "pages:build": "set VITE_USE_GITPAGE=true && vite build --mode production",
+    "pages:build": "vite build --mode github",
     "storybook:dev": "set VITE_USE_DOCUMENT=true && storybook dev -p 6006",
     "storybook:build": "set VITE_USE_DOCUMENT=true && storybook build -o docs/storybook",
     "vitepress:dev": "vitepress dev .docs",

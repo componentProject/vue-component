@@ -139,7 +139,7 @@ export default defineConfig(({ mode }) => {
     build: {
       sourcemap: isDev,
       // outDir: `${systemCode}`,
-      outDir: viteEnv.VITE_USE_GITPAGE ? './docs/pages' : `${systemCode}`,
+      outDir: mode === 'github' ? './docs/pages' : `${systemCode}`,
       cssCodeSplit: true,
       chunkSizeWarningLimit: 1500,
       minify: 'esbuild',
