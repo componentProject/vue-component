@@ -138,7 +138,8 @@ export default defineConfig(({ mode }) => {
     },
     build: {
       sourcemap: isDev,
-      outDir: `${systemCode}`,
+      // outDir: `${systemCode}`,
+      outDir: './docs/pages',
       cssCodeSplit: true,
       chunkSizeWarningLimit: 1500,
       minify: 'esbuild',

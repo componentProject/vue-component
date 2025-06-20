@@ -60,6 +60,9 @@ jobs:
       - name: 打包vitepress
         # npm run docs:build / pnpm docs:build / yarn docs:build / bun run docs:build
         run: pnpm vitepress:build
+      - name: 打包页面
+        # npm run docs:build / pnpm docs:build / yarn docs:build / bun run docs:build
+        run: pnpm build
       - name: 上传打包文件
         uses: actions/upload-pages-artifact@v3
         with:
