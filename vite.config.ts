@@ -28,34 +28,6 @@ import type { Plugin } from 'postcss'
 import { createHtmlPlugin } from 'vite-plugin-html'
 import { wrapperEnv } from './src/utils/modules/getEnv'
 
-// function wrapperEnv(env: Record<string, string>) {
-//   const result: Record<string, any> = {}
-//
-//   for (const key in env) {
-//     if (Object.prototype.hasOwnProperty.call(env, key)) {
-//       const value = env[key].trim()
-//
-//       // 处理布尔值
-//       if (value === 'true' || value === 'false') {
-//         result[key] = value === 'true'
-//       }
-//       // 处理数值
-//       else if (!isNaN(Number(value))) {
-//         result[key] = Number(value)
-//       }
-//       // 处理空字符串
-//       else if (value === '') {
-//         result[key] = null
-//       }
-//       // 其他情况保留原始字符串
-//       else {
-//         result[key] = value
-//       }
-//     }
-//   }
-//
-//   return result as ViteEnv
-// }
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd())
   const viteEnv = wrapperEnv(env)
