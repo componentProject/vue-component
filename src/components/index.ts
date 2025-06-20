@@ -35,7 +35,7 @@ export const componentExampleRoutes = Object.keys(componentExampleFiles).reduce(
     if (!component) return modules
     if (name) {
       modules.children?.push({
-        path: `/${name}`,
+        path: `/components/${name}`,
         name,
         meta: {
           title: component.name || name,
