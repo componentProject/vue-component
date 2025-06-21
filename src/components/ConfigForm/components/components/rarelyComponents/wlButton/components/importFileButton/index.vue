@@ -4,23 +4,23 @@
  * @LastEditors: moluoxixi 1983531544@qq.com
  * @LastEditTime: 2025-04-09 10:50:52
  * @FilePath: \vue-component\src\components\ConfigForm\components\components\rarelyComponents\wlButton\components\importFileButton\index.vue
- * @Description: 
- * 
- * Copyright (c) 2025 by ${git_name_email}, All Rights Reserved. 
+ * @Description:
+ *
+ * Copyright (c) 2025 by ${git_name_email}, All Rights Reserved.
 -->
 <template>
   <div>
     <input
       name="file"
       type="file"
-      :accept="accept"
+      :accept="props.accept"
       @change="fileChange"
       ref="selectFile"
       class="none"
     />
-    <el-button class="button" :loading="loading" v-bind="$attrs" v-on="listeners">
+    <el-button class="button" :loading="props.loading" v-bind="attrs">
       <template #default>
-        <span v-if="title">{{ title }}</span>
+        <span v-if="props.title">{{ props.title }}</span>
         <slot name="default" />
       </template>
     </el-button>
@@ -29,7 +29,7 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import type { FormModelProps, configType } from '@/components/ConfigForm/types'
+import type { configType } from '@/components/ConfigForm/types'
 
 defineOptions({
   name: 'importFileButton',
@@ -40,14 +40,12 @@ const props = withDefaults(
     accept: string
     title: string
     loading: boolean
-    model: FormModelProps
     config: configType
   }>(),
   {
     accept: '',
     title: '',
     loading: false,
-    model: () => ({}),
     config: () => ({}),
   },
 )
@@ -56,14 +54,16 @@ const emit = defineEmits(['update:model', 'change'])
 
 const selectFile = ref<HTMLInputElement>()
 
-const listeners = computed(() => {
-  const listeners = { ...useAttrs() }
-  const { click } = listeners
-  listeners.click = (event: Event) => {
+const attrs = computed(() => {
+  const attrs = { ...useAttrs() }
+  const { onClick } = attrs
+  attrs.onClick = (event: Event) => {
     selectFile.value?.click()
-    click?.(event)
+    if (onClick) {
+      ;(onClick as any)(event)
+    }
   }
-  return listeners
+  return attrs
 })
 
 const fileChange = (e: Event) => {

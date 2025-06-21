@@ -37,7 +37,7 @@ export default defineConfig(({ mode }) => {
   const useDevMode = false
   const envSystemCode = isDev && !useDevMode ? 'el' : viteEnv.VITE_GLOB_APP_CODE
 
-  const useDoc = viteEnv.VITE_USE_DOCUMENT
+  const useDoc = mode === 'github'
 
   const vuePlugins = [
     pluginVue(),
@@ -139,7 +139,7 @@ export default defineConfig(({ mode }) => {
     build: {
       sourcemap: isDev,
       // outDir: `${systemCode}`,
-      outDir: mode === 'github' ? './docs/pages' : `${systemCode}`,
+      outDir: useDoc ? './docs/pages' : `${systemCode}`,
       cssCodeSplit: true,
       chunkSizeWarningLimit: 1500,
       minify: 'esbuild',

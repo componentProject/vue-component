@@ -1,7 +1,7 @@
 <template>
   <el-button class="button" :loading="loading" v-bind="$attrs">
     <template #default>
-      <span v-if="title">{{ title }}</span>
+      <span v-if="props.title">{{ props.title }}</span>
       <slot name="default" />
     </template>
   </el-button>
@@ -9,8 +9,7 @@
 
 <script setup lang="ts">
 import { ref, watch, useAttrs, onMounted } from 'vue'
-import type { FormModelProps, configType } from '@/components/ConfigForm/types'
-import { isType } from '@/components/ConfigForm/utils'
+import type { configType } from '@/components/ConfigForm/types'
 
 /**
  *  throttleButton
@@ -34,7 +33,6 @@ const props = withDefaults(
     isDeep: boolean
     message?: string
     eventConfig: Record<string, any>
-    model: FormModelProps
     config: configType
   }>(),
   {
@@ -52,19 +50,15 @@ const props = withDefaults(
         depValue: undefined,
       },
     }),
-    model: () => ({}),
     config: () => ({}),
   },
 )
-
-const emit = defineEmits(['update:model'])
 
 const loading = ref(false)
 const asyncEventQueue = ref(new Set())
 const depValueQueue = ref(new Set())
 
 const messageHandler = (key: string) => {
-  // @ts-expect-error ElMessage is globally available
   ElMessage.warning(props.message || props.eventConfig[key]?.message || '正在操作中,请稍后...')
 }
 

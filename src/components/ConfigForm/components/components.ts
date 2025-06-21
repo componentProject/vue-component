@@ -52,7 +52,6 @@ const components: ComponentsType = Object.keys(componentFiles).reduce(
   {},
 )
 //#endregion
-console.log('componentFiles', components)
 
 //#region 全局注册组件
 // const componentNames = Object.keys(components);

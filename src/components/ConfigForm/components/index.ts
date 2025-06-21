@@ -1,4 +1,4 @@
 import wlComponent from './components.ts'
-import wlPopComponent from './popComponents.ts'
-const components = { ...wlComponent, ...wlPopComponent }
+
+const components = { ...wlComponent }
 export default components
