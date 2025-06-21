@@ -10,7 +10,10 @@
  */
 import type { Plugin, Component } from 'vue'
 
-const pageFiles = import.meta.glob('./**/index.vue', { eager: true, import: 'default' })
+const pageFiles = import.meta.glob(['./**/index.vue', '!./**/components/*'], {
+  eager: true,
+  import: 'default',
+})
 const pages: Plugin = Object.keys(pageFiles).reduce((modules = {}, modulePath) => {
   const name: string | undefined = modulePath
   const component: Component = pageFiles[modulePath] as Component
