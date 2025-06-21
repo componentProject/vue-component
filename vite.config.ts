@@ -34,11 +34,12 @@ export default defineConfig(({ mode }) => {
   const appTitle = viteEnv.VITE_GLOB_APP_TITLE
   const isDev = mode === 'development'
   const systemCode = viteEnv.VITE_GLOB_APP_CODE
-  const useDevMode = false
+  const useDevMode = viteEnv.VITE_QIANKUN_DEV
   const envSystemCode = isDev && !useDevMode ? 'el' : viteEnv.VITE_GLOB_APP_CODE
 
   const useDoc = mode === 'github'
-
+  const useQianKun = viteEnv.VITE_USE_QIANKUN && !useDoc
+  const useCDN = viteEnv.VITE_USE_CDN && !useDoc && !useQianKun
   const vuePlugins = [
     pluginVue(),
     vueJsx(),
@@ -92,8 +93,7 @@ export default defineConfig(({ mode }) => {
           plugins: [{ name: 'removeViewBox' }, { name: 'removeEmptyAttrs', active: false }],
         },
       }),
-    viteEnv.VITE_USE_CDN &&
-      !useDoc &&
+    useCDN &&
       importToCDN({
         enableInDevMode: viteEnv.VITE_USE_CDN_IS_DEV,
         prodUrl: `${viteEnv.VITE_CDN_BASE_URL}/{name}@{version}{path}`,
@@ -109,18 +109,17 @@ export default defineConfig(({ mode }) => {
       }),
   ].filter((i) => !!i)
 
-  const qianKunPlugins =
-    viteEnv.VITE_USE_QIANKUN && !useDoc
-      ? [
-          qiankun(envSystemCode, { useDevMode }),
-          scopedCssPrefixPlugin({
-            prefixScoped: `div[data-qiankun='${envSystemCode}']`,
-            oldPrefix: 'el',
-            newPrefix: systemCode,
-            useDevMode,
-          }),
-        ]
-      : []
+  const qianKunPlugins = useQianKun
+    ? [
+        qiankun(envSystemCode, { useDevMode }),
+        scopedCssPrefixPlugin({
+          prefixScoped: `div[data-qiankun='${envSystemCode}']`,
+          oldPrefix: 'el',
+          newPrefix: systemCode,
+          useDevMode,
+        }),
+      ]
+    : []
 
   return {
     base: `/${systemCode}`,
