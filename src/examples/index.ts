@@ -10,7 +10,7 @@
  */
 import type { Plugin, Component } from 'vue'
 
-const exampleFiles = import.meta.glob(['./*/index.vue', '!./**/components/*'], {
+const exampleFiles = import.meta.glob(['./**/index.vue', '!./**/components/*'], {
   eager: true,
   import: 'default',
 })
