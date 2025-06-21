@@ -23,7 +23,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, watch, onUnmounted, nextTick, useTemplateRef } from 'vue'
+import { ref, watch, nextTick, useTemplateRef } from 'vue'
 import type { ComponentPublicInstance } from 'vue'
 import { ElPopover } from 'element-plus'
 import type { VxeTablePropTypes } from 'vxe-table'
@@ -74,11 +74,12 @@ const emit = defineEmits<{
   select: [row: TableRowData]
 }>()
 
-const popoverVisible = defineModel<boolean>()
-const popoverRef = useTemplateRef('popoverRef')
+const popoverVisible = defineModel({
+  type: Boolean,
+  default: false,
+})
 const gridRef = useTemplateRef('gridRef')
 const currentRowIndex = ref(0)
-let virtualElement: HTMLElement | null = null
 
 // 默认选中第一行
 watch(
@@ -94,6 +95,9 @@ watch(
   { immediate: true },
 )
 
+let virtualElement: HTMLElement | null = null
+
+const popoverRef = useTemplateRef('popoverRef')
 // 监听virtualRef的变化
 watch(
   () => props.virtualRef,
@@ -165,10 +169,6 @@ function handleOutsideClick(e: MouseEvent) {
   const popoverEl = popoverRef.value
   // 获取virtualRef元素
   const virtualEl = (props.virtualRef as ComponentPublicInstance)?.$el || props.virtualRef
-  // console.log("popoverEl", popoverEl)
-  // console.log('virtualEl', virtualEl)
-  // console.log(popoverEl.contains(e.target as Node))
-  // console.log(virtualEl.contains(e.target as Node))
   // 检查点击是否在popover或virtualRef元素外部
   if (
     popoverEl &&
@@ -181,7 +181,10 @@ function handleOutsideClick(e: MouseEvent) {
     ;(props.virtualRef as ComponentPublicInstance)?.$el?.blur?.()
   }
 }
-
+// 组件卸载时清理
+onUnmounted(() => {
+  cleanupEventListeners()
+})
 /**
  * 处理focus事件
  */
@@ -257,11 +260,6 @@ function handleCellClick({ row, rowIndex }: { row: TableRowData; rowIndex: numbe
     emit('select', selectedRow)
   })
 }
-
-// 组件卸载时清理
-onUnmounted(() => {
-  cleanupEventListeners()
-})
 </script>
 
 <style scoped></style>

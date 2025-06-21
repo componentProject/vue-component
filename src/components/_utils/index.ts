@@ -84,7 +84,8 @@ export function getTypeDefault(obj: any, type: types) {
  * @param obj
  */
 export function getStringObj(obj: any) {
-  if (getType(obj, 'object')) {
+  const allowTypes = ['object', 'array']
+  if (allowTypes.some((type) => getType(obj, type))) {
     return JSON.stringify(obj)
   }
   return obj

@@ -40,8 +40,8 @@ import DraggableTable from './index.vue'
 const loading = ref(false)
 
 // 拖拽开关状态
-const rowdragable = ref(true)
-const columndragable = ref(true)
+const rowdragable = ref(false)
+const columndragable = ref(false)
 
 // 表格引用
 const draggableTableRef = ref(null)
@@ -108,7 +108,7 @@ const tableData = ref([
 // 列配置
 const columns = ref([
   { type: 'seq', width: 70 },
-  { field: 'name', title: 'Name', editType: 'select' },
+  { field: 'name', title: 'Name' },
   { field: 'createTime', title: '日期', width: 150 },
   {
     field: 'sex',

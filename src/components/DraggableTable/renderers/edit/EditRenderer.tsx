@@ -1,5 +1,5 @@
 import { computed, defineComponent, ref, watch } from 'vue'
-import { getMomentIsValidIsNoNum, detectDateFormatByReplace } from '@/components/_utils/index'
+import { getMomentIsValidIsNoNum, detectDateFormatByReplace } from '@/components/_utils'
 import Select from '@/components/Select/index.vue'
 import DateRangePicker from '@/components/DateRangePicker/index.vue'
 import { ElInput } from 'element-plus'
