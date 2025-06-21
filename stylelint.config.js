@@ -19,6 +19,7 @@ export default {
     // 禁用 scss 的 扩展检测
     'scss/load-partial-extension': null,
     'no-descending-specificity': null,
+    'scss/dollar-variable-pattern': null,
     // 使 deep 可用
     'selector-pseudo-class-no-unknown': [
       true,

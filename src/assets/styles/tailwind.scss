@@ -1,8 +1,14 @@
-@forward "tailwindcss";
+@forward 'tailwindcss';
 
 @layer base {
   html {
     font-size: 4px;
+
+    @apply whitespace-nowrap;
+  }
+
+  canvas {
+    display: inline;
   }
 
   body {
@@ -12,4 +18,27 @@
   //:root {
   //  --spacing: 1px;
   //}
+}
+
+@layer utilities {
+  .bg-primary {
+    background-color: var(--el-color-primary);
+  }
+
+  .flex {
+    @apply flex flex-none!;
+  }
+
+  .flex-1-hidden {
+    @apply flex-1 overflow-hidden;
+  }
+
+  .flex-1-auto {
+    @apply flex-1 overflow-auto;
+  }
+
+  .container {
+    width: 100%;
+    max-width: 100%;
+  }
 }
