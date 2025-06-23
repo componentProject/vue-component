@@ -398,10 +398,27 @@ const computedColumns = computed<ColumnType[]>(() => {
     const { options, editProps, filterProps, cellProps, ...item } = col
     const customType = getCustomType(item.type)
     if (customType) delete item.type
+    let filters: any[] = []
+    if (props.filterable || props.sortable) {
+      const filterFields = new Set<any>([])
+      tableData.value.forEach((i: any) => {
+        if (!item.field) return
+        if (!i || !i[item.field]) return
+        if (i) {
+          filterFields.add(i[item.field])
+        }
+      })
+      filters = Array.from(filterFields)
+        .filter(Boolean)
+        .map((i) => ({ label: i, value: i }))
+    }
+
     /**
      * 提供默认排序
      */
-    item.sortable = item.sortable ?? props.sortable
+    if (filters.length > 1) {
+      item.sortable = item.sortable ?? props.sortable
+    }
     if (!item.field) return item
     //#region 提供基于field的插槽
     /*
@@ -470,18 +487,7 @@ const computedColumns = computed<ColumnType[]>(() => {
 
     //#region 添加基于field的自定义筛选器渲染器,该渲染器基于当前列显示的内容进行筛选，支持input搜索，checkbox多选，可通过filterLayout配置
     if (props.filterable && !item.filters && !item.slots.edit && isEmpty(item.filterRender)) {
-      const filterFields = new Set<any>([])
-      tableData.value.forEach((i: any) => {
-        if (!item.field) return
-        if (!i || !i[item.field]) return
-        if (i) {
-          filterFields.add(i[item.field])
-        }
-      })
-      const filters = Array.from(filterFields)
-        .filter(Boolean)
-        .map((i) => ({ label: i, value: i }))
-      if (filters.length) {
+      if (filters.length > 1) {
         item.filters = [
           {
             data: { vals: [], sVal: '' },
