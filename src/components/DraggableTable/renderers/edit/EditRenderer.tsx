@@ -36,7 +36,7 @@ export default defineComponent({
       if (!currColumn.value || !currRow.value) return
       return currRow.value[currColumn.value.field]
     })
-    const propsOptions = computed(() => renderOptsProps.value.options || [])
+    const propsOptions = computed(() => renderOptsProps.value.options)
     const valueFormat = computed(() => detectDateFormatByReplace(currentValue.value))
     // 判断是否为日期类型
     const isDateType = computed(() => getMomentIsValidIsNoNum(currentValue.value))
