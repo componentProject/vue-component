@@ -50,7 +50,7 @@ import type {
   VxeTablePropTypes,
 } from 'vxe-table'
 import { VxeGrid } from 'vxe-table'
-import { cloneDeep } from 'lodash'
+import { cloneDeep, groupBy } from 'lodash'
 import { ElMessage } from 'element-plus'
 import { diff, isEmpty } from 'radash'
 import { dispatchEvents, getClass, getStringObj, getType } from '@/components/_utils'
@@ -205,6 +205,7 @@ const props = defineProps({
   },
   /**
    * 拖拽模式
+   * vxe模式下，表格数据发生变化时整个表格会刷新key重新渲染，而draggable模式下不会重新渲染
    */
   dragType: {
     type: String,
@@ -332,6 +333,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  sortConfig: {
+    type: Object as PropType<VxeTablePropTypes.SortConfig>,
+    default: () => ({}),
+  },
   //#endregion
 })
 
@@ -398,27 +403,11 @@ const computedColumns = computed<ColumnType[]>(() => {
     const { options, editProps, filterProps, cellProps, ...item } = col
     const customType = getCustomType(item.type)
     if (customType) delete item.type
-    let filters: any[] = []
-    if (props.filterable || props.sortable) {
-      const filterFields = new Set<any>([])
-      tableData.value.forEach((i: any) => {
-        if (!item.field) return
-        if (!i || !i[item.field]) return
-        if (i) {
-          filterFields.add(i[item.field])
-        }
-      })
-      filters = Array.from(filterFields)
-        .filter(Boolean)
-        .map((i) => ({ label: i, value: i }))
-    }
 
     /**
      * 提供默认排序
      */
-    if (filters.length > 1) {
-      item.sortable = item.sortable ?? props.sortable
-    }
+    item.sortable = item.sortable ?? props.sortable
     if (!item.field) return item
     //#region 提供基于field的插槽
     /*
@@ -487,22 +476,20 @@ const computedColumns = computed<ColumnType[]>(() => {
 
     //#region 添加基于field的自定义筛选器渲染器,该渲染器基于当前列显示的内容进行筛选，支持input搜索，checkbox多选，可通过filterLayout配置
     if (props.filterable && !item.filters && !item.slots.edit && isEmpty(item.filterRender)) {
-      if (filters.length > 1) {
-        item.filters = [
-          {
-            data: { vals: [], sVal: '' },
-            checked: false,
-          },
-        ]
-        // 使用自定义筛选器渲染器
-        item.filterRender = {
-          name: 'filterRenderer',
-          props: {
-            filterLayout: props.filterLayout,
-            filterType: props.filterType,
-            ...filterProps,
-          },
-        }
+      item.filters = [
+        {
+          data: { vals: [], sVal: '' },
+          checked: false,
+        },
+      ]
+      // 使用自定义筛选器渲染器
+      item.filterRender = {
+        name: 'filterRenderer',
+        props: {
+          filterLayout: props.filterLayout,
+          filterType: props.filterType,
+          ...filterProps,
+        },
       }
     }
     //#endregion
@@ -584,10 +571,6 @@ const gridProps = computed<VxeGridProps>(() => {
       showIcon: false,
       ...props.editConfig,
     },
-    filterConfig: {
-      showIcon: true,
-      ...props.filterConfig,
-    },
     rowConfig: {
       useKey: true,
       drag: props.dragType == 'vxe' && (props.rowdragable || props.dragable),
@@ -633,6 +616,13 @@ const gridProps = computed<VxeGridProps>(() => {
       trigger: 'cell',
       dragEndMethod: (params) => {
         const isDrag = props.columnDragEndMethod ? props.columnDragEndMethod(params) : true
+        // Vxe自带逻辑，无须添加
+        // const { oldColumn, newColumn } = params
+        // const hasFixed = oldColumn.fixed || newColumn.fixed
+        // if (hasFixed) {
+        //   ElMessage.warning('固定列不允许拖动！')
+        //   return false
+        // }
         if (isDrag) {
           emit('column-dragend', params)
           handleSaveColumnsToStorage()
@@ -661,6 +651,26 @@ const gridProps = computed<VxeGridProps>(() => {
     menuConfig: {
       enabled: true,
       ...props.menuConfig,
+    },
+    sortConfig: {
+      iconVisibleMethod(params) {
+        const {
+          column: { field },
+        } = params
+        const fieldValues = Object.keys(groupBy(tableData.value, field))
+        return fieldValues.length > 1
+      },
+      ...props.sortConfig,
+    },
+    filterConfig: {
+      iconVisibleMethod(params) {
+        const {
+          column: { field },
+        } = params
+        const fieldValues = Object.keys(groupBy(tableData.value, field))
+        return fieldValues.length > 1
+      },
+      ...props.filterConfig,
     },
     ...attrs,
     // 使用计算后的列配置
