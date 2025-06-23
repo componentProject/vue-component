@@ -1,6 +1,6 @@
 <template>
   <!--  <DraggableTable />-->
-  <div class="h-full w-full" v-click-outside="handleClickOutside">
+  <div class="h-full w-full">
     <vxe-grid
       ref="xTable"
       v-bind="gridProps"
@@ -57,11 +57,18 @@ import { dispatchEvents, getClass, getStringObj, getType } from '@/components/_u
 
 // 导入自定义渲染器
 import './renderers'
+/**
+ * 自定义右键菜单
+ */
 import ContextMenu from './components/ContextMenu/index.vue'
 
 import type { types, ColumnType } from '@/components/DraggableTable/_types'
-import { getTypeName, handleGetColumn } from '@/components/DraggableTable/_utils'
-import { ClickOutside as vClickOutside } from 'element-plus'
+import {
+  getCustomType,
+  getTypeName,
+  handleGetColumn,
+  handleGetRequiredFileds,
+} from '@/components/DraggableTable/_utils'
 
 defineOptions({
   name: 'DraggableTable',
@@ -73,48 +80,81 @@ const props = defineProps({
   id: {
     type: String,
   },
+  /**
+   * 是否显示表格边框
+   */
   border: {
     type: Boolean,
     default: true,
   },
+  /**
+   * 表格内容溢出隐藏并显示tooltip
+   */
   showOverflow: {
-    type: Boolean,
+    type: [Boolean, String] as PropType<VxeTablePropTypes.ShowOverflow>,
     default: true,
   },
+  /**
+   * 头部溢出隐藏并显示tooltip
+   */
   showHeaderOverflow: {
-    type: Boolean,
+    type: [Boolean, String] as PropType<VxeTablePropTypes.ShowOverflow>,
     default: true,
   },
+  /**
+   * 底部溢出隐藏并显示tooltip
+   */
   showFooterOverflow: {
-    type: Boolean,
+    type: [Boolean, String] as PropType<VxeTablePropTypes.ShowOverflow>,
     default: true,
   },
   resizable: {
     type: Boolean,
     default: true,
   },
+  /**
+   * 是否自动调整列宽
+   */
   autoResize: {
     type: Boolean,
     default: true,
   },
+  /**
+   * 是否允许列宽拖拽
+   */
+  /**
+   * 列宽拖拽配置
+   */
   resizableConfig: {
     type: Object as PropType<VxeTablePropTypes.ResizableConfig>,
     default: () => ({}),
   },
   //#endregion
   //#region 编辑相关
+  /**
+   * 是否允许编辑
+   */
   editable: {
     type: Boolean,
     default: () => false,
   },
+  /**
+   * 触发编辑后是否自动聚焦
+   */
   editAutoFocus: {
     type: Boolean,
     default: () => true,
   },
+  /**
+   * 编辑规则
+   */
   editRules: {
     type: Object as PropType<VxeTablePropTypes.EditRules>,
     default: null,
   },
+  /**
+   * 编辑配置
+   */
   editConfig: {
     type: Object as PropType<VxeTablePropTypes.EditConfig>,
     default: () => ({}),
@@ -171,6 +211,9 @@ const props = defineProps({
     default: () => 'vxe',
     // default: () => 'draggable',
   },
+  /**
+   * 需要禁用拖拽的行class
+   */
   rowDisabledClass: {
     type: String,
     default: () => '',
@@ -256,19 +299,38 @@ const props = defineProps({
   },
   //#endregion
   //#region 虚拟列表配置
+  /**
+   * 列虚拟滚动配置
+   */
   virtualXConfig: {
     type: Object as PropType<VxeTablePropTypes.VirtualXConfig>,
     default: () => ({}),
   },
+  /**
+   * 行虚拟滚动配置
+   */
   virtualYConfig: {
     type: Object as PropType<VxeTablePropTypes.VirtualYConfig>,
     default: () => ({}),
   },
   //#endregion
-  // # region 右键菜单配置
+  //#region 右键菜单配置
+  /**
+   * 头部右键菜单是否允许配置列隐藏显示
+   */
+  menuConfigColumn: {
+    type: Boolean,
+    default: true,
+  },
   menuConfig: {
     type: Object as PropType<VxeTablePropTypes.MenuConfig>,
     default: () => ({}),
+  },
+  //#endregion
+  //#region 排序相关配置
+  sortable: {
+    type: Boolean,
+    default: false,
   },
   //#endregion
 })
@@ -297,10 +359,22 @@ const tableData = defineModel({
 
 /**
  * 计算后的columns，用于提供额外功能，目前功能如下：
- * 1. 添加基于field的插槽，当columns中没有该插槽时，edit-${field}开头的为edit插槽，field为默认插槽
- * 2. 添加基于field的默认filters，filterRender，通过props.filterable开启
+ * 1. 提供基于field的插槽，规则如下：
+ *    如果slotsDiff中存在"${field}"，则作为defaultSlots.default，
+ *    如果slotsDiff中存在"header-${field}"，则作为defaultSlots.header，
+ *    如果slotsDiff中存在"footer-${field}"，则作为defaultSlots.footer，
+ *    如果slotsDiff中存在"title-${field}"，且column.type等于checkbox或radio，则作为defaultSlots.title，
+ *    如果slotsDiff中存在"checkbox-${field}"，且column.type等于checkbox，则作为defaultSlots.checkbox，
+ *    如果slotsDiff中存在"radio-${field}"，且column.type等于radio，则作为defaultSlots.radio，
+ *    如果slotsDiff中存在"content-${field}"，且column.type等于expand，则作为defaultSlots.content，
+ *    如果slotsDiff中存在"filter-${field}"，且存在column.filterRender并且不存在column.filters，则作为defaultSlots.filter，
+ *    如果slotsDiff中存在"edit-${field}"，且存在column.editRender，则作为defaultSlots.edit，
+ *    如果slotsDiff中存在"valid-${field}"，且存在column.editRules,column.editRender，则作为defaultSlots.valid
+ * 2. 添加基于field的自定义筛选器渲染器,该渲染器基于当前列显示的内容进行筛选，支持input搜索，checkbox多选，可通过filterLayout配置
+ * 3. 添加基于field的自定义编辑渲染器，当前列满足正常年月日顺序的任意字符串时间格式/Date时，显示单日期时间选择器，列传递options，显示select,否则显示input
  */
 const computedColumns = computed<ColumnType[]>(() => {
+  console.log('computedColumns')
   const columns = cloneDeep(props.columns)
   if (!getType(columns, 'array')) return []
   //#region 获取所有插槽的名称
@@ -321,7 +395,13 @@ const computedColumns = computed<ColumnType[]>(() => {
     const col = handleGetColumn(i)
     col.title = col.title || getTypeName(col.type as types)
     col.visible = col.visible ?? true
-    const { options, ...item } = col
+    const { options, editProps, filterProps, cellProps, ...item } = col
+    const customType = getCustomType(item.type)
+    if (customType) delete item.type
+    /**
+     * 提供默认排序
+     */
+    item.sortable = item.sortable ?? props.sortable
     if (!item.field) return item
     //#region 提供基于field的插槽
     /*
@@ -387,14 +467,9 @@ const computedColumns = computed<ColumnType[]>(() => {
       ...item.slots,
     }
     //#endregion
-    // 添加默认filters，filterRender
-    if (
-      props.filterable &&
-      item.field &&
-      !item.filters &&
-      !item.slots.edit &&
-      isEmpty(item.filterRender)
-    ) {
+
+    //#region 添加基于field的自定义筛选器渲染器,该渲染器基于当前列显示的内容进行筛选，支持input搜索，checkbox多选，可通过filterLayout配置
+    if (props.filterable && !item.filters && !item.slots.edit && isEmpty(item.filterRender)) {
       const filterFields = new Set<any>([])
       tableData.value.forEach((i: any) => {
         if (!item.field) return
@@ -419,23 +494,48 @@ const computedColumns = computed<ColumnType[]>(() => {
           props: {
             filterLayout: props.filterLayout,
             filterType: props.filterType,
+            ...filterProps,
           },
         }
       }
     }
+    //#endregion
 
-    // 添加默认editRender
-    if (props.editable && item.field && isEmpty(item.editRender) && !item.slots?.edit) {
+    //#region 添加基于field的自定义编辑渲染器，当前列满足正常年月日顺序的任意字符串时间格式/Date时，显示单日期时间选择器，列传递options，显示select,否则显示input
+    if (props.editable && isEmpty(item.editRender) && !item.formatter && !item.slots?.edit) {
       // 使用自定义编辑渲染器
       item.editRender = {
         name: 'editRenderer',
         autoFocus: props.editAutoFocus,
         props: {
           options,
+          ...editProps,
         },
       }
     }
+    //#endregion
 
+    //#region 添加基于field的自定义默认渲染器，额外提供以下type功能：'input' | 'select' | 'date' | 'datetime' | 'switch' | 'progress' | 'tag'
+
+    if (
+      isEmpty(item.cellRender) &&
+      isEmpty(item.contentRender) &&
+      // 与editRender互斥
+      isEmpty(item.editRender) &&
+      !item.slots?.default &&
+      !item.formatter &&
+      customType
+    ) {
+      item.cellRender = {
+        name: 'cellRenderer',
+        props: {
+          options,
+          type: customType,
+          ...cellProps,
+        },
+      }
+    }
+    //#endregion
     return item
   })
 })
@@ -446,10 +546,10 @@ const virtualRef = ref<HTMLElement>()
 
 // 表格引用
 const xTable = useTemplateRef<VxeGridInstance>('xTable')
-const fullColumns = computed(() => {
+const fullColumns = computed<ColumnType[]>(() => {
   if (!xTable.value) return []
   const { fullColumn } = xTable.value.getTableColumn()
-  return fullColumn
+  return fullColumn as any[]
 })
 
 // 本地保存的列配置
@@ -465,11 +565,11 @@ const gridProps = computed<VxeGridProps>(() => {
     resizable: props.resizable,
     autoResize: props.autoResize,
     data: tableData.value,
-    showOverflow: props.showOverflow,
-    showHeaderOverflow: props.showHeaderOverflow,
-    showFooterOverflow: props.showFooterOverflow,
+    showOverflow: props.showOverflow ? 'title' : false,
+    showHeaderOverflow: props.showHeaderOverflow ? 'title' : false,
+    showFooterOverflow: props.showFooterOverflow ? 'title' : false,
     height: '100%',
-    keepSource: props.editable,
+    keepSource: true,
     editConfig: {
       enabled: props.editable,
       trigger: 'dblclick',
@@ -559,7 +659,7 @@ const gridProps = computed<VxeGridProps>(() => {
     ...attrs,
     // 使用计算后的列配置
     columns: localColumns.value,
-  }
+  } as VxeGridProps
 })
 
 /**
@@ -605,8 +705,6 @@ function handleCheckboxChange(params: VxeTableDefines.CheckboxChangeParams) {
   emit('checkbox-change', params)
 }
 
-function handleClickOutside() {}
-
 /**
  * 获取本地存储的列配置
  */
@@ -625,29 +723,30 @@ function handleGetStoredColumns(): ColumnType[] {
  */
 function handleSaveColumnsToStorage() {
   try {
+    console.log('!xTable.value', !xTable.value)
     if (!xTable.value) return
 
     // 直接从表格实例获取完整列配置
     const { fullColumn } = xTable.value.getTableColumn()
     // 只保存必要的列属性
-    const columns: ColumnType[] = fullColumn.filter((item: ColumnType) => item.title || item.type)
+    const columns: ColumnType[] = (fullColumn as any[])
+      .filter((item: ColumnType) => item.title || item.type)
+      .map((i) => handleGetColumn(i))
     console.log('保存的列配置', columns)
     localStorage.setItem(getStorageKey(), JSON.stringify(columns))
-  } catch (error) {
-    console.error('保存列配置到本地存储失败:', error)
-  }
+  } catch (error) {}
 }
 
 /**
  * 没有本地存储的列配置，使用props.columns
  */
 function handleSavePropsColumns() {
-  const types = new Set<string>([])
+  const typeSet = new Set<types | undefined>([])
   localColumns.value = cloneDeep(computedColumns.value).filter((i) => {
-    if (i.type && types.has(i.type)) {
+    if (i.type && typeSet.has(i.type)) {
       return false
     }
-    types.add(i.type as string)
+    typeSet.add(i.type)
     return true
   })
 }
@@ -661,25 +760,15 @@ function handleCompareColumns(
   computedColumns: ColumnType[] = [],
   storedColumns: ColumnType[] = [],
 ) {
-  const requiredFields: Array<keyof ColumnType> = [
-    'title',
-    'field',
-    'sortable',
-    'align',
-    'slots',
-    'fixed',
-    'type',
-    'editRender',
-    'filterRender',
-    'filters',
-  ]
+  if (computedColumns.length !== storedColumns.length) return true
+  const requiredFields: Array<keyof ColumnType> = handleGetRequiredFileds()
+  console.log('requiredFields', requiredFields)
   return computedColumns.some((source) => {
     const target = storedColumns.find(
       (item) =>
         item.field == source.field && item.type == source.type && item.title == source.title,
     )
     if (!target) {
-      console.log('!target')
       return true
     }
     return requiredFields.some(
@@ -713,11 +802,19 @@ watch(
   (newColumns) => {
     // 尝试从本地存储获取列配置
     const storedColumns = handleGetStoredColumns()
-    console.log('storedColumns', storedColumns, 'computedColumns', computedColumns.value)
     if (!isEmpty(newColumns)) {
       // 对比本地存储的列配置和props.columns
       // 检查每列的field, title, fixed, sortable是否变化
       const shouldUseStored = handleCompareColumns(newColumns, storedColumns || [])
+      console.log(
+        'shouldUseStored',
+        shouldUseStored,
+        'storedColumns',
+        storedColumns,
+        'computedColumns',
+        computedColumns.value,
+      )
+
       // 使用props.columns并保存到本地
       if (shouldUseStored) {
         handleSavePropsColumns()
@@ -736,6 +833,9 @@ watch(
       xTable.value?.loadColumn(newVal)
       handleSaveColumnsToStorage()
     })
+  },
+  {
+    immediate: true,
   },
 )
 //#region draggable模式逻辑
@@ -869,7 +969,7 @@ const initColumnDraggable = () => {
       fullColumn.splice(newColumnIndex, 0, currRow)
 
       // 将修改后的列配置保存到本地
-      localColumns.value = fullColumn
+      localColumns.value = fullColumn as any[]
 
       // 构造vxe格式的事件参数
       const dragColumn = tableColumn[oldIndex]

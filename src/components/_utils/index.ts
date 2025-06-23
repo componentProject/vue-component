@@ -123,23 +123,29 @@ export function dispatchEvents(target: Document, events: EventType | EventType[]
 
 //#region 日期相关
 /**
- * 匹配 以年月日 时分秒 顺序排列的任意时间格式
+ * 匹配 以年月日 时分秒 顺序排列的任意时间格式字符串,匹配不到默认返回 YYYY-MM-DD HH:mm:ss
  * @param str
+ * @param defaultFormat
  */
-export function detectDateFormatByReplace(str: string) {
-  // 匹配所有数字和分隔符的片段
-  const pattern = /(\d{4}|\d{2})(\D?)/g
-  const tokens = ['YYYY', 'MM', 'DD', 'HH', 'mm', 'ss']
-  let i = 0
-  let result = ''
-  let match
+export function detectDateFormatByReplace(str: string, defaultFormat = 'YYYY-MM-DD HH:mm:ss') {
+  if (getType(str, 'string')) {
+    // 匹配所有数字和分隔符的片段
+    const pattern = /(\d{4}|\d{2})(\D?)/g
+    const tokens = ['YYYY', 'MM', 'DD', 'HH', 'mm', 'ss']
+    let i = 0
+    let result = ''
+    let match
 
-  while ((match = pattern.exec(str)) !== null && i < tokens.length) {
-    result += tokens[i++] + match[2] // match[2]是分隔符（可能为空）
+    while ((match = pattern.exec(str as string)) !== null && i < tokens.length) {
+      result += tokens[i++] + match[2] // match[2]是分隔符（可能为空）
+    }
+
+    // 若未匹配到任何数字，则返回defaultFormat
+    console.log('result', result, defaultFormat)
+    return i === 0 ? defaultFormat : result
+  } else {
+    return defaultFormat
   }
-
-  // 若未匹配到任何数字，则返回null
-  return i === 0 ? null : result
 }
 
 /**
@@ -155,7 +161,7 @@ export function dateIsBefore(date1: DateType, date2: DateType) {
  * 判断一个日期是否满足某个moment格式，如果满足返回moment对象，否则返回false
  * @param dateStr 日期
  * @param format moment格式
- * @param strictType 强制校验日期是否满足该类型
+ * @param strictType 强制校验dateStr是否满足该类型
  */
 export function getMomentIsValid(dateStr: DateType, format?: string, strictType?: string) {
   if (!dateStr || (strictType && !getType(dateStr, strictType))) return false
@@ -165,33 +171,38 @@ export function getMomentIsValid(dateStr: DateType, format?: string, strictType?
 
 /**
  * 判断一个非数值的日期是否满足某个moment格式，如果满足返回moment对象，否则返回false
- * @param dateStr 日期
- * @param format moment格式
- * @param strictType 强制校验日期是否满足该类型
+ * @param dateStr 任意日期格式，包括Date
+ * @param format 是否强校验是否满足format格式
+ * @param strictType 强制校验dateStr是否满足该类型
  */
 export function getMomentIsValidIsNoNum(dateStr: DateType, format?: string, strictType?: string) {
-  if (!isNaN(+dateStr)) return false
-  return getMomentIsValid(dateStr, format, strictType)
+  const dateTypes = ['string', 'date']
+  if (dateTypes.some((type) => getType(dateStr, type))) {
+    if (!isNaN(+dateStr)) return false
+    return getMomentIsValid(dateStr, format, strictType)
+  } else {
+    return false
+  }
 }
 
 /**
  * 校验日期范围格式
- * @param date 日期
+ * @param dateStr 日期
  * @param format moment格式
- * @param strictType 强制校验的类型
+ * @param strictType 强制校验dateStr是否满足该类型
  */
 export function validateDate(
-  date: DateType,
+  dateStr: DateType,
   format: string = 'YYYY-MM-DD HH:mm:ss',
   strictType: string,
 ) {
-  if (!date) return false
+  if (!dateStr) return false
 
-  if (Array.isArray(date)) {
-    return date.every((date) => getMomentIsValid(date, format, strictType))
+  if (Array.isArray(dateStr)) {
+    return dateStr.every((date) => getMomentIsValid(date, format, strictType))
   } else {
     // 单个日期值 xxx
-    return getMomentIsValid(date, format, strictType)
+    return getMomentIsValid(dateStr, format, strictType)
   }
 }
 

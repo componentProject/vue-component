@@ -85,7 +85,7 @@ const props = defineProps({
   // 当无选定值时，是否默认返回今天的日期范围
   defaultToday: {
     type: Boolean,
-    default: false,
+    default: true,
   },
   /**
    * 日期范围，可以是数字或数组

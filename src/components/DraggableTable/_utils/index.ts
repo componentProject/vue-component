@@ -1,15 +1,32 @@
 import type { types, ColumnType } from '@/components/DraggableTable/_types'
 
+/**
+ * 自定义的列模板
+ */
+const customTypeMap = {
+  input: '',
+  select: '',
+  date: '',
+  datetime: '',
+  switch: '',
+  progress: '',
+  tag: '',
+}
 const typeMap = {
   seq: '序号',
   checkbox: '复选框',
   radio: '单选框',
   expand: '展开行',
   html: '',
+  ...customTypeMap,
 }
 
 export function getTypeName(type?: types) {
-  return type ? typeMap[type] : ''
+  return type ? typeMap[type] || '' : ''
+}
+
+export function getCustomType(type?: types) {
+  return type ? Object.keys(customTypeMap).find((customType) => customType === type) || '' : ''
 }
 
 export function handleGetColumn(Column: ColumnType): ColumnType {
@@ -59,8 +76,14 @@ export function handleGetColumn(Column: ColumnType): ColumnType {
     colId,
     children,
     slots,
+    //#region 自定义属性部分
     options,
+    cellProps,
+    editProps,
+    filterProps,
+    //#endregion
   } = Column
+  console.log('sssss', sortable)
   return {
     type,
     field,
@@ -82,7 +105,8 @@ export function handleGetColumn(Column: ColumnType): ColumnType {
     padding,
     verticalAlign,
     formatter,
-    sortable: sortable ?? false,
+    // sortable: sortable ?? false,
+    sortable,
     sortBy,
     sortType: sortType ?? 'auto',
     filters: filters?.map((filter) => {
@@ -109,6 +133,59 @@ export function handleGetColumn(Column: ColumnType): ColumnType {
     colId,
     children,
     slots,
+    //#region 自定义属性部分
     options,
+    cellProps,
+    editProps,
+    filterProps,
+    //#endregion
   }
+}
+
+export function handleGetRequiredFileds(): Array<keyof ColumnType> {
+  return [
+    'type',
+    'field',
+    'title',
+    'width',
+    'minWidth',
+    'resizable',
+    'fixed',
+    'align',
+    'headerAlign',
+    'footerAlign',
+    'showOverflow',
+    'showHeaderOverflow',
+    'showFooterOverflow',
+    'className',
+    'headerClassName',
+    'footerClassName',
+    'padding',
+    'verticalAlign',
+    'formatter',
+    'sortable',
+    'sortBy',
+    'sortType',
+    'filters',
+    'filterMultiple',
+    'filterMethod',
+    'filterResetMethod',
+    'filterRecoverMethod',
+    'filterRender',
+    'headerExportMethod',
+    'exportMethod',
+    'footerExportMethod',
+    'titlePrefix',
+    'titleSuffix',
+    'aggFunc',
+    'cellType',
+    'cellRender',
+    'editRender',
+    'contentRender',
+    'treeNode',
+    'params',
+    'colId',
+    'children',
+    'slots',
+  ]
 }

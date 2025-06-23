@@ -3,10 +3,40 @@
     <h2>可拖拽表格演示</h2>
     <div class="demo-actions">
       <el-button @click="addRow">添加行</el-button>
-      <el-button @click="toggleRowDrag">{{ rowdragable ? '禁用行拖拽' : '启用行拖拽' }}</el-button>
-      <el-button @click="toggleColumnDrag"
+      <el-button @click="rowdragable = !rowdragable"
+        >{{ rowdragable ? '禁用行拖拽' : '启用行拖拽' }}
+      </el-button>
+      <el-button @click="columndragable = !columndragable"
         >{{ columndragable ? '禁用列拖拽' : '启用列拖拽' }}
       </el-button>
+
+      <el-button @click="editable = !editable"
+        >{{ editable ? '禁用编辑' : '启用编辑(与cellRender互斥)' }}
+      </el-button>
+
+      <el-button @click="filterable = !filterable"
+        >{{ filterable ? '禁用过滤' : '启用过滤' }}
+      </el-button>
+
+      <el-button @click="sortable = !sortable">{{ sortable ? '禁用排序' : '启用排序' }} </el-button>
+
+      <div class="flex items-center">
+        <span class="mr-8!">扩展type选择：</span>
+        <el-select
+          class="w-[200px]!"
+          v-model="cellType"
+          value-key="type"
+          placeholder="请选择"
+          @change="changeCellType"
+        >
+          <el-option
+            v-for="item in cellTypeList"
+            :key="item.label"
+            :label="item.label"
+            :value="item.value"
+          />
+        </el-select>
+      </div>
     </div>
 
     <!-- 使用DraggableTable组件 -->
@@ -14,13 +44,14 @@
       ref="draggableTableRef"
       v-model="tableData"
       :columns="columns"
-      :rowdragable="rowdragable"
-      :columndragable="columndragable"
       :loading="loading"
-      editable
-      filterable
       :height="500"
       id="demo_table"
+      :rowdragable="rowdragable"
+      :columndragable="columndragable"
+      :editable="editable"
+      :filterable="filterable"
+      :sortable="sortable"
     >
       <!-- 自定义操作列插槽 -->
       <template #aaa="{ row }">
@@ -43,6 +74,9 @@ const loading = ref(false)
 const rowdragable = ref(false)
 const columndragable = ref(false)
 
+const editable = ref(false)
+const filterable = ref(false)
+const sortable = ref(false)
 // 表格引用
 const draggableTableRef = ref(null)
 
@@ -108,7 +142,11 @@ const tableData = ref([
 // 列配置
 const columns = ref([
   { type: 'seq', width: 70 },
-  { field: 'name', title: 'Name' },
+
+  {
+    field: 'name',
+    title: 'Name',
+  },
   { field: 'createTime', title: '日期', width: 150 },
   {
     field: 'sex',
@@ -124,9 +162,87 @@ const columns = ref([
       },
     ],
   },
-  { field: 'age', title: 'Age' },
+  {
+    field: 'age',
+    title: 'Age',
+  },
   { field: 'aaa', title: '操作' },
 ])
+
+const cellType = ref({})
+const cellTypeList = ref([
+  {
+    label: '输入框',
+    value: {
+      type: 'input',
+    },
+  },
+  {
+    label: '下拉框',
+    value: {
+      type: 'select',
+      options: [
+        {
+          label: '男',
+          value: '1',
+        },
+        {
+          label: '女',
+          value: '2',
+        },
+      ],
+    },
+  },
+  {
+    label: '开关',
+    value: {
+      type: 'switch',
+    },
+  },
+  {
+    label: '日期',
+    value: {
+      type: 'date',
+    },
+  },
+  {
+    label: '日期时间',
+    value: {
+      type: 'datetime',
+    },
+  },
+  {
+    label: '进度条',
+    value: {
+      type: 'progress',
+    },
+  },
+  {
+    label: '多标签',
+    value: {
+      type: 'tag',
+      options: [
+        {
+          label: '男',
+          value: '1',
+        },
+        {
+          label: '女',
+          value: '2',
+        },
+      ],
+    },
+  },
+])
+
+function changeCellType(type) {
+  console.log('type', type)
+  const item = columns.value.at(-2)
+  columns.value[columns.value.length - 2] = {
+    ...item,
+    ...type,
+  }
+}
 
 // 组件挂载时的初始化
 onMounted(() => {
@@ -155,18 +271,6 @@ const addRow = () => {
 
   tableData.value.push(newRow)
   ElMessage.success('已添加新行')
-}
-
-// 切换行拖拽
-const toggleRowDrag = () => {
-  rowdragable.value = !rowdragable.value
-  ElMessage.info(`行拖拽已${rowdragable.value ? '启用' : '禁用'}`)
-}
-
-// 切换列拖拽
-const toggleColumnDrag = () => {
-  columndragable.value = !columndragable.value
-  ElMessage.info(`列拖拽已${columndragable.value ? '启用' : '禁用'}`)
 }
 
 // 编辑行

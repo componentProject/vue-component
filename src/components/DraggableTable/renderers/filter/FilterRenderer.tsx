@@ -3,6 +3,7 @@ import { ElInput, ElCheckbox, ElButton } from 'element-plus'
 import type { VxeGlobalRendererHandles, VxeTableDefines } from 'vxe-table'
 import { groupBy } from 'lodash'
 import { getTypeDefault } from '@/components/_utils'
+import type { objType } from '@/components/_types'
 
 interface ColValItem {
   checked: boolean
@@ -10,7 +11,7 @@ interface ColValItem {
 }
 
 export default defineComponent({
-  name: 'CustomFilter',
+  name: 'FilterRenderer',
   props: {
     renderParams: Object as PropType<VxeGlobalRendererHandles.RenderTableFilterParams>,
     renderOpts: Object as PropType<VxeGlobalRendererHandles.RenderTableFilterOptions>,
@@ -19,6 +20,7 @@ export default defineComponent({
     renderParams?: VxeGlobalRendererHandles.RenderTableFilterParams
     renderOpts?: VxeGlobalRendererHandles.RenderTableFilterOptions
   }) {
+    const renderOptsProps = computed<objType>(() => props.renderOpts?.props || {})
     const currOption = ref<VxeTableDefines.FilterOption>()
     const isCheckedAll = ref(false)
     const allValList = ref<ColValItem[]>([])
@@ -42,10 +44,7 @@ export default defineComponent({
         const option = column.filters[0]
         const { vals } = option.data
         const colValList = Object.keys(
-          groupBy(
-            props.renderOpts?.props?.filterType === 'full' ? fullData : tableData,
-            column.field,
-          ),
+          groupBy(renderOptsProps.value.filterType === 'full' ? fullData : tableData, column.field),
         ).map((val) => {
           return {
             checked: vals.includes(val),
@@ -88,7 +87,6 @@ export default defineComponent({
         if (data.vals.length === 0) {
           await $table.resetFilterPanel()
         } else {
-          console.log('data.vals', data.vals)
           await $table.updateFilterOptionStatus(option, true)
           await $table.saveFilterPanel()
         }
@@ -103,15 +101,9 @@ export default defineComponent({
       }
     }
 
-    watch(
-      () => [props.renderParams, props.renderOpts],
-      () => {
-        load()
-      },
-      {
-        immediate: true,
-      },
-    )
+    watch(() => [props.renderParams, props.renderOpts], load, {
+      immediate: true,
+    })
 
     const inputRender = computed(() => {
       return [
@@ -134,20 +126,14 @@ export default defineComponent({
         <div class="px-8">
           {columnValList.value.length ? (
             <>
-              <ul class="m-0 p-0 list-none">
-                <li class="block">
-                  <ElCheckbox v-model={isCheckedAll.value} onChange={changeAllEvent}>
-                    全选
-                  </ElCheckbox>
-                </li>
-              </ul>
-              <ul class="m-0 p-0 list-none">
-                {...columnValList.value.map((item) => (
-                  <li class="block">
-                    <ElCheckbox v-model={item.checked}>{item.value}</ElCheckbox>
-                  </li>
+              <div class="flex flex-col">
+                <ElCheckbox v-model={isCheckedAll.value} onChange={changeAllEvent}>
+                  全选
+                </ElCheckbox>
+                {columnValList.value.map((item) => (
+                  <ElCheckbox v-model={item.checked}>{item.value}</ElCheckbox>
                 ))}
-              </ul>
+              </div>
             </>
           ) : (
             <div class="text-center py-5">无匹配项</div>
@@ -156,15 +142,13 @@ export default defineComponent({
       ]
     })
     const filterLayoutRender = computed(() => {
-      return getTypeDefault(props.renderOpts?.props?.filterLayout, 'array')
+      return getTypeDefault(renderOptsProps.value.filterLayout, 'array')
         .map((item: string) => {
           switch (item) {
             case 'input':
               return inputRender.value
             case 'checkbox':
               return checkboxRender.value
-            case 'select':
-              break
             default:
               break
           }
@@ -175,7 +159,7 @@ export default defineComponent({
       currOption.value && (
         <div class="p-8 select-none">
           <div>{filterLayoutRender.value}</div>
-          <div class="flex justify-center">
+          <div class="flex justify-center py-8">
             <ElButton onClick={resetFilterEvent}>
               <span>重置</span>
             </ElButton>
