@@ -1,265 +1,105 @@
 <template>
-  <el-popover
-    :visible="popoverVisible"
-    virtual-triggering
-    :virtual-ref="props.virtualRef"
-    :width="props.width"
-    :placement="props.placement"
-  >
-    <div ref="popoverRef">
-      <slot name="default" />
-      <DraggableTable
-        :id="props.id"
-        ref="gridRef"
-        border
-        highlight-current-row
-        :columns="columns"
-        :modelValue="data"
-        :height="height"
-        @cell-click="handleCellClick"
-      />
-    </div>
-  </el-popover>
+  <PopoverTableSelect v-model="popoverModel" :virtualRef="computedVirtualRef" v-bind="$attrs" />
+  <ElInput
+    v-if="props.popType === 'input'"
+    ref="inputRef"
+    :placeholder="computedPlaceholder"
+    v-bind="props.inputProps"
+    @focus="handleFocus"
+    @blur="handleBlur"
+    @input="computedInput"
+    v-model="currentInputValue"
+  />
 </template>
 
-<script lang="ts" setup>
-import { ref, watch, nextTick, useTemplateRef } from 'vue'
-import type { ComponentPublicInstance } from 'vue'
-import { ElPopover } from 'element-plus'
-import type { VxeTablePropTypes } from 'vxe-table'
-import DraggableTable from '@/components/DraggableTable/index.vue'
+<script setup lang="ts">
+import PopoverTableSelect from '@/components/PopoverTableSelect/base/index.vue'
+import { ElInput } from 'element-plus'
+import type { InputInstance, InputProps } from 'element-plus'
+import { computed, useTemplateRef, watch } from 'vue'
+import type { PropType, ComponentInternalInstance, ComponentPublicInstance } from 'vue'
+import { debounce as _debounce, throttle as _throttle } from 'lodash'
 
-type TableRowData = VxeTablePropTypes.Row
-
-type ColumnType = VxeTablePropTypes.ColumnConfig
-defineOptions({
-  name: 'PopoverTableSelect',
-})
 const props = defineProps({
-  //#region 透传给popover
-  virtualRef: {
-    type: Object as () => ComponentPublicInstance | HTMLElement,
-    required: true,
+  debounce: {
+    type: Number,
+    default: 0,
   },
-  placement: {
-    type: String,
-    default: 'bottom',
-  },
-  width: {
-    type: [String, Number],
-    default: 400,
-  },
-  height: {
-    type: [String, Number],
+  throttle: {
+    type: Number,
     default: 300,
   },
-  //#endregion
-  //#region 透传给DraggableTable
-  id: {
+  popType: {
+    type: String as PropType<'default' | 'input'>,
+    default: 'default',
+  },
+  inputProps: {
+    type: Object as PropType<InputProps>,
+    default: () => ({}),
+  },
+  inputValue: {
     type: String,
     default: '',
   },
-  columns: {
-    type: Array as () => ColumnType[],
-    default: () => [],
+  virtualRef: {
+    type: Object as () =>
+      | ComponentPublicInstance
+      | ComponentInternalInstance
+      | InputInstance
+      | HTMLElement
+      | null,
+    default: null,
   },
-  data: {
-    type: Array as () => VxeTablePropTypes.Data,
-    default: () => [],
-  },
-  //#endregion
 })
 
-const emit = defineEmits<{
-  select: [row: TableRowData]
-}>()
-
-const popoverVisible = defineModel({
+const popoverModel = defineModel({
   type: Boolean,
   default: false,
 })
-const gridRef = useTemplateRef('gridRef')
-const currentRowIndex = ref(0)
-
-// 默认选中第一行
-watch(
-  () => props.data,
-  (val) => {
-    if (val && val.length > 0) {
-      currentRowIndex.value = 0
-      nextTick(() => {
-        selectRow(0)
-      })
-    }
-  },
-  { immediate: true },
-)
-
-let virtualElement: HTMLElement | null = null
-
-const popoverRef = useTemplateRef('popoverRef')
-// 监听virtualRef的变化
-watch(
-  () => props.virtualRef,
-  () => {
-    // 移除旧元素的事件监听
-    cleanupEventListeners()
-
-    // 添加新元素的事件监听
-    setupEventListeners()
-  },
-  { immediate: true },
-)
-
-// 监听popoverVisible的变化
-watch(
-  () => popoverVisible.value,
-  (visible) => {
-    if (visible) {
-      if (props.data.length > 0) {
-        // 当popover显示时，确保选中第一行
-        nextTick(() => {
-          selectRow(currentRowIndex.value)
-        })
-      }
-      // 添加点击外部关闭的事件监听
-      nextTick(() => {
-        document.addEventListener('mousedown', handleOutsideClick)
-      })
-    } else {
-      // 移除点击外部关闭的事件监听
-      document.removeEventListener('mousedown', handleOutsideClick)
-    }
-  },
-)
-
-/**
- * 设置事件监听器
- */
-function setupEventListeners() {
-  virtualElement = (props.virtualRef as ComponentPublicInstance)?.$el || props.virtualRef
-  if (virtualElement) {
-    virtualElement.addEventListener('keydown', handleKeydown)
-    virtualElement.addEventListener('focus', handleFocus)
-    virtualElement.addEventListener('click', handleClick)
-  }
-}
-
-/**
- * 清理事件监听器
- */
-function cleanupEventListeners() {
-  if (virtualElement) {
-    virtualElement.removeEventListener('keydown', handleKeydown)
-    virtualElement.removeEventListener('focus', handleFocus)
-    virtualElement.removeEventListener('click', handleClick)
-    virtualElement = null
-  }
-  // 确保移除document上的事件监听
-  document.removeEventListener('mousedown', handleOutsideClick)
-}
-
-/**
- * 处理点击外部区域，关闭popover
- */
-function handleOutsideClick(e: MouseEvent) {
-  if (!popoverVisible.value) return
-
-  // 获取popover元素
-  const popoverEl = popoverRef.value
-  // 获取virtualRef元素
-  const virtualEl = (props.virtualRef as ComponentPublicInstance)?.$el || props.virtualRef
-  // 检查点击是否在popover或virtualRef元素外部
-  if (
-    popoverEl &&
-    !popoverEl.contains(e.target as Node) &&
-    virtualEl &&
-    !virtualEl.contains(e.target as Node)
-  ) {
-    popoverVisible.value = false
-    ;(props.virtualRef as HTMLElement)?.blur?.()
-    ;(props.virtualRef as ComponentPublicInstance)?.$el?.blur?.()
-  }
-}
-// 组件卸载时清理
-onUnmounted(() => {
-  cleanupEventListeners()
+const emits = defineEmits(['focus', 'input'])
+const inputRef = useTemplateRef<InputInstance>('inputRef')
+const computedVirtualRef = computed(() => {
+  return props.virtualRef || inputRef.value
 })
-/**
- * 处理focus事件
- */
+const currentInputValue = ref('')
+const cacheInputValue = ref('')
+
+watch(
+  () => props.inputValue,
+  (val) => {
+    currentInputValue.value = val
+    cacheInputValue.value = val
+  },
+)
+const computedPlaceholder = computed(() => {
+  return cacheInputValue.value || '点击或按下方向键试试'
+})
+
 function handleFocus() {
-  // 避免重复触发
-  if (popoverVisible.value) return
-  popoverVisible.value = true
+  popoverModel.value = true
+  cacheInputValue.value = currentInputValue.value
+  currentInputValue.value = ''
+  emits('focus')
 }
 
-/**
- * 处理click事件，即使元素已聚焦也能打开popover
- */
-function handleClick() {
-  popoverVisible.value = true
+function handleBlur() {
+  popoverModel.value = false
+  currentInputValue.value = cacheInputValue.value
+  cacheInputValue.value = ''
 }
 
-/**
- * 选中指定索引的行
- * @param index 行索引
- */
-function selectRow(index: number) {
-  if (!props.data.length) return
-  currentRowIndex.value = index
-  const row = props.data[index]
-  gridRef.value?.getTable()?.setCurrentRow(row)
-  gridRef.value?.getTable()?.scrollToRow(row)
+function handleInput(val: string) {
+  emits('input', val)
 }
 
-/**
- * 处理键盘按键事件
- * 上下键切换选中行，回车确认选择
- */
-function handleKeydown(e: KeyboardEvent) {
-  if (!popoverVisible.value) return
-  if (e.key === 'ArrowDown') {
-    e.preventDefault()
-    if (currentRowIndex.value < props.data.length - 1) {
-      selectRow(currentRowIndex.value + 1)
-    }
-  } else if (e.key === 'ArrowUp') {
-    e.preventDefault()
-    if (currentRowIndex.value > 0) {
-      selectRow(currentRowIndex.value - 1)
-    }
-  } else if (e.key === 'Enter') {
-    e.preventDefault()
-    if (props.data.length > 0) {
-      const selectedRow = props.data[currentRowIndex.value]
-      // 先关闭popover，再触发事件
-      popoverVisible.value = false
-      nextTick(() => {
-        emit('select', selectedRow)
-      })
-    }
-  } else if (e.key === 'Escape') {
-    e.preventDefault()
-    popoverVisible.value = false
+const computedInput = computed(() => {
+  if (props.debounce) {
+    return _debounce(handleInput, props.debounce)
+  } else if (props.throttle) {
+    return _throttle(handleInput, props.throttle)
+  } else {
+    return handleInput
   }
-}
-
-/**
- * 处理单元格点击事件
- */
-function handleCellClick({ row, rowIndex }: { row: TableRowData; rowIndex: number }) {
-  currentRowIndex.value = rowIndex
-
-  // 使用nextTick确保先关闭popover再触发事件
-  const selectedRow = row
-  popoverVisible.value = false
-
-  // 使用nextTick延迟emit，确保popover关闭后再触发事件
-  nextTick(() => {
-    emit('select', selectedRow)
-  })
-}
+})
 </script>
-
-<style scoped></style>
+<style scoped lang="scss"></style>

@@ -1,19 +1,37 @@
 <template>
   <div>
-    <el-input
-      ref="inputRef"
-      v-model="inputValue"
-      placeholder="点击或按下方向键试试"
-      @focus="showPopover = true"
-      style="width: 240px"
-    />
-    <PopoverTableSelect
-      v-model="showPopover"
-      :virtual-ref="inputRef"
-      :columns="columns"
-      :data="tableData"
-      @select="handleSelect"
-    />
+    <div>
+      <h2>基础用法</h2>
+      <div>
+        <el-input
+          ref="inputRef"
+          v-model="inputValue"
+          placeholder="点击或按下方向键试试"
+          @focus="showPopover = true"
+          style="width: 240px"
+        />
+        <PopoverTableSelect
+          v-model="showPopover"
+          :virtual-ref="inputRef"
+          :columns="columns"
+          :data="tableData"
+          @select="handleSelect"
+        />
+      </div>
+    </div>
+    <div>
+      <h2>自带input用法</h2>
+      <div class="w-[240px]!">
+        <PopoverTableSelect
+          v-model="inputShowPopover"
+          :inputValue="inputValue1"
+          pop-type="input"
+          :columns="columns"
+          :data="tableData"
+          @select="handleInputSelect"
+        />
+      </div>
+    </div>
   </div>
 </template>
 
@@ -98,5 +116,13 @@ const tableData = [
 function handleSelect(row: any) {
   inputValue.value = row.name
   showPopover.value = false
+}
+
+const inputValue1 = ref('')
+const inputShowPopover = ref(false)
+
+function handleInputSelect(row: any) {
+  inputValue1.value = row.name
+  inputShowPopover.value = false
 }
 </script>

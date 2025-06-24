@@ -1,4 +1,4 @@
-import type { VxeTableDefines, VxeColumnPropTypes } from 'vxe-table'
+import type { VxeTableDefines, VxeColumnPropTypes, VxeTablePropTypes } from 'vxe-table'
 import type { objType } from '@/components/_types'
 
 export type customCustomTypes =
@@ -26,3 +26,4 @@ interface customColumnProps {
 }
 
 export type ColumnType = VxeTableDefines.ColumnOptions & customColumnProps
+export type TableRowData = VxeTablePropTypes.Row
