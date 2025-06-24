@@ -72,6 +72,7 @@ export default defineComponent({
           <Select
             class="w-full!"
             filterable
+            automatic-dropdown
             {...renderOptsProps.value}
             v-model={currRow.value[currColumn.value.field]}
             options={propsOptions.value}

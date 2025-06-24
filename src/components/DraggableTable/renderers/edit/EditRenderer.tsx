@@ -65,6 +65,7 @@ export default defineComponent({
             teleported={false}
             class="w-full!"
             filterable
+            automatic-dropdown
             v-model={currRow.value[currColumn.value.field]}
             options={propsOptions.value}
           />
