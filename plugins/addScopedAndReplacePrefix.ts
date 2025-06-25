@@ -27,7 +27,6 @@ export default function addScopedAndReplacePrefixPlugin({
     configResolved(config: any) {
       isProduction = config.command === 'build' || config.isProduction
     },
-    enforce: 'post',
     transform(code = '', id = '') {
       if (!isProduction && !useDevMode) return code
       if (!oldPrefix || !newPrefix) return code
