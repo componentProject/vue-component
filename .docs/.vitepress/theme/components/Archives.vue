@@ -29,16 +29,6 @@ import type { PostType } from '../../utils/utils'
 const { theme } = useData()
 
 const data = computed<PostType[][]>(() => useYearSort(theme.value.posts))
-watch(
-  () => data,
-  (v) => {
-    console.log('data', v)
-  },
-  {
-    immediate: true,
-    deep: true,
-  },
-)
 </script>
 
 <style scoped>
@@ -57,7 +47,7 @@ watch(
 }
 
 .year {
-  padding: 16px 0 8px 0;
+  padding: 16px 0 8px;
   font-size: 1.2rem;
   font-weight: 600;
 }
@@ -66,7 +56,7 @@ watch(
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin: 10px 10px;
+  margin: 10px;
   color: var(--vp-c-text-2);
   transition:
     border 0.3s ease,

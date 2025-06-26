@@ -1,18 +1,15 @@
 {
   "extends": "@tsconfig/node22/tsconfig.json",
   "include": [
-    ".storybook/main.ts",
     "src/constants/*",
     "vite.config.*",
     "vitest.config.*",
     "cypress.config.*",
     "nightwatch.conf.*",
     "playwright.config.*",
-    ".docs/.vitepress/config.*",
-    ".docs/.vitepress/utils/*",
     "plugins/**/*",
-    "env.d.ts",
-    "src/utils/**/*"
+    "src/utils/**/*",
+    "env.d.ts"
   ],
   "exclude": [],
   "compilerOptions": {

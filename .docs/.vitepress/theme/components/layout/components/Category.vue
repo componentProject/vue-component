@@ -32,14 +32,12 @@ const headers = shallowRef<any>([])
 const showIndent = ref(false)
 
 function scrollTo(item) {
-  console.log('item', item)
   const VPContent = document.querySelector('.VPContent')
   const currentTitle = VPContent?.querySelector(item.link)
   currentTitle?.scrollIntoView({
     behavior: 'smooth',
     block: 'start',
   })
-  console.log('currentTitle', currentTitle)
 }
 
 onContentUpdated(() => {

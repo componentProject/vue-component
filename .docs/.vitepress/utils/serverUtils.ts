@@ -48,5 +48,3 @@ export async function getComponentLength(componentPath: string) {
   // getComponentMDFilePath return type is object not array
   return [...(await getComponentMDFilePaths(componentPath))].length
 }
-
-console.log('getComponentLength', getComponentLength)

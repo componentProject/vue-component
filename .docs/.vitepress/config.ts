@@ -1,9 +1,9 @@
-import { getComponents } from './utils/serverUtils'
-import { buildBlogRSS } from './utils/rss'
+import { getComponents } from './utils/serverUtils.ts'
+import { buildBlogRSS } from './utils/rss.ts'
 
 // https://github.com/mingyuLi97/blog
 // https://vitepress.dev/reference/site-config
-import { getSidebar } from './utils'
+import { getSidebar } from './utils/index.js'
 
 import { transformerTwoslash } from '@shikijs/vitepress-twoslash'
 import mathjax3 from 'markdown-it-mathjax3'
@@ -20,6 +20,8 @@ import tailwindcss from '@tailwindcss/postcss'
 
 import path from 'path'
 
+import { githubConfig } from './constants/index.js'
+
 async function config(): Promise<Awaited<UserConfig>> {
   const componentPath = '/components'
   const posts = await getComponents(componentPath)
@@ -28,10 +30,13 @@ async function config(): Promise<Awaited<UserConfig>> {
 
   const components = await getSidebar('components')
   const navs = await getSidebar('navs')
+
+  const { repo, owner } = githubConfig
+  console.log('repo', repo, owner)
   return {
     title: 'vueComponent',
     description: '一个vue组件库',
-    base: '/vue-component/vitepress/',
+    base: `/${repo}/vitepress/`,
     lang: 'zh-CN',
     outDir: '../docs/vitepress',
     vite: {
@@ -70,7 +75,7 @@ async function config(): Promise<Awaited<UserConfig>> {
         {
           rel: 'icon',
           type: 'image/svg',
-          href: '/vue-component/vitepress/horse.svg',
+          href: `/${repo}/vitepress/horse.svg`,
         },
       ],
       [
@@ -111,7 +116,7 @@ async function config(): Promise<Awaited<UserConfig>> {
     },
     themeConfig: {
       // https://vitepress.dev/reference/default-theme-config
-      avator: '/vue-component/vitepress/avator.png',
+      avator: `/${repo}/vitepress/avator.png`,
       // 标题
       siteTitle: 'vueComponent',
       // logo
@@ -148,7 +153,7 @@ async function config(): Promise<Awaited<UserConfig>> {
       socialLinks: [
         {
           icon: 'github',
-          link: 'https://componentproject.github.io/vue-component/storybook',
+          link: `https://${owner}.github.io/${repo}/storybook`,
         },
       ],
       // 搜索配置
