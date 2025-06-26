@@ -79,16 +79,6 @@ const meta: Meta<typeof DateRangePicker> = {
       control: 'boolean',
       defaultValue: false,
     },
-    size: {
-      description: '输入框尺寸',
-      control: { type: 'select', options: ['default', 'small', 'large'] },
-      defaultValue: 'default',
-    },
-    disabled: {
-      description: '是否禁用',
-      control: 'boolean',
-      defaultValue: false,
-    },
   },
 }
 

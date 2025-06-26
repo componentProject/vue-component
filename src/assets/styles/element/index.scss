@@ -15,6 +15,7 @@ $--colors: (
     'base': #db2828,
   ),
 );
+
 @forward 'element-plus/theme-chalk/src/mixins/config.scss' with (
   $namespace: $namespace
 );
@@ -24,6 +25,5 @@ $--colors: (
 );
 
 @use 'element-plus/theme-chalk/src/index.scss' as *;
-
 @use 'custom';
 @use 'fixQiankun.scss';

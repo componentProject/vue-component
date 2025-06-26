@@ -1,10 +1,14 @@
 <template>
-  <div @click="throwError">测试sentry报错，点我</div>
+  <div>hello 狗子</div>
 </template>
-<script setup lang="ts">
-defineOptions({ name: '示例sentry报错收集' })
-function throwError() {
-  throw new Error('测试sentry报错，点我')
-}
+<script lang="ts">
+import { defineComponent } from 'vue'
+export default defineComponent({
+  data() {
+    return {}
+  },
+  methods: {},
+  computed: {},
+})
 </script>
 <style scoped lang="scss"></style>

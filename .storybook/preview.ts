@@ -9,6 +9,8 @@ import { store } from '@/stores'
 
 import 'vxe-table/lib/style.css'
 
+import i18n from '@/locales'
+
 import { setup } from '@storybook/vue3'
 import type { Preview } from '@storybook/vue3'
 import { computed } from 'vue'
@@ -60,6 +62,7 @@ setup((app) => {
     locale: zhCn,
   })
 
+  app.use(i18n)
   app.use(store)
 })
 

@@ -11,6 +11,7 @@ import { modifyComponents } from '@/utils'
 
 moment.locale('zh-cn') //中文化
 import { store } from '@/stores'
+import i18n from '@/locales'
 import { renderWithQiankun, qiankunWindow } from 'vite-plugin-qiankun/dist/helper'
 import type { QiankunProps } from 'vite-plugin-qiankun/dist/helper'
 import App from './App.vue'
@@ -103,6 +104,7 @@ async function render(props: QiankunProps) {
   //#endregion
 
   app.use(store)
+  app.use(i18n)
 
   // 测试主题变更
   // const systemStore = useSystemStore()

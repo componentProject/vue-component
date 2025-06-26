@@ -1,7 +1,7 @@
 import DraggableTable from '@/components/DraggableTable/index.vue'
 import type { Meta, StoryObj } from '@storybook/vue3'
 import { ref, reactive, onMounted } from 'vue'
-import { ElMessage, ElMessageBox, ElButton } from 'element-plus'
+import { ElMessage, ElButton } from 'element-plus'
 
 /**
  * 可拖拽表格组件

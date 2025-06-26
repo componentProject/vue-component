@@ -9,7 +9,6 @@
  * Copyright (c) 2025 by ${git_name_email}, All Rights Reserved.
  */
 import axios from 'axios'
-import { addSign } from '@/utils/modules/his6.0'
 import type { AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios'
 
 export class BaseApi {
@@ -26,7 +25,6 @@ export class BaseApi {
     // 请求拦截器
     this.instance.interceptors.request.use(
       (config) => {
-        addSign(config)
         return config
       },
       (error: AxiosError) => {

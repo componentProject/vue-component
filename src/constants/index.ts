@@ -42,19 +42,4 @@ function getCdnModules(modules: Array<string | CdnModule>): any {
     })
 }
 
-export const modules = getCdnModules([
-  'vue',
-  'vue-router',
-  {
-    name: 'lodash',
-    var: '_',
-  },
-  {
-    name: 'element-plus',
-    css: 'dist/index.css',
-  },
-  {
-    name: '@element-plus/icons-vue',
-    var: 'ElementPlusIconsVue',
-  },
-])
+export const modules = getCdnModules([])

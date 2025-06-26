@@ -71,10 +71,14 @@
     "sortablejs": "^1.15.6",
     "uuid": "^11.1.0",
     "vue": "^3.5.13",
+    "vue-i18n": "^11.1.7",
     "vue-router": "4.5.0",
-    "vxe-table": "4.13.39"
+    "vxe-table": "4.13.39",
+    "xlsx": "^0.18.5",
+    "file-saver": "^2.0.5"
   },
   "devDependencies": {
+    "@types/file-saver": "^2.0.7",
     "@commitlint/cli": "^19.8.0",
     "@commitlint/config-conventional": "^19.8.0",
     "@shikijs/vitepress-twoslash": "^3.6.0",
@@ -92,7 +96,6 @@
     "@types/lodash": "^4.17.17",
     "@types/markdown-it": "^14.1.2",
     "@types/node": "^22.14.0",
-    "@types/rollup": "^0.54.0",
     "@types/sortablejs": "^1.15.8",
     "@types/uuid": "^10.0.0",
     "@vitejs/plugin-vue": "^5.2.3",
