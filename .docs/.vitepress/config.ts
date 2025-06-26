@@ -31,7 +31,7 @@ async function config(): Promise<Awaited<UserConfig>> {
   return {
     title: 'vueComponent',
     description: '一个vue组件库',
-    base: '/vue-template-docs/vitepress/',
+    base: '/vue-component/vitepress/',
     lang: 'zh-CN',
     outDir: '../docs/vitepress',
     vite: {
@@ -70,7 +70,7 @@ async function config(): Promise<Awaited<UserConfig>> {
         {
           rel: 'icon',
           type: 'image/svg',
-          href: '/vue-template-docs/vitepress/horse.svg',
+          href: '/vue-component/vitepress/horse.svg',
         },
       ],
       [
@@ -111,7 +111,7 @@ async function config(): Promise<Awaited<UserConfig>> {
     },
     themeConfig: {
       // https://vitepress.dev/reference/default-theme-config
-      avator: '/vue-template-docs/vitepress/avator.png',
+      avator: '/vue-component/vitepress/avator.png',
       // 标题
       siteTitle: 'vueComponent',
       // logo
@@ -148,7 +148,7 @@ async function config(): Promise<Awaited<UserConfig>> {
       socialLinks: [
         {
           icon: 'github',
-          link: 'https://moluoxixi-template.github.io/vue-template-docs/storybook',
+          link: 'https://componentproject.github.io/vue-component/storybook',
         },
       ],
       // 搜索配置
