@@ -17,6 +17,9 @@ import { modules } from './src/constants'
 import qiankun from 'vite-plugin-qiankun'
 import scopedCssPrefixPlugin from './plugins/addScopedAndReplacePrefix'
 
+// 自动路由
+import autoRoutesPlugin from './plugins/autoRoutes'
+
 // tailwind
 import autoprefixer from 'autoprefixer'
 import tailwindcss from '@tailwindcss/postcss'
@@ -123,7 +126,25 @@ export default defineConfig(({ mode }) => {
 
   return {
     base: `/${systemCode}`,
-    plugins: [...vuePlugins, ...performancePlugins, ...monitorPlugins, ...qianKunPlugins],
+    plugins: [
+      ...vuePlugins,
+      ...performancePlugins,
+      ...monitorPlugins,
+      ...qianKunPlugins,
+      autoRoutesPlugin({
+        routeConfig: {
+          views: ['/src/views/**/index.vue', '!/src/views/**/components/*'],
+          examples: '/src/examples/**/index.vue',
+          componentExamples: {
+            glob: ['/src/components/**/Example.vue', '!/src/components/**/components/*'],
+            baseRoute: {
+              path: '/components',
+              name: '组件示例',
+            },
+          },
+        },
+      }),
+    ],
     esbuild: {
       pure:
         !isDev && viteEnv.VITE_PURE_CONSOLE_AND_DEBUGGER

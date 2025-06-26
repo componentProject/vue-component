@@ -2,22 +2,11 @@ import { createRouter, createWebHistory } from 'vue-router'
 import { qiankunWindow } from 'vite-plugin-qiankun/dist/helper'
 import { isEmpty, assign } from 'radash'
 import { cloneDeep } from 'lodash'
-import pages from '@/views'
-import examples from '@/examples'
-import { componentExampleRoutes } from '@/components'
-import { getRoutes, findDefaultRoute } from '@/utils'
-import type { modulesTypes } from '@/utils'
+import { findDefaultRoute, routes as autoRoutes } from 'virtual:auto-routes'
 
-const pagesRoutes = getRoutes(pages, 'views')
-const examplesRoutes = getRoutes(examples, 'examples')
-console.log('pages', pages, 'examples', examples, 'componentExamples', componentExampleRoutes)
-const customRoutes: modulesTypes[] = [
-  //   一些路由
-]
-const routesChildrens = customRoutes.length
-  ? [...customRoutes]
-  : [...pagesRoutes, ...examplesRoutes, componentExampleRoutes]
-
+// 自动生成的路由
+const routesChildrens = autoRoutes
+console.log('autoRoutes', autoRoutes)
 const Routes = [
   {
     path: '/',
@@ -33,7 +22,7 @@ const Routes = [
 ]
 
 function getRouter(props: any) {
-  let base
+  let base: string
   const routes = cloneDeep(Routes)
   if (qiankunWindow.__POWERED_BY_QIANKUN__) {
     const { activeRule } = props.data
@@ -51,7 +40,7 @@ function getRouter(props: any) {
     history: createWebHistory(base),
     routes,
   })
-  router.beforeEach((to, from, next) => {
+  router.beforeEach((_, from, next) => {
     if (isEmpty(history.state.current)) {
       assign(history.state, { current: from.fullPath })
     }
