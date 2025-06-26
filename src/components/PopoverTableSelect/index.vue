@@ -1,5 +1,9 @@
 <template>
-  <PopoverTableSelect v-model="popoverModel" :virtualRef="computedVirtualRef" v-bind="$attrs" />
+  <PopoverTableSelect v-model="popoverModel" :virtualRef="computedVirtualRef" v-bind="$attrs">
+    <template #[name]="slotParams" v-for="name in slotNames" :key="name">
+      <slot :name="name" v-bind="slotParams" />
+    </template>
+  </PopoverTableSelect>
   <ElInput
     v-if="props.popType === 'input'"
     ref="inputRef"
@@ -51,6 +55,9 @@ const props = defineProps({
     default: null,
   },
 })
+// 获取插槽
+const slots = useSlots()
+const slotNames = computed(() => Object.keys(slots))
 
 const popoverModel = defineModel({
   type: Boolean,
@@ -80,6 +87,7 @@ function handleFocus() {
   cacheInputValue.value = currentInputValue.value
   currentInputValue.value = ''
   emits('focus')
+  emits('input', currentInputValue.value)
 }
 
 function handleBlur() {

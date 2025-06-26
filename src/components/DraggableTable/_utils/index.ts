@@ -83,7 +83,6 @@ export function handleGetColumn(Column: ColumnType): ColumnType {
     filterProps,
     //#endregion
   } = Column
-  console.log('sssss', sortable)
   return {
     type,
     field,
@@ -142,50 +141,9 @@ export function handleGetColumn(Column: ColumnType): ColumnType {
   }
 }
 
-export function handleGetRequiredFileds(): Array<keyof ColumnType> {
-  return [
-    'type',
-    'field',
-    'title',
-    'width',
-    'minWidth',
-    'resizable',
-    'fixed',
-    'align',
-    'headerAlign',
-    'footerAlign',
-    'showOverflow',
-    'showHeaderOverflow',
-    'showFooterOverflow',
-    'className',
-    'headerClassName',
-    'footerClassName',
-    'padding',
-    'verticalAlign',
-    'formatter',
-    'sortable',
-    'sortBy',
-    'sortType',
-    'filters',
-    'filterMultiple',
-    'filterMethod',
-    'filterResetMethod',
-    'filterRecoverMethod',
-    'filterRender',
-    'headerExportMethod',
-    'exportMethod',
-    'footerExportMethod',
-    'titlePrefix',
-    'titleSuffix',
-    'aggFunc',
-    'cellType',
-    'cellRender',
-    'editRender',
-    'contentRender',
-    'treeNode',
-    'params',
-    'colId',
-    'children',
-    'slots',
-  ]
+export function handleGetRequiredFields() {
+  const noRequiredFields = ['width', 'visible', 'options', 'cellProps', 'editProps', 'filterProps']
+  return Object.keys(handleGetColumn({})).filter((key) => !noRequiredFields.includes(key)) as Array<
+    keyof ColumnType
+  >
 }

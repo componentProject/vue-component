@@ -1,7 +1,7 @@
 <template>
-  <div class="w-full inline-block">
+  <div class="w-full inline-block flex-1 overflow-hidden">
     <el-date-picker
-      class="w-full!"
+      style="width: 100%"
       ref="datePicker"
       v-bind="$attrs"
       v-model="localDateValue"
@@ -12,6 +12,9 @@
       :range-separator="rangeSeparator"
       :type="props.type"
       :disabledDate="disabledDateFn"
+      :disabledHours="disabledHoursFn"
+      :disabledMinutes="disabledMinutesFn"
+      :disabledSeconds="disabledSecondsFn"
       @change="handleDateChange"
       :shortcuts="computedShortcuts"
     />
@@ -130,6 +133,13 @@ const props = defineProps({
     type: Array,
     default: null,
   },
+  /**
+   * datetime的时分秒禁用规则
+   */
+  datetimeDisableTypes: {
+    type: Array,
+    default: () => ['hours', 'minutes', 'seconds'],
+  },
   //#endregion
   // 是否显示快速选择选项
   shortcuts: {
@@ -150,13 +160,127 @@ const localDateValue = ref([])
 const datePicker = useTemplateRef<typeof ElDatePicker>('datePicker')
 
 // 禁用日期函数
-function disabledDateFn(time: any) {
+function disabledDateFn(date: any) {
+  const time = moment(date).format('YYYY-MM-DD')
   // 优先使用disabledDateRange
-  const [min = props.minDate, max = props.maxDate] = getTypeDefault(
-    props.disabledDateRange,
-    'array',
-  )
-  return dateIsBefore(time, min) || dateIsBefore(max, time)
+  const [min, max] = getTypeDefault(props.disabledDateRange, 'array')
+  const minStr = min || props.minDate
+  const maxStr = max || props.maxDate
+  const minDay = minStr && moment(minStr).format('YYYY-MM-DD')
+  const maxDay = maxStr && moment(maxStr).format('YYYY-MM-DD')
+  return dateIsBefore(time, minDay) || dateIsBefore(maxDay, time)
+}
+
+// 其实是Dayjs | 'start' | 'end',但是不想装dayjs了
+type DisabledTypes = any | 'start' | 'end'
+type restParams = Array<any | DisabledTypes>
+const hours = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]
+
+// 禁用日期函数
+function disabledHoursFn(type: DisabledTypes) {
+  if (!props.datetimeDisableTypes.includes('hours')) return []
+  // // 优先使用disabledDateRange
+  const [min, max] = getTypeDefault(props.disabledDateRange, 'array')
+  const minStr = min || props.minDate
+  const maxStr = max || props.maxDate
+  const minHour = minStr && moment(minStr).get('hour')
+  const minDay = minStr && moment(minStr).get('day')
+  const maxHour = maxStr && moment(maxStr).get('hour')
+  const maxDay = maxStr && moment(maxStr).get('day')
+  let minCurrentDay: number
+  let maxCurrentDay: number
+  if (Array.isArray(localDateValue.value)) {
+    minCurrentDay = moment(localDateValue.value[0]).get('day')
+    maxCurrentDay = moment(localDateValue.value[1]).get('day')
+  } else {
+    minCurrentDay = moment(localDateValue.value).get('day')
+    maxCurrentDay = moment(localDateValue.value).get('day')
+  }
+  if (minHour && maxHour) {
+    if (type === 'start') {
+      return minCurrentDay === minDay ? hours.filter((h) => h < minHour) : []
+    } else if (type === 'end') {
+      return maxCurrentDay === maxDay ? hours.filter((h) => h > maxHour) : []
+    }
+  } else if (minHour) {
+    return minCurrentDay === minDay ? hours.filter((h) => h < minHour) : []
+  } else if (maxHour) {
+    return maxCurrentDay === maxDay ? hours.filter((h) => h > maxHour) : []
+  }
+  return []
+}
+
+const minutesOrSeconds = [
+  0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26,
+  27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50,
+  51, 52, 53, 54, 55, 56, 57, 58, 59,
+]
+
+// 禁用日期函数
+function disabledMinutesFn(_: number, type: DisabledTypes) {
+  if (!props.datetimeDisableTypes.includes('minutes')) return []
+  const [min, max] = getTypeDefault(props.disabledDateRange, 'array')
+  const minStr = min || props.minDate
+  const maxStr = max || props.maxDate
+  const minMinute = minStr && moment(minStr).get('minutes')
+  const minDay = minStr && moment(minStr).get('day')
+  const maxMinute = maxStr && moment(maxStr).get('minutes')
+  const maxDay = maxStr && moment(maxStr).get('day')
+  let minCurrentDay: number
+  let maxCurrentDay: number
+  if (Array.isArray(localDateValue.value)) {
+    minCurrentDay = moment(localDateValue.value[0]).get('day')
+    maxCurrentDay = moment(localDateValue.value[1]).get('day')
+  } else {
+    minCurrentDay = moment(localDateValue.value).get('day')
+    maxCurrentDay = moment(localDateValue.value).get('day')
+  }
+  if (minMinute && maxMinute) {
+    if (type === 'start') {
+      return minCurrentDay === minDay ? minutesOrSeconds.filter((m) => m < minMinute) : []
+    } else if (type === 'end') {
+      return maxCurrentDay === maxDay ? minutesOrSeconds.filter((m) => m > maxMinute) : []
+    }
+  } else if (minMinute) {
+    return minCurrentDay === minDay ? minutesOrSeconds.filter((m) => m < minMinute) : []
+  } else if (maxMinute) {
+    return maxCurrentDay === maxDay ? minutesOrSeconds.filter((m) => m > maxMinute) : []
+  }
+  return []
+}
+
+// 禁用日期函数
+function disabledSecondsFn(...rest: restParams) {
+  if (!props.datetimeDisableTypes.includes('seconds')) return []
+  const type: DisabledTypes = rest.at(2)
+  const [min, max] = getTypeDefault(props.disabledDateRange, 'array')
+  const minStr = min || props.minDate
+  const maxStr = max || props.maxDate
+  const minSecond = minStr && moment(minStr).get('seconds')
+  const minDay = minStr && moment(minStr).get('day')
+  const maxSecond = maxStr && moment(maxStr).get('seconds')
+  const maxDay = maxStr && moment(maxStr).get('day')
+  let minCurrentDay: number
+  let maxCurrentDay: number
+  if (Array.isArray(localDateValue.value)) {
+    minCurrentDay = moment(localDateValue.value[0]).get('day')
+    maxCurrentDay = moment(localDateValue.value[1]).get('day')
+  } else {
+    minCurrentDay = moment(localDateValue.value).get('day')
+    maxCurrentDay = moment(localDateValue.value).get('day')
+  }
+  if (minSecond && maxSecond) {
+    if (type === 'start') {
+      return minCurrentDay === minDay ? minutesOrSeconds.filter((s) => s < minSecond) : []
+    } else if (type === 'end') {
+      return maxCurrentDay === maxDay ? minutesOrSeconds.filter((s) => s > maxSecond) : []
+    }
+  } else if (minSecond) {
+    return minCurrentDay === minDay ? minutesOrSeconds.filter((s) => s < minSecond) : []
+  } else if (maxSecond) {
+    return maxCurrentDay === maxDay ? minutesOrSeconds.filter((s) => s > maxSecond) : []
+  }
+  return []
 }
 
 // 根据dateRange生成初始日期范围

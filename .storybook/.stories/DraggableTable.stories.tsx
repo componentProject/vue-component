@@ -1,7 +1,7 @@
-import DraggableTable from '@/components/DraggableTable/index.vue'
+import DraggableTable from '../../src/components/DraggableTable/index.vue'
 import type { Meta, StoryObj } from '@storybook/vue3'
-import { ref, reactive, onMounted } from 'vue'
-import { ElMessage, ElButton } from 'element-plus'
+import { ref } from 'vue'
+import { ElButton } from 'element-plus'
 
 /**
  * 可拖拽表格组件
@@ -46,7 +46,7 @@ const meta = {
       description: '表格唯一标识',
     },
   },
-} satisfies Meta<typeof DraggableTable>
+} satisfies Meta<any>
 
 export default meta
 

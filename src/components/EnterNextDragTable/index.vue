@@ -3,6 +3,7 @@
   <DraggableTable
     ref="tableRef"
     v-model="tableData"
+    drag-type="draggable"
     v-bind="$attrs"
     @toggle-tree-expand="handleTableRendered"
   >

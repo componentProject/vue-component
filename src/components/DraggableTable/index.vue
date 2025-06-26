@@ -67,7 +67,7 @@ import {
   getCustomType,
   getTypeName,
   handleGetColumn,
-  handleGetRequiredFileds,
+  handleGetRequiredFields,
 } from '@/components/DraggableTable/_utils'
 
 defineOptions({
@@ -777,7 +777,7 @@ function handleCompareColumns(
   storedColumns: ColumnType[] = [],
 ) {
   if (computedColumns.length !== storedColumns.length) return true
-  const requiredFields: Array<keyof ColumnType> = handleGetRequiredFileds()
+  const requiredFields: Array<keyof ColumnType> = handleGetRequiredFields()
   console.log('requiredFields', requiredFields)
   return computedColumns.some((source) => {
     const target = storedColumns.find(
