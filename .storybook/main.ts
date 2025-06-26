@@ -9,7 +9,6 @@ const config: StorybookConfig = {
     '@storybook/addon-onboarding',
     '@storybook/addon-essentials',
     '@storybook/addon-interactions',
-    '@storybook/addon-storysource',
   ],
   core: {
     builder: '@storybook/builder-vite',
