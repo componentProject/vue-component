@@ -105,7 +105,6 @@ async function render(props: QiankunProps) {
 
   app.use(store)
   app.use(i18n)
-
   // 测试主题变更
   // const systemStore = useSystemStore()
   // systemStore.setTheme('red');
