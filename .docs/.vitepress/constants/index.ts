@@ -15,10 +15,10 @@ export const githubConfig = {
    * https://github.com/settings/developers
    * github授权码 ID
    */
-  clientID: 'Ov23lib6kV0uel05wgGI',
+  clientID: 'Ov23liUBqWy6qVA3BaRO',
   /**
    * https://github.com/settings/developers
    * github授权码 Secret
    */
-  clientSecret: '91c64584a4f0738475e93d02c3ab210e74258a6f',
+  clientSecret: 'bc0ebf91365d6be3ba26570266c2800be2b7c603',
 }
