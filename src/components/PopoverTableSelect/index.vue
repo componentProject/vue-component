@@ -3,7 +3,7 @@ import type { InputInstance, InputProps } from 'element-plus'
 import type { ComponentInternalInstance, ComponentPublicInstance, PropType } from 'vue'
 import { ElInput } from 'element-plus'
 import { debounce as _debounce, throttle as _throttle } from 'lodash'
-import { computed, useTemplateRef, watch } from 'vue'
+import { computed, watch } from 'vue'
 import PopoverTableSelect from '@/components/PopoverTableSelect/base/index.vue'
 
 const props = defineProps({
@@ -46,10 +46,6 @@ const popoverModel = defineModel({
   type: Boolean,
   default: false,
 })
-const inputRef = useTemplateRef<InputInstance>('inputRef')
-const computedVirtualRef = computed(() => {
-  return props.virtualRef || inputRef.value
-})
 const currentInputValue = ref('')
 const cacheInputValue = ref('')
 
@@ -61,10 +57,15 @@ watch(
   },
 )
 const computedPlaceholder = computed(() => {
-  return cacheInputValue.value || '点击或按下方向键试试'
+  return cacheInputValue.value || '点击试试'
+})
+const inputRef = ref<HTMLElement | null>(null)
+const computedVirtualRef = computed(() => {
+  return props.virtualRef || inputRef.value
 })
 
-function handleFocus() {
+function handleFocus(e: any) {
+  inputRef.value = e.target
   popoverModel.value = true
   cacheInputValue.value = currentInputValue.value
   currentInputValue.value = ''
@@ -103,7 +104,6 @@ const computedInput = computed(() => {
   </PopoverTableSelect>
   <ElInput
     v-if="props.popType === 'input'"
-    ref="inputRef"
     v-bind="props.inputProps"
     v-model="currentInputValue"
     :placeholder="computedPlaceholder"

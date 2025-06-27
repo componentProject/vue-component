@@ -73,6 +73,19 @@ function handleNoNextInput({ rowIndex }: noNextInputParams) {
   // 自动添加新行
   addRow()
 }
+
+// #region popSelectTable
+const columns = [
+  { field: 'id', title: 'ID', width: 60 },
+  { field: 'name', title: '姓名', width: 120 },
+  { field: 'age', title: '年龄' },
+]
+const tableData1 = [
+  { id: 1, name: '张三', age: 18 },
+  { id: 2, name: '李四', age: 20 },
+  { id: 3, name: '王五', age: 22 },
+]
+// #endregion
 </script>
 
 <template>
@@ -131,7 +144,13 @@ function handleNoNextInput({ rowIndex }: noNextInputParams) {
 
         <el-table-column label="年龄" prop="age" width="150">
           <template #default="scope">
-            <el-input v-model="scope.row.age" placeholder="请输入年龄" />
+            <PopoverTableSelect
+              :input-value="scope.row.age"
+              pop-type="input"
+              :columns="columns"
+              :data="tableData1"
+              @select="scope.row.age = $event.name"
+            />
           </template>
         </el-table-column>
 
