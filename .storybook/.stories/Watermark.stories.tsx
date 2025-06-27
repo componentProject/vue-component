@@ -1,6 +1,7 @@
+// noinspection JSUnusedGlobalSymbols
+
+import type { Meta, StoryFn, StoryObj } from '@storybook/vue3'
 import Watermark from '@/components/Watermark/index.vue'
-import type { propsType } from '@/components/Watermark/types'
-import type { Meta, StoryFn } from '@storybook/vue3'
 
 /**
  * 利用父元素会被子元素撑开的特点,将子组件包裹在relative的父元素内,
@@ -12,64 +13,59 @@ import type { Meta, StoryFn } from '@storybook/vue3'
  *
  * 通过mutationObserver监视dom元素变化,重新绘制水印
  */
-const meta: Meta<propsType> = {
-  title: '水印',
-  component: Watermark,
-  args: {},
-  argTypes: {},
-}
-export default meta
 
-const Template: StoryFn = (props) => {
-  return (
-    <Watermark {...props}>
-      <div style={{ height: 800 }}>
-        <p>
-          Lorem ipsum dolor, sit amet consectetur adipisicing elit. Quos quod deserunt quidem quas
-          in rem ipsam ut nesciunt asperiores dignissimos recusandae minus, eaque, harum
-          exercitationem esse sapiente? Eveniet, id provident!
-        </p>
-        <p>
-          Lorem ipsum dolor, sit amet consectetur adipisicing elit. Quos quod deserunt quidem quas
-          in rem ipsam ut nesciunt asperiores dignissimos recusandae minus, eaque, harum
-          exercitationem esse sapiente? Eveniet, id provident!
-        </p>
-        <p>
-          Lorem ipsum dolor, sit amet consectetur adipisicing elit. Quos quod deserunt quidem quas
-          in rem ipsam ut nesciunt asperiores dignissimos recusandae minus, eaque, harum
-          exercitationem esse sapiente? Eveniet, id provident!
-        </p>
-        <p>
-          Lorem ipsum dolor, sit amet consectetur adipisicing elit. Quos quod deserunt quidem quas
-          in rem ipsam ut nesciunt asperiores dignissimos recusandae minus, eaque, harum
-          exercitationem esse sapiente? Eveniet, id provident!
-        </p>
-        <p>
-          Lorem ipsum dolor, sit amet consectetur adipisicing elit. Quos quod deserunt quidem quas
-          in rem ipsam ut nesciunt asperiores dignissimos recusandae minus, eaque, harum
-          exercitationem esse sapiente? Eveniet, id provident!
-        </p>
-        <p>
-          Lorem ipsum dolor, sit amet consectetur adipisicing elit. Quos quod deserunt quidem quas
-          in rem ipsam ut nesciunt asperiores dignissimos recusandae minus, eaque, harum
-          exercitationem esse sapiente? Eveniet, id provident!
-        </p>
-        <p>
-          Lorem ipsum dolor, sit amet consectetur adipisicing elit. Quos quod deserunt quidem quas
-          in rem ipsam ut nesciunt asperiores dignissimos recusandae minus, eaque, harum
-          exercitationem esse sapiente? Eveniet, id provident!
-        </p>
+// 定义元数据
+const meta: Meta<typeof Watermark> = {
+  title: 'Watermark',
+  component: Watermark,
+  tags: ['autodocs'],
+  argTypes: {
+    content: {
+      description: '水印内容，可以是字符串或字符串数组',
+      control: 'object',
+    },
+    gap: {
+      description: '水印之间的间距，格式为 [横向间距, 纵向间距]',
+      control: 'object',
+    },
+    offset: {
+      description: '水印的偏移量，格式为 [水平偏移, 垂直偏移]',
+      control: 'object',
+    },
+    fontStyle: {
+      description: '水印文字样式',
+      control: 'object',
+    },
+  },
+}
+
+export default meta
+type Story = StoryObj<typeof Watermark>
+
+const Template: StoryFn = (args) => ({
+  components: { Watermark },
+  template: `
+    <Watermark v-bind="args">
+      <div style="height: 400px; padding: 20px;">
+        <p>这是一个带有水印的示例内容区域。</p>
+        <p>水印会自动应用到这个区域的背景中。</p>
+        <p>水印会根据组件的属性配置设置相关样式和位置。</p>
       </div>
     </Watermark>
-  )
-}
+  `,
+  setup() {
+    return { args }
+  },
+})
 
-export const watermark = Template.bind({})
+export const watermark: Story = Template.bind({})
 watermark.args = {
   content: ['测试水印', '小汪的水印'],
   gap: [20, 0],
   offset: [50, 100],
   fontStyle: {
-    color: 'green',
+    color: 'rgba(0, 0, 0, 0.15)',
+    fontSize: '16px',
+    fontWeight: 'normal',
   },
 }

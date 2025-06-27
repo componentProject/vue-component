@@ -1,51 +1,39 @@
-import ConfigProvider from '@/components/ConfigProvider/index.vue'
-import type { propsType } from '@/components/ConfigProvider/types'
-import type { Meta, StoryObj } from '@storybook/vue3'
+// noinspection JSUnusedGlobalSymbols
 
+import type { Meta, StoryFn, StoryObj } from '@storybook/vue3'
+import ConfigProvider from '@/components/ConfigProvider/index.vue'
 import Calendar from '@/components/Calendar/index.vue'
 
-const meta: Meta<propsType> = {
+// 定义元数据
+const meta: Meta<typeof ConfigProvider> = {
   title: 'ConfigProvider',
   component: ConfigProvider,
-  args: {},
-  tags: ['!autodocs'],
-}
-export default meta
-//#region 直接args传值,好处是docs里示例代码正常
-export const calendar: StoryObj = {
-  args: {
-    locale: 'zh-CN',
-    // 默认插槽
-    default: () => <Calendar />,
-  },
+  tags: ['autodocs'],
   argTypes: {
-    default: {
-      control: false,
-    },
     locale: {
-      control: 'radio',
+      description: '语言设置',
+      control: 'select',
       options: ['zh-CN', 'en-US'],
     },
   },
 }
-//#endregion
 
-//#region props写法
-// export const calendar = (args) => ({
-//   template: `
-//     <ConfigProvider :locale="args.locale">
-//       <Calendar />
-//     </ConfigProvider>
-//   `,
-//   components: { ConfigProvider, Calendar },
-//   setup () {
-//     return { args }
-//   }
-// })
-// calendar.argTypes = {
-//   locale: {
-//     control: 'radio',
-//     options: ['zh-CN', 'en-US']
-//   }
-// }
-//#endregion
+export default meta
+type Story = StoryObj<typeof ConfigProvider>
+
+const Template: StoryFn = (args) => ({
+  components: { ConfigProvider, Calendar },
+  template: `
+    <ConfigProvider v-bind="args">
+      <Calendar />
+    </ConfigProvider>
+  `,
+  setup() {
+    return { args }
+  },
+})
+
+export const configProvider: Story = Template.bind({})
+configProvider.args = {
+  locale: 'zh-CN',
+}

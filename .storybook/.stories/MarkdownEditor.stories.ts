@@ -1,3 +1,5 @@
+// noinspection JSUnusedGlobalSymbols
+
 import MarkdownEditor from '@/components/MarkdownEditor/index.vue'
 import type { Meta } from '@storybook/vue3'
 
