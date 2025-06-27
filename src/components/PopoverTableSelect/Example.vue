@@ -1,3 +1,40 @@
+<template>
+  <div>
+    <div>
+      <h2>基础用法</h2>
+      <div>
+        <ElInput
+          ref="inputRef"
+          v-model="inputValue"
+          placeholder="点击或按下方向键试试"
+          style="width: 240px"
+          @focus="showPopover = true"
+        />
+        <PopoverTableSelect
+          v-model="showPopover"
+          :virtual-ref="inputRef"
+          :columns="columns"
+          :data="tableData"
+          @select="handleSelect"
+        />
+      </div>
+    </div>
+    <div>
+      <h2>自带input用法</h2>
+      <div class="w-[240px]!">
+        <PopoverTableSelect
+          v-model="inputShowPopover"
+          :input-value="inputValue1"
+          pop-type="input"
+          :columns="columns"
+          :data="tableData"
+          @select="handleInputSelect"
+        />
+      </div>
+    </div>
+  </div>
+</template>
+
 <script lang="ts" setup>
 import { ElInput } from 'element-plus'
 import { ref } from 'vue'
@@ -89,40 +126,3 @@ function handleInputSelect(row: any) {
   inputShowPopover.value = false
 }
 </script>
-
-<template>
-  <div>
-    <div>
-      <h2>基础用法</h2>
-      <div>
-        <ElInput
-          ref="inputRef"
-          v-model="inputValue"
-          placeholder="点击或按下方向键试试"
-          style="width: 240px"
-          @focus="showPopover = true"
-        />
-        <PopoverTableSelect
-          v-model="showPopover"
-          :virtual-ref="inputRef"
-          :columns="columns"
-          :data="tableData"
-          @select="handleSelect"
-        />
-      </div>
-    </div>
-    <div>
-      <h2>自带input用法</h2>
-      <div class="w-[240px]!">
-        <PopoverTableSelect
-          v-model="inputShowPopover"
-          :input-value="inputValue1"
-          pop-type="input"
-          :columns="columns"
-          :data="tableData"
-          @select="handleInputSelect"
-        />
-      </div>
-    </div>
-  </div>
-</template>

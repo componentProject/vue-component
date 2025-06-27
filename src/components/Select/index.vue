@@ -1,3 +1,34 @@
+<template>
+  <div>
+    <el-select
+      v-model="data"
+      append-to="#app"
+      :clearable="props.clearable"
+      :filterable="props.filterable"
+      :filter-method="computedFilterMethod"
+      :collapse-tags="props.collapseTags"
+      :tag-type="props.tagType"
+      :teleported="props.teleported"
+      :collapse-tags-tooltip="props.collapseTagsTooltip"
+      v-bind="$attrs"
+    >
+      <el-option
+        v-for="(item, index) in computedOptions"
+        :key="index"
+        :label="item[props.label]"
+        :value="item[props.value]"
+        :disabled="
+          computedDisabledHandler({
+            label: item[props.label],
+            value: item[props.value],
+            data: item,
+          })
+        "
+      />
+    </el-select>
+  </div>
+</template>
+
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import getServerOptions from '@/components/Select/uitls'
@@ -165,34 +196,3 @@ const computedDisabledHandler = computed(() => {
   return getTypeDefault(props.disabledHandler, 'function') || defaultDisabledHandler
 })
 </script>
-
-<template>
-  <div>
-    <el-select
-      v-model="data"
-      append-to="#app"
-      :clearable="props.clearable"
-      :filterable="props.filterable"
-      :filter-method="computedFilterMethod"
-      :collapse-tags="props.collapseTags"
-      :tag-type="props.tagType"
-      :teleported="props.teleported"
-      :collapse-tags-tooltip="props.collapseTagsTooltip"
-      v-bind="$attrs"
-    >
-      <el-option
-        v-for="(item, index) in computedOptions"
-        :key="index"
-        :label="item[props.label]"
-        :value="item[props.value]"
-        :disabled="
-          computedDisabledHandler({
-            label: item[props.label],
-            value: item[props.value],
-            data: item,
-          })
-        "
-      />
-    </el-select>
-  </div>
-</template>

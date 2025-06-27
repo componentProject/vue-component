@@ -1,3 +1,26 @@
+<template>
+  <div class="w-full inline-block flex-1 overflow-hidden">
+    <ElDatePicker
+      ref="datePicker"
+      v-bind="$attrs"
+      v-model="localDateValue"
+      style="width: 100%"
+      :format="props.format"
+      :placeholder="placeholder"
+      :start-placeholder="startPlaceholder"
+      :end-placeholder="endPlaceholder"
+      :range-separator="rangeSeparator"
+      :type="props.type"
+      :disabled-date="disabledDateFn"
+      :disabled-hours="disabledHoursFn"
+      :disabled-minutes="disabledMinutesFn"
+      :disabled-seconds="disabledSecondsFn"
+      :shortcuts="computedShortcuts"
+      @change="handleDateChange"
+    />
+  </div>
+</template>
+
 <script lang="ts" setup>
 import type { DatePickerProps } from 'element-plus'
 import type { Moment, unitOfTime } from 'moment'
@@ -13,7 +36,7 @@ defineOptions({
 })
 // 组件属性
 const props = defineProps({
-  // #region 透传给el-date-picker
+  //#region 透传给el-date-picker
   // 日期选择类型，支持 date(单日期) 和 daterange(日期范围)
   type: {
     type: String as () => DatePickerProps['type'],
@@ -50,8 +73,8 @@ const props = defineProps({
     type: String,
     default: '至',
   },
-  // #endregion
-  // #region 默认值相关
+  //#endregion
+  //#region 默认值相关
   // 绑定值
   modelValue: {
     type: Array,
@@ -93,8 +116,8 @@ const props = defineProps({
     type: [String, Object],
     default: moment(),
   },
-  // #endregion
-  // #region 禁用相关
+  //#endregion
+  //#region 禁用相关
   // 最小可选日期
   minDate: {
     type: [String, Object],
@@ -117,7 +140,7 @@ const props = defineProps({
     type: Array,
     default: () => ['hours', 'minutes', 'seconds'],
   },
-  // #endregion
+  //#endregion
   // 是否显示快速选择选项
   shortcuts: {
     type: [Boolean, Array],
@@ -487,28 +510,5 @@ defineExpose({
   blur: () => datePicker.value?.blur(),
 })
 </script>
-
-<template>
-  <div class="w-full inline-block flex-1 overflow-hidden">
-    <ElDatePicker
-      ref="datePicker"
-      v-bind="$attrs"
-      v-model="localDateValue"
-      style="width: 100%"
-      :format="props.format"
-      :placeholder="placeholder"
-      :start-placeholder="startPlaceholder"
-      :end-placeholder="endPlaceholder"
-      :range-separator="rangeSeparator"
-      :type="props.type"
-      :disabled-date="disabledDateFn"
-      :disabled-hours="disabledHoursFn"
-      :disabled-minutes="disabledMinutesFn"
-      :disabled-seconds="disabledSecondsFn"
-      :shortcuts="computedShortcuts"
-      @change="handleDateChange"
-    />
-  </div>
-</template>
 
 <style scoped></style>

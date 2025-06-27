@@ -1,3 +1,37 @@
+<template>
+  <div>
+    <ElPopover
+      :visible="popoverVisible"
+      virtual-triggering
+      :virtual-ref="props.virtualRef"
+      trigger="contextmenu"
+      placement="bottom"
+      width="200"
+    >
+      <div ref="popoverRef" class="flex flex-col">
+        <div class="flex flex-col">
+          <ElCheckbox
+            v-for="col in allColumns"
+            :key="col.field"
+            v-model="col.visible"
+            :label="col.field"
+          >
+            {{ col.title }}
+          </ElCheckbox>
+        </div>
+        <div class="flex justify-center">
+          <el-button size="small" @click="popoverVisible = false">
+            取消
+          </el-button>
+          <el-button size="small" type="primary" @click="handleConfirm">
+            确定
+          </el-button>
+        </div>
+      </div>
+    </ElPopover>
+  </div>
+</template>
+
 <script setup lang="ts">
 import type { ComponentPublicInstance, PropType } from 'vue'
 import type { ColumnType, types } from '@/components/DraggableTable/_types'
@@ -129,37 +163,3 @@ onUnmounted(() => {
   cleanupEventListeners()
 })
 </script>
-
-<template>
-  <div>
-    <ElPopover
-      :visible="popoverVisible"
-      virtual-triggering
-      :virtual-ref="props.virtualRef"
-      trigger="contextmenu"
-      placement="bottom"
-      width="200"
-    >
-      <div ref="popoverRef" class="flex flex-col">
-        <div class="flex flex-col">
-          <ElCheckbox
-            v-for="col in allColumns"
-            :key="col.field"
-            v-model="col.visible"
-            :label="col.field"
-          >
-            {{ col.title }}
-          </ElCheckbox>
-        </div>
-        <div class="flex justify-center">
-          <el-button size="small" @click="popoverVisible = false">
-            取消
-          </el-button>
-          <el-button size="small" type="primary" @click="handleConfirm">
-            确定
-          </el-button>
-        </div>
-      </div>
-    </ElPopover>
-  </div>
-</template>

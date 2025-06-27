@@ -1,3 +1,25 @@
+<template>
+  <DraggableTable
+    :id="props.id"
+    ref="draggableTableRef"
+    :columns="computedColumns"
+    v-bind="$attrs"
+    @checkbox-all="checkboxAll"
+    @checkbox-change="checkboxChange"
+    @cell-click="handleCellClick"
+  >
+    <!-- 使用动态插槽渲染 -->
+    <template v-for="name in Object.keys($slots)" :key="name" #[name]="slotProps">
+      <slot :name="name" v-bind="slotProps" />
+    </template>
+  </DraggableTable>
+
+  <!-- 用于捕获el-table-column组件 -->
+  <ElTable ref="hiddenTable" style="display: none">
+    <slot />
+  </ElTable>
+</template>
+
 <script setup lang="jsx">
 import { ElTable } from 'element-plus'
 import { computed, ref, useTemplateRef, watch } from 'vue'
@@ -48,7 +70,7 @@ function handleCellClick(params) {
   emit('rowClick', params.row, params.column, params.$event)
 }
 
-// #region 使用el-table-column组件
+//#region 使用el-table-column组件
 const hiddenTable = useTemplateRef('hiddenTable')
 const computedElTableColumns = computed(() => {
   return hiddenTable.value?.columns
@@ -101,7 +123,7 @@ watch(
     deep: true,
   },
 )
-// #endregion
+//#endregion
 
 // 表格引用
 const draggableTableRef = useTemplateRef(null)
@@ -111,27 +133,5 @@ defineExpose({
   getTable: () => draggableTableRef.value?.getTable(),
 })
 </script>
-
-<template>
-  <DraggableTable
-    :id="props.id"
-    ref="draggableTableRef"
-    :columns="computedColumns"
-    v-bind="$attrs"
-    @checkbox-all="checkboxAll"
-    @checkbox-change="checkboxChange"
-    @cell-click="handleCellClick"
-  >
-    <!-- 使用动态插槽渲染 -->
-    <template v-for="name in Object.keys($slots)" :key="name" #[name]="slotProps">
-      <slot :name="name" v-bind="slotProps" />
-    </template>
-  </DraggableTable>
-
-  <!-- 用于捕获el-table-column组件 -->
-  <ElTable ref="hiddenTable" style="display: none">
-    <slot />
-  </ElTable>
-</template>
 
 <style scoped lang="scss"></style>

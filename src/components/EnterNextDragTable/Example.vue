@@ -1,3 +1,46 @@
+<template>
+  <div class="example-container">
+    <h2>EnterNextDragTable 示例</h2>
+    <ElCheckbox v-model="allowSelectNextInEmpty" style="display: none">
+      允许在空select下也能跳转
+    </ElCheckbox>
+    <div class="table-container">
+      <EnterNextDragTable
+        ref="tableRef"
+        v-model="tableData"
+        :columns="columns"
+        editable
+        filterable
+        sortable
+        dragable
+        drag-type="draggable"
+        :allow-select-next-in-empty="allowSelectNextInEmpty"
+        @no-next-input="handleNoNextInput"
+      >
+        <template #name="{ row, column }">
+          <el-input v-model="row[column.field]" />
+        </template>
+        <template #age="{ row, column }">
+          <el-input v-model="row[column.field]" />
+        </template>
+        <template #operation="{ row }">
+          <ElButton type="danger" size="small" @click="handleDelete(row)">
+            删除
+          </ElButton>
+        </template>
+      </EnterNextDragTable>
+    </div>
+    <div class="actions">
+      <ElButton type="primary" @click="addRow">
+        添加行
+      </ElButton>
+      <ElButton type="danger" @click="removeLastRow">
+        删除最后一行
+      </ElButton>
+    </div>
+  </div>
+</template>
+
 <script setup lang="ts">
 import type { ColumnType } from '@/components/DraggableTable/_types'
 import { ElButton, ElCheckbox, ElMessage } from 'element-plus'
@@ -106,49 +149,6 @@ function handleDelete(row: TableRowData) {
 // 表格引用
 const tableRef = ref(null)
 </script>
-
-<template>
-  <div class="example-container">
-    <h2>EnterNextDragTable 示例</h2>
-    <ElCheckbox v-model="allowSelectNextInEmpty" style="display: none">
-      允许在空select下也能跳转
-    </ElCheckbox>
-    <div class="table-container">
-      <EnterNextDragTable
-        ref="tableRef"
-        v-model="tableData"
-        :columns="columns"
-        editable
-        filterable
-        sortable
-        dragable
-        drag-type="draggable"
-        :allow-select-next-in-empty="allowSelectNextInEmpty"
-        @no-next-input="handleNoNextInput"
-      >
-        <template #name="{ row, column }">
-          <el-input v-model="row[column.field]" />
-        </template>
-        <template #age="{ row, column }">
-          <el-input v-model="row[column.field]" />
-        </template>
-        <template #operation="{ row }">
-          <ElButton type="danger" size="small" @click="handleDelete(row)">
-            删除
-          </ElButton>
-        </template>
-      </EnterNextDragTable>
-    </div>
-    <div class="actions">
-      <ElButton type="primary" @click="addRow">
-        添加行
-      </ElButton>
-      <ElButton type="danger" @click="removeLastRow">
-        删除最后一行
-      </ElButton>
-    </div>
-  </div>
-</template>
 
 <style scoped>
 .example-container {

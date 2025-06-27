@@ -1,3 +1,34 @@
+<template>
+  <!--  <DraggableTable /> -->
+  <div class="h-full w-full">
+    <VxeGrid
+      ref="xTable"
+      v-bind="gridProps"
+      @checkbox-all="handleCheckboxAll"
+      @checkbox-change="handleCheckboxChange"
+      @resizable-change="handleColumnResizableChange"
+      @header-cell-menu.prevent="handleHeaderCellMenu"
+    >
+      <!--      <template #empty> -->
+      <!--        <span style="color: red;"> -->
+      <!--          <img src="https://vxeui.com/resource/img/546.gif"> -->
+      <!--          <p>不用再看了，没有更多数据了！</p> -->
+      <!--        </span> -->
+      <!--      </template> -->
+      <!-- 使用插槽方式渲染自定义内容 -->
+      <template v-for="name in slotNames" #[name]="slotParams" :key="name">
+        <slot :name="name" v-bind="slotParams" />
+      </template>
+    </VxeGrid>
+    <ContextMenu
+      v-model="contextMenuVisible"
+      :columns="fullColumns"
+      :virtual-ref="virtualRef"
+      @menu-confirm="handleMenuConfirm"
+    />
+  </div>
+</template>
+
 <script lang="ts" setup>
 import type { PropType } from 'vue'
 import type {
@@ -44,7 +75,7 @@ defineOptions({
 })
 // 定义组件属性
 const props = defineProps({
-  // #region 其他原始配置加默认值
+  //#region 其他原始配置加默认值
   // 表格唯一ID，用于本地存储识别
   id: {
     type: String,
@@ -98,8 +129,8 @@ const props = defineProps({
     type: Object as PropType<VxeTablePropTypes.ResizableConfig>,
     default: () => ({}),
   },
-  // #endregion
-  // #region 编辑相关
+  //#endregion
+  //#region 编辑相关
   /**
    * 是否允许编辑
    */
@@ -128,8 +159,8 @@ const props = defineProps({
     type: Object as PropType<VxeTablePropTypes.EditConfig>,
     default: () => ({}),
   },
-  // #endregion
-  // #region 过滤相关
+  //#endregion
+  //#region 过滤相关
   filterable: {
     type: Boolean,
     default: () => false,
@@ -150,8 +181,8 @@ const props = defineProps({
     type: Object as PropType<VxeTablePropTypes.FilterConfig>,
     default: () => ({}),
   },
-  // #endregion
-  // #region 行列拖拽
+  //#endregion
+  //#region 行列拖拽
   dragable: {
     type: Boolean,
     default: false,
@@ -230,8 +261,8 @@ const props = defineProps({
     default: () => ({}),
   },
 
-  // #endregion
-  // #region 行相关配置
+  //#endregion
+  //#region 行相关配置
   /**
    * 行的唯一标识字段
    * @default '_X_ROW_KEY'
@@ -248,8 +279,8 @@ const props = defineProps({
     type: Object as PropType<VxeTablePropTypes.RowConfig>,
     default: () => ({}),
   },
-  // #endregion
-  // #region 列相关配置
+  //#endregion
+  //#region 列相关配置
   /**
    * 列配置数组
    * @default []
@@ -267,8 +298,8 @@ const props = defineProps({
     type: Object as PropType<VxeTablePropTypes.ColumnConfig>,
     default: () => ({}),
   },
-  // #endregion
-  // #region 虚拟列表配置
+  //#endregion
+  //#region 虚拟列表配置
   /**
    * 列虚拟滚动配置
    */
@@ -283,8 +314,8 @@ const props = defineProps({
     type: Object as PropType<VxeTablePropTypes.VirtualYConfig>,
     default: () => ({}),
   },
-  // #endregion
-  // #region 右键菜单配置
+  //#endregion
+  //#region 右键菜单配置
   /**
    * 头部右键菜单是否允许配置列隐藏显示
    */
@@ -296,8 +327,8 @@ const props = defineProps({
     type: Object as PropType<VxeTablePropTypes.MenuConfig>,
     default: () => ({}),
   },
-  // #endregion
-  // #region 排序相关配置
+  //#endregion
+  //#region 排序相关配置
   sortable: {
     type: Boolean,
     default: false,
@@ -306,7 +337,7 @@ const props = defineProps({
     type: Object as PropType<VxeTablePropTypes.SortConfig>,
     default: () => ({}),
   },
-  // #endregion
+  //#endregion
 })
 
 // 组件事件
@@ -351,7 +382,7 @@ const computedColumns = computed<ColumnType[]>(() => {
   const columns = cloneDeep(props.columns)
   if (!getType(columns, 'array'))
     return []
-  // #region 获取所有插槽的名称
+  //#region 获取所有插槽的名称
   const columnsSlotsNames: string[] = []
   columns.forEach((item) => {
     if (item?.slots) {
@@ -360,7 +391,7 @@ const computedColumns = computed<ColumnType[]>(() => {
       )
     }
   })
-  // #endregion
+  //#endregion
 
   // 获取slots中未使用的插槽
   const slotsDiff = [...diff(slotNames.value, columnsSlotsNames)]
@@ -380,7 +411,7 @@ const computedColumns = computed<ColumnType[]>(() => {
     item.sortable = item.sortable ?? props.sortable
     if (!item.field)
       return item
-    // #region 提供基于field的插槽
+    //#region 提供基于field的插槽
     /*
      * 提供基于field的插槽，规则如下：
      * 如果slotsDiff中存在"${field}"，则作为defaultSlots.default，
@@ -450,9 +481,9 @@ const computedColumns = computed<ColumnType[]>(() => {
       ...defaultSlots,
       ...item.slots,
     }
-    // #endregion
+    //#endregion
 
-    // #region 添加基于field的自定义筛选器渲染器,该渲染器基于当前列显示的内容进行筛选，支持input搜索，checkbox多选，可通过filterLayout配置
+    //#region 添加基于field的自定义筛选器渲染器,该渲染器基于当前列显示的内容进行筛选，支持input搜索，checkbox多选，可通过filterLayout配置
     if (props.filterable && !item.filters && !item.slots.edit && isEmpty(item.filterRender)) {
       item.filters = [
         {
@@ -470,9 +501,9 @@ const computedColumns = computed<ColumnType[]>(() => {
         },
       }
     }
-    // #endregion
+    //#endregion
 
-    // #region 添加基于field的自定义编辑渲染器，当前列满足正常年月日顺序的任意字符串时间格式/Date时，显示单日期时间选择器，列传递options，显示select,否则显示input
+    //#region 添加基于field的自定义编辑渲染器，当前列满足正常年月日顺序的任意字符串时间格式/Date时，显示单日期时间选择器，列传递options，显示select,否则显示input
     if (props.editable && isEmpty(item.editRender) && !item.formatter && !item.slots?.edit) {
       // 使用自定义编辑渲染器
       item.editRender = {
@@ -484,9 +515,9 @@ const computedColumns = computed<ColumnType[]>(() => {
         },
       }
     }
-    // #endregion
+    //#endregion
 
-    // #region 添加基于field的自定义默认渲染器，额外提供以下type功能：'input' | 'select' | 'date' | 'datetime' | 'switch' | 'progress' | 'tag'
+    //#region 添加基于field的自定义默认渲染器，额外提供以下type功能：'input' | 'select' | 'date' | 'datetime' | 'switch' | 'progress' | 'tag'
 
     if (
       isEmpty(item.cellRender)
@@ -506,7 +537,7 @@ const computedColumns = computed<ColumnType[]>(() => {
         },
       }
     }
-    // #endregion
+    //#endregion
     return item
   })
 })
@@ -827,7 +858,7 @@ watch(
     immediate: true,
   },
 )
-// #region draggable模式逻辑
+//#region draggable模式逻辑
 // 保存拖拽实例的引用
 const rowSortableInstance = ref<Sortable | null>()
 const columnSortableInstance = ref<Sortable | null>()
@@ -1063,7 +1094,7 @@ watch(
     immediate: true,
   },
 )
-// #endregion
+//#endregion
 
 /**
  * 暴露给父组件的方法和属性
@@ -1073,34 +1104,3 @@ defineExpose({
   getTable: () => xTable.value,
 })
 </script>
-
-<template>
-  <!--  <DraggableTable /> -->
-  <div class="h-full w-full">
-    <VxeGrid
-      ref="xTable"
-      v-bind="gridProps"
-      @checkbox-all="handleCheckboxAll"
-      @checkbox-change="handleCheckboxChange"
-      @resizable-change="handleColumnResizableChange"
-      @header-cell-menu.prevent="handleHeaderCellMenu"
-    >
-      <!--      <template #empty> -->
-      <!--        <span style="color: red;"> -->
-      <!--          <img src="https://vxeui.com/resource/img/546.gif"> -->
-      <!--          <p>不用再看了，没有更多数据了！</p> -->
-      <!--        </span> -->
-      <!--      </template> -->
-      <!-- 使用插槽方式渲染自定义内容 -->
-      <template v-for="name in slotNames" #[name]="slotParams" :key="name">
-        <slot :name="name" v-bind="slotParams" />
-      </template>
-    </VxeGrid>
-    <ContextMenu
-      v-model="contextMenuVisible"
-      :columns="fullColumns"
-      :virtual-ref="virtualRef"
-      @menu-confirm="handleMenuConfirm"
-    />
-  </div>
-</template>

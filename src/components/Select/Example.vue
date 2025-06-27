@@ -1,3 +1,10 @@
+<template>
+  <div>
+    <Select :options="data" label="name" value="age" @change="onChangeValue" />
+    {{ value }}
+  </div>
+</template>
+
 <script setup lang="ts">
 import { ref } from 'vue'
 import Select from '@/components/Select/index.vue'
@@ -19,12 +26,5 @@ function onChangeValue(a) {
   value.value = a
 }
 </script>
-
-<template>
-  <div>
-    <Select :options="data" label="name" value="age" @change="onChangeValue" />
-    {{ value }}
-  </div>
-</template>
 
 <style scoped lang="scss"></style>

@@ -81,7 +81,7 @@ async function render(props: QiankunProps) {
 
   const router = getRouter(props)
 
-  // #region 初始化sentry
+  //#region 初始化sentry
   import.meta.env.VITE_SENTRY
     && init({
       app,
@@ -102,7 +102,7 @@ async function render(props: QiankunProps) {
         browserTracingIntegration({ router }),
       ],
     })
-  // #endregion
+  //#endregion
 
   app.use(store)
   app.use(i18n)

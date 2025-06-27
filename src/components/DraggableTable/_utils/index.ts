@@ -76,12 +76,12 @@ export function handleGetColumn(Column: ColumnType): ColumnType {
     colId,
     children,
     slots,
-    // #region 自定义属性部分
+    //#region 自定义属性部分
     options,
     cellProps,
     editProps,
     filterProps,
-    // #endregion
+    //#endregion
   } = Column
   return {
     type,
@@ -132,12 +132,12 @@ export function handleGetColumn(Column: ColumnType): ColumnType {
     colId,
     children,
     slots,
-    // #region 自定义属性部分
+    //#region 自定义属性部分
     options,
     cellProps,
     editProps,
     filterProps,
-    // #endregion
+    //#endregion
   }
 }
 

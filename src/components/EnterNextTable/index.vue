@@ -1,3 +1,20 @@
+<template>
+  <!-- 渲染el-table -->
+  <ElTable ref="tableRef" :data="props.data" v-bind="$attrs">
+    <!-- 使用默认插槽渲染表格内容 -->
+    <slot />
+  </ElTable>
+
+  <!-- 为表格中的每一行创建EnterNextContainer -->
+  <EnterNextContainer
+    v-for="(row, index) in tableRows"
+    :key="`row-${index}`"
+    :allow-select-next-in-empty="props.allowSelectNextInEmpty"
+    :virtual-ref="row"
+    @no-next-input="handleNoNextInput"
+  />
+</template>
+
 <script setup lang="ts">
 import type { noNextInputParams } from '@/components/EnterNextTable/_types'
 import { ElTable } from 'element-plus'
@@ -95,22 +112,5 @@ defineExpose({
   refreshRows: debouncedCollectTableRows,
 })
 </script>
-
-<template>
-  <!-- 渲染el-table -->
-  <ElTable ref="tableRef" :data="props.data" v-bind="$attrs">
-    <!-- 使用默认插槽渲染表格内容 -->
-    <slot />
-  </ElTable>
-
-  <!-- 为表格中的每一行创建EnterNextContainer -->
-  <EnterNextContainer
-    v-for="(row, index) in tableRows"
-    :key="`row-${index}`"
-    :allow-select-next-in-empty="props.allowSelectNextInEmpty"
-    :virtual-ref="row"
-    @no-next-input="handleNoNextInput"
-  />
-</template>
 
 <style scoped></style>

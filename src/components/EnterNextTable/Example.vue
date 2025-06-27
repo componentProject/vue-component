@@ -1,93 +1,3 @@
-<script setup lang="ts">
-import type { noNextInputParams } from '@/components/EnterNextTable/_types'
-import { ElMessage } from 'element-plus'
-import { ref } from 'vue'
-import TableEnterNext from './index.vue'
-
-// 定义表格数据类型
-interface TableRowData {
-  name: string
-  age: string
-  gender: string
-  address: string
-}
-
-// 表格数据
-const tableData = ref<TableRowData[]>([
-  { name: '张三', age: '25', gender: '男', address: '北京市朝阳区' },
-  { name: '李四', age: '30', gender: '女', address: '上海市浦东新区' },
-  { name: '王五', age: '28', gender: '男', address: '广州市天河区' },
-])
-
-// 是否允许在select没有选中值时跳转
-const allowSelectNextInEmpty = ref(true)
-
-// 表格组件引用，使用类型断言确保能访问refreshRows方法
-const tableEnterNextRef = ref<InstanceType<typeof TableEnterNext> | null>(null)
-
-// 添加行
-function addRow() {
-  tableData.value.push({
-    name: '',
-    age: '',
-    gender: '',
-    address: '',
-  })
-
-  // 刷新行收集
-  setTimeout(() => {
-    tableEnterNextRef.value?.refreshRows()
-  }, 0)
-}
-
-// 删除最后一行
-function removeLastRow() {
-  if (tableData.value.length > 0) {
-    tableData.value.pop()
-    ElMessage.success('已删除最后一行')
-
-    // 刷新行收集
-    setTimeout(() => {
-      tableEnterNextRef.value?.refreshRows()
-    }, 0)
-  }
-  else {
-    ElMessage.warning('表格已无数据')
-  }
-}
-
-// 处理删除指定行
-function handleDelete(row: TableRowData, index: number) {
-  tableData.value.splice(index, 1)
-  ElMessage.success(`已删除第${index + 1}行数据`)
-
-  // 刷新行收集
-  setTimeout(() => {
-    tableEnterNextRef.value?.refreshRows()
-  }, 0)
-}
-
-// 当没有下一个输入元素时的处理
-function handleNoNextInput({ rowIndex }: noNextInputParams) {
-  ElMessage.success(`已到达最后一个输入元素！当前行索引: ${rowIndex}`)
-  // 自动添加新行
-  addRow()
-}
-
-// #region popSelectTable
-const columns = [
-  { field: 'id', title: 'ID', width: 60 },
-  { field: 'name', title: '姓名', width: 120 },
-  { field: 'age', title: '年龄' },
-]
-const tableData1 = [
-  { id: 1, name: '张三', age: 18 },
-  { id: 2, name: '李四', age: 20 },
-  { id: 3, name: '王五', age: 22 },
-]
-// #endregion
-</script>
-
 <template>
   <div class="table-enter-next-example">
     <h2>TableEnterNext 组件示例</h2>
@@ -180,6 +90,96 @@ const tableData1 = [
     </el-card>
   </div>
 </template>
+
+<script setup lang="ts">
+import type { noNextInputParams } from '@/components/EnterNextTable/_types'
+import { ElMessage } from 'element-plus'
+import { ref } from 'vue'
+import TableEnterNext from './index.vue'
+
+// 定义表格数据类型
+interface TableRowData {
+  name: string
+  age: string
+  gender: string
+  address: string
+}
+
+// 表格数据
+const tableData = ref<TableRowData[]>([
+  { name: '张三', age: '25', gender: '男', address: '北京市朝阳区' },
+  { name: '李四', age: '30', gender: '女', address: '上海市浦东新区' },
+  { name: '王五', age: '28', gender: '男', address: '广州市天河区' },
+])
+
+// 是否允许在select没有选中值时跳转
+const allowSelectNextInEmpty = ref(true)
+
+// 表格组件引用，使用类型断言确保能访问refreshRows方法
+const tableEnterNextRef = ref<InstanceType<typeof TableEnterNext> | null>(null)
+
+// 添加行
+function addRow() {
+  tableData.value.push({
+    name: '',
+    age: '',
+    gender: '',
+    address: '',
+  })
+
+  // 刷新行收集
+  setTimeout(() => {
+    tableEnterNextRef.value?.refreshRows()
+  }, 0)
+}
+
+// 删除最后一行
+function removeLastRow() {
+  if (tableData.value.length > 0) {
+    tableData.value.pop()
+    ElMessage.success('已删除最后一行')
+
+    // 刷新行收集
+    setTimeout(() => {
+      tableEnterNextRef.value?.refreshRows()
+    }, 0)
+  }
+  else {
+    ElMessage.warning('表格已无数据')
+  }
+}
+
+// 处理删除指定行
+function handleDelete(row: TableRowData, index: number) {
+  tableData.value.splice(index, 1)
+  ElMessage.success(`已删除第${index + 1}行数据`)
+
+  // 刷新行收集
+  setTimeout(() => {
+    tableEnterNextRef.value?.refreshRows()
+  }, 0)
+}
+
+// 当没有下一个输入元素时的处理
+function handleNoNextInput({ rowIndex }: noNextInputParams) {
+  ElMessage.success(`已到达最后一个输入元素！当前行索引: ${rowIndex}`)
+  // 自动添加新行
+  addRow()
+}
+
+//#region popSelectTable
+const columns = [
+  { field: 'id', title: 'ID', width: 60 },
+  { field: 'name', title: '姓名', width: 120 },
+  { field: 'age', title: '年龄' },
+]
+const tableData1 = [
+  { id: 1, name: '张三', age: 18 },
+  { id: 2, name: '李四', age: 20 },
+  { id: 3, name: '王五', age: 22 },
+]
+//#endregion
+</script>
 
 <style scoped>
 .table-enter-next-example {

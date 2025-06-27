@@ -38,7 +38,7 @@
 // }, {});
 // //#endregion
 
-// #region vite下
+//#region vite下
 import type { ComponentsType } from '@/components/ConfigForm/types'
 
 const componentFiles = import.meta.glob('./components/**/*.vue')
@@ -51,15 +51,15 @@ const components: ComponentsType = Object.keys(componentFiles).reduce(
   },
   {},
 )
-// #endregion
+//#endregion
 
-// #region 全局注册组件
+//#region 全局注册组件
 // const componentNames = Object.keys(components);
 // components.install = function (Vue) {
 //   componentNames.forEach(name => {
 //     Vue.component(name, components[name]);
 //   });
 // };
-// #endregion
+//#endregion
 
 export default components

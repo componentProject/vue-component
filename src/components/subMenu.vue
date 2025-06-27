@@ -1,12 +1,3 @@
-<script setup lang="ts">
-defineProps({
-  routes: {
-    type: Array,
-    required: true,
-  },
-})
-</script>
-
 <template>
   <template v-for="(route, index) in routes" :key="index">
     <el-menu-item v-if="!route.children?.length" :index="route.path">
@@ -22,5 +13,14 @@ defineProps({
     </template>
   </template>
 </template>
+
+<script setup lang="ts">
+defineProps({
+  routes: {
+    type: Array,
+    required: true,
+  },
+})
+</script>
 
 <style scoped lang="scss"></style>

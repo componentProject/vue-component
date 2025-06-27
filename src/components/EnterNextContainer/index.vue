@@ -1,3 +1,9 @@
+<template>
+  <div ref="containerRef" class="enter-next-container">
+    <slot />
+  </div>
+</template>
+
 <script setup lang="ts">
 import type { ComponentInternalInstance, ComponentPublicInstance } from 'vue'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
@@ -167,12 +173,6 @@ onUnmounted(() => {
   cleanup?.()
 })
 </script>
-
-<template>
-  <div ref="containerRef" class="enter-next-container">
-    <slot />
-  </div>
-</template>
 
 <style scoped>
 .enter-next-container {

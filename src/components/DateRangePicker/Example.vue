@@ -1,33 +1,3 @@
-<script setup>
-import moment from 'moment'
-import { ref } from 'vue'
-import DateRangePicker from './index.vue'
-
-// 日期范围选择器
-const dateRange1 = ref([])
-const dateRange2 = ref([])
-
-// 自定义日期范围
-const dateRange3 = ref([])
-const dateRange4 = ref([])
-const dateRange5 = ref([])
-const dateRange18 = ref([])
-
-// 禁用日期
-const today = moment().format('YYYY-MM-DD')
-const futureWeek = moment().add(7, 'days').format('YYYY-MM-DD')
-const dateRange6 = ref([])
-const dateRange7 = ref([])
-const dateRange8 = ref([])
-
-// 快速选择选项
-const dateRange9 = ref([])
-
-// 尺寸和禁用
-const dateRange10 = ref([])
-const dateRange11 = ref([])
-</script>
-
 <template>
   <div class="date-range-picker-example">
     <h2>日期范围选择器示例</h2>
@@ -203,6 +173,36 @@ const dateRange11 = ref([])
     </div>
   </div>
 </template>
+
+<script setup>
+import moment from 'moment'
+import { ref } from 'vue'
+import DateRangePicker from './index.vue'
+
+// 日期范围选择器
+const dateRange1 = ref([])
+const dateRange2 = ref([])
+
+// 自定义日期范围
+const dateRange3 = ref([])
+const dateRange4 = ref([])
+const dateRange5 = ref([])
+const dateRange18 = ref([])
+
+// 禁用日期
+const today = moment().format('YYYY-MM-DD')
+const futureWeek = moment().add(7, 'days').format('YYYY-MM-DD')
+const dateRange6 = ref([])
+const dateRange7 = ref([])
+const dateRange8 = ref([])
+
+// 快速选择选项
+const dateRange9 = ref([])
+
+// 尺寸和禁用
+const dateRange10 = ref([])
+const dateRange11 = ref([])
+</script>
 
 <style scoped>
 .date-range-picker-example {

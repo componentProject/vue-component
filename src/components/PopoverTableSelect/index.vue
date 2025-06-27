@@ -1,3 +1,20 @@
+<template>
+  <PopoverTableSelect v-model="popoverModel" :virtual-ref="computedVirtualRef" v-bind="$attrs">
+    <template v-for="name in slotNames" #[name]="slotParams" :key="name">
+      <slot :name="name" v-bind="slotParams" />
+    </template>
+  </PopoverTableSelect>
+  <ElInput
+    v-if="props.popType === 'input'"
+    v-bind="props.inputProps"
+    v-model="currentInputValue"
+    :placeholder="computedPlaceholder"
+    @focus="handleFocus"
+    @blur="handleBlur"
+    @input="computedInput"
+  />
+</template>
+
 <script setup lang="ts">
 import type { InputInstance, InputProps } from 'element-plus'
 import type { ComponentInternalInstance, ComponentPublicInstance, PropType } from 'vue'
@@ -95,22 +112,5 @@ const computedInput = computed(() => {
   }
 })
 </script>
-
-<template>
-  <PopoverTableSelect v-model="popoverModel" :virtual-ref="computedVirtualRef" v-bind="$attrs">
-    <template v-for="name in slotNames" #[name]="slotParams" :key="name">
-      <slot :name="name" v-bind="slotParams" />
-    </template>
-  </PopoverTableSelect>
-  <ElInput
-    v-if="props.popType === 'input'"
-    v-bind="props.inputProps"
-    v-model="currentInputValue"
-    :placeholder="computedPlaceholder"
-    @focus="handleFocus"
-    @blur="handleBlur"
-    @input="computedInput"
-  />
-</template>
 
 <style scoped lang="scss"></style>

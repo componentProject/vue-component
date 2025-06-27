@@ -1,3 +1,27 @@
+<template>
+  <ElPopover
+    :visible="popoverVisible"
+    virtual-triggering
+    :virtual-ref="props.virtualRef"
+    :width="props.width"
+    :placement="props.placement"
+  >
+    <div ref="popoverRef">
+      <slot name="default" />
+      <DraggableTable
+        :id="props.id"
+        ref="gridRef"
+        border
+        highlight-current-row
+        :columns="columns"
+        :model-value="data"
+        :height="height"
+        @cell-click="handleCellClick"
+      />
+    </div>
+  </ElPopover>
+</template>
+
 <script lang="ts" setup>
 import type { InputInstance } from 'element-plus'
 import type { ComponentInternalInstance, ComponentPublicInstance } from 'vue'
@@ -11,7 +35,7 @@ defineOptions({
   name: 'PopoverTableSelect',
 })
 const props = defineProps({
-  // #region 透传给popover
+  //#region 透传给popover
   virtualRef: {
     type: Object as () =>
       | ComponentPublicInstance
@@ -33,8 +57,8 @@ const props = defineProps({
     type: [String, Number],
     default: 300,
   },
-  // #endregion
-  // #region 透传给DraggableTable
+  //#endregion
+  //#region 透传给DraggableTable
   id: {
     type: String,
     default: '',
@@ -47,7 +71,7 @@ const props = defineProps({
     type: Array as () => VxeTablePropTypes.Data,
     default: () => [],
   },
-  // #endregion
+  //#endregion
 })
 
 const emit = defineEmits<{
@@ -251,29 +275,5 @@ function handleCellClick({ row, rowIndex }: { row: TableRowData, rowIndex: numbe
   })
 }
 </script>
-
-<template>
-  <ElPopover
-    :visible="popoverVisible"
-    virtual-triggering
-    :virtual-ref="props.virtualRef"
-    :width="props.width"
-    :placement="props.placement"
-  >
-    <div ref="popoverRef">
-      <slot name="default" />
-      <DraggableTable
-        :id="props.id"
-        ref="gridRef"
-        border
-        highlight-current-row
-        :columns="columns"
-        :model-value="data"
-        :height="height"
-        @cell-click="handleCellClick"
-      />
-    </div>
-  </ElPopover>
-</template>
 
 <style scoped></style>

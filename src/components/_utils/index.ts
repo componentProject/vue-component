@@ -127,7 +127,7 @@ export function dispatchEvents(target: Document, events: EventType | EventType[]
   }
 }
 
-// #region 日期相关
+//#region 日期相关
 /**
  * 匹配 以年月日 时分秒 顺序排列的任意时间格式字符串,匹配不到默认返回 YYYY-MM-DD HH:mm:ss
  * @param str
@@ -273,4 +273,4 @@ export function formatDateRange(
   }
 }
 
-// #endregion
+//#endregion

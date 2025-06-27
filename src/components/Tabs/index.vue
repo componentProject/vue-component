@@ -1,27 +1,3 @@
-<script setup lang="ts">
-const props = defineProps({
-  tabCard: {
-    type: Boolean,
-    default: true,
-  },
-  tabList: {
-    type: Array<{
-      id: string
-      label: string
-      slot?: string
-      lazy?: boolean
-      show?: (item: any) => boolean
-    }>,
-    default: () => [],
-  },
-})
-const emits = defineEmits(['tabChange'])
-const activeName = defineModel({ default: '1', type: String })
-function handleTabChange(val: any) {
-  emits('tabChange', val)
-}
-</script>
-
 <template>
   <div class="height-100">
     <el-tabs
@@ -45,6 +21,30 @@ function handleTabChange(val: any) {
     </el-tabs>
   </div>
 </template>
+
+<script setup lang="ts">
+const props = defineProps({
+  tabCard: {
+    type: Boolean,
+    default: true,
+  },
+  tabList: {
+    type: Array<{
+      id: string
+      label: string
+      slot?: string
+      lazy?: boolean
+      show?: (item: any) => boolean
+    }>,
+    default: () => [],
+  },
+})
+const emits = defineEmits(['tabChange'])
+const activeName = defineModel({ default: '1', type: String })
+function handleTabChange(val: any) {
+  emits('tabChange', val)
+}
+</script>
 
 <style scoped lang="scss">
 .tabs-card {

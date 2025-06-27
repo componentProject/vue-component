@@ -8,24 +8,6 @@
  *
  * Copyright (c) 2025 by ${git_name_email}, All Rights Reserved.
 -->
-<script setup>
-import zhCn from 'element-plus/dist/locale/zh-cn.mjs'
-import { qiankunWindow } from 'vite-plugin-qiankun/dist/helper'
-import { computed, reactive } from 'vue'
-import { RouterView, useRouter } from 'vue-router'
-import subMenu from '@/components/subMenu.vue'
-import { useSystemStore } from '@/stores/modules/system.js'
-
-const router = useRouter()
-const routes = reactive(router.options.routes[0].children)
-const systemStore = useSystemStore()
-const themeColor = computed(() => systemStore.themeColor)
-const systemCode = computed(() => {
-  return systemStore.systemCode
-})
-const defaultTab = computed(() => router.currentRoute.value.path)
-</script>
-
 <template>
   <el-config-provider :locale="zhCn" :namespace="systemCode" :empty-values="[undefined]">
     <div
@@ -59,5 +41,23 @@ const defaultTab = computed(() => router.currentRoute.value.path)
     </div>
   </el-config-provider>
 </template>
+
+<script setup>
+import zhCn from 'element-plus/dist/locale/zh-cn.mjs'
+import { qiankunWindow } from 'vite-plugin-qiankun/dist/helper'
+import { computed, reactive } from 'vue'
+import { RouterView, useRouter } from 'vue-router'
+import subMenu from '@/components/subMenu.vue'
+import { useSystemStore } from '@/stores/modules/system.js'
+
+const router = useRouter()
+const routes = reactive(router.options.routes[0].children)
+const systemStore = useSystemStore()
+const themeColor = computed(() => systemStore.themeColor)
+const systemCode = computed(() => {
+  return systemStore.systemCode
+})
+const defaultTab = computed(() => router.currentRoute.value.path)
+</script>
 
 <style lang="scss" scoped></style>

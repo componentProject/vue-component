@@ -1,3 +1,27 @@
+<template>
+  <!-- 使用DraggableTable作为基础组件 -->
+  <DraggableTable
+    ref="tableRef"
+    v-model="tableData"
+    drag-type="draggable"
+    v-bind="$attrs"
+    @toggle-tree-expand="handleTableRendered"
+  >
+    <!-- 使用默认插槽渲染表格内容 -->
+    <template v-for="name in slotNames" #[name]="slotParams" :key="name">
+      <slot :name="name" v-bind="slotParams" />
+    </template>
+  </DraggableTable>
+
+  <EnterNextContainer
+    v-for="(row, index) in tableRows"
+    :key="`row-${index}`"
+    :virtual-ref="row"
+    :allow-select-next-in-empty="props.allowSelectNextInEmpty"
+    @no-next-input="handleNoNextInput"
+  />
+</template>
+
 <script setup lang="ts">
 import type { VxeTableDefines } from 'vxe-table'
 import type { EnterNextDragTableProps, NoNextInputParams } from './_types'
@@ -110,29 +134,5 @@ defineExpose({
   getTableRef: () => tableRef.value,
 })
 </script>
-
-<template>
-  <!-- 使用DraggableTable作为基础组件 -->
-  <DraggableTable
-    ref="tableRef"
-    v-model="tableData"
-    drag-type="draggable"
-    v-bind="$attrs"
-    @toggle-tree-expand="handleTableRendered"
-  >
-    <!-- 使用默认插槽渲染表格内容 -->
-    <template v-for="name in slotNames" #[name]="slotParams" :key="name">
-      <slot :name="name" v-bind="slotParams" />
-    </template>
-  </DraggableTable>
-
-  <EnterNextContainer
-    v-for="(row, index) in tableRows"
-    :key="`row-${index}`"
-    :virtual-ref="row"
-    :allow-select-next-in-empty="props.allowSelectNextInEmpty"
-    @no-next-input="handleNoNextInput"
-  />
-</template>
 
 <style scoped></style>
