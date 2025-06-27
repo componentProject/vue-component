@@ -1,6 +1,6 @@
 <template>
   <!--  <DraggableTable /> -->
-  <div class="h-full w-full">
+  <div class="h-full w-full flex-1 overflow-hidden">
     <VxeGrid
       ref="xTable"
       v-bind="gridProps"

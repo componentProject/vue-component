@@ -30,6 +30,8 @@ export default antfu(
       'no-use-before-define': 'off',
       'ts/no-use-before-define': 'off',
       //#endregion
+      // 不能使用console
+      'no-console': 'off',
     },
   },
 )
