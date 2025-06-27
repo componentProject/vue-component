@@ -1,21 +1,29 @@
-import EnterNextTable from '../../src/components/EnterNextTable/index.vue'
-import type { Meta, StoryFn } from '@storybook/vue3'
-import { ref } from 'vue'
-import { ElButton, ElInput, ElMessage, ElSelect, ElOption, ElTableColumn } from 'element-plus'
+// noinspection JSUnusedGlobalSymbols
 
-const meta: Meta<any> = {
+import type { Meta, StoryFn, StoryObj } from '@storybook/vue3'
+import EnterNextTable from '@/components/EnterNextTable/index.vue'
+import { ref } from 'vue'
+import { ElInput, ElMessage, ElSelect, ElOption, ElTableColumn } from 'element-plus'
+
+// 定义元数据
+const meta: Meta<typeof EnterNextTable> = {
   title: 'EnterNextTable',
   component: EnterNextTable,
   tags: ['autodocs'],
-  argTypes: {},
+  argTypes: {
+    data: {
+      description: '表格数据',
+      control: 'object',
+    },
+  },
 }
 
 export default meta
+type Story = StoryObj<typeof EnterNextTable>
 
-export const Basic: StoryFn = () => ({
+const Template: StoryFn = (args) => ({
   components: {
     EnterNextTable,
-    ElButton,
     ElInput,
     ElSelect,
     ElOption,
@@ -41,41 +49,41 @@ export const Basic: StoryFn = () => ({
     // 处理到达最后一个输入元素时的操作
     const handleNoNextInput = ({ rowIndex }) => {
       ElMessage.success(`已到达最后一个输入元素！当前行索引: ${rowIndex}`)
-      addRow()
     }
 
-    return { tableData, addRow, handleNoNextInput }
+    return { args, tableData, addRow, handleNoNextInput }
   },
   template: `
-    <div style="width: 600px;">
-      <ElButton type="primary" @click="addRow" style="margin-bottom: 10px;">添加行</ElButton>
+    <ElButton type="primary" @click="addRow" style="margin-bottom: 10px;">添加行</ElButton>
+    <EnterNextTable
+      :data="tableData"
+      border
+      @no-next-input="handleNoNextInput"
+      v-bind="args"
+    >
+      <ElTableColumn label="姓名" prop="name" width="180">
+        <template #default="scope">
+          <ElInput v-model="scope.row.name" placeholder="请输入姓名"></ElInput>
+        </template>
+      </ElTableColumn>
 
-      <EnterNextTable
-        :data="tableData"
-        border
-        @no-next-input="handleNoNextInput"
-      >
-        <ElTableColumn label="姓名" prop="name" width="180">
-          <template #default="scope">
-            <ElInput v-model="scope.row.name" placeholder="请输入姓名"></ElInput>
-          </template>
-        </ElTableColumn>
+      <ElTableColumn label="性别" prop="gender" width="150">
+        <template #default="scope">
+          <ElSelect v-model="scope.row.gender" placeholder="请选择性别">
+            <ElOption label="男" value="男"></ElOption>
+            <ElOption label="女" value="女"></ElOption>
+          </ElSelect>
+        </template>
+      </ElTableColumn>
 
-        <ElTableColumn label="性别" prop="gender" width="150">
-          <template #default="scope">
-            <ElSelect v-model="scope.row.gender" placeholder="请选择性别">
-              <ElOption label="男" value="男"></ElOption>
-              <ElOption label="女" value="女"></ElOption>
-            </ElSelect>
-          </template>
-        </ElTableColumn>
-
-        <ElTableColumn label="年龄" prop="age" width="120">
-          <template #default="scope">
-            <ElInput v-model="scope.row.age" placeholder="请输入年龄"></ElInput>
-          </template>
-        </ElTableColumn>
-      </EnterNextTable>
-    </div>
+      <ElTableColumn label="年龄" prop="age" width="120">
+        <template #default="scope">
+          <ElInput v-model="scope.row.age" placeholder="请输入年龄"></ElInput>
+        </template>
+      </ElTableColumn>
+    </EnterNextTable>
   `,
 })
+
+export const enterNextTable: Story = Template.bind({})
+enterNextTable.args = {}

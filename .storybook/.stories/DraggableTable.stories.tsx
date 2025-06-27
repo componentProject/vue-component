@@ -1,60 +1,72 @@
-import DraggableTable from '../../src/components/DraggableTable/index.vue'
-import type { Meta, StoryObj } from '@storybook/vue3'
+// noinspection JSUnusedGlobalSymbols
+
+import type { Meta, StoryFn, StoryObj } from '@storybook/vue3'
+import DraggableTable from '@/components/DraggableTable/index.vue'
 import { ref } from 'vue'
-import { ElButton } from 'element-plus'
+import type { TableRowData } from '@/components/DraggableTable/_types'
 
 /**
  * 可拖拽表格组件
  */
-const meta = {
+const meta: Meta<typeof DraggableTable> = {
   title: 'DraggableTable',
   component: DraggableTable,
   tags: ['autodocs'],
   argTypes: {
+    id: {
+      description: '表格唯一标识',
+      control: 'text',
+    },
     rowdragable: {
-      control: 'boolean',
       description: '是否开启行拖拽功能',
-      defaultValue: true,
+      control: 'boolean',
     },
     columndragable: {
-      control: 'boolean',
       description: '是否开启列拖拽功能',
-      defaultValue: true,
+      control: 'boolean',
     },
     editable: {
-      control: 'boolean',
       description: '是否开启单元格编辑功能',
-      defaultValue: false,
+      control: 'boolean',
     },
     filterable: {
-      control: 'boolean',
       description: '是否开启过滤功能',
-      defaultValue: false,
-    },
-    loading: {
       control: 'boolean',
-      description: '是否显示加载状态',
-      defaultValue: false,
     },
-    height: {
-      control: 'number',
-      description: '表格高度',
-      defaultValue: 500,
+    border: {
+      description: '是否显示表格边框',
+      control: 'boolean',
     },
-    id: {
-      control: 'text',
-      description: '表格唯一标识',
+    showOverflow: {
+      description: '表格内容溢出隐藏并显示tooltip',
+      control: 'boolean',
+    },
+    autoResize: {
+      description: '是否自动调整列宽',
+      control: 'boolean',
     },
   },
-} satisfies Meta<any>
+}
 
 export default meta
+type Story = StoryObj<typeof DraggableTable>
 
-type Story = StoryObj<typeof meta>
+// 自定义类型，扩展TabeRowData
+interface UserRow extends TableRowData {
+  id: number
+  name: string
+  age: number
+  sex: string
+  address: string
+  phone: string
+  email: string
+  status: number
+  createTime: string
+}
 
 // 生成示例数据
-const generateData = (count = 5) => {
-  const data = []
+const generateData = (count = 5): UserRow[] => {
+  const data: UserRow[] = []
   for (let i = 1; i <= count; i++) {
     data.push({
       id: i,
@@ -88,199 +100,25 @@ const columns = [
   { field: 'actions', title: '操作' },
 ]
 
-// 基础用法
-export const Basic: Story = {
-  render: (args) => ({
-    components: { DraggableTable, ElButton },
-    setup() {
-      const tableData = ref(generateData())
-      const tableColumns = ref(columns)
+const Template: StoryFn = (args) => ({
+  components: { DraggableTable },
+  setup() {
+    const tableData = ref(generateData())
+    const tableColumns = ref(columns)
 
-      const handleEdit = (row) => {
-        alert(`编辑行: ${row.name}`)
-      }
-
-      const handleDelete = (row) => {
-        if (confirm(`确定要删除 ${row.name} 吗？`)) {
-          tableData.value = tableData.value.filter((item) => item.id !== row.id)
-        }
-      }
-
-      return { args, tableData, tableColumns, handleEdit, handleDelete }
-    },
-    template: `
-      <div style="padding: 20px;">
-        <h3>可拖拽表格基础用法</h3>
-        <DraggableTable
-          v-model="tableData"
-          :columns="tableColumns"
-          v-bind="args"
-        >
-          <template #actions="{ row }">
-            <ElButton type="primary" size="small" @click="handleEdit(row)">编辑</ElButton>
-            <ElButton type="danger" size="small" @click="handleDelete(row)">删除</ElButton>
-          </template>
-        </DraggableTable>
-      </div>
-    `,
-  }),
-  args: {
-    rowdragable: true,
-    columndragable: true,
-    editable: true,
-    filterable: true,
-    height: 500,
-    loading: false,
-    id: 'basic-table',
+    return { args, tableData, tableColumns }
   },
-}
+  template: '<DraggableTable v-model="tableData" :columns="tableColumns" v-bind="args" />',
+})
 
-// 禁用拖拽功能
-export const DisableDrag: Story = {
-  render: (args) => ({
-    components: { DraggableTable },
-    setup() {
-      const tableData = ref(generateData())
-      const tableColumns = ref(columns)
-
-      return { args, tableData, tableColumns }
-    },
-    template: `
-      <div style="padding: 20px;">
-        <h3>禁用拖拽功能</h3>
-        <DraggableTable
-          v-model="tableData"
-          :columns="tableColumns"
-          v-bind="args"
-        />
-      </div>
-    `,
-  }),
-  args: {
-    rowdragable: false,
-    columndragable: false,
-    editable: false,
-    filterable: true,
-    height: 400,
-    id: 'no-drag-table',
-  },
-}
-
-// 加载状态展示
-export const Loading: Story = {
-  render: (args) => ({
-    components: { DraggableTable },
-    setup() {
-      const tableData = ref(generateData())
-      const tableColumns = ref(columns)
-
-      return { args, tableData, tableColumns }
-    },
-    template: `
-      <div style="padding: 20px;">
-        <h3>表格加载状态</h3>
-        <DraggableTable
-          v-model="tableData"
-          :columns="tableColumns"
-          v-bind="args"
-        />
-      </div>
-    `,
-  }),
-  args: {
-    loading: true,
-    rowdragable: true,
-    columndragable: true,
-    id: 'loading-table',
-  },
-}
-
-// 交互式演示
-export const Interactive: Story = {
-  render: (args) => ({
-    components: { DraggableTable, ElButton },
-    setup() {
-      const tableData = ref(generateData(3))
-      const tableColumns = ref(columns)
-      const rowDragEnabled = ref(true)
-      const colDragEnabled = ref(true)
-
-      const addRow = () => {
-        const newId =
-          tableData.value.length > 0 ? Math.max(...tableData.value.map((item) => item.id)) + 1 : 1
-
-        tableData.value.push({
-          id: newId,
-          name: `新用户${newId}`,
-          age: Math.floor(Math.random() * 40) + 20,
-          sex: newId % 2 === 0 ? '2' : '1',
-          address: '待填写',
-          phone: `138${String(newId).padStart(8, '0')}`,
-          email: `user${newId}@example.com`,
-          status: Math.floor(Math.random() * 3) + 1,
-          createTime: new Date().toISOString().split('T')[0],
-        })
-      }
-
-      const toggleRowDrag = () => {
-        rowDragEnabled.value = !rowDragEnabled.value
-      }
-
-      const toggleColDrag = () => {
-        colDragEnabled.value = !colDragEnabled.value
-      }
-
-      const handleEdit = (row) => {
-        alert(`编辑行: ${row.name}`)
-      }
-
-      const handleDelete = (row) => {
-        if (confirm(`确定要删除 ${row.name} 吗？`)) {
-          tableData.value = tableData.value.filter((item) => item.id !== row.id)
-        }
-      }
-
-      return {
-        args,
-        tableData,
-        tableColumns,
-        rowDragEnabled,
-        colDragEnabled,
-        addRow,
-        toggleRowDrag,
-        toggleColDrag,
-        handleEdit,
-        handleDelete,
-      }
-    },
-    template: `
-      <div style="padding: 20px;">
-        <h3>可交互演示</h3>
-        <div style="margin-bottom: 20px; display: flex; gap: 10px;">
-          <ElButton @click="addRow">添加行</ElButton>
-          <ElButton @click="toggleRowDrag">{{ rowDragEnabled ? '禁用行拖拽' : '启用行拖拽' }}</ElButton>
-          <ElButton @click="toggleColDrag">{{ colDragEnabled ? '禁用列拖拽' : '启用列拖拽' }}</ElButton>
-        </div>
-
-        <DraggableTable
-          v-model="tableData"
-          :columns="tableColumns"
-          :rowdragable="rowDragEnabled"
-          :columndragable="colDragEnabled"
-          editable
-          filterable
-          :height="400"
-          id="interactive-table"
-        >
-          <template #actions="{ row }">
-            <ElButton type="primary" size="small" @click="handleEdit(row)">编辑</ElButton>
-            <ElButton type="danger" size="small" @click="handleDelete(row)">删除</ElButton>
-          </template>
-        </DraggableTable>
-      </div>
-    `,
-  }),
-  args: {
-    // Interactive示例使用内部状态控制，这里不需要额外的args
-  },
+export const draggableTable: Story = Template.bind({})
+draggableTable.args = {
+  id: 'example-table',
+  rowdragable: true,
+  columndragable: true,
+  editable: true,
+  filterable: true,
+  border: true,
+  showOverflow: true,
+  autoResize: true,
 }

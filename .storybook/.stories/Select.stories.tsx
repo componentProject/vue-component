@@ -1,21 +1,37 @@
-import Select from '../../src/components/Select/index.vue'
-import type { Meta, StoryFn } from '@storybook/vue3'
+// noinspection JSUnusedGlobalSymbols
+
+import type { Meta, StoryFn, StoryObj } from '@storybook/vue3'
+import Select from '@/components/Select/index.vue'
 import { ref } from 'vue'
 
-const meta: Meta<any> = {
+// 定义元数据
+const meta: Meta<typeof Select> = {
   title: 'Select',
   component: Select,
   tags: ['autodocs'],
-  argTypes: {},
+  argTypes: {
+    options: {
+      description: '下拉选项数据',
+      control: 'object',
+    },
+    label: {
+      description: '选项标签字段名',
+      control: 'text',
+    },
+    value: {
+      description: '选项值字段名',
+      control: 'text',
+    },
+  },
 }
 
 export default meta
+type Story = StoryObj<typeof Select>
 
-export const Basic: StoryFn = () => ({
+const Template: StoryFn = (args) => ({
   components: { Select },
   setup() {
     const value = ref('')
-
     const data = [
       { name: '测试1', age: '12' },
       { name: '测试2', age: '13' },
@@ -23,18 +39,13 @@ export const Basic: StoryFn = () => ({
       { name: '测试4', age: '15' },
     ]
 
-    const handleChange = (val) => {
-      value.value = val
-    }
-
-    return { data, value, handleChange }
+    return { args, value, data }
   },
-  template: `
-    <div style="width: 300px;">
-      <Select :options="data" @change="handleChange" label="name" value="age" />
-      <div style="margin-top: 16px;">
-        <span>选中值: {{ value }}</span>
-      </div>
-    </div>
-  `,
+  template: '<Select v-bind="args" :options="data" />',
 })
+
+export const select: Story = Template.bind({})
+select.args = {
+  label: 'name',
+  value: 'age',
+}

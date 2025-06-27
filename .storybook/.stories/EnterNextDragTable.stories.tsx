@@ -1,19 +1,32 @@
-import EnterNextDragTable from '../../src/components/EnterNextDragTable/index.vue'
-import type { Meta, StoryFn } from '@storybook/vue3'
-import { ref } from 'vue'
-import { ElButton, ElMessage } from 'element-plus'
+// noinspection JSUnusedGlobalSymbols
 
-const meta: Meta<any> = {
+import type { Meta, StoryFn, StoryObj } from '@storybook/vue3'
+import EnterNextDragTable from '@/components/EnterNextDragTable/index.vue'
+import { ref } from 'vue'
+import { ElMessage, ElInput, ElButton } from 'element-plus'
+
+// 定义元数据
+const meta: Meta<typeof EnterNextDragTable> = {
   title: 'EnterNextDragTable',
   component: EnterNextDragTable,
   tags: ['autodocs'],
-  argTypes: {},
+  argTypes: {
+    modelValue: {
+      description: '表格数据',
+      control: false,
+    },
+    // allowSelectNextInEmpty: {
+    //   description: '是否允许在select没有选中值时跳转',
+    //   control: 'boolean',
+    // }
+  },
 }
 
 export default meta
+type Story = StoryObj<typeof EnterNextDragTable>
 
-export const Basic: StoryFn = () => ({
-  components: { EnterNextDragTable, ElButton },
+const Template: StoryFn = (args) => ({
+  components: { EnterNextDragTable, ElInput, ElButton },
   setup() {
     // 定义表格数据
     const tableData = ref([
@@ -52,7 +65,7 @@ export const Basic: StoryFn = () => ({
     ]
 
     // 处理在最后一个输入框按下Enter的情况
-    const handleNoNextInput = ({ row, rowIndex }) => {
+    const handleNoNextInput = ({ rowIndex }) => {
       ElMessage.info(`在最后一个输入框按下了Enter，当前行：${rowIndex + 1}`)
     }
 
@@ -70,7 +83,7 @@ export const Basic: StoryFn = () => ({
       })
     }
 
-    return { tableData, columns, handleNoNextInput, addRow }
+    return { tableData, columns, args, handleNoNextInput, addRow }
   },
   template: `
     <div style="width: 600px;">
@@ -79,10 +92,22 @@ export const Basic: StoryFn = () => ({
         v-model="tableData"
         :columns="columns"
         editable
-        dragable
         @no-next-input="handleNoNextInput"
         style="height: 200px;"
-      />
+        v-bind="args"
+      >
+        <template #name="{ row,column }">
+          <ElInput v-model="row[column.field]" />
+        </template>
+        <template #age="{ row,column }">
+          <ElInput v-model="row[column.field]" />
+        </template>
+      </EnterNextDragTable>
     </div>
   `,
 })
+
+export const enterNextDragTable: Story = Template.bind({})
+enterNextDragTable.args = {
+  allowSelectNextInEmpty: false,
+}

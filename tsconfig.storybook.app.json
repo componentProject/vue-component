@@ -1,15 +1,31 @@
 {
-  "extends": "@vue/tsconfig/tsconfig.dom.json",
-  "include": [".storybook/**/*"],
-  "exclude": [".storybook/main.ts"],
   "compilerOptions": {
-    "jsx": "preserve",
+    "target": "ES2020",
+    "module": "ESNext",
+    "useDefineForClassFields": true,
     "lib": ["ESNext", "DOM", "DOM.Iterable"],
-    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
-    "noImplicitAny": false,
-    "baseUrl": "./",
+    "skipLibCheck": true,
+    //Path Alias
+    "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
-    }
-  }
+    },
+    /* Bundler mode */
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "isolatedModules": true,
+    "moduleDetection": "force",
+    "noEmit": true,
+    "jsx": "react-jsx",
+    /* Linting */
+    "noImplicitAny": false,
+    "strict": true,
+    "allowJs": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "allowSyntheticDefaultImports": true
+  },
+  "include": [".storybook/.stories/**/*", ".storybook/.stories/**/*.tsx"],
+  "exclude": [".storybook/main.ts"]
 }

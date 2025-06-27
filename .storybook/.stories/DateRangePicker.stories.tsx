@@ -1,5 +1,7 @@
+// noinspection JSUnusedGlobalSymbols
+
 import type { Meta, StoryFn, StoryObj } from '@storybook/vue3'
-import DateRangePicker from '../../src/components/DateRangePicker/index.vue'
+import DateRangePicker from '@/components/DateRangePicker/index.vue'
 
 // 定义元数据
 const meta: Meta<typeof DateRangePicker> = {
@@ -71,7 +73,7 @@ const meta: Meta<typeof DateRangePicker> = {
       control: 'text',
     },
     modelValue: {
-      control: 'disabled',
+      control: false,
     },
   },
 }
@@ -88,7 +90,7 @@ const Template: StoryFn = (args) => ({
 })
 
 export const dateRangePicker: Story = Template.bind({})
-dateRangePicker.args = {
+const props: any = {
   type: 'date',
   format: 'YYYY-MM-DD',
   valueFormat: 'YYYY-MM-DD HH:mm:ss',
@@ -107,3 +109,4 @@ dateRangePicker.args = {
   dateRangeBaseDate: '',
   modelValue: [],
 }
+dateRangePicker.args = props
