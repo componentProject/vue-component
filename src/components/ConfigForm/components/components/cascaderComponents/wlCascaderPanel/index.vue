@@ -1,16 +1,7 @@
-<template>
-  <el-cascader-panel v-if="show" v-model="computedModel" v-bind="Options" v-on="Event">
-    <!-- default自定义备选项的节点内容，参数为 { node, data }，分别为当前节点的 Node 对象和数据-->
-    <template v-if="slots.default" #default="scope">
-      <slot name="default" v-bind="scope" />
-    </template>
-  </el-cascader-panel>
-</template>
-
 <script setup lang="ts">
-import { ref, watch, computed } from 'vue'
+import type { configType, FormModelProps } from '@/components/ConfigForm/types'
+import { computed, ref, watch } from 'vue'
 import { isType } from '@/components/ConfigForm/utils'
-import type { FormModelProps, configType } from '@/components/ConfigForm/types'
 
 const props = withDefaults(
   defineProps<{
@@ -53,5 +44,14 @@ watch(
   { immediate: true, deep: true },
 )
 </script>
+
+<template>
+  <el-cascader-panel v-if="show" v-model="computedModel" v-bind="Options" v-on="Event">
+    <!-- default自定义备选项的节点内容，参数为 { node, data }，分别为当前节点的 Node 对象和数据 -->
+    <template v-if="slots.default" #default="scope">
+      <slot name="default" v-bind="scope" />
+    </template>
+  </el-cascader-panel>
+</template>
 
 <style scoped lang="scss"></style>

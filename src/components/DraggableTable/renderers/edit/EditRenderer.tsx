@@ -1,11 +1,11 @@
-import { computed, defineComponent, ref, watch } from 'vue'
-import { getMomentIsValidIsNoNum, detectDateFormatByReplace } from '@/components/_utils'
-import type { objType } from '@/components/_types'
-import Select from '@/components/Select/index.vue'
-import DateRangePicker from '@/components/DateRangePicker/index.vue'
-import { ElInput } from 'element-plus'
 import type { PropType } from 'vue'
-import type { VxeTableDefines, VxeGlobalRendererHandles } from 'vxe-table'
+import type { VxeGlobalRendererHandles, VxeTableDefines } from 'vxe-table'
+import type { objType } from '@/components/_types'
+import { ElInput } from 'element-plus'
+import { computed, defineComponent, ref, watch } from 'vue'
+import { detectDateFormatByReplace, getMomentIsValidIsNoNum } from '@/components/_utils'
+import DateRangePicker from '@/components/DateRangePicker/index.vue'
+import Select from '@/components/Select/index.vue'
 
 export default defineComponent({
   name: 'EditRenderer',
@@ -24,7 +24,8 @@ export default defineComponent({
 
     const load = () => {
       const { renderParams } = props
-      if (!renderParams) return
+      if (!renderParams)
+        return
       const { row, column } = renderParams
       currRow.value = row
       currColumn.value = column
@@ -33,7 +34,8 @@ export default defineComponent({
       immediate: true,
     })
     const currentValue = computed<any>(() => {
-      if (!currColumn.value || !currRow.value) return
+      if (!currColumn.value || !currRow.value)
+        return
       return currRow.value[currColumn.value.field]
     })
     const propsOptions = computed(() => renderOptsProps.value.options)
@@ -51,8 +53,7 @@ export default defineComponent({
             {...renderOptsProps.value}
             modelValue={currRow.value[currColumn.value.field]}
             onUpdate:modelValue={(val: string[]) =>
-              (currRow.value[currColumn.value.field] = val[0])
-            }
+              (currRow.value[currColumn.value.field] = val[0])}
           />
         )
       )

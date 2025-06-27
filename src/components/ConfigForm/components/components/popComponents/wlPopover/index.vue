@@ -8,27 +8,18 @@
  *
  * Copyright (c) 2025 by ${git_name_email}, All Rights Reserved.
 -->
-<template>
-  <el-popover v-bind="options" v-on="event">
-    <!--  — Popover 内嵌 HTML 文本-->
-    <template v-if="slots.default" #default>
-      <slot name="default" />
-    </template>
-    <!-- reference 触发 Popover 显示的 HTML 元素-->
-    <template #reference>
-      <slot name="reference" />
-    </template>
-  </el-popover>
-</template>
-
 <script setup lang="ts">
-import { withDefaults, watch, ref } from 'vue'
-import type { ComponentPropsType, configType } from '@/components/ConfigForm/types'
+import type { configType } from '@/components/ConfigForm/types'
+import { ref, watch, withDefaults } from 'vue'
 
 interface Props {
   slots?: Record<string, any>
   config: configType
 }
+
+defineOptions({
+  name: 'WlPopover',
+})
 
 const props = withDefaults(defineProps<Props>(), {
   slots: () => ({}),
@@ -54,10 +45,19 @@ watch(
   },
   { immediate: true, deep: true },
 )
-
-defineOptions({
-  name: 'wlPopover',
-})
 </script>
+
+<template>
+  <el-popover v-bind="options" v-on="event">
+    <!--  — Popover 内嵌 HTML 文本 -->
+    <template v-if="slots.default" #default>
+      <slot name="default" />
+    </template>
+    <!-- reference 触发 Popover 显示的 HTML 元素 -->
+    <template #reference>
+      <slot name="reference" />
+    </template>
+  </el-popover>
+</template>
 
 <style scoped lang="scss"></style>

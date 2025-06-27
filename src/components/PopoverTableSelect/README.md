@@ -21,7 +21,7 @@
   :columns="columns"
   :data="tableData"
   @select="handleSelect"
-  @row-click="handleRowClick"
+  @rowClick="handleRowClick"
 />
 ```
 
@@ -37,10 +37,10 @@
 
 ## 事件
 
-| 事件名    | 说明             | 回调参数          |
-| --------- | ---------------- | ----------------- |
-| select    | 回车选中行时触发 | row（当前行数据） |
-| row-click | 点击行时触发     | row（当前行数据） |
+| 事件名   | 说明             | 回调参数          |
+| -------- | ---------------- | ----------------- |
+| select   | 回车选中行时触发 | row（当前行数据） |
+| rowClick | 点击行时触发     | row（当前行数据） |
 
 ## 依赖
 

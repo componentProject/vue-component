@@ -1,3 +1,4 @@
+import type { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios'
 /*
  * @Author: moluoxixi 1983531544@qq.com
  * @Date: 2025-05-09 08:53:16
@@ -9,7 +10,7 @@
  * Copyright (c) 2025 by ${git_name_email}, All Rights Reserved.
  */
 import axios from 'axios'
-import type { AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios'
+import { addSign } from '@/utils/modules/his6.0'
 
 export class BaseApi {
   protected baseURL: string
@@ -25,6 +26,7 @@ export class BaseApi {
     // 请求拦截器
     this.instance.interceptors.request.use(
       (config) => {
+        addSign(config)
         return config
       },
       (error: AxiosError) => {

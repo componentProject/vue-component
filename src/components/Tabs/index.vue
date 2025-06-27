@@ -1,26 +1,3 @@
-<template>
-  <div class="height-100">
-    <el-tabs
-      v-model="activeName"
-      type="border-card"
-      :class="props.tabCard && 'tabs-card'"
-      @tab-change="handleTabChange"
-    >
-      <template v-for="item in props.tabList">
-        <el-tab-pane
-          style="height: 100%"
-          v-if="item.show ? item.show(item) : true"
-          :label="item.label"
-          :name="item.id"
-          :lazy="item.lazy"
-          :key="item.id"
-        >
-          <slot :name="item.slot || item.label"></slot>
-        </el-tab-pane>
-      </template>
-    </el-tabs>
-  </div>
-</template>
 <script setup lang="ts">
 const props = defineProps({
   tabCard: {
@@ -38,13 +15,36 @@ const props = defineProps({
     default: () => [],
   },
 })
+const emits = defineEmits(['tabChange'])
 const activeName = defineModel({ default: '1', type: String })
-const emits = defineEmits(['tab-change'])
-
 function handleTabChange(val: any) {
-  emits('tab-change', val)
+  emits('tabChange', val)
 }
 </script>
+
+<template>
+  <div class="height-100">
+    <el-tabs
+      v-model="activeName"
+      type="border-card"
+      :class="props.tabCard && 'tabs-card'"
+      @tab-change="handleTabChange"
+    >
+      <template v-for="item in props.tabList">
+        <el-tab-pane
+          v-if="item.show ? item.show(item) : true"
+          :key="item.id"
+          style="height: 100%"
+          :label="item.label"
+          :name="item.id"
+          :lazy="item.lazy"
+        >
+          <slot :name="item.slot || item.label" />
+        </el-tab-pane>
+      </template>
+    </el-tabs>
+  </div>
+</template>
 
 <style scoped lang="scss">
 .tabs-card {

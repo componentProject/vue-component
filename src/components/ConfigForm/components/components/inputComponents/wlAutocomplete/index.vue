@@ -1,31 +1,7 @@
-<template>
-  <el-autocomplete v-if="show" v-model="computedModel" v-bind="Options" v-on="Event">
-    <!-- prefix 输入框头部内容，只对 type="text" 有效-->
-    <template v-if="slots.default" #default="scope">
-      <slot name="default" v-bind="scope" />
-    </template>
-    <template v-if="slots.prefix" #prefix>
-      <slot name="prefix" />
-    </template>
-    <!-- suffix 输入框尾部内容，只对 type="text" 有效-->
-    <template v-if="slots.suffix" #suffix>
-      <slot name="suffix" />
-    </template>
-    <!-- prepend 输入框前置内容，只对 type="text" 有效-->
-    <template v-if="slots.prepend" #prepend>
-      <slot name="prepend" />
-    </template>
-    <!-- append 输入框后置内容，只对 type="text" 有效-->
-    <template v-if="slots.append" #append>
-      <slot name="append" />
-    </template>
-  </el-autocomplete>
-</template>
-
 <script setup lang="ts">
-import { ref, watch, computed } from 'vue'
+import type { configType, FormModelProps } from '@/components/ConfigForm/types'
+import { computed, ref, watch } from 'vue'
 import { isType } from '@/components/ConfigForm/utils'
-import type { FormModelProps, configType } from '@/components/ConfigForm/types'
 
 const props = withDefaults(
   defineProps<{
@@ -68,5 +44,29 @@ watch(
   { immediate: true, deep: true },
 )
 </script>
+
+<template>
+  <el-autocomplete v-if="show" v-model="computedModel" v-bind="Options" v-on="Event">
+    <!-- prefix 输入框头部内容，只对 type="text" 有效 -->
+    <template v-if="slots.default" #default="scope">
+      <slot name="default" v-bind="scope" />
+    </template>
+    <template v-if="slots.prefix" #prefix>
+      <slot name="prefix" />
+    </template>
+    <!-- suffix 输入框尾部内容，只对 type="text" 有效 -->
+    <template v-if="slots.suffix" #suffix>
+      <slot name="suffix" />
+    </template>
+    <!-- prepend 输入框前置内容，只对 type="text" 有效 -->
+    <template v-if="slots.prepend" #prepend>
+      <slot name="prepend" />
+    </template>
+    <!-- append 输入框后置内容，只对 type="text" 有效 -->
+    <template v-if="slots.append" #append>
+      <slot name="append" />
+    </template>
+  </el-autocomplete>
+</template>
 
 <style scoped lang="scss"></style>

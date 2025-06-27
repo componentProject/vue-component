@@ -26,7 +26,7 @@
 //
 // //#endregion
 
-//#region vite下
+// #region vite下
 
 import type { ComponentsType } from '@/components/ConfigForm/types'
 
@@ -37,5 +37,5 @@ const components: ComponentsType = Object.keys(componentFiles).reduce((modules, 
   if (value && name) modules[name] = value
   return modules
 }, {})
-//#endregion
+// #endregion
 export default components

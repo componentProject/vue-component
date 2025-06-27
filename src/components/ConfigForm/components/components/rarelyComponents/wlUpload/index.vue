@@ -1,18 +1,11 @@
-<template>
-  <el-upload v-if="show" v-bind="Options" v-on="Event">
-    <slot name="default">
-      <el-button>点击上传</el-button>
-    </slot>
-    <template v-if="slots.tip" #tip>
-      <slot name="tip"></slot>
-    </template>
-  </el-upload>
-</template>
-
 <script setup lang="ts">
+import type { configType, FormModelProps } from '@/components/ConfigForm/types'
 import { ref, watch } from 'vue'
 import { isType } from '@/components/ConfigForm/utils'
-import type { FormModelProps, configType } from '@/components/ConfigForm/types'
+
+defineOptions({
+  name: 'WlUpload',
+})
 
 const props = withDefaults(
   defineProps<{
@@ -26,10 +19,6 @@ const props = withDefaults(
     config: () => ({}),
   },
 )
-
-defineOptions({
-  name: 'WlUpload',
-})
 
 const show = ref(true)
 const Event = ref({})
@@ -48,5 +37,16 @@ watch(
   { immediate: true, deep: true },
 )
 </script>
+
+<template>
+  <el-upload v-if="show" v-bind="Options" v-on="Event">
+    <slot name="default">
+      <el-button>点击上传</el-button>
+    </slot>
+    <template v-if="slots.tip" #tip>
+      <slot name="tip" />
+    </template>
+  </el-upload>
+</template>
 
 <style scoped lang="scss"></style>

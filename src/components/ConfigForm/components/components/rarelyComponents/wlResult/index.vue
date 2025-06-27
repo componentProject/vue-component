@@ -1,24 +1,7 @@
-<template>
-  <el-result v-if="show" v-bind="Options" v-on="Event">
-    <template v-if="slots.icon" #icon>
-      <slot name="icon" />
-    </template>
-    <template v-if="slots.title" #title>
-      <slot name="title" />
-    </template>
-    <template v-if="slots.subTitle" #subTitle>
-      <slot name="subTitle" />
-    </template>
-    <template v-if="slots.extra" #extra>
-      <slot name="extra" />
-    </template>
-  </el-result>
-</template>
-
 <script setup lang="ts">
+import type { configType, FormModelProps } from '@/components/ConfigForm/types'
 import { ref, watch } from 'vue'
 import { isType } from '@/components/ConfigForm/utils'
-import type { FormModelProps, configType } from '@/components/ConfigForm/types'
 
 const props = withDefaults(
   defineProps<{
@@ -54,5 +37,22 @@ watch(
   { immediate: true, deep: true },
 )
 </script>
+
+<template>
+  <el-result v-if="show" v-bind="Options" v-on="Event">
+    <template v-if="slots.icon" #icon>
+      <slot name="icon" />
+    </template>
+    <template v-if="slots.title" #title>
+      <slot name="title" />
+    </template>
+    <template v-if="slots.subTitle" #subTitle>
+      <slot name="subTitle" />
+    </template>
+    <template v-if="slots.extra" #extra>
+      <slot name="extra" />
+    </template>
+  </el-result>
+</template>
 
 <style scoped lang="scss"></style>

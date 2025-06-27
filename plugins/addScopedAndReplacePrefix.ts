@@ -28,9 +28,12 @@ export default function addScopedAndReplacePrefixPlugin({
       isProduction = config.command === 'build' || config.isProduction
     },
     transform(code = '', id = '') {
-      if (!isProduction && !useDevMode) return code
-      if (!oldPrefix || !newPrefix) return code
-      if (id.includes('node_modules')) return code
+      if (!isProduction && !useDevMode)
+        return code
+      if (!oldPrefix || !newPrefix)
+        return code
+      if (id.includes('node_modules'))
+        return code
 
       const cssLangs = ['css', 'scss', 'less', 'stylus', 'styl']
       let newCode = code
@@ -38,7 +41,7 @@ export default function addScopedAndReplacePrefixPlugin({
         newCode = changeHtmlClassPrefix(newCode, oldPrefix, newPrefix)
       }
       // else if (id.includes('.vue') && id.includes('scoped')) {
-      else if (cssLangs.some((lang) => id.endsWith(`.${lang}`))) {
+      else if (cssLangs.some(lang => id.endsWith(`.${lang}`))) {
         if (oldPrefix && newPrefix) {
           newCode = changeSelectorPrefix(newCode, oldPrefix, newPrefix)
         }

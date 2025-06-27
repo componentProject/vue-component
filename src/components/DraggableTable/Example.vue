@@ -1,70 +1,6 @@
-<template>
-  <div class="draggable-table-demo">
-    <h2>可拖拽表格演示</h2>
-    <div class="demo-actions">
-      <el-button @click="addRow">添加行</el-button>
-      <el-button @click="rowdragable = !rowdragable"
-        >{{ rowdragable ? '禁用行拖拽' : '启用行拖拽' }}
-      </el-button>
-      <el-button @click="columndragable = !columndragable"
-        >{{ columndragable ? '禁用列拖拽' : '启用列拖拽' }}
-      </el-button>
-
-      <el-button @click="editable = !editable"
-        >{{ editable ? '禁用编辑' : '启用编辑(与cellRender互斥)' }}
-      </el-button>
-
-      <el-button @click="filterable = !filterable"
-        >{{ filterable ? '禁用过滤' : '启用过滤' }}
-      </el-button>
-
-      <el-button @click="sortable = !sortable">{{ sortable ? '禁用排序' : '启用排序' }} </el-button>
-
-      <div class="flex items-center">
-        <span class="mr-8!">扩展type选择：</span>
-        <el-select
-          class="w-[200px]!"
-          v-model="cellType"
-          value-key="type"
-          placeholder="请选择"
-          @change="changeCellType"
-        >
-          <el-option
-            v-for="item in cellTypeList"
-            :key="item.label"
-            :label="item.label"
-            :value="item.value"
-          />
-        </el-select>
-      </div>
-    </div>
-
-    <!-- 使用DraggableTable组件 -->
-    <DraggableTable
-      ref="draggableTableRef"
-      v-model="tableData"
-      :columns="columns"
-      :loading="loading"
-      :height="500"
-      id="demo_table"
-      :rowdragable="rowdragable"
-      :columndragable="columndragable"
-      :editable="editable"
-      :filterable="filterable"
-      :sortable="sortable"
-    >
-      <!-- 自定义操作列插槽 -->
-      <template #aaa="{ row }">
-        <el-button type="primary" size="small" @click="handleEdit(row)">编辑</el-button>
-        <el-button type="danger" size="small" @click="handleDelete(row)">删除</el-button>
-      </template>
-    </DraggableTable>
-  </div>
-</template>
-
 <script setup>
-import { ref, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import { onMounted, ref } from 'vue'
 import DraggableTable from './index.vue'
 
 // 表格加载状态
@@ -236,7 +172,6 @@ const cellTypeList = ref([
 ])
 
 function changeCellType(type) {
-  console.log('type', type)
   const item = columns.value.at(-2)
   columns.value[columns.value.length - 2] = {
     ...item,
@@ -254,9 +189,9 @@ onMounted(() => {
 })
 
 // 添加新行
-const addRow = () => {
-  const newId =
-    tableData.value.length > 0 ? Math.max(...tableData.value.map((item) => item.id)) + 1 : 1
+function addRow() {
+  const newId
+    = tableData.value.length > 0 ? Math.max(...tableData.value.map(item => item.id)) + 1 : 1
 
   const newRow = {
     id: newId,
@@ -274,21 +209,21 @@ const addRow = () => {
 }
 
 // 编辑行
-const handleEdit = (row) => {
+function handleEdit(row) {
   ElMessageBox.alert(`正在编辑: ${row.name}`, '编辑', {
     confirmButtonText: '确定',
   })
 }
 
 // 删除行
-const handleDelete = (row) => {
+function handleDelete(row) {
   ElMessageBox.confirm(`确定要删除 ${row.name} 吗?`, '警告', {
     confirmButtonText: '确定',
     cancelButtonText: '取消',
     type: 'warning',
   })
     .then(() => {
-      tableData.value = tableData.value.filter((item) => item.id !== row.id)
+      tableData.value = tableData.value.filter(item => item.id !== row.id)
       ElMessage.success('删除成功')
     })
     .catch(() => {
@@ -296,6 +231,78 @@ const handleDelete = (row) => {
     })
 }
 </script>
+
+<template>
+  <div class="draggable-table-demo">
+    <h2>可拖拽表格演示</h2>
+    <div class="demo-actions">
+      <el-button @click="addRow">
+        添加行
+      </el-button>
+      <el-button @click="rowdragable = !rowdragable">
+        {{ rowdragable ? '禁用行拖拽' : '启用行拖拽' }}
+      </el-button>
+      <el-button @click="columndragable = !columndragable">
+        {{ columndragable ? '禁用列拖拽' : '启用列拖拽' }}
+      </el-button>
+
+      <el-button @click="editable = !editable">
+        {{ editable ? '禁用编辑' : '启用编辑(与cellRender互斥)' }}
+      </el-button>
+
+      <el-button @click="filterable = !filterable">
+        {{ filterable ? '禁用过滤' : '启用过滤' }}
+      </el-button>
+
+      <el-button @click="sortable = !sortable">
+        {{ sortable ? '禁用排序' : '启用排序' }}
+      </el-button>
+
+      <div class="flex items-center">
+        <span class="mr-8!">扩展type选择：</span>
+        <el-select
+          v-model="cellType"
+          class="w-[200px]!"
+          value-key="type"
+          placeholder="请选择"
+          @change="changeCellType"
+        >
+          <el-option
+            v-for="item in cellTypeList"
+            :key="item.label"
+            :label="item.label"
+            :value="item.value"
+          />
+        </el-select>
+      </div>
+    </div>
+
+    <!-- 使用DraggableTable组件 -->
+    <DraggableTable
+      id="demo_table"
+      ref="draggableTableRef"
+      v-model="tableData"
+      :columns="columns"
+      :loading="loading"
+      :height="500"
+      :rowdragable="rowdragable"
+      :columndragable="columndragable"
+      :editable="editable"
+      :filterable="filterable"
+      :sortable="sortable"
+    >
+      <!-- 自定义操作列插槽 -->
+      <template #aaa="{ row }">
+        <el-button type="primary" size="small" @click="handleEdit(row)">
+          编辑
+        </el-button>
+        <el-button type="danger" size="small" @click="handleDelete(row)">
+          删除
+        </el-button>
+      </template>
+    </DraggableTable>
+  </div>
+</template>
 
 <style scoped>
 .draggable-table-demo {

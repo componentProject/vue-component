@@ -3,7 +3,7 @@ import { store } from '../index.ts'
 
 /**
  * 系统对象
- * @returns {Object} 系统存储对象
+ * @returns {object} 系统存储对象
  */
 const systemStore = defineStore('system', {
   state: () => ({

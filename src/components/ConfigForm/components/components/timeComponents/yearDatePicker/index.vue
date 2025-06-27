@@ -1,105 +1,6 @@
-<template>
-  <div class="yearPicker" ref="yearPicker" :style="{ width: width + 'px' }">
-    <div class="_inner labelText" :style="{ width: labelWidth + 'px' }">{{ labelText }}</div>
-    <input
-      class="_inner"
-      ref="inputLeft"
-      v-model="startShowYear"
-      @focus="onFocus"
-      type="text"
-      @click="clickInput"
-      name="yearInput"
-      @input="checkStartInput"
-      placeholder="选择年份"
-    />
-    <span>{{ sp }}</span>
-    <input
-      class="_inner"
-      ref="inputRight"
-      v-model="endShowYear"
-      @focus="onFocus"
-      type="text"
-      @click="clickInput"
-      name="yearInput"
-      @input="checkEndInput"
-      placeholder="选择年份"
-    />
-    <div class="_inner floatPanel" v-if="showPanel">
-      <div class="_inner leftPanel">
-        <div class="_inner panelHead">
-          <i class="_inner el-icon-d-arrow-left" @click="onClickLeft"></i>
-          {{ leftYearList[0] + '-' + leftYearList[9] }}
-        </div>
-        <div class="_inner panelContent">
-          <div
-            v-for="item in leftYearList"
-            :class="{
-              disabled: checkValidYear(item) !== 0,
-              oneSelected: item === startYear && oneSelected,
-              startSelected: item === startYear,
-              endSelected: item === endYear,
-              _inner: true,
-              betweenSelected: item > startYear && item < endYear,
-            }"
-            :key="item"
-          >
-            <a
-              :class="{
-                cell: true,
-                _inner: true,
-                selected: item === startYear || item === endYear,
-              }"
-              @click="onClickItem(item)"
-              @mouseover="onHoverItem(item)"
-            >
-              {{ item }}
-            </a>
-          </div>
-        </div>
-      </div>
-      <div class="_inner rightPanel">
-        <div class="_inner panelHead">
-          <i class="_inner el-icon-d-arrow-right" @click="onClickRight"></i>
-          {{ rightYearList[0] + '-' + rightYearList[9] }}
-        </div>
-        <div class="_inner panelContent">
-          <div
-            :class="{
-              disabled: checkValidYear(item) !== 0,
-              startSelected: item === startYear,
-              endSelected: item === endYear,
-              betweenSelected: item > startYear && item < endYear,
-            }"
-            v-for="item in rightYearList"
-            :key="item"
-          >
-            <a
-              :class="{
-                cell: true,
-                _inner: true,
-                selected: item === endYear || item === startYear,
-              }"
-              @click="onClickItem(item)"
-              @mouseover="onHoverItem(item)"
-            >
-              {{ item }}
-            </a>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</template>
-
 <script setup lang="ts">
-import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { isType } from '@/components/ConfigForm/utils'
-
-enum SELECT_STATE {
-  UNSELECT,
-  SELECTING,
-  SELECTED,
-}
 
 const props = defineProps<{
   width?: number
@@ -118,6 +19,12 @@ const emit = defineEmits<{
   (e: 'change', value: [string, string]): void
   (e: 'update:model', value: Record<string, any>): void
 }>()
+
+enum SELECT_STATE {
+  UNSELECT,
+  SELECTING,
+  SELECTED,
+}
 
 const yearPicker = ref<HTMLElement | null>(null)
 const inputLeft = ref<HTMLInputElement | null>(null)
@@ -159,8 +66,8 @@ watch(
   () => props.value,
   (newValue) => {
     const [start, end] = newValue
-    startYear.value = parseInt(start)
-    endYear.value = parseInt(end)
+    startYear.value = Number.parseInt(start)
+    endYear.value = Number.parseInt(end)
   },
 )
 
@@ -177,7 +84,7 @@ watch(
   { immediate: true, deep: true },
 )
 
-const checkStartInput = () => {
+function checkStartInput() {
   if (isNaN(Number(startShowYear.value))) {
     startShowYear.value = startYear.value?.toString() || null
   } else {
@@ -185,7 +92,7 @@ const checkStartInput = () => {
   }
 }
 
-const checkEndInput = () => {
+function checkEndInput() {
   if (isNaN(Number(endShowYear.value))) {
     endShowYear.value = endYear.value?.toString() || null
   } else {
@@ -193,7 +100,7 @@ const checkEndInput = () => {
   }
 }
 
-const changeYear = () => {
+function changeYear() {
   if (startYear.value && endYear.value && startYear.value > endYear.value) {
     const tmp = endYear.value
     endYear.value = startYear.value
@@ -220,7 +127,7 @@ const changeYear = () => {
   }
 }
 
-const onHoverItem = (iYear: number) => {
+function onHoverItem(iYear: number) {
   if (checkValidYear(iYear) !== 0) {
     return
   }
@@ -231,14 +138,14 @@ const onHoverItem = (iYear: number) => {
   }
 }
 
-const checkValidYear = (year: number): number => {
+function checkValidYear(year: number): number {
   if (!props.initYear) return 0
   if (year < props.initYear.startYear) return -1
   if (year > props.initYear.endYear) return 1
   return 0
 }
 
-const onClickItem = (iYear: number) => {
+function onClickItem(iYear: number) {
   if (checkValidYear(iYear) !== 0) return
 
   if (curState.value === SELECT_STATE.UNSELECT) {
@@ -253,29 +160,29 @@ const onClickItem = (iYear: number) => {
   }
 }
 
-const onClickLeft = () => {
+function onClickLeft() {
   const firstYear = yearList.value[0]
   yearList.value = Array.from({ length: 20 }, (_, i) => firstYear - 20 + i)
 }
 
-const onClickRight = () => {
+function onClickRight() {
   const lastYear = yearList.value[yearList.value.length - 1]
   yearList.value = Array.from({ length: 20 }, (_, i) => lastYear + 1 + i)
 }
 
-const onFocus = () => {
+function onFocus() {
   showPanel.value = true
   const currentYear = new Date().getFullYear()
   yearList.value = Array.from({ length: 20 }, (_, i) => currentYear - 10 + i)
   curState.value = SELECT_STATE.UNSELECT
 }
 
-const clickInput = () => {
+function clickInput() {
   showPanel.value = true
 }
 
 // Close panel when clicking outside
-const handleClickOutside = (event: MouseEvent) => {
+function handleClickOutside(event: MouseEvent) {
   const target = event.target as HTMLElement
   if (yearPicker.value && !yearPicker.value.contains(target)) {
     showPanel.value = false
@@ -291,6 +198,99 @@ onUnmounted(() => {
   document.removeEventListener('click', handleClickOutside)
 })
 </script>
+
+<template>
+  <div ref="yearPicker" class="yearPicker" :style="{ width: `${width}px` }">
+    <div class="_inner labelText" :style="{ width: `${labelWidth}px` }">
+      {{ labelText }}
+    </div>
+    <input
+      ref="inputLeft"
+      v-model="startShowYear"
+      class="_inner"
+      type="text"
+      name="yearInput"
+      placeholder="选择年份"
+      @focus="onFocus"
+      @click="clickInput"
+      @input="checkStartInput"
+    />
+    <span>{{ sp }}</span>
+    <input
+      ref="inputRight"
+      v-model="endShowYear"
+      class="_inner"
+      type="text"
+      name="yearInput"
+      placeholder="选择年份"
+      @focus="onFocus"
+      @click="clickInput"
+      @input="checkEndInput"
+    />
+    <div v-if="showPanel" class="_inner floatPanel">
+      <div class="_inner leftPanel">
+        <div class="_inner panelHead">
+          <i class="_inner el-icon-d-arrow-left" @click="onClickLeft" />
+          {{ `${leftYearList[0]}-${leftYearList[9]}` }}
+        </div>
+        <div class="_inner panelContent">
+          <div
+            v-for="item in leftYearList"
+            :key="item"
+            class="_inner"
+            :class="{
+              disabled: checkValidYear(item) !== 0,
+              oneSelected: item === startYear && oneSelected,
+              startSelected: item === startYear,
+              endSelected: item === endYear,
+              betweenSelected: item > startYear && item < endYear,
+            }"
+          >
+            <a
+              class="cell _inner"
+              :class="{
+                selected: item === startYear || item === endYear,
+              }"
+              @click="onClickItem(item)"
+              @mouseover="onHoverItem(item)"
+            >
+              {{ item }}
+            </a>
+          </div>
+        </div>
+      </div>
+      <div class="_inner rightPanel">
+        <div class="_inner panelHead">
+          <i class="_inner el-icon-d-arrow-right" @click="onClickRight" />
+          {{ `${rightYearList[0]}-${rightYearList[9]}` }}
+        </div>
+        <div class="_inner panelContent">
+          <div
+            v-for="item in rightYearList"
+            :key="item"
+            :class="{
+              disabled: checkValidYear(item) !== 0,
+              startSelected: item === startYear,
+              endSelected: item === endYear,
+              betweenSelected: item > startYear && item < endYear,
+            }"
+          >
+            <a
+              class="cell _inner"
+              :class="{
+                selected: item === endYear || item === startYear,
+              }"
+              @click="onClickItem(item)"
+              @mouseover="onHoverItem(item)"
+            >
+              {{ item }}
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
 
 <style lang="scss" scoped>
 .yearPicker {

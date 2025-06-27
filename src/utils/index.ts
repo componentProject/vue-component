@@ -3,7 +3,8 @@ export * from './modules/modifyComponent.tsx'
 export function getType(obj: any, type?: string) {
   if (type) {
     return Object.prototype.toString.call(obj).slice(8, -1).toLowerCase() === type.toLowerCase()
-  } else {
+  }
+  else {
     return Object.prototype.toString.call(obj).slice(8, -1).toLowerCase()
   }
 }
@@ -35,7 +36,8 @@ export function cloneDeep(obj: any, map = new WeakMap()): any {
       // 递归拷贝数组中的每个元素
       clone[index] = cloneDeep(item, map)
     })
-  } else {
+  }
+  else {
     clone = {}
     map.set(obj, clone)
     for (const key in obj) {

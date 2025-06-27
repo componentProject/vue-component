@@ -25,7 +25,7 @@ api/
 
 ```typescript
 // 方法1: 使用提供的hook函数
-import { useUserService, usePatientService } from '@/api'
+import { usePatientService, useUserService } from '@/api'
 
 // 方法2: 使用服务集合
 import { services } from '@/api'
@@ -74,14 +74,17 @@ async function loadUsers() {
 
 ```typescript
 // 1. 创建数据模型 (models/example.ts)
+// 2. 创建服务类 (services/example-service.ts)
+import { BaseApi } from '@/api/utils'
+import { Example } from '../models/example'
+
+// 4. 创建实例和hook (api/index.ts)
+import { ExampleService } from './services'
+
 export interface Example {
   id: number
   name: string
 }
-
-// 2. 创建服务类 (services/example-service.ts)
-import { BaseApi } from '@/api/utils'
-import { Example } from '../models/example'
 
 export class ExampleService extends BaseApi {
   constructor() {
@@ -95,9 +98,6 @@ export class ExampleService extends BaseApi {
 
 // 3. 导出服务 (services/index.ts)
 export * from './example-service'
-
-// 4. 创建实例和hook (api/index.ts)
-import { ExampleService } from './services'
 const exampleService = new ExampleService()
 
 export function useExampleService() {

@@ -38,7 +38,7 @@ module.exports = {
   // 限制主题长度
   subjectLimit: 100,
   // // 跳过你想要的问题
-  skipQuestions: ['scope','customScope', 'body','breaking','footer'],
+  skipQuestions: ['scope', 'customScope', 'body', 'breaking', 'footer'],
   // // 定义可选范围
   // scopes: [{ name: 'accounts' }, { name: 'admin' }, { name: 'exampleScope' }, { name: 'changeMe' }],
   //
@@ -73,4 +73,4 @@ module.exports = {
   // footerPrefix : 'ISSUES CLOSED:',
   // // 是否首先询问破坏性更改，默认是false
   // askForBreakingChangeFirst : true,
-};
+}

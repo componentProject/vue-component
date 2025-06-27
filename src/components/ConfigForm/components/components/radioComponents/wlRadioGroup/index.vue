@@ -1,14 +1,7 @@
-<template>
-  <el-radio-group v-if="show" v-model="computedModel" v-bind="Options" v-on="Event">
-    <el-radio v-for="radio in radios" :key="radio.label" v-bind="radio" />
-    <el-radio-button v-for="button in buttons" :key="button.label" v-bind="button" />
-  </el-radio-group>
-</template>
-
 <script setup lang="ts">
-import { ref, watch, computed } from 'vue'
+import type { configType, FormModelProps } from '@/components/ConfigForm/types'
+import { computed, ref, watch } from 'vue'
 import { isType } from '@/components/ConfigForm/utils'
-import type { FormModelProps, configType } from '@/components/ConfigForm/types'
 
 interface RadioItem {
   label: string
@@ -17,10 +10,10 @@ interface RadioItem {
 
 const props = withDefaults(
   defineProps<{
-    prop: string
-    slots: Record<string, any>
-    model: FormModelProps
-    config: configType
+    prop?: string
+    slots?: Record<string, any>
+    model?: FormModelProps
+    config?: configType
   }>(),
   {
     prop: '',
@@ -60,5 +53,12 @@ watch(
   { immediate: true, deep: true },
 )
 </script>
+
+<template>
+  <el-radio-group v-if="show" v-model="computedModel" v-bind="Options" v-on="Event">
+    <el-radio v-for="radio in radios" :key="radio.label" v-bind="radio" />
+    <el-radio-button v-for="button in buttons" :key="button.label" v-bind="button" />
+  </el-radio-group>
+</template>
 
 <style scoped lang="scss"></style>

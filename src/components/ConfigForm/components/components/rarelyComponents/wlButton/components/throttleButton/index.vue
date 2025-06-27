@@ -1,15 +1,6 @@
-<template>
-  <el-button class="button" :loading="loading" v-bind="$attrs">
-    <template #default>
-      <span v-if="props.title">{{ props.title }}</span>
-      <slot name="default" />
-    </template>
-  </el-button>
-</template>
-
 <script setup lang="ts">
-import { ref, watch, useAttrs, onMounted } from 'vue'
 import type { configType } from '@/components/ConfigForm/types'
+import { onMounted, ref, useAttrs, watch } from 'vue'
 
 /**
  *  throttleButton
@@ -18,7 +9,7 @@ import type { configType } from '@/components/ConfigForm/types'
  *  @see https://github.com/pikax/vue-throttle-debounce
  */
 defineOptions({
-  name: 'throttleButton',
+  name: 'ThrottleButton',
 })
 
 const props = withDefaults(
@@ -58,13 +49,13 @@ const loading = ref(false)
 const asyncEventQueue = ref(new Set())
 const depValueQueue = ref(new Set())
 
-const messageHandler = (key: string) => {
+function messageHandler(key: string) {
   ElMessage.warning(props.message || props.eventConfig[key]?.message || '正在操作中,请稍后...')
 }
 
 type EventHandler = (...args: any[]) => void | Promise<void>
 
-const asyncHandler = (fn: EventHandler, key: string) => {
+function asyncHandler(fn: EventHandler, key: string) {
   return async (...args: any[]) => {
     if (props.isLoad) {
       loading.value = true
@@ -79,7 +70,7 @@ const asyncHandler = (fn: EventHandler, key: string) => {
   }
 }
 
-const depHandler = (fn: EventHandler, key: string) => {
+function depHandler(fn: EventHandler, key: string) {
   return (...args: any[]) => {
     const stopQueue: (() => void)[] = []
     const deleteDepValueHandler = () => {
@@ -99,7 +90,7 @@ const depHandler = (fn: EventHandler, key: string) => {
   }
 }
 
-const debounce = (fn: EventHandler) => {
+function debounce(fn: EventHandler) {
   let timeout: NodeJS.Timeout
   return (...args: any[]) => {
     clearTimeout(timeout)
@@ -109,7 +100,7 @@ const debounce = (fn: EventHandler) => {
   }
 }
 
-const throttle = (fn: EventHandler) => {
+function throttle(fn: EventHandler) {
   let inThrottle = false
   let timer: NodeJS.Timeout
   return (...args: any[]) => {
@@ -122,7 +113,7 @@ const throttle = (fn: EventHandler) => {
   }
 }
 
-const handleEvents = () => {
+function handleEvents() {
   const events = useAttrs()
   for (const key of Object.keys(events)) {
     const fn = events[key] as EventHandler
@@ -142,6 +133,15 @@ onMounted(() => {
   handleEvents()
 })
 </script>
+
+<template>
+  <el-button class="button" :loading="loading" v-bind="$attrs">
+    <template #default>
+      <span v-if="props.title">{{ props.title }}</span>
+      <slot name="default" />
+    </template>
+  </el-button>
+</template>
 
 <style scoped>
 .button {

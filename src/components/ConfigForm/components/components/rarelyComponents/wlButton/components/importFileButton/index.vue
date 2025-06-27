@@ -8,31 +8,12 @@
  *
  * Copyright (c) 2025 by ${git_name_email}, All Rights Reserved.
 -->
-<template>
-  <div>
-    <input
-      name="file"
-      type="file"
-      :accept="props.accept"
-      @change="fileChange"
-      ref="selectFile"
-      class="none"
-    />
-    <el-button class="button" :loading="props.loading" v-bind="attrs">
-      <template #default>
-        <span v-if="props.title">{{ props.title }}</span>
-        <slot name="default" />
-      </template>
-    </el-button>
-  </div>
-</template>
-
 <script setup lang="ts">
-import { ref, computed } from 'vue'
 import type { configType } from '@/components/ConfigForm/types'
+import { computed, ref } from 'vue'
 
 defineOptions({
-  name: 'importFileButton',
+  name: 'ImportFileButton',
 })
 
 const props = withDefaults(
@@ -66,11 +47,30 @@ const attrs = computed(() => {
   return attrs
 })
 
-const fileChange = (e: Event) => {
+function fileChange(e: Event) {
   const target = e.target as HTMLInputElement
   emit('change', target.files?.[0])
   target.value = ''
 }
 </script>
+
+<template>
+  <div>
+    <input
+      ref="selectFile"
+      name="file"
+      type="file"
+      :accept="props.accept"
+      class="none"
+      @change="fileChange"
+    />
+    <el-button class="button" :loading="props.loading" v-bind="attrs">
+      <template #default>
+        <span v-if="props.title">{{ props.title }}</span>
+        <slot name="default" />
+      </template>
+    </el-button>
+  </div>
+</template>
 
 <style scoped lang="scss"></style>

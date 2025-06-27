@@ -1,21 +1,7 @@
-<template>
-  <el-drawer v-if="show" v-bind="Options" v-on="Event">
-    <template v-if="slots.header" #header>
-      <slot name="header" />
-    </template>
-    <template v-if="slots.footer" #footer>
-      <slot name="footer" />
-    </template>
-    <template v-if="slots.default" #default>
-      <slot />
-    </template>
-  </el-drawer>
-</template>
-
 <script setup lang="ts">
+import type { configType, FormModelProps } from '@/components/ConfigForm/types'
 import { ref, watch } from 'vue'
 import { isType } from '@/components/ConfigForm/utils'
-import type { FormModelProps, configType } from '@/components/ConfigForm/types'
 
 const props = withDefaults(
   defineProps<{
@@ -51,5 +37,19 @@ watch(
   { immediate: true, deep: true },
 )
 </script>
+
+<template>
+  <el-drawer v-if="show" v-bind="Options" v-on="Event">
+    <template v-if="slots.header" #header>
+      <slot name="header" />
+    </template>
+    <template v-if="slots.footer" #footer>
+      <slot name="footer" />
+    </template>
+    <template v-if="slots.default" #default>
+      <slot />
+    </template>
+  </el-drawer>
+</template>
 
 <style scoped lang="scss"></style>

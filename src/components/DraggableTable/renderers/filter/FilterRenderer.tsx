@@ -1,9 +1,9 @@
-import { watch, ref, computed, defineComponent } from 'vue'
-import { ElInput, ElCheckbox, ElButton } from 'element-plus'
 import type { VxeGlobalRendererHandles, VxeTableDefines } from 'vxe-table'
-import { groupBy } from 'lodash'
-import { getTypeDefault } from '@/components/_utils'
 import type { objType } from '@/components/_types'
+import { ElButton, ElCheckbox, ElInput } from 'element-plus'
+import { groupBy } from 'lodash'
+import { computed, defineComponent, ref, watch } from 'vue'
+import { getTypeDefault } from '@/components/_utils'
 
 interface ColValItem {
   checked: boolean
@@ -27,12 +27,13 @@ export default defineComponent({
     const columnValList = ref<ColValItem[]>([])
 
     const checkList = computed(() => {
-      return columnValList.value.filter((item) => item.checked).map((item) => item.value)
+      return columnValList.value.filter(item => item.checked).map(item => item.value)
     })
     watch(
       () => checkList.value,
       (newVal) => {
-        if (newVal.length === allValList.value.length && newVal.length) isCheckedAll.value = true
+        if (newVal.length === allValList.value.length && newVal.length)
+          isCheckedAll.value = true
       },
     )
 
@@ -83,10 +84,11 @@ export default defineComponent({
       if (renderParams && option) {
         const { data } = option
         const { $table } = renderParams
-        data.vals = columnValList.value.filter((item) => item.checked).map((item) => item.value)
+        data.vals = columnValList.value.filter(item => item.checked).map(item => item.value)
         if (data.vals.length === 0) {
           await $table.resetFilterPanel()
-        } else {
+        }
+        else {
           await $table.updateFilterOptionStatus(option, true)
           await $table.saveFilterPanel()
         }
@@ -108,36 +110,40 @@ export default defineComponent({
     const inputRender = computed(() => {
       return [
         <div class="py-4">
-          {currOption.value ? (
-            <ElInput
-              v-model={currOption.value.data.sVal}
-              placeholder="搜索"
-              clearable
-              onChange={searchEvent}
-            />
-          ) : (
-            <ElInput disabled placeholder="搜索" clearable />
-          )}
+          {currOption.value
+            ? (
+                <ElInput
+                  v-model={currOption.value.data.sVal}
+                  placeholder="搜索"
+                  clearable
+                  onChange={searchEvent}
+                />
+              )
+            : (
+                <ElInput disabled placeholder="搜索" clearable />
+              )}
         </div>,
       ]
     })
     const checkboxRender = computed(() => {
       return [
         <div class="px-8">
-          {columnValList.value.length ? (
-            <>
-              <div class="flex flex-col">
-                <ElCheckbox v-model={isCheckedAll.value} onChange={changeAllEvent}>
-                  全选
-                </ElCheckbox>
-                {columnValList.value.map((item) => (
-                  <ElCheckbox v-model={item.checked}>{item.value}</ElCheckbox>
-                ))}
-              </div>
-            </>
-          ) : (
-            <div class="text-center py-5">无匹配项</div>
-          )}
+          {columnValList.value.length
+            ? (
+                <>
+                  <div class="flex flex-col">
+                    <ElCheckbox v-model={isCheckedAll.value} onChange={changeAllEvent}>
+                      全选
+                    </ElCheckbox>
+                    {columnValList.value.map(item => (
+                      <ElCheckbox v-model={item.checked}>{item.value}</ElCheckbox>
+                    ))}
+                  </div>
+                </>
+              )
+            : (
+                <div class="text-center py-5">无匹配项</div>
+              )}
         </div>,
       ]
     })
@@ -150,7 +156,7 @@ export default defineComponent({
             case 'checkbox':
               return checkboxRender.value
             default:
-              break
+              return null
           }
         })
         .filter(Boolean)

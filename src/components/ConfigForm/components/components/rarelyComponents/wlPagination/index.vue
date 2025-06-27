@@ -8,17 +8,8 @@
  *
  * Copyright (c) 2025 by ${git_name_email}, All Rights Reserved.
 -->
-<template>
-  <el-pagination v-if="show" v-model="computedModel" v-bind="Options" v-on="Event">
-    <!-- — 自定义内容，需要在 layout 中列出 slot-->
-    <template v-if="slots.default" #default>
-      <slot name="default" />
-    </template>
-  </el-pagination>
-</template>
-
 <script setup lang="ts">
-import { ref, watch, computed } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { isType } from '@/components/ConfigForm/utils'
 
 const props = defineProps<{
@@ -52,5 +43,14 @@ watch(
   { immediate: true, deep: true },
 )
 </script>
+
+<template>
+  <el-pagination v-if="show" v-model="computedModel" v-bind="Options" v-on="Event">
+    <!-- — 自定义内容，需要在 layout 中列出 slot -->
+    <template v-if="slots.default" #default>
+      <slot name="default" />
+    </template>
+  </el-pagination>
+</template>
 
 <style scoped lang="scss"></style>

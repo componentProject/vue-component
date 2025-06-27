@@ -1,3 +1,3 @@
 export default function registerDirectives(app: any) {
-  console.log('registerDirectives', app)
+  console.warn('registerDirectives', app)
 }

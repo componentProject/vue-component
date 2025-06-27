@@ -1,1 +1,4 @@
-export type noNextInputParams = { row: any; rowIndex: number }
+export interface noNextInputParams {
+  row: any
+  rowIndex: number
+}

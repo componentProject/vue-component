@@ -1,10 +1,10 @@
-<template>
-  <el-color-picker v-if="show" v-model="computedModel" v-bind="Options" v-on="Event" />
-</template>
-
 <script setup lang="ts">
-import { ref, watch, computed } from 'vue'
 import type { FormItemConfig } from '@/components/ConfigForm/types'
+import { computed, ref, watch } from 'vue'
+
+defineOptions({
+  name: 'WlColorPicker',
+})
 
 const props = withDefaults(
   defineProps<{
@@ -18,10 +18,6 @@ const props = withDefaults(
     config: () => ({}),
   },
 )
-
-defineOptions({
-  name: 'WlColorPicker',
-})
 
 const show = ref(true)
 const Event = ref({})
@@ -50,5 +46,9 @@ watch(
   { immediate: true, deep: true },
 )
 </script>
+
+<template>
+  <el-color-picker v-if="show" v-model="computedModel" v-bind="Options" v-on="Event" />
+</template>
 
 <style scoped></style>

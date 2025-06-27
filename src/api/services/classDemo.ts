@@ -1,6 +1,6 @@
-import { BaseApi } from '@/api/utils'
+import type { CreateUserDto, User } from '@/api/models/user'
 
-import type { User, CreateUserDto } from '@/api/models/user'
+import { BaseApi } from '@/api/utils'
 
 export class UserApi extends BaseApi {
   constructor() {

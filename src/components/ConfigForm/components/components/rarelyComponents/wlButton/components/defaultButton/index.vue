@@ -8,20 +8,11 @@
  *
  * Copyright (c) 2025 by ${git_name_email}, All Rights Reserved.
 -->
-<template>
-  <el-button class="button" :loading="props.loading" v-bind="$attrs">
-    <template #default>
-      <span v-if="props.title">{{ props.title }}</span>
-      <slot name="default" />
-    </template>
-  </el-button>
-</template>
-
 <script setup lang="ts">
 import type { configType } from '@/components/ConfigForm/types'
 
 defineOptions({
-  name: 'defaultButton',
+  name: 'DefaultButton',
 })
 
 const props = withDefaults(
@@ -37,5 +28,14 @@ const props = withDefaults(
   },
 )
 </script>
+
+<template>
+  <el-button class="button" :loading="props.loading" v-bind="$attrs">
+    <template #default>
+      <span v-if="props.title">{{ props.title }}</span>
+      <slot name="default" />
+    </template>
+  </el-button>
+</template>
 
 <style scoped lang="scss"></style>

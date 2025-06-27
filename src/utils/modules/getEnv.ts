@@ -1,5 +1,6 @@
-import fs from 'fs'
-import path from 'path'
+import fs from 'node:fs'
+import path from 'node:path'
+import process from 'node:process'
 import dotenv from 'dotenv'
 
 export function isDevFn(mode: string): boolean {
@@ -32,7 +33,7 @@ export function wrapperEnv(env: Record<string, string>) {
         result[key] = value === 'true'
       }
       // 处理数值
-      else if (!isNaN(Number(value))) {
+      else if (!Number.isNaN(Number(value))) {
         result[key] = Number(value)
       }
       // 处理空字符串
@@ -60,7 +61,8 @@ export function getEnvConfig(match = 'VITE_GLOB_', confFiles = ['.env', '.env.pr
     try {
       const env = dotenv.parse(fs.readFileSync(path.resolve(process.cwd(), item)))
       envConfig = { ...envConfig, ...env }
-    } catch (error) {
+    }
+    catch (error) {
       console.error(`Error in parsing ${item}`, error)
     }
   })

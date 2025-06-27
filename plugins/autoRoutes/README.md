@@ -43,9 +43,9 @@ export default defineConfig({
 ### 2. 在路由文件中使用虚拟模块
 
 ```ts
+import autoRoutes from 'virtual:auto-routes'
 // src/router/index.ts
 import { createRouter, createWebHistory } from 'vue-router'
-import autoRoutes from 'virtual:auto-routes'
 
 const routes = [
   {

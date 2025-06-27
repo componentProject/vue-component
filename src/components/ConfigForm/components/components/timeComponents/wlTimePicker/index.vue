@@ -1,15 +1,7 @@
-<template>
-  <el-time-picker v-if="show" v-model="computedModel" v-bind="Options" v-on="Event">
-    <template v-if="slots.default" #default="scope">
-      <slot name="default" v-bind="scope" />
-    </template>
-  </el-time-picker>
-</template>
-
 <script setup lang="ts">
-import { ref, watch, computed } from 'vue'
+import type { configType, FormModelProps } from '@/components/ConfigForm/types'
+import { computed, ref, watch } from 'vue'
 import { isType } from '@/components/ConfigForm/utils'
-import type { FormModelProps, configType } from '@/components/ConfigForm/types'
 
 const props = withDefaults(
   defineProps<{
@@ -52,5 +44,13 @@ watch(
   { immediate: true, deep: true },
 )
 </script>
+
+<template>
+  <el-time-picker v-if="show" v-model="computedModel" v-bind="Options" v-on="Event">
+    <template v-if="slots.default" #default="scope">
+      <slot name="default" v-bind="scope" />
+    </template>
+  </el-time-picker>
+</template>
 
 <style scoped lang="scss"></style>

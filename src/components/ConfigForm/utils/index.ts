@@ -3,7 +3,7 @@
  * @param str
  * @return {string}
  */
-export const getType = (str) => {
+export function getType(str) {
   return Object.prototype.toString.call(str).slice(8, -1).toLowerCase()
 }
 /**
@@ -12,7 +12,7 @@ export const getType = (str) => {
  * @param type 只支持小写,例如boolean
  * @return {boolean}
  */
-export const isType = (str, type) => {
+export function isType(str, type) {
   return Object.prototype.toString.call(str).slice(8, -1).toLowerCase() == type
 }
 

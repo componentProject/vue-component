@@ -1,5 +1,3 @@
-import type { ColumnType } from '@/components/DraggableTable/_types'
-
 /**
  * EnterNextDragTable组件的属性接口
  */

@@ -1,29 +1,7 @@
-<template>
-  <DraggableTable
-    ref="draggableTableRef"
-    :id="props.id"
-    :columns="computedColumns"
-    v-bind="$attrs"
-    @checkbox-all="checkboxAll"
-    @checkbox-change="checkboxChange"
-    @cell-click="handleCellClick"
-  >
-    <!-- 使用动态插槽渲染 -->
-    <template v-for="name in Object.keys($slots)" :key="name" #[name]="slotProps">
-      <slot :name="name" v-bind="slotProps"></slot>
-    </template>
-  </DraggableTable>
-
-  <!-- 用于捕获el-table-column组件 -->
-  <el-table ref="hiddenTable" style="display: none">
-    <slot />
-  </el-table>
-</template>
-
 <script setup lang="jsx">
-import DraggableTable from '@/components/DraggableTable/base/index.vue'
 import { ElTable } from 'element-plus'
-import { computed, ref, watch, useTemplateRef } from 'vue'
+import { computed, ref, useTemplateRef, watch } from 'vue'
+import DraggableTable from '@/components/DraggableTable/base/index.vue'
 
 const props = defineProps({
   // 表格唯一ID，用于本地存储识别
@@ -39,38 +17,38 @@ const props = defineProps({
 
 const emit = defineEmits([
   'select',
-  'select-all',
-  'selection-change',
-  'checkbox-change',
-  'checkbox-all',
-  'cell-click',
-  'row-click',
+  'selectAll',
+  'selectionChange',
+  'checkboxChange',
+  'checkboxAll',
+  'cellClick',
+  'rowClick',
 ])
 
 function checkboxAll(params) {
   const { records } = params
   emit('select', records)
-  emit('select-all', records)
-  emit('selection-change', records)
-  emit('checkbox-change', params)
-  emit('checkbox-all', params)
+  emit('selectAll', records)
+  emit('selectionChange', records)
+  emit('checkboxChange', params)
+  emit('checkboxAll', params)
 }
 
 function checkboxChange(params) {
   const { records } = params
   emit('select', records)
-  emit('selection-change', records)
-  emit('checkbox-change', params)
+  emit('selectionChange', records)
+  emit('checkboxChange', params)
 }
 
 // 处理单元格点击
 function handleCellClick(params) {
-  emit('cell-click', params)
-  // 同时触发row-click事件，与Element Plus保持一致
-  emit('row-click', params.row, params.column, params.$event)
+  emit('cellClick', params)
+  // 同时触发rowClick事件，与Element Plus保持一致
+  emit('rowClick', params.row, params.column, params.$event)
 }
 
-//#region 使用el-table-column组件
+// #region 使用el-table-column组件
 const hiddenTable = useTemplateRef('hiddenTable')
 const computedElTableColumns = computed(() => {
   return hiddenTable.value?.columns
@@ -87,8 +65,8 @@ function convertColumnsConfig(computedElTableColumns) {
     const columnProps = col.props || col
 
     // 获取基本属性
-    const { property, label, width, minWidth, fixed, align, showOverflowTooltip, sortable, type } =
-      columnProps
+    const { property, label, width, minWidth, fixed, align, showOverflowTooltip, sortable, type }
+      = columnProps
     const typeMap = {
       default: null,
       selection: 'checkbox',
@@ -105,7 +83,7 @@ function convertColumnsConfig(computedElTableColumns) {
       fixed: fixed === 'right' ? 'right' : fixed === true || fixed === 'left' ? 'left' : null,
       align: align?.slice(3),
       showOverflow: showOverflowTooltip,
-      sortable: sortable,
+      sortable,
       slots: {},
     }
   })
@@ -114,7 +92,8 @@ function convertColumnsConfig(computedElTableColumns) {
 watch(
   () => computedElTableColumns.value,
   (newVal) => {
-    if (!newVal) return
+    if (!newVal)
+      return
     convertColumnsConfig(newVal)
   },
   {
@@ -122,7 +101,7 @@ watch(
     deep: true,
   },
 )
-//#endregion
+// #endregion
 
 // 表格引用
 const draggableTableRef = useTemplateRef(null)
@@ -132,5 +111,27 @@ defineExpose({
   getTable: () => draggableTableRef.value?.getTable(),
 })
 </script>
+
+<template>
+  <DraggableTable
+    :id="props.id"
+    ref="draggableTableRef"
+    :columns="computedColumns"
+    v-bind="$attrs"
+    @checkbox-all="checkboxAll"
+    @checkbox-change="checkboxChange"
+    @cell-click="handleCellClick"
+  >
+    <!-- 使用动态插槽渲染 -->
+    <template v-for="name in Object.keys($slots)" :key="name" #[name]="slotProps">
+      <slot :name="name" v-bind="slotProps" />
+    </template>
+  </DraggableTable>
+
+  <!-- 用于捕获el-table-column组件 -->
+  <ElTable ref="hiddenTable" style="display: none">
+    <slot />
+  </ElTable>
+</template>
 
 <style scoped lang="scss"></style>

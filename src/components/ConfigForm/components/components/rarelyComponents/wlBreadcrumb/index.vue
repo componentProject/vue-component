@@ -1,17 +1,7 @@
-<template>
-  <el-breadcrumb v-if="show" v-bind="Options" v-on="Event">
-    <el-breadcrumb-item v-for="item in items" :key="item.to" v-bind="item">
-      <template v-if="slots.default" #default>
-        <slot name="default" />
-      </template>
-    </el-breadcrumb-item>
-  </el-breadcrumb>
-</template>
-
 <script setup lang="ts">
+import type { configType, FormModelProps } from '@/components/ConfigForm/types'
 import { ref, watch } from 'vue'
 import { isType } from '@/components/ConfigForm/utils'
-import type { FormModelProps, configType } from '@/components/ConfigForm/types'
 
 interface BreadcrumbItem {
   to: string
@@ -52,5 +42,15 @@ watch(
   { immediate: true, deep: true },
 )
 </script>
+
+<template>
+  <el-breadcrumb v-if="show" v-bind="Options" v-on="Event">
+    <el-breadcrumb-item v-for="item in items" :key="item.to" v-bind="item">
+      <template v-if="slots.default" #default>
+        <slot name="default" />
+      </template>
+    </el-breadcrumb-item>
+  </el-breadcrumb>
+</template>
 
 <style scoped lang="scss"></style>

@@ -1,13 +1,7 @@
-<template>
-  <el-checkbox-group v-if="show" v-model="computedModel" v-bind="Options" v-on="Event">
-    <el-checkbox v-for="checkbox in checkboxes" :key="checkbox.label" v-bind="checkbox" />
-  </el-checkbox-group>
-</template>
-
 <script setup lang="ts">
-import { ref, watch, computed } from 'vue'
+import type { configType, FormModelProps } from '@/components/ConfigForm/types'
+import { computed, ref, watch } from 'vue'
 import { isType } from '@/components/ConfigForm/utils'
-import type { FormModelProps, configType } from '@/components/ConfigForm/types'
 
 interface CheckboxItem {
   label: string
@@ -57,5 +51,11 @@ watch(
   { immediate: true, deep: true },
 )
 </script>
+
+<template>
+  <el-checkbox-group v-if="show" v-model="computedModel" v-bind="Options" v-on="Event">
+    <el-checkbox v-for="checkbox in checkboxes" :key="checkbox.label" v-bind="checkbox" />
+  </el-checkbox-group>
+</template>
 
 <style scoped lang="scss"></style>

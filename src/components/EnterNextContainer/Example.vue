@@ -1,3 +1,39 @@
+<script setup lang="ts">
+import { ElMessage } from 'element-plus'
+import { ref } from 'vue'
+import EnterNextContainer from './index.vue'
+
+// 示例表单数据
+const form2 = ref({
+  field1: '',
+  field2: '',
+  field3: '',
+})
+
+const form3 = ref({
+  input1: '',
+  select1: '',
+  input2: '',
+  select2: '',
+})
+
+// 作为virtualRef使用的元素引用
+const customContainerRef = ref<HTMLElement | null>(null)
+
+// 处理没有下一个输入元素的事件
+function handleNoNextInput(element: HTMLElement) {
+  const elementType = element.tagName.toLowerCase()
+  const elementId = element.id || '未知'
+  const elementValue = (element as HTMLInputElement).value || '无数据'
+
+  ElMessage({
+    message: `已到达最后一个输入元素！类型: ${elementType}, ID: ${elementId}, 值: ${elementValue}`,
+    type: 'success',
+    duration: 3000,
+  })
+}
+</script>
+
 <template>
   <div class="example-container">
     <h2>EnterNextContainer 示例</h2>
@@ -29,55 +65,12 @@
           </el-select>
         </div>
       </EnterNextContainer>
-      <div class="description">按Enter键在输入框之间跳转，最后一个元素会触发提示</div>
+      <div class="description">
+        按Enter键在输入框之间跳转，最后一个元素会触发提示
+      </div>
     </div>
   </div>
 </template>
-
-<script setup lang="ts">
-import { ref } from 'vue'
-import { ElMessage } from 'element-plus'
-import EnterNextContainer from './index.vue'
-
-// 示例表单数据
-const form = ref({
-  name: '',
-  age: '',
-  address: '',
-})
-
-const form2 = ref({
-  field1: '',
-  field2: '',
-  field3: '',
-})
-
-const form3 = ref({
-  input1: '',
-  select1: '',
-  input2: '',
-  select2: '',
-})
-
-// 作为virtualRef使用的元素引用
-const customContainerRef = ref<HTMLElement | null>(null)
-
-// 处理没有下一个输入元素的事件
-const handleNoNextInput = (element: HTMLElement) => {
-  const elementType = element.tagName.toLowerCase()
-  const elementId = element.id || '未知'
-  const elementValue = (element as HTMLInputElement).value || '无数据'
-
-  ElMessage({
-    message: `已到达最后一个输入元素！类型: ${elementType}, ID: ${elementId}, 值: ${elementValue}`,
-    type: 'success',
-    duration: 3000,
-  })
-
-  // 这里可以添加其他逻辑，例如提交表单等
-  console.log('已到达最后一个输入元素', element)
-}
-</script>
 
 <style scoped>
 .example-container {

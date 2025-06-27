@@ -1,12 +1,11 @@
-import { createRouter, createWebHistory } from 'vue-router'
-import { qiankunWindow } from 'vite-plugin-qiankun/dist/helper'
-import { isEmpty, assign } from 'radash'
 import { cloneDeep } from 'lodash'
-import { findDefaultRoute, routes as autoRoutes } from 'virtual:auto-routes'
+import { assign, isEmpty } from 'radash'
+import { routes as autoRoutes, findDefaultRoute } from 'virtual:auto-routes'
+import { qiankunWindow } from 'vite-plugin-qiankun/dist/helper'
+import { createRouter, createWebHistory } from 'vue-router'
 
 // 自动生成的路由
 const routesChildrens = autoRoutes
-console.log('autoRoutes', autoRoutes)
 const Routes = [
   {
     path: '/',
@@ -33,7 +32,8 @@ function getRouter(props: any) {
     //   }
     // }
     base = activeRule
-  } else {
+  }
+  else {
     base = import.meta.env.VITE_GLOB_APP_CODE
   }
   const router = createRouter({

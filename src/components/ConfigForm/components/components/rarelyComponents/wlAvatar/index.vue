@@ -8,18 +8,10 @@
  *
  * Copyright (c) 2025 by ${git_name_email}, All Rights Reserved.
 -->
-<template>
-  <el-avatar v-if="show" v-bind="Options" v-on="Event">
-    <template #default>
-      <slot />
-    </template>
-  </el-avatar>
-</template>
-
 <script setup lang="ts">
+import type { configType, FormModelProps } from '@/components/ConfigForm/types'
 import { ref, watch } from 'vue'
 import { isType } from '@/components/ConfigForm/utils'
-import type { FormModelProps, configType } from '@/components/ConfigForm/types'
 
 const props = withDefaults(
   defineProps<{
@@ -55,5 +47,13 @@ watch(
   { immediate: true, deep: true },
 )
 </script>
+
+<template>
+  <el-avatar v-if="show" v-bind="Options" v-on="Event">
+    <template #default>
+      <slot />
+    </template>
+  </el-avatar>
+</template>
 
 <style scoped lang="scss"></style>

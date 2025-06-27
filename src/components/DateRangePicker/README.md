@@ -21,17 +21,6 @@
 ## 基本用法
 
 ```vue
-<template>
-  <DateRangePicker
-    v-model="dateRange"
-    :type="'daterange'"
-    :defaultToday="true"
-    :quickOptions="true"
-    :dateRange="7"
-    :format="'YYYY-MM-DD'"
-  />
-</template>
-
 <script setup>
 import { ref } from 'vue'
 import DateRangePicker from '@/components/DateRangePicker/index.vue'
@@ -44,6 +33,17 @@ watch(dateRange, (newVal) => {
   console.log('日期范围变化:', newVal)
 })
 </script>
+
+<template>
+  <DateRangePicker
+    v-model="dateRange"
+    type="daterange"
+    :default-today="true"
+    :quick-options="true"
+    :date-range="7"
+    format="YYYY-MM-DD"
+  />
+</template>
 ```
 
 ## 组件属性（Props）

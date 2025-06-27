@@ -1,7 +1,7 @@
-import * as fs from 'fs'
-import * as path from 'path'
-import { execSync } from 'child_process'
-import { fileURLToPath } from 'url'
+import { execSync } from 'node:child_process'
+import * as fs from 'node:fs'
+import * as path from 'node:path'
+import { fileURLToPath } from 'node:url'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const envPath = path.resolve(__dirname, '../.env')
@@ -9,11 +9,11 @@ const envText = fs.readFileSync(envPath, 'utf-8')
 const envObj = Object.fromEntries(
   envText
     .split(/\r?\n/)
-    .filter((line) => line.includes('='))
-    .map((line) => line.split('=')),
+    .filter(line => line.includes('='))
+    .map(line => line.split('=')),
 )
 
-const appCode = envObj['VITE_GLOB_APP_CODE'].replace(/["']/g, '')
+const appCode = envObj.VITE_GLOB_APP_CODE.replace(/["']/g, '')
 
 const ciPath = path.resolve(__dirname, '../.gitlab-ci.yml')
 if (fs.existsSync(ciPath)) {
@@ -25,7 +25,8 @@ if (fs.existsSync(ciPath)) {
     console.log(
       'appCode in .gitlab-ci.yml is the same as the environment variable, no need to update',
     )
-  } else {
+  }
+  else {
     const newCiText = ciText.replace(
       /variables:\s+systemCode: '.*'/,
       `variables:\r  systemCode: '${appCode}'`,
@@ -44,14 +45,16 @@ if (fs.existsSync(ciPath)) {
         console.log(
           'appCode in .gitignore is the same as the environment variable, no need to update',
         )
-      } else {
+      }
+      else {
         const newGitignoreText = gitignoreText.replaceAll(oldAppCode, `${appCode}`)
         fs.writeFileSync(gitignorePath, newGitignoreText)
 
         execSync('git add .gitignore')
         execSync('git commit --no-verify -m "chore: update appCode in .gitignore" --no-verify')
       }
-    } else {
+    }
+    else {
       console.log('.gitignore file not found')
     }
   }

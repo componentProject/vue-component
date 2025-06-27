@@ -1,28 +1,10 @@
-<template>
-  <PopoverTableSelect v-model="popoverModel" :virtualRef="computedVirtualRef" v-bind="$attrs">
-    <template #[name]="slotParams" v-for="name in slotNames" :key="name">
-      <slot :name="name" v-bind="slotParams" />
-    </template>
-  </PopoverTableSelect>
-  <ElInput
-    v-if="props.popType === 'input'"
-    ref="inputRef"
-    :placeholder="computedPlaceholder"
-    v-bind="props.inputProps"
-    @focus="handleFocus"
-    @blur="handleBlur"
-    @input="computedInput"
-    v-model="currentInputValue"
-  />
-</template>
-
 <script setup lang="ts">
-import PopoverTableSelect from '@/components/PopoverTableSelect/base/index.vue'
-import { ElInput } from 'element-plus'
 import type { InputInstance, InputProps } from 'element-plus'
-import { computed, useTemplateRef, watch } from 'vue'
-import type { PropType, ComponentInternalInstance, ComponentPublicInstance } from 'vue'
+import type { ComponentInternalInstance, ComponentPublicInstance, PropType } from 'vue'
+import { ElInput } from 'element-plus'
 import { debounce as _debounce, throttle as _throttle } from 'lodash'
+import { computed, useTemplateRef, watch } from 'vue'
+import PopoverTableSelect from '@/components/PopoverTableSelect/base/index.vue'
 
 const props = defineProps({
   debounce: {
@@ -55,6 +37,7 @@ const props = defineProps({
     default: null,
   },
 })
+const emits = defineEmits(['focus', 'input'])
 // 获取插槽
 const slots = useSlots()
 const slotNames = computed(() => Object.keys(slots))
@@ -63,7 +46,6 @@ const popoverModel = defineModel({
   type: Boolean,
   default: false,
 })
-const emits = defineEmits(['focus', 'input'])
 const inputRef = useTemplateRef<InputInstance>('inputRef')
 const computedVirtualRef = computed(() => {
   return props.virtualRef || inputRef.value
@@ -103,11 +85,32 @@ function handleInput(val: string) {
 const computedInput = computed(() => {
   if (props.debounce) {
     return _debounce(handleInput, props.debounce)
-  } else if (props.throttle) {
+  }
+  else if (props.throttle) {
     return _throttle(handleInput, props.throttle)
-  } else {
+  }
+  else {
     return handleInput
   }
 })
 </script>
+
+<template>
+  <PopoverTableSelect v-model="popoverModel" :virtual-ref="computedVirtualRef" v-bind="$attrs">
+    <template v-for="name in slotNames" #[name]="slotParams" :key="name">
+      <slot :name="name" v-bind="slotParams" />
+    </template>
+  </PopoverTableSelect>
+  <ElInput
+    v-if="props.popType === 'input'"
+    ref="inputRef"
+    v-bind="props.inputProps"
+    v-model="currentInputValue"
+    :placeholder="computedPlaceholder"
+    @focus="handleFocus"
+    @blur="handleBlur"
+    @input="computedInput"
+  />
+</template>
+
 <style scoped lang="scss"></style>

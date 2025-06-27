@@ -1,5 +1,15 @@
 {
   "extends": "@tsconfig/node22/tsconfig.json",
+  "compilerOptions": {
+    "composite": true,
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.node.tsbuildinfo",
+    "jsx": "preserve",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "types": ["node"],
+    "allowImportingTsExtensions": true,
+    "noEmit": true
+  },
   "include": [
     "src/constants/*",
     "vite.config.*",
@@ -11,15 +21,5 @@
     "src/utils/**/*",
     "env.d.ts"
   ],
-  "exclude": [],
-  "compilerOptions": {
-    "allowImportingTsExtensions": true,
-    "jsx": "preserve",
-    "composite": true,
-    "noEmit": true,
-    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.node.tsbuildinfo",
-    "module": "ESNext",
-    "moduleResolution": "Bundler",
-    "types": ["node"]
-  }
+  "exclude": []
 }

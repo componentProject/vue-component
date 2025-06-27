@@ -27,8 +27,8 @@ pnpm add xe-utils vxe-table
 
 ```js
 import { createApp } from 'vue'
-import App from './App.vue'
 import VXETable from 'vxe-table'
+import App from './App.vue'
 import 'vxe-table/lib/style.css'
 
 const app = createApp(App)
@@ -39,24 +39,6 @@ app.mount('#app')
 ## 基本用法
 
 ```vue
-<template>
-  <DraggableTable
-    v-model="tableData"
-    :columns="columns"
-    dragable
-    editable
-    filterable
-    @row-dragend="handleRowDrop"
-    @column-dragend="handleColumnDrop"
-  >
-    <!-- 自定义插槽 -->
-    <template #操作="{ row }">
-      <el-button type="primary" size="small" @click="handleEdit(row)">编辑</el-button>
-      <el-button type="danger" size="small" @click="handleDelete(row)">删除</el-button>
-    </template>
-  </DraggableTable>
-</template>
-
 <script setup>
 import { ref } from 'vue'
 import DraggableTable from '@/components/DraggableTable/index.vue'
@@ -116,24 +98,42 @@ const columns = ref([
 ])
 
 // 行拖拽事件处理
-const handleRowDrop = ({ oldIndex, newIndex, row }) => {
+function handleRowDrop({ oldIndex, newIndex, row }) {
   console.log('行拖拽完成:', { oldIndex, newIndex, row })
 }
 
 // 列拖拽事件处理
-const handleColumnDrop = ({ oldIndex, newIndex, column }) => {
+function handleColumnDrop({ oldIndex, newIndex, column }) {
   console.log('列拖拽完成:', { oldIndex, newIndex, column })
 }
 
 // 操作按钮事件处理
-const handleEdit = (row) => {
+function handleEdit(row) {
   console.log('编辑行:', row)
 }
 
-const handleDelete = (row) => {
+function handleDelete(row) {
   console.log('删除行:', row)
 }
 </script>
+
+<template>
+  <DraggableTable
+    v-model="tableData"
+    :columns="columns"
+    dragable
+    editable
+    filterable
+    @row-dragend="handleRowDrop"
+    @column-dragend="handleColumnDrop"
+  >
+    <!-- 自定义插槽 -->
+    <template #操作="{ row }">
+      <el-button type="primary" size="small" @click="handleEdit(row)"> 编辑 </el-button>
+      <el-button type="danger" size="small" @click="handleDelete(row)"> 删除 </el-button>
+    </template>
+  </DraggableTable>
+</template>
 ```
 
 ## 组件属性（Props）
@@ -215,8 +215,8 @@ const handleDelete = (row) => {
 | ---------------- | -------------------------------- | ---------------- |
 | update:tableData | (newData: Array)                 | 表格数据更新事件 |
 | update:columns   | (newColumns: Array)              | 列配置更新事件   |
-| row-dragend      | ({ oldIndex, newIndex, row })    | 行拖拽完成事件   |
-| column-dragend   | ({ oldIndex, newIndex, column }) | 列拖拽完成事件   |
+| rowDragend       | ({ oldIndex, newIndex, row })    | 行拖拽完成事件   |
+| columnDragend    | ({ oldIndex, newIndex, column }) | 列拖拽完成事件   |
 
 ## 插槽（Slots）
 

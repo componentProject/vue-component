@@ -1,37 +1,38 @@
+import type { Plugin } from 'postcss'
+// 其余vite插件与配置
+import path from 'node:path'
+import process from 'node:process'
+// sentry
+import { sentryVitePlugin } from '@sentry/vite-plugin'
+import tailwindcss from '@tailwindcss/postcss'
 // vite vue插件
 import pluginVue from '@vitejs/plugin-vue'
-import vueJsx from '@vitejs/plugin-vue-jsx'
-import vueDevTools from 'vite-plugin-vue-devtools'
-import AutoImport from 'unplugin-auto-import/vite'
-import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
-import Components from 'unplugin-vue-components/vite'
 
+import vueJsx from '@vitejs/plugin-vue-jsx'
+// tailwind
+import autoprefixer from 'autoprefixer'
 // 性能优化模块
 import { visualizer } from 'rollup-plugin-visualizer'
-import viteCompression from 'vite-plugin-compression'
-import viteImagemin from 'vite-plugin-imagemin'
+import AutoImport from 'unplugin-auto-import/vite'
+import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
+
+import Components from 'unplugin-vue-components/vite'
+import { defineConfig, loadEnv } from 'vite'
+
 import importToCDN from 'vite-plugin-cdn-import'
-import { modules } from './src/constants'
+
+import viteCompression from 'vite-plugin-compression'
+import { createHtmlPlugin } from 'vite-plugin-html'
+
+import viteImagemin from 'vite-plugin-imagemin'
 
 // qiankun
 import qiankun from 'vite-plugin-qiankun'
+import vueDevTools from 'vite-plugin-vue-devtools'
 import scopedCssPrefixPlugin from './plugins/addScopedAndReplacePrefix'
-
 // 自动路由
 import autoRoutesPlugin from './plugins/autoRoutes'
-
-// tailwind
-import autoprefixer from 'autoprefixer'
-import tailwindcss from '@tailwindcss/postcss'
-
-// sentry
-import { sentryVitePlugin } from '@sentry/vite-plugin'
-
-// 其余vite插件与配置
-import path from 'path'
-import { defineConfig, loadEnv } from 'vite'
-import type { Plugin } from 'postcss'
-import { createHtmlPlugin } from 'vite-plugin-html'
+import { modules } from './src/constants'
 import { wrapperEnv } from './src/utils/modules/getEnv.ts'
 
 export default defineConfig(({ mode }) => {
@@ -61,14 +62,14 @@ export default defineConfig(({ mode }) => {
       resolvers: [
         ElementPlusResolver({
           exclude: new RegExp(
-            (useDoc ? [] : ['ElDrawer', 'ElDialog']).map((item) => `^${item}$`).join('|'),
+            (useDoc ? [] : ['ElDrawer', 'ElDialog']).map(item => `^${item}$`).join('|'),
           ),
         }),
       ],
       globs: ['src/components/**/index.vue'],
       dts: path.resolve(__dirname, './src/typings/components.d.ts'),
     }),
-  ].filter((i) => !!i)
+  ].filter(i => !!i)
 
   const performancePlugins = [
     createHtmlPlugin({
@@ -79,47 +80,47 @@ export default defineConfig(({ mode }) => {
       },
     }),
     // 代码压缩
-    viteEnv.VITE_COMPRESS &&
-      viteCompression({
-        algorithm: viteEnv.VITE_BUILD_GZIP ? 'gzip' : 'brotliCompress',
-        verbose: true,
-        disable: false,
-        ext: '.gz',
-        threshold: 10240,
-        deleteOriginFile: false,
-      }),
+    viteEnv.VITE_COMPRESS
+    && viteCompression({
+      algorithm: viteEnv.VITE_BUILD_GZIP ? 'gzip' : 'brotliCompress',
+      verbose: true,
+      disable: false,
+      ext: '.gz',
+      threshold: 10240,
+      deleteOriginFile: false,
+    }),
     // 图片压缩
-    viteEnv.VITE_IMAGEMIN &&
-      viteImagemin({
-        gifsicle: { optimizationLevel: 7, interlaced: false },
-        optipng: { optimizationLevel: 7 },
-        mozjpeg: { quality: 20 },
-        pngquant: { quality: [0.8, 0.9], speed: 4 },
-        svgo: {
-          plugins: [{ name: 'removeViewBox' }, { name: 'removeEmptyAttrs', active: false }],
-        },
-      }),
-    useCDN &&
-      importToCDN({
-        enableInDevMode: viteEnv.VITE_USE_CDN_IS_DEV,
-        prodUrl: `${viteEnv.VITE_CDN_BASE_URL}/{name}@{version}{path}`,
-        modules,
-      }),
-  ].filter((i) => !!i)
+    viteEnv.VITE_IMAGEMIN
+    && viteImagemin({
+      gifsicle: { optimizationLevel: 7, interlaced: false },
+      optipng: { optimizationLevel: 7 },
+      mozjpeg: { quality: 20 },
+      pngquant: { quality: [0.8, 0.9], speed: 4 },
+      svgo: {
+        plugins: [{ name: 'removeViewBox' }, { name: 'removeEmptyAttrs', active: false }],
+      },
+    }),
+    useCDN
+    && importToCDN({
+      enableInDevMode: viteEnv.VITE_USE_CDN_IS_DEV,
+      prodUrl: `${viteEnv.VITE_CDN_BASE_URL}/{name}@{version}{path}`,
+      modules,
+    }),
+  ].filter(i => !!i)
 
   const monitorPlugins = [
-    viteEnv.VITE_SENTRY &&
-      sentryVitePlugin({
-        authToken: process.env.SENTRY_AUTH_TOKEN,
-        org: 'f1f562b9b82f',
-        project: 'javascript-vue',
-      }),
+    viteEnv.VITE_SENTRY
+    && sentryVitePlugin({
+      authToken: process.env.SENTRY_AUTH_TOKEN,
+      org: 'f1f562b9b82f',
+      project: 'javascript-vue',
+    }),
     // 是否生成包预览
-    viteEnv.VITE_REPORT &&
-      visualizer({
-        open: true,
-      }),
-  ].filter((i) => !!i)
+    viteEnv.VITE_REPORT
+    && visualizer({
+      open: true,
+    }),
+  ].filter(i => !!i)
 
   const qianKunPlugins = useQianKun
     ? [

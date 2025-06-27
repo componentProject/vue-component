@@ -1,7 +1,7 @@
 import { createI18n } from 'vue-i18n'
-import zh from './lang/zh'
 import en from './lang/en'
 import es from './lang/es'
+import zh from './lang/zh'
 
 const messages = {
   zh,
@@ -14,7 +14,7 @@ let language = navigator.language.split('-')[0]
 if (!savedLanguage && language) {
   window.localStorage.setItem('language', language)
 }
-language = savedLanguage ? savedLanguage : language
+language = savedLanguage || language
 const i18n = createI18n({
   legacy: false,
   locale: language,

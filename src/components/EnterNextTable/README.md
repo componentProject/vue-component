@@ -21,31 +21,6 @@ import TableEnterNext from '@/components/TableEnterNext/index.vue'
 ### 1. 基础表格用法
 
 ```vue
-<template>
-  <TableEnterNext :data="tableData" border @no-next-input="handleNoNextInput">
-    <el-table-column label="姓名" prop="name">
-      <template #default="scope">
-        <el-input v-model="scope.row.name" placeholder="请输入姓名"></el-input>
-      </template>
-    </el-table-column>
-
-    <el-table-column label="年龄" prop="age">
-      <template #default="scope">
-        <el-input v-model="scope.row.age" placeholder="请输入年龄"></el-input>
-      </template>
-    </el-table-column>
-
-    <el-table-column label="性别" prop="gender">
-      <template #default="scope">
-        <el-select v-model="scope.row.gender" placeholder="请选择性别">
-          <el-option label="男" value="男"></el-option>
-          <el-option label="女" value="女"></el-option>
-        </el-select>
-      </template>
-    </el-table-column>
-  </TableEnterNext>
-</template>
-
 <script setup>
 import { ref } from 'vue'
 import TableEnterNext from '@/components/TableEnterNext/index.vue'
@@ -56,11 +31,36 @@ const tableData = ref([
 ])
 
 // 当没有下一个输入元素时的处理
-const handleNoNextInput = (element, rowIndex) => {
+function handleNoNextInput(element, rowIndex) {
   console.log('已到达最后一个输入元素', element, `行索引: ${rowIndex}`)
   // 在这里可以执行提交表单等操作
 }
 </script>
+
+<template>
+  <TableEnterNext :data="tableData" border @no-next-input="handleNoNextInput">
+    <el-table-column label="姓名" prop="name">
+      <template #default="scope">
+        <el-input v-model="scope.row.name" placeholder="请输入姓名" />
+      </template>
+    </el-table-column>
+
+    <el-table-column label="年龄" prop="age">
+      <template #default="scope">
+        <el-input v-model="scope.row.age" placeholder="请输入年龄" />
+      </template>
+    </el-table-column>
+
+    <el-table-column label="性别" prop="gender">
+      <template #default="scope">
+        <el-select v-model="scope.row.gender" placeholder="请选择性别">
+          <el-option label="男" value="男" />
+          <el-option label="女" value="女" />
+        </el-select>
+      </template>
+    </el-table-column>
+  </TableEnterNext>
+</template>
 ```
 
 ### 2. 允许在下拉框展开时也能跳转
@@ -81,15 +81,6 @@ const handleNoNextInput = (element, rowIndex) => {
 ### 3. 动态添加行后刷新组件
 
 ```vue
-<template>
-  <div>
-    <el-button @click="addRow">添加行</el-button>
-    <TableEnterNext ref="tableEnterNextRef" :data="tableData" border>
-      <!-- 表格列定义 -->
-    </TableEnterNext>
-  </div>
-</template>
-
 <script setup>
 import { ref } from 'vue'
 import TableEnterNext from '@/components/TableEnterNext/index.vue'
@@ -98,7 +89,7 @@ const tableData = ref([{ name: '张三', age: '25', gender: '男' }])
 
 const tableEnterNextRef = ref(null)
 
-const addRow = () => {
+function addRow() {
   tableData.value.push({
     name: '',
     age: '',
@@ -111,6 +102,15 @@ const addRow = () => {
   }, 0)
 }
 </script>
+
+<template>
+  <div>
+    <el-button @click="addRow"> 添加行 </el-button>
+    <TableEnterNext ref="tableEnterNextRef" :data="tableData" border>
+      <!-- 表格列定义 -->
+    </TableEnterNext>
+  </div>
+</template>
 ```
 
 ## Props
@@ -123,9 +123,9 @@ const addRow = () => {
 
 ## Events
 
-| 事件名        | 参数                                   | 说明                                                              |
-| ------------- | -------------------------------------- | ----------------------------------------------------------------- |
-| no-next-input | element: HTMLElement, rowIndex: number | 当用户在最后一个输入元素上按下Enter键时触发，提供当前元素和行索引 |
+| 事件名      | 参数                                   | 说明                                                              |
+| ----------- | -------------------------------------- | ----------------------------------------------------------------- |
+| noNextInput | element: HTMLElement, rowIndex: number | 当用户在最后一个输入元素上按下Enter键时触发，提供当前元素和行索引 |
 
 此外，组件支持所有 el-table 的事件。
 

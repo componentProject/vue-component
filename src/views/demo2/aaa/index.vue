@@ -1,11 +1,7 @@
+<script lang="ts"></script>
+
 <template>
   <div>q23131</div>
 </template>
 
-<script lang="ts">
-
-</script>
-
-<style scoped lang="scss">
-
-</style>
+<style scoped lang="scss"></style>

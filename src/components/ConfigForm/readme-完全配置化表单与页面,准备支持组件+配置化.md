@@ -246,7 +246,6 @@ this.$refs.form.setFormItemByProp('a', '你好', 'label');
     支持普通div,
         rows中传一个type:div,此时不使用el-row和el-col
 
-
 稳定后,支持可视化生成
 
 ```

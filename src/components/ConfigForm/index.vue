@@ -1,24 +1,24 @@
 <script lang="tsx">
-import { reactive, defineComponent, defineAsyncComponent } from 'vue'
+import type { ColProps } from 'element-plus'
 import type { PropType } from 'vue'
+import type {
+  ComponentPropsType,
+  ComponentType,
+  ConfigFormProps,
+  configType,
+  FormItemConfig,
+  FormModelProps,
+  formOptionsConfig,
+  FormRuleProps,
+  rowConfig,
+} from './types'
+import { defineAsyncComponent, defineComponent, reactive } from 'vue'
 import wlComponent from '@/components/ConfigForm/components/components.ts'
 import wlPopComponent from '@/components/ConfigForm/components/popComponents.ts'
 import { deepClone, getType } from '@/components/ConfigForm/utils'
-import type {
-  ConfigFormProps,
-  FormModelProps,
-  formOptionsConfig,
-  rowConfig,
-  ComponentType,
-  FormItemConfig,
-  FormRuleProps,
-  ComponentPropsType,
-  configType,
-} from './types'
-import type { ColProps } from 'element-plus'
 
 export default defineComponent({
-  name: 'wlConfigForm',
+  name: 'WlConfigForm',
   components: { ...wlComponent },
   props: {
     formOptions: {
@@ -132,8 +132,8 @@ export default defineComponent({
       emit('update:rows', rows)
     }
 
-    const validate = async (callback?: Function) => {
-      const formRef = refs['form']
+    const validate = async (callback?: any) => {
+      const formRef = refs.form
       if (!formRef) return
       return formRef.validate(callback)
     }
@@ -272,7 +272,7 @@ export default defineComponent({
     const getComponentName = (str: string) => {
       const strings = str.split('-')
       const getStr = (string: string) => string.charAt(0).toUpperCase() + string.slice(1)
-      return 'wl' + strings.reduce((p, c) => p + getStr(c), '')
+      return `wl${strings.reduce((p, c) => p + getStr(c), '')}`
     }
 
     expose({
@@ -307,7 +307,7 @@ export default defineComponent({
           {slots.default
             ? slots.default()
             : (props.rows || []).map((row: rowConfig) => {
-                //代表这一行隐藏
+                // 代表这一行隐藏
                 if (
                   row.hidden &&
                   typeof row.hidden === 'function' &&
@@ -315,7 +315,7 @@ export default defineComponent({
                 ) {
                   return <span />
                 }
-                //代表这一行自定义渲染
+                // 代表这一行自定义渲染
                 if (row.render) {
                   return row.render()
                 }

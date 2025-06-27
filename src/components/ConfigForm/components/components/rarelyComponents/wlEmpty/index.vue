@@ -1,21 +1,7 @@
-<template>
-  <el-empty v-if="show" v-bind="Options" v-on="Event">
-    <template v-if="slots.image" #image>
-      <slot name="image" />
-    </template>
-    <template v-if="slots.description" #description>
-      <slot name="description" />
-    </template>
-    <template v-if="slots.default" #default>
-      <slot />
-    </template>
-  </el-empty>
-</template>
-
 <script setup lang="ts">
+import type { configType, FormModelProps } from '@/components/ConfigForm/types'
 import { ref, watch } from 'vue'
 import { isType } from '@/components/ConfigForm/utils'
-import type { FormModelProps, configType } from '@/components/ConfigForm/types'
 
 const props = withDefaults(
   defineProps<{
@@ -51,5 +37,19 @@ watch(
   { immediate: true, deep: true },
 )
 </script>
+
+<template>
+  <el-empty v-if="show" v-bind="Options" v-on="Event">
+    <template v-if="slots.image" #image>
+      <slot name="image" />
+    </template>
+    <template v-if="slots.description" #description>
+      <slot name="description" />
+    </template>
+    <template v-if="slots.default" #default>
+      <slot />
+    </template>
+  </el-empty>
+</template>
 
 <style scoped lang="scss"></style>

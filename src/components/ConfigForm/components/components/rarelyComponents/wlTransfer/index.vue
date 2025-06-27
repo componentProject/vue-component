@@ -1,11 +1,11 @@
-<template>
-  <el-transfer v-if="show" v-model="computedModel" v-bind="Options" v-on="Event" />
-</template>
-
 <script setup lang="ts">
-import { ref, watch, computed } from 'vue'
+import type { configType, FormModelProps } from '@/components/ConfigForm/types'
+import { computed, ref, watch } from 'vue'
 import { isType } from '@/components/ConfigForm/utils'
-import type { FormModelProps, configType } from '@/components/ConfigForm/types'
+
+defineOptions({
+  name: 'WlTransfer',
+})
 
 const props = withDefaults(
   defineProps<{
@@ -19,10 +19,6 @@ const props = withDefaults(
     config: () => ({}),
   },
 )
-
-defineOptions({
-  name: 'WlTransfer',
-})
 
 const emit = defineEmits(['update:model'])
 
@@ -50,5 +46,9 @@ watch(
   { immediate: true, deep: true },
 )
 </script>
+
+<template>
+  <el-transfer v-if="show" v-model="computedModel" v-bind="Options" v-on="Event" />
+</template>
 
 <style scoped></style>

@@ -23,16 +23,6 @@ import EnterNextContainer from '@/components/EnterNextContainer/index.vue'
 ### 1. 基础用法 - 包裹表单元素
 
 ```vue
-<template>
-  <EnterNextContainer>
-    <div>
-      <el-input v-model="form.field1" placeholder="字段1" />
-      <el-input v-model="form.field2" placeholder="字段2" />
-      <el-input v-model="form.field3" placeholder="字段3" />
-    </div>
-  </EnterNextContainer>
-</template>
-
 <script setup>
 import { ref } from 'vue'
 import EnterNextContainer from '@/components/EnterNextContainer/index.vue'
@@ -43,6 +33,16 @@ const form = ref({
   field3: '',
 })
 </script>
+
+<template>
+  <EnterNextContainer>
+    <div>
+      <el-input v-model="form.field1" placeholder="字段1" />
+      <el-input v-model="form.field2" placeholder="字段2" />
+      <el-input v-model="form.field3" placeholder="字段3" />
+    </div>
+  </EnterNextContainer>
+</template>
 ```
 
 ### 2. 使用virtualRef
@@ -50,17 +50,6 @@ const form = ref({
 当你不想直接包裹元素，或者需要监控的元素在组件外部时，可以使用virtualRef：
 
 ```vue
-<template>
-  <div ref="formRef">
-    <el-input v-model="form.field1" placeholder="字段1" />
-    <el-input v-model="form.field2" placeholder="字段2" />
-    <el-input v-model="form.field3" placeholder="字段3" />
-  </div>
-
-  <!-- EnterNextContainer不包含任何内容，但通过virtualRef监控外部表单 -->
-  <EnterNextContainer :virtual-ref="formRef" />
-</template>
-
 <script setup>
 import { ref } from 'vue'
 import EnterNextContainer from '@/components/EnterNextContainer/index.vue'
@@ -72,6 +61,17 @@ const form = ref({
 })
 const formRef = ref(null)
 </script>
+
+<template>
+  <div ref="formRef">
+    <el-input v-model="form.field1" placeholder="字段1" />
+    <el-input v-model="form.field2" placeholder="字段2" />
+    <el-input v-model="form.field3" placeholder="字段3" />
+  </div>
+
+  <!-- EnterNextContainer不包含任何内容，但通过virtualRef监控外部表单 -->
+  <EnterNextContainer :virtual-ref="formRef" />
+</template>
 ```
 
 ### 3. 处理下拉选择组件
@@ -92,19 +92,9 @@ const formRef = ref(null)
 
 ### 4. 监听没有下一个输入元素的事件
 
-当用户在最后一个输入元素上按Enter键时，或者只有一个输入元素时，组件会触发`no-next-input`事件：
+当用户在最后一个输入元素上按Enter键时，或者只有一个输入元素时，组件会触发`noNextInput`事件：
 
 ```vue
-<template>
-  <EnterNextContainer @no-next-input="handleNoNextInput">
-    <div>
-      <el-input v-model="form.field1" placeholder="字段1" />
-      <el-input v-model="form.field2" placeholder="字段2" />
-      <el-input v-model="form.field3" placeholder="字段3" />
-    </div>
-  </EnterNextContainer>
-</template>
-
 <script setup>
 import { ref } from 'vue'
 import EnterNextContainer from '@/components/EnterNextContainer/index.vue'
@@ -116,11 +106,21 @@ const form = ref({
 })
 
 // 当没有下一个输入元素时的处理函数
-const handleNoNextInput = (element) => {
+function handleNoNextInput(element) {
   console.log('已到达最后一个输入元素', element)
   // 执行其他操作，如提交表单、显示确认对话框等
 }
 </script>
+
+<template>
+  <EnterNextContainer @no-next-input="handleNoNextInput">
+    <div>
+      <el-input v-model="form.field1" placeholder="字段1" />
+      <el-input v-model="form.field2" placeholder="字段2" />
+      <el-input v-model="form.field3" placeholder="字段3" />
+    </div>
+  </EnterNextContainer>
+</template>
 ```
 
 ## Props
@@ -132,9 +132,9 @@ const handleNoNextInput = (element) => {
 
 ## Events
 
-| 事件名        | 参数                 | 说明                                                              |
-| ------------- | -------------------- | ----------------------------------------------------------------- |
-| no-next-input | element: HTMLElement | 当用户在最后一个输入元素上按下Enter键，或者只有一个输入元素时触发 |
+| 事件名      | 参数                 | 说明                                                              |
+| ----------- | -------------------- | ----------------------------------------------------------------- |
+| noNextInput | element: HTMLElement | 当用户在最后一个输入元素上按下Enter键，或者只有一个输入元素时触发 |
 
 ## 工作原理
 
@@ -145,7 +145,7 @@ const handleNoNextInput = (element) => {
    - 检查aria-activedescendant属性
    - 根据设置决定是否允许跳转
    - 如果有下一个元素，焦点跳转到下一个输入元素
-   - 如果没有下一个元素（已是最后一个或只有一个元素），触发`no-next-input`事件
+   - 如果没有下一个元素（已是最后一个或只有一个元素），触发`noNextInput`事件
 4. 当virtualRef或DOM结构变化时，重新收集所有输入元素并更新事件监听
 
 ## 常见问题
@@ -164,7 +164,7 @@ A: 从功能上两者完全一致，只是使用方式不同。virtualRef适用�
 
 **Q: 如何处理已经是最后一个输入元素的情况？**
 
-A: 当用户在最后一个输入元素上按Enter键时，组件会触发`no-next-input`事件。你可以监听这个事件来执行自定义操作，比如提交表单或者显示确认对话框。
+A: 当用户在最后一个输入元素上按Enter键时，组件会触发`noNextInput`事件。你可以监听这个事件来执行自定义操作，比如提交表单或者显示确认对话框。
 
 ## 示例
 

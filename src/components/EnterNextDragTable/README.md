@@ -11,16 +11,6 @@ EnterNextDragTable 是一个封装了 DraggableTable 和 EnterNextContainer 功�
 ## 基本用法
 
 ```vue
-<template>
-  <EnterNextDragTable
-    v-model:tableData="tableData"
-    :columns="columns"
-    @no-next-input="handleNoNextInput"
-  >
-    <!-- 可选的自定义列插槽 -->
-  </EnterNextDragTable>
-</template>
-
 <script setup>
 import { ref } from 'vue'
 import EnterNextDragTable from '@/components/EnterNextDragTable/index.vue'
@@ -37,11 +27,21 @@ const columns = [
 ]
 
 // 当没有下一个输入元素时的处理函数
-const handleNoNextInput = ({ row, rowIndex }) => {
+function handleNoNextInput({ row, rowIndex }) {
   console.log('在最后一个输入元素按下了Enter', row, rowIndex)
   // 可以在这里添加新行或执行其他操作
 }
 </script>
+
+<template>
+  <EnterNextDragTable
+    v-model:table-data="tableData"
+    :columns="columns"
+    @no-next-input="handleNoNextInput"
+  >
+    <!-- 可选的自定义列插槽 -->
+  </EnterNextDragTable>
+</template>
 ```
 
 ## 属性
@@ -54,9 +54,9 @@ const handleNoNextInput = ({ row, rowIndex }) => {
 
 ## 事件
 
-| 事件名        | 参数              | 说明                                        |
-| ------------- | ----------------- | ------------------------------------------- |
-| no-next-input | { row, rowIndex } | 当在表格中最后一个输入元素按下Enter键时触发 |
+| 事件名      | 参数              | 说明                                        |
+| ----------- | ----------------- | ------------------------------------------- |
+| noNextInput | { row, rowIndex } | 当在表格中最后一个输入元素按下Enter键时触发 |
 
 ## 方法
 

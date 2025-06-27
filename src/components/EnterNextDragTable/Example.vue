@@ -1,45 +1,8 @@
-<template>
-  <div class="example-container">
-    <h2>EnterNextDragTable 示例</h2>
-    <ElCheckbox style="display: none" v-model="allowSelectNextInEmpty"
-      >允许在空select下也能跳转</ElCheckbox
-    >
-    <div class="table-container">
-      <EnterNextDragTable
-        ref="tableRef"
-        v-model="tableData"
-        :columns="columns"
-        editable
-        filterable
-        sortable
-        dragable
-        dragType="draggable"
-        :allowSelectNextInEmpty="allowSelectNextInEmpty"
-        @no-next-input="handleNoNextInput"
-      >
-        <template #name="{ row, column }">
-          <el-input v-model="row[column.field]" />
-        </template>
-        <template #age="{ row, column }">
-          <el-input v-model="row[column.field]" />
-        </template>
-        <template #operation="{ row }">
-          <el-button type="danger" size="small" @click="handleDelete(row)">删除</el-button>
-        </template>
-      </EnterNextDragTable>
-    </div>
-    <div class="actions">
-      <el-button type="primary" @click="addRow">添加行</el-button>
-      <el-button type="danger" @click="removeLastRow">删除最后一行</el-button>
-    </div>
-  </div>
-</template>
-
 <script setup lang="ts">
-import { ref } from 'vue'
-import { ElMessage, ElCheckbox, ElButton } from 'element-plus'
-import EnterNextDragTable from './index.vue'
 import type { ColumnType } from '@/components/DraggableTable/_types'
+import { ElButton, ElCheckbox, ElMessage } from 'element-plus'
+import { ref } from 'vue'
+import EnterNextDragTable from './index.vue'
 
 // 定义表格数据类型
 interface TableRowData {
@@ -100,16 +63,16 @@ const columns: ColumnType[] = [
 ]
 
 // 处理在最后一个输入框按下Enter的情况
-const handleNoNextInput = ({ row, rowIndex }: { row: TableRowData; rowIndex: number }) => {
+function handleNoNextInput({ row, rowIndex }: { row: TableRowData, rowIndex: number }) {
   ElMessage.info(`在最后一个输入框按下了Enter，当前行：${rowIndex + 1}，姓名：${row.name}`)
   // 自动添加新行
   addRow()
 }
 
 // 添加新行
-const addRow = () => {
-  const newId =
-    tableData.value.length > 0 ? Math.max(...tableData.value.map((item) => item.id)) + 1 : 1
+function addRow() {
+  const newId
+    = tableData.value.length > 0 ? Math.max(...tableData.value.map(item => item.id)) + 1 : 1
 
   tableData.value.push({
     id: newId,
@@ -121,18 +84,19 @@ const addRow = () => {
 }
 
 // 删除最后一行
-const removeLastRow = () => {
+function removeLastRow() {
   if (tableData.value.length > 0) {
     tableData.value.pop()
     ElMessage.success('已删除最后一行')
-  } else {
+  }
+  else {
     ElMessage.warning('表格已无数据')
   }
 }
 
 // 处理删除指定行
-const handleDelete = (row: TableRowData) => {
-  const index = tableData.value.findIndex((item) => item.id === row.id)
+function handleDelete(row: TableRowData) {
+  const index = tableData.value.findIndex(item => item.id === row.id)
   if (index !== -1) {
     tableData.value.splice(index, 1)
     ElMessage.success(`已删除第${index + 1}行数据`)
@@ -142,6 +106,49 @@ const handleDelete = (row: TableRowData) => {
 // 表格引用
 const tableRef = ref(null)
 </script>
+
+<template>
+  <div class="example-container">
+    <h2>EnterNextDragTable 示例</h2>
+    <ElCheckbox v-model="allowSelectNextInEmpty" style="display: none">
+      允许在空select下也能跳转
+    </ElCheckbox>
+    <div class="table-container">
+      <EnterNextDragTable
+        ref="tableRef"
+        v-model="tableData"
+        :columns="columns"
+        editable
+        filterable
+        sortable
+        dragable
+        drag-type="draggable"
+        :allow-select-next-in-empty="allowSelectNextInEmpty"
+        @no-next-input="handleNoNextInput"
+      >
+        <template #name="{ row, column }">
+          <el-input v-model="row[column.field]" />
+        </template>
+        <template #age="{ row, column }">
+          <el-input v-model="row[column.field]" />
+        </template>
+        <template #operation="{ row }">
+          <ElButton type="danger" size="small" @click="handleDelete(row)">
+            删除
+          </ElButton>
+        </template>
+      </EnterNextDragTable>
+    </div>
+    <div class="actions">
+      <ElButton type="primary" @click="addRow">
+        添加行
+      </ElButton>
+      <ElButton type="danger" @click="removeLastRow">
+        删除最后一行
+      </ElButton>
+    </div>
+  </div>
+</template>
 
 <style scoped>
 .example-container {

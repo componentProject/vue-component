@@ -1,12 +1,12 @@
-import { computed, defineComponent, onMounted, ref, watch } from 'vue'
-import { detectDateFormatByReplace } from '@/components/_utils'
+import type { PropType } from 'vue'
+import type { VxeGlobalRendererHandles, VxeTableDefines } from 'vxe-table'
 import type { objType } from '@/components/_types'
 import type { customCustomTypes } from '@/components/DraggableTable/_types'
-import Select from '@/components/Select/index.vue'
+import { ElInput, ElProgress, ElSwitch, ElTag } from 'element-plus'
+import { computed, defineComponent, onMounted, ref, watch } from 'vue'
+import { detectDateFormatByReplace } from '@/components/_utils'
 import DateRangePicker from '@/components/DateRangePicker/index.vue'
-import { ElInput, ElSwitch, ElProgress, ElTag } from 'element-plus'
-import type { PropType } from 'vue'
-import type { VxeTableDefines, VxeGlobalRendererHandles } from 'vxe-table'
+import Select from '@/components/Select/index.vue'
 
 export default defineComponent({
   name: 'CellRenderer',
@@ -27,7 +27,8 @@ export default defineComponent({
 
     const load = () => {
       const { renderParams } = props
-      if (!renderParams) return
+      if (!renderParams)
+        return
       const { row, column } = renderParams
       currRow.value = row
       currColumn.value = column
@@ -36,7 +37,8 @@ export default defineComponent({
       immediate: true,
     })
     const currentValue = computed<any>(() => {
-      if (!currColumn.value || !currRow.value) return
+      if (!currColumn.value || !currRow.value)
+        return
       return currRow.value[currColumn.value.field]
     })
     const propsOptions = computed(() => renderOptsProps.value.options)
@@ -58,8 +60,7 @@ export default defineComponent({
             {...renderOptsProps.value}
             modelValue={currRow.value[currColumn.value.field]}
             onUpdate:modelValue={(val: string[]) =>
-              (currRow.value[currColumn.value.field] = val[0])
-            }
+              (currRow.value[currColumn.value.field] = val[0])}
           />
         )
       )
@@ -67,8 +68,8 @@ export default defineComponent({
 
     const SelectRender = computed(() => {
       return (
-        renderOptsPropsType.value === 'select' &&
-        propsOptions.value && (
+        renderOptsPropsType.value === 'select'
+        && propsOptions.value && (
           <Select
             class="w-full!"
             filterable
@@ -112,28 +113,30 @@ export default defineComponent({
 
     const TagRender = computed(() => {
       return (
-        renderOptsPropsType.value === 'tag' &&
-        (propsOptions.value ? (
-          propsOptions.value.map((item: any) => (
-            <ElTag class="mr-8!" {...item}>
-              {item.label}
-            </ElTag>
-          ))
-        ) : (
-          <ElTag {...renderOptsProps.value}>{currRow.value[currColumn.value.field]}</ElTag>
-        ))
+        renderOptsPropsType.value === 'tag'
+        && (propsOptions.value
+          ? (
+              propsOptions.value.map((item: any) => (
+                <ElTag class="mr-8!" {...item}>
+                  {item.label}
+                </ElTag>
+              ))
+            )
+          : (
+              <ElTag {...renderOptsProps.value}>{currRow.value[currColumn.value.field]}</ElTag>
+            ))
       )
     })
     return () => {
       return (
         <div>
           {currRow.value && currColumn.value
-            ? DateRender.value ||
-              SelectRender.value ||
-              InputRender.value ||
-              SwitchRender.value ||
-              ProgressRender.value ||
-              TagRender.value
+            ? DateRender.value
+            || SelectRender.value
+            || InputRender.value
+            || SwitchRender.value
+            || ProgressRender.value
+            || TagRender.value
             : null}
         </div>
       )

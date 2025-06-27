@@ -1,13 +1,6 @@
-<template>
-  <div>
-    <Select :options="data" @change="onChangeValue" label="name" value="age"> </Select>
-    {{ value }}
-  </div>
-</template>
-
 <script setup lang="ts">
-import Select from '@/components/Select/index.vue'
 import { ref } from 'vue'
+import Select from '@/components/Select/index.vue'
 
 const data = [
   { name: '测试1', age: '12' },
@@ -22,9 +15,16 @@ const data = [
 
 const value = ref('')
 
-const onChangeValue = (a) => {
-  console.log(a)
+function onChangeValue(a) {
   value.value = a
 }
 </script>
+
+<template>
+  <div>
+    <Select :options="data" label="name" value="age" @change="onChangeValue" />
+    {{ value }}
+  </div>
+</template>
+
 <style scoped lang="scss"></style>

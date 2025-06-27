@@ -19,7 +19,6 @@
     "lint:oxlint": "oxlint . --fix -D correctness --ignore-path .gitignore",
     "lint:eslint": "eslint . --fix",
     "lint": "run-s lint:*",
-    "format": "prettier --write src/",
     "prepare": "node .husky/install.mjs",
     "lint-staged": "lint-staged",
     "commit": "git-cz"
@@ -38,7 +37,6 @@
     "vue3",
     "ts",
     "eslint",
-    "prettier",
     "commitlint",
     "husky",
     "lint-staged",
@@ -82,6 +80,8 @@
     "markdown-it-anchor": "^9.2.0"
   },
   "devDependencies": {
+    "eslint-plugin-format": "^1.0.1",
+    "@antfu/eslint-config": "^4.16.1",
     "@types/file-saver": "^2.0.7",
     "@commitlint/cli": "^19.8.0",
     "@commitlint/config-conventional": "^19.8.0",
@@ -104,7 +104,6 @@
     "@types/uuid": "^10.0.0",
     "@vitejs/plugin-vue": "^5.2.3",
     "@vitejs/plugin-vue-jsx": "^4.1.2",
-    "@vue/eslint-config-prettier": "^10.2.0",
     "@vue/eslint-config-typescript": "^14.5.0",
     "@vue/tsconfig": "^0.7.0",
     "autoprefixer": "^10.4.21",
@@ -128,7 +127,6 @@
     "npm-run-all2": "^7.0.2",
     "oxlint": "^0.16.0",
     "postcss": "^8.5.3",
-    "prettier": "3.5.3",
     "rollup-plugin-visualizer": "^5.14.0",
     "sass": "^1.87.0",
     "sass-embedded": "^1.87.0",
@@ -157,12 +155,6 @@
     "vue-eslint-parser": "^10.1.4",
     "vue-tsc": "^2.2.8"
   },
-  "prettier": {
-    "$schema": "https://json.schemastore.org/prettierrc",
-    "semi": false,
-    "singleQuote": true,
-    "printWidth": 100
-  },
   "postcss": {
     "plugins": {
       "tailwindcss": {},
@@ -171,11 +163,7 @@
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx,vue}": [
-      "eslint --fix",
-      "prettier --write"
-    ],
-    "*.{scss,css,json,md}": [
-      "prettier --write"
+      "eslint --fix --no-warn-ignored"
     ],
     "*.{css,scss,less,vue}": [
       "stylelint --fix"

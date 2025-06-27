@@ -50,7 +50,8 @@ export function findParentRoute(
     }
     if (route.children) {
       const found = findParentRoute(route.children, parentPath)
-      if (found) return found
+      if (found)
+        return found
     }
   }
   return undefined
@@ -81,23 +82,24 @@ export function generateRoutes(
     })
     .reduce((modules: RouteModule[] = [], modulePath: string) => {
       const component = files[modulePath]
-      if (!component || modulePath === 'install') return modules
+      if (!component || modulePath === 'install')
+        return modules
 
       const filePathArr = modulePath.split('/')
-      const srcIndex = filePathArr.findIndex((part) => part === 'src')
-      if (srcIndex === -1) return modules
+      const srcIndex = filePathArr.findIndex(part => part === 'src')
+      if (srcIndex === -1)
+        return modules
 
       // 从src后面一位到倒数第二位作为path
       const pathArr = filePathArr.slice(srcIndex + 1, -1)
-      console.log('pathArr', pathArr)
       const name = component.name || pathArr.at(-1)
       const path = `/${pathArr.join('/')}`
       const parentPath = `/${pathArr.slice(0, -1).join('/')}`
 
       const parentRoute = findParentRoute(modules, parentPath)
-      console.log('parentPath', parentPath, path, parentRoute)
       if (parentRoute) {
-        if (!parentRoute.children) parentRoute.children = []
+        if (!parentRoute.children)
+          parentRoute.children = []
         parentRoute.children.push({
           path,
           name: path,
@@ -106,7 +108,8 @@ export function generateRoutes(
           },
           component,
         })
-      } else {
+      }
+      else {
         modules.push({
           path,
           name: path,
@@ -128,7 +131,8 @@ export function findDefaultRoute(routes: any[]): string {
   for (const route of routes) {
     if (route.meta?.default) {
       return route.path
-    } else {
+    }
+    else {
       if (route.children?.length) {
         return findDefaultRoute(route.children)
       }

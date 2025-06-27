@@ -1,7 +1,6 @@
 // import { userRequest } from '@/api/utils'
 
 async function serverRequest(url: string, params: any) {
-  console.log('serverRequest', url, params)
   // eg:
   // const res = await userRequest.post(url, params)
   // if (res.Code == 200) {
@@ -9,6 +8,7 @@ async function serverRequest(url: string, params: any) {
   // } else {
   //   return []
   // }
+  console.warn('serverRequest', url, params)
   return [
     {
       value: '1',

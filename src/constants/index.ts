@@ -2,7 +2,7 @@
 function getCamelCase(str: string): string {
   return str
     .replace(/[-_]+/g, ' ') // 将连字符或下划线替换为空格
-    .replace(/(?:^|\s)\w/g, (match) => match.toUpperCase()) // 每个单词首字母大写
+    .replace(/(?:^|\s)\w/g, match => match.toUpperCase()) // 每个单词首字母大写
     .replace(/\s+/g, '') // 移除所有空格
 }
 
@@ -16,7 +16,8 @@ interface CdnModule {
 
 function getCdnModules(modules: Array<string | CdnModule>): any {
   function getPath(str: string | undefined) {
-    if (!str) return ''
+    if (!str)
+      return ''
     return str.startsWith('/') ? str : `/${str}`
   }
 
@@ -28,7 +29,8 @@ function getCdnModules(modules: Array<string | CdnModule>): any {
           var: getCamelCase(item),
           path: '',
         }
-      } else {
+      }
+      else {
         return item
       }
     })

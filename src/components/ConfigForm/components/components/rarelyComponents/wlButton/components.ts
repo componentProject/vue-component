@@ -1,4 +1,4 @@
-//webpack下
+// webpack下
 
 /**
  * 获取./component目录下的所有组件,命名需要小驼峰
@@ -28,8 +28,8 @@ const components: ComponentsType & {
 //   return modules;
 // }, {});
 
-//vite下
-//const components = import.meta.glob("../components/**/*.vue")
+// vite下
+// const components = import.meta.glob("../components/**/*.vue")
 
 const componentNames = Object.keys(components)
 components.install = function (Vue) {

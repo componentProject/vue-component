@@ -1,17 +1,7 @@
-<template>
-  <yearDatePicker
-    v-if="show && Options.rangeType === 'yearrange'"
-    v-model="computedModel"
-    v-bind="Options"
-    v-on="Event"
-  />
-  <el-date-picker v-else-if="show" v-model="computedModel" v-bind="Options" v-on="Event" />
-</template>
-
 <script setup lang="ts">
-import { ref, watch, computed } from 'vue'
+import type { configType, FormModelProps } from '@/components/ConfigForm/types'
+import { computed, ref, watch } from 'vue'
 import { isType } from '@/components/ConfigForm/utils'
-import type { FormModelProps, configType } from '@/components/ConfigForm/types'
 import yearDatePicker from '../yearDatePicker/index.vue'
 
 const props = withDefaults(
@@ -53,5 +43,15 @@ watch(
   { immediate: true, deep: true },
 )
 </script>
+
+<template>
+  <yearDatePicker
+    v-if="show && Options.rangeType === 'yearrange'"
+    v-model="computedModel"
+    v-bind="Options"
+    v-on="Event"
+  />
+  <el-date-picker v-else-if="show" v-model="computedModel" v-bind="Options" v-on="Event" />
+</template>
 
 <style scoped lang="scss"></style>

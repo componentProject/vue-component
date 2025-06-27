@@ -8,6 +8,24 @@
  *
  * Copyright (c) 2025 by ${git_name_email}, All Rights Reserved.
 -->
+<script setup>
+import zhCn from 'element-plus/dist/locale/zh-cn.mjs'
+import { qiankunWindow } from 'vite-plugin-qiankun/dist/helper'
+import { computed, reactive } from 'vue'
+import { RouterView, useRouter } from 'vue-router'
+import subMenu from '@/components/subMenu.vue'
+import { useSystemStore } from '@/stores/modules/system.js'
+
+const router = useRouter()
+const routes = reactive(router.options.routes[0].children)
+const systemStore = useSystemStore()
+const themeColor = computed(() => systemStore.themeColor)
+const systemCode = computed(() => {
+  return systemStore.systemCode
+})
+const defaultTab = computed(() => router.currentRoute.value.path)
+</script>
+
 <template>
   <el-config-provider :locale="zhCn" :namespace="systemCode" :empty-values="[undefined]">
     <div
@@ -27,12 +45,12 @@
           <el-container class="h-full w-full bg-white">
             <el-main>
               <transition name="fade">
-                <router-view v-slot="{ Component, route }">
+                <RouterView v-slot="{ Component, route }">
                   <keep-alive>
-                    <component :is="Component" :key="route.path" v-if="route.meta.keep" />
+                    <component :is="Component" v-if="route.meta.keep" :key="route.path" />
                   </keep-alive>
-                  <component :is="Component" :key="route.path" v-if="!route.meta.keep" />
-                </router-view>
+                  <component :is="Component" v-if="!route.meta.keep" :key="route.path" />
+                </RouterView>
               </transition>
             </el-main>
           </el-container>
@@ -41,24 +59,5 @@
     </div>
   </el-config-provider>
 </template>
-<script setup>
-import zhCn from 'element-plus/dist/locale/zh-cn.mjs'
-import subMenu from '@/components/subMenu.vue'
-import { qiankunWindow } from 'vite-plugin-qiankun/dist/helper'
-import { computed, reactive } from 'vue'
-import { RouterView, useRouter } from 'vue-router'
-import { useSystemStore } from '@/stores/modules/system.js'
-
-const router = useRouter()
-const routes = reactive(router.options.routes[0].children)
-console.log('routes', routes)
-const systemStore = useSystemStore()
-const themeColor = computed(() => systemStore.themeColor)
-const systemCode = computed(() => {
-  console.log('systemStore.systemCode', systemStore.systemCode)
-  return systemStore.systemCode
-})
-const defaultTab = computed(() => router.currentRoute.value.path)
-</script>
 
 <style lang="scss" scoped></style>

@@ -1,5 +1,5 @@
-import { defineComponent, computed } from 'vue'
 import type { ComponentInstance } from 'vue'
+import { computed, defineComponent } from 'vue'
 
 function withModifiedProps(
   OriginalComponent: ComponentInstance<any>,

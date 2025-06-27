@@ -9,21 +9,19 @@
  * Copyright (c) 2025 by ${git_name_email}, All Rights Reserved.
  */
 import type {
-  FormProps,
-  FormItemProps,
   ColProps,
-  RowProps,
-  PopoverProps,
-  PopconfirmProps,
   ElTooltipProps,
+  FormItemProps,
+  FormProps,
+  PopconfirmProps,
+  PopoverProps,
+  RowProps,
 } from 'element-plus'
-import type { AsyncComponentOptions } from 'vue'
+import type { AsyncComponentOptions, DefineComponent } from 'vue'
 
 export interface ComponentsType {
   [key: string]: AsyncComponentOptions
 }
-
-import type { DefineComponent } from 'vue'
 
 export type FormModelProps = Partial<FormProps['model']>
 export type FormRuleProps = Partial<FormProps['rules']>

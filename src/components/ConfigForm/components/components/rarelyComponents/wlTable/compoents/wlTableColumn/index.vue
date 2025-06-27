@@ -1,7 +1,8 @@
 <script lang="jsx">
 import { defineComponent } from 'vue'
+
 export default defineComponent({
-  name: 'wlTableColumn',
+  name: 'WlTableColumn',
   props: {
     column: {
       type: Object,

@@ -1,38 +1,9 @@
-<template>
-  <div>
-    <el-popover
-      :visible="popoverVisible"
-      virtual-triggering
-      :virtual-ref="props.virtualRef"
-      trigger="contextmenu"
-      placement="bottom"
-      width="200"
-    >
-      <div class="flex flex-col" ref="popoverRef">
-        <div class="flex flex-col">
-          <el-checkbox
-            v-for="col in allColumns"
-            :label="col.field"
-            v-model="col.visible"
-            :key="col.field"
-            >{{ col.title }}
-          </el-checkbox>
-        </div>
-        <div class="flex justify-center">
-          <el-button size="small" @click="popoverVisible = false">取消</el-button>
-          <el-button size="small" type="primary" @click="handleConfirm">确定</el-button>
-        </div>
-      </div>
-    </el-popover>
-  </div>
-</template>
-
 <script setup lang="ts">
-import { ref, useTemplateRef } from 'vue'
-import type { PropType, ComponentPublicInstance } from 'vue'
-import { ElPopover, ElCheckbox } from 'element-plus'
-import { cloneDeep } from 'lodash'
+import type { ComponentPublicInstance, PropType } from 'vue'
 import type { ColumnType, types } from '@/components/DraggableTable/_types'
+import { ElCheckbox, ElPopover } from 'element-plus'
+import { cloneDeep } from 'lodash'
+import { ref, useTemplateRef } from 'vue'
 import { getTypeName } from '@/components/DraggableTable/_utils'
 
 const props = defineProps({
@@ -67,7 +38,7 @@ function initColumns() {
 }
 
 function handleConfirm() {
-  if (allColumns.value.filter((col) => !col.visible).length === 0) {
+  if (allColumns.value.filter(col => !col.visible).length === 0) {
     return ElMessage.warning('至少保留一列')
   }
   emits('menuConfirm', allColumns.value)
@@ -98,7 +69,8 @@ watch(
       nextTick(() => {
         document.addEventListener('mousedown', handleOutsideClick)
       })
-    } else {
+    }
+    else {
       // 移除点击外部关闭的事件监听
       document.removeEventListener('mousedown', handleOutsideClick)
     }
@@ -131,7 +103,8 @@ function cleanupEventListeners() {
  * 处理点击外部区域，关闭popover
  */
 function handleOutsideClick(e: MouseEvent) {
-  if (!popoverVisible.value) return
+  if (!popoverVisible.value)
+    return
 
   // 获取popover元素
   const popoverEl = popoverRef.value
@@ -139,10 +112,10 @@ function handleOutsideClick(e: MouseEvent) {
   const virtualEl = (props.virtualRef as ComponentPublicInstance)?.$el || props.virtualRef
   // 检查点击是否在popover或virtualRef元素外部
   if (
-    popoverEl &&
-    !popoverEl.contains(e.target as Node) &&
-    virtualEl &&
-    !virtualEl.contains(e.target as Node)
+    popoverEl
+    && !popoverEl.contains(e.target as Node)
+    && virtualEl
+    && !virtualEl.contains(e.target as Node)
   ) {
     popoverVisible.value = false
     initColumns()
@@ -156,3 +129,37 @@ onUnmounted(() => {
   cleanupEventListeners()
 })
 </script>
+
+<template>
+  <div>
+    <ElPopover
+      :visible="popoverVisible"
+      virtual-triggering
+      :virtual-ref="props.virtualRef"
+      trigger="contextmenu"
+      placement="bottom"
+      width="200"
+    >
+      <div ref="popoverRef" class="flex flex-col">
+        <div class="flex flex-col">
+          <ElCheckbox
+            v-for="col in allColumns"
+            :key="col.field"
+            v-model="col.visible"
+            :label="col.field"
+          >
+            {{ col.title }}
+          </ElCheckbox>
+        </div>
+        <div class="flex justify-center">
+          <el-button size="small" @click="popoverVisible = false">
+            取消
+          </el-button>
+          <el-button size="small" type="primary" @click="handleConfirm">
+            确定
+          </el-button>
+        </div>
+      </div>
+    </ElPopover>
+  </div>
+</template>

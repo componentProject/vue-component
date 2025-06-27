@@ -1,4 +1,4 @@
-import type { types, ColumnType } from '@/components/DraggableTable/_types'
+import type { ColumnType, types } from '@/components/DraggableTable/_types'
 
 /**
  * 自定义的列模板
@@ -26,7 +26,7 @@ export function getTypeName(type?: types) {
 }
 
 export function getCustomType(type?: types) {
-  return type ? Object.keys(customTypeMap).find((customType) => customType === type) || '' : ''
+  return type ? Object.keys(customTypeMap).find(customType => customType === type) || '' : ''
 }
 
 export function handleGetColumn(Column: ColumnType): ColumnType {
@@ -76,12 +76,12 @@ export function handleGetColumn(Column: ColumnType): ColumnType {
     colId,
     children,
     slots,
-    //#region 自定义属性部分
+    // #region 自定义属性部分
     options,
     cellProps,
     editProps,
     filterProps,
-    //#endregion
+    // #endregion
   } = Column
   return {
     type,
@@ -132,18 +132,18 @@ export function handleGetColumn(Column: ColumnType): ColumnType {
     colId,
     children,
     slots,
-    //#region 自定义属性部分
+    // #region 自定义属性部分
     options,
     cellProps,
     editProps,
     filterProps,
-    //#endregion
+    // #endregion
   }
 }
 
 export function handleGetRequiredFields() {
   const noRequiredFields = ['width', 'visible', 'options', 'cellProps', 'editProps', 'filterProps']
-  return Object.keys(handleGetColumn({})).filter((key) => !noRequiredFields.includes(key)) as Array<
+  return Object.keys(handleGetColumn({})).filter(key => !noRequiredFields.includes(key)) as Array<
     keyof ColumnType
   >
 }

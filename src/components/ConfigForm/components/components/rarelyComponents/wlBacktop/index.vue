@@ -4,22 +4,14 @@
  * @LastEditors: moluoxixi 1983531544@qq.com
  * @LastEditTime: 2025-04-09 10:32:17
  * @FilePath: \vue-component\src\components\ConfigForm\components\components\rarelyComponents\wlBacktop\index.vue
- * @Description: 
- * 
- * Copyright (c) 2025 by ${git_name_email}, All Rights Reserved. 
+ * @Description:
+ *
+ * Copyright (c) 2025 by ${git_name_email}, All Rights Reserved.
 -->
-<template>
-  <el-backtop v-if="show" v-bind="Options" v-on="Event">
-    <template v-if="slots.default" #default>
-      <slot />
-    </template>
-  </el-backtop>
-</template>
-
 <script setup lang="ts">
+import type { configType, FormModelProps } from '@/components/ConfigForm/types'
 import { ref, watch } from 'vue'
 import { isType } from '@/components/ConfigForm/utils'
-import type { FormModelProps, configType } from '@/components/ConfigForm/types'
 
 const props = withDefaults(
   defineProps<{
@@ -55,5 +47,13 @@ watch(
   { immediate: true, deep: true },
 )
 </script>
+
+<template>
+  <el-backtop v-if="show" v-bind="Options" v-on="Event">
+    <template v-if="slots.default" #default>
+      <slot />
+    </template>
+  </el-backtop>
+</template>
 
 <style scoped lang="scss"></style>

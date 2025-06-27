@@ -1,12 +1,12 @@
 variables:
-  systemCode: 'test'
+  systemCode: test
   SENTRY_AUTH_TOKEN: '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'
 #  GIT_SUBMODULE_STRATEGY: recursive  # 递归克隆所有子模块
 #  GIT_SUBMODULE_FORCE: "true" # 可选：强制更新子模块
 cache:
   paths:
-    - node_modules/ #node_modules目录缓存起来
-stages: #流水过程，先从build->deploy
+    - node_modules/ # node_modules目录缓存起来
+stages: # 流水过程，先从build->deploy
   - check
   - build
   - deploy
@@ -14,7 +14,7 @@ stages: #流水过程，先从build->deploy
 merge-check:
   stage: check
   tags:
-    - 'npm-deploy'
+    - npm-deploy
   rules:
     - if: $CI_MERGE_REQUEST_IID
   script:
@@ -23,28 +23,26 @@ npm-build:
   stage: build
   artifacts:
     paths:
-      - ${systemCode}/ #生成dist文件
+      - ${systemCode}/ # 生成dist文件
   only:
-    - develop #develop分支触发
+    - develop # develop分支触发
   tags:
-    - 'npm-deploy' #gitLab-runner的tag（表示使用哪个runner）
+    - npm-deploy # gitLab-runner的tag（表示使用哪个runner）
   script:
-    - . /root/.nvm/nvm-0.39.3/nvm.sh #使用nvm切换node.js版本
+    - . /root/.nvm/nvm-0.39.3/nvm.sh # 使用nvm切换node.js版本
     - nvm use 20.12.0
-    - pnpm install #指定python版本
-    - pnpm run build #执行npm构建命令
+    - pnpm install # 指定python版本
+    - pnpm run build # 执行npm构建命令
 
 npm-deploy:
   stage: deploy
   only:
-    - develop #dev分支触发
+    - develop # dev分支触发
   tags:
-    - 'npm-deploy' #gitLab-runner的tag（表示使用哪个runner）
+    - npm-deploy # gitLab-runner的tag（表示使用哪个runner）
   script:
     - current_date=$(date +"%Y-%m-%d-%H-%M-%S")
     - echo $current_date
     - ssh root@192.168.209.103 "mkdir  /data/opt/hip/nginx/html/${systemCode}_BAK/$current_date"
     - ssh root@192.168.209.103 "if du -sh "/data/opt/hip/nginx/html/${systemCode}" | grep -q '0\b'; then echo 'empty';else mv -f /data/opt/hip/nginx/html/${systemCode}/* /data/opt/hip/nginx/html/${systemCode}_BAK/$current_date;fi"
     - scp -r ${systemCode}/* root@192.168.209.103:/data/opt/hip/nginx/html/${systemCode}
-
-
