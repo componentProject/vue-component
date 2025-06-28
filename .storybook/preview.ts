@@ -1,9 +1,8 @@
 import '@/assets/styles/main.css'
-import elementPlus from 'element-plus'
+import elementPlus, { ElMessage, ElMessageBox } from 'element-plus'
 import 'element-plus/dist/index.css'
 import zhCn from 'element-plus/dist/locale/zh-cn.mjs'
 import { useSystemStore } from '@/stores/modules/system.js'
-import { ElMessage, ElMessageBox } from 'element-plus'
 
 import { store } from '@/stores'
 
@@ -25,7 +24,7 @@ const preview: Preview = {
     },
   },
   decorators: [
-    (Story) => ({
+    Story => ({
       components: { Story },
       template: `
         <el-config-provider :locale="zhCn" :namespace="systemCode" :empty-values="[undefined]">

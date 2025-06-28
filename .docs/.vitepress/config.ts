@@ -18,7 +18,7 @@ import { visualizer } from 'rollup-plugin-visualizer'
 import autoprefixer from 'autoprefixer'
 import tailwindcss from '@tailwindcss/postcss'
 
-import path from 'path'
+import path from 'node:path'
 
 import { githubConfig } from './constants/index.js'
 
@@ -175,5 +175,4 @@ async function config(): Promise<Awaited<UserConfig>> {
   }
 }
 
-const viteConfig = await config()
-export default viteConfig
+export default config()

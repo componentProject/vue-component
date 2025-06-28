@@ -26,6 +26,6 @@
     "noFallthroughCasesInSwitch": true,
     "allowSyntheticDefaultImports": true
   },
-  "include": [".storybook/.stories/**/*", ".storybook/.stories/**/*.tsx"],
+  "include": [".storybook/**/*"],
   "exclude": [".storybook/main.ts"]
 }
