@@ -61,7 +61,8 @@ function themeManager(props: QiankunProps) {
       }
     })
   }
-  catch {}
+  catch {
+  }
 }
 
 async function render(props: QiankunProps) {
@@ -72,7 +73,13 @@ async function render(props: QiankunProps) {
   directives(app)
 
   // 修改Element的appendToBody默认行为
-  modifyComponents(app, [ElDrawer, ElDialog], 'appendTo', () => container || '#app')
+  modifyComponents(app, [ElDrawer, ElDialog], (attrs) => {
+    const appendToBody = (attrs['append-to-body'] ?? false) !== false
+    return {
+      ...attrs,
+      appendTo: appendToBody ? container || '#app' : 'body',
+    }
+  })
 
   // 注册图标组件
   for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
@@ -89,10 +96,10 @@ async function render(props: QiankunProps) {
       normalizeDepth: 10,
       sendDefaultPii: true,
       integrations: [
-        // 跟踪vue
+      // 跟踪vue
         vueIntegration({
           tracingOptions: {
-            // 跟踪vue组件
+          // 跟踪vue组件
             trackComponents: true,
             // 需要跟踪的hooks,destroy用于vue2
             hooks: ['activate', 'create', 'unmount', 'destroy', 'mount', 'update'],
@@ -131,11 +138,13 @@ else {
       await render(props)
       themeManager(props)
     },
-    bootstrap() {},
+    bootstrap() {
+    },
     unmount() {
       app?.unmount()
       app = null
     },
-    update() {},
+    update() {
+    },
   })
 }

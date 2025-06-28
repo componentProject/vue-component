@@ -3,17 +3,12 @@ import { computed, defineComponent } from 'vue'
 
 function withModifiedProps(
   OriginalComponent: ComponentInstance<any>,
-  propName: string,
   modifier = (v: any) => v,
 ) {
   return defineComponent({
     name: OriginalComponent.name,
     setup(_: any, { attrs, slots }) {
-      const appendToBody = (attrs['append-to-body'] ?? false) !== false
-      const modifiedProps = computed(() => ({
-        ...attrs,
-        [propName]: appendToBody ? modifier(attrs[propName]) : 'body',
-      }))
+      const modifiedProps = computed(() => modifier(attrs))
       return () => <OriginalComponent {...modifiedProps.value} v-slots={slots} />
     },
   })
@@ -22,11 +17,10 @@ function withModifiedProps(
 export function modifyComponents(
   app: any,
   components: ComponentInstance<any>[],
-  propName: string,
   modifier = (v: any) => v,
 ) {
   components.forEach((component) => {
-    const newComponent = withModifiedProps(component, propName, modifier)
+    const newComponent = withModifiedProps(component, modifier)
     app.component(newComponent.name, newComponent)
   })
 }
