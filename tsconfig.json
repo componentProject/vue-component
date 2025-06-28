@@ -10,10 +10,10 @@
     "module": "ESNext",
     "moduleResolution": "Bundler",
     "paths": {
-      "~/*": [
+      "@/*": [
         "src/*"
       ],
-      "@/*": [
+      "~/*": [
         "src/*"
       ]
     },
@@ -34,25 +34,25 @@
   "vueCompilerOptions": {
     "plugins": [
       "@vue-macros/volar/define-models",
-      "@vue-macros/volar/define-slots"
+      "@vue-macros/volar/define-slots",
+      "@vue-macros/volar/define-props",
+      "@vue-macros/volar/define-emits"
     ]
   },
   "exclude": [
     "dist",
     "node_modules",
     "cypress",
-    ".storybook/**/*",
-    ".docs/.vitepress/config.ts"
+    "vite.config.ts",
+    ".storybook",
+    ".docs/.vitepress/config.ts",
   ],
   "references": [
     {
-      "path": "./tsconfig.storybook.app.json"
+      "path": "./tsconfig.node.json"
     },
     {
-      "path": "./tsconfig.storybook.node.json"
-    },
-    {
-      "path": "./tsconfig.vitepress.node.json"
+      "path": "./tsconfig.storybook.json"
     }
   ]
 }

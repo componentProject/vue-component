@@ -32,6 +32,8 @@ export default antfu(
       //#endregion
       // import 排序
       'perfectionist/sort-imports': 'off',
+      // JSON 排序
+      'jsonc/sort-keys': 'off',
       // 不能使用console
       'no-console': 'off',
     },

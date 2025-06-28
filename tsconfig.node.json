@@ -3,24 +3,12 @@
     "target": "ESNext",
     "jsx": "preserve",
     "lib": [
-      "DOM",
       "ESNext"
     ],
     "baseUrl": ".",
     "module": "ESNext",
     "moduleResolution": "nodenext",
-    "paths": {
-      "~/*": [
-        "src/*"
-      ],
-      "@/*": [
-        "src/*"
-      ]
-    },
     "resolveJsonModule": true,
-    "types": [
-      "vite/client"
-    ],
     "allowJs": true,
     "strict": true,
     "strictNullChecks": true,
@@ -32,13 +20,9 @@
     "skipLibCheck": true,
     "allowImportingTsExtensions": true
   },
-  "vueCompilerOptions": {
-    "plugins": [
-      "@vue-macros/volar/define-models",
-      "@vue-macros/volar/define-slots"
-    ]
-  },
   "include": [
-    ".docs/.vitepress/config.ts"
+    "vite.config.ts",
+    ".docs/.vitepress/config.ts",
+    ".storybook/main.ts"
   ]
 }

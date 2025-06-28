@@ -81,7 +81,7 @@ const meta: Meta<typeof DateRangePicker> = {
 export default meta
 type Story = StoryObj<typeof DateRangePicker>
 
-const Template: StoryFn = (args) => ({
+const Template: StoryFn = args => ({
   template: '<DateRangePicker v-bind="args" />',
   components: { DateRangePicker },
   setup() {
