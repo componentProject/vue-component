@@ -10,10 +10,11 @@
 </template>
 
 <script setup>
+import { ElMessage } from 'element-plus'
+import { saveAs } from 'file-saver'
 import { computed } from 'vue'
 import * as XLSX from 'xlsx'
-import { saveAs } from 'file-saver'
-import { ElMessage } from 'element-plus'
+import { getTypeDefault } from '@/components/_utils'
 
 // 设置组件不继承属性到根元素，而是手动通过$attrs绑定
 defineOptions({
@@ -71,16 +72,23 @@ const props = defineProps({
 
 // 计算按钮是否禁用
 const isDisabled = computed(() => {
-  if (!props.allowEmptyExport && (!props.tableData || props.tableData.length === 0)) {
-    return true
-  }
-  return false
+  return !props.allowEmptyExport && (!props.tableData || props.tableData.length === 0)
 })
+const computedColumn = computed(() => getTypeDefault(props.columns, 'array').filter(col => col.prop || col.field))
 
+const computedHeader = computed(() => {
+  return computedColumn.value.map(col => col.label || col.title || '')
+})
+const computedKeys = computed(() => {
+  return computedColumn.value.map(col => col.prop || col.field || '')
+})
 /**
  * 处理导出
  */
 function handleExport() {
+  if (computedColumn.value.length !== getTypeDefault(props.columns, 'array').length) {
+    console.warn('请检查列配置field/prop是否都配了')
+  }
   // 检查数据是否为空
   if (!props.tableData || props.tableData.length === 0) {
     if (props.allowEmptyExport) {
@@ -88,8 +96,8 @@ function handleExport() {
       ElMessage.warning('当前数据为空，将导出表头信息')
       // 创建仅包含表头的数据
       const emptyData = [{}] // 创建一个空对象，以便生成工作表
-      const header = props.columns.map(col => col.label || col.title || '')
-      const keys = props.columns.map(col => col.prop || col.dataIndex || col.key || '')
+      const header = computedHeader.value
+      const keys = computedKeys.value
 
       // 导出仅有表头的Excel
       exportExcel(emptyData, header, props.fileName, keys)
@@ -101,12 +109,12 @@ function handleExport() {
   }
   else {
     // 获取表头和数据
-    const header = props.columns.map(col => col.label || col.title || '')
-    const keys = props.columns.map(col => col.prop || col.dataIndex || col.key || '')
+    const header = computedHeader.value
+    const keys = computedKeys.value
 
     // 处理数据
     const data = formatData(props.tableData, keys)
-
+    console.log('data000', data)
     // 导出Excel
     exportExcel(data, header, props.fileName, keys)
   }
@@ -124,7 +132,7 @@ function formatData(dataSource, keys) {
 
     keys.forEach((key) => {
       // 处理格式化函数
-      const column = props.columns.find(col => (col.prop || col.dataIndex || col.key) === key)
+      const column = computedColumn.value
       if (column && typeof column.formatter === 'function') {
         newItem[key] = column.formatter(item, column, dataSource.indexOf(item))
         return
@@ -271,10 +279,5 @@ function calculateCellWidth(cellValue) {
 .export-excel-wrapper {
   display: inline-block;
   margin-left: 12px;
-}
-
-.disabled-slot {
-  cursor: not-allowed;
-  opacity: 0.7;
 }
 </style>

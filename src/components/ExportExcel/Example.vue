@@ -33,17 +33,6 @@
           icon="Download"
           size="small"
         />
-
-        <ExportExcel
-          :table-data="tableData"
-          :columns="columns"
-          file-name="用户数据CSV"
-          button-text="导出CSV"
-          type="warning"
-          icon="Document"
-          size="small"
-          export-type="csv"
-        />
       </div>
     </div>
 
