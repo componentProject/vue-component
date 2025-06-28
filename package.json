@@ -167,7 +167,6 @@
     "vite-plugin-html": "^3.2.2",
     "vite-plugin-imagemin": "^0.6.1",
     "vite-plugin-qiankun": "^1.0.15",
-    "vite-plugin-resolve-externals": "^0.2.2",
     "vite-plugin-vue-devtools": "^7.7.2",
     "vitepress": "^1.6.3",
     "vitepress-theme-demoblock": "^3.1.3",
