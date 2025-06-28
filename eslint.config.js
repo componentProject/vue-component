@@ -2,8 +2,6 @@ import antfu from '@antfu/eslint-config'
 
 export default antfu(
   {
-    jsx: true,
-    vue: true,
     formatters: true,
     ignores: [
       'src/components/ConfigForm/**',
