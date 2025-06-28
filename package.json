@@ -19,6 +19,7 @@
     "vitepress:build": "vitepress build .docs",
     "vitepress:preview": "vitepress preview .docs",
     "type-check": "vue-tsc --build",
+    "lint-check": "eslint --inspect-config",
     "lint:oxlint": "oxlint . --fix -D correctness --ignore-path .gitignore",
     "lint:eslint": "eslint . --fix",
     "lint": "run-s lint:*",

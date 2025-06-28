@@ -1,21 +1,13 @@
 import antfu from '@antfu/eslint-config'
-import { globalIgnores } from 'eslint/config'
 
 export default antfu(
   {
     jsx: true,
+    vue: true,
     formatters: true,
-  },
-  globalIgnores([
-    '**/.husky/**',
-    '**/dist/**',
-    '**/dist-ssr/**',
-    '**/coverage/**',
-    '**/src/components/ConfigForm/**',
-    '**/*.md',
-  ]),
-  {
-    name: 'ignores-rules',
+    ignores: [
+      'src/components/ConfigForm/**',
+    ],
     rules: {
       'style/spaced-comment': 'off',
       //#region 是否强制使用三等号
