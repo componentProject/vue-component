@@ -46,7 +46,7 @@ const meta: Meta<typeof PopoverTableSelect> = {
 export default meta
 type Story = StoryObj<typeof PopoverTableSelect>
 
-const Template: StoryFn = (args) => ({
+const Template: StoryFn = args => ({
   components: {
     PopoverTableSelect,
     ElInput,

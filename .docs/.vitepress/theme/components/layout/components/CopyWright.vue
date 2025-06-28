@@ -5,9 +5,11 @@
     | Copyright © 2019-{{ date }} | MIT License
   </footer>
 </template>
+
 <script lang="ts" setup>
 const date = new Date().getFullYear()
 </script>
+
 <style scoped>
 footer {
   text-align: center;

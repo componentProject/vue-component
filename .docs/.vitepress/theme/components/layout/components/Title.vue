@@ -1,9 +1,14 @@
 <template>
-  <h1 :id="pageData.title" class="title">{{ pageData.title }}</h1>
-  <div class="date">🕒 Published at: {{ publishDate }}</div>
+  <h1 :id="pageData.title" class="title">
+    {{ pageData.title }}
+  </h1>
+  <div class="date">
+    🕒 Published at: {{ publishDate }}
+  </div>
 </template>
+
 <script lang="ts" setup>
-import { useData, onContentUpdated } from 'vitepress'
+import { onContentUpdated, useData } from 'vitepress'
 import { ref } from 'vue'
 
 import dayjs from 'dayjs'
@@ -17,6 +22,7 @@ onContentUpdated(() => {
   publishDate.value = dayjs().to(dayjs(frontmatter.date || Date.now()))
 })
 </script>
+
 <style scoped>
 .title {
   color: var(--vp-c-text-1);

@@ -1,7 +1,7 @@
 import { globby } from 'globby'
 import matter from 'gray-matter'
 import fs from 'fs-extra'
-import path from 'path'
+import path from 'node:path'
 import type { PostType } from './utils.ts'
 
 export async function getComponents(componentPath: string) {
@@ -32,7 +32,8 @@ function _convertDate(date = new Date().toString()) {
 function _compareDate(obj1: PostType, obj2: PostType) {
   if (obj1.frontMatter.date && obj2.frontMatter.date) {
     return obj1.frontMatter.date < obj2.frontMatter.date ? 1 : -1
-  } else {
+  }
+  else {
     return 1
   }
 }

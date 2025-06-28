@@ -1,4 +1,4 @@
-import { dirname } from 'path'
+import { dirname } from 'node:path'
 import fg from 'fast-glob'
 import fs from 'fs-extra'
 import matter from 'gray-matter'
@@ -15,14 +15,14 @@ const AUTHOR = {
 }
 const OPTIONS: FeedOptions = {
   title: 'moluoxixi',
-  description: "moluoxixi' Blog",
+  description: 'moluoxixi\' Blog',
   id: `${DOMAIN}/`,
   link: `${DOMAIN}/`,
   copyright: 'MIT License',
   feedLinks: {
-    json: DOMAIN + '/feed.json',
-    atom: DOMAIN + '/feed.atom',
-    rss: DOMAIN + '/feed.xml',
+    json: `${DOMAIN}/feed.json`,
+    atom: `${DOMAIN}/feed.atom`,
+    rss: `${DOMAIN}/feed.xml`,
   },
   author: AUTHOR,
   // TODO:需要补充链接
@@ -48,7 +48,7 @@ async function generateRSS() {
   const posts: any[] = (
     await Promise.all(
       files
-        .filter((i) => !i.includes('index'))
+        .filter(i => !i.includes('index'))
         .map(async (i) => {
           const raw = await fs.readFile(i, 'utf-8')
           const { data, content } = matter(raw)
@@ -71,7 +71,7 @@ async function generateRSS() {
 
 async function writeFeed(name: string, items: Item[]) {
   const feed = new Feed(OPTIONS)
-  items.forEach((item) => feed.addItem(item))
+  items.forEach(item => feed.addItem(item))
 
   await fs.ensureDir(dirname(`./.vitepress/dist/${name}`))
   await fs.writeFile(`./.vitepress/dist/${name}.xml`, feed.rss2(), 'utf-8')

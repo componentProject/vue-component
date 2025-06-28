@@ -45,7 +45,7 @@
     "cypress",
     "vite.config.ts",
     ".storybook",
-    ".docs/.vitepress/config.ts",
+    ".docs/.vitepress/config.ts"
   ],
   "references": [
     {

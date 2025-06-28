@@ -32,7 +32,8 @@ export function initTags(post: PostType[]) {
     // tags是数组，需要tags按照数组语法的格式书写
     if (Array.isArray(tags)) {
       tags.forEach((item) => {
-        if (!data[item]) data[item] = []
+        if (!data[item])
+          data[item] = []
         if (element.hidden && element.frontMatter.hidden) {
           return
         }
@@ -49,14 +50,20 @@ export function initTags(post: PostType[]) {
           if (ptag !== tag) {
             data[tag].hasPTag = true
           }
-          if (!data[ptag]) data[ptag] = []
-          if (!data[ptag].childrenTags) data[ptag].childrenTags = {}
-          if (!data[ptag].childrenTags[tag]) data[ptag].childrenTags[tag] = []
+          if (!data[ptag])
+            data[ptag] = []
+          if (!data[ptag].childrenTags)
+            data[ptag].childrenTags = {}
+          if (!data[ptag].childrenTags[tag])
+            data[ptag].childrenTags[tag] = []
           data[ptag].childrenTags[tag].push(item)
         })
-      } else {
-        if (!data[tag].childrenTags) data[tag].childrenTags = {}
-        if (!data[tag].childrenTags[tag]) data[tag].childrenTags[tag] = []
+      }
+      else {
+        if (!data[tag].childrenTags)
+          data[tag].childrenTags = {}
+        if (!data[tag].childrenTags[tag])
+          data[tag].childrenTags[tag] = []
         data[tag].childrenTags[tag].push(item)
       }
     })
@@ -74,7 +81,8 @@ export function useYearSort(post: PostType[]): PostType[][] {
       const y = element.frontMatter.date?.split('-')[0]
       if (y === year) {
         data[num].push(element)
-      } else {
+      }
+      else {
         num++
         data[num] = []
         data[num].push(element)
@@ -87,12 +95,12 @@ export function useYearSort(post: PostType[]): PostType[][] {
 
 export function getHeaders() {
   return [...document.querySelectorAll('.VPDoc h2,h3,h4,h5,h6')]
-    .filter((el) => el.id && el.hasChildNodes())
+    .filter(el => el.id && el.hasChildNodes())
     .map((el) => {
       const level = Number(el.tagName[1])
       return {
         title: serializeHeader(el),
-        link: '#' + el.id,
+        link: `#${el.id}`,
         level,
       }
     })
@@ -103,13 +111,14 @@ function serializeHeader(h: Element): string {
   for (const node of h.childNodes) {
     if (node.nodeType === 1) {
       if (
-        (node as Element).classList.contains('VPBadge') ||
-        (node as Element).classList.contains('header-anchor')
+        (node as Element).classList.contains('VPBadge')
+        || (node as Element).classList.contains('header-anchor')
       ) {
         continue
       }
       ret += node.textContent
-    } else if (node.nodeType === 3) {
+    }
+    else if (node.nodeType === 3) {
       ret += node.textContent
     }
   }

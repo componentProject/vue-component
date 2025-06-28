@@ -3,7 +3,7 @@
 import type { Meta, StoryFn, StoryObj } from '@storybook/vue3'
 import EnterNextTable from '@/components/EnterNextTable/index.vue'
 import { ref } from 'vue'
-import { ElInput, ElMessage, ElSelect, ElOption, ElTableColumn } from 'element-plus'
+import { ElInput, ElMessage, ElOption, ElSelect, ElTableColumn } from 'element-plus'
 
 // 定义元数据
 const meta: Meta<typeof EnterNextTable> = {
@@ -21,7 +21,7 @@ const meta: Meta<typeof EnterNextTable> = {
 export default meta
 type Story = StoryObj<typeof EnterNextTable>
 
-const Template: StoryFn = (args) => ({
+const Template: StoryFn = args => ({
   components: {
     EnterNextTable,
     ElInput,

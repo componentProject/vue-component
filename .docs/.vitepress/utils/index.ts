@@ -1,5 +1,5 @@
-import fs from 'fs'
-import path from 'path'
+import fs from 'node:fs'
+import path from 'node:path'
 
 /**
  * 将.docs目录下的指定目录里所有md文件转成vitepress的sidebar格式
@@ -16,12 +16,13 @@ export async function getSidebar(fileName: string, excludePaths: string[] = []) 
       const filePath = path.join(srcPath, file)
       const stat = fs.statSync(filePath)
 
-      if (excludePaths.some((excludePath) => filePath.includes(excludePath))) {
+      if (excludePaths.some(excludePath => filePath.includes(excludePath))) {
         return
       }
       if (stat.isDirectory()) {
         items[file] = await getDirectoryStructure(filePath)
-      } else {
+      }
+      else {
         // 只处理特定类型的文件，例如 .md
         if (path.extname(file) === '.md') {
           items[file.replace('.md', '')] = filePath
@@ -46,7 +47,8 @@ export async function getSidebar(fileName: string, excludePaths: string[] = []) 
           collapsed: true,
           items: getSidebarItems(value, fileName),
         })
-      } else {
+      }
+      else {
         const link = `/${fileName}/${path.relative(srcPath, value as string).replace('.md', '')}`
         modules.push({
           activeMatch: link,

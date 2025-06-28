@@ -28,7 +28,7 @@ const meta: Meta<typeof Select> = {
 export default meta
 type Story = StoryObj<typeof Select>
 
-const Template: StoryFn = (args) => ({
+const Template: StoryFn = args => ({
   components: { Select },
   setup() {
     const value = ref('')

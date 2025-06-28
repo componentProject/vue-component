@@ -6,11 +6,13 @@
     </template>
     <template #doc-after>
       <div>
-        <button @click="back">cd ··</button>
+        <button @click="back">
+          cd ··
+        </button>
       </div>
       <Comments />
     </template>
-    <!-- Home slot-->
+    <!-- Home slot -->
     <template #home-hero-before>
       <HomeHero />
     </template>
@@ -21,6 +23,7 @@
   <!-- copywright -->
   <CopyWright />
 </template>
+
 <script lang="ts" setup>
 import DefaultTheme from 'vitepress/theme'
 import HomeHero from './components/HomeHero.vue'
@@ -31,10 +34,11 @@ import Category from './components/Category.vue'
 import Title from './components/Title.vue'
 
 const { Layout } = DefaultTheme
-const back = () => {
+function back() {
   history.back()
 }
 </script>
+
 <style scoped>
 button {
   display: inline-block;

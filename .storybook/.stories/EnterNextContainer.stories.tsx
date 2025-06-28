@@ -21,7 +21,7 @@ const meta: Meta<typeof EnterNextContainer> = {
 export default meta
 type Story = StoryObj<typeof EnterNextContainer>
 
-const Template: StoryFn = (args) => ({
+const Template: StoryFn = args => ({
   components: { EnterNextContainer, ElInput },
   setup() {
     const formData = ref({

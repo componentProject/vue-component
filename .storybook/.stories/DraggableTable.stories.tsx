@@ -65,7 +65,7 @@ interface UserRow extends TableRowData {
 }
 
 // 生成示例数据
-const generateData = (count = 5): UserRow[] => {
+function generateData(count = 5): UserRow[] {
   const data: UserRow[] = []
   for (let i = 1; i <= count; i++) {
     data.push({
@@ -100,7 +100,7 @@ const columns = [
   { field: 'actions', title: '操作' },
 ]
 
-const Template: StoryFn = (args) => ({
+const Template: StoryFn = args => ({
   components: { DraggableTable },
   setup() {
     const tableData = ref(generateData())

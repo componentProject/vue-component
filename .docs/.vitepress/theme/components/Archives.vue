@@ -1,17 +1,17 @@
 <template>
   <div class="main">
-    <div v-for="(yearList, index) in data" class="yearItem" :key="index">
+    <div v-for="(yearList, index) in data" :key="index" class="yearItem">
       <div class="year">
         {{ yearList[0].frontMatter.date?.split('-')[0] }}
       </div>
       <a
+        v-for="(article) in yearList"
+        :key="article.regularPath"
         :href="withBase(article.regularPath)"
-        v-for="(article, index) in yearList"
-        :key="index"
         class="article"
       >
         <div class="title">
-          <div class="title-o"></div>
+          <div class="title-o" />
           {{ article.frontMatter.title }}
         </div>
         <div class="date">{{ article.frontMatter.date?.slice(5) }}</div>
@@ -22,7 +22,7 @@
 
 <script lang="ts" setup>
 import { useData, withBase } from 'vitepress'
-import { computed, watch } from 'vue'
+import { computed } from 'vue'
 import { useYearSort } from '../../utils/utils'
 import type { PostType } from '../../utils/utils'
 

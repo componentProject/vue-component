@@ -3,7 +3,7 @@
 import type { Meta, StoryFn, StoryObj } from '@storybook/vue3'
 import EnterNextDragTable from '@/components/EnterNextDragTable/index.vue'
 import { ref } from 'vue'
-import { ElMessage, ElInput, ElButton } from 'element-plus'
+import { ElButton, ElInput, ElMessage } from 'element-plus'
 
 // 定义元数据
 const meta: Meta<typeof EnterNextDragTable> = {
@@ -25,7 +25,7 @@ const meta: Meta<typeof EnterNextDragTable> = {
 export default meta
 type Story = StoryObj<typeof EnterNextDragTable>
 
-const Template: StoryFn = (args) => ({
+const Template: StoryFn = args => ({
   components: { EnterNextDragTable, ElInput, ElButton },
   setup() {
     // 定义表格数据
@@ -71,8 +71,8 @@ const Template: StoryFn = (args) => ({
 
     // 添加新行
     const addRow = () => {
-      const newId =
-        tableData.value.length > 0 ? Math.max(...tableData.value.map((item) => item.id)) + 1 : 1
+      const newId
+        = tableData.value.length > 0 ? Math.max(...tableData.value.map(item => item.id)) + 1 : 1
 
       tableData.value.push({
         id: newId,

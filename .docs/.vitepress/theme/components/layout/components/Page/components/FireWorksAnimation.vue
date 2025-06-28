@@ -1,7 +1,7 @@
 <template>
-  <div class="pyro" v-if="showFireworksAnimation">
-    <div class="before"></div>
-    <div class="after"></div>
+  <div v-if="showFireworksAnimation" class="pyro">
+    <div class="before" />
+    <div class="after" />
   </div>
 </template>
 

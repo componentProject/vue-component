@@ -1,6 +1,7 @@
 <template>
-  <div id="gitalk-container"></div>
+  <div id="gitalk-container" />
 </template>
+
 <script lang="ts" setup>
 import 'gitalk/dist/gitalk.css'
 import Gitalk from 'gitalk'
@@ -40,4 +41,5 @@ onContentUpdated(() => {
   gitalk.render('gitalk-container')
 })
 </script>
+
 <style scoped></style>

@@ -1,31 +1,30 @@
 <template>
-  <div class="category" v-if="headers.length > 0">
+  <div v-if="headers.length > 0" class="category">
     <ul class="list">
-      <li class="header" v-for="(item, index) in headers" :key="index">
+      <li v-for="(item, index) in headers" :key="index" class="header">
         <a
-          @click.prevent="scrollTo(item)"
+          v-if="item.level === 2"
           :href="item.link"
           class="header-h2"
-          v-if="item.level === 2"
-          >{{ item.title }}</a
-        >
+          @click.prevent="scrollTo(item)"
+        >{{ item.title }}</a>
         <ul v-if="item.level === 3">
           <li class="header">
             <a
-              @click.prevent="scrollTo(item)"
               :href="item.link"
-              :class="['header-h3', { showIndent: showIndent }]"
-              >{{ item.title }}</a
-            >
+              class="header-h3"
+              :class="[{ showIndent }]" @click.prevent="scrollTo(item)"
+            >{{ item.title }}</a>
           </li>
         </ul>
       </li>
     </ul>
   </div>
 </template>
+
 <script lang="ts" setup>
 import { onContentUpdated } from 'vitepress'
-import { shallowRef, ref } from 'vue'
+import { ref, shallowRef } from 'vue'
 import { getHeaders } from '../../../../utils/utils'
 
 const headers = shallowRef<any>([])
@@ -47,6 +46,7 @@ onContentUpdated(() => {
   })
 })
 </script>
+
 <style scoped>
 .category {
   width: 20rem;

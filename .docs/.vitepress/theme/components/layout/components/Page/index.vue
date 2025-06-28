@@ -1,13 +1,15 @@
 <template>
   <FireWorksAnimation />
   <ShareCard />
-  <h1 class="blog-title">Blogs</h1>
+  <h1 class="blog-title">
+    Blogs
+  </h1>
   <div class="flex flex-col items-center flex-1-hidden">
     <div class="w-full blogList flex flex-col items-center flex-1-auto">
       <a
+        v-for="(item) in posts"
+        :key="item.regularPath"
         class="blog"
-        v-for="(item, index) in posts"
-        :key="index"
         :href="withBase(item.regularPath)"
       >
         <div class="title">{{ item.frontMatter.title }}</div>
@@ -15,16 +17,19 @@
       </a>
     </div>
     <div class="pagination">
-      <button class="left" v-if="pageCurrent > 1" @click="go(pageCurrent - 1)">
+      <button v-if="pageCurrent > 1" class="left" @click="go(pageCurrent - 1)">
         Previous page
       </button>
-      <div v-if="pagesNum > 1">{{ `${pageCurrent}/${pagesNum}` }}</div>
-      <button class="right" v-if="pageCurrent < pagesNum" @click="go(pageCurrent + 1)">
+      <div v-if="pagesNum > 1">
+        {{ `${pageCurrent}/${pagesNum}` }}
+      </div>
+      <button v-if="pageCurrent < pagesNum" class="right" @click="go(pageCurrent + 1)">
         Next page
       </button>
     </div>
   </div>
 </template>
+
 <script lang="ts" setup>
 import { ref } from 'vue'
 import ShareCard from './components/ShareCard.vue'
@@ -48,12 +53,12 @@ const pageSize = theme.value.pageSize
 
 //  pagesNum
 let pagesNum = postLength % pageSize === 0 ? postLength / pageSize : postLength / pageSize + 1
-pagesNum = parseInt(pagesNum.toString())
+pagesNum = Number.parseInt(pagesNum.toString())
 //pageCurrent
 const pageCurrent = ref<number>(1)
 // filter index post
 postsAll = postsAll.filter((item: post) => {
-  return item.regularPath.indexOf('index') < 0
+  return item.regularPath.includes('index')
 })
 // pagination
 const allMap = {}
@@ -71,12 +76,12 @@ for (let i = 0; i < postsAll.length; i++) {
 const posts = ref<PostType[]>([])
 posts.value = allMap[pageCurrent.value - 1]
 // click pagination
-const go = (i: number) => {
+function go(i: number) {
   pageCurrent.value = i
   posts.value = allMap[pageCurrent.value - 1]
 }
 // timestamp transform
-const transDate = (date?: string) => {
+function transDate(date?: string) {
   const dateArray = date?.split('-') || []
   const year = dateArray[0]
   const day = dateArray[2]
