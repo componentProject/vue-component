@@ -4,7 +4,7 @@ import ExportExcel from './index.vue'
 export default ExportExcel
 
 // 用于Vue插件形式注册
-export const install = (app) => {
+export function install(app) {
   app.component('ExportExcel', ExportExcel)
 }
 

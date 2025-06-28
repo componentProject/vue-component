@@ -2,17 +2,17 @@
   <!-- 日历组件 -->
   <div class="calendar" :class="props.className">
     <!--  头部  -->
-    <CalendarHeader :localeContext="localeContext" v-model="curDate" @change="monthChange" />
+    <CalendarHeader v-model="curDate" :locale-context="localeContext" @change="monthChange" />
     <!--  主体  -->
-    <CalendarMonth :localeContext="localeContext" v-model="curDate" @change="dateChange">
+    <CalendarMonth v-model="curDate" :locale-context="localeContext" @change="dateChange">
       <!--  重新渲染日期  -->
       <template #date="{ date }">
-        <slot name="date" :date="date"></slot>
+        <slot name="date" :date="date" />
       </template>
 
       <!--  重新渲染日期内容  -->
       <template #dateContent="{ date }">
-        <slot name="dateContent" :date="date"></slot>
+        <slot name="dateContent" :date="date" />
       </template>
     </CalendarMonth>
   </div>
@@ -36,6 +36,8 @@ const props = withDefaults(defineProps<propsType>(), {
   modelValue: Date.now(),
   locale: 'zh-CN',
 })
+
+const emits = defineEmits(['update:modelValue'])
 
 //  defineSlots  VUE 3.x  defineComponent
 defineSlots<slotsType>()
@@ -65,18 +67,18 @@ watch(
   },
 )
 
-const emits = defineEmits(['update:modelValue'])
 //  dateChange  change date
-const dateChange = (date: Dayjs) => {
+function dateChange(date: Dayjs) {
   curDate.value = date
   emits('update:modelValue', date)
 }
 
 //  monthChange  change month
-const monthChange = (type = 'subtract') => {
+function monthChange(type = 'subtract') {
   if (type == 'today') {
     curDate.value = dayjs(Date.now())
-  } else {
+  }
+  else {
     curDate.value = curDate.value?.[type](1, 'month')
   }
   emits('update:modelValue', curDate.value)

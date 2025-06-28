@@ -22,7 +22,7 @@ const props = defineProps({
 const wrapperMap = new Map()
 // 缓存列表
 const include = ref([])
-const route = useRoute()
+const currentRoute = useRoute()
 
 function isType(value, type) {
   return Object.prototype.toString.call(value).slice(8, -1).toLowerCase() === type.toLowerCase()
@@ -30,13 +30,13 @@ function isType(value, type) {
 
 // 监听路由变化
 watch(
-  () => route,
-  (route) => {
+  () => currentRoute,
+  (currentRoute) => {
     // 根据query参数中keepAlive的值或默认值决定是否缓存该路由
     const shouldCache = isType(props.defaultKeepAlive, 'function')
-      ? props.defaultKeepAlive(route)
-      : route.query.keepAlive === 'true' || route.meta.keepAlive
-    const routePath = route.fullPath
+      ? props.defaultKeepAlive(currentRoute)
+      : currentRoute.query.keepAlive === 'true' || currentRoute.meta.keepAlive
+    const routePath = currentRoute.fullPath
 
     // 检查是否已经在缓存列表中
     const cacheIndex = include.value.indexOf(routePath)
@@ -46,7 +46,8 @@ watch(
       if (cacheIndex === -1) {
         include.value.push(routePath)
       }
-    } else {
+    }
+    else {
       // 如果不需要缓存但已在缓存列表中，则移除
       if (cacheIndex !== -1) {
         include.value.splice(cacheIndex, 1)
@@ -57,14 +58,15 @@ watch(
 )
 
 // 为keep-alive里的component接收的组件包上一层自定义name的壳
-const wrap = (fullPath, component) => {
+function wrap(fullPath, component) {
   let wrapper
   // 使用完整路径(包含参数)作为组件名，这样不同参数的路由会被视为不同组件
   if (component) {
     const wrapperName = fullPath
     if (wrapperMap.has(wrapperName)) {
       wrapper = wrapperMap.get(wrapperName)
-    } else {
+    }
+    else {
       wrapper = {
         name: wrapperName,
         render() {
@@ -78,7 +80,7 @@ const wrap = (fullPath, component) => {
 }
 
 // 提供清除特定路由缓存的方法
-const clearCache = (fullPath) => {
+function clearCache(fullPath) {
   const index = include.value.indexOf(fullPath)
   if (index !== -1) {
     include.value.splice(index, 1)
@@ -91,7 +93,7 @@ const clearCache = (fullPath) => {
 }
 
 // 清除所有缓存
-const clearAllCache = () => {
+function clearAllCache() {
   include.value = []
   wrapperMap.clear()
 }

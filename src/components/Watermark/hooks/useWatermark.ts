@@ -1,4 +1,5 @@
-import { watch, ref, computed, type ComputedRef } from 'vue'
+import { computed, ref, watch } from 'vue'
+import type { ComputedRef } from 'vue'
 import type { propsType } from '../types'
 import { assign } from 'radash'
 
@@ -7,7 +8,7 @@ interface WatermarkOptions extends WatermarkType {
   container?: ComputedRef<HTMLElement | undefined> | HTMLElement
 }
 export function isNumber(obj: any): obj is number {
-  return Object.prototype.toString.call(obj) === '[object Number]' && obj === obj
+  return Object.prototype.toString.call(obj) === '[object Number]'
 }
 
 /**
@@ -15,14 +16,14 @@ export function isNumber(obj: any): obj is number {
  * @param value
  * @param defaultValue
  */
-const toNumber = (value?: string | number, defaultValue?: number) => {
+function toNumber(value?: string | number, defaultValue?: number) {
   if (value === undefined) {
     return defaultValue
   }
   if (isNumber(value)) {
     return value
   }
-  const numberVal = parseFloat(value)
+  const numberVal = Number.parseFloat(value)
   return isNumber(numberVal) ? numberVal : defaultValue
 }
 
@@ -47,7 +48,7 @@ const defaultOptions = {
  * 获取合并后的配置
  * @param options
  */
-const getMergedOptions = (options: Partial<WatermarkOptions> = {}) => {
+function getMergedOptions(options: Partial<WatermarkOptions> = {}) {
   const mergedOptions = {
     ...options,
     rotate: options.rotate || defaultOptions.rotate,
@@ -76,10 +77,10 @@ const getMergedOptions = (options: Partial<WatermarkOptions> = {}) => {
  * @param content 文本内容
  * @param rotate 旋转角度
  */
-const measureTextSize = (ctx: CanvasRenderingContext2D, content: string[], rotate: number) => {
+function measureTextSize(ctx: CanvasRenderingContext2D, content: string[], rotate: number) {
   let width = 0
   let height = 0
-  const lineSize: Array<{ width: number; height: number }> = []
+  const lineSize: Array<{ width: number, height: number }> = []
 
   content.forEach((item) => {
     const {
@@ -113,9 +114,7 @@ const measureTextSize = (ctx: CanvasRenderingContext2D, content: string[], rotat
  * 获取画布
  * @param options
  */
-const getCanvasData = async (
-  options: Required<WatermarkOptions>,
-): Promise<{ width: number; height: number; base64Url: string }> => {
+async function getCanvasData(options: Required<WatermarkOptions>): Promise<{ width: number, height: number, base64Url: string }> {
   const { rotate, image, content, fontStyle, gap } = options
 
   const canvas = document.createElement('canvas')
@@ -125,9 +124,8 @@ const getCanvasData = async (
 
   /**
    * 配置画布
-   * @param size
    */
-  const configCanvas = (size: { width: number; height: number }) => {
+  const configCanvas = (size: { width: number, height: number }) => {
     const canvasWidth = gap[0] + size.width
     const canvasHeight = gap[1] + size.height
 
@@ -176,7 +174,7 @@ const getCanvasData = async (
    * 绘制图片
    */
   function drawImage() {
-    return new Promise<{ width: number; height: number; base64Url: string }>((resolve) => {
+    return new Promise<{ width: number, height: number, base64Url: string }>((resolve) => {
       const img = new Image()
       img.crossOrigin = 'anonymous'
       img.referrerPolicy = 'no-referrer'
@@ -187,7 +185,8 @@ const getCanvasData = async (
         if (!width || !height) {
           if (width) {
             height = (img.height / img.width) * +width
-          } else {
+          }
+          else {
             width = (img.width / img.height) * +height
           }
         }
@@ -225,8 +224,8 @@ export default function useWatermark(params: WatermarkOptions = {}) {
     }
 
     getCanvasData(mergedOptions.value).then(({ base64Url, width, height }) => {
-      const offsetLeft = mergedOptions.value.offset[0] + 'px'
-      const offsetTop = mergedOptions.value.offset[1] + 'px'
+      const offsetLeft = `${mergedOptions.value.offset[0]}px`
+      const offsetTop = `${mergedOptions.value.offset[1]}px`
 
       const wmStyle = `
       width:calc(100% - ${offsetLeft});
@@ -246,7 +245,8 @@ export default function useWatermark(params: WatermarkOptions = {}) {
       if (!watermarkDiv.value) {
         const div = document.createElement('div')
         watermarkDiv.value = div
-        if (!container) return
+        if (!container)
+          return
         container.append(div)
         container.style.position = 'relative'
       }
@@ -260,7 +260,7 @@ export default function useWatermark(params: WatermarkOptions = {}) {
           const isChanged = mutations.some((mutation) => {
             let flag = false
             if (mutation.removedNodes.length) {
-              flag = Array.from(mutation.removedNodes).some((node) => node === watermarkDiv.value)
+              flag = Array.from(mutation.removedNodes).includes(watermarkDiv.value!)
             }
             if (mutation.type === 'attributes' && mutation.target === watermarkDiv.value) {
               flag = true

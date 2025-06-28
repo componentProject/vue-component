@@ -115,7 +115,7 @@ autocomplete.args = {
             placeholder: '请输入内容',
             fetchSuggestions: (queryString: string, cb: (suggestions: string[]) => void) => {
               const results = ['选项1', '选项2', '选项3']
-              cb(results.filter((item) => item.includes(queryString)))
+              cb(results.filter(item => item.includes(queryString)))
             },
           },
           colConfig: {

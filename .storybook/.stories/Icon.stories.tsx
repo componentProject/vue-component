@@ -1,10 +1,10 @@
 // noinspection JSUnusedGlobalSymbols
 
 import Icon from '@/components/Icon/index.vue'
+import type { Meta, StoryFn, StoryObj } from '@storybook/vue3'
 // 注意: 如果SVG导入仍有问题，可以使用字符串替代
-const checkIconString =
-  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"></path></svg>'
-import type { Meta, StoryObj, StoryFn } from '@storybook/vue3'
+const checkIconString
+  = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"></path></svg>'
 
 const meta: Meta<typeof Icon> = {
   title: 'Icon',
@@ -42,7 +42,7 @@ export default meta
 type Story = StoryObj<typeof Icon>
 
 // 基础用法 - 传递SVG图标
-const BasicTemplate: StoryFn = (args) => ({
+const BasicTemplate: StoryFn = args => ({
   components: { Icon },
   template: '<Icon v-bind="args" />',
   setup() {
@@ -59,7 +59,7 @@ basicIcon.args = {
 }
 
 // 使用外部图标库
-const ExternalTemplate: StoryFn = (args) => ({
+const ExternalTemplate: StoryFn = args => ({
   components: { Icon },
   template: '<Icon v-bind="args" />',
   setup() {
@@ -76,7 +76,7 @@ externalIcon.args = {
 }
 
 // 使用插槽方式
-const SlotTemplate: StoryFn = (args) => ({
+const SlotTemplate: StoryFn = args => ({
   components: { Icon },
   template: `
     <Icon v-bind="args">

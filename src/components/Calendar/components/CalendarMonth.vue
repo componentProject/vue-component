@@ -1,7 +1,7 @@
 <template>
   <div class="calendar-month">
     <div class="calendar-month-week-list">
-      <div v-for="week in weekList" class="calendar-month-week-list-item" :key="week">
+      <div v-for="week in weekList" :key="week" class="calendar-month-week-list-item">
         {{ CalendarLocale.week[week] }}
       </div>
     </div>
@@ -12,8 +12,8 @@
           v-for="(day, index) in row"
           :key="index"
           class="calendar-month-body-cell"
-          @click="emits('change', day.date)"
           :class="{ 'calendar-month-body-cell-current': day.currentMonth }"
+          @click="emits('change', day.date)"
         >
           <slot name="date" :date="day.date">
             <div class="calendar-month-body-cell-date">
@@ -27,7 +27,7 @@
                 {{ day.date.date() }}
               </div>
               <div class="calendar-month-body-cell-date-content">
-                <slot name="dateContent" :date="day.date"></slot>
+                <slot name="dateContent" :date="day.date" />
               </div>
             </div>
           </slot>
@@ -36,6 +36,7 @@
     </div>
   </div>
 </template>
+
 <script lang="ts" setup>
 import { computed } from 'vue'
 import dayjs from 'dayjs'
@@ -49,9 +50,10 @@ const props = withDefaults(defineProps<CalendarHeaderPropsType>(), {
   }),
   modelValue: () => dayjs(),
 })
+const emits = defineEmits(['change'])
+
 const weekList = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday']
 
-const emits = defineEmits(['change'])
 interface daysType {
   date: Dayjs
   currentMonth: boolean
@@ -61,7 +63,7 @@ function getAllDays(date: Dayjs) {
   const startDate = date.startOf('month')
   const day = startDate.day()
 
-  const daysInfo: Array<daysType> = new Array(6 * 7)
+  const daysInfo: Array<daysType> = Array.from({ length: 6 * 7 })
 
   for (let i = 0; i < day; i++) {
     daysInfo[i] = {

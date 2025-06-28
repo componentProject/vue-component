@@ -3,20 +3,21 @@
     <slot />
   </div>
 </template>
+
 <script lang="ts" setup>
 import { onBeforeUnmount, onMounted } from 'vue'
 
 const props = defineProps({
   /**
    * 元素是否进入视口
-   * */
+   */
   isIntersecting: {
     type: Boolean,
     default: true,
   },
   /**
    * 进入或离开视口的比例
-   * */
+   */
   threshold: {
     type: Number,
     default: 1.0,
@@ -32,14 +33,14 @@ const props = defineProps({
   },
   /**
    * 需要监听进入/离开容器的元素列表
-   * */
+   */
   observers: {
     type: Array<any>,
     default: () => [],
   },
   /**
    * 需要监听进入/离开容器的元素id列表
-   * */
+   */
   observerIds: {
     type: Array<any>,
     default: () => [],
@@ -48,7 +49,7 @@ const props = defineProps({
 /**
  * mutate接受根据isIntersecting判断的进入或离开视口的元素
  * getTargets接受根据observerIds获取到的元素组成的{id:target} 隐射对象
- * */
+ */
 const emits = defineEmits([
   /**
    * 根据isIntersecting判断的进入或离开视口的元素
@@ -72,7 +73,8 @@ onMounted(() => {
           ? entry.contentBoxSize[0]
           : entry.contentBoxSize
         const { blockSize, inlineSize } = contentBoxSize
-        if (observer) observer.disconnect()
+        if (observer)
+          observer.disconnect()
 
         const { threshold, isIntersecting, observers, observerIds } = props
 

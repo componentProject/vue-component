@@ -91,7 +91,7 @@ const exportColumns = [
   { prop: 'phone', label: '电话' },
 ]
 
-const Template: StoryFn = (args) => ({
+const Template: StoryFn = args => ({
   components: { ExportExcel, DragTable },
   setup() {
     const tableData = ref(mockData)

@@ -6,12 +6,12 @@
     :style="style"
     :src="props.icon"
     alt="My Icon"
-  />
+  >
   <i v-else class="icon" :class="{ 'icon-spin': props.spin }" :style="style">
-    <svg viewBox="0 0 24 24" aria-hidden="true" v-if="props.type" fill="currentColor">
+    <svg v-if="props.type" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor">
       <use :href="`#${props.type}`" />
     </svg>
-    <slot v-else name="default"></slot>
+    <slot v-else name="default" />
   </i>
 </template>
 
@@ -40,7 +40,7 @@ watch(
   },
 )
 
-const getSize = (size: any) => {
+function getSize(size: any) {
   if (Array.isArray(size) && size.length === 2) {
     return size
   }

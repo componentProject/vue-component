@@ -1,4 +1,4 @@
-import type { EditorProps, ConfigOption } from 'md-editor-v3'
+import type { ConfigOption, EditorProps } from 'md-editor-v3'
 
 export interface propsType {
   //#region 扩展props

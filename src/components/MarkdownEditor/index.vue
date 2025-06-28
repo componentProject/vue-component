@@ -1,18 +1,18 @@
 <template>
   <MdEditor ref="mdEditor" v-model="text" v-bind="props" v-on="props" />
-  <MdCatalog :editorId="props.id" :scrollElement="scrollElement" :theme="props.theme" />
+  <MdCatalog :editor-id="props.id" :scroll-element="scrollElement" :theme="props.theme" />
 </template>
 
 <script setup lang="ts">
-import { MdEditor, MdCatalog, config, editorExtensionsAttrs, XSSPlugin } from 'md-editor-v3'
+import { config, editorExtensionsAttrs, MdCatalog, MdEditor, XSSPlugin } from 'md-editor-v3'
 import 'md-editor-v3/lib/style.css'
 import screenfull from 'screenfull'
 import type { eventsType, propsType, slotsType } from './types'
 import type { ExposeParam } from 'md-editor-v3'
 import { lineNumbers } from '@codemirror/view'
 import ancher from 'markdown-it-anchor'
-// https://imzbf.github.io/md-editor-v3/zh-CN/demo
-const text = ref('')
+import { useTemplateRef } from 'vue'
+
 defineOptions({
   name: 'MarkdownEditor',
 })
@@ -22,9 +22,11 @@ const props = withDefaults(defineProps<propsType & eventsType>(), {
   previewTheme: 'cyanosis',
   codeTheme: 'github',
 })
-defineExpose<ExposeParam>()
 defineSlots<slotsType>()
-
+const mdEditor = useTemplateRef('mdEditor')
+// https://imzbf.github.io/md-editor-v3/zh-CN/demo
+const text = ref('')
+defineExpose<ExposeParam>()
 const scrollElement = document.documentElement
 config({
   /**

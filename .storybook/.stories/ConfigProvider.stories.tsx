@@ -21,7 +21,7 @@ const meta: Meta<typeof ConfigProvider> = {
 export default meta
 type Story = StoryObj<typeof ConfigProvider>
 
-const Template: StoryFn = (args) => ({
+const Template: StoryFn = args => ({
   components: { ConfigProvider, Calendar },
   template: `
     <ConfigProvider v-bind="args">

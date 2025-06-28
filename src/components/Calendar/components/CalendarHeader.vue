@@ -1,22 +1,26 @@
 <template>
   <div class="calendar-header">
     <div class="calendar-header-left">
-      <div class="calendar-header-icon" @click="emits('change', 'subtract')">&lt;</div>
+      <div class="calendar-header-icon" @click="emits('change', 'subtract')">
+        &lt;
+      </div>
       <div class="calendar-header-value">
         {{ props.modelValue.format(CalendarLocale.formatMonth) }}
       </div>
-      <div class="calendar-header-icon" @click="emits('change', 'add')">&gt;</div>
+      <div class="calendar-header-icon" @click="emits('change', 'add')">
+        &gt;
+      </div>
       <button class="calendar-header-btn" @click="emits('change', 'today')">
         {{ CalendarLocale.today }}
       </button>
     </div>
   </div>
 </template>
+
 <script lang="ts" setup>
 import dayjs from 'dayjs'
 import allLocales from '../locale'
 import { computed } from 'vue'
-const emits = defineEmits(['change'])
 import type { CalendarHeaderPropsType } from '../types'
 
 const props = withDefaults(defineProps<CalendarHeaderPropsType>(), {
@@ -25,6 +29,9 @@ const props = withDefaults(defineProps<CalendarHeaderPropsType>(), {
   }),
   modelValue: () => dayjs(),
 })
+
+const emits = defineEmits(['change'])
+
 const CalendarLocale = computed(() => allLocales[props.localeContext.locale])
 </script>
 

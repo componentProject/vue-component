@@ -3,11 +3,16 @@
     <slot />
   </div>
 </template>
+
 <script setup lang="ts">
 import { provide } from 'vue'
 import type { Component } from 'vue'
 import type { propsType } from './types'
+
 const props = withDefaults(defineProps<propsType>(), {})
+defineSlots<{
+  default: Component
+}>()
 watch(
   () => props,
   (val) => {
@@ -18,8 +23,5 @@ watch(
     immediate: true,
   },
 )
-defineSlots<{
-  default: Component
-}>()
 provide('configProvider', props)
 </script>

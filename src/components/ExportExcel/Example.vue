@@ -11,7 +11,7 @@
       </el-table>
 
       <div class="export-actions">
-        <export-excel :table-data="tableData" :columns="columns" file-name="用户数据" />
+        <ExportExcel :table-data="tableData" :columns="columns" file-name="用户数据" />
       </div>
     </div>
 
@@ -24,7 +24,7 @@
       </el-table>
 
       <div class="export-actions">
-        <export-excel
+        <ExportExcel
           :table-data="tableData"
           :columns="columns"
           file-name="用户数据"
@@ -34,7 +34,7 @@
           size="small"
         />
 
-        <export-excel
+        <ExportExcel
           :table-data="tableData"
           :columns="columns"
           file-name="用户数据CSV"
@@ -52,15 +52,19 @@
       <el-table :data="nestedData" border>
         <el-table-column prop="name" label="姓名" />
         <el-table-column label="年龄">
-          <template #default="{ row }">{{ row.info.age }}</template>
+          <template #default="{ row }">
+            {{ row.info.age }}
+          </template>
         </el-table-column>
         <el-table-column label="地址">
-          <template #default="{ row }">{{ row.info.address }}</template>
+          <template #default="{ row }">
+            {{ row.info.address }}
+          </template>
         </el-table-column>
       </el-table>
 
       <div class="export-actions">
-        <export-excel
+        <ExportExcel
           :table-data="nestedData"
           :columns="nestedColumns"
           file-name="嵌套数据"

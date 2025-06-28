@@ -1,14 +1,16 @@
 <template>
   <div class="export-excel-wrapper">
     <!-- 使用默认按钮 -->
-    <el-button v-bind="$attrs" @click="handleExport" :disabled="isDisabled">
-      <slot name="default">{{ buttonText }}</slot>
+    <el-button v-bind="$attrs" :disabled="isDisabled" @click="handleExport">
+      <slot name="default">
+        {{ buttonText }}
+      </slot>
     </el-button>
   </div>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { computed } from 'vue'
 import * as XLSX from 'xlsx'
 import { saveAs } from 'file-saver'
 import { ElMessage } from 'element-plus'
@@ -43,7 +45,7 @@ const props = defineProps({
   exportType: {
     type: String,
     default: 'xlsx',
-    validator: (value) => ['xlsx', 'csv'].includes(value),
+    validator: value => ['xlsx', 'csv'].includes(value),
   },
   // 工作表名称
   sheetName: {
@@ -78,7 +80,7 @@ const isDisabled = computed(() => {
 /**
  * 处理导出
  */
-const handleExport = () => {
+function handleExport() {
   // 检查数据是否为空
   if (!props.tableData || props.tableData.length === 0) {
     if (props.allowEmptyExport) {
@@ -86,20 +88,21 @@ const handleExport = () => {
       ElMessage.warning('当前数据为空，将导出表头信息')
       // 创建仅包含表头的数据
       const emptyData = [{}] // 创建一个空对象，以便生成工作表
-      const header = props.columns.map((col) => col.label || col.title || '')
-      const keys = props.columns.map((col) => col.prop || col.dataIndex || col.key || '')
+      const header = props.columns.map(col => col.label || col.title || '')
+      const keys = props.columns.map(col => col.prop || col.dataIndex || col.key || '')
 
       // 导出仅有表头的Excel
       exportExcel(emptyData, header, props.fileName, keys)
-    } else {
+    }
+    else {
       // 不允许空数据导出
       ElMessage.warning(props.emptyMessage)
-      return
     }
-  } else {
+  }
+  else {
     // 获取表头和数据
-    const header = props.columns.map((col) => col.label || col.title || '')
-    const keys = props.columns.map((col) => col.prop || col.dataIndex || col.key || '')
+    const header = props.columns.map(col => col.label || col.title || '')
+    const keys = props.columns.map(col => col.prop || col.dataIndex || col.key || '')
 
     // 处理数据
     const data = formatData(props.tableData, keys)
@@ -115,13 +118,13 @@ const handleExport = () => {
  * @param {Array} keys 表格列的key
  * @returns {Array} 格式化后的数据
  */
-const formatData = (dataSource, keys) => {
+function formatData(dataSource, keys) {
   return dataSource.map((item) => {
     const newItem = {}
 
     keys.forEach((key) => {
       // 处理格式化函数
-      const column = props.columns.find((col) => (col.prop || col.dataIndex || col.key) === key)
+      const column = props.columns.find(col => (col.prop || col.dataIndex || col.key) === key)
       if (column && typeof column.formatter === 'function') {
         newItem[key] = column.formatter(item, column, dataSource.indexOf(item))
         return
@@ -135,7 +138,8 @@ const formatData = (dataSource, keys) => {
           value = value?.[k]
         })
         newItem[key] = value !== undefined ? value : ''
-      } else {
+      }
+      else {
         newItem[key] = item[key] !== undefined ? item[key] : ''
       }
     })
@@ -147,10 +151,10 @@ const formatData = (dataSource, keys) => {
  * 导出Excel
  * @param {Array} data 导出数据
  * @param {Array} header 表头
- * @param {String} fileName 文件名
+ * @param {string} fileName 文件名
  * @param {Array} keys 可选，列key，用于空数据导出
  */
-const exportExcel = (data, header, fileName, keys = null) => {
+function exportExcel(data, header, fileName, keys = null) {
   // 创建工作簿
   const wb = XLSX.utils.book_new()
 
@@ -165,7 +169,8 @@ const exportExcel = (data, header, fileName, keys = null) => {
       emptyObj[key] = ''
     })
     worksheet = XLSX.utils.json_to_sheet([emptyObj], { header: keys })
-  } else {
+  }
+  else {
     // 正常数据导出
     worksheet = XLSX.utils.json_to_sheet(data, { header: keys })
   }
@@ -177,7 +182,8 @@ const exportExcel = (data, header, fileName, keys = null) => {
   const range = XLSX.utils.decode_range(worksheet['!ref'])
   for (let col = range.s.c; col <= range.e.c; ++col) {
     const cellRef = XLSX.utils.encode_cell({ r: 0, c: col })
-    if (!worksheet[cellRef]) continue
+    if (!worksheet[cellRef])
+      continue
     worksheet[cellRef].s = {
       font: {
         bold: true,
@@ -242,11 +248,12 @@ const exportExcel = (data, header, fileName, keys = null) => {
 
 /**
  * 计算单元格宽度
- * @param {String} cellValue 单元格内容
- * @returns {Number} 宽度值
+ * @param {string} cellValue 单元格内容
+ * @returns {number} 宽度值
  */
-const calculateCellWidth = (cellValue) => {
-  if (!cellValue) return 10
+function calculateCellWidth(cellValue) {
+  if (!cellValue)
+    return 10
 
   // 中文字符计算
   let width = 0

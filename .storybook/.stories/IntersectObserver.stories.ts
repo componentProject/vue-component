@@ -4,7 +4,7 @@ import IntersectObserver from '@/components/IntersectObserver/index.vue'
 import './assets/styles/IntersectObserver.scss'
 
 import { ref } from 'vue'
-import { ElRow, ElCol, ElForm, ElFormItem, ElSelect, ElOption, ElCheckboxGroup } from 'element-plus'
+import { ElCheckboxGroup, ElCol, ElForm, ElFormItem, ElOption, ElRow, ElSelect } from 'element-plus'
 
 import type { Meta, StoryFn } from '@storybook/vue3'
 
@@ -848,7 +848,7 @@ export const intersectObserver: StoryFn = () => ({
     // 入区健康信息
     const inAreaHealthInfo = ref({})
     // 过敏信息
-    const allergyColumns = ref<Array<{ label: string; prop: string; type?: string }>>([
+    const allergyColumns = ref<Array<{ label: string, prop: string, type?: string }>>([
       { label: '过敏类型', prop: 'allergyType' },
       { label: '过敏原名称', prop: 'allergyOrigin' },
       { label: '过敏物/过敏药品', prop: 'allergyDrug' },
@@ -933,7 +933,7 @@ export const intersectObserver: StoryFn = () => ({
     const isolationMark = ref([])
 
     // list
-    const list = ref<{ name: string; id: string; target: Element | null }[]>([
+    const list = ref<{ name: string, id: string, target: Element | null }[]>([
       { name: '基本信息', id: 'baseInfo', target: null },
       { name: '住院信息', id: 'hospitalInfo', target: null },
       { name: '入区健康信息', id: 'inAreaHealth', target: null },
@@ -948,7 +948,7 @@ export const intersectObserver: StoryFn = () => ({
     const activeListItem = ref<string>('baseInfo')
     const scrollToHandler = (ref: string) => {
       const findItem: { target: Element | null } | undefined = list.value.find(
-        (item) => item.id === ref,
+        item => item.id === ref,
       )
       const element: Element | undefined | null = findItem?.target
       activeListItem.value = ref

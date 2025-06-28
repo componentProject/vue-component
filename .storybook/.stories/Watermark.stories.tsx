@@ -42,7 +42,7 @@ const meta: Meta<typeof Watermark> = {
 export default meta
 type Story = StoryObj<typeof Watermark>
 
-const Template: StoryFn = (args) => ({
+const Template: StoryFn = args => ({
   components: { Watermark },
   template: `
     <Watermark v-bind="args">
