@@ -44,7 +44,9 @@
     "node_modules",
     "cypress",
     "vite.config.ts",
-    ".storybook",
+    ".storybook/main.ts",
+    ".storybook/.stories/**/*",
+    ".storybook/.stories/**/*.tsx",
     ".docs/.vitepress/config.ts"
   ],
   "references": [

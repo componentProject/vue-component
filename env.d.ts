@@ -68,10 +68,6 @@ declare interface ViteEnv {
    * 是否删除生产环境 console
    */
   VITE_DROP_CONSOLE: boolean
-  /**
-   * 是否开启文档模式,与CDN，qiankun互斥
-   */
-  VITE_USE_DOCUMENT: boolean
 }
 
 declare const __SYSTEM_CODE__ = string

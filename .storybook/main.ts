@@ -13,8 +13,17 @@ const config: StorybookConfig = {
   core: {
     builder: '@storybook/builder-vite',
   },
-  async viteFinal(config) {
-    return config
+  async viteFinal(config, { configType }) {
+    const { mergeConfig } = await import('vite')
+    if (configType === 'DEVELOPMENT') {
+      // 开发环境
+    }
+    if (configType === 'PRODUCTION') {
+      // 生产环境
+    }
+    return mergeConfig(config, {
+      mode: 'github',
+    })
   },
   docs: {
     autodocs: true,
