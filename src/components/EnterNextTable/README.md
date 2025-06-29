@@ -21,22 +21,6 @@ import TableEnterNext from '@/components/TableEnterNext/index.vue'
 ### 1. 基础表格用法
 
 ```vue
-<script setup>
-import { ref } from 'vue'
-import TableEnterNext from '@/components/TableEnterNext/index.vue'
-
-const tableData = ref([
-  { name: '张三', age: '25', gender: '男' },
-  { name: '李四', age: '30', gender: '女' },
-])
-
-// 当没有下一个输入元素时的处理
-function handleNoNextInput(element, rowIndex) {
-  console.log('已到达最后一个输入元素', element, `行索引: ${rowIndex}`)
-  // 在这里可以执行提交表单等操作
-}
-</script>
-
 <template>
   <TableEnterNext :data="tableData" border @no-next-input="handleNoNextInput">
     <el-table-column label="姓名" prop="name">
@@ -61,6 +45,22 @@ function handleNoNextInput(element, rowIndex) {
     </el-table-column>
   </TableEnterNext>
 </template>
+
+<script setup>
+import { ref } from 'vue'
+import TableEnterNext from '@/components/TableEnterNext/index.vue'
+
+const tableData = ref([
+  { name: '张三', age: '25', gender: '男' },
+  { name: '李四', age: '30', gender: '女' },
+])
+
+// 当没有下一个输入元素时的处理
+function handleNoNextInput(element, rowIndex) {
+  console.log('已到达最后一个输入元素', element, `行索引: ${rowIndex}`)
+  // 在这里可以执行提交表单等操作
+}
+</script>
 ```
 
 ### 2. 允许在下拉框展开时也能跳转
@@ -81,6 +81,17 @@ function handleNoNextInput(element, rowIndex) {
 ### 3. 动态添加行后刷新组件
 
 ```vue
+<template>
+  <div>
+    <el-button @click="addRow">
+      添加行
+    </el-button>
+    <TableEnterNext ref="tableEnterNextRef" :data="tableData" border>
+      <!-- 表格列定义 -->
+    </TableEnterNext>
+  </div>
+</template>
+
 <script setup>
 import { ref } from 'vue'
 import TableEnterNext from '@/components/TableEnterNext/index.vue'
@@ -102,15 +113,6 @@ function addRow() {
   }, 0)
 }
 </script>
-
-<template>
-  <div>
-    <el-button @click="addRow"> 添加行 </el-button>
-    <TableEnterNext ref="tableEnterNextRef" :data="tableData" border>
-      <!-- 表格列定义 -->
-    </TableEnterNext>
-  </div>
-</template>
 ```
 
 ## Props

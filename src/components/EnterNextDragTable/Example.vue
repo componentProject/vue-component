@@ -16,6 +16,7 @@
         drag-type="draggable"
         :allow-select-next-in-empty="allowSelectNextInEmpty"
         @no-next-input="handleNoNextInput"
+        @no-select-value="handleNoSelectValue"
       >
         <template #name="{ row, column }">
           <el-input v-model="row[column.field]" />
@@ -110,6 +111,12 @@ function handleNoNextInput({ row, rowIndex }: { row: TableRowData, rowIndex: num
   ElMessage.info(`在最后一个输入框按下了Enter，当前行：${rowIndex + 1}，姓名：${row.name}`)
   // 自动添加新行
   addRow()
+}
+
+// 处理select下拉为空的情况
+function handleNoSelectValue({ rowIndex, colIndex }: { row: TableRowData, rowIndex: number, colIndex: number }) {
+  ElMessage.warning(`select下拉为空，当前行：${rowIndex + 1}，列：${colIndex + 1}`)
+  // 这里可以处理select没有值的情况
 }
 
 // 添加新行

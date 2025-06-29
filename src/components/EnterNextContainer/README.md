@@ -23,6 +23,16 @@ import EnterNextContainer from '@/components/EnterNextContainer/index.vue'
 ### 1. 基础用法 - 包裹表单元素
 
 ```vue
+<template>
+  <EnterNextContainer>
+    <div>
+      <el-input v-model="form.field1" placeholder="字段1" />
+      <el-input v-model="form.field2" placeholder="字段2" />
+      <el-input v-model="form.field3" placeholder="字段3" />
+    </div>
+  </EnterNextContainer>
+</template>
+
 <script setup>
 import { ref } from 'vue'
 import EnterNextContainer from '@/components/EnterNextContainer/index.vue'
@@ -33,16 +43,6 @@ const form = ref({
   field3: '',
 })
 </script>
-
-<template>
-  <EnterNextContainer>
-    <div>
-      <el-input v-model="form.field1" placeholder="字段1" />
-      <el-input v-model="form.field2" placeholder="字段2" />
-      <el-input v-model="form.field3" placeholder="字段3" />
-    </div>
-  </EnterNextContainer>
-</template>
 ```
 
 ### 2. 使用virtualRef
@@ -50,6 +50,17 @@ const form = ref({
 当你不想直接包裹元素，或者需要监控的元素在组件外部时，可以使用virtualRef：
 
 ```vue
+<template>
+  <div ref="formRef">
+    <el-input v-model="form.field1" placeholder="字段1" />
+    <el-input v-model="form.field2" placeholder="字段2" />
+    <el-input v-model="form.field3" placeholder="字段3" />
+  </div>
+
+  <!-- EnterNextContainer不包含任何内容，但通过virtualRef监控外部表单 -->
+  <EnterNextContainer :virtual-ref="formRef" />
+</template>
+
 <script setup>
 import { ref } from 'vue'
 import EnterNextContainer from '@/components/EnterNextContainer/index.vue'
@@ -61,17 +72,6 @@ const form = ref({
 })
 const formRef = ref(null)
 </script>
-
-<template>
-  <div ref="formRef">
-    <el-input v-model="form.field1" placeholder="字段1" />
-    <el-input v-model="form.field2" placeholder="字段2" />
-    <el-input v-model="form.field3" placeholder="字段3" />
-  </div>
-
-  <!-- EnterNextContainer不包含任何内容，但通过virtualRef监控外部表单 -->
-  <EnterNextContainer :virtual-ref="formRef" />
-</template>
 ```
 
 ### 3. 处理下拉选择组件
@@ -95,6 +95,16 @@ const formRef = ref(null)
 当用户在最后一个输入元素上按Enter键时，或者只有一个输入元素时，组件会触发`noNextInput`事件：
 
 ```vue
+<template>
+  <EnterNextContainer @no-next-input="handleNoNextInput">
+    <div>
+      <el-input v-model="form.field1" placeholder="字段1" />
+      <el-input v-model="form.field2" placeholder="字段2" />
+      <el-input v-model="form.field3" placeholder="字段3" />
+    </div>
+  </EnterNextContainer>
+</template>
+
 <script setup>
 import { ref } from 'vue'
 import EnterNextContainer from '@/components/EnterNextContainer/index.vue'
@@ -111,16 +121,6 @@ function handleNoNextInput(element) {
   // 执行其他操作，如提交表单、显示确认对话框等
 }
 </script>
-
-<template>
-  <EnterNextContainer @no-next-input="handleNoNextInput">
-    <div>
-      <el-input v-model="form.field1" placeholder="字段1" />
-      <el-input v-model="form.field2" placeholder="字段2" />
-      <el-input v-model="form.field3" placeholder="字段3" />
-    </div>
-  </EnterNextContainer>
-</template>
 ```
 
 ## Props

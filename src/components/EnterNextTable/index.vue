@@ -12,6 +12,7 @@
     :allow-select-next-in-empty="props.allowSelectNextInEmpty"
     :virtual-ref="row"
     @no-next-input="handleNoNextInput"
+    @no-select-value="handleNoSelectValue"
   />
 </template>
 
@@ -36,7 +37,15 @@ const props = defineProps({
 const emit = defineEmits<{
   // 当在表格中最后一个输入元素按下Enter键时触发
   (e: 'noNextInput', { row, rowIndex }: noNextInputParams): void
+  // 当在表格中select下拉为空时触发
+  (e: 'noSelectValue', { row, rowIndex, colIndex }: noSelectValueParams): void
 }>()
+
+interface noSelectValueParams {
+  row: any
+  rowIndex: number
+  colIndex: number
+}
 
 // 防抖函数，正确定义类型
 function debounce<T extends (...args: any[]) => void>(
@@ -92,6 +101,26 @@ function handleNoNextInput(element: HTMLElement) {
   emit('noNextInput', {
     row: props.data[rowIndex],
     rowIndex,
+  })
+}
+// 当找不到下拉框输入元素值时的处理
+function handleNoSelectValue(element: HTMLElement) {
+  // 查找当前行的索引
+  const row = element.closest('tr')
+  const rowIndex = row ? tableRows.value.indexOf(row) : -1
+  // 获取当前元素最近的td祖先
+  const td = element.closest('td')
+  // 获取所有td元素
+  const tds = row ? Array.from(row.querySelectorAll('td')) : []
+
+  // 计算td在所有td中的索引位置（从0开始）
+  const colIndex = td ? tds.indexOf(td as HTMLTableCellElement) : -1
+  console.log(`当前元素位于第 ${colIndex + 1} 个td中`)
+  // 向外传递事件，并包含更多信息
+  emit('noSelectValue', {
+    row: props.data[rowIndex],
+    rowIndex,
+    colIndex,
   })
 }
 

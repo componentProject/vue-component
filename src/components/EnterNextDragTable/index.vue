@@ -19,12 +19,13 @@
     :virtual-ref="row"
     :allow-select-next-in-empty="props.allowSelectNextInEmpty"
     @no-next-input="handleNoNextInput"
+    @no-select-value="handleNoSelectValue"
   />
 </template>
 
 <script setup lang="ts">
 import type { VxeTableDefines } from 'vxe-table'
-import type { EnterNextDragTableProps, NoNextInputParams } from './_types'
+import type { EnterNextDragTableProps, NoNextInputParams, NoSelectValueParams } from './_types'
 import { computed, nextTick, ref, useTemplateRef, watch } from 'vue'
 import DraggableTable from '@/components/DraggableTable/index.vue'
 import EnterNextContainer from '@/components/EnterNextContainer/index.vue'
@@ -36,6 +37,8 @@ const props = withDefaults(defineProps<EnterNextDragTableProps>(), {
 const emit = defineEmits<{
   // 当在表格中最后一个输入元素按下Enter键时触发
   (e: 'noNextInput', params: NoNextInputParams): void
+  // 当在表格中select下拉为空时触发
+  (e: 'noSelectValue', params: NoSelectValueParams): void
   (e: 'toggleTreeExpand', params: VxeTableDefines.ToggleRowExpandEventParams): void
 }>()
 
@@ -104,6 +107,30 @@ function handleNoNextInput(element: HTMLElement) {
     emit('noNextInput', {
       row: tableData.value[rowIndex],
       rowIndex,
+    })
+  }
+}
+
+// 当找不到下拉框输入元素值时的处理
+function handleNoSelectValue(element: HTMLElement) {
+  // 查找当前行的索引
+  const row = element.closest('.vxe-body--row') as HTMLElement
+  const rowIndex = row ? tableRows.value.indexOf(row) : -1
+
+  // 获取当前元素最近的td祖先
+  const td = element.closest('td')
+  // 获取所有td元素
+  const tds = row ? Array.from(row.querySelectorAll('td')) : []
+
+  // 计算td在所有td中的索引位置（从0开始）
+  const colIndex = td ? tds.indexOf(td as HTMLTableCellElement) : -1
+
+  // 向外传递事件，并包含更多信息
+  if (rowIndex !== -1 && tableData.value) {
+    emit('noSelectValue', {
+      row: tableData.value[rowIndex],
+      rowIndex,
+      colIndex,
     })
   }
 }

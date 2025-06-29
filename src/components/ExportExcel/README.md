@@ -37,7 +37,7 @@ npm install xlsx file-saver
       <el-table-column prop="address" label="地址" />
     </el-table>
 
-    <export-excel :table-data="tableData" :columns="columns" file-name="用户数据" />
+    <ExportExcel :table-data="tableData" :columns="columns" file-name="用户数据" />
   </div>
 </template>
 
@@ -84,13 +84,13 @@ const columns = ref([
 
 ```vue
 <template>
-  <export-excel :table-data="tableData" :columns="exportColumns" file-name="用户数据">
+  <ExportExcel :table-data="tableData" :columns="exportColumns" file-name="用户数据">
     导出数据
-  </export-excel>
+  </ExportExcel>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { computed, ref } from 'vue'
 import ExportExcel from '@/components/ExportExcel/index.vue'
 
 const tableData = ref([
@@ -118,7 +118,7 @@ const exportColumns = computed(() => [
   {
     prop: 'status',
     label: '状态',
-    formatter: (row) => statusMap[row.status] || row.status,
+    formatter: row => statusMap[row.status] || row.status,
   },
 ])
 </script>
@@ -143,7 +143,7 @@ const exportColumns = computed(() => [
       <el-table-column prop="info.address" label="地址" />
     </el-table>
 
-    <export-excel :table-data="tableData" :columns="columns" file-name="用户嵌套数据" />
+    <ExportExcel :table-data="tableData" :columns="columns" file-name="用户嵌套数据" />
   </div>
 </template>
 

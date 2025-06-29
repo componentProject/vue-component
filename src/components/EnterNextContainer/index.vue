@@ -24,6 +24,7 @@ const props = withDefaults(defineProps<Props>(), {
 // 定义可以发出的事件
 const emit = defineEmits<{
   (e: 'noNextInput', element: HTMLElement): void // 当找不到下一个输入元素时触发
+  (e: 'noSelectValue', element: HTMLElement): void // 当select为空时触发
 }>()
 
 const containerRef = ref<HTMLElement | null>(null)
@@ -100,8 +101,10 @@ function handleInputKeyUp(event: KeyboardEvent) {
   // // if (!canSelectNext) return
   // console.log('canSelectNext', canSelectNext)
   // //#endregion
-  if (!hasAriaActive)
+  if (!hasAriaActive) {
+    emit('noSelectValue', activeElement)
     return
+  }
 
   // 获取当前焦点元素在列表中的索引
   const currentIndex = inputElements.value.findIndex(el => el === activeElement)

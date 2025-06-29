@@ -39,6 +39,28 @@ app.mount('#app')
 ## 基本用法
 
 ```vue
+<template>
+  <DraggableTable
+    v-model="tableData"
+    :columns="columns"
+    dragable
+    editable
+    filterable
+    @row-dragend="handleRowDrop"
+    @column-dragend="handleColumnDrop"
+  >
+    <!-- 自定义插槽 -->
+    <template #操作="{ row }">
+      <el-button type="primary" size="small" @click="handleEdit(row)">
+        编辑
+      </el-button>
+      <el-button type="danger" size="small" @click="handleDelete(row)">
+        删除
+      </el-button>
+    </template>
+  </DraggableTable>
+</template>
+
 <script setup>
 import { ref } from 'vue'
 import DraggableTable from '@/components/DraggableTable/index.vue'
@@ -116,24 +138,6 @@ function handleDelete(row) {
   console.log('删除行:', row)
 }
 </script>
-
-<template>
-  <DraggableTable
-    v-model="tableData"
-    :columns="columns"
-    dragable
-    editable
-    filterable
-    @row-dragend="handleRowDrop"
-    @column-dragend="handleColumnDrop"
-  >
-    <!-- 自定义插槽 -->
-    <template #操作="{ row }">
-      <el-button type="primary" size="small" @click="handleEdit(row)"> 编辑 </el-button>
-      <el-button type="danger" size="small" @click="handleDelete(row)"> 删除 </el-button>
-    </template>
-  </DraggableTable>
-</template>
 ```
 
 ## 组件属性（Props）

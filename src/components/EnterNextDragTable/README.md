@@ -7,10 +7,22 @@ EnterNextDragTable 是一个封装了 DraggableTable 和 EnterNextContainer 功�
 - 支持所有 DraggableTable 的功能（行列拖拽、虚拟滚动、右键菜单配置等）
 - 支持在表格内按 Enter 键时自动切换到下一个输入框/选择器
 - 当最后一个输入框按 Enter 键时，可触发自定义事件处理
+- 当select没有选中值时，可触发自定义事件处理
 
 ## 基本用法
 
 ```vue
+<template>
+  <EnterNextDragTable
+    v-model:table-data="tableData"
+    :columns="columns"
+    @no-next-input="handleNoNextInput"
+    @no-select-value="handleNoSelectValue"
+  >
+    <!-- 可选的自定义列插槽 -->
+  </EnterNextDragTable>
+</template>
+
 <script setup>
 import { ref } from 'vue'
 import EnterNextDragTable from '@/components/EnterNextDragTable/index.vue'
@@ -31,17 +43,13 @@ function handleNoNextInput({ row, rowIndex }) {
   console.log('在最后一个输入元素按下了Enter', row, rowIndex)
   // 可以在这里添加新行或执行其他操作
 }
-</script>
 
-<template>
-  <EnterNextDragTable
-    v-model:table-data="tableData"
-    :columns="columns"
-    @no-next-input="handleNoNextInput"
-  >
-    <!-- 可选的自定义列插槽 -->
-  </EnterNextDragTable>
-</template>
+// 当select下拉为空时的处理函数
+function handleNoSelectValue({ row, rowIndex, colIndex }) {
+  console.log('select下拉为空', row, rowIndex, colIndex)
+  // 可以在这里处理select没有值的情况
+}
+</script>
 ```
 
 ## 属性
@@ -54,9 +62,10 @@ function handleNoNextInput({ row, rowIndex }) {
 
 ## 事件
 
-| 事件名      | 参数              | 说明                                        |
-| ----------- | ----------------- | ------------------------------------------- |
-| noNextInput | { row, rowIndex } | 当在表格中最后一个输入元素按下Enter键时触发 |
+| 事件名        | 参数                        | 说明                                        |
+| ------------- | --------------------------- | ------------------------------------------- |
+| noNextInput   | { row, rowIndex }           | 当在表格中最后一个输入元素按下Enter键时触发 |
+| noSelectValue | { row, rowIndex, colIndex } | 当在表格中select下拉为空时触发              |
 
 ## 方法
 
