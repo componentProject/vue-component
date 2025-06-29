@@ -11,7 +11,10 @@ const config: StorybookConfig = {
     '@storybook/addon-interactions',
   ],
   core: {
-    builder: '@storybook/builder-vite',
+    builder: {
+      name: '@storybook/builder-vite',
+      options: {},
+    },
   },
   async viteFinal(config, { configType }) {
     const { mergeConfig } = await import('vite')
@@ -21,6 +24,19 @@ const config: StorybookConfig = {
     if (configType === 'PRODUCTION') {
       // 生产环境
     }
+    const excludePlugins = ['vite-plugin-cdn-import']
+    const filterPluginsRecursive = (plugins: any[]): any[] => {
+      return plugins.filter((item) => {
+        if (Array.isArray(item)) {
+          const filtered = filterPluginsRecursive(item)
+          return filtered.length > 0
+        }
+        else {
+          return !excludePlugins.includes(item.name)
+        }
+      })
+    }
+    config.plugins = filterPluginsRecursive(config.plugins || [])
     return mergeConfig(config, {
       mode: 'github',
     })

@@ -45,8 +45,7 @@ export default defineConfig(({ mode }) => {
   const useDevMode = viteEnv.VITE_QIANKUN_DEV
   const envSystemCode = isDev && !useDevMode ? 'el' : viteEnv.VITE_GLOB_APP_CODE
 
-  const useDoc = mode === 'github' || viteEnv.VITE_USE_DOCUMENT
-  console.log('useDoc', useDoc, viteEnv.VITE_USE_DOCUMENT)
+  const useDoc = mode === 'github'
   const useQianKun = viteEnv.VITE_USE_QIANKUN && !useDoc
   const useCDN = viteEnv.VITE_USE_CDN && !useDoc && !useQianKun
   const vuePlugins = [
