@@ -5,6 +5,8 @@ export default antfu(
     formatters: true,
     ignores: [
       'src/components/ConfigForm/**',
+      '.husky/**',
+      '**/*.md',
     ],
     rules: {
       'style/spaced-comment': 'off',

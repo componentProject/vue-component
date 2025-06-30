@@ -1,4 +1,37 @@
-@forward 'tailwindcss';
+////#region use v4 如果用它，需要修改依赖tailwindcss和@tailwindcss/postcss为"^4.1.8"
+//@forward 'tailwindcss';
+//@layer base {
+//  html {
+//    font-size: 4px;
+//    @apply whitespace-nowrap;
+//  }
+//  canvas {
+//    display: inline;
+//  }
+//  body {
+//    font-size: 16px;
+//  }
+//}
+//@layer utilities {
+//  .flex {
+//    @apply flex flex-none!;
+//  }
+//  .flex-1-hidden {
+//    @apply flex-1 overflow-hidden;
+//  }
+//  .flex-1-auto {
+//    @apply flex-1 overflow-auto;
+//  }
+//  .container {
+//    width: 100%;
+//    max-width: 100%;
+//  }
+//}
+////#endregion
+//#region use v3 如果用它，需要修改依赖tailwindcss和@tailwindcss/postcss为"npm:tailwindcss@3",
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 @layer base {
   html {
@@ -14,19 +47,18 @@
   body {
     font-size: 16px;
   }
+}
 
-  //:root {
-  //  --spacing: 1px;
-  //}
+@layer components {
+  .container {
+    width: 100%;
+    max-width: 100%;
+  }
 }
 
 @layer utilities {
-  .bg-primary {
-    background-color: var(--el-color-primary);
-  }
-
   .flex {
-    @apply flex flex-none!;
+    @apply flex-none;
   }
 
   .flex-1-hidden {
@@ -36,9 +68,6 @@
   .flex-1-auto {
     @apply flex-1 overflow-auto;
   }
-
-  .container {
-    width: 100%;
-    max-width: 100%;
-  }
 }
+
+//#endregion

@@ -12,6 +12,7 @@
   --el-menu-popup-text-hover-color: var(--el-menu-bg-hover-color);
 }
 
+//#region 布局类
 .el-main {
   --el-main-padding: 12px;
 }
@@ -20,6 +21,9 @@
   --el-header-padding: 0;
 }
 
+//#endregion
+
+//#region el-menu
 ////用于头部菜单
 //.el-menu--popup-container {
 //  background-color: var(--el-menu-popup-bg-color);
@@ -79,6 +83,10 @@
   }
 }
 
+//#endregion
+
+//#region el-dialog
+
 /* dialog全局样式 */
 .el-dialog {
   user-select: none;
@@ -103,11 +111,19 @@
   height: calc(100% - 47px);
 }
 
+//#endregion
+
+//#region el-tree
+
 /* 树高亮 */
 .el-tree--highlight-current > .is-current {
   background: var(--primary-color-4) !important;
   color: var(--primary-color);
 }
+
+//#endregion
+
+//#region el-drawer
 
 /* 抽屉全局样式 */
 .el-drawer {
@@ -126,6 +142,14 @@
   }
 }
 
+//#endregion
+
+//#region el-input,el-select
+.el-input__inner,
+.el-range-input {
+  font-size: 12px !important;
+}
+
 .el-input__wrapper {
   position: relative;
 
@@ -141,10 +165,16 @@
   }
 }
 
+//#endregion
+
+//#region el-form,el-form-item
 .el-form-item__label {
   color: var(--text-color) !important;
 }
 
+//#endregion
+
+//#region el-table
 .el-table {
   color: #29354f !important;
   font-size: 14px !important;
@@ -254,7 +284,11 @@
   }
 }
 
-.el-input__inner,
-.el-range-input {
-  font-size: 12px !important;
+//#endregion
+
+//#region custom
+.bg-primary {
+  background-color: var(--el-color-primary);
 }
+
+//#endregion
