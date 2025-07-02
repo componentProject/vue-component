@@ -1,4 +1,22 @@
 import type { App, Component } from 'vue'
+// 导出所有组件供统一导入
+import Calendar from './Calendar/index.vue'
+import ConfigForm from './ConfigForm/index.vue'
+import ConfigProvider from './ConfigProvider/index.vue'
+import DateRangePicker from './DateRangePicker/index.vue'
+import DraggableTable from './DraggableTable/index.vue'
+import EnterNextContainer from './EnterNextContainer/index.vue'
+import EnterNextDragTable from './EnterNextDragTable/index.vue'
+import EnterNextTable from './EnterNextTable/index.vue'
+import ExportExcel from './ExportExcel/index.vue'
+import Icon from './Icon/index.vue'
+import IntersectObserver from './IntersectObserver/index.vue'
+import KeepAllAlive from './KeepAllAlive/index.vue'
+import MarkdownEditor from './MarkdownEditor/index.vue'
+import PopoverTableSelect from './PopoverTableSelect/index.vue'
+import Select from './Select/index.vue'
+import Tabs from './Tabs/index.vue'
+import Watermark from './Watermark/index.vue'
 
 const componentFiles = import.meta.glob(['./**/index.vue', '!./**/components/*'], {
   eager: true,
@@ -26,4 +44,25 @@ function install(app: App) {
 const plugin = {
   install,
 }
+
 export default plugin
+
+export {
+  Calendar,
+  ConfigForm,
+  ConfigProvider,
+  DateRangePicker,
+  DraggableTable,
+  EnterNextContainer,
+  EnterNextDragTable,
+  EnterNextTable,
+  ExportExcel,
+  Icon,
+  IntersectObserver,
+  KeepAllAlive,
+  MarkdownEditor,
+  PopoverTableSelect,
+  Select,
+  Tabs,
+  Watermark,
+}

@@ -107,7 +107,7 @@ export default defineConfig(({ mode }) => {
         plugins: [{ name: 'removeViewBox' }, { name: 'removeEmptyAttrs', active: false }],
       },
     }),
-    useCDN && !isComponentMode
+    useCDN
     && importToCDN({
       enableInDevMode: viteEnv.VITE_USE_CDN_IS_DEV,
       prodUrl: `${viteEnv.VITE_CDN_BASE_URL}/{name}@{version}{path}`,
@@ -116,7 +116,7 @@ export default defineConfig(({ mode }) => {
   ].filter(i => !!i)
 
   const monitorPlugins = [
-    viteEnv.VITE_SENTRY && !isComponentMode
+    viteEnv.VITE_SENTRY
     && sentryVitePlugin({
       authToken: process.env.SENTRY_AUTH_TOKEN,
       org: 'f1f562b9b82f',
@@ -142,6 +142,7 @@ export default defineConfig(({ mode }) => {
     : []
 
   let build: UserConfig['build']
+  let plugins: UserConfig['plugins']
   // 如果是组件库模式，则使用不同的配置
   if (isComponentMode) {
     // 组件库入口文件
@@ -151,8 +152,12 @@ export default defineConfig(({ mode }) => {
         entry: componentEntry,
         name: 'moluoxixi',
         fileName: 'moluoxixi',
+        formats: ['es', 'cjs'],
       },
       outDir: 'moluoxixi',
+      emptyOutDir: true,
+      minify: 'esbuild',
+      cssCodeSplit: false,
       rollupOptions: {
         external: ['vue', 'element-plus'],
         output: {
@@ -163,6 +168,9 @@ export default defineConfig(({ mode }) => {
         },
       },
     }
+    plugins = [
+      ...vuePlugins,
+    ]
   }
   else {
     build = {
@@ -187,10 +195,7 @@ export default defineConfig(({ mode }) => {
         },
       },
     }
-  }
-  return {
-    base: `/${systemCode}`,
-    plugins: [
+    plugins = [
       ...vuePlugins,
       ...performancePlugins,
       ...monitorPlugins,
@@ -208,7 +213,11 @@ export default defineConfig(({ mode }) => {
           },
         },
       }),
-    ],
+    ]
+  }
+  return {
+    base: `/${systemCode}`,
+    plugins,
     esbuild: {
       pure:
         !isDev && viteEnv.VITE_PURE_CONSOLE_AND_DEBUGGER

@@ -1,14 +1,23 @@
 {
-  "name": "vue-template",
+  "name": "moluoxixi",
   "packageManager": "pnpm@10.8.0",
-  "version": "0.1.0",
+  "version": "1.3.0",
   "private": false,
   "type": "module",
   "engines": {
     "node": ">=20.18.0"
   },
   "publishConfig": {
-    "registry": "http://pms.trasen.cn:8008/repository/local-npm/"
+    "registry": "https://registry.npmjs.org/"
+  },
+  "main": "./moluoxixi/moluoxixi.cjs",
+  "module": "./moluoxixi/moluoxixi.js",
+  "exports": {
+    ".": {
+      "import": "./moluoxixi/moluoxixi.cjs",
+      "require": "./moluoxixi/moluoxixi.js"
+    },
+    "./style.css": "./moluoxixi/moluoxixi.css"
   },
   "scripts": {
     "dev": "vite",
