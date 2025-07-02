@@ -1,7 +1,8 @@
 import type { Plugin } from 'postcss'
 import path from 'node:path'
 import process from 'node:process'
-
+import { defineConfig, loadEnv } from 'vite'
+import type { UserConfig } from 'vite'
 // vite vue插件
 import pluginVue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
@@ -32,7 +33,6 @@ import scopedCssPrefixPlugin from './plugins/addScopedAndReplacePrefix.ts'
 import autoRoutesPlugin from './plugins/autoRoutes/index.ts'
 
 // 其余vite插件与配置
-import { defineConfig, loadEnv } from 'vite'
 import { wrapperEnv } from './src/utils/modules/getEnv.ts'
 import { createHtmlPlugin } from 'vite-plugin-html'
 
@@ -48,6 +48,8 @@ export default defineConfig(({ mode }) => {
   const useDoc = mode === 'github'
   const useQianKun = viteEnv.VITE_USE_QIANKUN && !useDoc
   const useCDN = viteEnv.VITE_USE_CDN && !useDoc && !useQianKun
+  // 组件库构建模式
+  const isComponentMode = mode === 'component'
   const vuePlugins = [
     pluginVue(),
     vueJsx(),
@@ -105,7 +107,7 @@ export default defineConfig(({ mode }) => {
         plugins: [{ name: 'removeViewBox' }, { name: 'removeEmptyAttrs', active: false }],
       },
     }),
-    useCDN
+    useCDN && !isComponentMode
     && importToCDN({
       enableInDevMode: viteEnv.VITE_USE_CDN_IS_DEV,
       prodUrl: `${viteEnv.VITE_CDN_BASE_URL}/{name}@{version}{path}`,
@@ -114,7 +116,7 @@ export default defineConfig(({ mode }) => {
   ].filter(i => !!i)
 
   const monitorPlugins = [
-    viteEnv.VITE_SENTRY
+    viteEnv.VITE_SENTRY && !isComponentMode
     && sentryVitePlugin({
       authToken: process.env.SENTRY_AUTH_TOKEN,
       org: 'f1f562b9b82f',
@@ -139,6 +141,53 @@ export default defineConfig(({ mode }) => {
       ]
     : []
 
+  let build: UserConfig['build']
+  // 如果是组件库模式，则使用不同的配置
+  if (isComponentMode) {
+    // 组件库入口文件
+    const componentEntry = path.resolve(__dirname, 'src/components/index.ts')
+    build = {
+      lib: {
+        entry: componentEntry,
+        name: 'moluoxixi',
+        fileName: 'moluoxixi',
+      },
+      outDir: 'moluoxixi',
+      rollupOptions: {
+        external: ['vue', 'element-plus'],
+        output: {
+          globals: {
+            'vue': 'Vue',
+            'element-plus': 'ElementPlus',
+          },
+        },
+      },
+    }
+  }
+  else {
+    build = {
+      sourcemap: isDev,
+      outDir: useDoc ? './docs/pages' : `${systemCode}`,
+      cssCodeSplit: true,
+      chunkSizeWarningLimit: 1500,
+      minify: 'esbuild',
+      rollupOptions: {
+        external: [],
+        output: {
+          globals: {},
+          chunkFileNames: 'static/js/[name]-[hash].js',
+          entryFileNames: 'static/js/[name]-[hash].js',
+          assetFileNames: 'static/[ext]/[name]-[hash].[ext]',
+          manualChunks: (id: string) => {
+            // 优化拆分策略
+            if (id.includes('node_modules')) {
+              return id.toString().split('node_modules/')[1].split('/')[0].toString()
+            }
+          },
+        },
+      },
+    }
+  }
   return {
     base: `/${systemCode}`,
     plugins: [
@@ -171,29 +220,7 @@ export default defineConfig(({ mode }) => {
       include: [],
       exclude: [],
     },
-    build: {
-      sourcemap: isDev,
-      // outDir: `${systemCode}`,
-      outDir: useDoc ? './docs/pages' : `${systemCode}`,
-      cssCodeSplit: true,
-      chunkSizeWarningLimit: 1500,
-      minify: 'esbuild',
-      rollupOptions: {
-        external: [],
-        output: {
-          globals: {},
-          chunkFileNames: 'static/js/[name]-[hash].js',
-          entryFileNames: 'static/js/[name]-[hash].js',
-          assetFileNames: 'static/[ext]/[name]-[hash].[ext]',
-          manualChunks: (id: string) => {
-            // 优化拆分策略
-            if (id.includes('node_modules')) {
-              return id.toString().split('node_modules/')[1].split('/')[0].toString()
-            }
-          },
-        },
-      },
-    },
+    build,
     define: {
       __SYSTEM_CODE__: JSON.stringify(envSystemCode),
     },

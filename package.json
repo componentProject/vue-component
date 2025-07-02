@@ -1,16 +1,20 @@
 {
   "name": "vue-template",
   "packageManager": "pnpm@10.8.0",
-  "version": "0.0.0",
-  "private": true,
+  "version": "0.1.0",
+  "private": false,
   "type": "module",
   "engines": {
     "node": ">=20.18.0"
+  },
+  "publishConfig": {
+    "registry": "http://pms.trasen.cn:8008/repository/local-npm/"
   },
   "scripts": {
     "dev": "vite",
     "CICD": "node ./scripts/CICD.mjs",
     "build": "vite build --mode production & node ./scripts/build.mjs",
+    "build:component": "vite build --mode component",
     "preview": "vite preview",
     "storybook:dev": "storybook dev -p 6006",
     "storybook:build": "storybook build -o docs/storybook",
