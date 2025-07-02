@@ -1,4 +1,9 @@
-import type { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios'
+import type {
+  AxiosError,
+  AxiosRequestConfig,
+  AxiosResponse,
+  InternalAxiosRequestConfig,
+} from 'axios'
 /*
  * @Author: moluoxixi 1983531544@qq.com
  * @Date: 2025-05-09 08:53:16
@@ -22,13 +27,23 @@ export default class BaseApi {
     this.setupInterceptors()
   }
 
+  processRequestConfig(config: InternalAxiosRequestConfig) {
+    return config
+  }
+
+  processResponseConfig(data: AxiosResponse['data']) {
+    return data
+  }
+
+  async processResponseError(error: AxiosError): Promise<AxiosError> {
+    return error
+  }
+
   private setupInterceptors() {
     // 请求拦截器
     this.instance.interceptors.request.use(
       (config) => {
-        config.data = {
-          ...config.data,
-        }
+        this.processRequestConfig(config)
         return config
       },
       (error: AxiosError) => {
@@ -43,23 +58,11 @@ export default class BaseApi {
           return Promise.reject(new Error(res.data?.message || 'Error'))
         }
         else {
-          const data = res.data
-          if (data.Code != 200) {
-            ElMessage({
-              message: data.Message || data.message,
-              type: 'error',
-            })
-          }
-          else {
-            return data // 返回响应数据
-          }
+          return this.processResponseConfig(res.data)
         }
       },
       async (error: AxiosError) => {
-        // 登录失败做点啥
-        if (error.response?.status === 401) {
-          return
-        }
+        await this.processResponseError(error)
         ElMessage.error({
           message: error.response?.data as string || '',
           duration: 5 * 1000,
@@ -69,24 +72,25 @@ export default class BaseApi {
     )
   }
 
-  protected async request<R>(config: AxiosRequestConfig): Promise<R> {
-    const response = await this.instance.request<R>(config)
-    return response.data
+  protected async request<R>(config: AxiosRequestConfig): Promise<AxiosResponse<R>> {
+    return this.instance.request<R>(config)
   }
 
-  public get<R>(url: string, params?: any, data?: any, config?: AxiosRequestConfig): Promise<R> {
+  public async get<R>(url: string, params?: any, data?: any, config?: AxiosRequestConfig): Promise<AxiosResponse<R>> {
+    const res = await this.request<R>({ ...config, url, method: 'get', data, params })
+    console.log('res', res)
     return this.request<R>({ ...config, url, method: 'get', data, params })
   }
 
-  public post<R>(url: string, data?: any, params?: any, config?: AxiosRequestConfig): Promise<R> {
+  public post<R>(url: string, data?: any, params?: any, config?: AxiosRequestConfig): Promise<AxiosResponse<R>> {
     return this.request<R>({ ...config, url, method: 'post', data, params })
   }
 
-  public delete<R>(url: string, params?: any, data?: any, config?: AxiosRequestConfig): Promise<R> {
+  public delete<R>(url: string, params?: any, data?: any, config?: AxiosRequestConfig): Promise<AxiosResponse<R>> {
     return this.request<R>({ ...config, url, method: 'delete', data, params })
   }
 
-  public put<R>(url: string, data?: any, params?: any, config?: AxiosRequestConfig): Promise<R> {
+  public put<R>(url: string, data?: any, params?: any, config?: AxiosRequestConfig): Promise<AxiosResponse<R>> {
     return this.request<R>({ ...config, url, method: 'put', data, params })
   }
 }
