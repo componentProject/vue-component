@@ -10,9 +10,9 @@ import type { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios'
  * Copyright (c) 2025 by ${git_name_email}, All Rights Reserved.
  */
 import axios from 'axios'
-import { addSign } from '@/utils/modules/his6.0'
+import { ElMessage } from 'element-plus'
 
-export class BaseApi {
+export default class BaseApi {
   protected baseURL: string
   instance: ReturnType<typeof axios.create>
 
@@ -26,7 +26,9 @@ export class BaseApi {
     // 请求拦截器
     this.instance.interceptors.request.use(
       (config) => {
-        addSign(config)
+        config.data = {
+          ...config.data,
+        }
         return config
       },
       (error: AxiosError) => {
@@ -36,21 +38,32 @@ export class BaseApi {
 
     // 响应拦截器
     this.instance.interceptors.response.use(
-      (response: AxiosResponse) => {
-        // 对响应数据做点什么
-        const { data } = response
-        if (data.code === 200) {
-          return data.data
+      (res: AxiosResponse) => {
+        if (res.status !== 200) {
+          return Promise.reject(new Error(res.data?.message || 'Error'))
         }
-        return Promise.reject(new Error(data.message || '请求失败'))
+        else {
+          const data = res.data
+          if (data.Code != 200) {
+            ElMessage({
+              message: data.Message || data.message,
+              type: 'error',
+            })
+          }
+          else {
+            return data // 返回响应数据
+          }
+        }
       },
-      (error: AxiosError) => {
-        // 对响应错误做点什么
+      async (error: AxiosError) => {
+        // 登录失败做点啥
         if (error.response?.status === 401) {
-          // 处理未授权
-          localStorage.removeItem('token')
-          window.location.href = '/login'
+          return
         }
+        ElMessage.error({
+          message: error.response?.data as string || '',
+          duration: 5 * 1000,
+        })
         return Promise.reject(error)
       },
     )
@@ -61,28 +74,19 @@ export class BaseApi {
     return response.data
   }
 
-  public get<R>(url: string, config?: AxiosRequestConfig): Promise<R> {
-    return this.request<R>({ ...config, url, method: 'get' })
+  public get<R>(url: string, params?: any, data?: any, config?: AxiosRequestConfig): Promise<R> {
+    return this.request<R>({ ...config, url, method: 'get', data, params })
   }
 
-  public post<R>(url: string, data?: any, config?: AxiosRequestConfig): Promise<R> {
-    return this.request<R>({ ...config, url, method: 'post', data })
+  public post<R>(url: string, data?: any, params?: any, config?: AxiosRequestConfig): Promise<R> {
+    return this.request<R>({ ...config, url, method: 'post', data, params })
   }
 
-  public delete<R>(url: string, config?: AxiosRequestConfig): Promise<R> {
-    return this.request<R>({ ...config, url, method: 'delete' })
+  public delete<R>(url: string, params?: any, data?: any, config?: AxiosRequestConfig): Promise<R> {
+    return this.request<R>({ ...config, url, method: 'delete', data, params })
   }
 
-  public put<R>(url: string, data?: any, config?: AxiosRequestConfig): Promise<R> {
-    return this.request<R>({ ...config, url, method: 'put', data })
-  }
-}
-
-export class UserApi extends BaseApi {
-  constructor() {
-    super('/api/users')
+  public put<R>(url: string, data?: any, params?: any, config?: AxiosRequestConfig): Promise<R> {
+    return this.request<R>({ ...config, url, method: 'put', data, params })
   }
 }
-
-const userService = new UserApi()
-export const userRequest = userService.instance
