@@ -117,7 +117,7 @@ async function buildComponents() {
             },
             chunkFileNames: (chunkInfo) => {
               // 检查是否是utils相关的chunk
-              if (chunkInfo.name.includes('utils') || chunkInfo.name.includes('_utils')) {
+              if (chunkInfo.name.includes('_utils')) {
                 return '_utils/[name].mjs'
               }
 
@@ -181,7 +181,7 @@ async function buildComponents() {
             },
             chunkFileNames: (chunkInfo) => {
               // 检查是否是utils相关的chunk
-              if (chunkInfo.name.includes('utils') || chunkInfo.name.includes('_utils')) {
+              if (chunkInfo.name.includes('_utils')) {
                 return '_utils/[name].cjs'
               }
 
