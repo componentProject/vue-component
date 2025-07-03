@@ -88,7 +88,7 @@ async function buildSingleComponent({ comp, entry, format, outDir, entryFileName
               return '_shared/js/[name].[ext]'
             }
             if (assetInfo.name && assetInfo.name.endsWith('.css')) {
-              return '_shared/style/[name].[ext]'
+              return 'styles/[name][extname]'
             }
             return '_shared/[name].[ext]'
           },
@@ -97,15 +97,18 @@ async function buildSingleComponent({ comp, entry, format, outDir, entryFileName
       },
     },
   })
-  // 打包后自动复制README.md
-  const readmeSrc = resolve(rootDir, `src/components/${comp}/README.md`)
-  try {
-    await fsp.access(readmeSrc)
-    await fsp.copyFile(readmeSrc, resolve(outDir, 'README.md'))
-    console.log(`已复制README.md到: ${outDir}`)
-  }
-  catch {
-    // 没有README.md则跳过
+  // 只在第一次打包时复制README.md到moluoxixi/组件名/
+  if (format === 'es') {
+    const readmeSrc = resolve(rootDir, `src/components/${comp}/README.md`)
+    const readmeDest = resolve(rootDir, `moluoxixi/${comp}/README.md`)
+    try {
+      await fsp.access(readmeSrc)
+      await fsp.copyFile(readmeSrc, readmeDest)
+      console.log(`已复制README.md到: moluoxixi/${comp}/`)
+    }
+    catch {
+      // 没有README.md则跳过
+    }
   }
 }
 
@@ -133,7 +136,7 @@ async function buildComponents() {
           comp,
           entry,
           format: 'es',
-          outDir: `moluoxixi/es/${comp}`,
+          outDir: `moluoxixi/${comp}/es`,
           entryFileName: 'index.mjs',
           chunkExt: 'mjs',
         })
@@ -144,7 +147,7 @@ async function buildComponents() {
           comp,
           entry,
           format: 'cjs',
-          outDir: `moluoxixi/lib/${comp}`,
+          outDir: `moluoxixi/${comp}/lib`,
           entryFileName: 'index.cjs',
           chunkExt: 'cjs',
         })
