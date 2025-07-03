@@ -3,6 +3,7 @@ import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import fs from 'node:fs'
 import glob from 'fast-glob'
+import fsp from 'node:fs/promises'
 // vite vue插件
 import pluginVue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
@@ -96,6 +97,16 @@ async function buildSingleComponent({ comp, entry, format, outDir, entryFileName
       },
     },
   })
+  // 打包后自动复制README.md
+  const readmeSrc = resolve(rootDir, `src/components/${comp}/README.md`)
+  try {
+    await fsp.access(readmeSrc)
+    await fsp.copyFile(readmeSrc, resolve(outDir, 'README.md'))
+    console.log(`已复制README.md到: ${outDir}`)
+  }
+  catch {
+    // 没有README.md则跳过
+  }
 }
 
 async function buildComponents() {
