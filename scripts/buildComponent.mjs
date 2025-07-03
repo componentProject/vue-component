@@ -1,91 +1,271 @@
-import fs from 'node:fs'
-import path from 'node:path'
-import process from 'node:process'
+import { build } from 'vite'
+import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { resolveConfig } from 'vite'
+import fs from 'node:fs'
+import vue from '@vitejs/plugin-vue'
+import glob from 'fast-glob'
+import { execSync } from 'node:child_process'
 
-// 获取当前模块的文件名
 const __filename = fileURLToPath(import.meta.url)
-// 获取当前目录名
-const __dirname = path.dirname(__filename)
-// 项目根目录
-const rootDir = path.join(__dirname, '..')
+const __dirname = dirname(__filename)
+const rootDir = resolve(__dirname, '..')
 
-// 解析vite配置，获取component模式下的输出目录
-async function getComponentOutDir() {
-  const viteConfig = await resolveConfig({}, 'build', 'component')
-  return viteConfig.build.outDir || 'moluoxixi' // 默认值为moluoxixi
+// 获取组件列表
+async function getComponentNames() {
+  const componentDirs = await glob(['src/components/*'], {
+    cwd: rootDir,
+    onlyDirectories: true,
+    ignore: ['src/components/_*'],
+  })
+
+  return componentDirs.map(dir => dir.split('/').pop())
 }
 
-// 版本号自增
-function incrementVersion(version) {
-  const parts = version.split('.')
-  // 增加补丁版本号
-  parts[2] = (Number.parseInt(parts[2], 10) + 1).toString()
-  return parts.join('.')
+// 创建入口配置
+function createEntries(componentNames) {
+  const entries = {
+    index: resolve(rootDir, 'src/components/index.ts'),
+    _utils: resolve(rootDir, 'src/components/_utils/index.ts'),
+  }
+
+  // 添加各个组件的入口
+  componentNames.forEach((name) => {
+    const entryPath = resolve(rootDir, `src/components/${name}/index.ts`)
+    // 检查文件是否存在
+    if (fs.existsSync(entryPath)) {
+      entries[name] = entryPath
+    }
+  })
+
+  return entries
 }
 
-async function main() {
+// 确保输出目录存在
+function ensureDir(dir) {
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true })
+  }
+}
+
+async function buildComponents() {
   try {
-    // 获取组件库输出目录
-    const outputDir = await getComponentOutDir()
-    console.log(`组件库输出目录: ${outputDir}`)
+    const componentNames = await getComponentNames()
+    console.log(`找到的组件: ${componentNames.join(', ')}`)
 
-    // 组件库输出路径
-    const outputPath = path.join(rootDir, outputDir)
-
-    // 读取项目package.json (只用来查看当前版本)
-    const projectPackagePath = path.join(rootDir, 'package.json')
-    const projectPackage = JSON.parse(fs.readFileSync(projectPackagePath, 'utf-8'))
-
-    // 读取组件库专用的package.json模板
-    const componentPackagePath = path.join(rootDir, 'package.component.json')
-    const componentPackage = JSON.parse(fs.readFileSync(componentPackagePath, 'utf-8'))
-
-    // 获取当前组件版本号，若不存在则使用项目版本号
-    const currentComponentVersion = componentPackage.version || projectPackage.version
-
-    // 仅增加组件库版本号
-    const newVersion = incrementVersion(currentComponentVersion)
-    console.log(`组件库版本号从 ${currentComponentVersion} 更新到 ${newVersion}`)
-
-    // 更新组件库package.json的版本号
-    componentPackage.version = newVersion
-
-    // 保存更新后的组件库配置到模板文件
-    fs.writeFileSync(componentPackagePath, JSON.stringify(componentPackage, null, 2))
-    console.log(`组件库配置模板已更新版本号为: ${newVersion}`)
+    const entries = createEntries(componentNames)
+    console.log('创建入口配置完成')
 
     // 确保输出目录存在
-    if (!fs.existsSync(outputPath)) {
-      fs.mkdirSync(outputPath, { recursive: true })
+    ensureDir(resolve(rootDir, 'moluoxixi/es'))
+    ensureDir(resolve(rootDir, 'moluoxixi/lib'))
+
+    // 构建 ES 模块
+    console.log('开始构建 ES 模块...')
+    await build({
+      configFile: false,
+      root: rootDir,
+      plugins: [vue()],
+      build: {
+        emptyOutDir: false,
+        minify: false,
+        cssMinify: false,
+        cssCodeSplit: true,
+        lib: {
+          entry: entries,
+          formats: ['es'],
+        },
+        rollupOptions: {
+          external: ['vue', 'element-plus'],
+          output: {
+            format: 'es',
+            dir: 'moluoxixi/es',
+            entryFileNames: (chunkInfo) => {
+              const name = chunkInfo.name
+              if (name === 'index') {
+                return 'index.mjs'
+              }
+              if (name === '_utils') {
+                return '_utils/index.mjs'
+              }
+              return `${name}/index.mjs`
+            },
+            chunkFileNames: (chunkInfo) => {
+              // 检查是否是utils相关的chunk
+              if (chunkInfo.name.includes('utils') || chunkInfo.name.includes('_utils')) {
+                return '_utils/[name].mjs'
+              }
+
+              // 检查是否是组件相关的chunk
+              for (const comp of componentNames) {
+                if (chunkInfo.name.includes(comp)) {
+                  return `${comp}/src/[name].mjs`
+                }
+              }
+
+              return 'shared/[name].mjs'
+            },
+            assetFileNames: (assetInfo) => {
+              const source = assetInfo.name || ''
+              const suffix = source.split('.').pop() || ''
+
+              // 如果是CSS文件，尝试确定所属组件
+              if (suffix === 'css') {
+                for (const comp of componentNames) {
+                  if (source.includes(comp)) {
+                    return `${comp}/style/index.css`
+                  }
+                }
+                return 'shared/style/[name].css'
+              }
+
+              return 'assets/[name].[ext]'
+            },
+          },
+        },
+      },
+    })
+
+    // 构建 CommonJS 模块
+    console.log('开始构建 CommonJS 模块...')
+    await build({
+      configFile: false,
+      root: rootDir,
+      plugins: [vue()],
+      build: {
+        emptyOutDir: false,
+        minify: false,
+        cssMinify: false,
+        cssCodeSplit: true,
+        lib: {
+          entry: entries,
+          formats: ['cjs'],
+        },
+        rollupOptions: {
+          external: ['vue', 'element-plus'],
+          output: {
+            format: 'cjs',
+            dir: 'moluoxixi/lib',
+            entryFileNames: (chunkInfo) => {
+              const name = chunkInfo.name
+              if (name === 'index') {
+                return 'index.cjs'
+              }
+              if (name === '_utils') {
+                return '_utils/index.cjs'
+              }
+              return `${name}/index.cjs`
+            },
+            chunkFileNames: (chunkInfo) => {
+              // 检查是否是utils相关的chunk
+              if (chunkInfo.name.includes('utils') || chunkInfo.name.includes('_utils')) {
+                return '_utils/[name].cjs'
+              }
+
+              // 检查是否是组件相关的chunk
+              for (const comp of componentNames) {
+                if (chunkInfo.name.includes(comp)) {
+                  return `${comp}/src/[name].cjs`
+                }
+              }
+
+              return 'shared/[name].cjs'
+            },
+            assetFileNames: (assetInfo) => {
+              const source = assetInfo.name || ''
+              const suffix = source.split('.').pop() || ''
+
+              // 如果是CSS文件，尝试确定所属组件
+              if (suffix === 'css') {
+                for (const comp of componentNames) {
+                  if (source.includes(comp)) {
+                    return `${comp}/style/index.css`
+                  }
+                }
+                return 'shared/style/[name].css'
+              }
+
+              return 'assets/[name].[ext]'
+            },
+          },
+        },
+      },
+    })
+
+    // 生成类型声明文件
+    console.log('开始生成类型声明文件...')
+
+    // 创建临时 tsconfig 用于生成声明文件
+    const tsconfigPath = resolve(rootDir, 'tsconfig.build.json')
+    const tsconfig = {
+      compilerOptions: {
+        target: 'ESNext',
+        useDefineForClassFields: true,
+        module: 'ESNext',
+        moduleResolution: 'node',
+        strict: true,
+        jsx: 'preserve',
+        sourceMap: true,
+        resolveJsonModule: true,
+        isolatedModules: true,
+        esModuleInterop: true,
+        declaration: true,
+        emitDeclarationOnly: true,
+        outDir: './moluoxixi/es',
+        skipLibCheck: true,
+      },
+      include: ['src/components/**/*'],
+      exclude: ['node_modules'],
     }
 
-    // 写入package.json到组件库目录
-    fs.writeFileSync(
-      path.join(outputPath, 'package.json'),
-      JSON.stringify(componentPackage, null, 2),
-    )
+    fs.writeFileSync(tsconfigPath, JSON.stringify(tsconfig, null, 2))
 
-    // 复制README文件到组件库目录
-    fs.copyFileSync(
-      path.join(rootDir, 'package.readme.md'),
-      path.join(outputPath, 'README.md'),
-    )
+    // 运行 tsc 生成 ES 模块的声明文件
+    console.log('生成 ES 模块的类型声明文件...')
+    execSync(`npx tsc -p ${tsconfigPath}`, { stdio: 'inherit' })
 
-    console.log(`组件库package.json和README.md已生成到 ${outputPath}`)
+    // 修改 tsconfig 为 lib 目录生成声明文件
+    // 复制类型文件
+    console.log('开始复制类型文件...')
+    const copyTypesDir = async (source, destination) => {
+      // 确保目标目录存在
+      ensureDir(destination)
 
-    // 更新scripts中的publish:component命令以使用动态输出目录
-    const publishCommand = `npm run build:component && cd ${outputDir} && npm publish`
-    projectPackage.scripts['publish:component'] = publishCommand
-    fs.writeFileSync(projectPackagePath, JSON.stringify(projectPackage, null, 2))
+      // 查找所有_types目录下的文件
+      const typeFiles = await glob([`${source}/**/*.ts`], {
+        cwd: rootDir,
+      })
 
-    console.log(`发布命令已更新为: ${publishCommand}`)
+      // 复制每个文件
+      for (const file of typeFiles) {
+        const destFile = file.replace(source, destination)
+        const destDir = dirname(resolve(rootDir, destFile))
+        ensureDir(destDir)
+        fs.copyFileSync(
+          resolve(rootDir, file),
+          resolve(rootDir, destFile),
+        )
+      }
+    }
+
+    // 复制 _types 目录到两个输出目录
+    await copyTypesDir('src/components/_types', 'moluoxixi/es/_types')
+    await copyTypesDir('src/components/_types', 'moluoxixi/lib/_types')
+
+    // 处理每个组件的 _type 目录（如果存在）
+    for (const comp of componentNames) {
+      const typeDir = `src/components/${comp}/_type`
+      if (fs.existsSync(resolve(rootDir, typeDir))) {
+        await copyTypesDir(typeDir, `moluoxixi/es/${comp}/_type`)
+        await copyTypesDir(typeDir, `moluoxixi/lib/${comp}/_type`)
+      }
+    }
+
+    console.log('打包完成！')
   }
   catch (error) {
-    console.error('构建组件库时出错:', error)
+    console.error('打包过程中发生错误:', error)
     process.exit(1)
   }
 }
 
-main()
+buildComponents()
