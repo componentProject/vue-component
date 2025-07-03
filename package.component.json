@@ -1,0 +1,39 @@
+{
+  "name": "moluoxixi",
+  "version": "1.3.0",
+  "description": "基于Vue 3的高级组件库",
+  "author": "1983531544@qq.com",
+  "license": "MIT",
+  "readme": "package.readme.md",
+  "keywords": [
+    "element-plus",
+    "vue",
+    "vue3",
+    "components",
+    "ui"
+  ],
+  "main": "./moluoxixi.cjs",
+  "module": "./moluoxixi.js",
+  "exports": {
+    ".": {
+      "import": "./moluoxixi.js",
+      "require": "./moluoxixi.cjs"
+    },
+    "./style.css": "./moluoxixi.css"
+  },
+  "dependencies": {
+    "vue": "^3.5.13",
+    "element-plus": "^2.10.1",
+    "lodash": "^4.17.21",
+    "dayjs": "^1.11.13",
+    "sortablejs": "^1.15.6",
+    "xlsx": "^0.18.5",
+    "file-saver": "^2.0.5",
+    "md-editor-v3": "^5.4.5",
+    "screenfull": "^6.0.2"
+  },
+  "peerDependencies": {
+    "vue": ">=3.3.0",
+    "element-plus": ">=2.3.0"
+  }
+}
