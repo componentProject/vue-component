@@ -145,20 +145,58 @@ export default defineConfig(({ mode }) => {
   let plugins: UserConfig['plugins']
   // 如果是组件库模式，则使用不同的配置
   if (isComponentMode) {
+    // 组件列表
+    const componentNames = [
+      'Calendar',
+      'ConfigForm',
+      'ConfigProvider',
+      'DateRangePicker',
+      'DraggableTable',
+      'EnterNextContainer',
+      'EnterNextDragTable',
+      'EnterNextTable',
+      'ExportExcel',
+      'Icon',
+      'IntersectObserver',
+      'KeepAllAlive',
+      'MarkdownEditor',
+      'PopoverTableSelect',
+      'Select',
+      'Tabs',
+      'Watermark',
+    ]
+
     // 组件库入口文件
     build = {
       lib: {
-        entry: 'src/components/index.ts',
-        name: 'moluoxixi',
-        fileName: 'moluoxixi',
+        entry: {
+          index: path.resolve(__dirname, 'src/components/index.ts'),
+          Calendar: path.resolve(__dirname, 'src/components/Calendar/index.vue'),
+          ConfigForm: path.resolve(__dirname, 'src/components/ConfigForm/index.vue'),
+          ConfigProvider: path.resolve(__dirname, 'src/components/ConfigProvider/index.vue'),
+          DateRangePicker: path.resolve(__dirname, 'src/components/DateRangePicker/index.vue'),
+          DraggableTable: path.resolve(__dirname, 'src/components/DraggableTable/index.vue'),
+          EnterNextContainer: path.resolve(__dirname, 'src/components/EnterNextContainer/index.vue'),
+          EnterNextDragTable: path.resolve(__dirname, 'src/components/EnterNextDragTable/index.vue'),
+          EnterNextTable: path.resolve(__dirname, 'src/components/EnterNextTable/index.vue'),
+          ExportExcel: path.resolve(__dirname, 'src/components/ExportExcel/index.vue'),
+          Icon: path.resolve(__dirname, 'src/components/Icon/index.vue'),
+          IntersectObserver: path.resolve(__dirname, 'src/components/IntersectObserver/index.vue'),
+          KeepAllAlive: path.resolve(__dirname, 'src/components/KeepAllAlive/index.vue'),
+          MarkdownEditor: path.resolve(__dirname, 'src/components/MarkdownEditor/index.vue'),
+          PopoverTableSelect: path.resolve(__dirname, 'src/components/PopoverTableSelect/index.vue'),
+          Select: path.resolve(__dirname, 'src/components/Select/index.vue'),
+          Tabs: path.resolve(__dirname, 'src/components/Tabs/index.vue'),
+          Watermark: path.resolve(__dirname, 'src/components/Watermark/index.vue'),
+        },
         formats: ['es', 'cjs'],
       },
       outDir: 'moluoxixi',
       emptyOutDir: true,
       minify: 'esbuild',
-      cssCodeSplit: false,
+      cssCodeSplit: true, // 启用CSS代码分割
       assetsInlineLimit: 0, // 不内联任何资产
-      assetsDir: '', // 防止资源被复制到输出目录
+      assetsDir: 'assets', // 指定资源输出目录
       copyPublicDir: false, // 不要复制public目录
       rollupOptions: {
         external: ['vue', 'element-plus'],
@@ -167,6 +205,44 @@ export default defineConfig(({ mode }) => {
             'vue': 'Vue',
             'element-plus': 'ElementPlus',
           },
+          // 设置输出格式，将每个组件输出到自己的目录中
+          entryFileNames: (chunkInfo) => {
+            const name = chunkInfo.name
+            if (name === 'index') {
+              return '[name].[format].js'
+            }
+            return `${name}/index.[format].js`
+          },
+          chunkFileNames: (chunkInfo) => {
+            // 检查是否是组件相关的chunk
+            for (const comp of componentNames) {
+              if (chunkInfo.name.includes(comp)) {
+                return `${comp}/js/[name].[hash].js`
+              }
+            }
+
+            return 'shared/js/[name].[hash].js'
+          },
+          assetFileNames: (assetInfo) => {
+            // 获取文件名用于匹配组件
+            const source = assetInfo.name || ''
+            const suffix = source.split('.').pop() || ''
+
+            // 如果是CSS文件，尝试确定所属组件
+            if (suffix === 'css') {
+              for (const comp of componentNames) {
+                if (source.includes(comp)) {
+                  return `${comp}/css/style.[hash].css`
+                }
+              }
+
+              return 'css/[name].[hash].[ext]'
+            }
+
+            return 'assets/[ext]/[name].[hash].[ext]'
+          },
+          // 分包策略
+          manualChunks: undefined,
         },
       },
     }
