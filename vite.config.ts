@@ -146,10 +146,9 @@ export default defineConfig(({ mode }) => {
   // 如果是组件库模式，则使用不同的配置
   if (isComponentMode) {
     // 组件库入口文件
-    const componentEntry = path.resolve(__dirname, 'src/components/index.ts')
     build = {
       lib: {
-        entry: componentEntry,
+        entry: 'src/components/index.ts',
         name: 'moluoxixi',
         fileName: 'moluoxixi',
         formats: ['es', 'cjs'],
@@ -158,6 +157,9 @@ export default defineConfig(({ mode }) => {
       emptyOutDir: true,
       minify: 'esbuild',
       cssCodeSplit: false,
+      assetsInlineLimit: 0, // 不内联任何资产
+      assetsDir: '', // 防止资源被复制到输出目录
+      copyPublicDir: false, // 不要复制public目录
       rollupOptions: {
         external: ['vue', 'element-plus'],
         output: {
