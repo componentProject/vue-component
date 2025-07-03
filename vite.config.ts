@@ -35,6 +35,7 @@ import autoRoutesPlugin from './plugins/autoRoutes/index.ts'
 // 其余vite插件与配置
 import { wrapperEnv } from './src/utils/modules/getEnv.ts'
 import { createHtmlPlugin } from 'vite-plugin-html'
+import { discoverComponents } from './src/utils/modules/discoverComponents.ts'
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd())
@@ -145,50 +146,13 @@ export default defineConfig(({ mode }) => {
   let plugins: UserConfig['plugins']
   // 如果是组件库模式，则使用不同的配置
   if (isComponentMode) {
-    // 组件列表
-    const componentNames = [
-      'Calendar',
-      'ConfigForm',
-      'ConfigProvider',
-      'DateRangePicker',
-      'DraggableTable',
-      'EnterNextContainer',
-      'EnterNextDragTable',
-      'EnterNextTable',
-      'ExportExcel',
-      'Icon',
-      'IntersectObserver',
-      'KeepAllAlive',
-      'MarkdownEditor',
-      'PopoverTableSelect',
-      'Select',
-      'Tabs',
-      'Watermark',
-    ]
+    // 自动发现组件
+    const { componentNames, entry } = discoverComponents()
 
     // 组件库入口文件
     build = {
       lib: {
-        entry: {
-          index: path.resolve(__dirname, 'src/components/index.ts'),
-          Calendar: path.resolve(__dirname, 'src/components/Calendar/index.vue'),
-          ConfigForm: path.resolve(__dirname, 'src/components/ConfigForm/index.vue'),
-          ConfigProvider: path.resolve(__dirname, 'src/components/ConfigProvider/index.vue'),
-          DateRangePicker: path.resolve(__dirname, 'src/components/DateRangePicker/index.vue'),
-          DraggableTable: path.resolve(__dirname, 'src/components/DraggableTable/index.vue'),
-          EnterNextContainer: path.resolve(__dirname, 'src/components/EnterNextContainer/index.vue'),
-          EnterNextDragTable: path.resolve(__dirname, 'src/components/EnterNextDragTable/index.vue'),
-          EnterNextTable: path.resolve(__dirname, 'src/components/EnterNextTable/index.vue'),
-          ExportExcel: path.resolve(__dirname, 'src/components/ExportExcel/index.vue'),
-          Icon: path.resolve(__dirname, 'src/components/Icon/index.vue'),
-          IntersectObserver: path.resolve(__dirname, 'src/components/IntersectObserver/index.vue'),
-          KeepAllAlive: path.resolve(__dirname, 'src/components/KeepAllAlive/index.vue'),
-          MarkdownEditor: path.resolve(__dirname, 'src/components/MarkdownEditor/index.vue'),
-          PopoverTableSelect: path.resolve(__dirname, 'src/components/PopoverTableSelect/index.vue'),
-          Select: path.resolve(__dirname, 'src/components/Select/index.vue'),
-          Tabs: path.resolve(__dirname, 'src/components/Tabs/index.vue'),
-          Watermark: path.resolve(__dirname, 'src/components/Watermark/index.vue'),
-        },
+        entry,
         formats: ['es', 'cjs'],
       },
       outDir: 'moluoxixi',

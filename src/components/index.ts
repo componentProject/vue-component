@@ -18,6 +18,25 @@ import Select from './Select/index.vue'
 import Tabs from './Tabs/index.vue'
 import Watermark from './Watermark/index.vue'
 
+export {
+  Calendar,
+  ConfigForm,
+  ConfigProvider,
+  DateRangePicker,
+  DraggableTable,
+  EnterNextContainer,
+  EnterNextDragTable,
+  EnterNextTable,
+  ExportExcel,
+  Icon,
+  IntersectObserver,
+  KeepAllAlive,
+  MarkdownEditor,
+  PopoverTableSelect,
+  Select,
+  Tabs,
+  Watermark,
+}
 const componentFiles = import.meta.glob(['./**/index.vue', '!./**/components/*', '!./**/base/*', '!./_*/**/*'], {
   eager: true,
   import: 'default',
@@ -45,23 +64,3 @@ const plugin = {
 }
 
 export default plugin
-
-export {
-  Calendar,
-  ConfigForm,
-  ConfigProvider,
-  DateRangePicker,
-  DraggableTable,
-  EnterNextContainer,
-  EnterNextDragTable,
-  EnterNextTable,
-  ExportExcel,
-  Icon,
-  IntersectObserver,
-  KeepAllAlive,
-  MarkdownEditor,
-  PopoverTableSelect,
-  Select,
-  Tabs,
-  Watermark,
-}
