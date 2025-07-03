@@ -18,11 +18,10 @@ import Select from './Select/index.vue'
 import Tabs from './Tabs/index.vue'
 import Watermark from './Watermark/index.vue'
 
-const componentFiles = import.meta.glob(['./**/index.vue', '!./**/components/*'], {
+const componentFiles = import.meta.glob(['./**/index.vue', '!./**/components/*', '!./**/base/*', '!./_*/**/*'], {
   eager: true,
   import: 'default',
 })
-
 const components = Object.keys(componentFiles).reduce((modules = {}, modulePath) => {
   const nameArr: string[] = modulePath.split('/')
   const name: string | undefined
