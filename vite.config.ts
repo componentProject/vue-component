@@ -2,7 +2,6 @@ import type { Plugin } from 'postcss'
 import path from 'node:path'
 import process from 'node:process'
 import { defineConfig, loadEnv } from 'vite'
-import type { UserConfig } from 'vite'
 // vite vue插件
 import pluginVue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
@@ -140,51 +139,27 @@ export default defineConfig(({ mode }) => {
       ]
     : []
 
-  const build: UserConfig['build'] = {
-    sourcemap: isDev,
-    outDir: useDoc ? './docs/pages' : `${systemCode}`,
-    cssCodeSplit: true,
-    chunkSizeWarningLimit: 1500,
-    minify: 'esbuild',
-    rollupOptions: {
-      external: [],
-      output: {
-        globals: {},
-        chunkFileNames: 'static/js/[name]-[hash].js',
-        entryFileNames: 'static/js/[name]-[hash].js',
-        assetFileNames: 'static/[ext]/[name]-[hash].[ext]',
-        manualChunks: (id: string) => {
-          // 优化拆分策略
-          if (id.includes('node_modules')) {
-            return id.toString().split('node_modules/')[1].split('/')[0].toString()
-          }
-        },
-      },
-    },
-  }
-
-  const plugins: UserConfig['plugins'] = [
-    ...vuePlugins,
-    ...performancePlugins,
-    ...monitorPlugins,
-    ...qianKunPlugins,
-    autoRoutesPlugin({
-      routeConfig: {
-        views: ['/src/views/**/index.vue', '!/src/views/**/components/*'],
-        examples: '/src/examples/**/index.vue',
-        componentExamples: {
-          glob: ['/src/components/**/Example.vue', '!/src/components/**/components/*'],
-          baseRoute: {
-            path: '/components',
-            name: '组件示例',
-          },
-        },
-      },
-    }),
-  ]
   return {
     base: `/${systemCode}`,
-    plugins,
+    plugins: [
+      ...vuePlugins,
+      ...performancePlugins,
+      ...monitorPlugins,
+      ...qianKunPlugins,
+      autoRoutesPlugin({
+        routeConfig: {
+          views: ['/src/views/**/index.vue', '!/src/views/**/components/*'],
+          examples: '/src/examples/**/index.vue',
+          componentExamples: {
+            glob: ['/src/components/**/Example.vue', '!/src/components/**/components/*'],
+            baseRoute: {
+              path: '/components',
+              name: '组件示例',
+            },
+          },
+        },
+      }),
+    ],
     esbuild: {
       pure:
         !isDev && viteEnv.VITE_PURE_CONSOLE_AND_DEBUGGER
@@ -196,7 +171,28 @@ export default defineConfig(({ mode }) => {
       include: [],
       exclude: [],
     },
-    build,
+    build: {
+      sourcemap: isDev,
+      outDir: useDoc ? './docs/pages' : `${systemCode}`,
+      cssCodeSplit: true,
+      chunkSizeWarningLimit: 1500,
+      minify: 'esbuild',
+      rollupOptions: {
+        external: [],
+        output: {
+          globals: {},
+          chunkFileNames: 'static/js/[name]-[hash].js',
+          entryFileNames: 'static/js/[name]-[hash].js',
+          assetFileNames: 'static/[ext]/[name]-[hash].[ext]',
+          manualChunks: (id: string) => {
+            // 优化拆分策略
+            if (id.includes('node_modules')) {
+              return id.toString().split('node_modules/')[1].split('/')[0].toString()
+            }
+          },
+        },
+      },
+    },
     define: {
       __SYSTEM_CODE__: JSON.stringify(envSystemCode),
     },
