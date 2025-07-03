@@ -26,6 +26,12 @@ export function discoverComponents() {
     entry[component] = path.resolve(process.cwd(), `src/components/${component}/index.vue`)
   })
 
+  // 添加utils模块入口
+  const utilsPath = path.resolve(process.cwd(), 'src/components/_utils/index.ts')
+  if (fs.existsSync(utilsPath)) {
+    entry._utils = utilsPath
+  }
+
   return {
     componentNames: componentDirs,
     entry,

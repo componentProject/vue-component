@@ -160,54 +160,103 @@ export default defineConfig(({ mode }) => {
       minify: 'esbuild',
       cssCodeSplit: true, // 启用CSS代码分割
       assetsInlineLimit: 0, // 不内联任何资产
-      assetsDir: 'assets', // 指定资源输出目录
       copyPublicDir: false, // 不要复制public目录
       rollupOptions: {
         external: ['vue', 'element-plus'],
-        output: {
-          globals: {
-            'vue': 'Vue',
-            'element-plus': 'ElementPlus',
-          },
-          // 设置输出格式，将每个组件输出到自己的目录中
-          entryFileNames: (chunkInfo) => {
-            const name = chunkInfo.name
-            if (name === 'index') {
-              return '[name].[format].js'
-            }
-            return `${name}/index.[format].js`
-          },
-          chunkFileNames: (chunkInfo) => {
-            // 检查是否是组件相关的chunk
-            for (const comp of componentNames) {
-              if (chunkInfo.name.includes(comp)) {
-                return `${comp}/js/[name].[hash].js`
+        output: [
+          // ES模块配置
+          {
+            format: 'es',
+            dir: 'moluoxixi/es',
+            entryFileNames: (chunkInfo) => {
+              const name = chunkInfo.name
+              if (name === 'index') {
+                return 'index.mjs'
               }
-            }
+              if (name === '_utils') {
+                return '_utils/index.mjs'
+              }
+              return `${name}/index.mjs`
+            },
+            chunkFileNames: (chunkInfo) => {
+              // 检查是否是utils相关的chunk
+              if (chunkInfo.name.includes('utils') || chunkInfo.name.includes('_utils')) {
+                return '_utils/[name].mjs'
+              }
 
-            return 'shared/js/[name].[hash].js'
-          },
-          assetFileNames: (assetInfo) => {
-            // 获取文件名用于匹配组件
-            const source = assetInfo.names[0] || ''
-            const suffix = source.split('.').pop() || ''
-
-            // 如果是CSS文件，尝试确定所属组件
-            if (suffix === 'css') {
+              // 检查是否是组件相关的chunk
               for (const comp of componentNames) {
-                if (source.includes(comp)) {
-                  return `${comp}/css/style.[hash].css`
+                if (chunkInfo.name.includes(comp)) {
+                  return `${comp}/src/[name].mjs`
                 }
               }
 
-              return 'css/[name].[hash].[ext]'
-            }
+              return 'shared/[name].mjs'
+            },
+            assetFileNames: (assetInfo) => {
+              const source = assetInfo.names?.[0] || ''
+              const suffix = source.split('.').pop() || ''
 
-            return 'assets/[ext]/[name].[hash].[ext]'
+              // 如果是CSS文件，尝试确定所属组件
+              if (suffix === 'css') {
+                for (const comp of componentNames) {
+                  if (source.includes(comp)) {
+                    return `${comp}/style/index.css`
+                  }
+                }
+                return 'shared/style/[name].css'
+              }
+
+              return 'assets/[name].[ext]'
+            },
           },
-          // 分包策略
-          manualChunks: undefined,
-        },
+          // CommonJS模块配置
+          {
+            format: 'cjs',
+            dir: 'moluoxixi/lib',
+            entryFileNames: (chunkInfo) => {
+              const name = chunkInfo.name
+              if (name === 'index') {
+                return 'index.cjs'
+              }
+              if (name === '_utils') {
+                return '_utils/index.cjs'
+              }
+              return `${name}/index.cjs`
+            },
+            chunkFileNames: (chunkInfo) => {
+              // 检查是否是utils相关的chunk
+              if (chunkInfo.name.includes('utils') || chunkInfo.name.includes('_utils')) {
+                return '_utils/[name].cjs'
+              }
+
+              // 检查是否是组件相关的chunk
+              for (const comp of componentNames) {
+                if (chunkInfo.name.includes(comp)) {
+                  return `${comp}/src/[name].cjs`
+                }
+              }
+
+              return 'shared/[name].cjs'
+            },
+            assetFileNames: (assetInfo) => {
+              const source = assetInfo.names?.[0] || ''
+              const suffix = source.split('.').pop() || ''
+
+              // 如果是CSS文件，尝试确定所属组件
+              if (suffix === 'css') {
+                for (const comp of componentNames) {
+                  if (source.includes(comp)) {
+                    return `${comp}/style/index.css`
+                  }
+                }
+                return 'shared/style/[name].css'
+              }
+
+              return 'assets/[name].[ext]'
+            },
+          },
+        ],
       },
     }
     plugins = [

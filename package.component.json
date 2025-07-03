@@ -1,6 +1,6 @@
 {
   "name": "moluoxixi",
-  "version": "1.3.15",
+  "version": "1.3.20",
   "description": "基于Vue 3的高级组件库",
   "author": "1983531544@qq.com",
   "license": "MIT",
@@ -12,14 +12,22 @@
     "components",
     "ui"
   ],
-  "main": "./moluoxixi.cjs",
-  "module": "./moluoxixi.js",
+  "main": "./lib/index.cjs",
+  "module": "./es/index.mjs",
+  "types": "./lib/index.d.ts",
   "exports": {
     ".": {
-      "import": "./moluoxixi.js",
-      "require": "./moluoxixi.cjs"
+      "import": "./es/index.mjs",
+      "require": "./lib/index.cjs",
+      "types": "./lib/index.d.ts"
     },
-    "./style.css": "./moluoxixi.css"
+    "./*": {
+      "import": "./es/*/index.mjs",
+      "require": "./lib/*/index.cjs",
+      "types": "./lib/*/index.d.ts"
+    },
+    "./es/*": "./es/*",
+    "./lib/*": "./lib/*"
   },
   "dependencies": {
     "vue": "^3.5.13",
