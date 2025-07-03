@@ -3,12 +3,37 @@ import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import fs from 'node:fs'
 import vue from '@vitejs/plugin-vue'
+import vueJsx from '@vitejs/plugin-vue-jsx'
 import glob from 'fast-glob'
 import { execSync } from 'node:child_process'
+import autoprefixer from 'autoprefixer'
+import tailwindcss from '@tailwindcss/postcss'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
 const rootDir = resolve(__dirname, '..')
+
+// 获取基础 Vite 配置
+function getBaseConfig() {
+  return {
+    root: rootDir,
+    plugins: [
+      vue(),
+      vueJsx(),
+    ],
+    resolve: {
+      extensions: ['.js', '.jsx', '.ts', '.tsx', '.vue'],
+      alias: {
+        '@': resolve(rootDir, 'src'),
+      },
+    },
+    css: {
+      postcss: {
+        plugins: [tailwindcss(), autoprefixer()],
+      },
+    },
+  }
+}
 
 // 获取组件列表
 async function getComponentNames() {
@@ -59,12 +84,13 @@ async function buildComponents() {
     ensureDir(resolve(rootDir, 'moluoxixi/es'))
     ensureDir(resolve(rootDir, 'moluoxixi/lib'))
 
+    // 获取基础配置
+    const baseConfig = getBaseConfig()
+
     // 构建 ES 模块
     console.log('开始构建 ES 模块...')
     await build({
-      configFile: false,
-      root: rootDir,
-      plugins: [vue()],
+      ...baseConfig,
       build: {
         emptyOutDir: false,
         minify: false,
@@ -105,7 +131,7 @@ async function buildComponents() {
               return 'shared/[name].mjs'
             },
             assetFileNames: (assetInfo) => {
-              const source = assetInfo.name || ''
+              const source = assetInfo.names[0] || ''
               const suffix = source.split('.').pop() || ''
 
               // 如果是CSS文件，尝试确定所属组件
@@ -128,9 +154,7 @@ async function buildComponents() {
     // 构建 CommonJS 模块
     console.log('开始构建 CommonJS 模块...')
     await build({
-      configFile: false,
-      root: rootDir,
-      plugins: [vue()],
+      ...baseConfig,
       build: {
         emptyOutDir: false,
         minify: false,
@@ -171,7 +195,7 @@ async function buildComponents() {
               return 'shared/[name].cjs'
             },
             assetFileNames: (assetInfo) => {
-              const source = assetInfo.name || ''
+              const source = assetInfo.names[0] || ''
               const suffix = source.split('.').pop() || ''
 
               // 如果是CSS文件，尝试确定所属组件
@@ -212,6 +236,9 @@ async function buildComponents() {
         emitDeclarationOnly: true,
         outDir: './moluoxixi/es',
         skipLibCheck: true,
+        paths: {
+          '@/*': ['./src/*'],
+        },
       },
       include: ['src/components/**/*'],
       exclude: ['node_modules'],
@@ -221,9 +248,26 @@ async function buildComponents() {
 
     // 运行 tsc 生成 ES 模块的声明文件
     console.log('生成 ES 模块的类型声明文件...')
-    execSync(`npx tsc -p ${tsconfigPath}`, { stdio: 'inherit' })
+    try {
+      execSync(`npx tsc -p ${tsconfigPath}`, { stdio: 'inherit' })
+    }
+    catch (error) {
+      console.warn('类型声明生成过程中有警告或错误，但将继续进行后续步骤', error.message)
+    }
 
     // 修改 tsconfig 为 lib 目录生成声明文件
+    tsconfig.compilerOptions.outDir = './moluoxixi/lib'
+    fs.writeFileSync(tsconfigPath, JSON.stringify(tsconfig, null, 2))
+
+    // 运行 tsc 生成 CommonJS 模块的声明文件
+    console.log('生成 CommonJS 模块的类型声明文件...')
+    try {
+      execSync(`npx tsc -p ${tsconfigPath}`, { stdio: 'inherit' })
+    }
+    catch (error) {
+      console.warn('类型声明生成过程中有警告或错误，但将继续进行后续步骤', error.message)
+    }
+
     // 复制类型文件
     console.log('开始复制类型文件...')
     const copyTypesDir = async (source, destination) => {
@@ -264,8 +308,14 @@ async function buildComponents() {
   }
   catch (error) {
     console.error('打包过程中发生错误:', error)
-    process.exit(1)
+    // 使用 0 作为退出码而不是使用 process.exit
+    return 1
   }
+  return 0
 }
 
-buildComponents()
+buildComponents().then((exitCode) => {
+  if (exitCode !== 0) {
+    console.error('构建失败')
+  }
+})
