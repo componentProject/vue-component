@@ -203,7 +203,11 @@ async function generateComponentPkgJson({ comp, entry }) {
   const peerList = ['vue', 'element-plus']
   const peerDependencies = {}
   const dependencies = {}
+  // 仅保留主项目package.json声明的依赖（npm包），过滤本地路径/类型文件
+  const mainPkgNames = Object.keys(mainDeps)
   imports.forEach((pkg) => {
+    if (!mainPkgNames.includes(pkg))
+      return // 只保留npm包
     if (peerList.includes(pkg)) {
       peerDependencies[pkg] = mainDeps[pkg] || '*'
     }
