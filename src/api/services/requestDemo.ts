@@ -1,9 +1,9 @@
-import { userRequest } from '@/api/utils'
+import { BaseApi } from '@/api/utils'
+import type { AxiosResponse } from 'axios'
+import type { User } from '@/api'
 
-export function getUserList(data: any) {
-  return userRequest({
-    url: '/user',
-    method: 'get',
-    params: data,
-  })
+const request = new BaseApi('/api/users')
+
+export async function getUsers(): Promise<AxiosResponse<User[]>> {
+  return request.get<User[]>('')
 }

@@ -17,7 +17,7 @@ import type {
 import axios from 'axios'
 import { ElMessage } from 'element-plus'
 
-export default class BaseApi {
+export class BaseApi {
   protected baseURL: string
   instance: ReturnType<typeof axios.create>
 
