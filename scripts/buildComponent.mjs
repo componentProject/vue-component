@@ -102,8 +102,9 @@ async function buildComponents() {
   try {
     const componentNames = await getComponentNames()
     console.log('将为每个组件单独打包:', componentNames)
+    // 并发打包ES和CJS模块
+    const buildTasks = []
     for (const comp of componentNames) {
-      // 入口文件优先index.vue，其次index.ts
       let entry = ''
       if (fs.existsSync(resolve(rootDir, `src/components/${comp}/index.vue`))) {
         entry = resolve(rootDir, `src/components/${comp}/index.vue`)
@@ -115,27 +116,30 @@ async function buildComponents() {
         console.warn(`组件${comp}没有入口文件，跳过`)
         continue
       }
-      // ES模块
-      console.log(`开始打包ES模块: ${comp}`)
-      await buildSingleComponent({
-        comp,
-        entry,
-        format: 'es',
-        outDir: `moluoxixi/es/${comp}`,
-        entryFileName: 'index.mjs',
-        chunkExt: 'mjs',
-      })
-      // CommonJS模块
-      console.log(`开始打包CJS模块: ${comp}`)
-      await buildSingleComponent({
-        comp,
-        entry,
-        format: 'cjs',
-        outDir: `moluoxixi/lib/${comp}`,
-        entryFileName: 'index.cjs',
-        chunkExt: 'cjs',
-      })
+      buildTasks.push((async () => {
+        console.log(`开始打包ES模块: ${comp}`)
+        await buildSingleComponent({
+          comp,
+          entry,
+          format: 'es',
+          outDir: `moluoxixi/es/${comp}`,
+          entryFileName: 'index.mjs',
+          chunkExt: 'mjs',
+        })
+      })())
+      buildTasks.push((async () => {
+        console.log(`开始打包CJS模块: ${comp}`)
+        await buildSingleComponent({
+          comp,
+          entry,
+          format: 'cjs',
+          outDir: `moluoxixi/lib/${comp}`,
+          entryFileName: 'index.cjs',
+          chunkExt: 'cjs',
+        })
+      })())
     }
+    await Promise.all(buildTasks)
     console.log('所有组件打包完成！')
   }
   catch (error) {
