@@ -132,7 +132,7 @@ function extractImports(file, seen = new Set()) {
     return []
   seen.add(file)
   let code = ''
-  let ext = file.split('.').pop()
+  const ext = file.split('.').pop()
   if (ext === 'vue') {
     // 提取<script>内容
     const sfc = parseSFC(fs.readFileSync(file, 'utf-8'))
@@ -215,6 +215,22 @@ async function generateComponentPkgJson({ comp, entry }) {
       dependencies[pkg] = mainDeps[pkg] || '*'
     }
   })
+  // 生成exports字段，支持多子路径
+  const exports = {
+    '.': {
+      types: './es/index.d.ts',
+      import: './es/index.mjs',
+      require: './lib/index.cjs',
+    },
+    './es': {
+      types: './es/index.d.ts',
+      import: './es/index.mjs',
+    },
+    './lib': {
+      types: './lib/index.d.ts',
+      require: './lib/index.cjs',
+    },
+  }
   // 生成package.json内容
   const pkgJson = {
     name: `@moluoxixi/${comp}`,
@@ -223,10 +239,7 @@ async function generateComponentPkgJson({ comp, entry }) {
     main: 'lib/index.cjs',
     module: 'es/index.mjs',
     types: 'es/index.d.ts',
-    exports: {
-      import: './es/index.mjs',
-      require: './lib/index.cjs',
-    },
+    exports,
     sideEffects: false,
     peerDependencies,
     dependencies,
