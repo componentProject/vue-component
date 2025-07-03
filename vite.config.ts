@@ -35,7 +35,6 @@ import autoRoutesPlugin from './plugins/autoRoutes/index.ts'
 // 其余vite插件与配置
 import { wrapperEnv } from './src/utils/modules/getEnv.ts'
 import { createHtmlPlugin } from 'vite-plugin-html'
-import { discoverComponents } from './src/utils/index.ts'
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd())
@@ -49,8 +48,7 @@ export default defineConfig(({ mode }) => {
   const useDoc = mode === 'github'
   const useQianKun = viteEnv.VITE_USE_QIANKUN && !useDoc
   const useCDN = viteEnv.VITE_USE_CDN && !useDoc && !useQianKun
-  // 组件库构建模式
-  const isComponentMode = mode === 'component'
+
   const vuePlugins = [
     pluginVue(),
     vueJsx(),
@@ -142,170 +140,48 @@ export default defineConfig(({ mode }) => {
       ]
     : []
 
-  let build: UserConfig['build']
-  let plugins: UserConfig['plugins']
-  // 如果是组件库模式，则使用不同的配置
-  if (isComponentMode) {
-    // 自动发现组件
-    const { componentNames, entry } = discoverComponents()
-
-    // 组件库入口文件
-    build = {
-      lib: {
-        entry,
-        formats: ['es', 'cjs'],
+  const build: UserConfig['build'] = {
+    sourcemap: isDev,
+    outDir: useDoc ? './docs/pages' : `${systemCode}`,
+    cssCodeSplit: true,
+    chunkSizeWarningLimit: 1500,
+    minify: 'esbuild',
+    rollupOptions: {
+      external: [],
+      output: {
+        globals: {},
+        chunkFileNames: 'static/js/[name]-[hash].js',
+        entryFileNames: 'static/js/[name]-[hash].js',
+        assetFileNames: 'static/[ext]/[name]-[hash].[ext]',
+        manualChunks: (id: string) => {
+          // 优化拆分策略
+          if (id.includes('node_modules')) {
+            return id.toString().split('node_modules/')[1].split('/')[0].toString()
+          }
+        },
       },
-      outDir: 'moluoxixi',
-      emptyOutDir: true,
-      minify: 'esbuild',
-      cssCodeSplit: true, // 启用CSS代码分割
-      assetsInlineLimit: 0, // 不内联任何资产
-      copyPublicDir: false, // 不要复制public目录
-      rollupOptions: {
-        external: ['vue', 'element-plus'],
-        output: [
-          // ES模块配置
-          {
-            format: 'es',
-            dir: 'moluoxixi/es',
-            entryFileNames: (chunkInfo) => {
-              const name = chunkInfo.name
-              if (name === 'index') {
-                return 'index.mjs'
-              }
-              if (name === '_utils') {
-                return '_utils/index.mjs'
-              }
-              return `${name}/index.mjs`
-            },
-            chunkFileNames: (chunkInfo) => {
-              // 检查是否是utils相关的chunk
-              if (chunkInfo.name.includes('utils') || chunkInfo.name.includes('_utils')) {
-                return '_utils/[name].mjs'
-              }
-
-              // 检查是否是组件相关的chunk
-              for (const comp of componentNames) {
-                if (chunkInfo.name.includes(comp)) {
-                  return `${comp}/src/[name].mjs`
-                }
-              }
-
-              return 'shared/[name].mjs'
-            },
-            assetFileNames: (assetInfo) => {
-              const source = assetInfo.names?.[0] || ''
-              const suffix = source.split('.').pop() || ''
-
-              // 如果是CSS文件，尝试确定所属组件
-              if (suffix === 'css') {
-                for (const comp of componentNames) {
-                  if (source.includes(comp)) {
-                    return `${comp}/style/index.css`
-                  }
-                }
-                return 'shared/style/[name].css'
-              }
-
-              return 'assets/[name].[ext]'
-            },
-          },
-          // CommonJS模块配置
-          {
-            format: 'cjs',
-            dir: 'moluoxixi/lib',
-            entryFileNames: (chunkInfo) => {
-              const name = chunkInfo.name
-              if (name === 'index') {
-                return 'index.cjs'
-              }
-              if (name === '_utils') {
-                return '_utils/index.cjs'
-              }
-              return `${name}/index.cjs`
-            },
-            chunkFileNames: (chunkInfo) => {
-              // 检查是否是utils相关的chunk
-              if (chunkInfo.name.includes('utils') || chunkInfo.name.includes('_utils')) {
-                return '_utils/[name].cjs'
-              }
-
-              // 检查是否是组件相关的chunk
-              for (const comp of componentNames) {
-                if (chunkInfo.name.includes(comp)) {
-                  return `${comp}/src/[name].cjs`
-                }
-              }
-
-              return 'shared/[name].cjs'
-            },
-            assetFileNames: (assetInfo) => {
-              const source = assetInfo.names?.[0] || ''
-              const suffix = source.split('.').pop() || ''
-
-              // 如果是CSS文件，尝试确定所属组件
-              if (suffix === 'css') {
-                for (const comp of componentNames) {
-                  if (source.includes(comp)) {
-                    return `${comp}/style/index.css`
-                  }
-                }
-                return 'shared/style/[name].css'
-              }
-
-              return 'assets/[name].[ext]'
-            },
-          },
-        ],
-      },
-    }
-    plugins = [
-      ...vuePlugins,
-    ]
+    },
   }
-  else {
-    build = {
-      sourcemap: isDev,
-      outDir: useDoc ? './docs/pages' : `${systemCode}`,
-      cssCodeSplit: true,
-      chunkSizeWarningLimit: 1500,
-      minify: 'esbuild',
-      rollupOptions: {
-        external: [],
-        output: {
-          globals: {},
-          chunkFileNames: 'static/js/[name]-[hash].js',
-          entryFileNames: 'static/js/[name]-[hash].js',
-          assetFileNames: 'static/[ext]/[name]-[hash].[ext]',
-          manualChunks: (id: string) => {
-            // 优化拆分策略
-            if (id.includes('node_modules')) {
-              return id.toString().split('node_modules/')[1].split('/')[0].toString()
-            }
+
+  const plugins: UserConfig['plugins'] = [
+    ...vuePlugins,
+    ...performancePlugins,
+    ...monitorPlugins,
+    ...qianKunPlugins,
+    autoRoutesPlugin({
+      routeConfig: {
+        views: ['/src/views/**/index.vue', '!/src/views/**/components/*'],
+        examples: '/src/examples/**/index.vue',
+        componentExamples: {
+          glob: ['/src/components/**/Example.vue', '!/src/components/**/components/*'],
+          baseRoute: {
+            path: '/components',
+            name: '组件示例',
           },
         },
       },
-    }
-    plugins = [
-      ...vuePlugins,
-      ...performancePlugins,
-      ...monitorPlugins,
-      ...qianKunPlugins,
-      autoRoutesPlugin({
-        routeConfig: {
-          views: ['/src/views/**/index.vue', '!/src/views/**/components/*'],
-          examples: '/src/examples/**/index.vue',
-          componentExamples: {
-            glob: ['/src/components/**/Example.vue', '!/src/components/**/components/*'],
-            baseRoute: {
-              path: '/components',
-              name: '组件示例',
-            },
-          },
-        },
-      }),
-    ]
-  }
+    }),
+  ]
   return {
     base: `/${systemCode}`,
     plugins,
