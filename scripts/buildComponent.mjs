@@ -223,7 +223,6 @@ async function generateComponentPkgJson({ comp, entry }) {
     main: 'lib/index.cjs',
     module: 'es/index.mjs',
     types: 'es/index.d.ts',
-    style: 'styles/moluoxixi.css',
     exports: {
       import: './es/index.mjs',
       require: './lib/index.cjs',
@@ -237,6 +236,11 @@ async function generateComponentPkgJson({ comp, entry }) {
     publishConfig: {
       access: 'public',
     },
+  }
+  // 检查es/style/index.css是否存在，存在则写入style字段
+  const stylePath = resolve(rootDir, `moluoxixi/${comp}/es/style/index.css`)
+  if (fs.existsSync(stylePath)) {
+    pkgJson.style = 'es/style/index.css'
   }
   const dest = resolve(rootDir, `moluoxixi/${comp}/package.json`)
   await fsp.writeFile(dest, JSON.stringify(pkgJson, null, 2), 'utf-8')
