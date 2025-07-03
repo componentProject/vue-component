@@ -12,7 +12,7 @@
     "dev": "vite",
     "CICD": "node ./scripts/CICD.mjs",
     "build": "vite build --mode production & node ./scripts/build.mjs",
-    "build:component": "node ./scripts/buildSimpleComponent.mjs && node ./scripts/buildComponent.mjs",
+    "build:component": "node ./scripts/buildComponent.mjs",
     "publish:component": "npm run build:component && cd moluoxixi && npm publish",
     "preview": "vite preview",
     "storybook:dev": "storybook dev -p 6006",
