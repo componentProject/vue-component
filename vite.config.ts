@@ -35,7 +35,7 @@ import autoRoutesPlugin from './plugins/autoRoutes/index.ts'
 // 其余vite插件与配置
 import { wrapperEnv } from './src/utils/modules/getEnv.ts'
 import { createHtmlPlugin } from 'vite-plugin-html'
-import { discoverComponents } from './src/utils/modules/discoverComponents.ts'
+import { discoverComponents } from './src/utils/index.ts'
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd())
@@ -189,7 +189,7 @@ export default defineConfig(({ mode }) => {
           },
           assetFileNames: (assetInfo) => {
             // 获取文件名用于匹配组件
-            const source = assetInfo.name || ''
+            const source = assetInfo.names[0] || ''
             const suffix = source.split('.').pop() || ''
 
             // 如果是CSS文件，尝试确定所属组件

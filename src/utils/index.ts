@@ -1,5 +1,5 @@
-export * from './modules/discoverComponents'
-export * from './modules/modifyComponent'
+export * from './modules/discoverComponents.ts'
+export * from './modules/modifyComponent.tsx'
 
 export function getType(obj: any, type?: string) {
   if (type) {
