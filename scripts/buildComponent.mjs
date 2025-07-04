@@ -6,6 +6,7 @@ import glob from 'fast-glob'
 import { build } from 'vite'
 import pluginVue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
+import dts from 'vite-plugin-dts'
 import autoprefixer from 'autoprefixer'
 import process from 'node:process'
 import { execSync } from 'node:child_process'
@@ -686,6 +687,27 @@ async function buildComponent(comp, version = '1.0.0') {
           isProduction: true,
         }),
         vueJsx(),
+        // 添加类型声明生成插件
+        dts({
+          vue: true,
+          entryRoot: dirname(entry),
+          outDir: [`${LIB_NAMESPACE}/${comp}/es`, `${LIB_NAMESPACE}/${comp}/lib`],
+          include: [`src/components/${comp}/**/*`],
+          exclude: [
+            '**/*.stories.*',
+            '**/*.test.*',
+            '**/*.spec.*',
+            '**/node_modules/**',
+            '**/dist/**',
+            '**/temp/**',
+          ],
+          skipDiagnostics: true,
+          copyDtsFiles: true,
+          cleanVueFileName: true,
+          insertTypesEntry: true,
+          staticImport: true,
+          excludeExternals: true,
+        }),
       ],
       resolve: {
         extensions: ['.js', '.jsx', '.ts', '.tsx', '.vue'],
@@ -799,17 +821,30 @@ async function buildComponent(comp, version = '1.0.0') {
       description: `${comp} 组件`,
       main: 'lib/index.cjs',
       module: 'es/index.mjs',
+      types: 'es/index.d.ts',
       exports: {
         '.': {
-          import: './es/index.mjs',
-          require: './lib/index.cjs',
+          import: {
+            types: './es/index.d.ts',
+            default: './es/index.mjs'
+          },
+          require: {
+            types: './lib/index.d.ts',
+            default: './lib/index.cjs'
+          }
         },
         './es': {
-          import: './es/index.mjs',
+          import: {
+            types: './es/index.d.ts',
+            default: './es/index.mjs'
+          }
         },
         './lib': {
-          require: './lib/index.cjs',
-        },
+          require: {
+            types: './lib/index.d.ts',
+            default: './lib/index.cjs'
+          }
+        }
       },
       sideEffects: [
         '*.css',
@@ -829,6 +864,7 @@ async function buildComponent(comp, version = '1.0.0') {
     const stylePath = resolve(outputDir, 'es/style/index.css')
     if (fs.existsSync(stylePath)) {
       pkgJson.exports['./style'] = './es/style/index.css'
+      pkgJson.exports['./style.css'] = './es/style/index.css'
     }
 
     await fsp.writeFile(resolve(outputDir, 'package.json'), JSON.stringify(pkgJson, null, 2), 'utf-8')
