@@ -28,14 +28,12 @@
 
 //#region vite下
 
-import type { ComponentsType } from '@/components/ConfigForm/types'
-
 const componentFiles = import.meta.glob('./components/popComponents/**/*.vue')
-const components: ComponentsType = Object.keys(componentFiles).reduce((modules, modulePath) => {
+const components = Object.keys(componentFiles).reduce((modules, modulePath) => {
   const name = modulePath.split('/').at(-2)
   const value = componentFiles[modulePath]
-  if (value && name) modules[name] = value
-  return modules
+  if (value && name) modules[name as string] = value as any
+  return modules as any
 }, {})
 //#endregion
 export default components
