@@ -12,6 +12,11 @@ import vueJsx from '@vitejs/plugin-vue-jsx'
 import autoprefixer from 'autoprefixer'
 import tailwindcss from '@tailwindcss/postcss'
 
+// 自动导入插件
+import AutoImport from 'unplugin-auto-import/vite'
+import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
+import Components from 'unplugin-vue-components/vite'
+
 import parser from '@babel/parser'
 import traverse from '@babel/traverse'
 import { parse as parseSFC } from '@vue/compiler-sfc'
@@ -27,6 +32,28 @@ function getBaseConfig(options = {}) {
   const plugins = [
     pluginVue(),
     vueJsx(),
+    // 自动引入
+    AutoImport({
+      imports: ['vue'],
+      resolvers: [ElementPlusResolver()],
+      dts: resolve(rootDir, './src/typings/auto-imports.d.ts'),
+    }),
+    // 自动导入组件
+    Components({
+      resolvers: [
+        ElementPlusResolver({
+          exclude: new RegExp(
+            ['ElButton', 'ElDrawer', 'ElDialog'].map(item => `^${item}$`).join('|'),
+          ),
+        }),
+      ],
+      globs: [
+        'src/components/**/index.vue',
+        '!src/components/**/components/**/*',
+        '!src/components/**/base/**/*',
+      ],
+      dts: resolve(rootDir, './src/typings/components.d.ts'),
+    }),
   ]
 
   // 如果启用 dts，添加 dts 插件
