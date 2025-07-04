@@ -164,7 +164,7 @@ async function analyzeComponentDeps(comp) {
         exclude: {
           path: 'node_modules', // 排除node_modules，但保留npm包引用信息
         },
-        maxDepth: 10,
+        maxDepth: 15, // 增加分析深度，确保能找到间接依赖
         moduleSystems: ['es6', 'cjs', 'tsd'],
         tsPreCompilationDeps: true,
         preserveSymlinks: false,
@@ -203,7 +203,7 @@ async function analyzeComponentDeps(comp) {
             }
 
             // 2. 检查是否是外部npm包依赖
-            if (dep.module && !dep.module.startsWith('.') && !dep.module.startsWith('/')) {
+            if (dep.module && !dep.module.startsWith('.') && !dep.module.startsWith('/') && !dep.module.startsWith('@/')) {
               // 提取包名（处理scoped packages）
               const packageName = dep.module.startsWith('@')
                 ? dep.module.split('/').slice(0, 2).join('/')
@@ -220,73 +220,131 @@ async function analyzeComponentDeps(comp) {
       }
     }
 
-    // 补充：直接扫描代码中的import语句（作为backup）
+    // 补充：直接扫描代码中的import语句（作为backup + 扩展分析）
     console.log('补充扫描import语句...')
     const files = await glob(['**/*.{vue,ts,tsx,js,jsx}'], {
       cwd: componentDir,
       absolute: true,
     })
 
-    for (const file of files) {
-      const content = await fsp.readFile(file, 'utf-8')
+    // 用于追踪已扫描的文件，避免重复扫描
+    const scannedFiles = new Set()
 
-      // 匹配import语句
-      const importRegex = /import\s[^'"]*from\s+['"]([^'"]+)['"]/g
-      let match
+    // 递归扫描函数
+    const scanFileForDeps = async (filePath) => {
+      if (scannedFiles.has(filePath))
+        return
+      scannedFiles.add(filePath)
 
-      // eslint-disable-next-line no-cond-assign
-      while ((match = importRegex.exec(content)) !== null) {
-        const importPath = match[1]
+      try {
+        const content = await fsp.readFile(filePath, 'utf-8')
 
-        // 1. 检查@/components引用
-        const componentMatch = importPath.match(/@\/components\/([A-Z][a-zA-Z0-9]+)/)
-        if (componentMatch && allComponents.includes(componentMatch[1]) && componentMatch[1] !== comp) {
-          internalDeps.add(componentMatch[1])
-        }
+        // 匹配import语句
+        const importRegex = /import\s[^'"]*from\s+['"]([^'"]+)['"]/g
+        let match
 
-        // 2. 检查相对路径组件引用 - 使用真正的路径解析
-        if (importPath.startsWith('../') || importPath.startsWith('./')) {
-          try {
-            // 解析相对路径为绝对路径
-            const currentFileDir = dirname(file)
-            const targetPath = resolve(currentFileDir, importPath)
+        // eslint-disable-next-line no-cond-assign
+        while ((match = importRegex.exec(content)) !== null) {
+          const importPath = match[1]
 
-            // 检查目标路径是否在 src/components/ 目录下
-            const componentsDir = resolve(rootDir, 'src/components')
-            const relativeTocComponents = resolve(targetPath).replace(componentsDir, '').replace(/\\/g, '/')
+          // 1. 检查@/components引用
+          const componentMatch = importPath.match(/@\/components\/([A-Z][a-zA-Z0-9]+)/)
+          if (componentMatch && allComponents.includes(componentMatch[1]) && componentMatch[1] !== comp) {
+            internalDeps.add(componentMatch[1])
+          }
 
-            // 如果路径以 / 开头且不包含 .. 说明在 components 目录下
-            if (relativeTocComponents.startsWith('/') && !relativeTocComponents.includes('..')) {
-              // 提取组件名：/ComponentName/xxx/xxx -> ComponentName
-              const pathParts = relativeTocComponents.substring(1).split('/')
-              const potentialComponentName = pathParts[0]
+          // 2. 检查@/components/_utils等共享模块的引用
+          if (importPath.startsWith('@/components/_utils') ||
+              importPath.startsWith('@/components/_types') ||
+              importPath.startsWith('@/components/')) {
+            try {
+              // 解析@路径为实际路径
+              const actualPath = importPath.replace('@/', 'src/')
+              const sharedModulePath = resolve(rootDir, actualPath)
 
-              // 验证是否是有效的组件名且存在于组件列表中
-              if (potentialComponentName
-                && allComponents.includes(potentialComponentName)
-                && potentialComponentName !== comp) {
-                internalDeps.add(potentialComponentName)
-                console.log(`✓ 发现相对路径组件依赖: ${potentialComponentName} (路径: ${importPath} -> ${targetPath})`)
+              // 如果是文件，直接扫描；如果是目录，尝试找index文件
+              let targetFile = null
+
+              // 首先检查是否是直接的文件
+              if (fs.existsSync(sharedModulePath) && fs.statSync(sharedModulePath).isFile()) {
+                targetFile = sharedModulePath
+              } else {
+                // 尝试添加不同的扩展名和index文件
+                const extensions = ['.ts', '.js', '.tsx', '.jsx', '/index.ts', '/index.js']
+                for (const ext of extensions) {
+                  const testPath = sharedModulePath + ext
+                  if (fs.existsSync(testPath) && fs.statSync(testPath).isFile()) {
+                    targetFile = testPath
+                    break
+                  }
+                }
+              }
+
+              if (targetFile && !scannedFiles.has(targetFile)) {
+                console.log(`✓ 递归分析共享模块: ${importPath} -> ${targetFile}`)
+                await scanFileForDeps(targetFile)
+              }
+            } catch (error) {
+              console.warn(`扫描共享模块失败: ${importPath}, 错误: ${error.message}`)
+            }
+          }
+
+          // 3. 检查相对路径组件引用 - 使用真正的路径解析
+          if (importPath.startsWith('../') || importPath.startsWith('./')) {
+            try {
+              // 解析相对路径为绝对路径
+              const currentFileDir = dirname(filePath)
+              const targetPath = resolve(currentFileDir, importPath)
+
+              // 检查目标路径是否在 src/components/ 目录下
+              const componentsDir = resolve(rootDir, 'src/components')
+              const relativeTocComponents = resolve(targetPath).replace(componentsDir, '').replace(/\\/g, '/')
+
+              // 如果路径以 / 开头且不包含 .. 说明在 components 目录下
+              if (relativeTocComponents.startsWith('/') && !relativeTocComponents.includes('..')) {
+                // 提取组件名：/ComponentName/xxx/xxx -> ComponentName
+                const pathParts = relativeTocComponents.substring(1).split('/')
+                const potentialComponentName = pathParts[0]
+
+                // 验证是否是有效的组件名且存在于组件列表中
+                if (potentialComponentName
+                  && allComponents.includes(potentialComponentName)
+                  && potentialComponentName !== comp) {
+                  internalDeps.add(potentialComponentName)
+                  console.log(`✓ 发现相对路径组件依赖: ${potentialComponentName} (路径: ${importPath} -> ${targetPath})`)
+                }
+              }
+            }
+            catch (error) {
+              // 路径解析失败，跳过
+              console.warn(`路径解析失败: ${importPath} 在文件 ${filePath}, 错误: ${error.message}`)
+            }
+          }
+
+          // 4. 检查外部包引用
+          if (!importPath.startsWith('.') && !importPath.startsWith('/') && !importPath.startsWith('@/')) {
+            const packageName = importPath.startsWith('@')
+              ? importPath.split('/').slice(0, 2).join('/')
+              : importPath.split('/')[0]
+
+            if (allProjectDeps[packageName]) {
+              externalDeps.set(packageName, allProjectDeps[packageName])
+              if (!scannedFiles.has(`external:${packageName}`)) {
+                scannedFiles.add(`external:${packageName}`)
+                console.log(`✓ 发现外部依赖: ${packageName}@${allProjectDeps[packageName]} (来源: ${filePath})`)
               }
             }
           }
-          catch (error) {
-            // 路径解析失败，跳过
-            console.warn(`路径解析失败: ${importPath} 在文件 ${file}, 错误: ${error.message}`)
-          }
-        }
-
-        // 3. 检查外部包引用
-        if (!importPath.startsWith('.') && !importPath.startsWith('/') && !importPath.startsWith('@/')) {
-          const packageName = importPath.startsWith('@')
-            ? importPath.split('/').slice(0, 2).join('/')
-            : importPath.split('/')[0]
-
-          if (allProjectDeps[packageName]) {
-            externalDeps.set(packageName, allProjectDeps[packageName])
-          }
         }
       }
+      catch (error) {
+        console.warn(`扫描文件失败: ${filePath}, 错误: ${error.message}`)
+      }
+    }
+
+    // 扫描组件目录下的所有文件
+    for (const file of files) {
+      await scanFileForDeps(file)
     }
 
     // 转换结果
