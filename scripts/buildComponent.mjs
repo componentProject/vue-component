@@ -732,7 +732,7 @@ async function doPublish(mode = 'all') {
 async function main() {
   // 获取命令行参数
   const args = process.argv.slice(2)
-  const command = args[0] || 'build' // 默认命令是build
+  const command = args[0] || 'build-publish' // 默认命令是build-publish
   const mode = args[1] || 'all' // 默认模式是all
   const versionType = args[2] || 'patch' // 默认增加补丁版本号
 
@@ -787,7 +787,8 @@ async function main() {
 命令:
   build         - 仅构建组件
   publish       - 仅发布组件（假设已经构建好）
-  build-publish - 构建并发布组件（默认）
+  build-publish - 构建并发布组件
+  all-run       - 仅构建所有组件和组件库，不发布（用于测试）
 
 模式:
   all           - 处理所有单个组件和整个组件库（默认）
@@ -804,7 +805,7 @@ async function main() {
   node scripts/buildComponent.mjs build library     - 只构建组件库
   node scripts/buildComponent.mjs build Icon        - 只构建Icon组件
   node scripts/buildComponent.mjs build-publish     - 构建并发布所有组件和组件库
-  node scripts/buildComponent.mjs build-publish all minor - 构建并发布所有组件和组件库，增加次版本号
+  node scripts/buildComponent.mjs all-run           - 测试构建所有组件和组件库（不发布）
       `)
       return 1
   }
