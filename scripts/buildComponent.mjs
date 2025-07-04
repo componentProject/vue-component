@@ -77,7 +77,7 @@ function getNextVersion(currentVersion, type = 'patch') {
 /**
  * 获取当前版本号
  * @param {string} comp 组件名，如果为空则获取整个组件库的版本号
- * @returns {string} 当前版本号，默认为2.0.0
+ * @returns {string} 当前版本号，默认为2.1.0
  */
 function getCurrentVersion(comp = '') {
   try {
@@ -87,7 +87,7 @@ function getCurrentVersion(comp = '') {
     if (fs.existsSync(libraryPath)) {
       const pkgContent = fs.readFileSync(libraryPath, 'utf-8')
       const pkg = JSON.parse(pkgContent)
-      return pkg.version || '2.0.0'
+      return pkg.version || '2.1.0'
     }
 
     // 如果组件库不存在，则尝试从指定组件获取
@@ -96,15 +96,26 @@ function getCurrentVersion(comp = '') {
       if (fs.existsSync(packagePath)) {
         const pkgContent = fs.readFileSync(packagePath, 'utf-8')
         const pkg = JSON.parse(pkgContent)
-        return pkg.version || '2.0.0'
+        return pkg.version || '2.1.0'
       }
     }
 
-    // 如果都不存在，返回默认版本号2.0.0，确保高于之前发布的版本
-    return '2.0.0'
+    // 如果组件库和组件都不存在，尝试从项目package.json获取
+    const projectPackagePath = resolve(rootDir, 'package.json')
+    if (fs.existsSync(projectPackagePath)) {
+      const pkgContent = fs.readFileSync(projectPackagePath, 'utf-8')
+      const pkg = JSON.parse(pkgContent)
+      // 如果项目package.json有version字段，使用它，否则使用默认值
+      if (pkg.version) {
+        return pkg.version
+      }
+    }
+
+    // 如果都不存在，返回默认版本号2.1.0，确保高于之前发布的版本
+    return '2.1.0'
   }
   catch {
-    return '2.0.0' // 默认版本号
+    return '2.1.0' // 默认版本号
   }
 }
 
@@ -547,8 +558,9 @@ app.use(${componentNames[0]})
 /**
  * 发布组件
  * @param {string} comp 组件名，如果为空则发布整个组件库
+ * @param {string} version 指定版本号，如果提供则覆盖package.json中的版本号
  */
-async function publishComponent(comp = '') {
+async function publishComponent(comp = '', version = '') {
   try {
     const packagePath = comp
       ? resolve(rootDir, `moluoxixi/${comp}/package.json`)
@@ -560,6 +572,12 @@ async function publishComponent(comp = '') {
 
     const pkgContent = fs.readFileSync(packagePath, 'utf-8')
     const pkg = JSON.parse(pkgContent)
+
+    // 如果提供了版本号，则更新package.json
+    if (version) {
+      pkg.version = version
+      fs.writeFileSync(packagePath, JSON.stringify(pkg, null, 2), 'utf-8')
+    }
 
     // 发布组件
     const packageDir = comp ? `moluoxixi/${comp}` : 'moluoxixi'
@@ -677,13 +695,14 @@ async function doBuild(mode = 'all', version = '1.0.0') {
 /**
  * 发布函数 - 统一处理三种模式：all、library、单个组件
  * @param {string} mode 发布模式：'all'、'library'、或组件名
+ * @param {string} version 版本号
  * @returns {Promise<boolean>} 是否成功
  */
-async function doPublish(mode = 'all') {
+async function doPublish(mode = 'all', version = '') {
   try {
     if (mode === 'all') {
       // 发布整个组件库和所有单个组件
-      const librarySuccess = await publishComponent()
+      const librarySuccess = await publishComponent('', version)
       if (!librarySuccess) {
         console.error('组件库发布失败')
         return false
@@ -696,7 +715,7 @@ async function doPublish(mode = 'all') {
       for (const comp of componentNames) {
         try {
           console.log(`开始发布组件: ${comp}...`)
-          const success = await publishComponent(comp)
+          const success = await publishComponent(comp, version)
           if (success) {
             successCount++
             console.log(`组件 ${comp} 发布成功！`)
@@ -715,11 +734,11 @@ async function doPublish(mode = 'all') {
     }
     else if (mode === 'library') {
       // 只发布整个组件库
-      return await publishComponent()
+      return await publishComponent('', version)
     }
     else {
       // 发布单个组件
-      return await publishComponent(mode)
+      return await publishComponent(mode, version)
     }
   }
   catch (error) {
@@ -765,7 +784,7 @@ async function main() {
 
     case 'publish':
       // 只发布（假设已经构建好了）
-      publishSuccess = await doPublish(mode)
+      publishSuccess = await doPublish(mode, newVersion)
       return publishSuccess ? 0 : 1
 
     case 'build-publish':
@@ -776,7 +795,7 @@ async function main() {
         return 1
       }
 
-      publishResult = await doPublish(mode)
+      publishResult = await doPublish(mode, newVersion)
       return publishResult ? 0 : 1
 
     default:
