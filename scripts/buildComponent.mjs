@@ -788,7 +788,6 @@ async function main() {
   build         - 仅构建组件
   publish       - 仅发布组件（假设已经构建好）
   build-publish - 构建并发布组件
-  all-run       - 仅构建所有组件和组件库，不发布（用于测试）
 
 模式:
   all           - 处理所有单个组件和整个组件库（默认）
@@ -805,7 +804,6 @@ async function main() {
   node scripts/buildComponent.mjs build library     - 只构建组件库
   node scripts/buildComponent.mjs build Icon        - 只构建Icon组件
   node scripts/buildComponent.mjs build-publish     - 构建并发布所有组件和组件库
-  node scripts/buildComponent.mjs all-run           - 测试构建所有组件和组件库（不发布）
       `)
       return 1
   }
