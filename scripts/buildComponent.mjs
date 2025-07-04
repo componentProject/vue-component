@@ -238,13 +238,45 @@ async function analyzeComponentDeps(comp) {
       while ((match = importRegex.exec(content)) !== null) {
         const importPath = match[1]
 
-        // 检查内部组件引用
+        // 1. 检查@/components引用
         const componentMatch = importPath.match(/@\/components\/([A-Z][a-zA-Z0-9]+)/)
         if (componentMatch && allComponents.includes(componentMatch[1]) && componentMatch[1] !== comp) {
           internalDeps.add(componentMatch[1])
         }
 
-        // 检查外部包引用
+        // 2. 检查相对路径组件引用 - 使用真正的路径解析
+        if (importPath.startsWith('../') || importPath.startsWith('./')) {
+          try {
+            // 解析相对路径为绝对路径
+            const currentFileDir = dirname(file)
+            const targetPath = resolve(currentFileDir, importPath)
+
+            // 检查目标路径是否在 src/components/ 目录下
+            const componentsDir = resolve(rootDir, 'src/components')
+            const relativeTocComponents = resolve(targetPath).replace(componentsDir, '').replace(/\\/g, '/')
+
+            // 如果路径以 / 开头且不包含 .. 说明在 components 目录下
+            if (relativeTocComponents.startsWith('/') && !relativeTocComponents.includes('..')) {
+              // 提取组件名：/ComponentName/xxx/xxx -> ComponentName
+              const pathParts = relativeTocComponents.substring(1).split('/')
+              const potentialComponentName = pathParts[0]
+
+              // 验证是否是有效的组件名且存在于组件列表中
+              if (potentialComponentName
+                && allComponents.includes(potentialComponentName)
+                && potentialComponentName !== comp) {
+                internalDeps.add(potentialComponentName)
+                console.log(`✓ 发现相对路径组件依赖: ${potentialComponentName} (路径: ${importPath} -> ${targetPath})`)
+              }
+            }
+          }
+          catch (error) {
+            // 路径解析失败，跳过
+            console.warn(`路径解析失败: ${importPath} 在文件 ${file}, 错误: ${error.message}`)
+          }
+        }
+
+        // 3. 检查外部包引用
         if (!importPath.startsWith('.') && !importPath.startsWith('/') && !importPath.startsWith('@/')) {
           const packageName = importPath.startsWith('@')
             ? importPath.split('/').slice(0, 2).join('/')
@@ -392,8 +424,8 @@ function createComponentReferencePlugin(internalDeps) {
 
       // 为每个内部依赖创建转换规则
       for (const dep of internalDeps) {
-        // 转换各种可能的导入格式
-        const patterns = [
+        // 1. 转换 @/components 路径引用
+        const aliasPatterns = [
           // import ... from '@/components/ComponentName'
           {
             from: new RegExp(`(import\\s+[^"']+from\\s+)['"]@/components/${dep}['"]`, 'g'),
@@ -416,14 +448,68 @@ function createComponentReferencePlugin(internalDeps) {
           },
         ]
 
-        // 应用所有转换规则
-        for (const pattern of patterns) {
+        // 应用别名路径转换规则
+        for (const pattern of aliasPatterns) {
           const newCode = transformedCode.replace(pattern.from, pattern.to)
           if (newCode !== transformedCode) {
             transformedCode = newCode
             hasChanges = true
-            console.log(`✓ 转换组件引用 ${dep} 在文件 ${id}`)
+            console.log(`✓ 转换@路径引用 ${dep} 在文件 ${id}`)
           }
+        }
+      }
+
+      // 2. 转换相对路径引用 - 使用真正的路径解析
+      const importRegex = /import\s[^"']*from\s+['"]([^'"]+)['"]/g
+      let match
+      const replacements = []
+
+      // eslint-disable-next-line no-cond-assign
+      while ((match = importRegex.exec(transformedCode)) !== null) {
+        const importPath = match[1]
+
+        // 只处理相对路径
+        if (importPath.startsWith('../') || importPath.startsWith('./')) {
+          try {
+            // 解析相对路径为绝对路径
+            const currentFileDir = dirname(id)
+            const targetPath = resolve(currentFileDir, importPath)
+
+            // 检查目标路径是否在 src/components/ 目录下
+            const componentsDir = resolve(rootDir, 'src/components')
+            const relativeTocComponents = resolve(targetPath).replace(componentsDir, '').replace(/\\/g, '/')
+
+            // 如果路径以 / 开头且不包含 .. 说明在 components 目录下
+            if (relativeTocComponents.startsWith('/') && !relativeTocComponents.includes('..')) {
+              // 提取组件名：/ComponentName/xxx/xxx -> ComponentName
+              const pathParts = relativeTocComponents.substring(1).split('/')
+              const potentialComponentName = pathParts[0]
+
+              // 验证是否是内部依赖中的组件
+              if (potentialComponentName && internalDeps.includes(potentialComponentName)) {
+                // 记录需要替换的内容
+                replacements.push({
+                  oldImport: match[0],
+                  newImport: match[0].replace(importPath, `@moluoxixi/${potentialComponentName}`),
+                  componentName: potentialComponentName,
+                })
+              }
+            }
+          }
+          catch (error) {
+            // 路径解析失败，跳过
+            console.warn(`路径解析失败: ${importPath} 在文件 ${id}, 错误: ${error.message}`)
+          }
+        }
+      }
+
+      // 执行相对路径替换
+      for (const replacement of replacements) {
+        const newCode = transformedCode.replace(replacement.oldImport, replacement.newImport)
+        if (newCode !== transformedCode) {
+          transformedCode = newCode
+          hasChanges = true
+          console.log(`✓ 转换相对路径引用 ${replacement.componentName} 在文件 ${id}`)
         }
       }
 
