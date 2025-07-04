@@ -301,7 +301,6 @@ async function analyzeComponentDeps(comp) {
 /**
  * 简单的依赖分析方法（作为fallback）
  * @param {string} comp 组件名称
- * @returns {Promise<{internal: string[], external: Record<string, string>}>}
  */
 async function simpleAnalyzeComponentDeps(comp) {
   try {
@@ -374,6 +373,93 @@ async function simpleAnalyzeComponentDeps(comp) {
 }
 
 /**
+ * 自定义插件：转换内部组件引用为外部npm包引用
+ * @param {Array<string>} internalDeps 内部组件依赖列表
+ * @returns {object} Rollup插件对象
+ */
+function createComponentReferencePlugin(internalDeps) {
+  return {
+    name: 'component-reference-transform',
+    enforce: 'pre',
+    transform(code, id) {
+      // 只处理TypeScript和Vue文件
+      if (!/\.(?:ts|tsx|js|jsx|vue)$/.test(id)) {
+        return null
+      }
+
+      let transformedCode = code
+      let hasChanges = false
+
+      // 为每个内部依赖创建转换规则
+      for (const dep of internalDeps) {
+        // 转换各种可能的导入格式
+        const patterns = [
+          // import ... from '@/components/ComponentName'
+          {
+            from: new RegExp(`(import\\s+[^"']+from\\s+)['"]@/components/${dep}['"]`, 'g'),
+            to: `$1'@moluoxixi/${dep}'`,
+          },
+          // import ... from '@/components/ComponentName/src/index.vue'
+          {
+            from: new RegExp(`(import\\s+[^"']+from\\s+)['"]@/components/${dep}/src/index\\.vue['"]`, 'g'),
+            to: `$1'@moluoxixi/${dep}'`,
+          },
+          // import ... from '@/components/ComponentName/index.ts'
+          {
+            from: new RegExp(`(import\\s+[^"']+from\\s+)['"]@/components/${dep}/index\\.ts['"]`, 'g'),
+            to: `$1'@moluoxixi/${dep}'`,
+          },
+          // import ... from '@/components/ComponentName/'
+          {
+            from: new RegExp(`(import\\s+[^"']+from\\s+)['"]@/components/${dep}/['"]`, 'g'),
+            to: `$1'@moluoxixi/${dep}'`,
+          },
+        ]
+
+        // 应用所有转换规则
+        for (const pattern of patterns) {
+          const newCode = transformedCode.replace(pattern.from, pattern.to)
+          if (newCode !== transformedCode) {
+            transformedCode = newCode
+            hasChanges = true
+            console.log(`✓ 转换组件引用 ${dep} 在文件 ${id}`)
+          }
+        }
+      }
+
+      return hasChanges ? { code: transformedCode, map: null } : null
+    },
+
+    // 处理external配置
+    options(opts) {
+      const originalExternal = opts.external || (() => false)
+
+      opts.external = (id, parentId, isResolved) => {
+        // 检查是否是内部组件引用
+        for (const dep of internalDeps) {
+          if (id === `@moluoxixi/${dep}` || id.startsWith(`@moluoxixi/${dep}/`)) {
+            return true // 标记为外部依赖
+          }
+        }
+
+        // 调用原始的external函数
+        if (typeof originalExternal === 'function') {
+          return originalExternal(id, parentId, isResolved)
+        }
+
+        if (Array.isArray(originalExternal)) {
+          return originalExternal.includes(id)
+        }
+
+        return originalExternal
+      }
+
+      return opts
+    },
+  }
+}
+
+/**
  * 专业的单组件打包函数 - 参考Element Plus和Ant Design
  * @param {string} comp 组件名
  * @param {string} version 版本号
@@ -407,9 +493,10 @@ async function buildComponent(comp, version = '1.0.0') {
     const componentDependencies = {}
 
     // 分析组件依赖
+    let deps = { internal: [], external: {} }
     try {
       console.log(`分析组件 ${comp} 依赖...`)
-      const deps = await analyzeComponentDeps(comp)
+      deps = await analyzeComponentDeps(comp)
 
       if (deps.internal.length > 0 || Object.keys(deps.external).length > 0) {
         console.log(`组件 ${comp} 依赖分析结果:`)
@@ -444,6 +531,8 @@ async function buildComponent(comp, version = '1.0.0') {
       publicDir: false,
       logLevel: 'info',
       plugins: [
+        // 添加路径替换插件，将内部组件引用转换为外部包引用
+        createComponentReferencePlugin(deps.internal),
         pluginVue({
           isProduction: true,
         }),
