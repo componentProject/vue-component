@@ -9,6 +9,7 @@ import vueJsx from '@vitejs/plugin-vue-jsx'
 import autoprefixer from 'autoprefixer'
 import process from 'node:process'
 import { execSync } from 'node:child_process'
+import { cruise } from 'dependency-cruiser'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
@@ -104,6 +105,275 @@ function getCurrentVersion(comp = '') {
 }
 
 /**
+ * 使用dependency-cruiser分析组件的完整依赖关系
+ * 返回内部依赖和外部依赖
+ * @param {string} comp 组件名称
+ * @returns {Promise<{internal: string[], external: Record<string, string>}>} 依赖分析结果
+ */
+async function analyzeComponentDeps(comp) {
+  try {
+    console.log(`开始分析组件 ${comp} 的完整依赖关系...`)
+
+    // 获取所有组件列表作为内部组件参考
+    const allComponents = await getComponentNames()
+
+    // 组件目录和入口文件
+    const componentDir = resolve(rootDir, `src/components/${comp}`)
+    const entryPoint = fs.existsSync(resolve(componentDir, 'index.ts'))
+      ? resolve(componentDir, 'index.ts')
+      : resolve(componentDir, 'index.vue')
+
+    console.log(`分析入口文件: ${entryPoint}`)
+
+    // 配置dependency-cruiser选项
+    const cruiseOptions = {
+      // 输出格式
+      outputType: 'json',
+
+      // 模块解析配置
+      moduleSystems: ['es6', 'cjs', 'tsd'],
+
+      // 文件扩展名
+      extensions: ['.js', '.jsx', '.ts', '.tsx', '.vue'],
+
+      // TypeScript配置
+      tsConfig: {
+        fileName: resolve(rootDir, 'tsconfig.json'),
+      },
+
+      // Webpack解析配置（用于别名等）
+      webpackConfig: {
+        resolve: {
+          alias: {
+            '@': resolve(rootDir, 'src'),
+          },
+          extensions: ['.js', '.jsx', '.ts', '.tsx', '.vue'],
+        },
+      },
+
+      // 规则配置
+      ruleSet: {
+        forbidden: [],
+        allowed: [],
+        allowedSeverity: 'warn',
+      },
+
+      // 选项
+      options: {
+        includeOnly: '', // 不限制分析范围
+        exclude: {
+          path: 'node_modules', // 排除node_modules，但保留npm包引用信息
+        },
+        maxDepth: 10,
+        moduleSystems: ['es6', 'cjs', 'tsd'],
+        tsPreCompilationDeps: true,
+        preserveSymlinks: false,
+        externalModuleResolutionStrategy: 'node_modules',
+      },
+    }
+
+    // 执行依赖分析
+    console.log('正在使用dependency-cruiser分析依赖...')
+    const cruiseResult = cruise([entryPoint], cruiseOptions)
+
+    // 处理分析结果
+    const internalDeps = new Set()
+    const externalDeps = new Map()
+
+    // 读取项目package.json获取版本信息
+    const projectPkg = JSON.parse(fs.readFileSync(resolve(rootDir, 'package.json'), 'utf-8'))
+    const allProjectDeps = {
+      ...projectPkg.dependencies || {},
+      ...projectPkg.devDependencies || {},
+      ...projectPkg.peerDependencies || {},
+    }
+
+    // 遍历所有模块和依赖
+    if (cruiseResult.output && cruiseResult.output.modules) {
+      for (const module of cruiseResult.output.modules) {
+        if (module.dependencies) {
+          for (const dep of module.dependencies) {
+            const depPath = dep.resolved || dep.module
+
+            // 1. 检查是否是内部组件依赖
+            const componentMatch = depPath.match(/components\/([A-Z][a-zA-Z0-9]+)/)
+            if (componentMatch && allComponents.includes(componentMatch[1]) && componentMatch[1] !== comp) {
+              internalDeps.add(componentMatch[1])
+              console.log(`✓ 发现内部组件依赖: ${componentMatch[1]}`)
+            }
+
+            // 2. 检查是否是外部npm包依赖
+            if (dep.module && !dep.module.startsWith('.') && !dep.module.startsWith('/')) {
+              // 提取包名（处理scoped packages）
+              const packageName = dep.module.startsWith('@')
+                ? dep.module.split('/').slice(0, 2).join('/')
+                : dep.module.split('/')[0]
+
+              // 检查是否在项目依赖中
+              if (allProjectDeps[packageName]) {
+                externalDeps.set(packageName, allProjectDeps[packageName])
+                console.log(`✓ 发现外部依赖: ${packageName}@${allProjectDeps[packageName]}`)
+              }
+            }
+          }
+        }
+      }
+    }
+
+    // 补充：直接扫描代码中的import语句（作为backup）
+    console.log('补充扫描import语句...')
+    const files = await glob(['**/*.{vue,ts,tsx,js,jsx}'], {
+      cwd: componentDir,
+      absolute: true,
+    })
+
+    for (const file of files) {
+      const content = await fsp.readFile(file, 'utf-8')
+
+      // 匹配import语句
+      const importRegex = /import\s[^'"]*from\s+['"]([^'"]+)['"]/g
+      let match
+
+      // eslint-disable-next-line no-cond-assign
+      while ((match = importRegex.exec(content)) !== null) {
+        const importPath = match[1]
+
+        // 检查内部组件引用
+        const componentMatch = importPath.match(/@\/components\/([A-Z][a-zA-Z0-9]+)/)
+        if (componentMatch && allComponents.includes(componentMatch[1]) && componentMatch[1] !== comp) {
+          internalDeps.add(componentMatch[1])
+        }
+
+        // 检查外部包引用
+        if (!importPath.startsWith('.') && !importPath.startsWith('/') && !importPath.startsWith('@/')) {
+          const packageName = importPath.startsWith('@')
+            ? importPath.split('/').slice(0, 2).join('/')
+            : importPath.split('/')[0]
+
+          if (allProjectDeps[packageName]) {
+            externalDeps.set(packageName, allProjectDeps[packageName])
+          }
+        }
+      }
+    }
+
+    // 转换结果
+    const result = {
+      internal: Array.from(internalDeps).sort(),
+      external: Object.fromEntries(externalDeps),
+    }
+
+    // 输出结果
+    console.log(`\n=== 组件 ${comp} 依赖分析结果 ===`)
+
+    if (result.internal.length > 0) {
+      console.log(`内部组件依赖 (${result.internal.length}个):`)
+      result.internal.forEach(dep => console.log(`  - ${dep}`))
+    }
+    else {
+      console.log(`内部组件依赖: 无`)
+    }
+
+    const externalCount = Object.keys(result.external).length
+    if (externalCount > 0) {
+      console.log(`\n外部包依赖 (${externalCount}个):`)
+      Object.entries(result.external).forEach(([pkg, version]) => {
+        console.log(`  - ${pkg}@${version}`)
+      })
+    }
+    else {
+      console.log(`\n外部包依赖: 无`)
+    }
+
+    console.log(`=== 分析完成 ===\n`)
+
+    return result
+  }
+  catch (error) {
+    console.error(`分析组件 ${comp} 依赖失败:`, error)
+
+    // 降级到简单分析
+    console.log('降级使用简单依赖分析...')
+    return await simpleAnalyzeComponentDeps(comp)
+  }
+}
+
+/**
+ * 简单的依赖分析方法（作为fallback）
+ * @param {string} comp 组件名称
+ * @returns {Promise<{internal: string[], external: Record<string, string>}>}
+ */
+async function simpleAnalyzeComponentDeps(comp) {
+  try {
+    const allComponents = await getComponentNames()
+    const componentDir = resolve(rootDir, `src/components/${comp}`)
+
+    const files = await glob(['**/*.{vue,ts,tsx,js,jsx}'], {
+      cwd: componentDir,
+      absolute: true,
+    })
+
+    const internalDeps = new Set()
+    const externalDeps = new Map()
+
+    // 读取项目依赖
+    const projectPkg = JSON.parse(fs.readFileSync(resolve(rootDir, 'package.json'), 'utf-8'))
+    const allProjectDeps = {
+      ...projectPkg.dependencies || {},
+      ...projectPkg.devDependencies || {},
+    }
+
+    for (const file of files) {
+      const content = await fsp.readFile(file, 'utf-8')
+
+      // 检查内部组件引用
+      for (const componentName of allComponents) {
+        if (componentName === comp)
+          continue
+
+        const patterns = [
+          new RegExp(`from\\s+['"]@/components/${componentName}['"\\s]`, 'g'),
+          new RegExp(`from\\s+['"]@/components/${componentName}/`, 'g'),
+          new RegExp(`<${componentName}[\\s>]`, 'g'),
+        ]
+
+        if (patterns.some(pattern => pattern.test(content))) {
+          internalDeps.add(componentName)
+        }
+      }
+
+      // 检查外部包引用
+      const importRegex = /import\s[^'"]*from\s+['"]([^'"]+)['"]/g
+      let match
+
+      // eslint-disable-next-line no-cond-assign
+      while ((match = importRegex.exec(content)) !== null) {
+        const importPath = match[1]
+
+        if (!importPath.startsWith('.') && !importPath.startsWith('/') && !importPath.startsWith('@/')) {
+          const packageName = importPath.startsWith('@')
+            ? importPath.split('/').slice(0, 2).join('/')
+            : importPath.split('/')[0]
+
+          if (allProjectDeps[packageName]) {
+            externalDeps.set(packageName, allProjectDeps[packageName])
+          }
+        }
+      }
+    }
+
+    return {
+      internal: Array.from(internalDeps).sort(),
+      external: Object.fromEntries(externalDeps),
+    }
+  }
+  catch (error) {
+    console.error('简单依赖分析也失败:', error)
+    return { internal: [], external: {} }
+  }
+}
+
+/**
  * 专业的单组件打包函数 - 参考Element Plus和Ant Design
  * @param {string} comp 组件名
  * @param {string} version 版本号
@@ -133,12 +403,38 @@ async function buildComponent(comp, version = '1.0.0') {
       throw new Error(`组件 ${comp} 没有找到入口文件`)
     }
 
-    // 读取项目package.json获取依赖信息
-    const pkgContent = fs.readFileSync(resolve(rootDir, 'package.json'), 'utf-8')
-    const pkg = JSON.parse(pkgContent)
-    const dependencies = {
-      ...pkg.dependencies || {},
-      ...pkg.peerDependencies || {},
+    // 初始化组件依赖为空对象，只添加分析出来的依赖
+    const componentDependencies = {}
+
+    // 分析组件依赖
+    try {
+      console.log(`分析组件 ${comp} 依赖...`)
+      const deps = await analyzeComponentDeps(comp)
+
+      if (deps.internal.length > 0 || Object.keys(deps.external).length > 0) {
+        console.log(`组件 ${comp} 依赖分析结果:`)
+        console.log(`- 内部组件: ${deps.internal.join(', ') || '无'}`)
+        console.log(`- 外部依赖: ${Object.keys(deps.external).join(', ') || '无'}`)
+
+        // 为每个内部组件依赖添加版本约束
+        for (const dep of deps.internal) {
+          componentDependencies[`@moluoxixi/${dep}`] = `^${version}`
+        }
+
+        // 为每个外部依赖添加版本约束
+        for (const [pkg, pkgVersion] of Object.entries(deps.external)) {
+          // vue作为peerDependency，不添加到dependencies中
+          if (pkg !== 'vue') {
+            componentDependencies[pkg] = pkgVersion
+          }
+        }
+      }
+      else {
+        console.log(`组件 ${comp} 没有依赖其他组件和外部包`)
+      }
+    }
+    catch (error) {
+      console.warn(`分析组件依赖失败，跳过依赖分析: ${error.message}`)
     }
 
     // 基础配置
@@ -195,7 +491,7 @@ async function buildComponent(comp, version = '1.0.0') {
         rollupOptions: {
           external: (id) => {
             // 简化external逻辑，直接使用Object.keys(dependencies).some
-            return Object.keys(dependencies).some(dep => id === dep || id.startsWith(`${dep}/`))
+            return Object.keys(componentDependencies).some(dep => id === dep || id.startsWith(`${dep}/`))
               || ['vue', '@vue/runtime-core', '@vue/runtime-dom'].includes(id)
           },
           output: {
@@ -230,7 +526,7 @@ async function buildComponent(comp, version = '1.0.0') {
         rollupOptions: {
           external: (id) => {
             // 简化external逻辑，直接使用Object.keys(dependencies).some
-            return Object.keys(dependencies).some(dep => id === dep || id.startsWith(`${dep}/`))
+            return Object.keys(componentDependencies).some(dep => id === dep || id.startsWith(`${dep}/`))
               || ['vue', '@vue/runtime-core', '@vue/runtime-dom'].includes(id)
           },
           output: {
@@ -257,15 +553,6 @@ async function buildComponent(comp, version = '1.0.0') {
       await fsp.copyFile(readmeSrc, readmeDest)
       console.log(`已复制README.md`)
     }
-
-    // 提取依赖信息
-    const componentDependencies = {}
-    Object.entries(dependencies).forEach(([key, value]) => {
-      // Vue作为peerDependency，其他依赖作为dependencies
-      if (key !== 'vue') {
-        componentDependencies[key] = value
-      }
-    })
 
     // 生成package.json
     const pkgJson = {
