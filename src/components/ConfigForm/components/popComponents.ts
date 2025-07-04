@@ -35,7 +35,7 @@ const components: ComponentsType = Object.keys(componentFiles).reduce((modules, 
   const name = modulePath.split('/').at(-2)
   const value = componentFiles[modulePath]
   if (value && name) modules[name] = value
-  return modules
+  return modules as any
 }, {})
 //#endregion
 export default components

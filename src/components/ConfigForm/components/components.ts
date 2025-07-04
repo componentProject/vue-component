@@ -39,15 +39,13 @@
 // //#endregion
 
 //#region vite下
-import type { ComponentsType } from '@/components/ConfigForm/types'
-
 const componentFiles = import.meta.glob('./components/**/*.vue')
-const components: ComponentsType = Object.keys(componentFiles).reduce(
+const components = Object.keys(componentFiles).reduce(
   (modules = {}, modulePath) => {
     const name = modulePath.split('/').at(-2)
     const value = componentFiles[modulePath]
     if (value && name) modules[name] = value
-    return modules
+    return modules as any
   },
   {},
 )

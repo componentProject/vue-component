@@ -20,7 +20,7 @@ const components: ComponentsType & {
   const value = componentFiles[modulePath]
   if (value && name) modules[name] = value
   return modules
-}, {})
+}, {} as any)
 // const components = componentFiles.keys().reduce((modules, modulePath) => {
 //   const name = modulePath.split('/')[1];
 //   const value = componentFiles(modulePath).default;

@@ -102,7 +102,13 @@ async function buildSingleComponent({ comp, entry, format, outDir, enableDts = f
         formats: [format],
       },
       rollupOptions: {
-        external: ['vue', 'element-plus'],
+        // 将所有node_modules依赖都external掉，不打包进组件库
+        external: (id) => {
+          // external掉所有node_modules下的依赖
+          return id.includes('node_modules')
+          // 也external掉一些常见的全局依赖
+            || ['vue', 'element-plus', '@vue/runtime-core', '@vue/runtime-dom'].includes(id)
+        },
         output: {
           // 关键：preserveModulesRoot 指向 src/components，mirror 组件根目录结构
           preserveModules: true,
@@ -217,22 +223,43 @@ function extractImports(file, seen = new Set()) {
 async function generateComponentPkgJson({ comp, entry }) {
   const mainDeps = getMainPkgDeps()
   const imports = Array.from(new Set(extractImports(entry)))
+
+  console.log(`组件 ${comp} 扫描到的依赖:`, imports)
+
   // 归类依赖
-  const peerList = ['vue', 'element-plus']
+  const peerList = ['vue', 'element-plus', '@vue/runtime-core', '@vue/runtime-dom']
   const peerDependencies = {}
   const dependencies = {}
-  // 仅保留主项目package.json声明的依赖（npm包），过滤本地路径/类型文件
-  const mainPkgNames = Object.keys(mainDeps)
+
+  // 处理扫描到的依赖
   imports.forEach((pkg) => {
-    if (!mainPkgNames.includes(pkg))
-      return // 只保留npm包
-    if (peerList.includes(pkg)) {
-      peerDependencies[pkg] = mainDeps[pkg] || '*'
+    // 提取包名（处理子路径导入，如 'element-plus/es/components/button' -> 'element-plus'）
+    const packageName = pkg.split('/')[0]
+
+    // 检查是否是主项目package.json中声明的依赖
+    if (mainDeps[packageName]) {
+      if (peerList.includes(packageName)) {
+        peerDependencies[packageName] = mainDeps[packageName]
+      }
+      else {
+        dependencies[packageName] = mainDeps[packageName]
+      }
     }
     else {
-      dependencies[pkg] = mainDeps[pkg] || '*'
+      // 如果主项目没有声明，但组件使用了，作为peerDependency
+      if (peerList.includes(packageName)) {
+        peerDependencies[packageName] = '*'
+      }
+      else {
+        // 其他依赖作为dependencies
+        dependencies[packageName] = '*'
+      }
     }
   })
+
+  console.log(`组件 ${comp} 的peerDependencies:`, peerDependencies)
+  console.log(`组件 ${comp} 的dependencies:`, dependencies)
+
   // 生成exports字段，支持多子路径
   const exports = {
     '.': {
@@ -274,6 +301,8 @@ async function generateComponentPkgJson({ comp, entry }) {
     pkgJson.style = 'es/style/index.css'
   }
   const dest = resolve(rootDir, `moluoxixi/${comp}/package.json`)
+  // 确保目录存在
+  await fsp.mkdir(dirname(dest), { recursive: true })
   await fsp.writeFile(dest, JSON.stringify(pkgJson, null, 2), 'utf-8')
   console.log(`已生成package.json: moluoxixi/${comp}/package.json`)
 }
