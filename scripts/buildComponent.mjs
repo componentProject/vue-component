@@ -272,12 +272,16 @@ async function generateComponentPkgJson({ comp, _entry }) {
   console.log(`组件 ${comp} 扫描到的依赖:`, imports)
 
   // 归类依赖
-  const peerList = ['vue', 'element-plus', '@vue/runtime-core', '@vue/runtime-dom']
+  const peerList = ['vue'] // 只有vue作为peerDependency
   const peerDependencies = {}
   const dependencies = {}
 
   // 处理扫描到的依赖
   imports.forEach((pkg) => {
+    // 只保留根目录package.json声明的依赖（npm包），排除所有内部依赖
+    if (!mainDeps[pkg.split('/')[0]]) {
+      return // 跳过内部依赖
+    }
     // 提取包名（处理子路径导入，如 'element-plus/es/components/button' -> 'element-plus'）
     const packageName = pkg.split('/')[0]
 
@@ -291,7 +295,7 @@ async function generateComponentPkgJson({ comp, _entry }) {
       }
     }
     else {
-      // 如果主项目没有声明，但组件使用了，作为peerDependency
+      // 如果主项目没有声明，但组件使用了，作为dependencies
       if (peerList.includes(packageName)) {
         peerDependencies[packageName] = '*'
       }

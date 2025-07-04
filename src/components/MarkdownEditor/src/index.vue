@@ -23,7 +23,8 @@ const props = withDefaults(defineProps<propsType & eventsType>(), {
   codeTheme: 'github',
 })
 defineSlots<slotsType>()
-const mdEditor = useTemplateRef('mdEditor')
+
+useTemplateRef('mdEditor')
 // https://imzbf.github.io/md-editor-v3/zh-CN/demo
 const text = ref('')
 defineExpose<ExposeParam>()

@@ -13,15 +13,5 @@ const props = withDefaults(defineProps<propsType>(), {})
 defineSlots<{
   default: Component
 }>()
-watch(
-  () => props,
-  (val) => {
-    console.log('val', val)
-  },
-  {
-    deep: true,
-    immediate: true,
-  },
-)
 provide('configProvider', props)
 </script>
