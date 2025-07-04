@@ -20,7 +20,7 @@
 import type { noNextInputParams } from '@/components/EnterNextTable/src/_types'
 import { ElTable } from 'element-plus'
 import { nextTick, ref, watch } from 'vue'
-import EnterNextContainer from '@/components/EnterNextContainer/src/index.vue'
+import EnterNextContainer from '@/components/EnterNextContainer/index.ts'
 
 const props = defineProps({
   data: {

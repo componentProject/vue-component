@@ -6,7 +6,7 @@
 </template>
 
 <script setup lang="ts">
-import Select from '@/components/Select/src/index.vue'
+import Select from '@/components/Select/index.ts'
 import { ref } from 'vue'
 
 const data = [

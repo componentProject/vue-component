@@ -27,8 +27,8 @@
 import type { VxeTableDefines } from 'vxe-table'
 import type { EnterNextDragTableProps, NoNextInputParams, NoSelectValueParams } from './_types'
 import { computed, nextTick, ref, useTemplateRef, watch } from 'vue'
-import DraggableTable from '@/components/DraggableTable/src/index.vue'
-import EnterNextContainer from '@/components/EnterNextContainer/src/index.vue'
+import DraggableTable from '@/components/DraggableTable/index.ts'
+import EnterNextContainer from '@/components/EnterNextContainer/index.ts'
 
 const props = withDefaults(defineProps<EnterNextDragTableProps>(), {
   allowSelectNextInEmpty: false,

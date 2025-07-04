@@ -5,8 +5,8 @@ import type { customCustomTypes } from '@/components/DraggableTable/src/_types'
 import { ElInput, ElProgress, ElSwitch, ElTag } from 'element-plus'
 import { computed, defineComponent, onMounted, ref, watch } from 'vue'
 import { detectDateFormatByReplace } from '@/components/_utils'
-import DateRangePicker from '@/components/DateRangePicker/src/index.vue'
-import Select from '@/components/Select/src/index.vue'
+import DateRangePicker from '@/components/DateRangePicker/index.ts'
+import Select from '@/components/Select/index.ts'
 
 export default defineComponent({
   name: 'CellRenderer',

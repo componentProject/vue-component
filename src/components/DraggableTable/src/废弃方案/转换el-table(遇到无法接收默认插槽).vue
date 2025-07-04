@@ -23,7 +23,7 @@
 <script setup lang="jsx">
 import { ElTable } from 'element-plus'
 import { computed, ref, useTemplateRef, watch } from 'vue'
-import DraggableTable from '@/components/DraggableTable/base/index.vue'
+import DraggableTable from '@/components/DraggableTable'
 
 const props = defineProps({
   // 表格唯一ID，用于本地存储识别
