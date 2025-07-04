@@ -31,9 +31,6 @@ async function getComponentNames() {
  * @returns {string} 下一个版本号
  */
 function getNextVersion(currentVersion, type = 'patch') {
-  // 确保版本号至少是2.1.0，以高于之前发布的版本
-  const minVersion = '2.1.0'
-
   // 解析当前版本号
   const [major, minor, patch] = currentVersion.split('.').map(Number)
 
@@ -58,20 +55,7 @@ function getNextVersion(currentVersion, type = 'patch') {
   }
 
   // 生成新版本号
-  const newVersion = `${newMajor}.${newMinor}.${newPatch}`
-
-  // 确保新版本号高于最小版本号
-  const [minMajor, minMinor, minPatch] = minVersion.split('.').map(Number)
-
-  if (
-    newMajor < minMajor
-    || (newMajor === minMajor && newMinor < minMinor)
-    || (newMajor === minMajor && newMinor === minMinor && newPatch < minPatch)
-  ) {
-    return minVersion
-  }
-
-  return newVersion
+  return `${newMajor}.${newMinor}.${newPatch}`
 }
 
 /**
