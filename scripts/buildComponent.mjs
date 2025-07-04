@@ -27,20 +27,84 @@ async function getComponentNames() {
 /**
  * 获取下一个版本号
  * @param {string} currentVersion 当前版本号
- * @param {string} type 版本类型：'major', 'minor', 'patch'
+ * @param {string} type 版本类型：major, minor, patch
  * @returns {string} 下一个版本号
  */
 function getNextVersion(currentVersion, type = 'patch') {
+  // 确保版本号至少是2.1.0，以高于之前发布的版本
+  const minVersion = '2.1.0'
+
+  // 解析当前版本号
   const [major, minor, patch] = currentVersion.split('.').map(Number)
+
+  // 根据类型计算新版本号
+  let newMajor = major
+  let newMinor = minor
+  let newPatch = patch
 
   switch (type) {
     case 'major':
-      return `${major + 1}.0.0`
+      newMajor++
+      newMinor = 0
+      newPatch = 0
+      break
     case 'minor':
-      return `${major}.${minor + 1}.0`
-    case 'patch':
-    default:
-      return `${major}.${minor}.${patch + 1}`
+      newMinor++
+      newPatch = 0
+      break
+    default: // patch
+      newPatch++
+      break
+  }
+
+  // 生成新版本号
+  const newVersion = `${newMajor}.${newMinor}.${newPatch}`
+
+  // 确保新版本号高于最小版本号
+  const [minMajor, minMinor, minPatch] = minVersion.split('.').map(Number)
+
+  if (
+    newMajor < minMajor
+    || (newMajor === minMajor && newMinor < minMinor)
+    || (newMajor === minMajor && newMinor === minMinor && newPatch < minPatch)
+  ) {
+    return minVersion
+  }
+
+  return newVersion
+}
+
+/**
+ * 获取当前版本号
+ * @param {string} comp 组件名，如果为空则获取整个组件库的版本号
+ * @returns {string} 当前版本号，默认为2.0.0
+ */
+function getCurrentVersion(comp = '') {
+  try {
+    // 优先从组件库获取版本号，确保一致性
+    const libraryPath = resolve(rootDir, 'moluoxixi/package.json')
+
+    if (fs.existsSync(libraryPath)) {
+      const pkgContent = fs.readFileSync(libraryPath, 'utf-8')
+      const pkg = JSON.parse(pkgContent)
+      return pkg.version || '2.0.0'
+    }
+
+    // 如果组件库不存在，则尝试从指定组件获取
+    if (comp) {
+      const packagePath = resolve(rootDir, `moluoxixi/${comp}/package.json`)
+      if (fs.existsSync(packagePath)) {
+        const pkgContent = fs.readFileSync(packagePath, 'utf-8')
+        const pkg = JSON.parse(pkgContent)
+        return pkg.version || '2.0.0'
+      }
+    }
+
+    // 如果都不存在，返回默认版本号2.0.0，确保高于之前发布的版本
+    return '2.0.0'
+  }
+  catch {
+    return '2.0.0' // 默认版本号
   }
 }
 
@@ -480,9 +544,46 @@ app.use(${componentNames[0]})
   }
 }
 
-// 打包所有组件
+/**
+ * 发布组件
+ * @param {string} comp 组件名，如果为空则发布整个组件库
+ */
+async function publishComponent(comp = '') {
+  try {
+    const packagePath = comp
+      ? resolve(rootDir, `moluoxixi/${comp}/package.json`)
+      : resolve(rootDir, 'moluoxixi/package.json')
+
+    if (!fs.existsSync(packagePath)) {
+      throw new Error(`找不到 ${packagePath}，请先打包组件`)
+    }
+
+    const pkgContent = fs.readFileSync(packagePath, 'utf-8')
+    const pkg = JSON.parse(pkgContent)
+
+    // 发布组件
+    const packageDir = comp ? `moluoxixi/${comp}` : 'moluoxixi'
+    console.log(`开始发布 ${pkg.name}@${pkg.version}...`)
+
+    // 使用--tag参数来避免版本号冲突问题
+    execSync(`cd ${packageDir} && npm publish --tag latest`, { stdio: 'inherit' })
+    console.log(`${pkg.name}@${pkg.version} 发布成功！`)
+
+    return true
+  }
+  catch (error) {
+    console.error('发布失败:', error)
+    return false
+  }
+}
+
+/**
+ * 打包所有单个组件
+ * @param {string} version 版本号
+ * @returns {Promise<boolean>} 是否全部成功
+ */
 async function buildAllComponents(version = '1.0.0') {
-  console.log('开始打包所有组件...')
+  console.log('开始打包所有单个组件...')
 
   try {
     // 确保输出目录存在
@@ -505,18 +606,23 @@ async function buildAllComponents(version = '1.0.0') {
       }
     }
 
-    console.log(`所有组件打包完成！成功: ${successCount}/${componentNames.length}`)
-    return successCount === componentNames.length ? 0 : 1
+    console.log(`所有单个组件打包完成！成功: ${successCount}/${componentNames.length}`)
+    return successCount === componentNames.length
   }
   catch (error) {
     console.error('打包过程中发生错误:', error)
-    return 1
+    return false
   }
 }
 
-// 打包单个组件
-async function buildSingleComponentByName(comp, version = '1.0.0') {
-  console.log(`开始打包组件: ${comp}`)
+/**
+ * 打包单个组件
+ * @param {string} comp 组件名
+ * @param {string} version 版本号
+ * @returns {Promise<boolean>} 是否成功
+ */
+async function buildSingleComponent(comp, version = '1.0.0') {
+  console.log(`开始打包单个组件: ${comp}`)
 
   try {
     // 确保输出目录存在
@@ -526,72 +632,99 @@ async function buildSingleComponentByName(comp, version = '1.0.0') {
 
     if (success) {
       console.log(`组件 ${comp} 打包完成！`)
-      return 0
+      return true
     }
     else {
       console.error(`组件 ${comp} 打包失败`)
-      return 1
+      return false
     }
   }
   catch (error) {
     console.error(`组件 ${comp} 打包失败:`, error)
-    return 1
-  }
-}
-
-/**
- * 发布组件
- * @param {string} comp 组件名，如果为空则发布整个组件库
- */
-async function publishComponent(comp = '') {
-  try {
-    const packagePath = comp
-      ? resolve(rootDir, `moluoxixi/${comp}/package.json`)
-      : resolve(rootDir, 'moluoxixi/package.json')
-
-    if (!fs.existsSync(packagePath)) {
-      throw new Error(`找不到 ${packagePath}，请先打包组件`)
-    }
-
-    const pkgContent = fs.readFileSync(packagePath, 'utf-8')
-    const pkg = JSON.parse(pkgContent)
-
-    // 发布组件
-    const packageDir = comp ? `moluoxixi/${comp}` : 'moluoxixi'
-    console.log(`开始发布 ${pkg.name}@${pkg.version}...`)
-
-    execSync(`cd ${packageDir} && npm publish`, { stdio: 'inherit' })
-    console.log(`${pkg.name}@${pkg.version} 发布成功！`)
-
-    return true
-  }
-  catch (error) {
-    console.error('发布失败:', error)
     return false
   }
 }
 
 /**
- * 获取当前版本号
- * @param {string} comp 组件名，如果为空则获取整个组件库的版本号
- * @returns {string} 当前版本号，默认为1.0.0
+ * 打包函数 - 统一处理三种模式：all、library、单个组件
+ * @param {string} mode 打包模式：'all'、'library'、或组件名
+ * @param {string} version 版本号
+ * @returns {Promise<boolean>} 是否成功
  */
-function getCurrentVersion(comp = '') {
+async function doBuild(mode = 'all', version = '1.0.0') {
   try {
-    const packagePath = comp
-      ? resolve(rootDir, `moluoxixi/${comp}/package.json`)
-      : resolve(rootDir, 'moluoxixi/package.json')
-
-    if (!fs.existsSync(packagePath)) {
-      return '1.0.0' // 默认版本号
+    if (mode === 'all') {
+      // 打包所有单个组件和整个组件库
+      const componentsSuccess = await buildAllComponents(version)
+      const librarySuccess = await buildComponentLibrary(version)
+      return componentsSuccess && librarySuccess
     }
-
-    const pkgContent = fs.readFileSync(packagePath, 'utf-8')
-    const pkg = JSON.parse(pkgContent)
-    return pkg.version || '1.0.0'
+    else if (mode === 'library') {
+      // 只打包整个组件库
+      return await buildComponentLibrary(version)
+    }
+    else {
+      // 打包单个组件
+      return await buildSingleComponent(mode, version)
+    }
   }
-  catch {
-    return '1.0.0' // 默认版本号
+  catch (error) {
+    console.error('打包过程中发生错误:', error)
+    return false
+  }
+}
+
+/**
+ * 发布函数 - 统一处理三种模式：all、library、单个组件
+ * @param {string} mode 发布模式：'all'、'library'、或组件名
+ * @returns {Promise<boolean>} 是否成功
+ */
+async function doPublish(mode = 'all') {
+  try {
+    if (mode === 'all') {
+      // 发布整个组件库和所有单个组件
+      const librarySuccess = await publishComponent()
+      if (!librarySuccess) {
+        console.error('组件库发布失败')
+        return false
+      }
+      console.log('组件库发布成功！')
+
+      // 逐个发布单独组件
+      const componentNames = await getComponentNames()
+      let successCount = 0
+      for (const comp of componentNames) {
+        try {
+          console.log(`开始发布组件: ${comp}...`)
+          const success = await publishComponent(comp)
+          if (success) {
+            successCount++
+            console.log(`组件 ${comp} 发布成功！`)
+          }
+          else {
+            console.error(`组件 ${comp} 发布失败`)
+          }
+        }
+        catch (error) {
+          console.error(`组件 ${comp} 发布失败:`, error)
+        }
+      }
+
+      console.log(`发布完成！成功发布组件库和 ${successCount}/${componentNames.length} 个单独组件`)
+      return successCount === componentNames.length
+    }
+    else if (mode === 'library') {
+      // 只发布整个组件库
+      return await publishComponent()
+    }
+    else {
+      // 发布单个组件
+      return await publishComponent(mode)
+    }
+  }
+  catch (error) {
+    console.error('发布过程中发生错误:', error)
+    return false
   }
 }
 
@@ -599,177 +732,79 @@ function getCurrentVersion(comp = '') {
 async function main() {
   // 获取命令行参数
   const args = process.argv.slice(2)
-  const command = args[0]
-  const componentName = args[1]
+  const command = args[0] || 'build' // 默认命令是build
+  const mode = args[1] || 'all' // 默认模式是all
   const versionType = args[2] || 'patch' // 默认增加补丁版本号
+
+  // 验证模式是否有效
+  if (mode !== 'all' && mode !== 'library') {
+    // 如果不是all或library，则检查是否是有效的组件名
+    const componentNames = await getComponentNames()
+    if (!componentNames.includes(mode)) {
+      console.error(`错误: 无效的模式或组件名 "${mode}"`)
+      console.error(`可用的组件: ${componentNames.join(', ')}`)
+      return 1
+    }
+  }
+
+  // 获取当前版本号
+  const currentVersion = getCurrentVersion()
+  // 计算新版本号
+  const newVersion = getNextVersion(currentVersion, versionType)
+  console.log(`版本号: ${currentVersion} -> ${newVersion}`)
+
+  // 声明变量，避免在case块中声明
+  let buildSuccess, publishSuccess, buildResult, publishResult
 
   // 根据命令执行不同的操作
   switch (command) {
     case 'build':
-      // 构建组件
-      if (componentName === 'library') {
-        // 获取当前版本号
-        const currentVersion = getCurrentVersion()
-        // 计算新版本号
-        const newVersion = getNextVersion(currentVersion, versionType)
-        console.log(`版本号: ${currentVersion} -> ${newVersion}`)
-
-        // 先打包所有组件
-        await buildAllComponents(newVersion)
-        // 然后打包整个组件库
-        return await buildComponentLibrary(newVersion) ? 0 : 1
-      }
-      else if (componentName) {
-        // 获取当前版本号
-        const currentVersion = getCurrentVersion(componentName)
-        // 计算新版本号
-        const newVersion = getNextVersion(currentVersion, versionType)
-        console.log(`版本号: ${currentVersion} -> ${newVersion}`)
-
-        // 打包单个组件
-        return await buildSingleComponentByName(componentName, newVersion)
-      }
-      else {
-        // 获取当前版本号
-        const currentVersion = getCurrentVersion()
-        // 计算新版本号
-        const newVersion = getNextVersion(currentVersion, versionType)
-        console.log(`版本号: ${currentVersion} -> ${newVersion}`)
-
-        // 打包所有组件
-        return await buildAllComponents(newVersion)
-      }
+      // 只构建
+      buildSuccess = await doBuild(mode, newVersion)
+      return buildSuccess ? 0 : 1
 
     case 'publish':
-      // 发布组件
-      if (componentName === 'library') {
-        // 发布整个组件库
-        return await publishComponent() ? 0 : 1
-      }
-      else if (componentName) {
-        // 发布单个组件
-        return await publishComponent(componentName) ? 0 : 1
-      }
-      else {
-        console.error('请指定要发布的组件名或使用 library 发布整个组件库')
-        return 1
-      }
+      // 只发布（假设已经构建好了）
+      publishSuccess = await doPublish(mode)
+      return publishSuccess ? 0 : 1
 
     case 'build-publish':
-      // 构建并发布组件
-      if (componentName === 'library') {
-        // 获取当前版本号
-        const currentVersion = getCurrentVersion()
-        // 计算新版本号
-        const newVersion = getNextVersion(currentVersion, versionType)
-        console.log(`版本号: ${currentVersion} -> ${newVersion}`)
-
-        // 先打包所有组件
-        await buildAllComponents(newVersion)
-        // 然后打包整个组件库
-        const buildSuccess = await buildComponentLibrary(newVersion)
-        if (!buildSuccess)
-          return 1
-
-        // 发布整个组件库
-        return await publishComponent() ? 0 : 1
-      }
-      else if (componentName) {
-        // 获取当前版本号
-        const currentVersion = getCurrentVersion(componentName)
-        // 计算新版本号
-        const newVersion = getNextVersion(currentVersion, versionType)
-        console.log(`版本号: ${currentVersion} -> ${newVersion}`)
-
-        // 打包单个组件
-        const buildSuccess = await buildSingleComponentByName(componentName, newVersion)
-        if (buildSuccess !== 0)
-          return buildSuccess
-
-        // 发布单个组件
-        return await publishComponent(componentName) ? 0 : 1
-      }
-      else {
-        console.error('请指定要构建并发布的组件名或使用 library 构建并发布整个组件库')
+      // 先构建再发布
+      buildResult = await doBuild(mode, newVersion)
+      if (!buildResult) {
+        console.error('构建失败，取消发布')
         return 1
       }
 
-    case 'build-publish-all':
-      // 构建并发布整个组件库和所有单独组件
-      try {
-        // 获取当前版本号
-        const currentVersion = getCurrentVersion()
-        // 计算新版本号
-        const newVersion = getNextVersion(currentVersion, versionType)
-        console.log(`版本号: ${currentVersion} -> ${newVersion}`)
-
-        // 获取所有组件名
-        const componentNames = await getComponentNames()
-        console.log(`找到 ${componentNames.length} 个组件，准备构建并发布...`)
-
-        // 先打包所有组件
-        await buildAllComponents(newVersion)
-
-        // 然后打包整个组件库
-        const buildLibrarySuccess = await buildComponentLibrary(newVersion)
-        if (!buildLibrarySuccess) {
-          console.error('组件库构建失败')
-          return 1
-        }
-
-        // 发布整个组件库
-        const publishLibrarySuccess = await publishComponent()
-        if (!publishLibrarySuccess) {
-          console.error('组件库发布失败')
-          return 1
-        }
-        console.log('组件库发布成功！')
-
-        // 逐个发布单独组件
-        let successCount = 0
-        for (const comp of componentNames) {
-          try {
-            console.log(`开始发布组件: ${comp}...`)
-            const success = await publishComponent(comp)
-            if (success) {
-              successCount++
-              console.log(`组件 ${comp} 发布成功！`)
-            }
-            else {
-              console.error(`组件 ${comp} 发布失败`)
-            }
-          }
-          catch (error) {
-            console.error(`组件 ${comp} 发布失败:`, error)
-          }
-        }
-
-        console.log(`所有操作完成！成功发布组件库和 ${successCount}/${componentNames.length} 个单独组件`)
-        return successCount === componentNames.length ? 0 : 1
-      }
-      catch (error) {
-        console.error('发布过程中发生错误:', error)
-        return 1
-      }
+      publishResult = await doPublish(mode)
+      return publishResult ? 0 : 1
 
     default:
       console.log(`
 使用方法:
-  node scripts/buildComponent.mjs build [component] [version-type]   - 构建组件
-  node scripts/buildComponent.mjs publish [component]               - 发布组件
-  node scripts/buildComponent.mjs build-publish [component] [version-type] - 构建并发布组件
-  node scripts/buildComponent.mjs build-publish-all [version-type]  - 构建并发布整个组件库和所有单独组件
+  node scripts/buildComponent.mjs [command] [mode] [version-type]
 
-参数:
-  component    - 组件名称，使用 'library' 表示整个组件库，不提供则构建所有组件
-  version-type - 版本类型：'major', 'minor', 'patch'(默认)
+命令:
+  build         - 仅构建组件
+  publish       - 仅发布组件（假设已经构建好）
+  build-publish - 构建并发布组件（默认）
+
+模式:
+  all           - 处理所有单个组件和整个组件库（默认）
+  library       - 只处理整个组件库
+  <组件名>      - 只处理指定的单个组件
+
+版本类型:
+  major         - 增加主版本号（1.0.0 -> 2.0.0）
+  minor         - 增加次版本号（1.0.0 -> 1.1.0）
+  patch         - 增加补丁版本号（1.0.0 -> 1.0.1）（默认）
 
 示例:
-  node scripts/buildComponent.mjs build Icon             - 构建 Icon 组件
-  node scripts/buildComponent.mjs build library minor    - 构建整个组件库并增加次版本号
-  node scripts/buildComponent.mjs publish Icon           - 发布 Icon 组件
-  node scripts/buildComponent.mjs build-publish library  - 构建并发布整个组件库
-  node scripts/buildComponent.mjs build-publish-all      - 构建并发布整个组件库和所有单独组件
+  node scripts/buildComponent.mjs                   - 构建所有组件和组件库
+  node scripts/buildComponent.mjs build library     - 只构建组件库
+  node scripts/buildComponent.mjs build Icon        - 只构建Icon组件
+  node scripts/buildComponent.mjs build-publish     - 构建并发布所有组件和组件库
+  node scripts/buildComponent.mjs build-publish all minor - 构建并发布所有组件和组件库，增加次版本号
       `)
       return 1
   }
