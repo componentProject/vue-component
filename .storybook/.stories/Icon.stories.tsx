@@ -1,6 +1,6 @@
 // noinspection JSUnusedGlobalSymbols
 
-import Icon from '@/components/Icon/index.vue'
+import Icon from '@/components/Icon/index.ts'
 import type { Meta, StoryFn, StoryObj } from '@storybook/vue3'
 // 注意: 如果SVG导入仍有问题，可以使用字符串替代
 const checkIconString

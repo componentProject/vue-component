@@ -1,8 +1,8 @@
-import type { ConfigOption, EditorProps } from 'md-editor-v3'
+import type { EditorProps } from 'md-editor-v3'
 
 export interface propsType {
   //#region 扩展props
-  config?: ConfigOption
+  config?: any
   /**
    * 是否显示行号
    */

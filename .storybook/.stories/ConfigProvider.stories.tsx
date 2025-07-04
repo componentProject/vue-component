@@ -1,8 +1,8 @@
 // noinspection JSUnusedGlobalSymbols
 
 import type { Meta, StoryFn, StoryObj } from '@storybook/vue3'
-import ConfigProvider from '@/components/ConfigProvider/index.vue'
-import Calendar from '@/components/Calendar/index.vue'
+import ConfigProvider from '@/components/ConfigProvider/index.ts'
+import Calendar from '@/components/Calendar/index.ts'
 
 // 定义元数据
 const meta: Meta<typeof ConfigProvider> = {

@@ -214,15 +214,60 @@ function extractImports(file, seen = new Set()) {
           imports = imports.concat(extractImports(resolve(dirname(file), depPath), seen))
         }
       }
+      // 处理别名路径（如 @/components/xxx）
+      if (node.source.value && node.source.value.startsWith('@/')) {
+        const aliasPath = node.source.value.replace('@/', 'src/')
+        let depPath = aliasPath
+        // 处理.vue/.ts/.js后缀
+        const base = depPath.replace(/\.[a-z]+$/, '')
+        const tryExts = ['.ts', '.js', '.vue']
+        let found = false
+        for (const ext of tryExts) {
+          const fullPath = resolve(rootDir, base + ext)
+          if (fs.existsSync(fullPath)) {
+            depPath = base + ext
+            found = true
+            break
+          }
+        }
+        if (!found) {
+          // 可能是目录，尝试index文件
+          for (const ext of tryExts) {
+            const fullPath = resolve(rootDir, depPath, `index${ext}`)
+            if (fs.existsSync(fullPath)) {
+              depPath = `${depPath}/index${ext}`
+              found = true
+              break
+            }
+          }
+        }
+        if (found) {
+          imports = imports.concat(extractImports(resolve(rootDir, depPath), seen))
+        }
+      }
     },
   })
   return imports
 }
 
 // 生成package.json
-async function generateComponentPkgJson({ comp, entry }) {
+async function generateComponentPkgJson({ comp, _entry }) {
   const mainDeps = getMainPkgDeps()
-  const imports = Array.from(new Set(extractImports(entry)))
+
+  // 扫描组件目录下所有文件的依赖
+  const componentDir = resolve(rootDir, `src/components/${comp}`)
+  const allFiles = await glob(['**/*.{vue,ts,js}'], {
+    cwd: componentDir,
+    absolute: true,
+  })
+
+  let allImports = []
+  for (const file of allFiles) {
+    const imports = extractImports(file)
+    allImports = allImports.concat(imports)
+  }
+
+  const imports = Array.from(new Set(allImports))
 
   console.log(`组件 ${comp} 扫描到的依赖:`, imports)
 
@@ -316,11 +361,12 @@ async function buildComponents() {
     const buildTasks = []
     for (const comp of componentNames) {
       let entry = ''
-      if (fs.existsSync(resolve(rootDir, `src/components/${comp}/index.vue`))) {
-        entry = resolve(rootDir, `src/components/${comp}/index.vue`)
-      }
-      else if (fs.existsSync(resolve(rootDir, `src/components/${comp}/index.ts`))) {
+      // 优先检测index.ts，然后检测index.vue
+      if (fs.existsSync(resolve(rootDir, `src/components/${comp}/index.ts`))) {
         entry = resolve(rootDir, `src/components/${comp}/index.ts`)
+      }
+      else if (fs.existsSync(resolve(rootDir, `src/components/${comp}/index.vue`))) {
+        entry = resolve(rootDir, `src/components/${comp}/index.vue`)
       }
       else {
         console.warn(`组件${comp}没有入口文件，跳过`)

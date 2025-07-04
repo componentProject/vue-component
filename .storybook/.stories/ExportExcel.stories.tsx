@@ -1,7 +1,7 @@
 // noinspection JSUnusedGlobalSymbols
 
 import type { Meta, StoryFn, StoryObj } from '@storybook/vue3'
-import ExportExcel from '@/components/ExportExcel/index.vue'
+import ExportExcel from '@/components/ExportExcel/index.ts'
 import DragTable from '@/components/DraggableTable/index.vue'
 import { ref } from 'vue'
 

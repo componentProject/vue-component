@@ -1,6 +1,6 @@
 // noinspection JSUnusedGlobalSymbols
 
-import IntersectObserver from '@/components/IntersectObserver/index.vue'
+import IntersectObserver from '@/components/IntersectObserver'
 import './assets/styles/IntersectObserver.scss'
 
 import { ref } from 'vue'

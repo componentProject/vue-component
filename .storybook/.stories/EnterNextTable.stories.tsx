@@ -1,7 +1,7 @@
 // noinspection JSUnusedGlobalSymbols
 
 import type { Meta, StoryFn, StoryObj } from '@storybook/vue3'
-import EnterNextTable from '@/components/EnterNextTable/index.vue'
+import EnterNextTable from '@/components/EnterNextTable/index.ts'
 import { ref } from 'vue'
 import { ElInput, ElMessage, ElOption, ElSelect, ElTableColumn } from 'element-plus'
 

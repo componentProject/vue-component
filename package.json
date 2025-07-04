@@ -82,6 +82,7 @@
     "@element-plus/icons-vue": "^2.3.1",
     "@sentry/vite-plugin": "^3.5.0",
     "@sentry/vue": "^9.27.0",
+    "@types/screenfull": "^4.1.0",
     "axios": "^1.9.0",
     "crypto-js": "^4.2.0",
     "dayjs": "^1.11.13",

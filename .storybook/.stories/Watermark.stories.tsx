@@ -1,7 +1,7 @@
 // noinspection JSUnusedGlobalSymbols
 
 import type { Meta, StoryFn, StoryObj } from '@storybook/vue3'
-import Watermark from '@/components/Watermark/index.vue'
+import Watermark from '@/components/Watermark/index.ts'
 
 /**
  * 利用父元素会被子元素撑开的特点,将子组件包裹在relative的父元素内,

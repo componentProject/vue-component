@@ -1,7 +1,7 @@
 // noinspection JSUnusedGlobalSymbols
 
-import Calendar from '@/components/Calendar/index.vue'
-import type { propsType, slotsType } from '@/components/Calendar/types'
+import Calendar from '@/components/Calendar/index.ts'
+import type { propsType, slotsType } from '@/components/Calendar/src/types'
 import type { Meta, StoryFn } from '@storybook/vue3'
 
 const meta: Meta<propsType & slotsType> = {

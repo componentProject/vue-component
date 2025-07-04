@@ -25,7 +25,7 @@ import dayjs from 'dayjs'
 import type { Dayjs } from 'dayjs'
 import { computed, inject, ref, watch } from 'vue'
 import type { propsType, slotsType } from './types'
-import type { propsType as ConfigProviderPropsType } from '@/components/ConfigProvider/types/index.ts'
+import type { propsType as ConfigProviderPropsType } from '@/components/ConfigProvider/src/types/index.ts'
 
 //  defineOptions  VUE 3.x  defineComponent
 defineOptions({
@@ -79,7 +79,7 @@ function monthChange(type = 'subtract') {
     curDate.value = dayjs(Date.now())
   }
   else {
-    curDate.value = curDate.value?.[type](1, 'month')
+    curDate.value = (curDate.value as Dayjs)?.[type as 'subtract' | 'add'](1, 'month')
   }
   emits('update:modelValue', curDate.value)
 }
