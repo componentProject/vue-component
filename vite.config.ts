@@ -1,7 +1,7 @@
 import type { Plugin } from 'postcss'
 import path from 'node:path'
 import process from 'node:process'
-import { defineConfig, loadEnv } from 'vite'
+
 // vite vue插件
 import pluginVue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
@@ -32,6 +32,7 @@ import scopedCssPrefixPlugin from './plugins/addScopedAndReplacePrefix.ts'
 import autoRoutesPlugin from './plugins/autoRoutes/index.ts'
 
 // 其余vite插件与配置
+import { defineConfig, loadEnv } from 'vite'
 import { wrapperEnv } from './src/utils/modules/getEnv.ts'
 import { createHtmlPlugin } from 'vite-plugin-html'
 
@@ -47,7 +48,6 @@ export default defineConfig(({ mode }) => {
   const useDoc = mode === 'github'
   const useQianKun = viteEnv.VITE_USE_QIANKUN && !useDoc
   const useCDN = viteEnv.VITE_USE_CDN && !useDoc && !useQianKun
-
   const vuePlugins = [
     pluginVue(),
     vueJsx(),
@@ -173,6 +173,7 @@ export default defineConfig(({ mode }) => {
     },
     build: {
       sourcemap: isDev,
+      // outDir: `${systemCode}`,
       outDir: useDoc ? './docs/pages' : `${systemCode}`,
       cssCodeSplit: true,
       chunkSizeWarningLimit: 1500,
