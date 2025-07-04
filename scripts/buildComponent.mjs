@@ -254,9 +254,9 @@ async function analyzeComponentDeps(comp) {
           }
 
           // 2. 检查@/components/_utils等共享模块的引用
-          if (importPath.startsWith('@/components/_utils') ||
-              importPath.startsWith('@/components/_types') ||
-              importPath.startsWith('@/components/')) {
+          if (importPath.startsWith('@/components/_utils')
+            || importPath.startsWith('@/components/_types')
+            || importPath.startsWith('@/components/')) {
             try {
               // 解析@路径为实际路径
               const actualPath = importPath.replace('@/', 'src/')
@@ -268,7 +268,8 @@ async function analyzeComponentDeps(comp) {
               // 首先检查是否是直接的文件
               if (fs.existsSync(sharedModulePath) && fs.statSync(sharedModulePath).isFile()) {
                 targetFile = sharedModulePath
-              } else {
+              }
+              else {
                 // 尝试添加不同的扩展名和index文件
                 const extensions = ['.ts', '.js', '.tsx', '.jsx', '/index.ts', '/index.js']
                 for (const ext of extensions) {
@@ -284,7 +285,8 @@ async function analyzeComponentDeps(comp) {
                 console.log(`✓ 递归分析共享模块: ${importPath} -> ${targetFile}`)
                 await scanFileForDeps(targetFile)
               }
-            } catch (error) {
+            }
+            catch (error) {
               console.warn(`扫描共享模块失败: ${importPath}, 错误: ${error.message}`)
             }
           }
@@ -487,22 +489,22 @@ function createComponentReferencePlugin(internalDeps) {
           // import ... from '@/components/ComponentName'
           {
             from: new RegExp(`(import\\s+[^"']+from\\s+)['"]@/components/${dep}['"]`, 'g'),
-            to: `$1'@moluoxixi/${dep}'`,
+            to: `$1'@moluoxixi/${dep.toLowerCase()}'`,
           },
           // import ... from '@/components/ComponentName/src/index.vue'
           {
             from: new RegExp(`(import\\s+[^"']+from\\s+)['"]@/components/${dep}/src/index\\.vue['"]`, 'g'),
-            to: `$1'@moluoxixi/${dep}'`,
+            to: `$1'@moluoxixi/${dep.toLowerCase()}'`,
           },
           // import ... from '@/components/ComponentName/index.ts'
           {
             from: new RegExp(`(import\\s+[^"']+from\\s+)['"]@/components/${dep}/index\\.ts['"]`, 'g'),
-            to: `$1'@moluoxixi/${dep}'`,
+            to: `$1'@moluoxixi/${dep.toLowerCase()}'`,
           },
           // import ... from '@/components/ComponentName/'
           {
             from: new RegExp(`(import\\s+[^"']+from\\s+)['"]@/components/${dep}/['"]`, 'g'),
-            to: `$1'@moluoxixi/${dep}'`,
+            to: `$1'@moluoxixi/${dep.toLowerCase()}'`,
           },
         ]
 
@@ -548,7 +550,7 @@ function createComponentReferencePlugin(internalDeps) {
                 // 记录需要替换的内容
                 replacements.push({
                   oldImport: match[0],
-                  newImport: match[0].replace(importPath, `@moluoxixi/${potentialComponentName}`),
+                  newImport: match[0].replace(importPath, `@moluoxixi/${potentialComponentName.toLowerCase()}`),
                   componentName: potentialComponentName,
                 })
               }
@@ -581,7 +583,7 @@ function createComponentReferencePlugin(internalDeps) {
       opts.external = (id, parentId, isResolved) => {
         // 检查是否是内部组件引用
         for (const dep of internalDeps) {
-          if (id === `@moluoxixi/${dep}` || id.startsWith(`@moluoxixi/${dep}/`)) {
+          if (id === `@moluoxixi/${dep.toLowerCase()}` || id.startsWith(`@moluoxixi/${dep.toLowerCase()}/`)) {
             return true // 标记为外部依赖
           }
         }
@@ -649,7 +651,7 @@ async function buildComponent(comp, version = '1.0.0') {
 
         // 为每个内部组件依赖添加版本约束
         for (const dep of deps.internal) {
-          componentDependencies[`@moluoxixi/${dep}`] = `^${version}`
+          componentDependencies[`@moluoxixi/${dep.toLowerCase()}`] = `^${version}`
         }
 
         // 为每个外部依赖添加版本约束
@@ -789,7 +791,7 @@ async function buildComponent(comp, version = '1.0.0') {
 
     // 生成package.json
     const pkgJson = {
-      name: `@moluoxixi/${comp}`,
+      name: `@moluoxixi/${comp.toLowerCase()}`,
       version,
       description: `${comp} 组件`,
       main: 'lib/index.cjs',
