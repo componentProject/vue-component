@@ -236,6 +236,233 @@ async function buildComponent(comp) {
   }
 }
 
+/**
+ * 打包整个组件库 - 生成统一入口
+ */
+async function buildComponentLibrary() {
+  console.log('开始打包整个组件库...')
+
+  try {
+    // 清空目录
+    const outputDir = resolve(rootDir, 'moluoxixi/components')
+    await fsp.rm(outputDir, { recursive: true, force: true }).catch(() => {})
+    await fsp.mkdir(outputDir, { recursive: true })
+
+    // 获取所有组件名
+    const componentNames = await getComponentNames()
+    console.log(`找到 ${componentNames.length} 个组件:`, componentNames)
+
+    // 读取项目package.json获取依赖信息
+    const pkgContent = fs.readFileSync(resolve(rootDir, 'package.json'), 'utf-8')
+    const pkg = JSON.parse(pkgContent)
+    const dependencies = {
+      ...pkg.dependencies || {},
+      ...pkg.peerDependencies || {},
+    }
+
+    // 基础配置
+    const baseConfig = {
+      root: rootDir,
+      configFile: false,
+      publicDir: false,
+      logLevel: 'info',
+      plugins: [
+        pluginVue({
+          isProduction: true,
+        }),
+        vueJsx(),
+      ],
+      resolve: {
+        extensions: ['.js', '.jsx', '.ts', '.tsx', '.vue'],
+        alias: {
+          '@': resolve(rootDir, './src'),
+        },
+      },
+      css: {
+        postcss: {
+          plugins: [
+            autoprefixer(),
+            // 添加tailwindcss支持 - 使用内联配置
+            {
+              postcssPlugin: 'tailwindcss',
+              config: {
+                content: ['./src/**/*.{vue,js,ts,jsx,tsx}'],
+                theme: {
+                  extend: {},
+                },
+                plugins: [],
+              },
+            },
+          ],
+        },
+      },
+    }
+
+    // 打包ES模块
+    await build({
+      ...baseConfig,
+      build: {
+        outDir: 'moluoxixi/components/es',
+        emptyOutDir: true,
+        minify: false, // 关闭压缩，方便调试
+        cssCodeSplit: true,
+        lib: {
+          entry: resolve(rootDir, 'src/components/index.ts'),
+          name: 'MoluoxixiComponents',
+          formats: ['es'],
+        },
+        rollupOptions: {
+          external: (id) => {
+            return Object.keys(dependencies).some(dep => id === dep || id.startsWith(`${dep}/`))
+              || ['vue', '@vue/runtime-core', '@vue/runtime-dom'].includes(id)
+          },
+          output: {
+            entryFileNames: 'index.mjs',
+            chunkFileNames: '[name].mjs',
+            assetFileNames: (assetInfo) => {
+              if (assetInfo.name && assetInfo.name.endsWith('.css')) {
+                return 'style/[name][extname]'
+              }
+              return '[name][extname]'
+            },
+          },
+        },
+      },
+    })
+
+    // 打包CJS模块
+    await build({
+      ...baseConfig,
+      build: {
+        outDir: 'moluoxixi/components/lib',
+        emptyOutDir: true,
+        minify: false, // 关闭压缩，方便调试
+        cssCodeSplit: true,
+        lib: {
+          entry: resolve(rootDir, 'src/components/index.ts'),
+          name: 'MoluoxixiComponents',
+          formats: ['cjs'],
+        },
+        rollupOptions: {
+          external: (id) => {
+            return Object.keys(dependencies).some(dep => id === dep || id.startsWith(`${dep}/`))
+              || ['vue', '@vue/runtime-core', '@vue/runtime-dom'].includes(id)
+          },
+          output: {
+            entryFileNames: 'index.cjs',
+            chunkFileNames: '[name].cjs',
+            assetFileNames: (assetInfo) => {
+              if (assetInfo.name && assetInfo.name.endsWith('.css')) {
+                return 'style/[name][extname]'
+              }
+              return '[name][extname]'
+            },
+            exports: 'named',
+          },
+        },
+      },
+    })
+
+    // 提取依赖信息
+    const libraryDependencies = {}
+    Object.entries(dependencies).forEach(([key, value]) => {
+      if (key !== 'vue') {
+        libraryDependencies[key] = value
+      }
+    })
+
+    // 生成package.json
+    const pkgJson = {
+      name: '@moluoxixi/components',
+      version: '1.0.0',
+      description: 'Moluoxixi Vue组件库',
+      main: 'lib/index.cjs',
+      module: 'es/index.mjs',
+      exports: {
+        '.': {
+          import: './es/index.mjs',
+          require: './lib/index.cjs',
+        },
+        './es': {
+          import: './es/index.mjs',
+        },
+        './lib': {
+          require: './lib/index.cjs',
+        },
+        './style': './es/style/index.css',
+      },
+      sideEffects: [
+        '*.css',
+        '*.scss',
+      ],
+      peerDependencies: {
+        vue: '^3.2.0',
+      },
+      dependencies: libraryDependencies,
+      publishConfig: {
+        access: 'public',
+      },
+      license: 'MIT',
+    }
+
+    // 为每个组件添加导出
+    componentNames.forEach((comp) => {
+      pkgJson.exports[`./${comp}`] = {
+        import: `./es/${comp}/index.mjs`,
+        require: `./lib/${comp}/index.cjs`,
+      }
+    })
+
+    // 写入package.json
+    await fsp.writeFile(resolve(outputDir, 'package.json'), JSON.stringify(pkgJson, null, 2), 'utf-8')
+
+    // 生成README.md
+    const readmeContent = `# Moluoxixi Vue组件库
+
+这是一个基于Vue 3的组件库，包含以下组件：
+
+${componentNames.map(comp => `- ${comp}`).join('\n')}
+
+## 安装
+
+\`\`\`bash
+npm install @moluoxixi/components
+\`\`\`
+
+## 使用
+
+### 全部导入
+
+\`\`\`js
+import MoluoxixiComponents from '@moluoxixi/components'
+import '@moluoxixi/components/style'
+
+app.use(MoluoxixiComponents)
+\`\`\`
+
+### 按需导入
+
+\`\`\`js
+import { ${componentNames[0]} } from '@moluoxixi/components'
+// 或者直接导入单个组件
+// import ${componentNames[0]} from '@moluoxixi/components/${componentNames[0]}'
+import '@moluoxixi/components/style'
+
+app.use(${componentNames[0]})
+\`\`\`
+`
+
+    await fsp.writeFile(resolve(outputDir, 'README.md'), readmeContent, 'utf-8')
+
+    console.log('整个组件库打包完成！')
+    return true
+  }
+  catch (error) {
+    console.error('组件库打包失败:', error)
+    return false
+  }
+}
+
 // 打包所有组件
 async function buildAllComponents() {
   console.log('开始打包所有组件...')
@@ -301,7 +528,14 @@ async function main() {
   const args = process.argv.slice(2)
   const componentName = args[0]
 
-  if (componentName) {
+  // 检查是否是打包整个库的命令
+  if (componentName === 'library') {
+    // 先打包所有组件
+    await buildAllComponents()
+    // 然后打包整个组件库
+    return await buildComponentLibrary() ? 0 : 1
+  }
+  else if (componentName) {
     // 打包单个组件
     return await buildSingleComponentByName(componentName)
   }

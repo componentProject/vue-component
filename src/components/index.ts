@@ -3,19 +3,16 @@ import type { App, Component } from 'vue'
 import Calendar from './Calendar/index.ts'
 import ConfigForm from './ConfigForm/index.vue'
 import ConfigProvider from './ConfigProvider/index.ts'
-import DateRangePicker from './DateRangePicker/index.ts'
+import DateRangePicker from './DateRangePicker/index.vue'
 import DraggableTable from './DraggableTable/index.vue'
-import EnterNextContainer from './EnterNextContainer/index.ts'
-import EnterNextDragTable from './EnterNextDragTable/index.ts'
-import EnterNextTable from './EnterNextTable/index.ts'
-import ExportExcel from './ExportExcel/index.ts'
+import EnterNextContainer from './EnterNextContainer/index.vue'
+import EnterNextDragTable from './EnterNextDragTable/index.vue'
+import EnterNextTable from './EnterNextTable/index.vue'
+import ExportExcel from './ExportExcel/index.vue'
 import Icon from './Icon'
-import IntersectObserver from './IntersectObserver'
-import KeepAllAlive from './KeepAllAlive'
 import MarkdownEditor from './MarkdownEditor'
-import PopoverTableSelect from './PopoverTableSelect'
-import Select from './Select/index.ts'
-import Tabs from './Tabs/index.ts'
+import PopoverTableSelect from './PopoverTableSelect/index.vue'
+import Select from './Select/index.vue'
 import Watermark from './Watermark/index.ts'
 
 export {
@@ -29,12 +26,9 @@ export {
   EnterNextTable,
   ExportExcel,
   Icon,
-  IntersectObserver,
-  KeepAllAlive,
   MarkdownEditor,
   PopoverTableSelect,
   Select,
-  Tabs,
   Watermark,
 }
 const componentFiles = import.meta.glob(['./**/index.vue', '!./**/components/*', '!./**/base/*', '!./_*/**/*'], {
