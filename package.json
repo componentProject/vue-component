@@ -153,6 +153,7 @@
     "markdown-it-mathjax3": "^4.3.2",
     "npm-run-all2": "^7.0.2",
     "oxlint": "^0.16.0",
+    "pkg-types": "^2.2.0",
     "postcss": "^8.5.3",
     "rollup-plugin-dts": "^6.2.1",
     "rollup-plugin-visualizer": "^5.14.0",

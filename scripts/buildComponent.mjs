@@ -7,6 +7,7 @@ import { build } from 'vite'
 import pluginVue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
 import autoprefixer from 'autoprefixer'
+import process from 'node:process'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
@@ -23,10 +24,10 @@ async function getComponentNames() {
 }
 
 /**
- * 极简的单组件打包函数
+ * 专业的单组件打包函数 - 参考Element Plus和Ant Design
  * @param {string} comp 组件名
  */
-async function buildSimpleComponent(comp) {
+async function buildComponent(comp) {
   console.log(`\n========== 开始打包组件: ${comp} ==========`)
 
   try {
@@ -51,6 +52,14 @@ async function buildSimpleComponent(comp) {
       throw new Error(`组件 ${comp} 没有找到入口文件`)
     }
 
+    // 读取项目package.json获取依赖信息
+    const pkgContent = fs.readFileSync(resolve(rootDir, 'package.json'), 'utf-8')
+    const pkg = JSON.parse(pkgContent)
+    const dependencies = {
+      ...pkg.dependencies || {},
+      ...pkg.peerDependencies || {},
+    }
+
     // 基础配置
     const baseConfig = {
       root: rootDir,
@@ -73,7 +82,17 @@ async function buildSimpleComponent(comp) {
         postcss: {
           plugins: [
             autoprefixer(),
-            // 注意：这里不使用tailwindcss，避免构建问题
+            // 添加tailwindcss支持 - 使用内联配置
+            {
+              postcssPlugin: 'tailwindcss',
+              config: {
+                content: ['./src/**/*.{vue,js,ts,jsx,tsx}'],
+                theme: {
+                  extend: {},
+                },
+                plugins: [],
+              },
+            },
           ],
         },
       },
@@ -94,8 +113,9 @@ async function buildSimpleComponent(comp) {
         },
         rollupOptions: {
           external: (id) => {
-            return id.includes('node_modules')
-              || ['vue', 'element-plus', '@vue/runtime-core', '@vue/runtime-dom'].includes(id)
+            // 简化external逻辑，直接使用Object.keys(dependencies).some
+            return Object.keys(dependencies).some(dep => id === dep || id.startsWith(`${dep}/`))
+              || ['vue', '@vue/runtime-core', '@vue/runtime-dom'].includes(id)
           },
           output: {
             preserveModules: true,
@@ -128,8 +148,9 @@ async function buildSimpleComponent(comp) {
         },
         rollupOptions: {
           external: (id) => {
-            return id.includes('node_modules')
-              || ['vue', 'element-plus', '@vue/runtime-core', '@vue/runtime-dom'].includes(id)
+            // 简化external逻辑，直接使用Object.keys(dependencies).some
+            return Object.keys(dependencies).some(dep => id === dep || id.startsWith(`${dep}/`))
+              || ['vue', '@vue/runtime-core', '@vue/runtime-dom'].includes(id)
           },
           output: {
             preserveModules: true,
@@ -148,14 +169,6 @@ async function buildSimpleComponent(comp) {
       },
     })
 
-    // 手动创建简单的类型声明文件
-    const dtsContent = `import { DefineComponent } from 'vue'
-declare const _default: DefineComponent<{}, {}, any>
-export default _default`
-
-    await fsp.writeFile(resolve(outputDir, 'es/index.d.ts'), dtsContent, 'utf-8')
-    await fsp.writeFile(resolve(outputDir, 'lib/index.d.ts'), dtsContent, 'utf-8')
-
     // 复制README.md
     const readmeSrc = resolve(rootDir, `src/components/${comp}/README.md`)
     const readmeDest = resolve(outputDir, 'README.md')
@@ -164,6 +177,15 @@ export default _default`
       console.log(`已复制README.md`)
     }
 
+    // 提取依赖信息
+    const componentDependencies = {}
+    Object.entries(dependencies).forEach(([key, value]) => {
+      // Vue作为peerDependency，其他依赖作为dependencies
+      if (key !== 'vue') {
+        componentDependencies[key] = value
+      }
+    })
+
     // 生成package.json
     const pkgJson = {
       name: `@moluoxixi/${comp}`,
@@ -171,19 +193,15 @@ export default _default`
       description: `${comp} 组件`,
       main: 'lib/index.cjs',
       module: 'es/index.mjs',
-      types: 'es/index.d.ts',
       exports: {
         '.': {
-          types: './es/index.d.ts',
           import: './es/index.mjs',
           require: './lib/index.cjs',
         },
         './es': {
-          types: './es/index.d.ts',
           import: './es/index.mjs',
         },
         './lib': {
-          types: './lib/index.d.ts',
           require: './lib/index.cjs',
         },
       },
@@ -194,9 +212,7 @@ export default _default`
       peerDependencies: {
         vue: '^3.2.0',
       },
-      dependencies: {
-        'element-plus': '^2.0.0',
-      },
+      dependencies: componentDependencies,
       publishConfig: {
         access: 'public',
       },
@@ -232,21 +248,18 @@ async function buildAllComponents() {
     const componentNames = await getComponentNames()
     console.log(`找到 ${componentNames.length} 个组件:`, componentNames)
 
-    // 并行打包所有组件
-    const buildTasks = []
-
+    // 串行打包所有组件，避免内存溢出
+    let successCount = 0
     for (const comp of componentNames) {
-      buildTasks.push(
-        buildSimpleComponent(comp)
-          .catch((error) => {
-            console.error(`组件 ${comp} 打包失败:`, error)
-            return false
-          }),
-      )
+      try {
+        const success = await buildComponent(comp)
+        if (success)
+          successCount++
+      }
+      catch (error) {
+        console.error(`组件 ${comp} 打包失败:`, error)
+      }
     }
-
-    const results = await Promise.all(buildTasks)
-    const successCount = results.filter(Boolean).length
 
     console.log(`所有组件打包完成！成功: ${successCount}/${componentNames.length}`)
     return successCount === componentNames.length ? 0 : 1
@@ -265,7 +278,7 @@ async function buildSingleComponentByName(comp) {
     // 确保输出目录存在
     await fsp.mkdir(resolve(rootDir, 'moluoxixi'), { recursive: true })
 
-    const success = await buildSimpleComponent(comp)
+    const success = await buildComponent(comp)
 
     if (success) {
       console.log(`组件 ${comp} 打包完成！`)
