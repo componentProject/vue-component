@@ -1,6 +1,6 @@
 // noinspection JSUnusedGlobalSymbols
 
-import MarkdownEditor from '@/components/MarkdownEditor'
+import MarkdownEditor from '@/components/MarkdownEditor/index.ts'
 import type { Meta } from '@storybook/vue3'
 
 const meta: Meta = {

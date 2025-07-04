@@ -1,7 +1,7 @@
 // noinspection JSUnusedGlobalSymbols
 
 import type { Meta, StoryFn, StoryObj } from '@storybook/vue3'
-import DateRangePicker from '@/components/DateRangePicker/index.ts'
+import DateRangePicker from '@/components/DateRangePicker/index.vue'
 
 // 定义元数据
 const meta: Meta<typeof DateRangePicker> = {

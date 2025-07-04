@@ -1,7 +1,7 @@
 // noinspection JSUnusedGlobalSymbols
 
 import type { Meta, StoryFn, StoryObj } from '@storybook/vue3'
-import PopoverTableSelect from '@/components/PopoverTableSelect'
+import PopoverTableSelect from '@/components/PopoverTableSelect/index.vue'
 import { ref } from 'vue'
 import { ElInput } from 'element-plus'
 
