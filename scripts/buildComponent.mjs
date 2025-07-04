@@ -285,7 +285,7 @@ async function buildComponent(comp, version = '1.0.0') {
 
     // 生成package.json
     const pkgJson = {
-      name: `@moluoxixi/${comp.toLowerCase()}`,
+      name: `@moluoxixi/${comp}`,
       version,
       description: `${comp} 组件`,
       main: 'lib/index.cjs',
