@@ -96,7 +96,7 @@ const formRef = ref(null)
 
 ```vue
 <template>
-  <EnterNextContainer @no-next-input="handleNoNextInput">
+  <EnterNextContainer @noNextInput="handleNoNextInput">
     <div>
       <el-input v-model="form.field1" placeholder="字段1" />
       <el-input v-model="form.field2" placeholder="字段2" />
@@ -135,6 +135,7 @@ function handleNoNextInput(element) {
 | 事件名      | 参数                 | 说明                                                              |
 | ----------- | -------------------- | ----------------------------------------------------------------- |
 | noNextInput | element: HTMLElement | 当用户在最后一个输入元素上按下Enter键，或者只有一个输入元素时触发 |
+| noSelectValue | element: HTMLElement | 当select下拉框没有选中值时触发 |
 
 ## 工作原理
 

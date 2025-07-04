@@ -1,40 +1,38 @@
 import type { App, Component } from 'vue'
-// 导出所有组件供统一导入
-import Calendar from './Calendar/index.ts'
-import ConfigForm from './ConfigForm/index.vue'
-import ConfigProvider from './ConfigProvider/index.ts'
-import DateRangePicker from './DateRangePicker/index.vue'
-import DraggableTable from './DraggableTable/index.vue'
-import EnterNextContainer from './EnterNextContainer/index.vue'
-import EnterNextDragTable from './EnterNextDragTable/index.vue'
-import EnterNextTable from './EnterNextTable/index.vue'
-import ExportExcel from './ExportExcel/index.vue'
-import Icon from './Icon'
-import MarkdownEditor from './MarkdownEditor'
-import PopoverTableSelect from './PopoverTableSelect/index.vue'
-import Select from './Select/index.vue'
-import Watermark from './Watermark/index.ts'
+
+import ConfigForm from '@/components/ConfigForm'
+import ConfigTable from '@/components/ConfigTable'
+import DateRangePicker from '@/components/DateRangePicker'
+import DraggableTable from '@/components/DraggableTable'
+import EnterNextContainer from '@/components/EnterNextContainer'
+import EnterNextDragTable from '@/components/EnterNextDragTable'
+import EnterNextTable from '@/components/EnterNextTable'
+import ExportExcel from '@/components/ExportExcel'
+import KeepAllAlive from '@/components/KeepAllAlive'
+import PopoverTableSelect from '@/components/PopoverTableSelect'
+import Select from '@/components/Select'
+import Tabs from '@/components/Tabs'
 
 export {
-  Calendar,
   ConfigForm,
-  ConfigProvider,
+  ConfigTable,
   DateRangePicker,
   DraggableTable,
   EnterNextContainer,
   EnterNextDragTable,
   EnterNextTable,
   ExportExcel,
-  Icon,
-  MarkdownEditor,
+  KeepAllAlive,
   PopoverTableSelect,
   Select,
-  Watermark,
+  Tabs,
 }
-const componentFiles = import.meta.glob(['./**/index.vue', '!./**/components/*', '!./**/base/*', '!./_*/**/*'], {
+
+const componentFiles = import.meta.glob(['./**/index.vue', '!./**/components/*'], {
   eager: true,
   import: 'default',
 })
+
 const components = Object.keys(componentFiles).reduce((modules = {}, modulePath) => {
   const nameArr: string[] = modulePath.split('/')
   const name: string | undefined
@@ -47,14 +45,12 @@ const components = Object.keys(componentFiles).reduce((modules = {}, modulePath)
   }
   return modules
 }, {} as any)
-function install(app: App) {
-  const componentNames = Object.keys(components)
-  componentNames.forEach((name) => {
-    app.component(name, components[name])
-  })
-}
-const plugin = {
-  install,
-}
 
-export default plugin
+export default {
+  install(app: App) {
+    const componentNames = Object.keys(components)
+    componentNames.forEach((name) => {
+      app.component(name, components[name])
+    })
+  },
+}

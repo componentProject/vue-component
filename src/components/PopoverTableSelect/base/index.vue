@@ -26,10 +26,10 @@
 import type { InputInstance } from 'element-plus'
 import type { ComponentInternalInstance, ComponentPublicInstance } from 'vue'
 import type { VxeTablePropTypes } from 'vxe-table'
-import type { ColumnType, TableRowData } from '@/components/DraggableTable/_types'
+import type { ColumnType, TableRowData } from '@/components/DraggableTable/src/_types'
 import { ElPopover } from 'element-plus'
 import { nextTick, ref, useTemplateRef, watch } from 'vue'
-import DraggableTable from '@/components/DraggableTable/index.vue'
+import DraggableTable from '@/components/DraggableTable/src/index.vue'
 
 defineOptions({
   name: 'PopoverTableSelect',

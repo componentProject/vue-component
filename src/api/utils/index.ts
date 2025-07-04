@@ -17,7 +17,7 @@ import type {
 import axios from 'axios'
 import { ElMessage } from 'element-plus'
 
-export class BaseApi {
+export default class BaseApi {
   protected baseURL: string
   instance: ReturnType<typeof axios.create>
 
@@ -77,8 +77,6 @@ export class BaseApi {
   }
 
   public async get<R>(url: string, params?: any, data?: any, config?: AxiosRequestConfig): Promise<AxiosResponse<R>> {
-    const res = await this.request<R>({ ...config, url, method: 'get', data, params })
-    console.log('res', res)
     return this.request<R>({ ...config, url, method: 'get', data, params })
   }
 

@@ -1,6 +1,6 @@
 import type { User } from '@/api/models/user'
 import type { AxiosResponse } from 'axios'
-import { BaseApi } from '@/api/utils'
+import BaseApi from '@/api/utils'
 
 export class UserApi extends BaseApi {
   constructor() {
