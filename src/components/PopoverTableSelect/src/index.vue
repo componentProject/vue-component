@@ -21,7 +21,7 @@ import type { ComponentInternalInstance, ComponentPublicInstance, PropType } fro
 import { ElInput } from 'element-plus'
 import { debounce as _debounce, throttle as _throttle } from 'lodash'
 import { computed, watch } from 'vue'
-import PopoverTableSelect from '@/components/PopoverTableSelect/base/index.vue'
+import PopoverTableSelect from '@/components/PopoverTableSelect/src/base/index.vue'
 
 const props = defineProps({
   debounce: {

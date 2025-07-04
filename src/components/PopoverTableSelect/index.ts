@@ -1,4 +1,4 @@
-import PopoverTableSelect from './index.vue'
+import PopoverTableSelect from './src/index.vue'
 import type { App } from 'vue'
 
 // 导出组件

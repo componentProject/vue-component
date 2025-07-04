@@ -29,7 +29,7 @@ import type { VxeTablePropTypes } from 'vxe-table'
 import type { ColumnType, TableRowData } from '@/components/DraggableTable/src/_types'
 import { ElPopover } from 'element-plus'
 import { nextTick, ref, useTemplateRef, watch } from 'vue'
-import DraggableTable from '@/components/DraggableTable/src/index.vue'
+import DraggableTable from '@/components/DraggableTable'
 
 defineOptions({
   name: 'PopoverTableSelect',
