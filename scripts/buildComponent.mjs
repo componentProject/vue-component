@@ -35,8 +35,8 @@ function getBaseConfig(options = {}) {
       dts({
         vue: true,
         tsconfigPath: resolve(rootDir, 'tsconfig.dts.json'),
-        // 关键：entryRoot 指向 src/components，类型声明 mirror 组件根目录结构
-        entryRoot: resolve(rootDir, 'src/components'),
+        // 关键：entryRoot 指向组件目录，类型声明直接 mirror 组件内容到 es/
+        entryRoot: resolve(rootDir, `src/components/${comp}`),
         include: [`src/components/${comp}/**/*`],
         outDir,
         skipDiagnostics: true,
@@ -110,9 +110,9 @@ async function buildSingleComponent({ comp, entry, format, outDir, enableDts = f
             || ['vue', 'element-plus', '@vue/runtime-core', '@vue/runtime-dom'].includes(id)
         },
         output: {
-          // 关键：preserveModulesRoot 指向 src/components，mirror 组件根目录结构
+          // 关键：preserveModulesRoot 指向组件目录，直接 mirror 组件内容到 es/
           preserveModules: true,
-          preserveModulesRoot: resolve(rootDir, 'src/components'),
+          preserveModulesRoot: resolve(rootDir, `src/components/${comp}`),
           entryFileNames: format === 'es' ? `[name].mjs` : `[name].cjs`,
           chunkFileNames: format === 'es' ? `[name].mjs` : `[name].cjs`,
           assetFileNames: (assetInfo) => {
