@@ -11,6 +11,9 @@ import process from 'node:process'
 import { execSync } from 'node:child_process'
 import { cruise } from 'dependency-cruiser'
 
+// === 组件库命名空间配置 ===
+const LIB_NAMESPACE = 'moluoxixi'
+
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
 const rootDir = resolve(__dirname, '..')
@@ -67,7 +70,7 @@ function getNextVersion(currentVersion, type = 'patch') {
 function getCurrentVersion(comp = '') {
   try {
     // 优先从组件库获取版本号，确保一致性
-    const libraryPath = resolve(rootDir, 'moluoxixi/package.json')
+    const libraryPath = resolve(rootDir, `${LIB_NAMESPACE}/package.json`)
 
     if (fs.existsSync(libraryPath)) {
       const pkgContent = fs.readFileSync(libraryPath, 'utf-8')
@@ -77,7 +80,7 @@ function getCurrentVersion(comp = '') {
 
     // 如果组件库不存在，则尝试从指定组件获取
     if (comp) {
-      const packagePath = resolve(rootDir, `moluoxixi/${comp}/package.json`)
+      const packagePath = resolve(rootDir, `${LIB_NAMESPACE}/${comp}/package.json`)
       if (fs.existsSync(packagePath)) {
         const pkgContent = fs.readFileSync(packagePath, 'utf-8')
         const pkg = JSON.parse(pkgContent)
@@ -489,22 +492,22 @@ function createComponentReferencePlugin(internalDeps) {
           // import ... from '@/components/ComponentName'
           {
             from: new RegExp(`(import\\s+[^"']+from\\s+)['"]@/components/${dep}['"]`, 'g'),
-            to: `$1'@moluoxixi/${dep.toLowerCase()}'`,
+            to: `$1'@${LIB_NAMESPACE}/${dep.toLowerCase()}'`,
           },
           // import ... from '@/components/ComponentName/src/index.vue'
           {
             from: new RegExp(`(import\\s+[^"']+from\\s+)['"]@/components/${dep}/src/index\\.vue['"]`, 'g'),
-            to: `$1'@moluoxixi/${dep.toLowerCase()}'`,
+            to: `$1'@${LIB_NAMESPACE}/${dep.toLowerCase()}'`,
           },
           // import ... from '@/components/ComponentName/index.ts'
           {
             from: new RegExp(`(import\\s+[^"']+from\\s+)['"]@/components/${dep}/index\\.ts['"]`, 'g'),
-            to: `$1'@moluoxixi/${dep.toLowerCase()}'`,
+            to: `$1'@${LIB_NAMESPACE}/${dep.toLowerCase()}'`,
           },
           // import ... from '@/components/ComponentName/'
           {
             from: new RegExp(`(import\\s+[^"']+from\\s+)['"]@/components/${dep}/['"]`, 'g'),
-            to: `$1'@moluoxixi/${dep.toLowerCase()}'`,
+            to: `$1'@${LIB_NAMESPACE}/${dep.toLowerCase()}'`,
           },
         ]
 
@@ -550,7 +553,7 @@ function createComponentReferencePlugin(internalDeps) {
                 // 记录需要替换的内容
                 replacements.push({
                   oldImport: match[0],
-                  newImport: match[0].replace(importPath, `@moluoxixi/${potentialComponentName.toLowerCase()}`),
+                  newImport: match[0].replace(importPath, `@${LIB_NAMESPACE}/${potentialComponentName.toLowerCase()}`),
                   componentName: potentialComponentName,
                 })
               }
@@ -583,7 +586,7 @@ function createComponentReferencePlugin(internalDeps) {
       opts.external = (id, parentId, isResolved) => {
         // 检查是否是内部组件引用
         for (const dep of internalDeps) {
-          if (id === `@moluoxixi/${dep.toLowerCase()}` || id.startsWith(`@moluoxixi/${dep.toLowerCase()}/`)) {
+          if (id === `@${LIB_NAMESPACE}/${dep.toLowerCase()}` || id.startsWith(`@${LIB_NAMESPACE}/${dep.toLowerCase()}/`)) {
             return true // 标记为外部依赖
           }
         }
@@ -615,7 +618,7 @@ async function buildComponent(comp, version = '1.0.0') {
 
   try {
     // 清空目录
-    const outputDir = resolve(rootDir, `moluoxixi/${comp}`)
+    const outputDir = resolve(rootDir, `${LIB_NAMESPACE}/${comp}`)
     await fsp.rm(outputDir, { recursive: true, force: true }).catch(() => {})
     await fsp.mkdir(outputDir, { recursive: true })
 
@@ -651,7 +654,7 @@ async function buildComponent(comp, version = '1.0.0') {
 
         // 为每个内部组件依赖添加版本约束
         for (const dep of deps.internal) {
-          componentDependencies[`@moluoxixi/${dep.toLowerCase()}`] = `^${version}`
+          componentDependencies[`@${LIB_NAMESPACE}/${dep.toLowerCase()}`] = `^${version}`
         }
 
         // 为每个外部依赖添加版本约束
@@ -714,7 +717,7 @@ async function buildComponent(comp, version = '1.0.0') {
     await build({
       ...baseConfig,
       build: {
-        outDir: `moluoxixi/${comp}/es`,
+        outDir: `${LIB_NAMESPACE}/${comp}/es`,
         emptyOutDir: true,
         minify: false, // 关闭压缩，方便调试
         cssCodeSplit: true,
@@ -749,7 +752,7 @@ async function buildComponent(comp, version = '1.0.0') {
     await build({
       ...baseConfig,
       build: {
-        outDir: `moluoxixi/${comp}/lib`,
+        outDir: `${LIB_NAMESPACE}/${comp}/lib`,
         emptyOutDir: true,
         minify: false, // 关闭压缩，方便调试
         cssCodeSplit: true,
@@ -791,7 +794,7 @@ async function buildComponent(comp, version = '1.0.0') {
 
     // 生成package.json
     const pkgJson = {
-      name: `@moluoxixi/${comp.toLowerCase()}`,
+      name: `@${LIB_NAMESPACE}/${comp.toLowerCase()}`,
       version,
       description: `${comp} 组件`,
       main: 'lib/index.cjs',
@@ -848,7 +851,7 @@ async function buildComponentLibrary(version = '1.0.0') {
 
   try {
     // 清空目录
-    const outputDir = resolve(rootDir, 'moluoxixi')
+    const outputDir = resolve(rootDir, LIB_NAMESPACE)
     await fsp.mkdir(outputDir, { recursive: true })
 
     // 读取项目package.json获取依赖信息
@@ -907,7 +910,7 @@ async function buildComponentLibrary(version = '1.0.0') {
     await build({
       ...baseConfig,
       build: {
-        outDir: 'moluoxixi/es',
+        outDir: `${LIB_NAMESPACE}/es`,
         emptyOutDir: true,
         minify: false, // 关闭压缩，方便调试
         cssCodeSplit: true,
@@ -939,7 +942,7 @@ async function buildComponentLibrary(version = '1.0.0') {
     await build({
       ...baseConfig,
       build: {
-        outDir: 'moluoxixi/lib',
+        outDir: `${LIB_NAMESPACE}/lib`,
         emptyOutDir: true,
         minify: false, // 关闭压缩，方便调试
         cssCodeSplit: true,
@@ -981,7 +984,7 @@ async function buildComponentLibrary(version = '1.0.0') {
 
     // 生成package.json
     const pkgJson = {
-      name: '@moluoxixi/components',
+      name: `@${LIB_NAMESPACE}/components`,
       version,
       description: 'Moluoxixi Vue组件库',
       main: 'lib/index.cjs',
@@ -1026,7 +1029,7 @@ ${componentNames.map(comp => `- ${comp}`).join('\n')}
 ## 安装
 
 \`\`\`bash
-npm install @moluoxixi/components
+npm install @${LIB_NAMESPACE}/components
 \`\`\`
 
 ## 使用
@@ -1034,8 +1037,8 @@ npm install @moluoxixi/components
 ### 全部导入
 
 \`\`\`js
-import MoluoxixiComponents from '@moluoxixi/components'
-import '@moluoxixi/components/style'
+import MoluoxixiComponents from '@${LIB_NAMESPACE}/components'
+import '@${LIB_NAMESPACE}/components/style'
 
 app.use(MoluoxixiComponents)
 \`\`\`
@@ -1043,8 +1046,8 @@ app.use(MoluoxixiComponents)
 ### 按需导入
 
 \`\`\`js
-import { ${componentNames[0]} } from '@moluoxixi/components'
-import '@moluoxixi/components/style'
+import { ${componentNames[0]} } from '@${LIB_NAMESPACE}/components'
+import '@${LIB_NAMESPACE}/components/style'
 
 app.use(${componentNames[0]})
 \`\`\`
@@ -1069,8 +1072,8 @@ app.use(${componentNames[0]})
 async function publishComponent(comp = '', version = '') {
   try {
     const packagePath = comp
-      ? resolve(rootDir, `moluoxixi/${comp}/package.json`)
-      : resolve(rootDir, 'moluoxixi/package.json')
+      ? resolve(rootDir, `${LIB_NAMESPACE}/${comp}/package.json`)
+      : resolve(rootDir, `${LIB_NAMESPACE}/package.json`)
 
     if (!fs.existsSync(packagePath)) {
       throw new Error(`找不到 ${packagePath}，请先打包组件`)
@@ -1086,7 +1089,7 @@ async function publishComponent(comp = '', version = '') {
     }
 
     // 发布组件
-    const packageDir = comp ? `moluoxixi/${comp}` : 'moluoxixi'
+    const packageDir = comp ? `${LIB_NAMESPACE}/${comp}` : LIB_NAMESPACE
     console.log(`开始发布 ${pkg.name}@${pkg.version}...`)
 
     // 使用--tag参数来避免版本号冲突问题
@@ -1111,7 +1114,7 @@ async function buildAllComponents(version = '1.0.0') {
 
   try {
     // 确保输出目录存在
-    await fsp.mkdir(resolve(rootDir, 'moluoxixi'), { recursive: true })
+    await fsp.mkdir(resolve(rootDir, LIB_NAMESPACE), { recursive: true })
 
     // 获取所有组件名
     const componentNames = await getComponentNames()
@@ -1150,7 +1153,7 @@ async function buildSingleComponent(comp, version = '1.0.0') {
 
   try {
     // 确保输出目录存在
-    await fsp.mkdir(resolve(rootDir, 'moluoxixi'), { recursive: true })
+    await fsp.mkdir(resolve(rootDir, LIB_NAMESPACE), { recursive: true })
 
     const success = await buildComponent(comp, version)
 
