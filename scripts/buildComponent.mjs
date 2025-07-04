@@ -694,12 +694,71 @@ async function main() {
         return 1
       }
 
+    case 'build-publish-all':
+      // 构建并发布整个组件库和所有单独组件
+      try {
+        // 获取当前版本号
+        const currentVersion = getCurrentVersion()
+        // 计算新版本号
+        const newVersion = getNextVersion(currentVersion, versionType)
+        console.log(`版本号: ${currentVersion} -> ${newVersion}`)
+
+        // 获取所有组件名
+        const componentNames = await getComponentNames()
+        console.log(`找到 ${componentNames.length} 个组件，准备构建并发布...`)
+
+        // 先打包所有组件
+        await buildAllComponents(newVersion)
+
+        // 然后打包整个组件库
+        const buildLibrarySuccess = await buildComponentLibrary(newVersion)
+        if (!buildLibrarySuccess) {
+          console.error('组件库构建失败')
+          return 1
+        }
+
+        // 发布整个组件库
+        const publishLibrarySuccess = await publishComponent()
+        if (!publishLibrarySuccess) {
+          console.error('组件库发布失败')
+          return 1
+        }
+        console.log('组件库发布成功！')
+
+        // 逐个发布单独组件
+        let successCount = 0
+        for (const comp of componentNames) {
+          try {
+            console.log(`开始发布组件: ${comp}...`)
+            const success = await publishComponent(comp)
+            if (success) {
+              successCount++
+              console.log(`组件 ${comp} 发布成功！`)
+            }
+            else {
+              console.error(`组件 ${comp} 发布失败`)
+            }
+          }
+          catch (error) {
+            console.error(`组件 ${comp} 发布失败:`, error)
+          }
+        }
+
+        console.log(`所有操作完成！成功发布组件库和 ${successCount}/${componentNames.length} 个单独组件`)
+        return successCount === componentNames.length ? 0 : 1
+      }
+      catch (error) {
+        console.error('发布过程中发生错误:', error)
+        return 1
+      }
+
     default:
       console.log(`
 使用方法:
   node scripts/buildComponent.mjs build [component] [version-type]   - 构建组件
   node scripts/buildComponent.mjs publish [component]               - 发布组件
   node scripts/buildComponent.mjs build-publish [component] [version-type] - 构建并发布组件
+  node scripts/buildComponent.mjs build-publish-all [version-type]  - 构建并发布整个组件库和所有单独组件
 
 参数:
   component    - 组件名称，使用 'library' 表示整个组件库，不提供则构建所有组件
@@ -710,6 +769,7 @@ async function main() {
   node scripts/buildComponent.mjs build library minor    - 构建整个组件库并增加次版本号
   node scripts/buildComponent.mjs publish Icon           - 发布 Icon 组件
   node scripts/buildComponent.mjs build-publish library  - 构建并发布整个组件库
+  node scripts/buildComponent.mjs build-publish-all      - 构建并发布整个组件库和所有单独组件
       `)
       return 1
   }
