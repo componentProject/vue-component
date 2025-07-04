@@ -244,13 +244,8 @@ async function buildComponentLibrary() {
 
   try {
     // 清空目录
-    const outputDir = resolve(rootDir, 'moluoxixi/components')
-    await fsp.rm(outputDir, { recursive: true, force: true }).catch(() => {})
+    const outputDir = resolve(rootDir, 'moluoxixi')
     await fsp.mkdir(outputDir, { recursive: true })
-
-    // 获取所有组件名
-    const componentNames = await getComponentNames()
-    console.log(`找到 ${componentNames.length} 个组件:`, componentNames)
 
     // 读取项目package.json获取依赖信息
     const pkgContent = fs.readFileSync(resolve(rootDir, 'package.json'), 'utf-8')
@@ -258,6 +253,12 @@ async function buildComponentLibrary() {
     const dependencies = {
       ...pkg.dependencies || {},
       ...pkg.peerDependencies || {},
+    }
+
+    // 获取入口文件
+    const entry = resolve(rootDir, 'src/components/index.ts')
+    if (!fs.existsSync(entry)) {
+      throw new Error('组件库入口文件 src/components/index.ts 不存在')
     }
 
     // 基础配置
@@ -302,12 +303,12 @@ async function buildComponentLibrary() {
     await build({
       ...baseConfig,
       build: {
-        outDir: 'moluoxixi/components/es',
+        outDir: 'moluoxixi/es',
         emptyOutDir: true,
         minify: false, // 关闭压缩，方便调试
         cssCodeSplit: true,
         lib: {
-          entry: resolve(rootDir, 'src/components/index.ts'),
+          entry,
           name: 'MoluoxixiComponents',
           formats: ['es'],
         },
@@ -334,12 +335,12 @@ async function buildComponentLibrary() {
     await build({
       ...baseConfig,
       build: {
-        outDir: 'moluoxixi/components/lib',
+        outDir: 'moluoxixi/lib',
         emptyOutDir: true,
         minify: false, // 关闭压缩，方便调试
         cssCodeSplit: true,
         lib: {
-          entry: resolve(rootDir, 'src/components/index.ts'),
+          entry,
           name: 'MoluoxixiComponents',
           formats: ['cjs'],
         },
@@ -362,6 +363,9 @@ async function buildComponentLibrary() {
         },
       },
     })
+
+    // 获取所有组件名
+    const componentNames = await getComponentNames()
 
     // 提取依赖信息
     const libraryDependencies = {}
@@ -405,14 +409,6 @@ async function buildComponentLibrary() {
       license: 'MIT',
     }
 
-    // 为每个组件添加导出
-    componentNames.forEach((comp) => {
-      pkgJson.exports[`./${comp}`] = {
-        import: `./es/${comp}/index.mjs`,
-        require: `./lib/${comp}/index.cjs`,
-      }
-    })
-
     // 写入package.json
     await fsp.writeFile(resolve(outputDir, 'package.json'), JSON.stringify(pkgJson, null, 2), 'utf-8')
 
@@ -444,8 +440,6 @@ app.use(MoluoxixiComponents)
 
 \`\`\`js
 import { ${componentNames[0]} } from '@moluoxixi/components'
-// 或者直接导入单个组件
-// import ${componentNames[0]} from '@moluoxixi/components/${componentNames[0]}'
 import '@moluoxixi/components/style'
 
 app.use(${componentNames[0]})
