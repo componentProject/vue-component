@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "CommonJS",
+    "moduleResolution": "Node",
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "strict": true,
+    "jsx": "preserve",
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    },
+    "outDir": "./temp/types"
+  },
+  "include": ["src/components/**/*"],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "moluoxixi",
+    "**/*.stories.*",
+    "**/*.test.*"
+  ]
+}

@@ -15,20 +15,49 @@ import tailwindcss from '@tailwindcss/postcss'
 import parser from '@babel/parser'
 import traverse from '@babel/traverse'
 import { parse as parseSFC } from '@vue/compiler-sfc'
+import dts from 'vite-plugin-dts'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
 const rootDir = resolve(__dirname, '..')
 
-function getBaseConfig() {
+function getBaseConfig(options = {}) {
+  const { enableDts = false, comp = '', entry = '', outDir = '' } = options
+
+  const plugins = [
+    pluginVue(),
+    vueJsx(),
+  ]
+
+  // 如果启用 dts，添加 dts 插件
+  if (enableDts && comp && entry && outDir) {
+    plugins.push(
+      dts({
+        vue: true,
+        tsconfigPath: resolve(rootDir, 'tsconfig.dts.json'),
+        // 关键：entryRoot 指向 src/components，类型声明 mirror 组件根目录结构
+        entryRoot: resolve(rootDir, 'src/components'),
+        include: [`src/components/${comp}/**/*`],
+        outDir,
+        skipDiagnostics: true,
+        copyDtsFiles: true,
+        logLevel: 'warn',
+        cleanVueFileName: true,
+        insertTypesEntry: true,
+        staticImport: true,
+        excludeExternals: true,
+        rollupTypes: true,
+        dtsFileName: 'index.d.ts',
+        outExtension: () => '.d.ts',
+      }),
+    )
+  }
+
   return {
     root: rootDir,
     base: './',
     configFile: false,
-    plugins: [
-      pluginVue(),
-      vueJsx(),
-    ],
+    plugins,
     css: {
       postcss: {
         plugins: [
@@ -57,9 +86,9 @@ async function getComponentNames() {
 }
 
 // 封装单个组件的打包逻辑
-async function buildSingleComponent({ comp, entry, format, outDir, entryFileName, chunkExt }) {
+async function buildSingleComponent({ comp, entry, format, outDir, enableDts = false }) {
   await build({
-    ...getBaseConfig(),
+    ...getBaseConfig({ enableDts, comp, entry, outDir }),
     build: {
       outDir,
       emptyOutDir: true,
@@ -70,33 +99,22 @@ async function buildSingleComponent({ comp, entry, format, outDir, entryFileName
       lib: {
         entry,
         name: comp,
-        fileName: () => entryFileName,
         formats: [format],
       },
       rollupOptions: {
         external: ['vue', 'element-plus'],
         output: {
-          entryFileNames: entryFileName,
-          chunkFileNames: (chunkInfo) => {
-            if (chunkInfo.name && chunkInfo.name !== 'index') {
-              return `src/[name].${chunkExt}`
-            }
-            return `_shared/js/[name].${chunkExt}`
-          },
+          // 关键：preserveModulesRoot 指向 src/components，mirror 组件根目录结构
+          preserveModules: true,
+          preserveModulesRoot: resolve(rootDir, 'src/components'),
+          entryFileNames: format === 'es' ? `[name].mjs` : `[name].cjs`,
+          chunkFileNames: format === 'es' ? `[name].mjs` : `[name].cjs`,
           assetFileNames: (assetInfo) => {
             if (assetInfo.name && assetInfo.name.endsWith('.css')) {
-              return 'style/index.css'
+              return 'style/[name][extname]'
             }
-            // 其他资源放到 _shared/style 或 _shared/js
-            if (assetInfo.name && assetInfo.name.endsWith('.js')) {
-              return '_shared/js/[name].[ext]'
-            }
-            if (assetInfo.name && assetInfo.name.endsWith('.css')) {
-              return 'styles/[name][extname]'
-            }
-            return '_shared/[name].[ext]'
+            return '[name][extname]'
           },
-          manualChunks: undefined,
         },
       },
     },
@@ -260,7 +278,7 @@ async function generateComponentPkgJson({ comp, entry }) {
   console.log(`已生成package.json: moluoxixi/${comp}/package.json`)
 }
 
-// 修改buildComponents，打包后生成package.json
+// 修改buildComponents，打包后生成d.ts
 async function buildComponents() {
   try {
     const componentNames = await getComponentNames()
@@ -280,14 +298,13 @@ async function buildComponents() {
         continue
       }
       buildTasks.push((async () => {
-        console.log(`开始打包ES模块: ${comp}`)
+        console.log(`开始打包ES模块和类型声明: ${comp}`)
         await buildSingleComponent({
           comp,
           entry,
           format: 'es',
           outDir: `moluoxixi/${comp}/es`,
-          entryFileName: 'index.mjs',
-          chunkExt: 'mjs',
+          enableDts: true,
         })
       })())
       buildTasks.push((async () => {
@@ -297,8 +314,6 @@ async function buildComponents() {
           entry,
           format: 'cjs',
           outDir: `moluoxixi/${comp}/lib`,
-          entryFileName: 'index.cjs',
-          chunkExt: 'cjs',
         })
       })())
       // 打包后生成package.json
