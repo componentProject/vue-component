@@ -980,11 +980,11 @@ async function buildAllComponents(_version = '1.0.0') {
 async function doBuild(mode = 'all') {
   try {
     if (mode === 'all') {
+      // 打包整个组件库
+      const { entry, outputDir, dependencies } = await getComponentConfig('')
+      const librarySuccess = await buildComponent('', entry, outputDir.replace('packages', ''), dependencies)
       // 打包所有单个组件和整个组件库
       const componentsSuccess = await buildAllComponents()
-      const { entry, outputDir, dependencies } = await getComponentConfig('')
-      // 打包整个组件库
-      const librarySuccess = await buildComponent('', entry, outputDir.replace('packages', ''), dependencies)
       return componentsSuccess && librarySuccess
     }
     else if (mode === 'library') {
