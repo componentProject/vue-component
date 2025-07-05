@@ -9,6 +9,7 @@ import pluginVue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
 // import dts from 'vite-plugin-dts'
 import autoprefixer from 'autoprefixer'
+import tailwindcss from '@tailwindcss/postcss'
 import process from 'node:process'
 import { execSync } from 'node:child_process'
 import { cruise } from 'dependency-cruiser'
@@ -595,9 +596,7 @@ function createBaseConfig(comp: string, internalDeps: string[]) {
     plugins: [
       // 添加路径替换插件，将内部组件引用转换为外部包引用
       createComponentReferencePlugin(internalDeps, comp),
-      pluginVue({
-        isProduction: true,
-      }),
+      pluginVue(),
       vueJsx(),
       // 添加类型声明生成插件
       // dts({
@@ -631,17 +630,7 @@ function createBaseConfig(comp: string, internalDeps: string[]) {
       postcss: {
         plugins: [
           autoprefixer(),
-          // 添加tailwindcss支持 - 使用内联配置
-          {
-            postcssPlugin: 'tailwindcss',
-            config: {
-              content: ['./src/**/*.{vue,js,ts,jsx,tsx}'],
-              theme: {
-                extend: {},
-              },
-              plugins: [],
-            },
-          },
+          tailwindcss(),
         ],
       },
     },
