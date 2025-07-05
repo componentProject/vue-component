@@ -820,7 +820,8 @@ async function buildComponent(comp: string, version = '1.0.0') {
             entryFileNames: `[name].mjs`,
             chunkFileNames: `[name].mjs`,
             assetFileNames: (assetInfo) => {
-              if (assetInfo.name && assetInfo.name.endsWith('.css')) {
+              const name = assetInfo.names?.[0] || ''
+              if (name.endsWith('.css')) {
                 return 'style/[name][extname]'
               }
               return '[name][extname]'
@@ -862,7 +863,8 @@ async function buildComponent(comp: string, version = '1.0.0') {
             entryFileNames: `[name].cjs`,
             chunkFileNames: `[name].cjs`,
             assetFileNames: (assetInfo) => {
-              if (assetInfo.name && assetInfo.name.endsWith('.css')) {
+              const name = assetInfo.names?.[0] || ''
+              if (name.endsWith('.css')) {
                 return 'style/[name][extname]'
               }
               return '[name][extname]'
@@ -1035,7 +1037,8 @@ async function buildComponentLibrary(version = '1.0.0') {
             entryFileNames: `[name].mjs`,
             chunkFileNames: `[name].mjs`,
             assetFileNames: (assetInfo) => {
-              if (assetInfo.name && assetInfo.name.endsWith('.css')) {
+              const name = assetInfo.names?.[0] || ''
+              if (name.endsWith('.css')) {
                 return 'style/[name][extname]'
               }
               return '[name][extname]'
@@ -1067,7 +1070,8 @@ async function buildComponentLibrary(version = '1.0.0') {
             entryFileNames: 'index.cjs',
             chunkFileNames: '[name].cjs',
             assetFileNames: (assetInfo) => {
-              if (assetInfo.name && assetInfo.name.endsWith('.css')) {
+              const name = assetInfo.names?.[0] || ''
+              if (name.endsWith('.css')) {
                 return 'style/[name][extname]'
               }
               return '[name][extname]'
