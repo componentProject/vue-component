@@ -734,15 +734,21 @@ async function bundleComponentModule({
  * 专业的单组件打包函数 - 参考Element Plus和Ant Design
  * @param comp 组件名
  * @param version 版本号
+ * @param entry 入口文件路径
+ * @param outputDir 输出目录
+ * @param dependencies 依赖分析结果
  */
-async function buildComponent(comp: string, version = '1.0.0') {
-  // 使用 \\${comp} 格式处理组件名，用于路径拼接时去掉斜杠
-  const componentName = `\\${comp}`
+async function buildComponent(
+  comp: string,
+  version = '1.0.0',
+  entry: string,
+  outputDir: string,
+  dependencies: { internal: string[], external: Record<string, string> },
+) {
   console.log(`\n========== 开始打包组件: ${comp}，版本：${version} ==========`)
 
   try {
     // 清空目录
-    const outputDir = resolve(rootDir, `${LIB_NAMESPACE}/packages/${comp}`)
     await fsp.rm(outputDir, { recursive: true, force: true }).catch(() => {})
     await fsp.mkdir(outputDir, { recursive: true })
 
@@ -750,49 +756,21 @@ async function buildComponent(comp: string, version = '1.0.0') {
     await fsp.mkdir(resolve(outputDir, 'es'), { recursive: true })
     await fsp.mkdir(resolve(outputDir, 'lib'), { recursive: true })
 
-    // 获取入口文件 - 使用 componentName 去掉路径中的斜杠
-    let entry = null
-    if (fs.existsSync(resolve(rootDir, `src/components${componentName}/index.ts`))) {
-      entry = resolve(rootDir, `src/components${componentName}/index.ts`)
-    }
-    else if (fs.existsSync(resolve(rootDir, `src/components${componentName}/index.vue`))) {
-      entry = resolve(rootDir, `src/components${componentName}/index.vue`)
-    }
-    else {
-      return Promise.reject(new Error(`组件 ${comp} 没有找到入口文件`))
-    }
-
     // 初始化组件依赖为空对象，只添加分析出来的依赖
     const componentDependencies: Record<string, string> = {}
 
-    // 分析组件依赖
-    let deps: { internal: string[], external: Record<string, string> } | undefined = { internal: [], external: {} }
-    try {
-      console.log(`分析组件 ${comp} 依赖...`)
-      deps = await analyzeComponentDeps(comp)
+    // 使用传入的依赖分析结果
+    const deps = dependencies
+    console.log(`使用传入的依赖分析结果:`)
+    console.log(`- 内部组件: ${deps.internal.join(', ') || '无'}`)
+    console.log(`- 外部依赖: ${Object.keys(deps.external).join(', ') || '无'}`)
 
-      if (deps.internal.length > 0 || Object.keys(deps.external).length > 0) {
-        console.log(`组件 ${comp} 依赖分析结果:`)
-        console.log(`- 内部组件: ${deps.internal.join(', ') || '无'}`)
-        console.log(`- 外部依赖: ${Object.keys(deps.external).join(', ') || '无'}`)
-
-        // 内部组件依赖保持为@/components路径，不添加到dependencies中
-        // 它们会在external配置中被处理
-
-        // 为每个外部依赖添加版本约束
-        for (const [pkg, pkgVersion] of Object.entries(deps.external)) {
-          // vue作为peerDependency，不添加到dependencies中
-          if (pkg !== 'vue') {
-            componentDependencies[pkg] = pkgVersion
-          }
-        }
+    // 为每个外部依赖添加版本约束
+    for (const [pkg, pkgVersion] of Object.entries(deps.external)) {
+      // vue作为peerDependency，不添加到dependencies中
+      if (pkg !== 'vue') {
+        componentDependencies[pkg] = pkgVersion
       }
-      else {
-        console.log(`组件 ${comp} 没有依赖其他组件和外部包`)
-      }
-    }
-    catch (error) {
-      console.warn(`分析组件依赖失败，跳过依赖分析: ${(error as Error).message}`)
     }
 
     // 构建 globals 配置
@@ -837,6 +815,7 @@ async function buildComponent(comp: string, version = '1.0.0') {
     })
 
     // 复制README.md
+    const componentName = `\\${comp}`
     const readmeSrc = resolve(rootDir, `src/components${componentName}/README.md`)
     const readmeDest = resolve(outputDir, 'README.md')
     if (fs.existsSync(readmeSrc)) {
@@ -1089,8 +1068,16 @@ async function buildComponentLibrary(version = '1.0.0') {
     // 写入package.json
     await fsp.writeFile(resolve(outputDir, 'package.json'), JSON.stringify(pkgJson, null, 2), 'utf-8')
 
-    // 生成README.md
-    const readmeContent = `# Moluoxixi Vue组件库
+    // 复制README.md（如果存在）
+    const readmeSrc = resolve(rootDir, 'src/components/README.md')
+    const readmeDest = resolve(outputDir, 'README.md')
+    if (fs.existsSync(readmeSrc)) {
+      await fsp.copyFile(readmeSrc, readmeDest)
+      console.log(`已复制README.md`)
+    }
+    else {
+      // 生成README.md
+      const readmeContent = `# Moluoxixi Vue组件库
 
 这是一个基于Vue 3的组件库，包含以下组件：
 
@@ -1122,8 +1109,8 @@ import '@${LIB_NAMESPACE}/components/style'
 app.use(${componentNames[0]})
 \`\`\`
 `
-
-    await fsp.writeFile(resolve(outputDir, 'README.md'), readmeContent, 'utf-8')
+      await fsp.writeFile(resolve(outputDir, 'README.md'), readmeContent, 'utf-8')
+    }
 
     console.log('整个组件库打包完成！')
     return true
@@ -1175,6 +1162,41 @@ async function publishComponent(comp = '', version = '') {
 }
 
 /**
+ * 获取组件的入口文件、输出目录和依赖分析
+ * @param comp 组件名
+ * @returns 组件的配置信息
+ */
+async function getComponentConfig(comp: string) {
+  const componentName = `\\${comp}`
+
+  // 获取入口文件
+  let entry = null
+  if (fs.existsSync(resolve(rootDir, `src/components${componentName}/index.ts`))) {
+    entry = resolve(rootDir, `src/components${componentName}/index.ts`)
+  }
+  else if (fs.existsSync(resolve(rootDir, `src/components${componentName}/index.vue`))) {
+    entry = resolve(rootDir, `src/components${componentName}/index.vue`)
+  }
+  else {
+    throw new Error(`组件 ${comp} 没有找到入口文件`)
+  }
+
+  // 获取输出目录
+  const outputDir = resolve(rootDir, `${LIB_NAMESPACE}/packages/${comp}`)
+
+  // 分析组件依赖
+  let dependencies: { internal: string[], external: Record<string, string> } = { internal: [], external: {} }
+  try {
+    dependencies = await analyzeComponentDeps(comp)
+  }
+  catch (error) {
+    console.warn(`分析组件 ${comp} 依赖失败: ${(error as Error).message}`)
+  }
+
+  return { entry, outputDir, dependencies }
+}
+
+/**
  * 打包所有单个组件
  * @param version 版本号
  * @returns 是否全部成功
@@ -1191,7 +1213,8 @@ async function buildAllComponents(version = '1.0.0') {
     let successCount = 0
     for (const comp of componentNames || []) {
       try {
-        const success = await buildComponent(comp || '', version)
+        const { entry, outputDir, dependencies } = await getComponentConfig(comp || '')
+        const success = await buildComponent(comp || '', version, entry, outputDir, dependencies)
         if (success)
           successCount++
       }
@@ -1229,7 +1252,8 @@ async function doBuild(mode = 'all', version = '1.0.0') {
     }
     else {
       // 打包单个组件
-      return await buildComponent(mode, version)
+      const { entry, outputDir, dependencies } = await getComponentConfig(mode)
+      return await buildComponent(mode, version, entry, outputDir, dependencies)
     }
   }
   catch (error) {
