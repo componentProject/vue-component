@@ -736,7 +736,9 @@ async function bundleComponentModule({
  * @param version 版本号
  */
 async function buildComponent(comp: string, version = '1.0.0') {
-  console.log(`\n========== 开始打包组件: ${comp} ==========`)
+  // 使用 \\${comp} 格式处理组件名，用于路径拼接时去掉斜杠
+  const componentName = `\\${comp}`
+  console.log(`\n========== 开始打包组件: ${comp}，版本：${version} ==========`)
 
   try {
     // 清空目录
@@ -748,13 +750,13 @@ async function buildComponent(comp: string, version = '1.0.0') {
     await fsp.mkdir(resolve(outputDir, 'es'), { recursive: true })
     await fsp.mkdir(resolve(outputDir, 'lib'), { recursive: true })
 
-    // 获取入口文件
+    // 获取入口文件 - 使用 componentName 去掉路径中的斜杠
     let entry = null
-    if (fs.existsSync(resolve(rootDir, `src/components/${comp}/index.ts`))) {
-      entry = resolve(rootDir, `src/components/${comp}/index.ts`)
+    if (fs.existsSync(resolve(rootDir, `src/components${componentName}/index.ts`))) {
+      entry = resolve(rootDir, `src/components${componentName}/index.ts`)
     }
-    else if (fs.existsSync(resolve(rootDir, `src/components/${comp}/index.vue`))) {
-      entry = resolve(rootDir, `src/components/${comp}/index.vue`)
+    else if (fs.existsSync(resolve(rootDir, `src/components${componentName}/index.vue`))) {
+      entry = resolve(rootDir, `src/components${componentName}/index.vue`)
     }
     else {
       return Promise.reject(new Error(`组件 ${comp} 没有找到入口文件`))
@@ -835,7 +837,7 @@ async function buildComponent(comp: string, version = '1.0.0') {
     })
 
     // 复制README.md
-    const readmeSrc = resolve(rootDir, `src/components/${comp}/README.md`)
+    const readmeSrc = resolve(rootDir, `src/components${componentName}/README.md`)
     const readmeDest = resolve(outputDir, 'README.md')
     if (fs.existsSync(readmeSrc)) {
       await fsp.copyFile(readmeSrc, readmeDest)
