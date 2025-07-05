@@ -1,4 +1,3 @@
-import { componentVersions } from '@/constants'
 import path, { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import fs from 'node:fs'
@@ -68,12 +67,12 @@ function getNextVersion(currentVersion: string, type: 'major' | 'minor' | 'patch
 
 /**
  * 将 componentVersions 对象写回 TypeScript 文件
- * @param versions 版本号对象
+ * @param versions 要更新的版本号对象
  */
-function writeComponentVersions(versions: Record<string, string>): boolean {
+async function writeComponentVersions(versions: Record<string, string>): Promise<boolean> {
   try {
     const constantsPath = resolve(rootDir, 'src/constants/index.ts')
-    const content = fs.readFileSync(constantsPath, 'utf-8')
+    const content = await fsp.readFile(constantsPath, 'utf-8')
 
     // 查找 componentVersions 对象的开始位置
     const startMatch = content.match(/export\s+const\s+componentVersions\s*:\s*Record<string,\s*string>\s*=\s*\{/)
@@ -103,8 +102,19 @@ function writeComponentVersions(versions: Record<string, string>): boolean {
       return false
     }
 
+    // 解析现有的版本号
+    const existingContent = content.substring(startIndex, endIndex)
+    const existingVersions: Record<string, string> = {}
+    const versionMatches = existingContent.matchAll(/(\w+):\s*'([^']+)'/g)
+    for (const match of versionMatches) {
+      existingVersions[match[1]] = match[2]
+    }
+
+    // 合并版本号（新版本覆盖旧版本）
+    const mergedVersions = { ...existingVersions, ...versions }
+
     // 生成新的对象内容
-    const newObjectContent = Object.entries(versions)
+    const newObjectContent = Object.entries(mergedVersions)
       .map(([key, value]) => `  ${key}: '${value}',`)
       .join('\n')
 
@@ -112,7 +122,7 @@ function writeComponentVersions(versions: Record<string, string>): boolean {
     const newContent = `${content.substring(0, startIndex)}\n${newObjectContent}\n${content.substring(endIndex)}`
 
     // 写回文件
-    fs.writeFileSync(constantsPath, newContent, 'utf-8')
+    await fsp.writeFile(constantsPath, newContent, 'utf-8')
     return true
   }
   catch (error) {
@@ -695,6 +705,39 @@ async function bundleComponentModule({
 }
 
 /**
+ * 异步获取当前版本号
+ * @param comp 组件名，如果为空则获取整个组件库的版本号
+ * @returns 当前版本号
+ */
+async function getCurrentVersion(comp: string): Promise<string> {
+  try {
+    const constantsPath = resolve(rootDir, 'src/constants/index.ts')
+    const content = await fsp.readFile(constantsPath, 'utf-8')
+
+    // 重新解析 componentVersions 对象，确保获取最新版本
+    const componentVersionsMatch = content.match(/export\s+const\s+componentVersions\s*:\s*Record<string,\s*string>\s*=\s*\{([\s\S]*?)\}/)
+    if (!componentVersionsMatch) {
+      return '0.0.1'
+    }
+
+    const componentVersionsContent = componentVersionsMatch[1]
+    const versionMatches = componentVersionsContent.matchAll(/(\w+):\s*'([^']+)'/g)
+
+    const versions: Record<string, string> = {}
+    for (const match of versionMatches) {
+      versions[match[1]] = match[2]
+    }
+
+    const componentKey = comp || 'components'
+    return versions[componentKey] || '0.0.1'
+  }
+  catch (error) {
+    console.warn(`获取版本号失败: ${(error as Error).message}，使用默认版本 0.0.1`)
+    return '0.0.1'
+  }
+}
+
+/**
  * 专业的单组件打包函数 - 参考Element Plus和Ant Design
  * @param comp 组件名
  * @param entry 入口文件路径
@@ -710,14 +753,11 @@ async function buildComponent(
   dependencies: { internal: string[], external: Record<string, string> },
 ) {
   const buildName = comp || '组件库'
-  // 1. 获取当前版本号
-  let currentVersion = '0.0.1'
-  if (comp && componentVersions[comp]) {
-    currentVersion = componentVersions[comp]
-  }
-  else if (!comp && componentVersions.components) {
-    currentVersion = componentVersions.components
-  }
+
+  // 1. 异步获取当前版本号
+  const currentVersion = await getCurrentVersion(comp)
+  const componentKey = comp || 'components'
+
   console.log(`\n========== 开始打包: ${buildName}，版本：${currentVersion} ==========`)
 
   try {
@@ -760,7 +800,6 @@ async function buildComponent(
     // 创建基础配置
     const baseConfig = createBaseConfig(comp, deps.internal)
 
-    console.log('entry=============================================================', entry, outputDir)
     // 打包ES模块
     await bundleComponentModule({
       comp,
@@ -852,22 +891,20 @@ async function buildComponent(
 
     await fsp.writeFile(resolve(outputDir, 'package.json'), JSON.stringify(pkgJson, null, 2), 'utf-8')
 
-    // 2. 打包成功后递增版本号
-    const nextVersion = getNextVersion(currentVersion, 'patch')
-    // 更新 constants
-    const newVersions = JSON.parse(JSON.stringify(componentVersions)) as Record<string, string>
-    if (comp) {
-      newVersions[comp] = nextVersion
+    // 5. 打包成功版本号+1
+    const newVersion = getNextVersion(currentVersion, 'patch')
+
+    // 6. 异步更新版本号到 constants 文件
+    const success = await writeComponentVersions({ [componentKey]: newVersion })
+    if (success) {
+      console.log(`✓ 已更新 ${componentKey} 版本号: ${currentVersion} -> ${newVersion}`)
     }
     else {
-      newVersions.components = nextVersion
+      console.warn(`更新 ${componentKey} 版本号失败`)
     }
-    const success = writeComponentVersions(newVersions)
-    if (success) {
-      console.log(`✓ 已递增${comp ? '组件' : '组件库'} ${comp || 'components'} 版本号: ${currentVersion} -> ${nextVersion}`)
-    }
+
     // 更新 package.json 版本号
-    pkgJson.version = nextVersion
+    pkgJson.version = newVersion
     await fsp.writeFile(resolve(outputDir, 'package.json'), JSON.stringify(pkgJson, null, 2), 'utf-8')
 
     console.log(`==========  ${buildName} 打包完成 ==========\n`)

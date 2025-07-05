@@ -50,12 +50,22 @@ export const modules = getCdnModules([
 
 // 组件版本号映射配置
 export const componentVersions: Record<string, string> = {
-  DraggableTable: '0.0.10',
-  components: '0.0.6',
-  library: '0.0.18',
+  Calendar: '0.0.2',
+  ConfigForm: '0.0.2',
+  ConfigProvider: '0.0.2',
+  ConfigTable: '0.0.2',
+  DateRangePicker: '0.0.2',
+  DraggableTable: '0.0.2',
+  EnterNextContainer: '0.0.2',
+  EnterNextDragTable: '0.0.2',
+  EnterNextTable: '0.0.2',
+  ExportExcel: '0.0.2',
   Icon: '0.0.2',
-  Calendar: '0.0.10',
-  ConfigTable: '0.0.6',
+  KeepAllAlive: '0.0.2',
+  MarkdownEditor: '0.0.2',
+  PopoverTableSelect: '0.0.2',
+  Select: '0.0.2',
+  Tabs: '0.0.2',
   Watermark: '0.0.2',
-  ConfigForm: '0.0.3',
+  components: '0.0.2',
 }
