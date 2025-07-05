@@ -1,5 +1,5 @@
 // 先引入src/constants中的componentVersions变量
-import { componentVersions } from '../src/constants/index'
+import { componentVersions } from '@/constants'
 import path, { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import fs from 'node:fs'
@@ -13,6 +13,7 @@ import autoprefixer from 'autoprefixer'
 import process from 'node:process'
 import { execSync } from 'node:child_process'
 import { cruise } from 'dependency-cruiser'
+import type { ICruiseOptions, ICruiseResult } from 'dependency-cruiser'
 
 // === 组件库命名空间配置 ===
 const LIB_NAMESPACE = 'moluoxixi'
@@ -33,9 +34,9 @@ async function getComponentNames() {
 
 /**
  * 获取下一个版本号
- * @param {string} currentVersion 当前版本号
- * @param {string} type 版本类型：major, minor, patch
- * @returns {string} 下一个版本号
+ * @param currentVersion 当前版本号
+ * @param type 版本类型：major, minor, patch
+ * @returns 下一个版本号
  */
 function getNextVersion(currentVersion: string, type: 'major' | 'minor' | 'patch' = 'patch'): string {
   // 解析当前版本号
@@ -67,7 +68,7 @@ function getNextVersion(currentVersion: string, type: 'major' | 'minor' | 'patch
 
 /**
  * 将 componentVersions 对象写回 TypeScript 文件
- * @param {Record<string, string>} versions 版本号对象
+ * @param versions 版本号对象
  */
 function writeComponentVersions(versions: Record<string, string>): boolean {
   try {
@@ -81,7 +82,7 @@ function writeComponentVersions(versions: Record<string, string>): boolean {
       return false
     }
 
-    const startIndex = startMatch.index + startMatch[0].length
+    const startIndex = (startMatch.index ?? 0) + startMatch[0].length
     let braceCount = 1
     let endIndex = startIndex
 
@@ -115,16 +116,16 @@ function writeComponentVersions(versions: Record<string, string>): boolean {
     return true
   }
   catch (error) {
-    console.error(`写入 componentVersions 失败: ${error.message}`)
+    console.error(`写入 componentVersions 失败: ${(error as Error).message}`)
     return false
   }
 }
 
 /**
  * 获取当前版本号并更新为下一个版本号
- * @param {string} comp 组件名，如果为空则获取整个组件库的版本号
- * @param {string} versionType 版本类型：major, minor, patch
- * @returns {string} 新的版本号
+ * @param comp 组件名，如果为空则获取整个组件库的版本号
+ * @param versionType 版本类型：major, minor, patch
+ * @returns 新的版本号
  */
 function getCurrentVersionAndUpdate(comp = '', versionType: 'major' | 'minor' | 'patch' = 'patch'): string {
   try {
@@ -156,7 +157,7 @@ function getCurrentVersionAndUpdate(comp = '', versionType: 'major' | 'minor' | 
     return newVersion
   }
   catch (error) {
-    console.error(`版本号管理失败: ${error.message}`)
+    console.error(`版本号管理失败: ${(error as Error).message}`)
     return comp ? '0.0.1' : '0.0.1'
   }
 }
@@ -164,10 +165,8 @@ function getCurrentVersionAndUpdate(comp = '', versionType: 'major' | 'minor' | 
 /**
  * 使用dependency-cruiser分析组件的完整依赖关系
  * 返回内部依赖和外部依赖
- * @param {string} comp 组件名称
- * @returns {Promise<{internal: string[], external: Record<string, string>}>} 依赖分析结果
  */
-async function analyzeComponentDeps(comp) {
+async function analyzeComponentDeps(comp: string) {
   try {
     console.log(`开始分析组件 ${comp} 的完整依赖关系...`)
 
@@ -183,55 +182,51 @@ async function analyzeComponentDeps(comp) {
     console.log(`分析入口文件: ${entryPoint}`)
 
     // 配置dependency-cruiser选项
-    const cruiseOptions = {
+    const cruiseOptions: ICruiseOptions = {
       // 输出格式
       outputType: 'json',
 
       // 模块解析配置
       moduleSystems: ['es6', 'cjs', 'tsd'],
-
-      // 文件扩展名
-      extensions: ['.js', '.jsx', '.ts', '.tsx', '.vue'],
-
       // TypeScript配置
       tsConfig: {
         fileName: resolve(rootDir, 'tsconfig.json'),
       },
 
+      // 文件扩展名
+      // extensions: ['.js', '.jsx', '.ts', '.tsx', '.vue'],
       // Webpack解析配置（用于别名等）
-      webpackConfig: {
-        resolve: {
-          alias: {
-            '@': resolve(rootDir, 'src'),
-          },
-          extensions: ['.js', '.jsx', '.ts', '.tsx', '.vue'],
-        },
-      },
-
+      // webpackConfig: {
+      //   resolve: {
+      //     alias: {
+      //       '@': resolve(rootDir, 'src'),
+      //     },
+      //     extensions: ['.js', '.jsx', '.ts', '.tsx', '.vue'],
+      //   },
+      // },
+      // // 选项
+      // options: {
+      //   includeOnly: '', // 不限制分析范围
+      //   exclude: {
+      //     path: 'node_modules', // 排除node_modules，但保留npm包引用信息
+      //   },
+      //   maxDepth: 15, // 增加分析深度，确保能找到间接依赖
+      //   moduleSystems: ['es6', 'cjs', 'tsd'],
+      //   tsPreCompilationDeps: true,
+      //   preserveSymlinks: false,
+      //   externalModuleResolutionStrategy: 'node_modules',
+      // },
       // 规则配置
       ruleSet: {
         forbidden: [],
         allowed: [],
-        allowedSeverity: 'warn',
       },
 
-      // 选项
-      options: {
-        includeOnly: '', // 不限制分析范围
-        exclude: {
-          path: 'node_modules', // 排除node_modules，但保留npm包引用信息
-        },
-        maxDepth: 15, // 增加分析深度，确保能找到间接依赖
-        moduleSystems: ['es6', 'cjs', 'tsd'],
-        tsPreCompilationDeps: true,
-        preserveSymlinks: false,
-        externalModuleResolutionStrategy: 'node_modules',
-      },
     }
 
     // 执行依赖分析
     console.log('正在使用dependency-cruiser分析依赖...')
-    const cruiseResult = cruise([entryPoint], cruiseOptions)
+    const cruiseResult = await cruise([entryPoint], cruiseOptions)
 
     // 处理分析结果
     const internalDeps = new Set()
@@ -246,8 +241,8 @@ async function analyzeComponentDeps(comp) {
     }
 
     // 遍历所有模块和依赖
-    if (cruiseResult.output && cruiseResult.output.modules) {
-      for (const module of cruiseResult.output.modules) {
+    if ((cruiseResult.output as ICruiseResult)?.modules) {
+      for (const module of (cruiseResult.output as ICruiseResult).modules) {
         if (module.dependencies) {
           for (const dep of module.dependencies) {
             const depPath = dep.resolved || dep.module
@@ -288,7 +283,7 @@ async function analyzeComponentDeps(comp) {
     const scannedFiles = new Set()
 
     // 递归扫描函数
-    const scanFileForDeps = async (filePath) => {
+    const scanFileForDeps = async (filePath: string) => {
       if (scannedFiles.has(filePath))
         return
       scannedFiles.add(filePath)
@@ -344,7 +339,7 @@ async function analyzeComponentDeps(comp) {
               }
             }
             catch (error) {
-              console.warn(`扫描共享模块失败: ${importPath}, 错误: ${error.message}`)
+              console.warn(`扫描共享模块失败: ${importPath}, 错误: ${(error as Error).message}`)
             }
           }
 
@@ -376,7 +371,7 @@ async function analyzeComponentDeps(comp) {
             }
             catch (error) {
               // 路径解析失败，跳过
-              console.warn(`路径解析失败: ${importPath} 在文件 ${filePath}, 错误: ${error.message}`)
+              console.warn(`路径解析失败: ${importPath} 在文件 ${filePath}, 错误: ${(error as Error).message}`)
             }
           }
 
@@ -397,7 +392,7 @@ async function analyzeComponentDeps(comp) {
         }
       }
       catch (error) {
-        console.warn(`扫描文件失败: ${filePath}, 错误: ${error.message}`)
+        console.warn(`扫描文件失败: ${filePath}, 错误: ${(error as Error).message}`)
       }
     }
 
@@ -407,8 +402,8 @@ async function analyzeComponentDeps(comp) {
     }
 
     // 转换结果
-    const result = {
-      internal: Array.from(internalDeps).sort(),
+    const result: { internal: string[], external: Record<string, string> } = {
+      internal: Array.from(internalDeps).sort() as string[],
       external: Object.fromEntries(externalDeps),
     }
 
@@ -449,9 +444,9 @@ async function analyzeComponentDeps(comp) {
 
 /**
  * 简单的依赖分析方法（作为fallback）
- * @param {string} comp 组件名称
+ * @param comp 组件名称
  */
-async function simpleAnalyzeComponentDeps(comp) {
+async function simpleAnalyzeComponentDeps(comp: string) {
   try {
     const allComponents = await getComponentNames()
     const componentDir = resolve(rootDir, `src/components/${comp}`)
@@ -511,7 +506,7 @@ async function simpleAnalyzeComponentDeps(comp) {
     }
 
     return {
-      internal: Array.from(internalDeps).sort(),
+      internal: Array.from(internalDeps).sort() as string[],
       external: Object.fromEntries(externalDeps),
     }
   }
@@ -523,15 +518,14 @@ async function simpleAnalyzeComponentDeps(comp) {
 
 /**
  * 自定义插件：将相对路径转换为@/components路径引用，并处理组件内部自引用
- * @param {Array<string>} internalDeps 内部组件依赖列表
- * @param {string} currentComponent 当前正在打包的组件名
- * @returns {object} Rollup插件对象
+ * @param internalDeps 内部组件依赖列表
+ * @param currentComponent 当前正在打包的组件名
  */
-function createComponentReferencePlugin(internalDeps, currentComponent) {
+function createComponentReferencePlugin(internalDeps: string[], currentComponent: string) {
   return {
     name: 'component-reference-transform',
     enforce: 'pre',
-    transform(code, id) {
+    transform(code: string, id: string) {
       // 只处理TypeScript和Vue文件
       if (!/\.(?:ts|tsx|js|jsx|vue)$/.test(id)) {
         return null
@@ -586,7 +580,7 @@ function createComponentReferencePlugin(internalDeps, currentComponent) {
           }
           catch (error) {
             // 路径解析失败，跳过
-            console.warn(`路径解析失败: ${importPath} 在文件 ${id}, 错误: ${error.message}`)
+            console.warn(`路径解析失败: ${importPath} 在文件 ${id}, 错误: ${(error as Error).message}`)
           }
         }
 
@@ -633,18 +627,15 @@ function createComponentReferencePlugin(internalDeps, currentComponent) {
     },
 
     // 处理external配置
-    options(opts) {
+    options(opts: any) {
       const originalExternal = opts.external || (() => false)
 
-      opts.external = (id, parentId, isResolved) => {
+      opts.external = (id: string, parentId?: string, isResolved?: boolean) => {
         // 检查是否是@/components路径引用（排除当前组件的自引用）
         if (id.startsWith('@/components/')) {
           const componentMatch = id.match(/@\/components\/([A-Z][a-zA-Z0-9]+)/)
-          if (componentMatch && componentMatch[1] === currentComponent) {
-            // 当前组件的自引用，不标记为外部依赖
-            return false
-          }
-          return true // 标记为外部依赖
+          return !(componentMatch && componentMatch[1] === currentComponent)
+          // 标记为外部依赖
         }
 
         // 调用原始的external函数
@@ -666,10 +657,10 @@ function createComponentReferencePlugin(internalDeps, currentComponent) {
 
 /**
  * 专业的单组件打包函数 - 参考Element Plus和Ant Design
- * @param {string} comp 组件名
- * @param {string} version 版本号
+ * @param comp 组件名
+ * @param version 版本号
  */
-async function buildComponent(comp, version = '1.0.0') {
+async function buildComponent(comp: string, version = '1.0.0') {
   console.log(`\n========== 开始打包组件: ${comp} ==========`)
 
   try {
@@ -691,14 +682,14 @@ async function buildComponent(comp, version = '1.0.0') {
       entry = resolve(rootDir, `src/components/${comp}/index.vue`)
     }
     else {
-      throw new Error(`组件 ${comp} 没有找到入口文件`)
+      return Promise.reject(new Error(`组件 ${comp} 没有找到入口文件`))
     }
 
     // 初始化组件依赖为空对象，只添加分析出来的依赖
-    const componentDependencies = {}
+    const componentDependencies: Record<string, string> = {}
 
     // 分析组件依赖
-    let deps = { internal: [], external: {} }
+    let deps: { internal: string[], external: Record<string, string> } = { internal: [], external: {} }
     try {
       console.log(`分析组件 ${comp} 依赖...`)
       deps = await analyzeComponentDeps(comp)
@@ -724,11 +715,11 @@ async function buildComponent(comp, version = '1.0.0') {
       }
     }
     catch (error) {
-      console.warn(`分析组件依赖失败，跳过依赖分析: ${error.message}`)
+      console.warn(`分析组件依赖失败，跳过依赖分析: ${(error as Error).message}`)
     }
 
     // 构建 globals 配置
-    const globals = {
+    const globals: Record<string, string> = {
       vue: 'Vue',
     }
     for (const compName of deps.internal) {
@@ -739,7 +730,7 @@ async function buildComponent(comp, version = '1.0.0') {
     }
 
     // 基础配置
-    const baseConfig = {
+    const baseConfig: any = {
       root: rootDir,
       configFile: false,
       publicDir: false,
@@ -835,7 +826,7 @@ async function buildComponent(comp, version = '1.0.0') {
               return '[name][extname]'
             },
             globals,
-            manualChunks: false, // 禁用手动分块，避免文件拆分
+            manualChunks: undefined, // 禁用手动分块，避免文件拆分
           },
         },
       },
@@ -878,7 +869,7 @@ async function buildComponent(comp, version = '1.0.0') {
             },
             exports: 'named',
             globals,
-            manualChunks: false, // 禁用手动分块，避免文件拆分
+            manualChunks: undefined, // 禁用手动分块，避免文件拆分
           },
         },
       },
@@ -893,7 +884,7 @@ async function buildComponent(comp, version = '1.0.0') {
     }
 
     // 生成package.json
-    const pkgJson = {
+    const pkgJson: any = {
       name: `@${LIB_NAMESPACE}/${comp.toLowerCase()}`,
       version,
       description: `${comp} 组件`,
@@ -958,7 +949,7 @@ async function buildComponent(comp, version = '1.0.0') {
 
 /**
  * 打包整个组件库 - 生成统一入口
- * @param {string} version 版本号
+ * @param version 版本号
  */
 async function buildComponentLibrary(version = '1.0.0') {
   console.log('开始打包整个组件库...')
@@ -979,11 +970,11 @@ async function buildComponentLibrary(version = '1.0.0') {
     // 获取入口文件
     const entry = resolve(rootDir, 'src/components/index.ts')
     if (!fs.existsSync(entry)) {
-      throw new Error('组件库入口文件 src/components/index.ts 不存在')
+      return Promise.reject(new Error('组件库入口文件 src/components/index.ts 不存在'))
     }
 
     // 基础配置
-    const baseConfig = {
+    const baseConfig: any = {
       root: rootDir,
       configFile: false,
       publicDir: false,
@@ -1091,10 +1082,10 @@ async function buildComponentLibrary(version = '1.0.0') {
     const componentNames = await getComponentNames()
 
     // 提取依赖信息
-    const libraryDependencies = {}
+    const libraryDependencies: Record<string, string> = {}
     Object.entries(dependencies).forEach(([key, value]) => {
       if (key !== 'vue') {
-        libraryDependencies[key] = value
+        libraryDependencies[key] = value as string
       }
     })
 
@@ -1182,8 +1173,8 @@ app.use(${componentNames[0]})
 
 /**
  * 发布组件
- * @param {string} comp 组件名，如果为空则发布整个组件库
- * @param {string} version 指定版本号，如果提供则覆盖package.json中的版本号
+ * @param comp 组件名，如果为空则发布整个组件库
+ * @param version 指定版本号，如果提供则覆盖package.json中的版本号
  */
 async function publishComponent(comp = '', version = '') {
   try {
@@ -1192,7 +1183,7 @@ async function publishComponent(comp = '', version = '') {
       : resolve(rootDir, `${LIB_NAMESPACE}/package.json`)
 
     if (!fs.existsSync(packagePath)) {
-      throw new Error(`找不到 ${packagePath}，请先打包组件`)
+      return Promise.reject(new Error(`找不到 ${packagePath}，请先打包组件`))
     }
 
     const pkgContent = fs.readFileSync(packagePath, 'utf-8')
@@ -1222,8 +1213,8 @@ async function publishComponent(comp = '', version = '') {
 
 /**
  * 打包所有单个组件
- * @param {string} version 版本号
- * @returns {Promise<boolean>} 是否全部成功
+ * @param version 版本号
+ * @returns 是否全部成功
  */
 async function buildAllComponents(version = '1.0.0') {
   console.log('开始打包所有单个组件...')
@@ -1234,13 +1225,13 @@ async function buildAllComponents(version = '1.0.0') {
 
     // 获取所有组件名
     const componentNames = await getComponentNames()
-    console.log(`找到 ${componentNames.length} 个组件:`, componentNames)
+    console.log(`找到 ${componentNames?.length || 0} 个组件:`, componentNames)
 
     // 串行打包所有组件，避免内存溢出
     let successCount = 0
-    for (const comp of componentNames) {
+    for (const comp of componentNames || []) {
       try {
-        const success = await buildComponent(comp, version)
+        const success = await buildComponent(comp || '', version)
         if (success)
           successCount++
       }
@@ -1260,11 +1251,10 @@ async function buildAllComponents(version = '1.0.0') {
 
 /**
  * 打包单个组件
- * @param {string} comp 组件名
- * @param {string} version 版本号
- * @returns {Promise<boolean>} 是否成功
+ * @param comp 组件名
+ * @param version 版本号
  */
-async function buildSingleComponent(comp, version = '1.0.0') {
+async function buildSingleComponent(comp: string, version = '1.0.0') {
   console.log(`开始打包单个组件: ${comp}`)
 
   try {
@@ -1290,9 +1280,9 @@ async function buildSingleComponent(comp, version = '1.0.0') {
 
 /**
  * 打包函数 - 统一处理三种模式：all、library、单个组件
- * @param {string} mode 打包模式：'all'、'library'、或组件名
- * @param {string} version 版本号
- * @returns {Promise<boolean>} 是否成功
+ * @param mode 打包模式：'all'、'library'、或组件名
+ * @param version 版本号
+ * @returns 是否成功
  */
 async function doBuild(mode = 'all', version = '1.0.0') {
   try {
@@ -1319,9 +1309,9 @@ async function doBuild(mode = 'all', version = '1.0.0') {
 
 /**
  * 发布函数 - 统一处理三种模式：all、library、单个组件
- * @param {string} mode 发布模式：'all'、'library'、或组件名
- * @param {string} version 版本号
- * @returns {Promise<boolean>} 是否成功
+ * @param mode 发布模式：'all'、'library'、或组件名
+ * @param version 版本号
+ * @returns 是否成功
  */
 async function doPublish(mode = 'all', version = '') {
   try {
@@ -1392,7 +1382,7 @@ async function main() {
   }
 
   // 获取并更新版本号
-  const newVersion = getCurrentVersionAndUpdate(mode === 'all' ? '' : mode, versionType)
+  const newVersion = getCurrentVersionAndUpdate(mode === 'all' ? '' : mode, versionType as 'major' | 'minor' | 'patch')
   console.log(`使用版本号: ${newVersion}`)
 
   // 声明变量，避免在case块中声明

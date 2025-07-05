@@ -50,6 +50,8 @@ export const modules = getCdnModules([
 
 // 组件版本号映射配置
 export const componentVersions: Record<string, string> = {
-  DraggableTable: '0.0.2',
+  DraggableTable: '0.0.4',
   components: '0.0.2',
+  library: '0.0.2',
+  Icon: '0.0.2',
 }
