@@ -54,5 +54,6 @@ export const componentVersions: Record<string, string> = {
   components: '0.0.2',
   library: '0.0.13',
   Icon: '0.0.2',
-  Calendar: '0.0.8',
+  Calendar: '0.0.9',
+  ConfigTable: '0.0.2',
 }

@@ -478,12 +478,14 @@ function createComponentReferencePlugin(internalDeps: string[], currentComponent
 
             // 检查目标路径是否在 src/components/ 目录下
             const componentsDir = resolve(rootDir, 'src/components')
-            const relativeTocComponents = resolve(targetPath).replace(componentsDir, '').replace(/\\/g, '/')
 
-            // 如果路径以 / 开头且不包含 .. 说明在 components 目录下
-            if (relativeTocComponents.startsWith('/') && !relativeTocComponents.includes('..')) {
-              // 提取组件名：/ComponentName/xxx/xxx -> ComponentName
-              const pathParts = relativeTocComponents.substring(1).split('/')
+            // 使用 path.relative 来正确计算相对路径
+            const relativeToComponents = path.relative(componentsDir, targetPath).replace(/\\/g, '/')
+
+            // 如果相对路径不以 .. 开头，说明在 components 目录下
+            if (!relativeToComponents.startsWith('..') && !relativeToComponents.includes('..')) {
+              // 提取组件名：ComponentName/xxx/xxx -> ComponentName
+              const pathParts = relativeToComponents.split('/')
               const potentialComponentName = pathParts[0]
 
               // 检查是否是当前组件内部的自引用（包括类型文件）
