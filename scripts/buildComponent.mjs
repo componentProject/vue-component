@@ -709,7 +709,7 @@ async function buildComponent(comp, version = '1.0.0') {
         outDir: `${LIB_NAMESPACE}/${comp}/es`,
         emptyOutDir: true,
         minify: false, // 关闭压缩，方便调试
-        cssCodeSplit: true,
+        cssCodeSplit: false, // 关闭CSS代码分割，避免文件拆分
         lib: {
           entry,
           name: comp,
@@ -738,6 +738,7 @@ async function buildComponent(comp, version = '1.0.0') {
               return '[name][extname]'
             },
             globals,
+            manualChunks: false, // 禁用手动分块，避免文件拆分
           },
         },
       },
@@ -750,7 +751,7 @@ async function buildComponent(comp, version = '1.0.0') {
         outDir: `${LIB_NAMESPACE}/${comp}/lib`,
         emptyOutDir: true,
         minify: false, // 关闭压缩，方便调试
-        cssCodeSplit: true,
+        cssCodeSplit: false, // 关闭CSS代码分割，避免文件拆分
         lib: {
           entry,
           name: comp,
@@ -780,6 +781,7 @@ async function buildComponent(comp, version = '1.0.0') {
             },
             exports: 'named',
             globals,
+            manualChunks: false, // 禁用手动分块，避免文件拆分
           },
         },
       },
