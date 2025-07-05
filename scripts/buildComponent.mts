@@ -795,11 +795,12 @@ async function buildComponent(
     // 创建基础配置
     const baseConfig = createBaseConfig(comp, deps.internal)
 
+    console.log('entry=============================================================', entry, outputDir)
     // 打包ES模块
     await bundleComponentModule({
       comp,
       entry,
-      outDir: `${LIB_NAMESPACE}/packages/${comp}/es`,
+      outDir: `${outputDir}/es`,
       format: 'es',
       componentDependencies,
       globals,
@@ -812,7 +813,7 @@ async function buildComponent(
     await bundleComponentModule({
       comp,
       entry,
-      outDir: `${LIB_NAMESPACE}/packages/${comp}/lib`,
+      outDir: `${outputDir}/lib`,
       format: 'cjs',
       componentDependencies,
       globals,
@@ -833,7 +834,7 @@ async function buildComponent(
 
     // 生成package.json
     const pkgJson: any = {
-      name: `@${LIB_NAMESPACE}/${comp.toLowerCase()}`,
+      name: `@${LIB_NAMESPACE}${(comp ? `/${comp}` : '').toLowerCase()}`,
       version,
       description: `${comp} 组件`,
       main: 'lib/index.cjs',
@@ -956,7 +957,7 @@ async function getComponentConfig(comp: string) {
   }
 
   // 获取输出目录
-  const outputDir = resolve(rootDir, `${LIB_NAMESPACE}/packages/${comp}`)
+  const outputDir = resolve(rootDir, `${LIB_NAMESPACE}/${comp ? `/packages${componentName}` : ''}`)
 
   // 分析组件依赖
   let dependencies: { internal: string[], external: Record<string, string> } = { internal: [], external: {} }
