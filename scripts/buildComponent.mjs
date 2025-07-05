@@ -1152,7 +1152,7 @@ app.use(${componentNames[0]})
 async function publishComponent(comp = '', version = '') {
   try {
     const packagePath = comp
-      ? resolve(rootDir, `${LIB_NAMESPACE}/${comp}/package.json`)
+      ? resolve(rootDir, `${LIB_NAMESPACE}/packages/${comp}/package.json`)
       : resolve(rootDir, `${LIB_NAMESPACE}/package.json`)
 
     if (!fs.existsSync(packagePath)) {
