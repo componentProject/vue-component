@@ -486,9 +486,11 @@ function createComponentReferencePlugin(internalDeps: string[], currentComponent
               const pathParts = relativeTocComponents.substring(1).split('/')
               const potentialComponentName = pathParts[0]
 
-              // 检查是否是当前组件内部的自引用
-              if (potentialComponentName === currentComponent) {
-                // 组件内部自引用，保持相对路径不变，但需要确保路径正确
+              // 检查是否是当前组件内部的自引用（包括类型文件）
+              // 对于组件库模式（currentComponent为空），检查文件是否在当前组件目录下
+              if (potentialComponentName === currentComponent
+                || (currentComponent === '' && id.includes(`/src/components/${potentialComponentName}/`))) {
+                // 组件内部自引用，保持相对路径不变
                 console.log(`✓ 保持组件内部自引用: ${importPath} 在文件 ${id}`)
                 continue
               }
