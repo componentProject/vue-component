@@ -52,6 +52,7 @@ export const modules = getCdnModules([
 export const componentVersions: Record<string, string> = {
   DraggableTable: '0.0.8',
   components: '0.0.2',
-  library: '0.0.3',
+  library: '0.0.8',
   Icon: '0.0.2',
+  Calendar: '0.0.2',
 }

@@ -737,6 +737,8 @@ async function bundleComponentModule({
  * @param entry 入口文件路径
  * @param outputDir 输出目录
  * @param dependencies 依赖分析结果
+ * @param dependencies.internal
+ * @param dependencies.external
  */
 async function buildComponent(
   comp: string,
@@ -745,7 +747,8 @@ async function buildComponent(
   outputDir: string,
   dependencies: { internal: string[], external: Record<string, string> },
 ) {
-  console.log(`\n========== 开始打包组件: ${comp}，版本：${version} ==========`)
+  const buildName = comp || '组件库'
+  console.log(`\n========== 开始打包: ${buildName}，版本：${version} ==========`)
 
   try {
     // 清空目录
@@ -878,245 +881,11 @@ async function buildComponent(
 
     await fsp.writeFile(resolve(outputDir, 'package.json'), JSON.stringify(pkgJson, null, 2), 'utf-8')
 
-    console.log(`========== 组件 ${comp} 打包完成 ==========\n`)
+    console.log(`==========  ${buildName} 打包完成 ==========\n`)
     return true
   }
   catch (error) {
-    console.error(`组件 ${comp} 打包失败:`, error)
-    return false
-  }
-}
-
-/**
- * 打包整个组件库 - 生成统一入口
- * @param version 版本号
- */
-async function buildComponentLibrary(version = '1.0.0') {
-  console.log('开始打包整个组件库...')
-
-  try {
-    // 清空目录
-    const outputDir = resolve(rootDir, LIB_NAMESPACE)
-    await fsp.mkdir(outputDir, { recursive: true })
-
-    // 读取项目package.json获取依赖信息
-    const pkgContent = fs.readFileSync(resolve(rootDir, 'package.json'), 'utf-8')
-    const pkg = JSON.parse(pkgContent)
-    const dependencies = {
-      ...pkg.dependencies || {},
-      ...pkg.peerDependencies || {},
-    }
-
-    // 获取入口文件
-    const entry = resolve(rootDir, 'src/components/index.ts')
-    if (!fs.existsSync(entry)) {
-      return Promise.reject(new Error('组件库入口文件 src/components/index.ts 不存在'))
-    }
-
-    // 基础配置
-    const baseConfig: any = {
-      root: rootDir,
-      configFile: false,
-      publicDir: false,
-      logLevel: 'info',
-      plugins: [
-        pluginVue({
-          isProduction: true,
-        }),
-        vueJsx(),
-      ],
-      resolve: {
-        extensions: ['.js', '.jsx', '.ts', '.tsx', '.vue'],
-        alias: {
-          '@': resolve(rootDir, './src'),
-        },
-      },
-      css: {
-        postcss: {
-          plugins: [
-            autoprefixer(),
-            // 添加tailwindcss支持 - 使用内联配置
-            {
-              postcssPlugin: 'tailwindcss',
-              config: {
-                content: ['./src/**/*.{vue,js,ts,jsx,tsx}'],
-                theme: {
-                  extend: {},
-                },
-                plugins: [],
-              },
-            },
-          ],
-        },
-      },
-    }
-
-    // 打包ES模块
-    await build({
-      ...baseConfig,
-      build: {
-        outDir: `${LIB_NAMESPACE}/es`,
-        emptyOutDir: true,
-        minify: false, // 关闭压缩，方便调试
-        cssCodeSplit: true,
-        lib: {
-          entry,
-          name: 'MoluoxixiComponents',
-          formats: ['es'],
-        },
-        rollupOptions: {
-          external: (id) => {
-            return Object.keys(dependencies).some(dep => id === dep || id.startsWith(`${dep}/`))
-              || ['vue', '@vue/runtime-core', '@vue/runtime-dom'].includes(id)
-          },
-          output: {
-            preserveModules: true,
-            preserveModulesRoot: resolve(rootDir, `src/components`),
-            entryFileNames: `[name].mjs`,
-            chunkFileNames: `[name].mjs`,
-            assetFileNames: (assetInfo) => {
-              const name = assetInfo.names?.[0] || ''
-              if (name.endsWith('.css')) {
-                return 'style/[name][extname]'
-              }
-              return '[name][extname]'
-            },
-          },
-        },
-      },
-    })
-
-    // 打包CJS模块
-    await build({
-      ...baseConfig,
-      build: {
-        outDir: `${LIB_NAMESPACE}/lib`,
-        emptyOutDir: true,
-        minify: false, // 关闭压缩，方便调试
-        cssCodeSplit: true,
-        lib: {
-          entry,
-          name: 'MoluoxixiComponents',
-          formats: ['cjs'],
-        },
-        rollupOptions: {
-          external: (id) => {
-            return Object.keys(dependencies).some(dep => id === dep || id.startsWith(`${dep}/`))
-              || ['vue', '@vue/runtime-core', '@vue/runtime-dom'].includes(id)
-          },
-          output: {
-            entryFileNames: 'index.cjs',
-            chunkFileNames: '[name].cjs',
-            assetFileNames: (assetInfo) => {
-              const name = assetInfo.names?.[0] || ''
-              if (name.endsWith('.css')) {
-                return 'style/[name][extname]'
-              }
-              return '[name][extname]'
-            },
-            exports: 'named',
-          },
-        },
-      },
-    })
-
-    // 获取所有组件名
-    const componentNames = await getComponentNames()
-
-    // 提取依赖信息
-    const libraryDependencies: Record<string, string> = {}
-    Object.entries(dependencies).forEach(([key, value]) => {
-      if (key !== 'vue') {
-        libraryDependencies[key] = value as string
-      }
-    })
-
-    // 生成package.json
-    const pkgJson = {
-      name: `@${LIB_NAMESPACE}/components`,
-      version,
-      description: 'Moluoxixi Vue组件库',
-      main: 'lib/index.cjs',
-      module: 'es/index.mjs',
-      exports: {
-        '.': {
-          import: './es/index.mjs',
-          require: './lib/index.cjs',
-        },
-        './es': {
-          import: './es/index.mjs',
-        },
-        './lib': {
-          require: './lib/index.cjs',
-        },
-        './style': './es/style/index.css',
-      },
-      sideEffects: [
-        '*.css',
-        '*.scss',
-      ],
-      peerDependencies: {
-        vue: '^3.2.0',
-      },
-      dependencies: libraryDependencies,
-      publishConfig: {
-        access: 'public',
-      },
-      license: 'MIT',
-    }
-
-    // 写入package.json
-    await fsp.writeFile(resolve(outputDir, 'package.json'), JSON.stringify(pkgJson, null, 2), 'utf-8')
-
-    // 复制README.md（如果存在）
-    const readmeSrc = resolve(rootDir, 'src/components/README.md')
-    const readmeDest = resolve(outputDir, 'README.md')
-    if (fs.existsSync(readmeSrc)) {
-      await fsp.copyFile(readmeSrc, readmeDest)
-      console.log(`已复制README.md`)
-    }
-    else {
-      // 生成README.md
-      const readmeContent = `# Moluoxixi Vue组件库
-
-这是一个基于Vue 3的组件库，包含以下组件：
-
-${componentNames.map(comp => `- ${comp}`).join('\n')}
-
-## 安装
-
-\`\`\`bash
-npm install @${LIB_NAMESPACE}/components
-\`\`\`
-
-## 使用
-
-### 全部导入
-
-\`\`\`js
-import MoluoxixiComponents from '@${LIB_NAMESPACE}/components'
-import '@${LIB_NAMESPACE}/components/style'
-
-app.use(MoluoxixiComponents)
-\`\`\`
-
-### 按需导入
-
-\`\`\`js
-import { ${componentNames[0]} } from '@${LIB_NAMESPACE}/components'
-import '@${LIB_NAMESPACE}/components/style'
-
-app.use(${componentNames[0]})
-\`\`\`
-`
-      await fsp.writeFile(resolve(outputDir, 'README.md'), readmeContent, 'utf-8')
-    }
-
-    console.log('整个组件库打包完成！')
-    return true
-  }
-  catch (error) {
-    console.error('组件库打包失败:', error)
+    console.error(` ${buildName} 打包失败:`, error)
     return false
   }
 }
@@ -1243,12 +1012,15 @@ async function doBuild(mode = 'all', version = '1.0.0') {
     if (mode === 'all') {
       // 打包所有单个组件和整个组件库
       const componentsSuccess = await buildAllComponents(version)
-      const librarySuccess = await buildComponentLibrary(version)
+      const { entry, outputDir, dependencies } = await getComponentConfig('')
+      // 打包整个组件库
+      const librarySuccess = await buildComponent('', version, entry, outputDir.replace('packages', ''), dependencies)
       return componentsSuccess && librarySuccess
     }
     else if (mode === 'library') {
-      // 只打包整个组件库
-      return await buildComponentLibrary(version)
+      const { entry, outputDir, dependencies } = await getComponentConfig('')
+      // 打包整个组件库
+      return await buildComponent('', version, entry, outputDir.replace('packages', ''), dependencies)
     }
     else {
       // 打包单个组件
