@@ -1211,35 +1211,6 @@ async function buildAllComponents(version = '1.0.0') {
 }
 
 /**
- * 打包单个组件
- * @param comp 组件名
- * @param version 版本号
- */
-async function buildSingleComponent(comp: string, version = '1.0.0') {
-  console.log(`开始打包单个组件: ${comp}`)
-
-  try {
-    // 确保输出目录存在
-    await fsp.mkdir(resolve(rootDir, LIB_NAMESPACE), { recursive: true })
-
-    const success = await buildComponent(comp, version)
-
-    if (success) {
-      console.log(`组件 ${comp} 打包完成！`)
-      return true
-    }
-    else {
-      console.error(`组件 ${comp} 打包失败`)
-      return false
-    }
-  }
-  catch (error) {
-    console.error(`组件 ${comp} 打包失败:`, error)
-    return false
-  }
-}
-
-/**
  * 打包函数 - 统一处理三种模式：all、library、单个组件
  * @param mode 打包模式：'all'、'library'、或组件名
  * @param version 版本号
@@ -1259,7 +1230,7 @@ async function doBuild(mode = 'all', version = '1.0.0') {
     }
     else {
       // 打包单个组件
-      return await buildSingleComponent(mode, version)
+      return await buildComponent(mode, version)
     }
   }
   catch (error) {
