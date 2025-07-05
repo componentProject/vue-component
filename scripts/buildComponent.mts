@@ -66,67 +66,29 @@ function getNextVersion(currentVersion: string, type: 'major' | 'minor' | 'patch
 }
 
 /**
- * 将 componentVersions 对象写回 TypeScript 文件
+ * 将版本号写回 version.json 文件
  * @param versions 要更新的版本号对象
  */
 async function writeComponentVersions(versions: Record<string, string>): Promise<boolean> {
   try {
-    const constantsPath = resolve(rootDir, 'src/constants/index.ts')
-    const content = await fsp.readFile(constantsPath, 'utf-8')
+    const versionPath = resolve(rootDir, 'version.json')
 
-    // 查找 componentVersions 对象的开始位置
-    const startMatch = content.match(/export\s+const\s+componentVersions\s*:\s*Record<string,\s*string>\s*=\s*\{/)
-    if (!startMatch) {
-      console.warn('未找到 componentVersions 对象定义')
-      return false
-    }
-
-    const startIndex = (startMatch.index ?? 0) + startMatch[0].length
-    let braceCount = 1
-    let endIndex = startIndex
-
-    // 找到匹配的结束大括号
-    for (let i = startIndex; i < content.length; i++) {
-      if (content[i] === '{')
-        braceCount++
-      if (content[i] === '}')
-        braceCount--
-      if (braceCount === 0) {
-        endIndex = i
-        break
-      }
-    }
-
-    if (braceCount !== 0) {
-      console.warn('componentVersions 对象格式不正确')
-      return false
-    }
-
-    // 解析现有的版本号
-    const existingContent = content.substring(startIndex, endIndex)
-    const existingVersions: Record<string, string> = {}
-    const versionMatches = existingContent.matchAll(/(\w+):\s*'([^']+)'/g)
-    for (const match of versionMatches) {
-      existingVersions[match[1]] = match[2]
+    // 读取现有版本文件
+    let existingVersions: Record<string, string> = {}
+    if (fs.existsSync(versionPath)) {
+      const content = await fsp.readFile(versionPath, 'utf-8')
+      existingVersions = JSON.parse(content)
     }
 
     // 合并版本号（新版本覆盖旧版本）
     const mergedVersions = { ...existingVersions, ...versions }
 
-    // 生成新的对象内容
-    const newObjectContent = Object.entries(mergedVersions)
-      .map(([key, value]) => `  ${key}: '${value}',`)
-      .join('\n')
-
-    // 替换对象内容
-    const newContent = `${content.substring(0, startIndex)}\n${newObjectContent}\n${content.substring(endIndex)}`
-
     // 写回文件
-    await fsp.writeFile(constantsPath, newContent, 'utf-8')
+    await fsp.writeFile(versionPath, JSON.stringify(mergedVersions, null, 2), 'utf-8')
     return true
   }
   catch (error) {
-    console.error(`写入 componentVersions 失败: ${(error as Error).message}`)
+    console.error(`写入版本号失败: ${(error as Error).message}`)
     return false
   }
 }
@@ -705,35 +667,24 @@ async function bundleComponentModule({
 }
 
 /**
- * 异步获取当前版本号
- * @param comp 组件名，如果为空则获取整个组件库的版本号
- * @returns 当前版本号
+ * 异步获取所有组件的版本号对象
+ * @returns 版本号对象 Record<string, string>
  */
-async function getCurrentVersion(comp: string): Promise<string> {
+async function getCurrentVersions(): Promise<Record<string, string>> {
   try {
-    const constantsPath = resolve(rootDir, 'src/constants/index.ts')
-    const content = await fsp.readFile(constantsPath, 'utf-8')
-
-    // 重新解析 componentVersions 对象，确保获取最新版本
-    const componentVersionsMatch = content.match(/export\s+const\s+componentVersions\s*:\s*Record<string,\s*string>\s*=\s*\{([\s\S]*?)\}/)
-    if (!componentVersionsMatch) {
-      return '0.0.1'
+    const versionPath = resolve(rootDir, 'version.json')
+    if (!fs.existsSync(versionPath)) {
+      // 如果不存在，创建默认版本文件
+      const defaultVersions: Record<string, string> = {}
+      await fsp.writeFile(versionPath, JSON.stringify(defaultVersions, null, 2), 'utf-8')
+      return defaultVersions
     }
-
-    const componentVersionsContent = componentVersionsMatch[1]
-    const versionMatches = componentVersionsContent.matchAll(/(\w+):\s*'([^']+)'/g)
-
-    const versions: Record<string, string> = {}
-    for (const match of versionMatches) {
-      versions[match[1]] = match[2]
-    }
-
-    const componentKey = comp || 'components'
-    return versions[componentKey] || '0.0.1'
+    const content = await fsp.readFile(versionPath, 'utf-8')
+    return JSON.parse(content)
   }
   catch (error) {
-    console.warn(`获取版本号失败: ${(error as Error).message}，使用默认版本 0.0.1`)
-    return '0.0.1'
+    console.warn(`获取版本号对象失败: ${(error as Error).message}`)
+    return {}
   }
 }
 
@@ -755,7 +706,8 @@ async function buildComponent(
   const buildName = comp || '组件库'
 
   // 1. 异步获取当前版本号
-  const currentVersion = await getCurrentVersion(comp)
+  const versions = await getCurrentVersions()
+  const currentVersion = versions[comp] || '0.0.1'
   const componentKey = comp || 'components'
 
   console.log(`\n========== 开始打包: ${buildName}，版本：${currentVersion} ==========`)
@@ -838,7 +790,7 @@ async function buildComponent(
 
     // 生成package.json
     const pkgJson: any = {
-      name: `@${LIB_NAMESPACE}${(comp ? `/${comp}` : '').toLowerCase()}`,
+      name: `@${LIB_NAMESPACE}${(comp ? `/${comp}` : '/components').toLowerCase()}`,
       version: currentVersion,
       description: `${comp} 组件`,
       main: 'lib/index.cjs',

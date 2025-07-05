@@ -3,6 +3,8 @@ test
 test.zip
 src/typings
 
+version.json
+
 moluoxixi
 docs
 .docs/.vitepress/cache
