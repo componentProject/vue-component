@@ -435,84 +435,10 @@ async function analyzeComponentDeps(comp: string) {
   }
   catch (error) {
     console.error(`分析组件 ${comp} 依赖失败:`, error)
-
-    // 降级到简单分析
-    console.log('降级使用简单依赖分析...')
-    return await simpleAnalyzeComponentDeps(comp)
-  }
-}
-
-/**
- * 简单的依赖分析方法（作为fallback）
- * @param comp 组件名称
- */
-async function simpleAnalyzeComponentDeps(comp: string) {
-  try {
-    const allComponents = await getComponentNames()
-    const componentDir = resolve(rootDir, `src/components/${comp}`)
-
-    const files = await glob(['**/*.{vue,ts,tsx,js,jsx}'], {
-      cwd: componentDir,
-      absolute: true,
-    })
-
-    const internalDeps = new Set()
-    const externalDeps = new Map()
-
-    // 读取项目依赖
-    const projectPkg = JSON.parse(fs.readFileSync(resolve(rootDir, 'package.json'), 'utf-8'))
-    const allProjectDeps = {
-      ...projectPkg.dependencies || {},
-      ...projectPkg.devDependencies || {},
-    }
-
-    for (const file of files) {
-      const content = await fsp.readFile(file, 'utf-8')
-
-      // 检查内部组件引用
-      for (const componentName of allComponents) {
-        if (componentName === comp)
-          continue
-
-        const patterns = [
-          new RegExp(`from\\s+['"]@/components/${componentName}['"\\s]`, 'g'),
-          new RegExp(`from\\s+['"]@/components/${componentName}/`, 'g'),
-          new RegExp(`<${componentName}[\\s>]`, 'g'),
-        ]
-
-        if (patterns.some(pattern => pattern.test(content))) {
-          internalDeps.add(componentName)
-        }
-      }
-
-      // 检查外部包引用
-      const importRegex = /import\s[^'"]*from\s+['"]([^'"]+)['"]/g
-      let match
-
-      // eslint-disable-next-line no-cond-assign
-      while ((match = importRegex.exec(content)) !== null) {
-        const importPath = match[1]
-
-        if (!importPath.startsWith('.') && !importPath.startsWith('/') && !importPath.startsWith('@/')) {
-          const packageName = importPath.startsWith('@')
-            ? importPath.split('/').slice(0, 2).join('/')
-            : importPath.split('/')[0]
-
-          if (allProjectDeps[packageName]) {
-            externalDeps.set(packageName, allProjectDeps[packageName])
-          }
-        }
-      }
-    }
-
     return {
-      internal: Array.from(internalDeps).sort() as string[],
-      external: Object.fromEntries(externalDeps),
+      internal: [],
+      external: {},
     }
-  }
-  catch (error) {
-    console.error('简单依赖分析也失败:', error)
-    return { internal: [], external: {} }
   }
 }
 
@@ -656,6 +582,155 @@ function createComponentReferencePlugin(internalDeps: string[], currentComponent
 }
 
 /**
+ * 创建基础Vite配置
+ * @param comp 组件名
+ * @param internalDeps 内部组件依赖列表
+ * @returns 基础配置对象
+ */
+function createBaseConfig(comp: string, internalDeps: string[]) {
+  return {
+    root: rootDir,
+    configFile: false,
+    publicDir: false,
+    logLevel: 'info',
+    plugins: [
+      // 添加路径替换插件，将内部组件引用转换为外部包引用
+      createComponentReferencePlugin(internalDeps, comp),
+      pluginVue({
+        isProduction: true,
+      }),
+      vueJsx(),
+      // 添加类型声明生成插件
+      // dts({
+      //   vue: true,
+      //   entryRoot: dirname(entry),
+      //   outDir: [`${LIB_NAMESPACE}/packages/${comp}/es`, `${LIB_NAMESPACE}/packages/${comp}/lib`],
+      //   include: [`src/components/${comp}/**/*`],
+      //   exclude: [
+      //     '**/*.stories.*',
+      //     '**/*.test.*',
+      //     '**/*.spec.*',
+      //     '**/node_modules/**',
+      //     '**/dist/**',
+      //     '**/temp/**',
+      //   ],
+      //   skipDiagnostics: true,
+      //   copyDtsFiles: true,
+      //   cleanVueFileName: true,
+      //   insertTypesEntry: true,
+      //   staticImport: true,
+      //   excludeExternals: true,
+      // }),
+    ],
+    resolve: {
+      extensions: ['.js', '.jsx', '.ts', '.tsx', '.vue'],
+      alias: {
+        '@': resolve(rootDir, './src'),
+      },
+    },
+    css: {
+      postcss: {
+        plugins: [
+          autoprefixer(),
+          // 添加tailwindcss支持 - 使用内联配置
+          {
+            postcssPlugin: 'tailwindcss',
+            config: {
+              content: ['./src/**/*.{vue,js,ts,jsx,tsx}'],
+              theme: {
+                extend: {},
+              },
+              plugins: [],
+            },
+          },
+        ],
+      },
+    },
+  }
+}
+
+/**
+ * 通用模块打包函数
+ * @param {object} options - 配置选项
+ * @param {string} options.comp - 组件名
+ * @param {string} options.entry - 入口文件
+ * @param {string} options.outDir - 输出目录
+ * @param {'es'|'cjs'} options.format - 模块格式：'es' 或 'cjs'
+ * @param {Record<string, string>} options.componentDependencies - 组件依赖
+ * @param {Record<string, string>} options.globals - 全局变量配置
+ * @param {any} options.baseConfig - 基础配置
+ * @param {string} options.entryFileNames - 入口文件名格式
+ * @param {string} options.chunkFileNames - 分块文件名格式
+ * @param {string} [options.exportsType] - 导出类型（仅CJS需要）
+ */
+async function bundleComponentModule({
+  comp,
+  entry,
+  outDir,
+  format,
+  componentDependencies,
+  globals,
+  baseConfig,
+  entryFileNames,
+  chunkFileNames,
+  exportsType,
+}: {
+  comp: string
+  entry: string
+  outDir: string
+  format: 'es' | 'cjs'
+  componentDependencies: Record<string, string>
+  globals: Record<string, string>
+  baseConfig: any
+  entryFileNames: string
+  chunkFileNames: string
+  exportsType?: string
+}) {
+  await build({
+    ...baseConfig,
+    build: {
+      outDir,
+      emptyOutDir: true,
+      minify: false, // 关闭压缩，方便调试
+      cssCodeSplit: false, // 关闭CSS代码分割，避免文件拆分
+      lib: {
+        entry,
+        name: `/${comp || ''}`,
+        formats: [format],
+      },
+      rollupOptions: {
+        external: (id: string) => {
+          // 检查外部依赖
+          const isExternalDep = Object.keys(componentDependencies).some(dep => id === dep || id.startsWith(`${dep}/`))
+          // 检查Vue相关依赖
+          const isVueDep = ['vue', '@vue/runtime-core', '@vue/runtime-dom'].includes(id)
+          // 检查@/components路径（内部组件依赖）
+          const isInternalComponent = id.startsWith('@/components/')
+
+          return isExternalDep || isVueDep || isInternalComponent
+        },
+        output: {
+          preserveModules: true,
+          preserveModulesRoot: resolve(rootDir, `src/components/${comp}`),
+          entryFileNames,
+          chunkFileNames,
+          assetFileNames: (assetInfo) => {
+            const name = assetInfo.names?.[0] || ''
+            if (name.endsWith('.css')) {
+              return 'style/[name][extname]'
+            }
+            return '[name][extname]'
+          },
+          globals,
+          ...(exportsType ? { exports: exportsType } : {}),
+          manualChunks: undefined, // 禁用手动分块，避免文件拆分
+        },
+      },
+    },
+  })
+}
+
+/**
  * 专业的单组件打包函数 - 参考Element Plus和Ant Design
  * @param comp 组件名
  * @param version 版本号
@@ -689,7 +764,7 @@ async function buildComponent(comp: string, version = '1.0.0') {
     const componentDependencies: Record<string, string> = {}
 
     // 分析组件依赖
-    let deps: { internal: string[], external: Record<string, string> } = { internal: [], external: {} }
+    let deps: { internal: string[], external: Record<string, string> } | undefined = { internal: [], external: {} }
     try {
       console.log(`分析组件 ${comp} 依赖...`)
       deps = await analyzeComponentDeps(comp)
@@ -729,152 +804,34 @@ async function buildComponent(comp: string, version = '1.0.0') {
       }
     }
 
-    // 基础配置
-    const baseConfig: any = {
-      root: rootDir,
-      configFile: false,
-      publicDir: false,
-      logLevel: 'info',
-      plugins: [
-        // 添加路径替换插件，将内部组件引用转换为外部包引用
-        createComponentReferencePlugin(deps.internal, comp),
-        pluginVue({
-          isProduction: true,
-        }),
-        vueJsx(),
-        // 添加类型声明生成插件
-        // dts({
-        //   vue: true,
-        //   entryRoot: dirname(entry),
-        //   outDir: [`${LIB_NAMESPACE}/packages/${comp}/es`, `${LIB_NAMESPACE}/packages/${comp}/lib`],
-        //   include: [`src/components/${comp}/**/*`],
-        //   exclude: [
-        //     '**/*.stories.*',
-        //     '**/*.test.*',
-        //     '**/*.spec.*',
-        //     '**/node_modules/**',
-        //     '**/dist/**',
-        //     '**/temp/**',
-        //   ],
-        //   skipDiagnostics: true,
-        //   copyDtsFiles: true,
-        //   cleanVueFileName: true,
-        //   insertTypesEntry: true,
-        //   staticImport: true,
-        //   excludeExternals: true,
-        // }),
-      ],
-      resolve: {
-        extensions: ['.js', '.jsx', '.ts', '.tsx', '.vue'],
-        alias: {
-          '@': resolve(rootDir, './src'),
-        },
-      },
-      css: {
-        postcss: {
-          plugins: [
-            autoprefixer(),
-            // 添加tailwindcss支持 - 使用内联配置
-            {
-              postcssPlugin: 'tailwindcss',
-              config: {
-                content: ['./src/**/*.{vue,js,ts,jsx,tsx}'],
-                theme: {
-                  extend: {},
-                },
-                plugins: [],
-              },
-            },
-          ],
-        },
-      },
-    }
+    // 创建基础配置
+    const baseConfig = createBaseConfig(comp, deps.internal)
 
     // 打包ES模块
-    await build({
-      ...baseConfig,
-      build: {
-        outDir: `${LIB_NAMESPACE}/packages/${comp}/es`,
-        emptyOutDir: true,
-        minify: false, // 关闭压缩，方便调试
-        cssCodeSplit: false, // 关闭CSS代码分割，避免文件拆分
-        lib: {
-          entry,
-          name: comp,
-          formats: ['es'],
-        },
-        rollupOptions: {
-          external: (id) => {
-            // 检查外部依赖
-            const isExternalDep = Object.keys(componentDependencies).some(dep => id === dep || id.startsWith(`${dep}/`))
-            // 检查Vue相关依赖
-            const isVueDep = ['vue', '@vue/runtime-core', '@vue/runtime-dom'].includes(id)
-            // 检查@/components路径（内部组件依赖）
-            const isInternalComponent = id.startsWith('@/components/')
-
-            return isExternalDep || isVueDep || isInternalComponent
-          },
-          output: {
-            preserveModules: true,
-            preserveModulesRoot: resolve(rootDir, `src/components/${comp}`),
-            entryFileNames: `[name].mjs`,
-            chunkFileNames: `[name].mjs`,
-            assetFileNames: (assetInfo) => {
-              const name = assetInfo.names?.[0] || ''
-              if (name.endsWith('.css')) {
-                return 'style/[name][extname]'
-              }
-              return '[name][extname]'
-            },
-            globals,
-            manualChunks: undefined, // 禁用手动分块，避免文件拆分
-          },
-        },
-      },
+    await bundleComponentModule({
+      comp,
+      entry,
+      outDir: `${LIB_NAMESPACE}/packages/${comp}/es`,
+      format: 'es',
+      componentDependencies,
+      globals,
+      baseConfig,
+      entryFileNames: `[name].mjs`,
+      chunkFileNames: `[name].mjs`,
     })
 
     // 打包CJS模块
-    await build({
-      ...baseConfig,
-      build: {
-        outDir: `${LIB_NAMESPACE}/packages/${comp}/lib`,
-        emptyOutDir: true,
-        minify: false, // 关闭压缩，方便调试
-        cssCodeSplit: false, // 关闭CSS代码分割，避免文件拆分
-        lib: {
-          entry,
-          name: comp,
-          formats: ['cjs'],
-        },
-        rollupOptions: {
-          external: (id) => {
-            // 检查外部依赖
-            const isExternalDep = Object.keys(componentDependencies).some(dep => id === dep || id.startsWith(`${dep}/`))
-            // 检查Vue相关依赖
-            const isVueDep = ['vue', '@vue/runtime-core', '@vue/runtime-dom'].includes(id)
-            // 检查@/components路径（内部组件依赖）
-            const isInternalComponent = id.startsWith('@/components/')
-
-            return isExternalDep || isVueDep || isInternalComponent
-          },
-          output: {
-            preserveModules: true,
-            preserveModulesRoot: resolve(rootDir, `src/components/${comp}`),
-            entryFileNames: `[name].cjs`,
-            chunkFileNames: `[name].cjs`,
-            assetFileNames: (assetInfo) => {
-              const name = assetInfo.names?.[0] || ''
-              if (name.endsWith('.css')) {
-                return 'style/[name][extname]'
-              }
-              return '[name][extname]'
-            },
-            exports: 'named',
-            globals,
-            manualChunks: undefined, // 禁用手动分块，避免文件拆分
-          },
-        },
-      },
+    await bundleComponentModule({
+      comp,
+      entry,
+      outDir: `${LIB_NAMESPACE}/packages/${comp}/lib`,
+      format: 'cjs',
+      componentDependencies,
+      globals,
+      baseConfig,
+      entryFileNames: `[name].cjs`,
+      chunkFileNames: `[name].cjs`,
+      exportsType: 'named',
     })
 
     // 复制README.md
