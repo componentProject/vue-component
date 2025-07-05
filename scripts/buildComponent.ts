@@ -633,6 +633,19 @@ function createBaseConfig(comp: string, internalDeps: string[]) {
           tailwindcss(),
         ],
       },
+      preprocessorOptions: {
+        scss: {
+          // 使用legacy-compiler避免initAsyncCompiler错误
+          api: 'legacy-compiler',
+          additionalData(content: string, filename: string) {
+            if (filename.includes('element')) {
+              const addStr = `$namespace: el`
+              return `${addStr}\n${content}`
+            }
+            return content
+          },
+        },
+      },
     },
   }
 }
