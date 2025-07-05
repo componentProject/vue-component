@@ -66,45 +66,62 @@ function getNextVersion(currentVersion, type = 'patch') {
 /**
  * 获取当前版本号
  * @param {string} comp 组件名，如果为空则获取整个组件库的版本号
- * @returns {string} 当前版本号，默认为2.1.0
+ * @returns {string} 当前版本号
  */
 function getCurrentVersion(comp = '') {
   try {
-    // 优先从组件库获取版本号，确保一致性
-    const libraryPath = resolve(rootDir, `${LIB_NAMESPACE}/package.json`)
+    // 从 constants 文件中读取版本号映射
+    const constantsPath = resolve(rootDir, 'src/constants/index.ts')
+    if (fs.existsSync(constantsPath)) {
+      const constantsContent = fs.readFileSync(constantsPath, 'utf-8')
 
-    if (fs.existsSync(libraryPath)) {
-      const pkgContent = fs.readFileSync(libraryPath, 'utf-8')
-      const pkg = JSON.parse(pkgContent)
-      return pkg.version || '2.1.0'
-    }
+      // 查找对应的组件版本号
+      const componentKey = comp || 'components'
+      const versionRegex = new RegExp(`['"]${componentKey}['"]:\\s*['"]([^'"]+)['"]`)
+      const match = constantsContent.match(versionRegex)
 
-    // 如果组件库不存在，则尝试从指定组件获取
-    if (comp) {
-      const packagePath = resolve(rootDir, `${LIB_NAMESPACE}/${comp}/package.json`)
-      if (fs.existsSync(packagePath)) {
-        const pkgContent = fs.readFileSync(packagePath, 'utf-8')
-        const pkg = JSON.parse(pkgContent)
-        return pkg.version || '2.1.0'
+      if (match) {
+        return match[1]
       }
     }
 
-    // 如果组件库和组件都不存在，尝试从项目package.json获取
-    const projectPackagePath = resolve(rootDir, 'package.json')
-    if (fs.existsSync(projectPackagePath)) {
-      const pkgContent = fs.readFileSync(projectPackagePath, 'utf-8')
-      const pkg = JSON.parse(pkgContent)
-      // 如果项目package.json有version字段，使用它，否则使用默认值
-      if (pkg.version) {
-        return pkg.version
-      }
-    }
-
-    // 如果都不存在，返回默认版本号2.1.0，确保高于之前发布的版本
-    return '2.1.0'
+    // 如果无法从 constants 读取，返回默认版本号
+    return comp ? '1.0.0' : '2.1.0'
   }
-  catch {
-    return '2.1.0' // 默认版本号
+  catch (error) {
+    console.warn(`读取版本号失败: ${error.message}`)
+    return comp ? '1.0.0' : '2.1.0'
+  }
+}
+
+/**
+ * 更新版本号
+ * @param {string} comp 组件名，如果为空则更新整个组件库的版本号
+ * @param {string} newVersion 新版本号
+ */
+function updateVersion(comp = '', newVersion) {
+  try {
+    const constantsPath = resolve(rootDir, 'src/constants/index.ts')
+    if (!fs.existsSync(constantsPath)) {
+      console.warn('constants 文件不存在，无法更新版本号')
+      return false
+    }
+
+    const constantsContent = fs.readFileSync(constantsPath, 'utf-8')
+    const componentKey = comp || 'components'
+
+    // 替换版本号
+    const versionRegex = new RegExp(`(['"]${componentKey}['"]:\\s*['"])[^'"]*(['"])`)
+    const newConstantsContent = constantsContent.replace(versionRegex, `$1${newVersion}$2`)
+
+    // 写回文件
+    fs.writeFileSync(constantsPath, newConstantsContent, 'utf-8')
+    console.log(`✓ 已更新 ${componentKey} 版本号为 ${newVersion}`)
+    return true
+  }
+  catch (error) {
+    console.error(`更新版本号失败: ${error.message}`)
+    return false
   }
 }
 
@@ -569,7 +586,8 @@ function createComponentReferencePlugin(internalDeps, currentComponent) {
           hasChanges = true
           if (replacement.isSelfReference) {
             console.log(`✓ 转换组件自引用: ${replacement.oldPath} -> ${replacement.newPath} (文件: ${id})`)
-          } else {
+          }
+          else {
             console.log(`✓ 转换相对路径引用 ${replacement.componentName} 为 @/components/${replacement.componentName} 在文件 ${id}`)
           }
         }
@@ -620,7 +638,7 @@ async function buildComponent(comp, version = '1.0.0') {
 
   try {
     // 清空目录
-    const outputDir = resolve(rootDir, `${LIB_NAMESPACE}/${comp}`)
+    const outputDir = resolve(rootDir, `${LIB_NAMESPACE}/packages/${comp}`)
     await fsp.rm(outputDir, { recursive: true, force: true }).catch(() => {})
     await fsp.mkdir(outputDir, { recursive: true })
 
@@ -701,7 +719,7 @@ async function buildComponent(comp, version = '1.0.0') {
         // dts({
         //   vue: true,
         //   entryRoot: dirname(entry),
-        //   outDir: [`${LIB_NAMESPACE}/${comp}/es`, `${LIB_NAMESPACE}/${comp}/lib`],
+        //   outDir: [`${LIB_NAMESPACE}/packages/${comp}/es`, `${LIB_NAMESPACE}/packages/${comp}/lib`],
         //   include: [`src/components/${comp}/**/*`],
         //   exclude: [
         //     '**/*.stories.*',
@@ -749,7 +767,7 @@ async function buildComponent(comp, version = '1.0.0') {
     await build({
       ...baseConfig,
       build: {
-        outDir: `${LIB_NAMESPACE}/${comp}/es`,
+        outDir: `${LIB_NAMESPACE}/packages/${comp}/es`,
         emptyOutDir: true,
         minify: false, // 关闭压缩，方便调试
         cssCodeSplit: false, // 关闭CSS代码分割，避免文件拆分
@@ -791,7 +809,7 @@ async function buildComponent(comp, version = '1.0.0') {
     await build({
       ...baseConfig,
       build: {
-        outDir: `${LIB_NAMESPACE}/${comp}/lib`,
+        outDir: `${LIB_NAMESPACE}/packages/${comp}/lib`,
         emptyOutDir: true,
         minify: false, // 关闭压缩，方便调试
         cssCodeSplit: false, // 关闭CSS代码分割，避免文件拆分
@@ -985,8 +1003,10 @@ async function buildComponentLibrary(version = '1.0.0') {
               || ['vue', '@vue/runtime-core', '@vue/runtime-dom'].includes(id)
           },
           output: {
-            entryFileNames: 'index.mjs',
-            chunkFileNames: '[name].mjs',
+            preserveModules: true,
+            preserveModulesRoot: resolve(rootDir, `src/components`),
+            entryFileNames: `[name].mjs`,
+            chunkFileNames: `[name].mjs`,
             assetFileNames: (assetInfo) => {
               if (assetInfo.name && assetInfo.name.endsWith('.css')) {
                 return 'style/[name][extname]'
@@ -1149,7 +1169,7 @@ async function publishComponent(comp = '', version = '') {
     }
 
     // 发布组件
-    const packageDir = comp ? `${LIB_NAMESPACE}/${comp}` : LIB_NAMESPACE
+    const packageDir = comp ? `${LIB_NAMESPACE}/packages/${comp}` : LIB_NAMESPACE
     console.log(`开始发布 ${pkg.name}@${pkg.version}...`)
 
     // 使用--tag参数来避免版本号冲突问题
@@ -1336,7 +1356,7 @@ async function main() {
   }
 
   // 获取当前版本号
-  const currentVersion = getCurrentVersion()
+  const currentVersion = getCurrentVersion(mode === 'all' ? '' : mode)
   // 计算新版本号
   const newVersion = getNextVersion(currentVersion, versionType)
   console.log(`版本号: ${currentVersion} -> ${newVersion}`)
@@ -1349,11 +1369,19 @@ async function main() {
     case 'build':
       // 只构建
       buildSuccess = await doBuild(mode, newVersion)
+      if (buildSuccess) {
+        // 构建成功后更新版本号
+        updateVersion(mode === 'all' ? '' : mode, newVersion)
+      }
       return buildSuccess ? 0 : 1
 
     case 'publish':
       // 只发布（假设已经构建好了）
       publishSuccess = await doPublish(mode, newVersion)
+      if (publishSuccess) {
+        // 发布成功后更新版本号
+        updateVersion(mode === 'all' ? '' : mode, newVersion)
+      }
       return publishSuccess ? 0 : 1
 
     case 'build-publish':
@@ -1365,6 +1393,10 @@ async function main() {
       }
 
       publishResult = await doPublish(mode, newVersion)
+      if (publishResult) {
+        // 发布成功后更新版本号
+        updateVersion(mode === 'all' ? '' : mode, newVersion)
+      }
       return publishResult ? 0 : 1
 
     default:
