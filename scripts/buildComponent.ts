@@ -1,4 +1,3 @@
-// 先引入src/constants中的componentVersions变量
 import { componentVersions } from '@/constants'
 import path, { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
