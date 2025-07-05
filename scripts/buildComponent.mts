@@ -707,8 +707,8 @@ async function buildComponent(
 
   // 1. 异步获取当前版本号
   const versions = await getCurrentVersions()
-  const currentVersion = versions[comp] || '0.0.1'
   const componentKey = comp || 'components'
+  const currentVersion = versions[componentKey] || '0.0.1'
 
   console.log(`\n========== 开始打包: ${buildName}，版本：${currentVersion} ==========`)
 
