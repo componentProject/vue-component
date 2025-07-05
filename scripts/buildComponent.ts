@@ -1,3 +1,5 @@
+// 先引入src/constants中的componentVersions变量
+import { componentVersions } from '../src/constants/index'
 import path, { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import fs from 'node:fs'
@@ -35,7 +37,7 @@ async function getComponentNames() {
  * @param {string} type 版本类型：major, minor, patch
  * @returns {string} 下一个版本号
  */
-function getNextVersion(currentVersion, type = 'patch') {
+function getNextVersion(currentVersion: string, type: 'major' | 'minor' | 'patch' = 'patch'): string {
   // 解析当前版本号
   const [major, minor, patch] = currentVersion.split('.').map(Number)
 
@@ -64,64 +66,98 @@ function getNextVersion(currentVersion, type = 'patch') {
 }
 
 /**
- * 获取当前版本号
- * @param {string} comp 组件名，如果为空则获取整个组件库的版本号
- * @returns {string} 当前版本号
+ * 将 componentVersions 对象写回 TypeScript 文件
+ * @param {Record<string, string>} versions 版本号对象
  */
-function getCurrentVersion(comp = '') {
+function writeComponentVersions(versions: Record<string, string>): boolean {
   try {
-    // 从 constants 文件中读取版本号映射
     const constantsPath = resolve(rootDir, 'src/constants/index.ts')
-    if (fs.existsSync(constantsPath)) {
-      const constantsContent = fs.readFileSync(constantsPath, 'utf-8')
+    const content = fs.readFileSync(constantsPath, 'utf-8')
 
-      // 查找对应的组件版本号
-      const componentKey = comp || 'components'
-      const versionRegex = new RegExp(`['"]${componentKey}['"]:\\s*['"]([^'"]+)['"]`)
-      const match = constantsContent.match(versionRegex)
+    // 查找 componentVersions 对象的开始位置
+    const startMatch = content.match(/export\s+const\s+componentVersions\s*:\s*Record<string,\s*string>\s*=\s*\{/)
+    if (!startMatch) {
+      console.warn('未找到 componentVersions 对象定义')
+      return false
+    }
 
-      if (match) {
-        return match[1]
+    const startIndex = startMatch.index + startMatch[0].length
+    let braceCount = 1
+    let endIndex = startIndex
+
+    // 找到匹配的结束大括号
+    for (let i = startIndex; i < content.length; i++) {
+      if (content[i] === '{')
+        braceCount++
+      if (content[i] === '}')
+        braceCount--
+      if (braceCount === 0) {
+        endIndex = i
+        break
       }
     }
 
-    // 如果无法从 constants 读取，返回默认版本号
-    return comp ? '1.0.0' : '2.1.0'
+    if (braceCount !== 0) {
+      console.warn('componentVersions 对象格式不正确')
+      return false
+    }
+
+    // 生成新的对象内容
+    const newObjectContent = Object.entries(versions)
+      .map(([key, value]) => `  ${key}: '${value}',`)
+      .join('\n')
+
+    // 替换对象内容
+    const newContent = `${content.substring(0, startIndex)}\n${newObjectContent}\n${content.substring(endIndex)}`
+
+    // 写回文件
+    fs.writeFileSync(constantsPath, newContent, 'utf-8')
+    return true
   }
   catch (error) {
-    console.warn(`读取版本号失败: ${error.message}`)
-    return comp ? '1.0.0' : '2.1.0'
+    console.error(`写入 componentVersions 失败: ${error.message}`)
+    return false
   }
 }
 
 /**
- * 更新版本号
- * @param {string} comp 组件名，如果为空则更新整个组件库的版本号
- * @param {string} newVersion 新版本号
+ * 获取当前版本号并更新为下一个版本号
+ * @param {string} comp 组件名，如果为空则获取整个组件库的版本号
+ * @param {string} versionType 版本类型：major, minor, patch
+ * @returns {string} 新的版本号
  */
-function updateVersion(comp = '', newVersion) {
+function getCurrentVersionAndUpdate(comp = '', versionType: 'major' | 'minor' | 'patch' = 'patch'): string {
   try {
-    const constantsPath = resolve(rootDir, 'src/constants/index.ts')
-    if (!fs.existsSync(constantsPath)) {
-      console.warn('constants 文件不存在，无法更新版本号')
-      return false
-    }
+    // 1. 先引入src/constants中的componentVersions变量（已在文件顶部import）
+    // 2. 进行深拷贝为一个新对象
+    const newVersions = JSON.parse(JSON.stringify(componentVersions)) as Record<string, string>
 
-    const constantsContent = fs.readFileSync(constantsPath, 'utf-8')
+    // 3. 通过对象的key匹配
     const componentKey = comp || 'components'
 
-    // 替换版本号
-    const versionRegex = new RegExp(`(['"]${componentKey}['"]:\\s*['"])[^'"]*(['"])`)
-    const newConstantsContent = constantsContent.replace(versionRegex, `$1${newVersion}$2`)
+    // 4. 匹配不到等于获取不到版本，版本号默认为0.0.1
+    const currentVersion = newVersions[componentKey] || '0.0.1'
 
-    // 写回文件
-    fs.writeFileSync(constantsPath, newConstantsContent, 'utf-8')
-    console.log(`✓ 已更新 ${componentKey} 版本号为 ${newVersion}`)
-    return true
+    // 5. 匹配的到则版本号+1
+    const newVersion = getNextVersion(currentVersion, versionType)
+
+    // 6. 更新新对象
+    newVersions[componentKey] = newVersion
+
+    // 7. 将新对象写入src/constants中的componentVersions变量中
+    const success = writeComponentVersions(newVersions)
+    if (success) {
+      console.log(`✓ 已更新 ${componentKey} 版本号: ${currentVersion} -> ${newVersion}`)
+    }
+    else {
+      console.warn(`更新 ${componentKey} 版本号失败`)
+    }
+
+    return newVersion
   }
   catch (error) {
-    console.error(`更新版本号失败: ${error.message}`)
-    return false
+    console.error(`版本号管理失败: ${error.message}`)
+    return comp ? '0.0.1' : '0.0.1'
   }
 }
 
@@ -1355,11 +1391,9 @@ async function main() {
     }
   }
 
-  // 获取当前版本号
-  const currentVersion = getCurrentVersion(mode === 'all' ? '' : mode)
-  // 计算新版本号
-  const newVersion = getNextVersion(currentVersion, versionType)
-  console.log(`版本号: ${currentVersion} -> ${newVersion}`)
+  // 获取并更新版本号
+  const newVersion = getCurrentVersionAndUpdate(mode === 'all' ? '' : mode, versionType)
+  console.log(`使用版本号: ${newVersion}`)
 
   // 声明变量，避免在case块中声明
   let buildSuccess, publishSuccess, buildResult, publishResult
@@ -1369,19 +1403,11 @@ async function main() {
     case 'build':
       // 只构建
       buildSuccess = await doBuild(mode, newVersion)
-      if (buildSuccess) {
-        // 构建成功后更新版本号
-        updateVersion(mode === 'all' ? '' : mode, newVersion)
-      }
       return buildSuccess ? 0 : 1
 
     case 'publish':
       // 只发布（假设已经构建好了）
       publishSuccess = await doPublish(mode, newVersion)
-      if (publishSuccess) {
-        // 发布成功后更新版本号
-        updateVersion(mode === 'all' ? '' : mode, newVersion)
-      }
       return publishSuccess ? 0 : 1
 
     case 'build-publish':
@@ -1393,10 +1419,6 @@ async function main() {
       }
 
       publishResult = await doPublish(mode, newVersion)
-      if (publishResult) {
-        // 发布成功后更新版本号
-        updateVersion(mode === 'all' ? '' : mode, newVersion)
-      }
       return publishResult ? 0 : 1
 
     default:
