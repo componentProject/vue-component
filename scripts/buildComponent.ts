@@ -1181,9 +1181,6 @@ async function buildAllComponents(version = '1.0.0') {
   console.log('开始打包所有单个组件...')
 
   try {
-    // 确保输出目录存在
-    await fsp.mkdir(resolve(rootDir, LIB_NAMESPACE), { recursive: true })
-
     // 获取所有组件名
     const componentNames = await getComponentNames()
     console.log(`找到 ${componentNames?.length || 0} 个组件:`, componentNames)
