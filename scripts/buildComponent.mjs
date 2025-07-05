@@ -6,7 +6,7 @@ import glob from 'fast-glob'
 import { build } from 'vite'
 import pluginVue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
-import dts from 'vite-plugin-dts'
+// import dts from 'vite-plugin-dts'
 import autoprefixer from 'autoprefixer'
 import process from 'node:process'
 import { execSync } from 'node:child_process'
@@ -469,7 +469,7 @@ async function simpleAnalyzeComponentDeps(comp) {
 }
 
 /**
- * 自定义插件：转换内部组件引用为外部npm包引用
+ * 自定义插件：将相对路径转换为@/components路径引用
  * @param {Array<string>} internalDeps 内部组件依赖列表
  * @returns {object} Rollup插件对象
  */
@@ -486,44 +486,7 @@ function createComponentReferencePlugin(internalDeps) {
       let transformedCode = code
       let hasChanges = false
 
-      // 为每个内部依赖创建转换规则
-      for (const dep of internalDeps) {
-        // 1. 转换 @/components 路径引用
-        const aliasPatterns = [
-          // import ... from '@/components/ComponentName'
-          {
-            from: new RegExp(`(import\\s+[^"']+from\\s+)['"]@/components/${dep}['"]`, 'g'),
-            to: `$1'@${LIB_NAMESPACE}/${dep.toLowerCase()}'`,
-          },
-          // import ... from '@/components/ComponentName/src/index.vue'
-          {
-            from: new RegExp(`(import\\s+[^"']+from\\s+)['"]@/components/${dep}/src/index\\.vue['"]`, 'g'),
-            to: `$1'@${LIB_NAMESPACE}/${dep.toLowerCase()}'`,
-          },
-          // import ... from '@/components/ComponentName/index.ts'
-          {
-            from: new RegExp(`(import\\s+[^"']+from\\s+)['"]@/components/${dep}/index\\.ts['"]`, 'g'),
-            to: `$1'@${LIB_NAMESPACE}/${dep.toLowerCase()}'`,
-          },
-          // import ... from '@/components/ComponentName/'
-          {
-            from: new RegExp(`(import\\s+[^"']+from\\s+)['"]@/components/${dep}/['"]`, 'g'),
-            to: `$1'@${LIB_NAMESPACE}/${dep.toLowerCase()}'`,
-          },
-        ]
-
-        // 应用别名路径转换规则
-        for (const pattern of aliasPatterns) {
-          const newCode = transformedCode.replace(pattern.from, pattern.to)
-          if (newCode !== transformedCode) {
-            transformedCode = newCode
-            hasChanges = true
-            console.log(`✓ 转换@路径引用 ${dep} 在文件 ${id}`)
-          }
-        }
-      }
-
-      // 2. 转换相对路径引用 - 使用真正的路径解析
+      // 转换相对路径引用为@/components路径 - 使用真正的路径解析
       const importRegex = /import\s[^"']*from\s+['"]([^'"]+)['"]/g
       let match
       const replacements = []
@@ -551,10 +514,10 @@ function createComponentReferencePlugin(internalDeps) {
 
               // 验证是否是内部依赖中的组件
               if (potentialComponentName && internalDeps.includes(potentialComponentName)) {
-                // 记录需要替换的内容
+                // 记录需要替换的内容 - 转换为@/components路径
                 replacements.push({
                   oldImport: match[0],
-                  newImport: match[0].replace(importPath, `@${LIB_NAMESPACE}/${potentialComponentName.toLowerCase()}`),
+                  newImport: match[0].replace(importPath, `@/components/${potentialComponentName}`),
                   componentName: potentialComponentName,
                 })
               }
@@ -573,7 +536,7 @@ function createComponentReferencePlugin(internalDeps) {
         if (newCode !== transformedCode) {
           transformedCode = newCode
           hasChanges = true
-          console.log(`✓ 转换相对路径引用 ${replacement.componentName} 在文件 ${id}`)
+          console.log(`✓ 转换相对路径引用 ${replacement.componentName} 为 @/components/${replacement.componentName} 在文件 ${id}`)
         }
       }
 
@@ -585,11 +548,9 @@ function createComponentReferencePlugin(internalDeps) {
       const originalExternal = opts.external || (() => false)
 
       opts.external = (id, parentId, isResolved) => {
-        // 检查是否是内部组件引用
-        for (const dep of internalDeps) {
-          if (id === `@${LIB_NAMESPACE}/${dep.toLowerCase()}` || id.startsWith(`@${LIB_NAMESPACE}/${dep.toLowerCase()}/`)) {
-            return true // 标记为外部依赖
-          }
+        // 检查是否是@/components路径引用
+        if (id.startsWith('@/components/')) {
+          return true // 标记为外部依赖
         }
 
         // 调用原始的external函数
@@ -653,10 +614,8 @@ async function buildComponent(comp, version = '1.0.0') {
         console.log(`- 内部组件: ${deps.internal.join(', ') || '无'}`)
         console.log(`- 外部依赖: ${Object.keys(deps.external).join(', ') || '无'}`)
 
-        // 为每个内部组件依赖添加版本约束
-        for (const dep of deps.internal) {
-          componentDependencies[`@${LIB_NAMESPACE}/${dep.toLowerCase()}`] = `^${version}`
-        }
+        // 内部组件依赖保持为@/components路径，不添加到dependencies中
+        // 它们会在external配置中被处理
 
         // 为每个外部依赖添加版本约束
         for (const [pkg, pkgVersion] of Object.entries(deps.external)) {
@@ -674,6 +633,14 @@ async function buildComponent(comp, version = '1.0.0') {
       console.warn(`分析组件依赖失败，跳过依赖分析: ${error.message}`)
     }
 
+    // 构建 globals 配置
+    const globals = {
+      vue: 'Vue',
+    }
+    for (const compName of deps.internal) {
+      globals[`@/components/${compName}`] = `@${LIB_NAMESPACE}/${compName.toLowerCase()}`
+    }
+
     // 基础配置
     const baseConfig = {
       root: rootDir,
@@ -688,26 +655,26 @@ async function buildComponent(comp, version = '1.0.0') {
         }),
         vueJsx(),
         // 添加类型声明生成插件
-        dts({
-          vue: true,
-          entryRoot: dirname(entry),
-          outDir: [`${LIB_NAMESPACE}/${comp}/es`, `${LIB_NAMESPACE}/${comp}/lib`],
-          include: [`src/components/${comp}/**/*`],
-          exclude: [
-            '**/*.stories.*',
-            '**/*.test.*',
-            '**/*.spec.*',
-            '**/node_modules/**',
-            '**/dist/**',
-            '**/temp/**',
-          ],
-          skipDiagnostics: true,
-          copyDtsFiles: true,
-          cleanVueFileName: true,
-          insertTypesEntry: true,
-          staticImport: true,
-          excludeExternals: true,
-        }),
+        // dts({
+        //   vue: true,
+        //   entryRoot: dirname(entry),
+        //   outDir: [`${LIB_NAMESPACE}/${comp}/es`, `${LIB_NAMESPACE}/${comp}/lib`],
+        //   include: [`src/components/${comp}/**/*`],
+        //   exclude: [
+        //     '**/*.stories.*',
+        //     '**/*.test.*',
+        //     '**/*.spec.*',
+        //     '**/node_modules/**',
+        //     '**/dist/**',
+        //     '**/temp/**',
+        //   ],
+        //   skipDiagnostics: true,
+        //   copyDtsFiles: true,
+        //   cleanVueFileName: true,
+        //   insertTypesEntry: true,
+        //   staticImport: true,
+        //   excludeExternals: true,
+        // }),
       ],
       resolve: {
         extensions: ['.js', '.jsx', '.ts', '.tsx', '.vue'],
@@ -750,9 +717,14 @@ async function buildComponent(comp, version = '1.0.0') {
         },
         rollupOptions: {
           external: (id) => {
-            // 简化external逻辑，直接使用Object.keys(dependencies).some
-            return Object.keys(componentDependencies).some(dep => id === dep || id.startsWith(`${dep}/`))
-              || ['vue', '@vue/runtime-core', '@vue/runtime-dom'].includes(id)
+            // 检查外部依赖
+            const isExternalDep = Object.keys(componentDependencies).some(dep => id === dep || id.startsWith(`${dep}/`))
+            // 检查Vue相关依赖
+            const isVueDep = ['vue', '@vue/runtime-core', '@vue/runtime-dom'].includes(id)
+            // 检查@/components路径（内部组件依赖）
+            const isInternalComponent = id.startsWith('@/components/')
+
+            return isExternalDep || isVueDep || isInternalComponent
           },
           output: {
             preserveModules: true,
@@ -765,6 +737,7 @@ async function buildComponent(comp, version = '1.0.0') {
               }
               return '[name][extname]'
             },
+            globals,
           },
         },
       },
@@ -785,9 +758,14 @@ async function buildComponent(comp, version = '1.0.0') {
         },
         rollupOptions: {
           external: (id) => {
-            // 简化external逻辑，直接使用Object.keys(dependencies).some
-            return Object.keys(componentDependencies).some(dep => id === dep || id.startsWith(`${dep}/`))
-              || ['vue', '@vue/runtime-core', '@vue/runtime-dom'].includes(id)
+            // 检查外部依赖
+            const isExternalDep = Object.keys(componentDependencies).some(dep => id === dep || id.startsWith(`${dep}/`))
+            // 检查Vue相关依赖
+            const isVueDep = ['vue', '@vue/runtime-core', '@vue/runtime-dom'].includes(id)
+            // 检查@/components路径（内部组件依赖）
+            const isInternalComponent = id.startsWith('@/components/')
+
+            return isExternalDep || isVueDep || isInternalComponent
           },
           output: {
             preserveModules: true,
@@ -801,6 +779,7 @@ async function buildComponent(comp, version = '1.0.0') {
               return '[name][extname]'
             },
             exports: 'named',
+            globals,
           },
         },
       },
@@ -826,25 +805,25 @@ async function buildComponent(comp, version = '1.0.0') {
         '.': {
           import: {
             types: './es/index.d.ts',
-            default: './es/index.mjs'
+            default: './es/index.mjs',
           },
           require: {
             types: './lib/index.d.ts',
-            default: './lib/index.cjs'
-          }
+            default: './lib/index.cjs',
+          },
         },
         './es': {
           import: {
             types: './es/index.d.ts',
-            default: './es/index.mjs'
-          }
+            default: './es/index.mjs',
+          },
         },
         './lib': {
           require: {
             types: './lib/index.d.ts',
-            default: './lib/index.cjs'
-          }
-        }
+            default: './lib/index.cjs',
+          },
+        },
       },
       sideEffects: [
         '*.css',
