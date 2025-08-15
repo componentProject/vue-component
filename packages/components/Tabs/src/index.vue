@@ -1,9 +1,9 @@
 <template>
-  <div class="height-100">
+  <div class="h-full bg-white">
     <ElTabs
       v-model="activeName"
-      type="border-card"
-      class="tabs-card"
+      :type="props.type"
+      :class="props.type === 'border-card' && 'tabs-card'"
       @tab-change="handleTabChange"
     >
       <template v-for="item in props.tabList">
@@ -40,6 +40,10 @@ const props = defineProps({
       show?: (item: any) => boolean
     }>,
     default: () => [],
+  },
+  type: {
+    type: String as PropType<'border-card' | 'card'>,
+    default: '',
   },
 })
 const emits = defineEmits(['tabChange'])
