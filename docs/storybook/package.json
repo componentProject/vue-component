@@ -10,7 +10,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/componentProject/vue-component.git"
+    "url": "http://192.168.18.106/middle-tec/front-web/vue-component.git"
   },
   "devDependencies": {
     "storybook": "8.4.7",
