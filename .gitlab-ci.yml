@@ -21,7 +21,7 @@ merge-check:
 npm-build-deploy:
   stage: build
   only:
-    - develop # develop分支触发
+    - main
   tags:
     - npm-deploy # gitLab-runner的tag（表示使用哪个runner）
   script:
