@@ -32,6 +32,7 @@ npm-build-deploy:
     - current_date=$(date +"%Y-%m-%d-%H-%M-%S")
     - echo $current_date
     - ssh root@192.168.209.103 "[ -d '/data/opt/hip/nginx/html/${systemCode}' ] || mkdir -p '/data/opt/hip/nginx/html/${systemCode}'"
+    - ssh root@192.168.209.103 "[ -d '/data/opt/hip/nginx/html/${systemCode}_BAK' ] || mkdir -p '/data/opt/hip/nginx/html/${systemCode}_BAK'"
     - ssh root@192.168.209.103 "mkdir  /data/opt/hip/nginx/html/${systemCode}_BAK/$current_date"
     - ssh root@192.168.209.103 "if du -sh "/data/opt/hip/nginx/html/${systemCode}" | grep -q '0\b'; then echo 'empty';else mv -f /data/opt/hip/nginx/html/${systemCode}/* /data/opt/hip/nginx/html/${systemCode}_BAK/$current_date;fi"
     - scp -r ${systemCode}/* root@192.168.209.103:/data/opt/hip/nginx/html/${systemCode}
