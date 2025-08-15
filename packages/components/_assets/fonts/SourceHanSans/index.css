@@ -1,0 +1,27 @@
+@font-face {
+  font-family: SourceHanSans-Light;
+  src: url('./SourceHanSans-Light.woff2');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: SourceHanSans-Medium;
+  src: url('./SourceHanSans-Medium.woff2');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: SourceHanSans-Regular;
+  src: url('./SourceHanSans-Regular.woff2');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: SourceHanSans-Semibold;
+  src: url('./SourceHanSans-Semibold.woff2');
+  font-weight: normal;
+  font-style: normal;
+}

@@ -1,0 +1,48 @@
+:root {
+  --vp-layout-max-width: 100% !important;
+}
+
+.VPDoc {
+  &.has-aside {
+    .content-container {
+      width: 100% !important;
+      max-width: 100% !important;
+    }
+  }
+}
+
+.vp-doc {
+  table {
+    display: table !important;
+    width: 100%;
+    //兼容vxe-table，el-table
+    &[class*=el-], &[class*=vxe-] {
+      margin: 0 !important;
+    }
+  }
+
+  th {
+    &[class*=el-], &[class*=vxe-] {
+      font-size: unset !important;
+    }
+  }
+
+  th, td {
+    &[class*=vxe-] {
+      border: unset;
+      padding: unset;
+    }
+  }
+
+  ul {
+    &[class*=el-] {
+      padding: 0 !important;
+      margin: 0 !important;
+      li + li {
+        margin-top: unset !important;
+      }
+    }
+  }
+
+}
+

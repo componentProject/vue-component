@@ -1,0 +1,62 @@
+{
+  "name": "@moluoxixi/components",
+  "version": "0.0.5",
+  "description": "all components are settled here",
+  "main": "index.ts",
+  "module": "index.ts",
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
+  },
+  "scripts": {
+    "build": "tsx scripts/buildComponent.mts",
+    "build:only": "tsx _scripts/buildComponent.mts build",
+    "build:publish": "tsx _scripts/buildComponent.mts publish"
+  },
+  "dependencies": {
+    "@codemirror/view": "^6.36.5",
+    "@element-plus/icons-vue": "^2.3.1",
+    "dayjs": "^1.11.13",
+    "element-plus": "^2.10.1",
+    "file-saver": "^2.0.5",
+    "lodash": "npm:lodash-es@4.17.21",
+    "markdown-it-anchor": "^9.2.0",
+    "md-editor-v3": "^5.4.5",
+    "moment": "^2.30.1",
+    "radash": "^12.1.0",
+    "screenfull": "^6.0.2",
+    "sortablejs": "^1.15.6",
+    "vxe-table": "4.13.39",
+    "vue-router": "4.5.0",
+    "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "@vue-macros/volar": "3.0.0-beta.15",
+    "@antfu/eslint-config": "^4.16.1",
+    "@sentry/vite-plugin": "^3.5.0",
+    "@tailwindcss/postcss": "^4.1.5",
+    "@types/file-saver": "^2.0.7",
+    "@vitejs/plugin-vue": "^5.0.4",
+    "@vitejs/plugin-vue-jsx": "^4.1.2",
+    "autoprefixer": "^10.4.21",
+    "postcss": "^8.5.3",
+    "rollup-plugin-visualizer": "^5.14.0",
+    "sass-embedded": "^1.87.0",
+    "sass-loader": "^16.0.5",
+    "tailwindcss": "^4.1.5",
+    "unplugin-auto-import": "^19.3.0",
+    "unplugin-vue-components": "^28.7.0",
+    "vite-plugin-cdn-import": "^1.0.1",
+    "vite-plugin-compression": "^0.5.1",
+    "vite-plugin-dts": "^4.5.4",
+    "vite-plugin-html": "^3.2.2",
+    "vite-plugin-imagemin": "^0.6.1",
+    "vite-plugin-qiankun": "^1.0.15",
+    "vite-plugin-vue-devtools": "^7.7.2",
+    "fast-glob": "^3.3.2",
+    "vite": "^5.4.9",
+    "dependency-cruiser": "^15.3.0",
+    "rollup-obfuscator": "^4.1.0",
+    "vite-plugin-css-injected-by-js": "^3.5.1",
+    "vue": "^3.5.17"
+  }
+}

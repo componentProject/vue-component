@@ -1,0 +1,9 @@
+#!/usr/bin/env sh
+# . "${PWD}/$(dirname -- "$0")/_/husky.sh"
+
+# COMMIT_LOCATION="${PWD}/.git/COMMIT_EDITMSG"
+# if [ -f "$COMMIT_LOCATION" ]; then
+#   npx --no-install commitlint --edit "${COMMIT_LOCATION}"
+# else
+#   npx --no-install commitlint --edit "$1"
+# fi

@@ -1,0 +1,108 @@
+{
+  "workspaces": [
+    "packages/*",
+    "play/*",
+    "docs/*"
+  ],
+  "packageManager": "pnpm@10.8.0",
+  "version": "1.3.1",
+  "private": false,
+  "engines": {
+    "node": ">=20.18.0"
+  },
+  "type": "module",
+  "readme": "README.md",
+  "scripts": {
+    "vue:dev": "pnpm run -C play/render dev",
+    "vue:build": "pnpm run -C play/render build",
+    "docs:dev": "pnpm run -C docs/vitepress dev",
+    "docs:build": "pnpm run -C docs/vitepress build",
+    "storybook:dev": "pnpm run -C docs/storybook build",
+    "storybook:build": "pnpm run -C docs/storybook build",
+    "component:build&publish": "pnpm run -C packages/components build",
+    "component:build": "pnpm run -C packages/components build:only",
+    "component:publish": "pnpm run -C packages/components build:publish",
+    "type-check": "vue-tsc --build",
+    "lint-check": "eslint --inspect-config",
+    "lint:eslint": "eslint . --fix",
+    "lint": "run-s lint:*",
+    "lint-staged": "lint-staged",
+    "commit": "git-cz"
+  },
+  "lint-staged": {
+    "*.{vue,jsx,tsx}": [
+      "eslint --fix"
+    ],
+    "*.{css,scss,less,vue,jsx,tsx}": [
+      "stylelint --fix"
+    ]
+  },
+  "config": {
+    "commitizen": {
+      "path": "cz-customizable"
+    },
+    "cz-customizable": {
+      "config": ".cz-config.cjs"
+    }
+  },
+  "license": "MIT",
+  "author": "1983531544@qq.com",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/componentProject/vue-component.git"
+  },
+  "keywords": [
+    "element-plus",
+    "ElementPlus",
+    "vue",
+    "vite",
+    "vue3",
+    "ts",
+    "eslint",
+    "commitlint",
+    "husky",
+    "lint-staged",
+    "typescript",
+    "vite",
+    "pinia",
+    "router",
+    "sass",
+    "tailwindcss",
+    "template"
+  ],
+  "dependencies": {
+    "@moluoxixi/components": "workspace:*",
+    "@moluoxixi/docs": "workspace:*",
+    "@moluoxixi/storybook": "workspace:*",
+    "@moluoxixi/render": "workspace:*"
+  },
+  "devDependencies": {
+    "@antfu/eslint-config": "^4.16.1",
+    "@commitlint/cli": "^19.8.0",
+    "@commitlint/config-conventional": "^19.8.0",
+    "@vitejs/plugin-vue-jsx": "^4.1.2",
+    "commitizen": "^4.3.1",
+    "cz-customizable": "^7.4.0",
+    "eslint": "^9.22.0",
+    "eslint-plugin-format": "^1.0.1",
+    "husky": "^9.1.7",
+    "lint-staged": "^15.5.1",
+    "npm-run-all2": "^7.0.2",
+    "stylelint": "^16.17.0",
+    "stylelint-config-standard": "^36.0.1",
+    "stylelint-config-standard-less": "^3.0.1",
+    "stylelint-config-standard-scss": "^14.0.0",
+    "stylelint-config-standard-vue": "^1.0.0",
+    "tsx": "^4.20.3",
+    "typescript": "~5.8.0"
+  },
+  "pnpm": {
+    "packageExtensions": {
+      "vue-template-compiler": {
+        "peerDependencies": {
+          "vue": "2.6.14"
+        }
+      }
+    }
+  }
+}

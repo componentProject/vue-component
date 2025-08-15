@@ -1,0 +1,10 @@
+.el-button {
+  border: 1px solid var(--border-color-1);
+  &--text {
+    border-color: transparent;
+  }
+}
+
+.el-radio-button__inner {
+  border: 1px solid var(--border-color-1);
+}
