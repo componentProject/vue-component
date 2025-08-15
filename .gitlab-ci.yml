@@ -1,5 +1,5 @@
 variables:
-  systemCode: test
+  systemCode: vueComponents
   SENTRY_AUTH_TOKEN: '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'
 #  GIT_SUBMODULE_STRATEGY: recursive  # 递归克隆所有子模块
 #  GIT_SUBMODULE_FORCE: "true" # 可选：强制更新子模块
@@ -31,6 +31,7 @@ npm-build-deploy:
     - pnpm run docs:build
     - current_date=$(date +"%Y-%m-%d-%H-%M-%S")
     - echo $current_date
+    - ssh root@192.168.209.103 "[ -d '/data/opt/hip/nginx/html/${systemCode}' ] || mkdir -p '/data/opt/hip/nginx/html/${systemCode}'"
     - ssh root@192.168.209.103 "mkdir  /data/opt/hip/nginx/html/${systemCode}_BAK/$current_date"
     - ssh root@192.168.209.103 "if du -sh "/data/opt/hip/nginx/html/${systemCode}" | grep -q '0\b'; then echo 'empty';else mv -f /data/opt/hip/nginx/html/${systemCode}/* /data/opt/hip/nginx/html/${systemCode}_BAK/$current_date;fi"
     - scp -r ${systemCode}/* root@192.168.209.103:/data/opt/hip/nginx/html/${systemCode}
