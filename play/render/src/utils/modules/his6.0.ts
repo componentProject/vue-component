@@ -9,7 +9,18 @@ function generateShortUUID(length: number) {
 }
 
 export function addSign(config: { [key: string]: any }) {
-  const appId = sessionStorage.getItem('appId') || 'trasen'
+  // 添加环境检测，判断是否在Node.js环境
+  const isNodeEnv = typeof window === 'undefined'
+
+  // 在Node.js环境中使用默认值，浏览器环境继续使用sessionStorage
+  const getStorageValue = (key: string, defaultValue: string) => {
+    if (isNodeEnv) {
+      return defaultValue
+    }
+    return sessionStorage.getItem(key) || defaultValue
+  }
+
+  const appId = getStorageValue('appId', 'trasen')
   const encrypted: {
     appId: string
     randomStr: string
@@ -25,7 +36,7 @@ export function addSign(config: { [key: string]: any }) {
   const queryString = Object.entries(encrypted)
     .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
     .join('&')
-  const finalString = `${queryString}&${sessionStorage.getItem('hisSignatureKey') || 'e1ec93ae-e25f-434d-8a64-f70116430a33'}`
+  const finalString = `${queryString}&${getStorageValue('hisSignatureKey', 'e1ec93ae-e25f-434d-8a64-f70116430a33')}`
   const signature = CryptoJS.MD5(finalString).toString()
   encrypted.sign = signature.toUpperCase()
   type encryptedKeyTypes = keyof typeof encrypted
