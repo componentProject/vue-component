@@ -1133,6 +1133,7 @@ async function buildComponent(
         console.log(`开始发布 ${pkgJson.name}@${pkgJson.version}...`)
 
         // 发布组件
+        // const packageDir = resolve(rootDir, `${LIB_NAMESPACE}/${comp ? `/packages${componentName}` : ''}`)
         const packageDir = comp ? `${LIB_NAMESPACE}/packages/${comp}` : LIB_NAMESPACE
         execSync(`cd ${packageDir} && npm publish --tag latest`, { stdio: 'inherit' })
         console.log(`${pkgJson.name}@${pkgJson.version} 发布成功！`)
