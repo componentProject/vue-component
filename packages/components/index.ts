@@ -13,6 +13,7 @@ import Select from '@moluoxixi/components/Select'
 import Tabs from '@moluoxixi/components/Tabs'
 import KeepAllAlive from '@moluoxixi/components/KeepAllAlive'
 import ConfigTable from '@moluoxixi/components/ConfigTable'
+import Editor from '@moluoxixi/components/Editor'
 
 export {
   ConfigForm,
@@ -28,9 +29,10 @@ export {
   PopoverTableSelect,
   Select,
   Tabs,
+  Editor,
 }
 
-const components: Component[] = [ConfigForm, ConfigTable, DateRangePicker, DraggableTable, EnterNextContainer, EnterNextDragTable, EnterNextTable, ExportExcel, ImportExcel, KeepAllAlive, PopoverTableSelect, Select, Tabs]
+const components: Component[] = [ConfigForm, ConfigTable, DateRangePicker, DraggableTable, EnterNextContainer, EnterNextDragTable, EnterNextTable, ExportExcel, ImportExcel, KeepAllAlive, PopoverTableSelect, Select, Tabs, Editor]
 
 export default {
   install(app: App) {
@@ -40,7 +42,7 @@ export default {
         console.warn('[withInstall] 组件缺少 name，已跳过注册。')
       }
       else {
-        console.log('🚀 注册组件:', name)
+        // 保持安静注册，避免在生产环境输出
         app.component(name, component)
       }
     })
