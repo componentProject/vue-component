@@ -24,9 +24,7 @@ const dependencyMapping: DependencyMap = {
 /**
  * 组件名称到组件实例的映射对象
  */
-const componentMapping: Record<string, any> = {
-  Vue,
-}
+const componentMapping: Record<string, any> = {}
 
 type analyzeImportsResult = Array<{
   type: string
@@ -471,6 +469,7 @@ async function replaceImportsAndExports(componentNames: string[], baseUrl = 'htt
  * @param baseUrl
  */
 async function loadRemoteComponents(Vue: any, componentNames: string[], baseUrl = 'http://localhost:98/components') {
+  componentMapping.Vue = Vue
   // 使用前面定义的函数加载组件代码
   const componentsCode = await replaceImportsAndExports(componentNames, baseUrl)
 
@@ -519,4 +518,3 @@ async function loadRemoteComponents(Vue: any, componentNames: string[], baseUrl 
   return componentResults
 }
 
-//#endregion
