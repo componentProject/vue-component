@@ -1,9 +1,15 @@
 <template>
+  <ElSelect v-model="language" placeholder="请选择">
+    <ElOption label="JavaScript" value="js" />
+    <ElOption label="TypeScript" value="ts" />
+    <ElOption label="SQL" value="sql" />
+  </ElSelect>
   <Editor v-model="code" :language="language" @change="console.log" />
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import { ElOption, ElSelect } from 'element-plus'
 import Editor from './index.vue'
 
 // const language = ref<'js' | 'sql'>('sql')
