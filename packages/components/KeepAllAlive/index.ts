@@ -1,8 +1,4 @@
 import KeepAllAlive from './src/index.vue'
 import { withInstall } from '@moluoxixi/components/_utils'
 
-// 导出组件
-export default KeepAllAlive
-
-// 用于Vue插件形式注册（改为使用 withInstall）
-export const install = withInstall(KeepAllAlive)
+export default withInstall(KeepAllAlive)

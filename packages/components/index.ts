@@ -1,4 +1,4 @@
-import type { App } from 'vue'
+import type { App, Component } from 'vue'
 
 import ConfigForm from '@moluoxixi/components/ConfigForm'
 import DateRangePicker from '@moluoxixi/components/DateRangePicker'
@@ -30,14 +30,18 @@ export {
   Tabs,
 }
 
-const components = [ConfigForm, ConfigTable, DateRangePicker, DraggableTable, EnterNextContainer, EnterNextDragTable, EnterNextTable, ExportExcel, ImportExcel, KeepAllAlive, PopoverTableSelect, Select, Tabs]
+const components: Component[] = [ConfigForm, ConfigTable, DateRangePicker, DraggableTable, EnterNextContainer, EnterNextDragTable, EnterNextTable, ExportExcel, ImportExcel, KeepAllAlive, PopoverTableSelect, Select, Tabs]
 
 export default {
   install(app: App) {
     components.forEach((component) => {
-      console.log('🚀 注册组件:', component.name)
-      if (component.name) {
-        app.component(component.name, component)
+      const name: string | undefined = (component as any)?.name
+      if (!name) {
+        console.warn('[withInstall] 组件缺少 name，已跳过注册。')
+      }
+      else {
+        console.log('🚀 注册组件:', name)
+        app.component(name, component)
       }
     })
   },
