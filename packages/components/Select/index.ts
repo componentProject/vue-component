@@ -1,10 +1,4 @@
 import Select from './src/index.vue'
-import type { App } from 'vue'
+import { withInstall } from '@moluoxixi/components/_utils'
 
-// 导出组件
-export default Select
-
-// 用于Vue插件形式注册
-export function install(app: App) {
-  app.component('Select', Select)
-}
+export default withInstall(Select)
