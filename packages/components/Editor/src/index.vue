@@ -4,16 +4,8 @@
 </template>
 
 <script setup lang="ts">
-import { editor as monacoEditor } from 'monaco-editor/esm/vs/editor/editor.api'
-// 各语言 的 basic 贡献
-//#region 全量引入
-// import 'monaco-editor/esm/vs/basic-languages/monaco.contribution'
-//#endregion
-//#region 分开引入
-import 'monaco-editor/esm/vs/basic-languages/sql/sql.contribution'
-import 'monaco-editor/esm/vs/basic-languages/javascript/javascript.contribution'
-import 'monaco-editor/esm/vs/basic-languages/typescript/typescript.contribution'
-//#endregion
+import type { langType } from './_types'
+import * as monaco from 'monaco-editor'
 
 defineOptions({
   name: 'Editor',
@@ -24,10 +16,9 @@ defineOptions({
 // 同时支持默认 v-model（modelValue）与 v-model:code 两种用法
 const props = withDefaults(defineProps<{
   language?:
-    | 'js' | 'javascript' | 'jsx'
-    | 'ts' | 'typescript' | 'tsx'
-    | 'sql' | 'mysql' | 'postgres' | 'postgresql' | 'mssql' | 'plsql' | 'oracle' | 'sqlite' | 'mariadb'
+  langType
   modelValue?: string
+  theme?: 'vs' | 'hc-black' | 'vs-dark'
 }>(), {
   language: 'js',
   modelValue: '',
@@ -38,15 +29,12 @@ const emit = defineEmits<{
   (e: 'change', value: string): void
 }>()
 
-const editorEl = ref<HTMLElement | null>(null)
-let editor: monacoEditor.IStandaloneCodeEditor | null = null
-let isProgrammaticChange = false
+const editorEl = useTemplateRef<HTMLElement | null>('editorEl')
+let editor: monaco.editor.IStandaloneCodeEditor | null = null
 
 function toMonacoLanguage(
   lang:
-    | 'js' | 'javascript' | 'jsx'
-    | 'ts' | 'typescript' | 'tsx'
-    | 'sql' | 'mysql' | 'postgres' | 'postgresql' | 'mssql' | 'plsql' | 'oracle' | 'sqlite' | 'mariadb',
+  langType,
 ): string {
   switch (lang) {
     // JavaScript 家族
@@ -54,12 +42,12 @@ function toMonacoLanguage(
     case 'javascript':
     case 'jsx':
       return 'javascript'
-    // TypeScript 家族
+      // TypeScript 家族
     case 'ts':
     case 'typescript':
     case 'tsx':
       return 'typescript'
-    // SQL 及各方言（Monaco 使用统一的 `sql`）
+      // SQL 及各方言（Monaco 使用统一的 `sql`）
     case 'sql':
     case 'mysql':
     case 'postgres':
@@ -79,55 +67,52 @@ onMounted(async () => {
   if (!editorEl.value)
     return
 
-  // 动态导入并配置 Monaco 的 worker（若打包器支持 ?worker 则启用）
-  let EditorWorkerCtor: any
-  let TsWorkerCtor: any
-  try {
-    const mod = await import('monaco-editor/esm/vs/editor/editor.worker?worker')
-    EditorWorkerCtor = mod?.default
-  }
-  catch {
-    // ignore
-  }
-  try {
-    const mod = await import('monaco-editor/esm/vs/language/typescript/ts.worker?worker')
-    TsWorkerCtor = mod?.default
-  }
-  catch {
-    // ignore
-  }
-  if (EditorWorkerCtor || TsWorkerCtor) {
-    ;(globalThis as any).MonacoEnvironment = {
-      getWorker(_moduleId: string, label: string) {
-        if (label === 'typescript' || label === 'javascript')
-          return TsWorkerCtor ? new TsWorkerCtor() : undefined
-        return EditorWorkerCtor ? new EditorWorkerCtor() : undefined
-      },
-    }
-  }
-
-  editor = monacoEditor.create(editorEl.value, {
+  editor = monaco.editor.create(editorEl.value, {
     value: props.modelValue ?? '',
     language: toMonacoLanguage(props.language),
+    // 官方白带三种主题vS, hc-btack, or vs-dark
+    theme: props.theme,
+    // 字体大小
+    fontSize: 14,
+    // 是否只读
+    readOnly: false,
+    // 滚动是否有边框
+    overviewRulerBorder: false,
+    // 控制光标平滑动画的开启与关闭。当开启时，光标移动会有平滑的动画效果。
+    cursorSmoothCaretAnimation: 'on',
+    //设置是否在粘贴文本时自动格式化代码
+    formatOnPaste: true,
+    //设置是否开启鼠标滚轮缩放功能
+    mouseWheelZoom: true,
+    //控制是否开启代码折叠功能
+    folding: true,
+    // 控制编辑器是否自动调整布局以适应容器大小的变化
     automaticLayout: true,
-    theme: 'vs',
-    minimap: { enabled: false },
+    minimap: {
+      // 是否启用预览图
+      enabled: true,
+    },
+    // 禁用额外滚动区
     scrollBeyondLastLine: false,
+    scrollbar: {
+      // 垂直滚动条宽度，默认px
+      verticalScrollbarSize: 2,
+      // 水平滚动条高度
+      horizontalScrollbarSize: 2,
+    },
+    //字形边缘
+    glyphMargin: true,
   })
 
+  // 编辑器内容变化
   editor.onDidChangeModelContent(() => {
     if (!editor)
       return
     const newVal = editor.getValue()
     if (newVal !== props.modelValue) {
-      isProgrammaticChange = true
       // 同步触发两种更新事件，外部用哪种 v-model 就会响应哪种
       emit('update:modelValue', newVal)
       emit('change', newVal)
-      // 稍后清除标记，避免外部 watch 回写再次触发
-      queueMicrotask(() => {
-        isProgrammaticChange = false
-      })
     }
   })
 })
@@ -139,14 +124,23 @@ watch(
       return
     const model = editor.getModel()
     if (model)
-      monacoEditor.setModelLanguage(model, toMonacoLanguage(lang))
+      monaco.editor.setModelLanguage(model, toMonacoLanguage(lang))
+  },
+)
+
+watch(
+  () => props.theme,
+  (val) => {
+    if (!editor)
+      return
+    monaco.editor.setTheme(val || 'vs')
   },
 )
 
 watch(
   () => props.modelValue,
   (val) => {
-    if (!editor || isProgrammaticChange)
+    if (!editor)
       return
     const safeVal = val ?? ''
     if (editor.getValue() !== safeVal)
