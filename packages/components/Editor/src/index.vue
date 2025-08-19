@@ -4,14 +4,22 @@
 </template>
 
 <script setup lang="ts">
-import * as monaco from 'monaco-editor/esm/vs/editor/editor.api'
-// 确保需要的语言已注册
-import 'monaco-editor/esm/vs/language/typescript/monaco.contribution'
+import { editor as monacoEditor } from 'monaco-editor/esm/vs/editor/editor.api'
+// 各语言 的 basic 贡献
+//#region 全量引入
+// import 'monaco-editor/esm/vs/basic-languages/monaco.contribution'
+//#endregion
+//#region 分开引入
 import 'monaco-editor/esm/vs/basic-languages/sql/sql.contribution'
+import 'monaco-editor/esm/vs/basic-languages/javascript/javascript.contribution'
+import 'monaco-editor/esm/vs/basic-languages/typescript/typescript.contribution'
+//#endregion
 
 defineOptions({
   name: 'Editor',
 })
+
+// Worker 由 onMounted 中按需动态导入配置，避免打包器不支持导致语法错误
 
 // 同时支持默认 v-model（modelValue）与 v-model:code 两种用法
 const props = withDefaults(defineProps<{
@@ -22,7 +30,7 @@ const props = withDefaults(defineProps<{
   modelValue?: string
 }>(), {
   language: 'js',
-  modelValue: undefined,
+  modelValue: '',
 })
 
 const emit = defineEmits<{
@@ -31,7 +39,7 @@ const emit = defineEmits<{
 }>()
 
 const editorEl = ref<HTMLElement | null>(null)
-let editor: monaco.editor.IStandaloneCodeEditor | null = null
+let editor: monacoEditor.IStandaloneCodeEditor | null = null
 let isProgrammaticChange = false
 
 function toMonacoLanguage(
@@ -67,11 +75,38 @@ function toMonacoLanguage(
   }
 }
 
-onMounted(() => {
+onMounted(async () => {
   if (!editorEl.value)
     return
 
-  editor = monaco.editor.create(editorEl.value, {
+  // 动态导入并配置 Monaco 的 worker（若打包器支持 ?worker 则启用）
+  let EditorWorkerCtor: any
+  let TsWorkerCtor: any
+  try {
+    const mod = await import('monaco-editor/esm/vs/editor/editor.worker?worker')
+    EditorWorkerCtor = mod?.default
+  }
+  catch {
+    // ignore
+  }
+  try {
+    const mod = await import('monaco-editor/esm/vs/language/typescript/ts.worker?worker')
+    TsWorkerCtor = mod?.default
+  }
+  catch {
+    // ignore
+  }
+  if (EditorWorkerCtor || TsWorkerCtor) {
+    ;(globalThis as any).MonacoEnvironment = {
+      getWorker(_moduleId: string, label: string) {
+        if (label === 'typescript' || label === 'javascript')
+          return TsWorkerCtor ? new TsWorkerCtor() : undefined
+        return EditorWorkerCtor ? new EditorWorkerCtor() : undefined
+      },
+    }
+  }
+
+  editor = monacoEditor.create(editorEl.value, {
     value: props.modelValue ?? '',
     language: toMonacoLanguage(props.language),
     automaticLayout: true,
@@ -104,7 +139,7 @@ watch(
       return
     const model = editor.getModel()
     if (model)
-      monaco.editor.setModelLanguage(model, toMonacoLanguage(lang))
+      monacoEditor.setModelLanguage(model, toMonacoLanguage(lang))
   },
 )
 

@@ -1,3 +1,4 @@
-export { default } from './src/index.vue'
+import Editor from './src/index.vue'
+import { withInstall } from '@moluoxixi/components/_utils'
 
-
+export default withInstall(Editor)
