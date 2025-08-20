@@ -4,7 +4,7 @@
 </template>
 
 <script setup lang="ts">
-import type { langType } from './_types'
+import type { languageType, themeType } from './_types'
 import * as monaco from 'monaco-editor'
 
 defineOptions({
@@ -16,9 +16,9 @@ defineOptions({
 // 同时支持默认 v-model（modelValue）与 v-model:code 两种用法
 const props = withDefaults(defineProps<{
   language?:
-  langType
+  languageType
   modelValue?: string
-  theme?: 'vs' | 'hc-black' | 'vs-dark'
+  theme?: themeType
 }>(), {
   language: 'js',
   modelValue: '',
@@ -34,7 +34,7 @@ let editor: monaco.editor.IStandaloneCodeEditor | null = null
 
 function toMonacoLanguage(
   lang:
-  langType,
+  languageType,
 ): string {
   switch (lang) {
     // JavaScript 家族

@@ -55,13 +55,13 @@ function createAutoRoutesPlugin({ routeConfig, virtualModuleId, dts, root }: con
   return {
     name: 'vite-plugin-auto-routes',
 
-    resolveId(id) {
+    resolveId(id: string) {
       if (id === VIRTUAL_MODULE_ID) {
         return RESOLVED_VIRTUAL_MODULE_ID
       }
     },
 
-    configResolved(config) {
+    configResolved(config: any) {
       // 处理dts
       if (dts !== false) {
         try {
@@ -96,7 +96,7 @@ function createAutoRoutesPlugin({ routeConfig, virtualModuleId, dts, root }: con
       }
     },
 
-    load(id) {
+    load(id: string) {
       if (id === RESOLVED_VIRTUAL_MODULE_ID) {
         const imports: string[] = []
         const routes: string[] = []
