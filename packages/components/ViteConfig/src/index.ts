@@ -33,7 +33,6 @@ import type { PluginMap, PluginType, ViteConfigType } from './_types/index.ts'
 import { defineConfig, mergeConfig } from 'vite'
 import type { ConfigEnv, PluginOption, UserConfig } from 'vite'
 import { createHtmlPlugin } from 'vite-plugin-html'
-import MocacoEditorPlugin from 'vite-plugin-monaco-editor'
 
 export default function createViteConfig(Config: ViteConfigType) {
   return defineConfig((params: ConfigEnv) => {
@@ -177,7 +176,6 @@ export default function createViteConfig(Config: ViteConfigType) {
         ...performancePlugins,
         ...monitorPlugins,
         ...qianKunPlugins,
-        MocacoEditorPlugin,
         viteEnv.VITE_AUTO_ROUTES && autoRoutesPlugin({
           root: rootPath,
           routeConfig: {
