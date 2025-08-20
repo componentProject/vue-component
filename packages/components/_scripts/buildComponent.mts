@@ -183,14 +183,12 @@ function createBaseConfig(comp: string, internalDeps: string[]): InlineConfig {
           }),
         ],
         globs: [
-          // 限制只扫描当前项目中的组件目录
-          `.${entryBaseUrl}${comp}/**/index.vue`,
-          `.${entryBaseUrl}${comp}/**/index.ts`,
-          // 排除不需要的目录
-          `!${entryBaseUrl}${comp}/**/base/**/*`,
-          `!${entryBaseUrl}${comp}/**/components/**/*`,
-          `!${entryBaseUrl}${comp}/**/src/**/*`,
-          `!${entryBaseUrl}${comp}/**/_*/**/*`,
+          `${entryBaseUrl}**/index.vue`,
+          `${entryBaseUrl}**/index.ts`,
+          `!${entryBaseUrl}**/base/**/*`,
+          `!${entryBaseUrl}**/components/**/*`,
+          `!${entryBaseUrl}**/src/**/*`,
+          `!${entryBaseUrl}**/_*/**/*`,
         ],
         dts: path.resolve(rootDir, './_typings/components.d.ts'),
       }),
