@@ -183,13 +183,6 @@ function createBaseConfig(comp: string, internalDeps: string[]): InlineConfig {
           }),
         ],
         globs: [
-          // `${entryBaseUrl}**/index.vue`,
-          // `${entryBaseUrl}**/index.ts`,
-          // `!${entryBaseUrl}**/base/**/*`,
-          // `!${entryBaseUrl}**/components/**/*`,
-          // `!${entryBaseUrl}**/src/**/*`,
-          // `!${entryBaseUrl}**/_utils/**/*`,
-          // `!${entryBaseUrl}**/_types/**/*`,
           // 限制只扫描当前项目中的组件目录
           `.${entryBaseUrl}${comp}/**/index.vue`,
           `.${entryBaseUrl}${comp}/**/index.ts`,
@@ -197,10 +190,9 @@ function createBaseConfig(comp: string, internalDeps: string[]): InlineConfig {
           `!${entryBaseUrl}${comp}/**/base/**/*`,
           `!${entryBaseUrl}${comp}/**/components/**/*`,
           `!${entryBaseUrl}${comp}/**/src/**/*`,
-          `!${entryBaseUrl}${comp}/**/_utils/**/*`,
-          `!${entryBaseUrl}${comp}/**/_types/**/*`,
+          `!${entryBaseUrl}${comp}/**/_*/**/*`,
         ],
-        dts: path.resolve(rootDir, './typings/components.d.ts'),
+        dts: path.resolve(rootDir, './_typings/components.d.ts'),
       }),
       viteImagemin({
         gifsicle: { optimizationLevel: 7, interlaced: false },
