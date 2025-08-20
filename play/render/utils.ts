@@ -56,12 +56,6 @@ function cleanImports(code: string): string {
   return cleanCode;
 }
 
-
-/**
- * 已加载的依赖组件缓存，避免重复加载
- */
-const loadedDependencies = new Set<string>();
-
 /**
  * 组件名称到组件实例的映射对象
  */
@@ -492,7 +486,7 @@ async function replaceImportsAndExports(componentNames: string[], componentobj: 
           const matchedComponent = componentobj.find((item: any) =>
             item.name.toLowerCase() === packagePath.toLowerCase()
           )
-          if (matchedComponent && !loadedDependencies.has(matchedComponent.name)) {
+          if (matchedComponent && !componentMapping[matchedComponent.name]) {
             console.log(`发现依赖组件: ${matchedComponent.name} (来自包: ${source})`);
             dependencies.push(matchedComponent.name);
             // 动态添加依赖映射
@@ -505,8 +499,6 @@ async function replaceImportsAndExports(componentNames: string[], componentobj: 
       if (dependencies.length > 0) {
         console.log(`正在加载${name}的依赖组件:`, dependencies);
         await loadRemoteComponents(componentMapping.Vue, dependencies, componentobj);
-        // 标记为已加载
-        dependencies.forEach(dep => loadedDependencies.add(dep));
       }
       const allExports = analyzeExports(componentCode)
       console.log(`${name}所有解析的export语句:`, allExports)
