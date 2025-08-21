@@ -14,12 +14,11 @@
       "vite/client"
     ],
     "paths": {
-      "@moluoxixi/components": [
-        "./"
-      ],
-      "@moluoxixi/components/*": [
-        "./*"
-      ]
+      "@moluoxixi/components": ["packages/components"],
+      "@moluoxixi/element": ["packages/element-plus"],
+      "@moluoxixi/render": ["play/render"],
+      "@moluoxixi/docs": ["docs/vitepress"],
+      "@moluoxixi/storybook": ["docs/storybook"],
     },
     "allowJs": true,
     "strict": true,
