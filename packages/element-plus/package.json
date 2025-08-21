@@ -1,0 +1,21 @@
+{
+  "name": "@moluoxixi/element",
+  "license": "MIT",
+  "main": "src/index.ts",
+  "sideEffects": [
+    "dist/*",
+    "esm/*.js",
+    "lib/*.js",
+    "src/*.ts",
+    "*.less",
+    "*.scss",
+    "**/*/style.js"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "resize-observer-polyfill": "^1.5.1",
+    "vue-slicksort": "^1.2.0"
+  }
+}

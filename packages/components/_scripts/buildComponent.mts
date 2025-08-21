@@ -20,6 +20,7 @@ import type { ICruiseOptions, ICruiseResult } from 'dependency-cruiser'
 import viteImagemin from 'vite-plugin-imagemin'
 import { obfuscator } from 'rollup-obfuscator'
 import cssInjectedByJsPlugin from 'vite-plugin-css-injected-by-js'
+import { UploadEvent } from './UploadComponent'
 
 // === 组件库命名空间配置 ===
 const LIB_NAMESPACE = 'moluoxixi'
@@ -187,10 +188,9 @@ function createBaseConfig(comp: string, internalDeps: string[]): InlineConfig {
           `!${entryBaseUrl}**/base/**/*`,
           `!${entryBaseUrl}**/components/**/*`,
           `!${entryBaseUrl}**/src/**/*`,
-          `!${entryBaseUrl}**/_utils/**/*`,
-          `!${entryBaseUrl}**/_types/**/*`,
+          `!${entryBaseUrl}**/_*/**/*`,
         ],
-        dts: path.resolve(rootDir, './typings/components.d.ts'),
+        dts: path.resolve(rootDir, './_typings/components.d.ts'),
       }),
       viteImagemin({
         gifsicle: { optimizationLevel: 7, interlaced: false },
@@ -928,7 +928,7 @@ async function bundleComponentModule({
  * @returns 组件的配置信息
  */
 async function getComponentConfig(comp: string) {
-  const componentName = `\\${comp}`
+  const componentName = comp
 
   // 获取入口文件
   let entry = null
@@ -943,7 +943,7 @@ async function getComponentConfig(comp: string) {
   }
 
   // 获取输出目录
-  const outputDir = resolve(rootDir, `${LIB_NAMESPACE}/${comp ? `/packages${componentName}` : ''}`)
+  const outputDir = resolve(rootDir, `${LIB_NAMESPACE}/${comp ? `/packages/${componentName}` : ''}`)
 
   // 分析组件依赖
   let dependencies: { internal: string[], external: Record<string, string> } = {
@@ -1119,7 +1119,8 @@ async function buildComponent(
 
     // 写入package.json
     await fsp.writeFile(resolve(outputDir, 'package.json'), JSON.stringify(pkgJson, null, 2), 'utf-8')
-
+    const fileUrl = path.resolve(`${outputDir}/es/index.mjs`)
+    await UploadEvent(fileUrl, buildName)
     console.log(`==========  ${buildName} 打包完成 ==========`)
     // 如果需要发布，执行发布
     if (shouldPublish) {

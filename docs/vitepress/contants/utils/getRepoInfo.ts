@@ -12,8 +12,6 @@ export interface RepoInfo {
   discussionsUrl: string
   contributorsUrl: string
   licenseUrl: string
-  starsBadgeUrl: string
-  licenseBadgeUrl: string
 }
 
 /**
@@ -48,6 +46,9 @@ export function getRepoInfo(): RepoInfo | null {
     if (repoUrl.startsWith('git+https://')) {
       httpsUrl = repoUrl.replace('git+', '').replace('.git', '')
     }
+    else if (repoUrl.startsWith('git@')) {
+      httpsUrl = repoUrl.replace('git@', 'https://').replace('.git', '')
+    }
     else if (repoUrl.startsWith('https://')) {
       httpsUrl = repoUrl.replace('.git', '')
     }
@@ -78,8 +79,6 @@ export function getRepoInfo(): RepoInfo | null {
       discussionsUrl: `${httpsUrl}/discussions`,
       contributorsUrl: `${httpsUrl}/graphs/contributors`,
       licenseUrl: `${httpsUrl}/blob/main/LICENSE`,
-      starsBadgeUrl: `https://img.shields.io/github/stars/${owner}/${repo}.svg`,
-      licenseBadgeUrl: `https://img.shields.io/github/license/${owner}/${repo}.svg`,
     }
 
     console.log('✅ 仓库信息解析成功:', {
@@ -99,7 +98,7 @@ export function getRepoInfo(): RepoInfo | null {
 /**
  * 获取仓库信息，如果失败则返回默认值
  */
-export function getRepoInfoWithFallback(): RepoInfo {
+export function getRepoInfoWithFallback(defaultRepoInfo: RepoInfo): RepoInfo {
   const repoInfo = getRepoInfo()
 
   if (repoInfo) {
@@ -108,17 +107,5 @@ export function getRepoInfoWithFallback(): RepoInfo {
 
   // 默认值
   console.log('🔄 使用默认仓库信息')
-  return {
-    owner: 'componentProject',
-    repo: 'vue-component',
-    url: 'https://github.com/componentProject/vue-component',
-    httpsUrl: 'https://github.com/componentProject/vue-component',
-    issuesUrl: 'https://github.com/componentProject/vue-component/issues',
-    releasesUrl: 'https://github.com/componentProject/vue-component/releases',
-    discussionsUrl: 'https://github.com/componentProject/vue-component/discussions',
-    contributorsUrl: 'https://github.com/componentProject/vue-component/graphs/contributors',
-    licenseUrl: 'https://github.com/componentProject/vue-component/blob/main/LICENSE',
-    starsBadgeUrl: 'https://img.shields.io/github/stars/componentProject/vue-component.svg',
-    licenseBadgeUrl: 'https://img.shields.io/github/license/componentProject/vue-component.svg',
-  }
+  return defaultRepoInfo
 }

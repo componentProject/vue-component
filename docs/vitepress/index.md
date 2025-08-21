@@ -22,7 +22,7 @@ hero:
       link: /components/Overview
     - theme: alt
       text: GitHub
-      link: https://github.com/componentProject/vue-component
+      link: http://192.168.18.106/middle-tec/front-web/vue-component
 
 features:
   - icon: 🚀
@@ -46,16 +46,16 @@ features:
 ---
 
 <p style="display: flex; justify-content: center; align-items: center; margin-top: 20px; gap: 10px;">
-  <a href="https://github.com/componentProject/vue-component" target="_blank">
+  <a href="http://192.168.18.106/middle-tec/front-web/vue-component" target="_blank">
     <img src="https://img.shields.io/badge/vue-3.5.13-brightgreen.svg" alt="vue3">
   </a>
-  <a href="https://github.com/componentProject/vue-component" target="_blank">
+  <a href="http://192.168.18.106/middle-tec/front-web/vue-component" target="_blank">
     <img src="https://img.shields.io/github/stars/componentProject/vue-component.svg" alt="github stars">
   </a>
   <a href="https://www.npmjs.com/package/@moluoxixi/components" target="_blank">
     <img alt="npm" src="https://img.shields.io/npm/v/@moluoxixi/components.svg" />
   </a>
-  <a href="https://github.com/componentProject/vue-component/blob/main/LICENSE" target="_blank">
+  <a href="http://192.168.18.106/middle-tec/front-web/vue-component/blob/main/LICENSE" target="_blank">
     <img src="https://img.shields.io/github/license/componentProject/vue-component.svg" alt="license">
   </a>
 </p>
@@ -65,7 +65,7 @@ features:
 欢迎提交 Issue 和 Pull Request 来完善这个项目。
 
 <p style="display: flex; justify-content: center; align-items: center; margin-top: 20px;">
-  <a href="https://github.com/componentProject/vue-component/graphs/contributors">
+  <a href="http://192.168.18.106/middle-tec/front-web/vue-component/graphs/contributors">
     <img src="https://contrib.rocks/image?repo=componentProject/vue-component" alt="contributors" />
   </a>
 </p>

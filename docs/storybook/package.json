@@ -10,7 +10,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/componentProject/vue-component.git"
+    "url": "http://192.168.18.106/middle-tec/front-web/vue-component.git"
   },
   "devDependencies": {
     "storybook": "8.4.7",
@@ -24,7 +24,5 @@
     "@storybook/vue3-vite": "8.4.7"
   },
   "dependencies": {
-    "@moluoxixi/components": "workspace:*",
-    "element-plus": "^2.10.1"
   }
 }

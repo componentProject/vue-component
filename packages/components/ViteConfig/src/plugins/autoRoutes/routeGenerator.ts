@@ -8,7 +8,7 @@
  * 路由模块接口定义
  */
 export interface RouteModule {
-  path: string
+  path?: string
   name: string
   meta?: {
     title?: string
@@ -67,13 +67,10 @@ export function findParentRouteHandle(
 export function generateRoutes(
   files: FilesMap,
   prefix: string = '',
-  baseRoute?: RouteModule,
+  baseRoute?: RouteModule | string,
 ): RouteModule[] {
-  if (baseRoute) {
-    baseRoute.children = baseRoute.children || []
-    baseRoute.name = baseRoute.name || prefix
-  }
-  const modules: RouteModule[] = baseRoute ? [baseRoute] : []
+  const newBaseRoute: RouteModule | undefined = typeof baseRoute === 'string' ? { name: baseRoute } : baseRoute
+  const modules: RouteModule[] = newBaseRoute ? [newBaseRoute] : []
   return Object.keys(files)
     .sort((a, b) => {
       const aLength = a.split('/').length
@@ -85,18 +82,20 @@ export function generateRoutes(
       if (!component || modulePath === 'install')
         return modules
 
-      const filePathArr = modulePath.split('/')
-
-      // 从src后面一位到倒数第二位作为path
-      const pathArr = filePathArr.slice(1, -1)
-      const componentName = pathArr.at(-1)
-      const name = component.name || componentName === 'src' ? pathArr.at(-2) : pathArr.at(-1)
-
+      const pathArr = modulePath.split('/').filter((item: string) => item && !item.includes('.'))
       if (pathArr.at(-1) === 'src') {
         pathArr.pop()
       }
+      const componentName = pathArr.at(-1)
+      const name = component.name || componentName
+
       const path = `/${pathArr.join('/')}`
       const parentPath = `/${pathArr.slice(0, -1).join('/')}`
+      if (newBaseRoute) {
+        newBaseRoute.children = newBaseRoute.children || []
+        newBaseRoute.name = newBaseRoute.name || prefix
+        newBaseRoute.path = `/${(newBaseRoute.path || parentPath).split('/').filter((item: string) => item && !item.includes('.')).join('/')}`
+      }
       const parentRoute = findParentRouteHandle(modules, parentPath)
       if (parentRoute) {
         if (!parentRoute.children)

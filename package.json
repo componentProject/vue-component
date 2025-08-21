@@ -49,7 +49,7 @@
   "author": "1983531544@qq.com",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/componentProject/vue-component.git"
+    "url": "git+http://192.168.18.106/middle-tec/front-web/vue-component.git"
   },
   "keywords": [
     "element-plus",
@@ -72,11 +72,42 @@
   ],
   "dependencies": {
     "@moluoxixi/components": "workspace:*",
-    "@moluoxixi/docs": "workspace:*",
-    "@moluoxixi/storybook": "workspace:*",
-    "@moluoxixi/render": "workspace:*"
+    "element-plus": "^2.10.1",
+    "@element-plus/icons-vue": "^2.3.1",
+    "moment": "^2.30.1",
+    "radash": "^12.1.0",
+    "lodash": "npm:lodash-es@4.17.21",
+    "vue": "^3.5.13",
+    "vite": "^6.2.4",
+    "axios": "^1.9.0",
+    "dayjs": "^1.11.13",
+    "@formily/core": "^2.3.7",
+    "@formily/json-schema": "^2.3.7",
+    "@formily/vue": "^2.3.7",
+    "@formily/grid": "^2.1.5",
+    "@formily/reactive": "^2.1.5",
+    "@formily/reactive-vue": "^2.1.5",
+    "@formily/shared": "^2.1.5",
+    "@formily/validator": "^2.1.5",
+    "vite-plugin-qiankun": "^1.0.15",
+    "vuedraggable": "^4.1.0",
+    "vxe-table": "4.13.39",
+    "uuid": "^11.1.0"
   },
   "devDependencies": {
+    "@types/uuid": "^10.0.0",
+    "sass": "1.32.13",
+    "sass-embedded": "^1.87.0",
+    "sass-loader": "13.1.0",
+    "@tailwindcss/postcss": "^4.1.5",
+    "tailwindcss": "^4.1.5",
+    "vite-plugin-compression": "^0.5.1",
+    "vite-plugin-imagemin": "^0.6.1",
+    "autoprefixer": "^10.4.21",
+    "compressing": "^1.10.1",
+    "npm-run-all2": "^7.0.2",
+    "postcss": "^8.5.3",
+    "@types/lodash": "^4.17.17",
     "@antfu/eslint-config": "^4.16.1",
     "@commitlint/cli": "^19.8.0",
     "@commitlint/config-conventional": "^19.8.0",
@@ -87,7 +118,6 @@
     "eslint-plugin-format": "^1.0.1",
     "husky": "^9.1.7",
     "lint-staged": "^15.5.1",
-    "npm-run-all2": "^7.0.2",
     "stylelint": "^16.17.0",
     "stylelint-config-standard": "^36.0.1",
     "stylelint-config-standard-less": "^3.0.1",
@@ -95,14 +125,5 @@
     "stylelint-config-standard-vue": "^1.0.0",
     "tsx": "^4.20.3",
     "typescript": "~5.8.0"
-  },
-  "pnpm": {
-    "packageExtensions": {
-      "vue-template-compiler": {
-        "peerDependencies": {
-          "vue": "2.6.14"
-        }
-      }
-    }
   }
 }

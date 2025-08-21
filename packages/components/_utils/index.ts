@@ -1,4 +1,5 @@
 import moment from 'moment'
+import type { App, Component } from 'vue'
 import { Fragment } from 'vue'
 
 export type DateType = string | Date | moment.Moment
@@ -42,6 +43,7 @@ export function getType(obj: any, type?: string) {
 export function isType(str: string, type: string) {
   return Object.prototype.toString.call(str).slice(8, -1).toLowerCase() == type
 }
+
 type types
   = | 'string'
     | 'number'
@@ -78,7 +80,8 @@ export function getTypeDefault(obj: any, type: types) {
       symbol: Symbol(''),
       object: {},
       array: [],
-      function: () => {},
+      function: () => {
+      },
       set: new Set(),
       map: new Map(),
       weakmap: new WeakMap(),
@@ -283,3 +286,31 @@ export function formatDateRange(
 }
 
 //#endregion
+
+/**
+ * 为传入的组件注入 install 方法，按组件的 name 自动完成全局注册。
+ *
+ * 用法示例：
+ * ```ts
+ * import EditorComp from './src/index.vue'
+ * import { withInstall } from '@moluoxixi/components/_utils'
+ * export default withInstall(EditorComp)
+ * ```
+ */
+export type WithInstall<T extends Component> = T & {
+  install: (app: App, options?: unknown) => void
+}
+
+export function withInstall<T extends Component>(component: T): WithInstall<T> {
+  (component as any).install = (app: App, _options?: unknown) => {
+    const name: string | undefined = (component as any)?.name
+    if (!name) {
+      console.warn('[withInstall] 组件缺少 name，已跳过注册。')
+    }
+    else {
+      console.log('🚀 注册组件:', component.name)
+      app.component(name, component as any)
+    }
+  }
+  return component as WithInstall<T>
+}

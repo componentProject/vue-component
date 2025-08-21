@@ -1,11 +1,7 @@
 variables:
   systemCode: vueComponents
+  outputPath: docsOut/vitepress
   SENTRY_AUTH_TOKEN: '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'
-#  GIT_SUBMODULE_STRATEGY: recursive  # 递归克隆所有子模块
-#  GIT_SUBMODULE_FORCE: "true" # 可选：强制更新子模块
-cache:
-  paths:
-    - node_modules/ # node_modules目录缓存起来
 stages: # 流水过程，先从build->deploy
   - check
   - build
@@ -21,7 +17,7 @@ merge-check:
 npm-build-deploy:
   stage: build
   only:
-    - main
+    - develop
   tags:
     - npm-deploy # gitLab-runner的tag（表示使用哪个runner）
   script:
@@ -34,4 +30,4 @@ npm-build-deploy:
     - ssh root@192.168.209.103 "[ -d '/data/opt/hip/nginx/html/${systemCode}_BAK' ] || mkdir -p '/data/opt/hip/nginx/html/${systemCode}_BAK'"
     - ssh root@192.168.209.103 "mkdir  /data/opt/hip/nginx/html/${systemCode}_BAK/$current_date"
     - ssh root@192.168.209.103 "if du -sh "/data/opt/hip/nginx/html/${systemCode}" | grep -q '0\b'; then echo 'empty';else mv -f /data/opt/hip/nginx/html/${systemCode}/* /data/opt/hip/nginx/html/${systemCode}_BAK/$current_date;fi"
-    - scp -r ${systemCode}/* root@192.168.209.103:/data/opt/hip/nginx/html/${systemCode}
+    - scp -r ${outputPath}/* root@192.168.209.103:/data/opt/hip/nginx/html/${systemCode}

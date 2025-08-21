@@ -1,5 +1,4 @@
 //#region 从远程服务器加载资源并替换
-
 interface DependencyMap {
   [key: string]: string
 }
@@ -12,21 +11,55 @@ interface DependencyMap {
  */
 const dependencyMapping: DependencyMap = {
   'vue': 'Vue',
-  '@moluoxixi/daterangepicker': 'DateRangePicker',
-  '@moluoxixi/select': 'Select',
-  '@moluoxixi/draggabletable': 'DraggableTable',
-  '@moluoxixi/enternextcontainer': 'EnterNextContainer',
-  '@moluoxixi/enternextdragtable': 'EnterNextDragTable',
-  '@moluoxixi/enternexttable': 'EnterNextTable',
-  '@moluoxixi/popovertableselect': 'PopoverTableSelect',
+}
+
+/**
+ * 动态添加组件到依赖映射中
+ * @param packageName - 包名
+ * @param componentName - 组件名
+ */
+function addToDependencyMapping(packageName: string, componentName: string) {
+  if (!dependencyMapping[packageName]) {
+    dependencyMapping[packageName] = componentName
+    console.log(`已添加组件映射: ${packageName} -> ${componentName}`)
+  }
+}
+
+/**
+ * 从组件名称获取对应的包名
+ * @param componentName - 组件名称
+ * @returns 对应的包名
+ */
+function getPackageNameFromComponentName(componentName: string): string {
+  // 将驼峰命名转换为短横线命名，并添加前缀
+  return `@moluoxixi/${componentName.replace(/([A-Z])/g, '$1').toLowerCase().replace(/^-/, '')}`
+}
+
+/**
+ * 清理代码中所有的import语句
+ * @param code 需要清理的代码
+ * @returns 清理后的代码
+ */
+function cleanImports(code: string): string {
+  let cleanCode = code;
+
+  // 移除所有类型的import语句
+  // 1. import Name from 'module'
+  cleanCode = cleanCode.replace(/import\s+\w+\s+from\s+["'][^"']+["']\s*;/g, '');
+  // 2. import { name1, name2 } from 'module'
+  cleanCode = cleanCode.replace(/import\s+\{[^}]*\}\s+from\s+["'][^"']+["']\s*;/g, '');
+  // 3. import * as name from 'module'
+  cleanCode = cleanCode.replace(/import\s+\*\s+as\s+\w+\s+from\s+["'][^"']+["']\s*;/g, '');
+  // 4. import 'module'
+  cleanCode = cleanCode.replace(/import\s+["'][^"']+["']\s*;/g, '');
+
+  return cleanCode
 }
 
 /**
  * 组件名称到组件实例的映射对象
  */
-const componentMapping: Record<string, any> = {
-  Vue,
-}
+const componentMapping: Record<string, any> = {}
 
 type analyzeImportsResult = Array<{
   type: string
@@ -425,25 +458,48 @@ function processExports(code: string, allExports: analyzeExportsResult): process
  * @param componentNames
  * @param baseUrl
  */
-async function replaceImportsAndExports(componentNames: string[], baseUrl = 'http://localhost:98/components') {
+async function replaceImportsAndExports(componentNames: string[], componentobj: any) {
   const processedComponents: Record<string, string | null> = {}
+
+  // 预先为所有组件添加依赖映射
+  componentobj.map((item: any) => item.name).forEach(name => {
+    const packageName = getPackageNameFromComponentName(name);
+    addToDependencyMapping(packageName, name);
+  });
 
   for (const name of componentNames) {
     try {
-      // 构建组件URL
-      const componentUrl = `${baseUrl}/${name}/es/index.mjs`
-
-      // 获取组件代码
-      const response = await fetch(componentUrl)
-      if (!response.ok) {
-        throw new Error(`无法加载组件 ${name}: ${response.status} ${response.statusText}`)
-      }
-
-      let componentCode = await response.text()
+      let componentCode = componentobj.find((item: any) => item.name === name).content
       console.log('componentCodecomponentCode', componentCode)
       // 第一阶段：分析所有导入导出语句
       const allImports = analyzeImports(componentCode)
       console.log(`${name}所有解析的import语句:`, allImports)
+
+      // 收集并加载依赖组件
+      const dependencies: string[] = []
+
+      for (const { source } of allImports) {
+        if (source.startsWith('@moluoxixi/')) {
+          // 提取包名中的组件名部分
+          const packagePath = source.substring('@moluoxixi/'.length);
+          // 查找匹配的组件（不区分大小写）
+          const matchedComponent = componentobj.find((item: any) =>
+            item.name.toLowerCase() === packagePath.toLowerCase()
+          )
+          if (matchedComponent && !componentMapping[matchedComponent.name]) {
+            console.log(`发现依赖组件: ${matchedComponent.name} (来自包: ${source})`);
+            dependencies.push(matchedComponent.name);
+            // 动态添加依赖映射
+            addToDependencyMapping(source, matchedComponent.name);
+          }
+        }
+      }
+
+      // 一次性加载所有未加载的依赖组件
+      if (dependencies.length > 0) {
+        console.log(`正在加载${name}的依赖组件:`, dependencies);
+        await loadRemoteComponents(componentMapping.Vue, dependencies, componentobj);
+      }
       const allExports = analyzeExports(componentCode)
       console.log(`${name}所有解析的export语句:`, allExports)
 
@@ -451,6 +507,9 @@ async function replaceImportsAndExports(componentNames: string[], baseUrl = 'htt
       componentCode = processImports(componentCode)
       const processResult = processExports(componentCode, allExports)
       componentCode = processResult.processedCode + processResult.returnCode
+
+      //在执行前完全清理所有可能残留的import语句
+      componentCode = cleanImports(componentCode)
 
       // 存储处理后的代码
       processedComponents[name] = componentCode
@@ -470,9 +529,10 @@ async function replaceImportsAndExports(componentNames: string[], baseUrl = 'htt
  * @param componentNames
  * @param baseUrl
  */
-async function loadRemoteComponents(Vue: any, componentNames: string[], baseUrl = 'http://localhost:98/components') {
+export async function loadRemoteComponents(Vue: any, componentNames: string[], componentobj: any) {
+  componentMapping.Vue = Vue
   // 使用前面定义的函数加载组件代码
-  const componentsCode = await replaceImportsAndExports(componentNames, baseUrl)
+  const componentsCode = await replaceImportsAndExports(componentNames, componentobj)
 
   // 组件结果对象，这将作为函数的返回值
   const componentResults: Record<string, any> = {}
@@ -485,23 +545,18 @@ async function loadRemoteComponents(Vue: any, componentNames: string[], baseUrl 
       // 确保code是字符串
       const codeString = typeof code === 'string' ? code : String(code)
 
-      if (name === 'DateRangePicker') {
-        console.log('component', codeString)
-      }
+      // 再次清理所有可能的import语句（双重保障）
+      cleanImports(codeString);
 
       // 注入process对象和组件映射对象
       // eslint-disable-next-line no-new-func
       const componentsCodeResult = new Function('Vue', 'process', 'componentMapping', codeString)(Vue, {
         env: {
-          NODE_ENV: import.meta.env.DEV ? 'development' : 'production',
+          NODE_ENV: 'production',
         },
       }, componentMapping)
-
-      const { default: component, Example } = componentsCodeResult
+      const { default: component } = componentsCodeResult
       componentResults[name] = component
-      if (name === 'DraggableTable') {
-        componentResults.DraggableTableDemo = Example
-      }
 
       // 更新组件映射对象
       if (name) {
@@ -518,5 +573,3 @@ async function loadRemoteComponents(Vue: any, componentNames: string[], baseUrl 
   }
   return componentResults
 }
-
-//#endregion
