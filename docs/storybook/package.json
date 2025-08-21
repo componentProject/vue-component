@@ -1,7 +1,6 @@
 {
   "name": "@moluoxixi/storybook",
   "version": "1.0.0",
-  "private": true,
   "description": "vue3 storybook 组件库",
   "main": "index.ts",
   "scripts": {
@@ -24,5 +23,7 @@
     "@storybook/vue3-vite": "8.4.7"
   },
   "dependencies": {
+    "@moluoxixi/components": "workspace:*",
+    "element-plus": "catalog:build"
   }
 }

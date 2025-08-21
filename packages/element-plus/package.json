@@ -16,6 +16,18 @@
   },
   "dependencies": {
     "resize-observer-polyfill": "^1.5.1",
-    "vue-slicksort": "^1.2.0"
+    "vue-slicksort": "^1.2.0",
+    "vuedraggable": "catalog:build",
+    "vue": "catalog:build",
+    "@element-plus/icons-vue": "catalog:build",
+    "@formily/core": "catalog:build",
+    "@formily/grid": "catalog:build",
+    "@formily/json-schema": "catalog:build",
+    "@formily/reactive": "catalog:build",
+    "@formily/reactive-vue": "catalog:build",
+    "@formily/shared": "catalog:build",
+    "@formily/validator": "catalog:build",
+    "@formily/vue": "catalog:build",
+    "element-plus": "catalog:build"
   }
 }

@@ -2,20 +2,18 @@
 #输出文件
 test
 test.zip
-src/typings
 moluoxixi
 moluoxixivue2
 docsOut
-# vue3文档
+# 文档
 docs/vitepress/.obsidian
 docs/vitepress/.vitepress/cache
-docs/vitepress/typings
-
-# vue3组件
-packages/components/typings
+typings
+_typings
 stats.html
 
 pnpm-lock.yaml
+yarn.lock
 # Logs
 logs
 *.log
