@@ -27,3 +27,27 @@ export function setWebUpload(data: any) {
     },
   })
 }
+//获取组件列表
+export function getList(data: any) {
+  return axiosApi({
+    url: '/ts-fm/file/getList',
+    method: 'post',
+    data,
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  })
+}
+
+//获取组件实例
+export function getDownLoadByIds(data: any) {
+  return axiosApi({
+    url: '/ts-fm/file/downLoadByIds',
+    method: 'post',
+    data,
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  })
+}
+
