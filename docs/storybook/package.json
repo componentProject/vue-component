@@ -24,7 +24,5 @@
     "@storybook/vue3-vite": "8.4.7"
   },
   "dependencies": {
-    "@moluoxixi/components": "workspace:*",
-    "element-plus": "^2.10.1"
   }
 }

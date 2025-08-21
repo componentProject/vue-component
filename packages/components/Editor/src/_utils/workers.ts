@@ -1,4 +1,4 @@
-import * as monaco from 'monaco-editor'
+import * as monaco from 'monaco-editor/esm/vs/editor/editor.main'
 import EditorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker'
 import JsonWorker from 'monaco-editor/esm/vs/language/json/json.worker?worker'
 import CssWorker from 'monaco-editor/esm/vs/language/css/css.worker?worker'
