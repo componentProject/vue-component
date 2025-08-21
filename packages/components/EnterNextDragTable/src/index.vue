@@ -30,6 +30,7 @@ import { computed, nextTick, ref, useTemplateRef, watch } from 'vue'
 import DraggableTable from '@moluoxixi/components/DraggableTable/index.ts'
 import EnterNextContainer from '@moluoxixi/components/EnterNextContainer/index.ts'
 import type { slotsType } from '@moluoxixi/components/_types'
+import {debounce} from "lodash";
 
 defineOptions({
   name: 'EnterNextDragTable',
@@ -49,23 +50,6 @@ const emit = defineEmits<{
 
 // 获取插槽
 const slots = defineSlots<slotsType>()
-
-// 防抖函数，正确定义类型
-function debounce<T extends (...args: any[]) => void>(
-  fn: T,
-  delay: number,
-): (...args: Parameters<T>) => void {
-  let timer: number | null = null
-  return function (this: any, ...args: Parameters<T>) {
-    if (timer) {
-      clearTimeout(timer)
-    }
-    timer = window.setTimeout(() => {
-      fn.apply(this, args)
-      timer = null
-    }, delay)
-  }
-}
 
 // 使用v-model
 const tableData = defineModel({

@@ -6,6 +6,6 @@ export default eslintConfig(
       'packages/components/ConfigForm/**',
       '.husky/**',
       '**/*.md',
-    ]
+    ],
   },
 )

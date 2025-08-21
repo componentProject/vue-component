@@ -50,6 +50,7 @@
     "fast-glob": "catalog:dev"
   },
   "dependencies": {
+    "moment": "catalog:build",
     "highlight.js": "^11.9.0",
     "@moluoxixi/components": "workspace:*",
     "element-plus": "catalog:build",

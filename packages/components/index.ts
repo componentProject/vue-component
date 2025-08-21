@@ -12,7 +12,6 @@ import Select from '@moluoxixi/components/Select'
 import Tabs from '@moluoxixi/components/Tabs'
 import KeepAllAlive from '@moluoxixi/components/KeepAllAlive'
 import ConfigTable from '@moluoxixi/components/ConfigTable'
-import Editor from '@moluoxixi/components/Editor'
 import ConfigForm from '@moluoxixi/components/ConfigForm'
 
 export {
@@ -20,7 +19,6 @@ export {
   ConfigForm,
   DateRangePicker,
   DraggableTable,
-  Editor,
   EnterNextContainer,
   EnterNextDragTable,
   EnterNextTable,
@@ -32,7 +30,7 @@ export {
   Tabs,
 }
 
-const components: Component[] = [ConfigTable, ConfigForm, DateRangePicker, DraggableTable, EnterNextContainer, EnterNextDragTable, EnterNextTable, ExportExcel, ImportExcel, KeepAllAlive, PopoverTableSelect, Select, Tabs, Editor]
+const components: Component[] = [ConfigTable, ConfigForm, DateRangePicker, DraggableTable, EnterNextContainer, EnterNextDragTable, EnterNextTable, ExportExcel, ImportExcel, KeepAllAlive, PopoverTableSelect, Select, Tabs]
 
 export default {
   install(app: App) {
