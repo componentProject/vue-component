@@ -16,7 +16,7 @@
     "@codemirror/view": "^6.36.5",
     "@element-plus/icons-vue": "^2.3.1",
     "@formily/core": "^2.3.7",
-    "@formily/element-plus": "^1.1.0",
+    "@moluoxixi/element": "workspace:*",
     "@formily/json-schema": "^2.3.7",
     "@formily/vue": "^2.3.7",
     "axios": "^1.9.0",

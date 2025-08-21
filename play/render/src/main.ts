@@ -1,4 +1,5 @@
 import type { QiankunProps } from 'vite-plugin-qiankun/dist/helper'
+import { createApp } from 'vue'
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 import {
   browserTracingIntegration,
@@ -11,7 +12,6 @@ import { ElDialog, ElDrawer } from 'element-plus'
 
 import moment from 'moment'
 import { qiankunWindow, renderWithQiankun } from 'vite-plugin-qiankun/dist/helper'
-import { createApp } from 'vue'
 import directives from '@/directives'
 import i18n from '@/locales'
 import { store } from '@/stores'
