@@ -63,10 +63,7 @@ export default viteConfig(
         routeConfig: {
           componentExamples: {
             glob: ['/../../packages/components/**/Example.vue', '!/../../packages/components/**/components/*'],
-            baseRoute: {
-              path: '/../../packages/components',
-              name: '组件示例',
-            },
+            baseRoute: '组件示例',
           },
         },
       },

@@ -1,6 +1,5 @@
 import type { App, Component } from 'vue'
 
-import ConfigForm from '@moluoxixi/components/ConfigForm'
 import DateRangePicker from '@moluoxixi/components/DateRangePicker'
 import DraggableTable from '@moluoxixi/components/DraggableTable'
 import EnterNextContainer from '@moluoxixi/components/EnterNextContainer'
@@ -14,12 +13,14 @@ import Tabs from '@moluoxixi/components/Tabs'
 import KeepAllAlive from '@moluoxixi/components/KeepAllAlive'
 import ConfigTable from '@moluoxixi/components/ConfigTable'
 import Editor from '@moluoxixi/components/Editor'
+import ConfigForm from '@moluoxixi/components/ConfigForm'
 
 export {
-  ConfigForm,
   ConfigTable,
+  ConfigForm,
   DateRangePicker,
   DraggableTable,
+  Editor,
   EnterNextContainer,
   EnterNextDragTable,
   EnterNextTable,
@@ -29,10 +30,9 @@ export {
   PopoverTableSelect,
   Select,
   Tabs,
-  Editor,
 }
 
-const components: Component[] = [ConfigForm, ConfigTable, DateRangePicker, DraggableTable, EnterNextContainer, EnterNextDragTable, EnterNextTable, ExportExcel, ImportExcel, KeepAllAlive, PopoverTableSelect, Select, Tabs, Editor]
+const components: Component[] = [ConfigTable, ConfigForm, DateRangePicker, DraggableTable, EnterNextContainer, EnterNextDragTable, EnterNextTable, ExportExcel, ImportExcel, KeepAllAlive, PopoverTableSelect, Select, Tabs, Editor]
 
 export default {
   install(app: App) {

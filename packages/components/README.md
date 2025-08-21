@@ -46,7 +46,7 @@ import 'vue-template-components/dist/style.css'
 组件库包含以下组件：
 
 - Calendar - 日历组件
-- ConfigForm - 配置化表单
+- ConfigForm - 配置化表单（基于 Formily + Element Plus）
 - ConfigProvider - 配置提供者
 - DateRangePicker - 日期范围选择器
 - DraggableTable - 可拖拽表格

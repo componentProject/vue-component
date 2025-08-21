@@ -1,4 +1,4 @@
-export type langType
+export type languageType
   = | 'js'
     | 'javascript'
     | 'jsx'
@@ -14,3 +14,5 @@ export type langType
     | 'oracle'
     | 'sqlite'
     | 'mariadb'
+export type themeType
+  = 'vs' | 'hc-black' | 'vs-dark'
