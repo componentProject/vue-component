@@ -53,7 +53,7 @@ function cleanImports(code: string): string {
   // 4. import 'module'
   cleanCode = cleanCode.replace(/import\s+["'][^"']+["']\s*;/g, '');
 
-  return cleanCode;
+  return cleanCode
 }
 
 /**
@@ -552,7 +552,7 @@ export async function loadRemoteComponents(Vue: any, componentNames: string[], c
       // eslint-disable-next-line no-new-func
       const componentsCodeResult = new Function('Vue', 'process', 'componentMapping', codeString)(Vue, {
         env: {
-          NODE_ENV: import.meta.env.DEV ? 'development' : 'production',
+          NODE_ENV: 'production',
         },
       }, componentMapping)
       const { default: component } = componentsCodeResult
@@ -573,4 +573,3 @@ export async function loadRemoteComponents(Vue: any, componentNames: string[], c
   }
   return componentResults
 }
-
