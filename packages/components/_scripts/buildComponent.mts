@@ -3,8 +3,9 @@ import { fileURLToPath } from 'node:url'
 import fs from 'node:fs'
 import fsp from 'node:fs/promises'
 import glob from 'fast-glob'
-import { build } from 'vite'
 import type { InlineConfig } from 'vite'
+import { build } from 'vite'
+
 import pluginVue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
 import dts from 'vite-plugin-dts'
@@ -12,11 +13,11 @@ import autoprefixer from 'autoprefixer'
 import tailwindcss from '@tailwindcss/postcss'
 import process from 'node:process'
 import { execSync } from 'node:child_process'
+import type { ICruiseOptions, ICruiseResult } from 'dependency-cruiser'
 import { cruise } from 'dependency-cruiser'
 import AutoImport from 'unplugin-auto-import/vite'
 import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
 import Components from 'unplugin-vue-components/vite'
-import type { ICruiseOptions, ICruiseResult } from 'dependency-cruiser'
 import viteImagemin from 'vite-plugin-imagemin'
 import { obfuscator } from 'rollup-obfuscator'
 import cssInjectedByJsPlugin from 'vite-plugin-css-injected-by-js'
@@ -34,6 +35,10 @@ const entryBaseUrl = '/'
  * 别名或者外部包的路径
  */
 const aliasComponentPath = '@moluoxixi/components'
+/**
+ * 是否分包，与preserveModules冲突，如果preserveModules开启，则需按preserveModules的目录结构分包
+ */
+const isChunck = false
 /**
  * 是否严格按照目录分组
  */
@@ -63,10 +68,11 @@ const presetGlobals = useExternal
 const peerDepList = Object.keys(presetGlobals)
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
+const rootDir = resolve(__dirname, '../../../')
 /**
  * 组件仓库所在路径
  */
-const rootDir = resolve(__dirname, '../')
+const packDir = resolve(__dirname, '../')
 
 // 主函数
 async function main() {
@@ -132,14 +138,14 @@ main().then((exitCode) => {
 // 获取组件列表（只分目录的组件）
 async function getComponentNames() {
   const componentDirs = await glob([`.${entryBaseUrl}*`, `!.${entryBaseUrl}_*`], {
-    cwd: rootDir,
+    cwd: packDir,
     onlyDirectories: true,
     ignore: [`${entryBaseUrl}_*`],
   })
   const excludeDirs = ['node_modules', LIB_NAMESPACE]
   return componentDirs
-    .map(dir => dir.split('/').pop())
-    .filter(dirName => !excludeDirs.includes(dirName))
+    .map(dir => dir.split('/').pop() || '')
+    .filter(dirName => !!dirName && !excludeDirs.includes(dirName))
 }
 
 /**
@@ -150,15 +156,12 @@ async function getComponentNames() {
  */
 function createBaseConfig(comp: string, internalDeps: string[]): InlineConfig {
   return {
-    root: rootDir,
+    root: packDir,
     configFile: false,
     publicDir: false,
     logLevel: 'info',
     esbuild: {
       pure: ['console.log', 'console.info', 'console.debug'],
-      minifyIdentifiers: false,
-      minifySyntax: false,
-      minifyWhitespace: false,
     },
     plugins: [
       // 添加路径替换插件，将内部组件引用转换为外部包引用
@@ -174,7 +177,7 @@ function createBaseConfig(comp: string, internalDeps: string[]): InlineConfig {
       AutoImport({
         imports: ['vue'],
         resolvers: [ElementPlusResolver()],
-        dts: path.resolve(rootDir, './typings/auto-imports.d.ts'),
+        dts: path.resolve(packDir, './typings/auto-imports.d.ts'),
       }),
       // 与自定义element组件冲突
       Components({
@@ -192,9 +195,8 @@ function createBaseConfig(comp: string, internalDeps: string[]): InlineConfig {
           `!.${entryBaseUrl}**/components/**/*`,
           `!.${entryBaseUrl}**/src/**/*`,
           `!.${entryBaseUrl}**/_*/**/*`,
-
         ],
-        dts: path.resolve(rootDir, './_typings/components.d.ts'),
+        dts: path.resolve(packDir, './_typings/components.d.ts'),
       }),
       viteImagemin({
         gifsicle: { optimizationLevel: 7, interlaced: false },
@@ -207,7 +209,7 @@ function createBaseConfig(comp: string, internalDeps: string[]): InlineConfig {
       }),
       // 添加类型声明生成插件
       dts({
-        root: rootDir,
+        root: packDir,
         entryRoot: `.${entryBaseUrl}${comp}`,
         tsconfigPath: './tsconfig.components.json',
         declarationOnly: false,
@@ -217,9 +219,8 @@ function createBaseConfig(comp: string, internalDeps: string[]): InlineConfig {
     resolve: {
       extensions: ['.js', '.jsx', '.ts', '.tsx', '.vue'],
       alias: {
-        '@': resolve(rootDir, './src'),
-        '@moluoxixi/components': resolve(rootDir, '.'),
-        '@moluoxixi/components/*': resolve(rootDir, './*'),
+        '@moluoxixi/components': resolve(packDir, './'),
+        '@moluoxixi/components/*': resolve(packDir, './*'),
       },
     },
     css: {
@@ -253,7 +254,7 @@ function createBaseConfig(comp: string, internalDeps: string[]): InlineConfig {
  */
 async function getCurrentVersions(): Promise<Record<string, string>> {
   try {
-    const versionPath = resolve(rootDir, 'version.json')
+    const versionPath = resolve(packDir, 'version.json')
     if (!fs.existsSync(versionPath)) {
       // 如果不存在，创建默认版本文件
       const defaultVersions: Record<string, string> = {}
@@ -309,7 +310,7 @@ function getNextVersion(currentVersion: string, type: 'major' | 'minor' | 'patch
  */
 async function writeComponentVersions(versions: Record<string, string>): Promise<boolean> {
   try {
-    const versionPath = resolve(rootDir, 'version.json')
+    const versionPath = resolve(packDir, 'version.json')
 
     // 读取现有版本文件
     let existingVersions: Record<string, string> = {}
@@ -330,9 +331,90 @@ async function writeComponentVersions(versions: Record<string, string>): Promise
     return false
   }
 }
+
 //#endregion
 
 //#region 依赖分析与转换
+
+/**
+ * 读取指定目录下 pnpm list --json 的依赖，并分类返回
+ * 注意：
+ * - 仅基于 pnpm list 的输出进行分类（不做降级/兜底处理）
+ * - 仅解析顶层依赖（--depth 0）
+ * - 返回值中的版本为字符串
+ */
+async function readDepsFromPnpmList(dir: string): Promise<{
+  dependencies: Record<string, string>
+  devDependencies: Record<string, string>
+  peerDependencies: Record<string, string>
+}> {
+  const cwd = resolve(dir)
+  const output = execSync(`pnpm list --filter ${aliasComponentPath} --json`, { cwd, stdio: 'pipe' })
+  const text = output.toString('utf-8')
+  const data = JSON.parse(text)
+
+  const listItems = Array.isArray(data) ? data : [data]
+  const normalizedCwd = resolve(cwd).replace(/\\/g, '/').toLowerCase()
+  const current
+    = listItems.find((it: any) => typeof it?.path === 'string' && it.path.replace(/\\/g, '/').toLowerCase() === normalizedCwd)
+      || listItems[0]
+
+  const pickVersions = (section: any): Record<string, string> => {
+    const result: Record<string, string> = {}
+    if (!section || typeof section !== 'object')
+      return result
+    for (const [name, info] of Object.entries(section)) {
+      if (typeof info === 'string') {
+        result[name as string] = info
+      }
+      else if (info && typeof info === 'object') {
+        const version = (info as any).version
+        if (typeof version === 'string')
+          result[name as string] = version
+      }
+    }
+    return result
+  }
+
+  return {
+    dependencies: pickVersions((current as any)?.dependencies),
+    devDependencies: pickVersions((current as any)?.devDependencies),
+    peerDependencies: pickVersions((current as any)?.peerDependencies),
+  }
+}
+
+/**
+ * 获取项目的包信息或锁文件内容
+ * - 当不传参时：保持兼容，返回 root 下 `package.json` 的对象
+ * - 当传入目录路径数组时：按优先级在每个目录中依次查找并读取
+ *   1) pnpm-lock.yaml
+ *   2) yarn.lock
+ *   3) package.json
+ *   命中即返回 { fileType, filePath, content }
+ *
+ * @param dirs 可选，目录路径数组，按给定顺序遍历
+ * @returns 当有 dirs 时，返回包含文件类型/路径/内容的对象；否则返回 package.json 对象
+ */
+async function getPackageJson(dirs?: string[]) {
+  // 若提供了目录数组，则按优先级读取并尽早返回
+  if (Array.isArray(dirs) && dirs.length > 0) {
+    for (const dir of dirs) {
+      // 仅使用 pnpm list --json
+      try {
+        return readDepsFromPnpmList(dir)
+      }
+      catch {
+      }
+
+      // 读取 package.json 兜底（确保至少有依赖字段返回）
+      const pkgPath = resolve(dir, 'package.json')
+      if (fs.existsSync(pkgPath))
+        return JSON.parse(fs.readFileSync(pkgPath, 'utf-8'))
+    }
+    return null
+  }
+}
+
 /**
  * 使用dependency-cruiser分析组件的完整依赖关系
  * 返回内部依赖和外部依赖
@@ -345,7 +427,7 @@ async function analyzeComponentDeps(comp: string) {
     const allComponents = await getComponentNames()
 
     // 组件目录和入口文件
-    const componentDir = resolve(rootDir, `.${entryBaseUrl}${comp}`)
+    const componentDir = resolve(packDir, `.${entryBaseUrl}${comp}`)
     const entryPoint = fs.existsSync(resolve(componentDir, 'index.ts'))
       ? resolve(componentDir, 'index.ts')
       : resolve(componentDir, 'index.vue')
@@ -361,7 +443,7 @@ async function analyzeComponentDeps(comp: string) {
       moduleSystems: ['es6', 'cjs', 'tsd'],
       // TypeScript配置
       tsConfig: {
-        fileName: resolve(rootDir, 'tsconfig.json'),
+        fileName: resolve(packDir, 'tsconfig.json'),
       },
       // 规则配置
       ruleSet: {
@@ -382,12 +464,13 @@ async function analyzeComponentDeps(comp: string) {
     const peerDeps = new Map()
 
     // 读取项目package.json获取版本信息
-    const projectPkg = JSON.parse(fs.readFileSync(resolve(rootDir, 'package.json'), 'utf-8'))
+    const projectPkg = await getPackageJson([rootDir, packDir])
     const allProjectDeps = {
       ...projectPkg.dependencies || {},
       ...projectPkg.devDependencies || {},
       ...projectPkg.peerDependencies || {},
     }
+    console.log('projectPkg', projectPkg)
 
     // 遍历所有模块和依赖
     if ((cruiseResult.output as ICruiseResult)?.modules) {
@@ -461,7 +544,7 @@ async function analyzeComponentDeps(comp: string) {
             try {
               // 解析@路径为实际路径
               const actualPath = importPath.replace('@/', './')
-              const sharedModulePath = resolve(rootDir, actualPath)
+              const sharedModulePath = resolve(packDir, actualPath)
 
               // 如果是文件，直接扫描；如果是目录，尝试找index文件
               let targetFile = null
@@ -500,7 +583,7 @@ async function analyzeComponentDeps(comp: string) {
               const targetPath = resolve(currentFileDir, importPath)
 
               // 检查目标路径是否在 entryBaseUrl 目录下
-              const componentsDir = resolve(rootDir, `.${entryBaseUrl}`)
+              const componentsDir = resolve(packDir, `.${entryBaseUrl}`)
               const relativeTocComponents = resolve(targetPath).replace(componentsDir, '').replace(/\\/g, '/')
 
               // 如果路径以 / 开头且不包含 .. 说明在 components 目录下
@@ -565,7 +648,11 @@ async function analyzeComponentDeps(comp: string) {
     console.log('peerDeps', peerDeps, newExternalDeps)
 
     // 转换结果
-    const result: { internal: string[], external: Record<string, string>, peerDependencies: Record<string, string> } = {
+    const result: {
+      internal: string[]
+      external: Record<string, string>
+      peerDependencies: Record<string, string>
+    } = {
       internal: Array.from(internalDeps).sort() as string[],
       external: Object.fromEntries(newExternalDeps),
       peerDependencies: Object.fromEntries(peerDeps),
@@ -653,7 +740,7 @@ function createComponentReferencePlugin(internalDeps: string[], currentComponent
             const targetPath = resolve(currentFileDir, importPath)
 
             // 检查目标路径是否在 entryBaseUrl 目录下
-            const componentsDir = resolve(rootDir, `.${entryBaseUrl}`)
+            const componentsDir = resolve(packDir, `.${entryBaseUrl}`)
 
             // 使用 path.relative 来正确计算相对路径
             const relativeToComponents = path.relative(componentsDir, targetPath).replace(/\\/g, '/')
@@ -693,7 +780,7 @@ function createComponentReferencePlugin(internalDeps: string[], currentComponent
         // 处理 ${aliasComponentPath} 路径的自引用
         if (importPath.startsWith(`${aliasComponentPath}/${currentComponent}`)) {
           // 1. 目标文件的绝对路径
-          const targetAbsPath = resolve(rootDir, `.${entryBaseUrl}`, importPath.replace(`${aliasComponentPath}/`, ''))
+          const targetAbsPath = resolve(packDir, `.${entryBaseUrl}`, importPath.replace(`${aliasComponentPath}/`, ''))
           // 2. 当前文件的绝对路径
           const currentFileDir = dirname(id)
           // 3. 计算相对路径
@@ -820,6 +907,7 @@ function createComponentReferencePlugin(internalDeps: string[], currentComponent
     },
   }
 }
+
 //#endregion
 
 //#region 组件打包
@@ -916,12 +1004,28 @@ async function bundleComponentModule({
         },
         output: {
           preserveModules,
-          preserveModulesRoot: resolve(rootDir, `.${entryBaseUrl}${comp}`),
+          preserveModulesRoot: resolve(packDir, `.${entryBaseUrl}${comp}`),
           entryFileNames,
           chunkFileNames,
           globals: Object.assign(globals, presetGlobals),
           ...(exportsType ? { exports: exportsType } : {}),
-          manualChunks: false, // 禁用手动分块，避免文件拆分
+          // 禁用手动分块，避免文件拆分
+          manualChunks: (id: string) => {
+            if (!isChunck) {
+              return 'index'
+            }
+            else {
+              if (id.includes('node_modules')) {
+                return 'vendor'
+              }
+              else if (preserveModules) {
+                return id.split('/').at(-2)
+              }
+              else {
+                return undefined
+              }
+            }
+          },
         },
       },
     },
@@ -938,26 +1042,40 @@ async function getComponentConfig(comp: string) {
 
   // 获取入口文件
   let entry = null
-  if (fs.existsSync(resolve(rootDir, `.${entryBaseUrl}${componentName}/index.ts`))) {
-    entry = resolve(rootDir, `.${entryBaseUrl}${componentName}/index.ts`)
+  if (fs.existsSync(resolve(packDir, `.${entryBaseUrl}${componentName}/index.ts`))) {
+    entry = resolve(packDir, `.${entryBaseUrl}${componentName}/index.ts`)
   }
-  else if (fs.existsSync(resolve(rootDir, `.${entryBaseUrl}${componentName}/index.vue`))) {
-    entry = resolve(rootDir, `.${entryBaseUrl}${componentName}/index.vue`)
+  else if (fs.existsSync(resolve(packDir, `.${entryBaseUrl}${componentName}/index.vue`))) {
+    entry = resolve(packDir, `.${entryBaseUrl}${componentName}/index.vue`)
   }
   else {
     throw new Error(`组件 ${comp} 没有找到入口文件`)
   }
 
   // 获取输出目录
-  const outputDir = resolve(rootDir, `${LIB_NAMESPACE}/${comp ? `/packages/${componentName}` : ''}`)
+  const outputDir = resolve(packDir, `${LIB_NAMESPACE}/${comp ? `/packages/${componentName}` : ''}`)
 
   // 分析组件依赖
-  let dependencies: { internal: string[], external: Record<string, string> } = {
+  let dependencies: {
+    internal: string[]
+    external: Record<string, string>
+    peerDependencies: Record<string, string>
+  } = {
     internal: [],
     external: {},
+    peerDependencies: {},
   }
   try {
-    dependencies = await analyzeComponentDeps(comp)
+    const analyzed = await analyzeComponentDeps(comp) as {
+      internal: string[]
+      external: Record<string, string>
+      peerDependencies: Record<string, string>
+    }
+    dependencies = {
+      internal: analyzed.internal || [],
+      external: analyzed.external || {},
+      peerDependencies: analyzed.peerDependencies || {},
+    }
   }
   catch (error) {
     console.warn(`分析组件 ${comp} 依赖失败: ${(error as Error).message}`)
@@ -981,7 +1099,11 @@ async function buildComponent(
   comp: string,
   entry: string,
   outputDir: string,
-  dependencies: { internal: string[], external: Record<string, string>, peerDependencies: Record<string, string> },
+  dependencies: {
+    internal: string[]
+    external: Record<string, string>
+    peerDependencies: Record<string, string>
+  },
   shouldPublish = false,
 ) {
   const buildName = comp || '组件库'
@@ -1005,10 +1127,6 @@ async function buildComponent(
 
     // 使用传入的依赖分析结果
     const deps = dependencies
-    console.log(`使用传入的依赖分析结果:`)
-    console.log(`- 内部组件: ${deps.internal.join(', ') || '无'}`)
-    console.log(`- 外部依赖: ${Object.keys(deps.external).join(', ') || '无'}`)
-    console.log(`- 预设依赖: ${Object.keys(deps.peerDependencies).join(', ') || '无'}`)
 
     // 构建 globals 配置
     const globals: Record<string, string> = {
@@ -1054,7 +1172,7 @@ async function buildComponent(
 
     // 复制README.md
     const componentName = `\\${comp}`
-    const readmeSrc = resolve(rootDir, `.${entryBaseUrl}${componentName}/README.md`)
+    const readmeSrc = resolve(packDir, `.${entryBaseUrl}${componentName}/README.md`)
     const readmeDest = resolve(outputDir, 'README.md')
     if (fs.existsSync(readmeSrc)) {
       await fsp.copyFile(readmeSrc, readmeDest)
@@ -1107,12 +1225,17 @@ async function buildComponent(
 
     // 分类依赖到 peerDependencies 和 dependencies
     pkgJson.peerDependencies = {
-      ...deps.preerDependencies,
+      ...deps.peerDependencies,
     }
+    const internal: Record<string, string> = deps.internal.reduce((p, item) => {
+      p[`@${LIB_NAMESPACE}/${item.toLowerCase()}`] = 'latest'
+      return p
+    }, {} as Record<string, string>)
     pkgJson.dependencies = {
-      ...deps.internal,
+      ...internal,
       ...deps.external,
     }
+    console.log('dependencies--------------', pkgJson.dependencies)
     // 检查是否有样式文件
     const stylePath = resolve(esOutputDir, 'style/index.css')
     if (fs.existsSync(stylePath)) {
@@ -1226,4 +1349,5 @@ async function doBuild(mode = 'all', shouldPublish = false) {
     return false
   }
 }
+
 //#endregion
