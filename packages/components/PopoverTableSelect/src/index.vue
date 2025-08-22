@@ -105,6 +105,7 @@ watch(
     currentInputValue.value = val
     cacheInputValue.value = val
   },
+  { immediate: true },
 )
 const computedPlaceholder = computed(() => {
   return cacheInputValue.value || props.placeholder
