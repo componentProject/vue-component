@@ -33,7 +33,7 @@ import { loadRemoteComponents } from '../../../utils.ts'
 defineOptions({ name: '调试与演示' })
 
 // 使用ref替代data属性
-const componentName = ref('PopoverTableSelect') // 调试与演示组件库的组件，直接修改组件名
+const componentName = ref('AIAgent') // 调试与演示组件库的组件，直接修改组件名
 const componentsData = ref<any>(null) // 组件库数据对象
 const dynamicDebugButtonComponent = ref<any>(null) // 调试组件
 const dynamicButtonComponent = ref<any>(null) // 用于存储动态组件
@@ -138,7 +138,8 @@ async function getDownLoadByIdsEvent(res: any) {
     const obj = await getDownLoadByIds(params)
     console.log('获取组件实例成功', obj.data.data)
     componentsData.value = obj.data.data
-  } catch (error) {
+  }
+  catch (error) {
     console.error('获取组件实例失败', error)
   }
 }
@@ -152,7 +153,8 @@ async function getListEvent() {
     const res = await getList(params)
     console.log('获取组件列表成功', res.data.data.Vue3) // 注意：这里改为Vue3
     await getDownLoadByIdsEvent(res.data.data.Vue3) // 注意：这里改为Vue3
-  } catch (error) {
+  }
+  catch (error) {
     console.error('获取组件列表失败', error)
   }
 }
@@ -160,6 +162,7 @@ async function getListEvent() {
 onMounted(async () => {
   await getListEvent()
   await loadDebugButtonComponent()
+  return
   await loadComponents([componentName.value], componentsData.value)
 })
 </script>
