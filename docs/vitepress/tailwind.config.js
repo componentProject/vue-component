@@ -1,8 +1,12 @@
-/** @type {import('tailwindcss').Config} */
+/** @type {import('tailwindcss').Config}仅用于v3 */
 export default {
-  content: ['../packages/components/**/*.{vue,js,ts,jsx,tsx}'],
+  content: ['./**/*.{vue,js,ts,jsx,tsx}', './../../packages/components/**/*.{vue,js,ts,jsx,tsx}'],
   theme: {
-    extend: {},
+    // 外边距
+    spacing: Array.from({ length: 1000 }).reduce((map, _, index) => {
+      map[index] = `${index}px`
+      return map
+    }, {}),
   },
   plugins: [],
 }

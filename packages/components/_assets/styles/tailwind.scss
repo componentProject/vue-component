@@ -1,15 +1,16 @@
 //#region use v4 如果用它，需要修改依赖tailwindcss和@tailwindcss/postcss为"^4.1.8"
-@forward 'tailwindcss';
+@forward "tailwindcss";
+@source '../../../components';
+@theme {
+  --spacing: 1px;
+}
+
 @layer base {
   html {
-    font-size: 4px;
     @apply whitespace-nowrap;
   }
   canvas {
     display: inline;
-  }
-  body {
-    font-size: 16px;
   }
 }
 @layer utilities {
