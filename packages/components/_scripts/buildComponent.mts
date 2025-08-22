@@ -183,12 +183,12 @@ function createBaseConfig(comp: string, internalDeps: string[]): InlineConfig {
           }),
         ],
         globs: [
-          `${entryBaseUrl}**/index.vue`,
-          `${entryBaseUrl}**/index.ts`,
-          `!${entryBaseUrl}**/base/**/*`,
-          `!${entryBaseUrl}**/components/**/*`,
-          `!${entryBaseUrl}**/src/**/*`,
-          `!${entryBaseUrl}**/_*/**/*`,
+          `.${entryBaseUrl}**/index.vue`,
+          `.${entryBaseUrl}**/index.ts`,
+          `!.${entryBaseUrl}**/base/**/*`,
+          `!.${entryBaseUrl}**/components/**/*`,
+          `!.${entryBaseUrl}**/src/**/*`,
+          `!.${entryBaseUrl}**/_*/**/*`,
         ],
         dts: path.resolve(rootDir, './_typings/components.d.ts'),
       }),
@@ -213,7 +213,7 @@ function createBaseConfig(comp: string, internalDeps: string[]): InlineConfig {
     resolve: {
       extensions: ['.js', '.jsx', '.ts', '.tsx', '.vue'],
       alias: {
-        '@': resolve(rootDir, './src'),
+        '@moluoxixi/components': resolve(rootDir, './'),
       },
     },
     css: {
