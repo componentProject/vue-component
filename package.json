@@ -71,10 +71,11 @@
     "template"
   ],
   "devDependencies": {
+    "typescript": "catalog:dev",
     "@vue-macros/volar": "catalog:dev",
     "eslint": "catalog:dev",
     "eslint-plugin-format": "catalog:dev",
-    "@moluoxixi/eslintconfig": "catalog:dev",
+    "@antfu/eslint-config": "catalog:dev",
     "@commitlint/cli": "^19.8.0",
     "@commitlint/config-conventional": "^19.8.0",
     "commitizen": "^4.3.1",

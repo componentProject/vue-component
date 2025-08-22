@@ -3,9 +3,18 @@ import antfu from '@antfu/eslint-config'
 import type { optionsType, userConfigType } from './_types/index.ts'
 
 export default function createEslintConfig(config: optionsType, ...userConfigs: userConfigType[]) {
+  const { ignores, rules, ...otherOptions } = config
   return antfu(
     {
+      typescript: true,
+      vue: true,
+      yaml: true,
       formatters: true,
+      ignores: [
+        '.husky/**',
+        '**/*.md',
+        ...ignores,
+      ],
       rules: {
         'style/spaced-comment': 'off',
         //#region 是否强制使用三等号
@@ -26,8 +35,9 @@ export default function createEslintConfig(config: optionsType, ...userConfigs: 
         'jsonc/sort-keys': 'off',
         // 不能使用console
         'no-console': 'off',
+        ...rules,
       },
-      ...config,
+      ...otherOptions,
     },
     ...userConfigs,
   )

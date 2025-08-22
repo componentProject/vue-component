@@ -1,6 +1,6 @@
-import eslintConfig from '@moluoxixi/eslintconfig'
+import EslintConfig from './packages/components/EslintConfig'
 
-export default eslintConfig(
+export default EslintConfig(
   {
     ignores: [
       'packages/components/ConfigForm/**',

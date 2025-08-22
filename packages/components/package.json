@@ -71,7 +71,7 @@
     "sass": "catalog:dev",
     "sass-embedded": "catalog:dev",
     "sass-loader": "catalog:dev",
-    "typescript": "catalog:type",
+    "typescript": "catalog:dev",
     "vite-plugin-compression": "catalog:dev",
     "vite-plugin-imagemin": "catalog:dev",
     "@types/file-saver": "catalog:type",

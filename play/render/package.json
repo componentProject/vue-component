@@ -57,7 +57,7 @@
     "sass": "catalog:dev",
     "sass-embedded": "catalog:dev",
     "sass-loader": "catalog:dev",
-    "typescript": "catalog:type",
+    "typescript": "catalog:dev",
     "vite": "catalog:dev",
     "vite-plugin-qiankun": "catalog:dev"
   },
