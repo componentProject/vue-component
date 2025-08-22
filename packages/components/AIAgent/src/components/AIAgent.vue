@@ -20,6 +20,7 @@
       @resize-start="handleDragStart"
       @resize-end="handleDragEnd"
     >
+    {{ isUserKnowNotice }}
       <UserNotice @confirm="handleUserNoticeConfirm" v-if="!isUserKnowNotice" />
       <!-- 浮动面板头部 -->
       <template #header v-if="isUserKnowNotice">
@@ -100,7 +101,7 @@ import FloatingButton from "./ui/FloatingButton.vue";
 import UserNotice from "./ui/UserNotice.vue";
 import Tabs from "./ui/Tabs.vue";
 import AgentCard from "./ui/AgentCard.vue";
-import ChatAgent from ".//business/ChatAgent.vue";
+import ChatAgent from "./business/ChatAgent.vue";
 import TrasenEditor from "./emrAgent/components/TrasenEditor.vue";
 import { $toast } from "./ui/toast";
 
