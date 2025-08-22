@@ -95,18 +95,18 @@
 </template>
 
 <script>
-import FloatingPanel from "./components/ui/FloatingPanel.vue";
-import FloatingButton from "./components/ui/FloatingButton.vue";
-import UserNotice from "./components/ui/UserNotice.vue";
-import Tabs from "./components/ui/Tabs.vue";
-import AgentCard from "./components/ui/AgentCard.vue";
-import ChatAgent from "./components/business/ChatAgent.vue";
-import TrasenEditor from "./components/emrAgent/components/TrasenEditor.vue";
-import { $toast } from "./components/ui/toast";
+import FloatingPanel from "./ui/FloatingPanel.vue";
+import FloatingButton from "./ui/FloatingButton.vue";
+import UserNotice from "./ui/UserNotice.vue";
+import Tabs from "./ui/Tabs.vue";
+import AgentCard from "./ui/AgentCard.vue";
+import ChatAgent from ".//business/ChatAgent.vue";
+import TrasenEditor from "./emrAgent/components/TrasenEditor.vue";
+import { $toast } from "./ui/toast";
 
-import { formatTemplate } from "./components/emrAgent/js/editorConfig/formatTemplate";
-import { buildAIData } from "./components/emrAgent/js/buildAIData";
-import { needCallCreateEmr } from "./components/emrAgent/js/editorConfig/model";
+import { formatTemplate } from "./emrAgent/js/editorConfig/formatTemplate";
+import { buildAIData } from "./emrAgent/js/buildAIData";
+import { needCallCreateEmr } from "./emrAgent/js/editorConfig/model";
 import {
   generateEmr,
   completeLine,
@@ -114,13 +114,13 @@ import {
   getDictPullDownList,
   getListAgentByApp,
   changeAgentCollect,
-} from "./components/api/api";
+} from "./api/api";
 import {
   updateEmrData,
   initEmrObject,
   parseEmrData,
   clearEmrData,
-} from "./components/emrAgent/js/syncMonacoData";
+} from "./emrAgent/js/syncMonacoData";
 
 export default {
   name: "AIAgent",

@@ -71,6 +71,7 @@
     "template"
   ],
   "devDependencies": {
+    "@vue-macros/volar": "catalog:dev",
     "eslint": "catalog:dev",
     "eslint-plugin-format": "catalog:dev",
     "@moluoxixi/eslintconfig": "catalog:dev",

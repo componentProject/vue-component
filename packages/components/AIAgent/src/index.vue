@@ -5,7 +5,7 @@
 <script setup>
 import { ref } from 'vue'
 import { EmrUtils } from './components/index.js'
-import AIAgentPage from './AIAgent.vue'
+import AIAgentPage from './components/AIAgent.vue'
 
 defineOptions({
   name: 'AIAgent',

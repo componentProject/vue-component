@@ -16,22 +16,22 @@ export const getDataByDeCode = (deCode) => {
         return null;
     }
 
-    for (let i = 0; i < emrObject.emrReadOnlyTemplate.length; i++) {
-        const item = emrObject.emrReadOnlyTemplate[i];
-        if (item.deCode === deCode) {
-            item.line = i + 1;
-            item.type = 'readOnly';
-            return item;
-        }
+    for (let index = 0; index < emrObject.emrReadOnlyTemplate.length; index++) {
+      const item = emrObject.emrReadOnlyTemplate[index];
+      if (item.deCode === deCode) {
+        item.line = index + 1;
+        item.type = 'readOnly';
+        return item;
+      }
     }
 
-    for (let i = 0; i < emrObject.emrNormalTemplate.length; i++) {
-        const item = emrObject.emrNormalTemplate[i];
-        if (item.deCode === deCode) {
-            item.line = i + 1;
-            item.type = 'normal';
-            return item;
-        }
+    for (let index = 0; index < emrObject.emrNormalTemplate.length; index++) {
+      const item = emrObject.emrNormalTemplate[index];
+      if (item.deCode === deCode) {
+        item.line = index + 1;
+        item.type = 'normal';
+        return item;
+      }
     }
 
     return null;
@@ -42,7 +42,7 @@ export const parseEmrData = (emrData) => {
     const retData = [];
     for (let i = 0; i < emrObject.emrNormalTemplate.length; i++) {
         const item = emrObject.emrNormalTemplate[i];
-        const aiItem = emrData.find(i => i.deCode === item.deCode);
+        const aiItem = emrData.find(aiDataItem => aiDataItem.deCode === item.deCode);
         const tempItem = getDataByDeCode(item.deCode);
         if (tempItem && aiItem && tempItem.type === 'normal') {
             retData.push({

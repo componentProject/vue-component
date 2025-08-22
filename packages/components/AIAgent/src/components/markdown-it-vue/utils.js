@@ -36,13 +36,13 @@ export const off = (function () {
   }
 })()
 
-export function rafThrottle(fn) {
+export function rafThrottle(callback) {
   let locked = false;
   return function (...args) {
     if (locked) return
     locked = true
     window.requestAnimationFrame(() => {
-      fn.apply(this, args);
+      callback.apply(this, args);
       locked = false;
     })
   }
