@@ -999,10 +999,6 @@ async function buildComponent(
 
     // 使用传入的依赖分析结果
     const deps = dependencies
-    console.log(`使用传入的依赖分析结果:`)
-    console.log(`- 内部组件: ${deps.internal.join(', ') || '无'}`)
-    console.log(`- 外部依赖: ${Object.keys(deps.external).join(', ') || '无'}`)
-    console.log(`- 预设依赖: ${Object.keys(deps.peerDependencies).join(', ') || '无'}`)
 
     // 构建 globals 配置
     const globals: Record<string, string> = {
@@ -1101,12 +1097,17 @@ async function buildComponent(
 
     // 分类依赖到 peerDependencies 和 dependencies
     pkgJson.peerDependencies = {
-      ...deps.preerDependencies,
+      ...deps.peerDependencies,
     }
+    const internal: Record<string, string>=deps.internal.reduce((p, item)=>{
+      p[`@${LIB_NAMESPACE}/${item.toLowerCase()}`]="latest"
+      return p
+    },{} as Record<string, string>)
     pkgJson.dependencies = {
-      ...deps.internal,
+      ...internal,
       ...deps.external,
     }
+    console.log('dependencies--------------', pkgJson.dependencies)
     // 检查是否有样式文件
     const stylePath = resolve(esOutputDir, 'style/index.css')
     if (fs.existsSync(stylePath)) {
