@@ -156,6 +156,9 @@ function createBaseConfig(comp: string, internalDeps: string[]): InlineConfig {
     logLevel: 'info',
     esbuild: {
       pure: ['console.log', 'console.info', 'console.debug'],
+      minifyIdentifiers: false,
+      minifySyntax: false,
+      minifyWhitespace: false,
     },
     plugins: [
       // 添加路径替换插件，将内部组件引用转换为外部包引用
@@ -189,6 +192,7 @@ function createBaseConfig(comp: string, internalDeps: string[]): InlineConfig {
           `!.${entryBaseUrl}**/components/**/*`,
           `!.${entryBaseUrl}**/src/**/*`,
           `!.${entryBaseUrl}**/_*/**/*`,
+
         ],
         dts: path.resolve(rootDir, './_typings/components.d.ts'),
       }),
@@ -213,7 +217,9 @@ function createBaseConfig(comp: string, internalDeps: string[]): InlineConfig {
     resolve: {
       extensions: ['.js', '.jsx', '.ts', '.tsx', '.vue'],
       alias: {
-        '@moluoxixi/components': resolve(rootDir, './'),
+        '@': resolve(rootDir, './src'),
+        '@moluoxixi/components': resolve(rootDir, '.'),
+        '@moluoxixi/components/*': resolve(rootDir, './*'),
       },
     },
     css: {
@@ -915,7 +921,7 @@ async function bundleComponentModule({
           chunkFileNames,
           globals: Object.assign(globals, presetGlobals),
           ...(exportsType ? { exports: exportsType } : {}),
-          manualChunks: undefined, // 禁用手动分块，避免文件拆分
+          manualChunks: false, // 禁用手动分块，避免文件拆分
         },
       },
     },

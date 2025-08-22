@@ -1,4 +1,3 @@
-"use client"
 import type * as monaco from 'monaco-editor/esm/vs/editor/editor.api'
 
 export interface CreateMonacoEditorOptions {

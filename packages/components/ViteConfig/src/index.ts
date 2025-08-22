@@ -251,6 +251,8 @@ export default function createViteConfig(Config: ViteConfigType) {
         extensions: ['.js', '.jsx', '.ts', '.tsx', '.vue'],
         alias: {
           '@': path.resolve(rootPath, './src'),
+          '@moluoxixi/components': path.resolve(__dirname, '../../'),
+          '@moluoxixi/components/*': path.resolve(__dirname, '../../*'),
         },
       },
       server: {
