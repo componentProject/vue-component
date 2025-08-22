@@ -1,0 +1,49 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "jsx": "preserve",
+    "lib": [
+      "DOM",
+      "ESNext"
+    ],
+    "baseUrl": ".",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "resolveJsonModule": true,
+    "types": [
+      "vite/client"
+    ],
+    "paths": {
+      "@moluoxixi/components": ["packages/components"],
+      "@moluoxixi/element": ["packages/element-plus"],
+      "@moluoxixi/render": ["play/render"],
+      "@moluoxixi/docs": ["docs/vitepress"],
+      "@moluoxixi/storybook": ["docs/storybook"],
+    },
+    "allowJs": true,
+    "strict": true,
+    "strictNullChecks": true,
+    "noUnusedLocals": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "isolatedModules": true,
+    "skipLibCheck": true,
+    "allowImportingTsExtensions": true
+  },
+  "vueCompilerOptions": {
+    "plugins": [
+      "@vue-macros/volar/define-models",
+      "@vue-macros/volar/define-slots",
+      "@vue-macros/volar/define-props",
+      "@vue-macros/volar/define-emits"
+    ]
+  },
+  "include": [
+    "./**/*"
+  ],
+  "exclude": [
+    "./ViteConfig/**/*",
+    "./EslintConfig/**/*"
+  ]
+}

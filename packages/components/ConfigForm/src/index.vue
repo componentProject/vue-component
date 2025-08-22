@@ -10,7 +10,7 @@
 import type {ISchema} from '@formily/json-schema'
 import {createForm} from '@formily/core'
 import {createSchemaField, FormProvider} from '@formily/vue'
-import * as ElementPlusComponents from '@formily/element-plus'
+import * as ElementPlusComponents from '@moluoxixi/element'
 import {watch} from 'vue'
 
 defineOptions({name: 'ConfigForm'})

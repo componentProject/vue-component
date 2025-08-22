@@ -1,7 +1,6 @@
 {
   "name": "@moluoxixi/storybook",
   "version": "1.0.0",
-  "private": true,
   "description": "vue3 storybook 组件库",
   "main": "index.ts",
   "scripts": {
@@ -25,6 +24,6 @@
   },
   "dependencies": {
     "@moluoxixi/components": "workspace:*",
-    "element-plus": "^2.10.1"
+    "element-plus": "catalog:build"
   }
 }
