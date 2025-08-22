@@ -214,6 +214,8 @@ function createBaseConfig(comp: string, internalDeps: string[]): InlineConfig {
       extensions: ['.js', '.jsx', '.ts', '.tsx', '.vue'],
       alias: {
         '@': resolve(rootDir, './src'),
+        '@moluoxixi/components': resolve(rootDir, '.'),
+        '@moluoxixi/components/*': resolve(rootDir, './*'),
       },
     },
     css: {

@@ -3,13 +3,13 @@
     <div class="title">调试与演示</div>
     <div class="main">
       <div class="list-title">开发调试组件</div>
-      <component
+      <!-- <component
         :is="dynamicDebugButtonComponent"
         popType="input"
         :columns="columns"
         :data="tableData"
         v-if="dynamicDebugButtonComponent"
-      />
+      /> -->
     </div>
     <div class="main">
       <div class="list-title">引用组件库解析的组件</div>
@@ -118,14 +118,14 @@ async function loadDebugButtonComponent() {
   }
 }
 
-async function loadComponents(components: string[], componentsData: any) {
+async function loadComponents(components, componentsData) {
   try {
     // 接收并使用loadRemoteComponents的返回值
     // 注意：Vue 3不再需要传入Vue构造函数
     const loadedComponents = await loadRemoteComponents(vue, components, componentsData)
     // 直接赋值给ref.value
     dynamicButtonComponent.value = loadedComponents[componentName.value]
-    console.log('动态组件加载成功:', dynamicButtonComponent.value)
+    console.log('动态组件加载成功:', dynamicButtonComponent)
   }
   catch (error) {
     console.error('加载动态组件失败:', error)
@@ -162,7 +162,6 @@ async function getListEvent() {
 onMounted(async () => {
   await getListEvent()
   await loadDebugButtonComponent()
-  return
   await loadComponents([componentName.value], componentsData.value)
 })
 </script>
