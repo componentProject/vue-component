@@ -3,13 +3,18 @@
         <div class="readonly-info-container">
             <div class="readonly-info-item" v-for="item in patientInfo" :key="item.deCode">
                 <div class="readonly-info-item-title">{{ item.name }}:</div>
-                <div class="readonly-info-item-content" :class="{ 'important-content': importantContent.includes(item.deCode) }">
+                <div
+                    class="readonly-info-item-content"
+                    :class="{ 'important-content': importantContent.includes(item.deCode) }"
+                >
                     {{ item.content || '' }}
                 </div>
             </div>
         </div>
         <div class="regenerate-btn-container" v-if="showRegenerate">
-            <div class="regenerate-btn-item" @click="handleRegenerate"><i class="ai-iconfont icon-refresh"></i>重新生成</div>
+            <div class="regenerate-btn-item" @click="handleRegenerate">
+                <i class="ai-iconfont icon-refresh"></i>重新生成
+            </div>
         </div>
         <div class="monaco-editor-container">
             <div ref="editorContainer" class="monaco-editor"></div>
@@ -21,7 +26,13 @@
 <script>
 import * as monaco from 'monaco-editor';
 import Loading from '../../ui/Loading.vue';
-import { getModelField, getValueByContent, getModelContentByLineNumber, updateEmrContentByLineNumber, needCallCreateEmr } from '../js/editorConfig/model';
+import {
+    getModelField,
+    getValueByContent,
+    getModelContentByLineNumber,
+    updateEmrContentByLineNumber,
+    needCallCreateEmr
+} from '../js/editorConfig/model';
 import MedicalLanguage from '../js/editorConfig/language';
 import { themeName } from '../js/editorConfig/theme';
 import { dealTabCommand } from '../js/editorConfig/command';
@@ -192,7 +203,10 @@ export default {
             editorInstance.onDidChangeCursorSelection(e => {
                 const selection = e.selection;
                 // 判断是否有选中内容
-                if (selection.startLineNumber !== selection.endLineNumber || selection.startColumn !== selection.endColumn) {
+                if (
+                    selection.startLineNumber !== selection.endLineNumber ||
+                    selection.startColumn !== selection.endColumn
+                ) {
                     this.selectedLineNum = [];
                     for (let i = selection.startLineNumber; i <= selection.endLineNumber; i++) {
                         this.selectedLineNum.push(i);
@@ -213,7 +227,10 @@ export default {
                         {
                             text: this.selectedLineNum.length > 0 ? '同步选中行' : '同步当前行',
                             handler: () => {
-                                this.$emit('syncSelectedEmr', this.selectedLineNum.length > 0 ? this.selectedLineNum : currentLineNumber);
+                                this.$emit(
+                                    'syncSelectedEmr',
+                                    this.selectedLineNum.length > 0 ? this.selectedLineNum : currentLineNumber
+                                );
                             }
                         },
                         {
@@ -341,7 +358,12 @@ export default {
                     lineNumber,
                     column: model.getLineMaxColumn(lineNumber)
                 };
-                const range = new monaco.Range(startPosition.lineNumber, startPosition.column, endPosition.lineNumber, endPosition.column);
+                const range = new monaco.Range(
+                    startPosition.lineNumber,
+                    startPosition.column,
+                    endPosition.lineNumber,
+                    endPosition.column
+                );
 
                 const key = obj.name + ':';
 
@@ -406,7 +428,7 @@ export default {
 
     .readonly-info-container {
         padding: 8px;
-        /* white-space: pre-wrap; */
+        white-space: pre-wrap;
         .readonly-info-item {
             display: inline-flex;
             margin-right: 24px;

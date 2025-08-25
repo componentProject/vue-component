@@ -1,6 +1,6 @@
 
 // 服务端地址
-import { $toast } from '@/components/ui/toast';
+import { $toast } from '../../ui/toast';
 
 const apiConfig = {
     baseURL: '',

@@ -55,7 +55,7 @@ const extractInputFields = (node, result, setContent = true) => {
                 dict
             };
             //模板不规范，特殊处理
-            if (!node.Elements || node.Elements.length <= 0 || (node.Elements.length === 1 && node.Elements[0].Type !== 'InputField')) {
+            if (!node.Elements || node.Elements.length <= 0 || node.Elements[0].Type !== 'InputField') {
                 if (readOnlyNodeList.includes(deCode)) {
                     result.readOnly.push(item);
                 } else if (!ignoreNodeList.includes(deCode)) {

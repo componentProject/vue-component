@@ -1,10 +1,12 @@
 import 'highlight.js/styles/atom-one-light.css'
 import hljs from 'highlight.js/lib/core'
+import Htmlbars from 'highlight.js/lib/languages/htmlbars'
 import Handlebars from 'highlight.js/lib/languages/handlebars'
 import Css from 'highlight.js/lib/languages/css'
 import Shell from 'highlight.js/lib/languages/shell'
 import Bash from 'highlight.js/lib/languages/bash'
 import C from 'highlight.js/lib/languages/c'
+import Clike from 'highlight.js/lib/languages/c-like'
 import Java from 'highlight.js/lib/languages/java'
 import Python from 'highlight.js/lib/languages/python'
 import Cpp from 'highlight.js/lib/languages/cpp'
@@ -45,8 +47,6 @@ import Erlang from 'highlight.js/lib/languages/erlang'
 import ErlangRepl from 'highlight.js/lib/languages/erlang-repl'
 import Json from 'highlight.js/lib/languages/json'
 import Ini from 'highlight.js/lib/languages/ini'
-import Htmlbars from 'highlight.js/lib/languages/htmlbars'
-import Clike from 'highlight.js/lib/languages/c-like'
 
 hljs.registerLanguage('json', Json)
 hljs.registerLanguage('ini', Ini)

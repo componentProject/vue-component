@@ -6,7 +6,7 @@
                 placeholder="请输入提示词..."
                 v-model="inputValue"
                 @input="adjustHeight"
-                :style="{ maxHeight: `${6 * lineHeight}px` }"
+                :style="{ maxHeight: `${10 * lineHeight}px` }"
                 ref="promptTextarea"
             ></textarea>
         </div>
@@ -52,7 +52,7 @@ export default {
             if (!target) return;
             target.style.height = 'auto';
             let rows = Math.floor(target.scrollHeight / this.lineHeight);
-            this.rows = rows < 2 ? 2 : rows > 6 ? 6 : rows;
+            this.rows = rows < 2 ? 2 : rows > 10 ? 10 : rows;
             target.style.height = `${this.rows * this.lineHeight}px`;
         },
         handleSave() {

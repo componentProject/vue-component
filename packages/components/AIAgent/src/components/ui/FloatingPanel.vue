@@ -1,6 +1,7 @@
 <template>
     <div
         class="floating-panel"
+        :class="{ 'drag-panel-disabled': !drag }"
         id="trasen-ai-agent-floating-panel"
         :style="{
             width: `${containerWidth}px`,
@@ -10,38 +11,39 @@
         }"
         v-show="visible"
     >
-        <!-- 左边调整句柄 -->
-        <div class="resize-handle resize-handle-left" @mousedown="handleMouseDown($event, 'left')" />
-        <!-- 右边调整句柄 -->
-        <div class="resize-handle resize-handle-right" @mousedown="handleMouseDown($event, 'right')" />
-        <!-- 上边调整句柄 -->
-        <div class="resize-handle resize-handle-top" @mousedown="handleMouseDown($event, 'top')" />
-        <!-- 下边调整句柄 -->
-        <div class="resize-handle resize-handle-bottom" @mousedown="handleMouseDown($event, 'bottom')" />
-        <!-- 四个角的调整句柄 -->
-        <div
-            class="resize-handle resize-handle-corner resize-handle-top-left"
-            @mousedown="handleMouseDown($event, 'top-left')"
-        />
-        <div
-            class="resize-handle resize-handle-corner resize-handle-top-right"
-            @mousedown="handleMouseDown($event, 'top-right')"
-        />
-        <div
-            class="resize-handle resize-handle-corner resize-handle-bottom-left"
-            @mousedown="handleMouseDown($event, 'bottom-left')"
-        />
-        <div
-            class="resize-handle resize-handle-corner resize-handle-bottom-right"
-            @mousedown="handleMouseDown($event, 'bottom-right')"
-        />
-
+        <template v-if="drag">
+            <!-- 左边调整句柄 -->
+            <div class="resize-handle resize-handle-left" @mousedown="handleMouseDown($event, 'left')" />
+            <!-- 右边调整句柄 -->
+            <div class="resize-handle resize-handle-right" @mousedown="handleMouseDown($event, 'right')" />
+            <!-- 上边调整句柄 -->
+            <div class="resize-handle resize-handle-top" @mousedown="handleMouseDown($event, 'top')" />
+            <!-- 下边调整句柄 -->
+            <div class="resize-handle resize-handle-bottom" @mousedown="handleMouseDown($event, 'bottom')" />
+            <!-- 四个角的调整句柄 -->
+            <div
+                class="resize-handle resize-handle-corner resize-handle-top-left"
+                @mousedown="handleMouseDown($event, 'top-left')"
+            />
+            <div
+                class="resize-handle resize-handle-corner resize-handle-top-right"
+                @mousedown="handleMouseDown($event, 'top-right')"
+            />
+            <div
+                class="resize-handle resize-handle-corner resize-handle-bottom-left"
+                @mousedown="handleMouseDown($event, 'bottom-left')"
+            />
+            <div
+                class="resize-handle resize-handle-corner resize-handle-bottom-right"
+                @mousedown="handleMouseDown($event, 'bottom-right')"
+            />
+        </template>
         <slot></slot>
         <div class="floating-panel-header" @mousedown="handleHeaderMouseDown($event)">
             <slot name="header" v-if="$slots.header"></slot>
             <template v-else>
                 <div class="floating-panel-header-title">标题</div>
-                <div class="floating-panel-header-close" @click="handleClose" @mousedown.stop>
+                <div class="floating-panel-header-close" @click="handleClose" @mousedown.stop v-if="drag">
                     <i class="ai-iconfont icon-times"></i>
                 </div>
             </template>
@@ -87,6 +89,10 @@ export default {
         minHeight: {
             type: Number,
             default: 380
+        },
+        drag: {
+            type: Boolean,
+            default: true
         }
     },
     created() {
@@ -407,7 +413,7 @@ export default {
         display: flex;
         align-items: center;
         color: #29354f;
-        padding: 6px 20px;
+        padding: 6px 12px;
         border-bottom: 1px solid #e3e6e9;
         background-color: #f9fafc;
         user-select: none;
@@ -550,5 +556,13 @@ export default {
         right: -5px;
         cursor: se-resize;
     }
+}
+.drag-panel-disabled {
+    position: static !important;
+    display: flex !important;
+    width: 100% !important;
+    height: 100% !important;
+    box-shadow: unset !important;
+    border: unset !important;
 }
 </style>

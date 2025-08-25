@@ -1,6 +1,6 @@
 @font-face {
     font-family: 'ai-iconfont'; /* Project id 4940645 */
-    src: url('iconfont.ttf?t=1753337364317') format('truetype');
+    src: url('iconfont.ttf?t=1755152280009') format('truetype');
 }
 
 .ai-iconfont {
@@ -9,6 +9,18 @@
     font-style: normal;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-bangzhu:before {
+    content: '\e606';
+}
+
+.icon-wenhaofill:before {
+    content: '\e72c';
+}
+
+.icon-wenhao:before {
+    content: '\e72d';
 }
 
 .icon-statistics:before {
