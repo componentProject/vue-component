@@ -14,7 +14,11 @@
                     </div>
                 </div>
                 <div class="bubble-content" v-else>
-                    <div class="bubble-content-text markdown-body" v-html="content" v-if="role === 'assistant'"></div>
+                    <div
+                        class="bubble-content-text markdown-body"
+                        v-html="processedContent"
+                        v-if="role === 'assistant'"
+                    ></div>
                     <div class="bubble-content-text error" v-else-if="role === 'error'">{{ content }}</div>
                     <div class="bubble-content-text user" v-else>{{ content }}</div>
                     <div class="bubble-tip" v-if="role === 'assistant'">本回答由AI生成，内容仅供参考，请仔细甄别。</div>
@@ -44,6 +48,126 @@ export default {
     },
     data() {
         return {};
+    },
+    computed: {
+        processedContent() {
+            if (this.role !== 'assistant' || !this.content) {
+                return this.content;
+            }
+
+            // 处理details标签，添加自定义样式和自动折叠逻辑
+            return this.processDetailsTags(this.content);
+        }
+    },
+    methods: {
+        processDetailsTags(content) {
+            // 使用正则表达式查找details标签
+            const detailsRegex = /<details[^>]*>([\s\S]*?)<\/details>/g;
+
+            return content.replace(detailsRegex, (match, innerContent) => {
+                // 检查是否包含Thinking...，如果是则添加自动折叠逻辑
+                if (innerContent.includes('Thinking...')) {
+                    // 替换Thinking...为初始状态
+                    const processedMatch = match.replace(
+                        /<summary[^>]*>([^<]*Thinking[^<]*)<\/summary>/,
+                        '<summary>思考中...</summary>'
+                    );
+
+                    // 添加自定义样式类
+                    const styledMatch = processedMatch.replace(
+                        /<details([^>]*)>/,
+                        '<details$1 class="thinking-details" data-auto-collapse="true">'
+                    );
+
+                    // 在下一个tick中处理自动折叠
+                    this.$nextTick(() => {
+                        this.setupAutoCollapse();
+                    });
+
+                    return styledMatch;
+                }
+
+                return match;
+            });
+        },
+
+        setupAutoCollapse() {
+            // 只查找当前组件内的details标签，避免影响其他组件
+            const detailsElements = this.$el.querySelectorAll('details.thinking-details');
+
+            if (detailsElements.length === 0) return;
+
+            detailsElements.forEach(details => {
+                // 检查details是否已经闭合（没有open属性）
+                if (!details.hasAttribute('open')) {
+                    return;
+                }
+
+                // 监听内容变化，当检测到details标签闭合时自动折叠
+                const observer = new MutationObserver(mutations => {
+                    mutations.forEach(mutation => {
+                        if (mutation.type === 'attributes' && mutation.attributeName === 'open') {
+                            // 如果details被手动关闭，停止观察
+                            if (!details.hasAttribute('open')) {
+                                observer.disconnect();
+                            }
+                        }
+                    });
+                });
+
+                // 开始观察
+                observer.observe(details, {
+                    attributes: true,
+                    attributeFilter: ['open']
+                });
+
+                // 检查内容是否包含完整的思考过程
+                const checkContentCompletion = () => {
+                    const content = details.innerHTML;
+                    // 如果内容包含完整的details结构，延迟后自动折叠
+                    if (content.includes('</details>') || content.includes('</summary>')) {
+                        setTimeout(() => {
+                            // 检查是否还在观察中且仍然打开
+                            if (details.hasAttribute('open') && details.getAttribute('data-auto-collapse') === 'true') {
+                                // 更新summary内容为完成状态
+                                this.updateSummaryToCompleted(details);
+
+                                details.removeAttribute('open');
+                                details.classList.add('auto-collapsed');
+                                observer.disconnect();
+                            }
+                        }, 50);
+                    }
+                };
+
+                // 延迟检查内容完整性
+                setTimeout(checkContentCompletion, 50);
+            });
+        },
+
+        updateSummaryToCompleted(detailsElement) {
+            // 使用更安全的方式查找summary元素，确保只在当前组件内查找
+            const summaryElement = detailsElement.querySelector('summary');
+            if (summaryElement) {
+                summaryElement.textContent = '已深度思考...';
+            }
+        }
+    },
+
+    mounted() {
+        if (this.role === 'assistant' && this.content) {
+            this.$nextTick(() => {
+                this.setupAutoCollapse();
+            });
+        }
+    },
+
+    updated() {
+        if (this.role === 'assistant' && this.content) {
+            this.$nextTick(() => {
+                this.setupAutoCollapse();
+            });
+        }
     }
 };
 </script>
@@ -98,9 +222,58 @@ export default {
             border-radius: 12px;
             box-sizing: border-box;
             color: #333;
-            line-height: 1.8;
+            line-height: 1.5;
             font-size: 15px;
             white-space: normal;
+
+            // 美化details标签样式
+            details {
+                border: 1px solid #e1e5e9 !important;
+                border-radius: 4px !important;
+                overflow: hidden !important;
+                transition: all 0.3s ease !important;
+                font-size: 13px;
+                summary {
+                    cursor: pointer;
+                    color: #1e293b;
+                    position: relative;
+                    transition: all 0.2s ease;
+                    display: block;
+                    margin: 0;
+                    font-size: 14px;
+                    line-height: 1.5;
+
+                    &::after {
+                        content: '▼';
+                        position: absolute;
+                        right: 0px;
+                        top: 50%;
+                        transform: translateY(-50%);
+                        font-size: 12px;
+                        color: #64748b;
+                        transition: transform 0.2s ease;
+                    }
+                }
+
+                &[open] summary::after {
+                    transform: translateY(-50%) rotate(180deg);
+                }
+                > :last-child {
+                    margin-bottom: 0;
+                }
+
+                // 特殊样式：Thinking... 状态
+                // &.thinking-details summary::before {
+                //     content: '🤔' !important;
+                //     animation: thinking-pulse 2s infinite !important;
+                // }
+
+                // // 特殊样式：已完成状态
+                // &.auto-collapsed summary::before {
+                //     content: '✅' !important;
+                // }
+            }
+
             .hljs code {
                 white-space: pre-wrap;
             }
@@ -132,6 +305,7 @@ export default {
             display: flex;
             align-items: center;
             padding: 0 10px;
+            line-height: 38px;
         }
 
         .bubble-tip {
@@ -234,6 +408,18 @@ export default {
     }
     50% {
         opacity: 0.3;
+    }
+}
+
+@keyframes thinking-pulse {
+    0%,
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.7;
+        transform: scale(1.1);
     }
 }
 </style>

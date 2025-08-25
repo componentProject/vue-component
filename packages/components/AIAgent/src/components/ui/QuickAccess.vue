@@ -1,23 +1,22 @@
 <template>
-    <div class="tabs-container">
+    <div class="tabs-container" v-if="tabList.length > 0">
         <div class="tabs">
-            <div class="tab-item" :class="{ active: currentTab === '全部' }" @click="handleTabClick({ id: '全部' })">
+            <div class="tab-item" :class="{ active: currentTab === '全部' }" @click="handleTabClick({ appId: '全部' })">
                 <i class="ai-iconfont icon-tubiao_-"></i>
                 全部
             </div>
 
             <div
                 class="tab-item"
-                :class="{ active: currentTab === item.id }"
+                :class="{ active: currentTab === item.appId }"
                 v-for="(item, index) in tabList"
-                :key="item.id"
+                :key="item.appId"
                 @click="handleTabClick(item)"
             >
-                <i :class="'iconfont ' + iconList[index]"></i>
-                {{ item.name }}
+                <i :class="'ai-iconfont ' + iconList[index % 4]"></i>
+                {{ item.appName }}
             </div>
         </div>
-        <div style="height: 12px"></div>
     </div>
 </template>
 
@@ -25,17 +24,24 @@
 export default {
     name: 'Tabs',
     props: {
-        tabList: {
+        list: {
             type: Array,
             default: () => []
-        },
-        currentTab: {
-            type: String,
-            default: ''
+        }
+    },
+    watch: {
+        list: {
+            handler(newVal) {
+                this.tabList = newVal.filter(item => item.agentInfo.collectFlag == 2);
+            },
+            deep: true,
+            immediate: true
         }
     },
     data() {
         return {
+            currentTab: '全部',
+            tabList: [],
             iconList: [
                 'icon-yiliaoweisheng-',
                 'icon-yiliao',
@@ -46,8 +52,11 @@ export default {
     },
     methods: {
         handleTabClick(item) {
-            this.$emit('update:currentTab', item.id);
-            // this.$emit('change', item);
+            if (item.appId == '全部') {
+                this.$emit('change', null);
+            } else {
+                this.$emit('change', item);
+            }
         }
     }
 };
@@ -55,11 +64,12 @@ export default {
 <style scoped lang="scss">
 .tabs-container {
     padding: 0 16px 4px 16px;
-    overflow-x: auto;
     overflow: hidden;
+    overflow-x: auto;
+    margin-bottom: 8px;
     .tabs {
         white-space: nowrap;
-        text-align: center;
+        // text-align: center;
         .tab-item {
             height: 30px;
             padding: 0 12px;
@@ -67,7 +77,7 @@ export default {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            border-radius: 15px;
+            border-radius: 8px;
             border: 1px solid #e5e5e5;
             color: #333;
             cursor: pointer;

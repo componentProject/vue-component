@@ -1,15 +1,6 @@
 <template>
     <div class="chat-agent">
         <div class="chat-agent-container">
-            <AgentHeader
-                :agent="agent"
-                :is-star="isStar"
-                :show-back="showBack"
-                :show-params="hasCustomParams"
-                @back="back"
-                @star="handleStar"
-                @show-params="showParamsPanel = true"
-            />
             <div class="chat-agent-content">
                 <div class="chat-list-container">
                     <div class="chat-list-content" @scroll="handleScroll" ref="chatList">
@@ -41,7 +32,14 @@
                 </div>
                 <div class="chat-footer">
                     <div class="page-config">
-                        <div v-if="pageConfig.showEditWord == 'Y'" class="config-btn" @click="isEditPrompt = true">
+                        <div
+                            v-if="pageConfig.showEditWord == 'Y'"
+                            class="config-btn"
+                            @click="
+                                isEditPrompt = true;
+                                showParamsPanel = false;
+                            "
+                        >
                             修改提示词
                         </div>
                         <div
@@ -59,11 +57,31 @@
                         >
                             AI提问{{ isShrinkInput ? '展开' : '收起' }}
                         </div>
+                        <div
+                            v-if="hasCustomParams && pageConfig.showReplenishInformation == 'Y'"
+                            class="config-btn"
+                            @click="
+                                showParamsPanel = !showParamsPanel;
+                                isEditPrompt = false;
+                            "
+                        >
+                            补充信息
+                        </div>
                     </div>
+                    <ParamsPanel
+                        :visible="showParamsPanel"
+                        @update:visible="showParamsPanel = $event"
+                        :params="configParams"
+                        :showSubmit="pageConfig.showDialogBox == 'N'"
+                        @submit="sendMessage"
+                        v-if="hasCustomParams && pageConfig.showReplenishInformation == 'Y'"
+                    />
                     <ChatInput
-                        v-model="inputContent"
+                        :modelValue="inputContent"
+                        @update:modelValue="inputContent = $event"
                         :show-new-message="pageConfig.showNewConversation == 'Y'"
                         :stop-disabled="isStreamLoad"
+                        :params="configParams"
                         @send="sendMessage"
                         @stop="onStop"
                         @newMessage="newMessage"
@@ -82,14 +100,12 @@
             </div>
 
             <FeedBack ref="feedBackRef" />
-            <ParamsPanel v-model:visible="showParamsPanel" :params="configParams" v-if="hasCustomParams" />
         </div>
     </div>
 </template>
 
 <script>
-import AgentHeader from '../ui/AgentHeader.vue';
-import Bubble from '../ui/Bubble.vue';
+import Bubble from '..//ui/Bubble.vue';
 import ChatInput from '../ui/ChatInput.vue';
 import Conversations from '../ui/Conversations.vue';
 import tsAiChat from '../utils/tsAiChat.js';
@@ -105,12 +121,13 @@ import {
     getAgentInfo,
     getConversationList,
     changeAgentCollect,
-    getDetailByConversationId
+    getDetailByConversationId,
+    getCommonSysDetailsData
 } from '../api/api';
 import { $toast } from '../ui/toast';
 export default {
     name: 'ChatAgent',
-    components: { AgentHeader, Bubble, BubbleAction, ChatInput, Conversations, EditPrompt, FeedBack, ParamsPanel },
+    components: { Bubble, BubbleAction, ChatInput, Conversations, EditPrompt, FeedBack, ParamsPanel },
     inject: ['token'],
     mixins: [markdownIt],
     props: {
@@ -121,6 +138,10 @@ export default {
         showBack: {
             type: Boolean,
             default: true
+        },
+        commonSysData: {
+            type: Object,
+            default: () => ({})
         }
     },
     data() {
@@ -129,7 +150,7 @@ export default {
     watch: {
         agent: {
             handler(newVal) {
-                if (newVal.agentInfo.id) {
+                if (newVal.agentInfo.id && !newVal.isCache) {
                     this.isStar = newVal.agentInfo.collectFlag;
                     this.resetChat();
                     this.getAgentInfo();
@@ -161,7 +182,7 @@ export default {
                 cueWordDetail: '', //提示词详情
                 pageConfig: {}, //页面配置
                 isShrinkInput: false, //是否收起输入框
-                hasCustomParams: true, //是否存在自定义参数
+                hasCustomParams: false, //是否存在自定义参数
                 showParamsPanel: false, //是否显示参数面板
                 configParams: [], //输入参数配置
                 inputContent: '' // 输入框内容（如果需要父组件控制）
@@ -227,7 +248,7 @@ export default {
             }
         },
 
-        sendMessage(inputValue) {
+        sendMessage(inputValue = '') {
             for (let param of this.configParams) {
                 if (param.isRequired == 1 && !param.paramValue) {
                     $toast(`请输入参数${param.paramExplain || param.paramName}`, {
@@ -241,11 +262,10 @@ export default {
             this.inputEnter(inputValue);
             this.$emit('send', inputValue);
         },
-        inputEnter(inputValue) {
+        inputEnter(inputValue = '') {
             if (this.isStreamLoad) {
                 return;
             }
-            if (!inputValue) return;
             const params = {
                 message_id: '',
                 conversationId: '',
@@ -311,7 +331,10 @@ export default {
                 };
 
                 const stream = await this.tsAiChat.chatStream(options);
-
+                if (!stream || stream.ok == false) {
+                    this.onComplete(false, stream.message || '请求失败', lastItem);
+                    return;
+                }
                 // 判断流式响应的关键点：
                 // 1. 检查Content-Type是否是事件流
                 const contentType = stream.headers.get('content-type') || '';
@@ -321,16 +344,17 @@ export default {
                 if (!isStream) {
                     try {
                         const res = await stream.json();
-                        if (res.statusCode != 200) {
-                            this.onComplete(false, res.message || '请求失败');
+                        if (res.statusCode != 200 || !res.object) {
+                            this.onComplete(false, res.message || '请求失败', lastItem);
                         } else {
-                            lastItem.content = res.object.text;
+                            const key = Object.keys(res.object)[0];
+                            lastItem.content = res.object[key];
                             lastItem.markedContent = this.md.render(lastItem.content);
                             this.onComplete(true, res.object, lastItem);
                         }
                         return;
                     } catch (error) {
-                        this.onComplete(false, error.message || '请求失败');
+                        this.onComplete(false, error.message || '请求失败', lastItem);
                         return;
                     }
                 }
@@ -430,12 +454,19 @@ export default {
                     showNewConversation: 'N',
                     showEditWord: 'Y',
                     showHistoryConversation: 'Y'
+
+                    // showReplenishInformation: 'N',
+                    // outputType: '1',
+                    // pageTemplate: ''
                 };
             }
-            const configParams = res.configParam?.agentConfigParamList || [];
+            const configParams = (res.configParam?.agentConfigParamList || []).filter(item => item.paramType == 2);
             if (configParams && configParams.length > 0) {
                 this.hasCustomParams = true;
                 this.configParams = JSON.parse(JSON.stringify(configParams));
+                if (res.agentConfig.callbackUrl) {
+                    this.setConfigParams(res.agentConfig.callbackUrl);
+                }
             }
         },
         async getCueWordDetail() {
@@ -459,10 +490,22 @@ export default {
             }
         },
 
+        async setConfigParams(url) {
+            const res = await getCommonSysDetailsData(url, this.commonSysData);
+            if (JSON.stringify(res) == '{}') {
+                return;
+            }
+            for (let item of this.configParams) {
+                if (res[item.paramName]) {
+                    item.paramValue = res[item.paramName];
+                }
+            }
+            this.sendMessage(this.inputContent);
+        },
+
         resetChat() {
             // 停止当前流
             this.tsAiChat && this.tsAiChat.stopStream();
-
             // 保存需要保留的状态
             const preservedState = {
                 isStar: this.agent.agentInfo.collectFlag,
@@ -471,7 +514,20 @@ export default {
             };
 
             // 一次性重置到初始状态并合并保留状态
-            Object.assign(this, this.getInitialData(), preservedState);
+            Object.assign(this, this.getInitialData());
+        },
+
+        // 添加一个方法来获取当前状态（供父组件调用）
+        getCurrentState() {
+            return JSON.parse(JSON.stringify(this.$data));
+        },
+
+        // 添加一个方法来设置状态（供父组件调用）
+        setState(state) {
+            if (!state) return;
+            setTimeout(() => {
+                Object.assign(this, state);
+            }, 100);
         }
     }
 };

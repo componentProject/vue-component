@@ -5,9 +5,10 @@
                 class="chat-textarea__inner"
                 placeholder="请输入消息..."
                 v-model="inputValue"
-                @keyup.enter="sendMessage"
+                @keydown="handleKeydown"
                 @input="adjustHeight"
-                :style="{ maxHeight: `${6 * lineHeight}px` }"
+                :style="{ maxHeight: `${10 * lineHeight + 18}px` }"
+                ref="promptTextarea"
             ></textarea>
         </div>
         <div class="chat-bottom">
@@ -20,7 +21,7 @@
             </div>
             <div
                 class="chat-button"
-                :class="{ 'chat-is-disabled': !inputValue || stopDisabled }"
+                :class="{ 'chat-is-disabled': submitDisabled }"
                 @click="sendMessage"
                 v-if="!stopDisabled"
             >
@@ -35,17 +36,13 @@
 </template>
 
 <script>
-// import Select from './Select.vue';
 export default {
     name: 'ChatInput',
-    // components: {
-    //     Select
-    // },
     data() {
         return {
+            inputValue: '',
             lineHeight: 22,
-            rows: 2
-            // selectValue: ''
+            rows: 1
         };
     },
     props: {
@@ -60,21 +57,45 @@ export default {
         showNewMessage: {
             type: Boolean,
             default: true
+        },
+        params: {
+            type: Array,
+            default: () => []
+        }
+    },
+    watch: {
+        modelValue: {
+            handler(newVal) {
+                this.inputValue = newVal;
+            },
+            immediate: true
+        },
+        inputValue: {
+            handler(newVal) {
+                this.$emit('update:modelValue', newVal);
+            },
+            immediate: true
         }
     },
     computed: {
-        inputValue: {
-            get() {
-                return this.modelValue;
-            },
-            set(value) {
-                this.$emit('update:modelValue', value);
+        submitDisabled() {
+            const requiredParams = this.params.filter(param => param.isRequired == 1);
+            const allParamsDone =
+                requiredParams.length > 0
+                    ? requiredParams.every(param => param.paramValue)
+                    : this.params.some(param => param.paramValue);
+            let allDone = false;
+            if (requiredParams.length > 0) {
+                allDone = allParamsDone;
+            } else {
+                allDone = this.params.some(param => param.paramValue) || !!this.inputValue;
             }
+            return this.stopDisabled || !allDone;
         }
     },
     methods: {
         sendMessage() {
-            if (this.stopDisabled || !this.inputValue) {
+            if (this.submitDisabled) {
                 return;
             }
             this.$emit('send', this.inputValue);
@@ -88,11 +109,42 @@ export default {
             // 新对话时清空输入框
         },
         adjustHeight(e) {
-            const target = e.target;
+            const target = this.$refs.promptTextarea;
+            if (!target) return;
             target.style.height = 'auto';
             let rows = Math.floor(target.scrollHeight / this.lineHeight);
-            this.rows = rows < 2 ? 2 : rows > 6 ? 6 : rows;
+            this.rows = rows < 2 ? 2 : rows > 10 ? 10 : rows;
             target.style.height = `${this.rows * this.lineHeight}px`;
+        },
+        handleKeydown(e) {
+            const isEnter = e.key === 'Enter' || e.keyCode === 13;
+            const isCtrl = e.ctrlKey;
+            const isShift = e.shiftKey;
+
+            if (isEnter) {
+                // Enter 发送消息
+                if (!isCtrl && !isShift) {
+                    e.preventDefault();
+                    this.sendMessage();
+                } else if (isCtrl || isShift) {
+                    // 手动插入换行符
+                    e.preventDefault();
+                    const textarea = e.target;
+                    const start = textarea.selectionStart;
+                    const end = textarea.selectionEnd;
+                    const value = this.inputValue;
+
+                    // 在光标位置插入换行符
+                    this.inputValue = value.substring(0, start) + '\n' + value.substring(end);
+
+                    // 设置光标位置到换行符后
+                    this.$nextTick(() => {
+                        textarea.selectionStart = textarea.selectionEnd = start + 1;
+                        // 触发高度调整
+                        this.adjustHeight(e);
+                    });
+                }
+            }
         }
     }
 };
