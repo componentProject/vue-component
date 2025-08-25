@@ -641,7 +641,10 @@ export default {
   },
 };
 </script>
-
+<style>
+@import './assets/iconfont/iconfont.css';
+@import './components/markdown-it-vue/markdown-it.css';
+</style>
 <style scoped lang="scss">
 .ai-agent {
   font-family: "Microsoft YaHei", sans-serif;
