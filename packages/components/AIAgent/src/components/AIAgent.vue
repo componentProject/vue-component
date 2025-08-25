@@ -20,7 +20,6 @@
       @resize-start="handleDragStart"
       @resize-end="handleDragEnd"
     >
-    {{ isUserKnowNotice }}
       <UserNotice @confirm="handleUserNoticeConfirm" v-if="!isUserKnowNotice" />
       <!-- 浮动面板头部 -->
       <template #header v-if="isUserKnowNotice">
@@ -52,7 +51,7 @@
       <!-- 浮动面板内容 -->
       <template #content v-if="isUserKnowNotice">
         <template v-if="currentView == 'findAgent'">
-          <Tabs :tabList="categoryList" v-model:currentTab="currentTab" />
+          <CXTabs :tabList="categoryList" v-model:currentTab="currentTab" />
           <div class="agent-list-container">
             <!-- 智能体列表 -->
             <div class="agent-list" id="tsAiAgent-find-agent-list">
@@ -99,7 +98,7 @@
 import FloatingPanel from "./ui/FloatingPanel.vue";
 import FloatingButton from "./ui/FloatingButton.vue";
 import UserNotice from "./ui/UserNotice.vue";
-import Tabs from "./ui/Tabs.vue";
+import CXTabs from "./ui/Tabs.vue";
 import AgentCard from "./ui/AgentCard.vue";
 import ChatAgent from "./business/ChatAgent.vue";
 import TrasenEditor from "./emrAgent/components/TrasenEditor.vue";
@@ -129,7 +128,7 @@ export default {
     FloatingPanel,
     FloatingButton,
     UserNotice,
-    Tabs,
+    CXTabs,
     AgentCard,
     ChatAgent,
     TrasenEditor,

@@ -56,6 +56,17 @@ export default viteConfig(
                 })
               },
             },
+            '/ai-application': {
+              // target: 'http://192.168.31.46:19061',
+              target: 'http://192.168.209.101:19061',
+              // target: 'http://192.168.31.218:19061',
+              changeOrigin: true,
+            },
+            '/sso': {
+              // target: 'http://192.168.211.135:8080',
+              target: 'http://192.168.209.103:9099',
+              changeOrigin: true,
+            },
           },
         },
       },
