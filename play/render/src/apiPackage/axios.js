@@ -1,8 +1,5 @@
 import axios from 'axios'
-import { useUserStore } from '@/stores/modules/user.js'
 import { ElMessage, ElNotification } from 'element-plus'
-
-const store = useUserStore()
 
 /**
  * 创建基础的axios实例
@@ -18,14 +15,6 @@ export function createAxiosInstance(baseURL) {
   // 请求拦截器
   instance.interceptors.request.use(
     (config) => {
-      // 处理请求配置
-      // if (store.getToken()) {
-      //   config.headers.token = store.getToken()
-      // }
-      // 处理文件上传
-      if (config.file) {
-        config.headers['Content-Type'] = 'multipart/form-data;'
-      }
       config.data = {
         ...config.data,
       }
@@ -92,7 +81,11 @@ export function createAxiosInstance(baseURL) {
     async (error) => {
       // 处理响应错误
       if (error.response?.status === 401) {
-        await store.userLogin()
+        //登录失效，重新登录
+        ElMessage.error({
+          message: '登录失效，请重新登录',
+          duration: 5 * 1000,
+        })
       }
 
       ElMessage.error({

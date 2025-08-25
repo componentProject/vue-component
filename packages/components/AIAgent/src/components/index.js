@@ -2,7 +2,7 @@ import 'highlight.js/styles/atom-one-light.css';
 import '../assets/iconfont/iconfont.css';
 import './markdown-it-vue/markdown-it.css';
 import { syncAllEmrData, syncSelectedData } from './emrAgent/js/syncToEmr';
-import AIAgent from './AIAgent.vue';
+import AIAgent from '../index.vue';
 // 组件集合
 const components = {
     AIAgent,

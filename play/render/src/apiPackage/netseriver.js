@@ -1,5 +1,5 @@
-import { defaultAxiosInstance, createAxiosInstance, baseAxios } from './axios.js'
-import { HttpRequest, http as defaultHttp } from './http.js'
+import { defaultAxiosInstance } from './axios.js'
+import { HttpRequest } from './http.js'
 
 /**
  * Vue Axios插件
@@ -73,4 +73,4 @@ const VueAxiosPlugin = {
 export default VueAxiosPlugin
 
 // 同时导出各个实例和创建函数，方便按需导入
-export { defaultAxiosInstance, createAxiosInstance, baseAxios }
+export { defaultAxiosInstance }
