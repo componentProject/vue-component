@@ -3,23 +3,26 @@
     <div class="title">调试与演示</div>
     <div class="main">
       <div class="list-title">开发调试组件</div>
-      <!-- <component
+      <PopoverTableSelect popType="input"
+        :columns="columns"
+        :data="tableData" />
+      <component
         :is="dynamicDebugButtonComponent"
         popType="input"
         :columns="columns"
         :data="tableData"
         v-if="dynamicDebugButtonComponent"
-      /> -->
+      />
     </div>
     <div class="main">
       <div class="list-title">引用组件库解析的组件</div>
-      <component
+      <!-- <component
         :is="dynamicButtonComponent"
         popType="input"
         :columns="columns"
         :data="tableData"
         v-if="dynamicButtonComponent"
-      />
+      /> -->
     </div>
   </div>
 </template>
@@ -29,6 +32,7 @@ import * as vue from 'vue'
 import { onMounted, ref } from 'vue'
 import { getDownLoadByIds, getList } from '../../../../../packages/components/_api'
 import { loadRemoteComponents } from '../../../utils.ts'
+import PopoverTableSelect from '../../../../../packages/components/moluoxixi/packages/AIAgent/es/index.mjs'
 
 defineOptions({ name: '调试与演示' })
 
