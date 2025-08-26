@@ -79,6 +79,7 @@ export interface ModeConfig {
 }
 
 export interface objRouteConfig {
+  // 需要以/开头，基于rootPath的相对路径，!是排除的文件
   glob: string | string[]
   baseRoute?: {
     path: string
@@ -127,7 +128,13 @@ export interface Config {
    */
   autoRoutes?: AutoRoutesConfig
   viteConfig?: UserConfig | ((mode: ConfigEnv) => UserConfig)
+  /**
+   * unplugin-auto-import的配置项
+   */
   unpluginAutoImportOptions?: unpluginAutoImportOptions
+  /**
+   * unplugin-vue-components的配置项
+   */
   unpluginVueComponentsOptions?: unpluginVueComponentsOptions & {
     /**
      * 需要排除的element-plus组件
@@ -138,6 +145,9 @@ export interface Config {
      */
     globs: string[]
   }
+  /**
+   * vite-plugin-cdn-import的配置项
+   */
   CDNImportOptions?: CDNImportOptions
 }
 

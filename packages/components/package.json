@@ -8,7 +8,7 @@
     "registry": "https://registry.npmjs.org/"
   },
   "scripts": {
-    "build": "tsx scripts/buildComponent.mts",
+    "build": "tsx _scripts/buildComponent.mts build-publish",
     "build:only": "tsx _scripts/buildComponent.mts build",
     "build:publish": "tsx _scripts/buildComponent.mts publish"
   },
