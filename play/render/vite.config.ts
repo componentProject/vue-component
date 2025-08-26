@@ -1,4 +1,4 @@
-import viteConfig, { wrapperEnv } from '../../packages/components//ViteConfig/index.ts'
+import viteConfig, { wrapperEnv } from '../../packages/utils/ViteConfig/index.ts'
 import path from 'node:path'
 import process from 'node:process'
 import { loadEnv } from 'vite'
