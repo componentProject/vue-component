@@ -1,17 +1,108 @@
-import { defaultAxiosInstance } from './axios.js'
+import { createAxiosInstance } from './axios.js'
 import { HttpRequest } from './http.js'
 
 /**
+ * 创建 HTTP 服务实例
+ * @param {Object} options - 配置选项
+ * @param {string} options.baseURL - 基础URL
+ * @param {number} options.timeout - 超时时间
+ * @param {Function} options.getToken - 获取token的函数
+ * @param {Function} options.onLoginRequired - 登录失效回调
+ * @param {Object} options.responseFields - 响应字段映射
+ * @param {Function} options.responseHandler - 响应处理器
+ * @returns {Object} HTTP服务实例
+ */
+function createHttpService(options = {}) {
+  const defaultConfig = {
+    baseURL: import.meta.env.VITE_APP || '',
+    timeout: 5000,
+    getToken: () => localStorage.getItem('token') || '',
+    onLoginRequired: () => {
+      window.location.href = `/login?redirect=${encodeURIComponent(window.location.href)}`
+    },
+    responseFields: {
+      code: 'code',
+      message: 'msg',
+      data: 'data',
+    },
+    ...options,
+  }
+
+  // 创建axios实例
+  const axiosInstance = createAxiosInstance(
+    defaultConfig.baseURL,
+    defaultConfig.timeout,
+    {
+      getToken: defaultConfig.getToken,
+      onLoginRequired: defaultConfig.onLoginRequired,
+      responseFields: defaultConfig.responseFields,
+      responseHandler: defaultConfig.responseHandler,
+    },
+  )
+
+  // 创建HTTP请求实例
+  const httpInstance = new HttpRequest(axiosInstance)
+
+  // 创建统一的HTTP服务对象
+  const httpService = {
+    // 核心实例
+    instance: httpInstance,
+
+    // 快捷方法
+    get(url, params, config) {
+      return httpInstance.get(url, params, config)
+    },
+
+    post(url, data, config) {
+      return httpInstance.post(url, data, config)
+    },
+
+    put(url, data, config) {
+      return httpInstance.put(url, data, config)
+    },
+
+    delete(url, params, config) {
+      return httpInstance.delete(url, params, config)
+    },
+
+    // 上传文件方法
+    uploadFile(url, file, config) {
+      const formData = new FormData()
+      formData.append('file', file)
+      return httpInstance.upload(url, formData, config)
+    },
+
+    // 批量请求
+    all(requests) {
+      return httpInstance.all(requests)
+    },
+  }
+
+  return httpService
+}
+
+/**
  * Vue Axios插件
- * 提供全局的$http方法，整合axios.js的实例和http.js的请求方法
+ * 提供全局的$http方法，支持多个配置化的axios实例
  */
 const VueAxiosPlugin = {
   install(app, options = {}) {
-    // 创建基于不同axios实例的HttpRequest实例
-    const httpInstances = {
-      // 默认实例
-      default: new HttpRequest(defaultAxiosInstance),
+    // 创建默认实例
+    const defaultHttpService = createHttpService(options.default)
 
+    const httpInstances = {
+      default: defaultHttpService.instance,
+    }
+
+    // 创建其他配置化的实例
+    if (options.instances) {
+      Object.entries(options.instances).forEach(([name, config]) => {
+        const instanceService = createHttpService({
+          ...options.default,
+          ...config,
+        })
+        httpInstances[name] = instanceService.instance
+      })
     }
 
     // 创建统一的HTTP服务对象
@@ -20,32 +111,30 @@ const VueAxiosPlugin = {
       ...httpInstances,
 
       // 快捷方法 - 使用默认实例
-      get(url, params = {}, config = {}) {
-        return httpInstances.default.get(url, params, config)
+      get(url, params, config) {
+        return defaultHttpService.get(url, params, config)
       },
 
-      post(url, data = {}, params = {}, config = {}) {
-        return httpInstances.default.post(url, data, params, config)
+      post(url, data, config) {
+        return defaultHttpService.post(url, data, config)
       },
 
-      put(url, data = {}, params = {}, config = {}) {
-        return httpInstances.default.put(url, data, params, config)
+      put(url, data, config) {
+        return defaultHttpService.put(url, data, config)
       },
 
-      delete(url, params = {}, data = {}, config = {}) {
-        return httpInstances.default.delete(url, params, data, config)
+      delete(url, params, config) {
+        return defaultHttpService.delete(url, params, config)
       },
 
       // 上传文件方法
-      uploadFile(url, file, config = {}) {
-        const formData = new FormData()
-        formData.append('file', file)
-        return httpInstances.default.upload(url, formData, config)
+      uploadFile(url, file, config) {
+        return defaultHttpService.uploadFile(url, file, config)
       },
 
       // 批量请求
       all(requests) {
-        return httpInstances.default.all(requests)
+        return defaultHttpService.all(requests)
       },
     }
 
@@ -55,22 +144,33 @@ const VueAxiosPlugin = {
     // 同时提供provide/inject支持
     app.provide('$http', httpService)
 
+    // 为每个实例提供独立的访问
+    Object.entries(httpInstances).forEach(([name, instance]) => {
+      app.provide(`$http${name.charAt(0).toUpperCase() + name.slice(1)}`, instance)
+    })
+
     // 可选：在Vue3的选项式API中也可使用
     if (options.globalMixin !== false) {
       app.mixin({
         created() {
           this.$http = httpService
-        }
+        },
       })
     }
 
-    // 同时提供默认实例的独立访问
-    app.provide('$httpDefault', httpInstances.default)
-  }
+    // 挂载到window对象以便非Vue环境使用
+    if (typeof window !== 'undefined') {
+      window.$http = httpService
+    }
+  },
 }
 
 // 默认导出插件
 export default VueAxiosPlugin
 
-// 同时导出各个实例和创建函数，方便按需导入
-export { defaultAxiosInstance }
+// 导出创建函数，方便按需导入
+export { createAxiosInstance, createHttpService }
+
+export function getHttpService(options) {
+  return createHttpService(options)
+}

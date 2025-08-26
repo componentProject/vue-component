@@ -27,7 +27,9 @@
 <script setup lang="ts">
 import * as vue from 'vue'
 import { onMounted, ref } from 'vue'
-import { getDownLoadByIds, getList } from '../../../../../packages/components/_api'
+// import { getDownLoadByIds, getList } from '../../../../../packages/components/_api'
+// import { getDownLoadByIds } from '../../../../../packages/components/_api'
+import { getList, getDownLoadByIds } from '../../api/index.ts'
 import { loadRemoteComponents } from '../../../utils.ts'
 
 defineOptions({ name: '调试与演示' })
@@ -136,8 +138,8 @@ async function getDownLoadByIdsEvent(res: any) {
   const params = res.map((item: any) => item.id)
   try {
     const obj = await getDownLoadByIds(params)
-    console.log('获取组件实例成功', obj.data.data)
-    componentsData.value = obj.data.data
+    console.log('获取组件实例成功', obj)
+    componentsData.value = obj
   }
   catch (error) {
     console.error('获取组件实例失败', error)
@@ -151,8 +153,8 @@ async function getListEvent() {
   }
   try {
     const res = await getList(params)
-    console.log('获取组件列表成功', res.data.data.Vue3) // 注意：这里改为Vue3
-    await getDownLoadByIdsEvent(res.data.data.Vue3) // 注意：这里改为Vue3
+    console.log('获取组件列表成功', res) // 注意：这里改为Vue3
+    await getDownLoadByIdsEvent(res.Vue3) // 注意：这里改为Vue3
   }
   catch (error) {
     console.error('获取组件列表失败', error)

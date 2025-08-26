@@ -1,9 +1,12 @@
 import { defaultAxiosInstance } from './axios.js'
-
 /**
  * HTTP请求封装类，提供常用的HTTP方法
  */
 class HttpRequest {
+  constructor(axiosInstance) {
+    this.axiosInstance = axiosInstance
+  }
+
   /**
    * GET请求
    * @param {string} url - 请求URL
@@ -13,7 +16,7 @@ class HttpRequest {
    */
   async get(url, params = {}, config = {}) {
     try {
-      const response = await defaultAxiosInstance.get(url, { params, ...config })
+      const response = await this.axiosInstance.get(url, { params, ...config })
       return response.data
     }
     catch (error) {
@@ -24,14 +27,13 @@ class HttpRequest {
   /**
    * POST请求
    * @param {string} url - 请求URL
-   * @param {object} [data] - 请求体数据
-   * @param {object} [params] - 查询参数
+   * @param {object} [params] - 请求参数
    * @param {object} [config] - axios配置
    * @returns {Promise} 请求结果
    */
-  async post(url, data = {}, params = {}, config = {}) {
+  async post(url, params = {}, config = {}) {
     try {
-      const response = await defaultAxiosInstance.post(url, data, { params, ...config })
+      const response = await this.axiosInstance.post(url, params, config)
       return response.data
     }
     catch (error) {
@@ -42,14 +44,13 @@ class HttpRequest {
   /**
    * PUT请求
    * @param {string} url - 请求URL
-   * @param {object} [data] - 请求体数据
-   * @param {object} [params] - 查询参数
+   * @param {object} [params] - 请求参数
    * @param {object} [config] - axios配置
    * @returns {Promise} 请求结果
    */
-  async put(url, data = {}, params = {}, config = {}) {
+  async put(url, params = {}, config = {}) {
     try {
-      const response = await defaultAxiosInstance.put(url, data, { params, ...config })
+      const response = await this.axiosInstance.put(url, params, config)
       return response.data
     }
     catch (error) {
@@ -60,14 +61,16 @@ class HttpRequest {
   /**
    * DELETE请求
    * @param {string} url - 请求URL
-   * @param {object} [params] - 查询参数
-   * @param {object} [data] - 请求体数据
+   * @param {object} [params] - 请求参数
    * @param {object} [config] - axios配置
    * @returns {Promise} 请求结果
    */
-  async delete(url, params = {}, data = {}, config = {}) {
+  async delete(url, params = {}, config = {}) {
     try {
-      const response = await defaultAxiosInstance.delete(url, { params, data, ...config })
+      const response = await this.axiosInstance.delete(url, {
+        params,
+        ...config,
+      })
       return response.data
     }
     catch (error) {
@@ -84,7 +87,7 @@ class HttpRequest {
    */
   async upload(url, formData, config = {}) {
     try {
-      const response = await defaultAxiosInstance.post(url, formData, {
+      const response = await this.axiosInstance.post(url, formData, {
         ...config,
         headers: {
           'Content-Type': 'multipart/form-data',
@@ -137,7 +140,7 @@ class HttpRequest {
 }
 
 // 创建默认实例
-export const http = new HttpRequest()
+export const http = new HttpRequest(defaultAxiosInstance)
 
 // 导出类供自定义使用
 export { HttpRequest }
