@@ -162,6 +162,7 @@ watch(
     startYear.value = Number.parseInt(start)
     endYear.value = Number.parseInt(end)
   },
+  { immediate: true, deep: true },
 )
 
 watch(

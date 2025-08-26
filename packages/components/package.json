@@ -96,7 +96,7 @@
   },
   "postcss": {
     "plugins": {
-      "tailwindcss": {},
+      "@tailwindcss/postcss": {},
       "autoprefixer": {}
     }
   }
