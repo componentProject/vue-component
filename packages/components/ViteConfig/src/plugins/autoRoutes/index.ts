@@ -1,9 +1,8 @@
 import type { Plugin } from 'vite'
-import { normalizePath } from 'vite'
-import path from 'node:path'
-import fs from 'node:fs'
+// no-op
 // autoRoutes/index.ts
 import { findDefaultRouteHandle, findParentRouteHandle, generateRoutes } from './routeGenerator.ts'
+import { createVirtualPlugin } from '../utils/virtual.ts'
 
 interface RouteModule {
   path: string
@@ -22,14 +21,14 @@ interface RouteConfig {
   [prefix: string]: string | string[] | objRouteConfig
 }
 
-interface config {
+interface AutoRoutesPluginOptions {
   routeConfig: RouteConfig
   virtualModuleId?: string
   dts?: string | boolean
   root?: string
 }
 
-// 声明文件模板
+// 声明文件模板：由通用工厂按 dts/root 默认落盘
 const dtsTemplate = `// 此文件由ViteConfig自动生成，请勿手动修改
 declare module 'virtual:auto-routes' {
   interface RouteModule {
@@ -47,93 +46,54 @@ declare module 'virtual:auto-routes' {
 }
 `
 
-function createAutoRoutesPlugin({ routeConfig, virtualModuleId, dts, root }: config): Plugin {
-  const moduleCache = new Map()
+function createAutoRoutesPlugin({ routeConfig, virtualModuleId, dts, root }: AutoRoutesPluginOptions): Plugin {
   const VIRTUAL_MODULE_ID = virtualModuleId || 'virtual:auto-routes'
-  const RESOLVED_VIRTUAL_MODULE_ID = `\0${VIRTUAL_MODULE_ID}`
 
-  return {
-    name: 'vite-plugin-auto-routes',
+  // 已默认监听所有文件，无需计算 watch globs
 
-    resolveId(id: string) {
-      if (id === VIRTUAL_MODULE_ID) {
-        return RESOLVED_VIRTUAL_MODULE_ID
-      }
+  return createVirtualPlugin(
+    {
+      name: 'vite-plugin-auto-routes',
+      virtualModuleId: VIRTUAL_MODULE_ID,
+      dts,
+      root,
+      typeContent: dtsTemplate,
+      extra: { routeConfig },
     },
+    // 生成虚拟模块代码：仅负责产出字符串，监听/HMR/缓存由工厂统一处理
+    ({ extra }) => {
+      const { routeConfig } = (extra || {}) as { routeConfig: RouteConfig }
+      const imports: string[] = []
+      const routes: string[] = []
 
-    configResolved(config: any) {
-      // 处理dts
-      if (dts !== false) {
-        try {
-          const rootDir = root || config.root
-          let dtsPath: string
+      Object.entries(routeConfig).forEach(([prefix, globVal], index) => {
+        const varName = `files${index}`
+        const glob: string | string[] = (globVal as objRouteConfig).glob || (globVal as string | string[])
+        imports.push(
+          `const ${varName} = import.meta.glob(${JSON.stringify(glob)}, { eager: true, import: 'default' });\n`,
+        )
+        const baseRoute: RouteModule = (globVal as objRouteConfig).baseRoute!
+        routes.push(`...generateRoutes(${varName}, '${prefix}',${JSON.stringify(baseRoute)})`)
+      })
 
-          if (typeof dts === 'string') {
-            // 使用用户指定的路径
-            dtsPath = path.isAbsolute(dts) ? dts : path.resolve(rootDir, dts)
-          }
-          else {
-            // 使用默认路径
-            dtsPath = path.resolve(rootDir, './src/typings/auto-routes.d.ts')
-          }
+      const code = `
+        ${imports.join('\n')}
+        const findParentRoute = ${findParentRouteHandle}
+        // 用于routes
+        const generateRoutes = ${generateRoutes};
+        // 用于导出
+        const findDefaultRoute = ${findDefaultRouteHandle};
 
-          // 使用normalizePath规范化路径
-          dtsPath = normalizePath(dtsPath)
+        ${findParentRouteHandle}
+        ${findDefaultRouteHandle}
+        const routes = [${routes.join(',\n')}];
+        export { routes, findDefaultRoute };
+        export default routes;
+      `
 
-          // 确保目录存在
-          const dir = path.dirname(dtsPath)
-          if (!fs.existsSync(dir)) {
-            fs.mkdirSync(dir, { recursive: true })
-          }
-
-          // 写入声明文件
-          fs.writeFileSync(dtsPath, dtsTemplate, 'utf-8')
-          console.log(`[vite-plugin-auto-routes] 类型声明文件已生成: ${dtsPath}`)
-        }
-        catch (error) {
-          console.error(`[vite-plugin-auto-routes] 生成类型声明文件时出错:`, error)
-        }
-      }
+      return code
     },
-
-    load(id: string) {
-      if (id === RESOLVED_VIRTUAL_MODULE_ID) {
-        const imports: string[] = []
-        const routes: string[] = []
-
-        Object.entries(routeConfig).forEach(([prefix, globVal], index) => {
-          const varName = `files${index}`
-          const glob: string | string[]
-            = (globVal as objRouteConfig).glob || (globVal as string | string[])
-          imports.push(
-            `const ${varName} = import.meta.glob(${JSON.stringify(glob)}, { eager: true, import: 'default' });
-            `,
-          )
-          const baseRoute: RouteModule = (globVal as objRouteConfig).baseRoute!
-          routes.push(`...generateRoutes(${varName}, '${prefix}',${JSON.stringify(baseRoute)})`)
-        })
-
-        // 生成路由JS代码
-        const code = `
-          ${imports.join('\n')}
-          const findParentRoute = ${findParentRouteHandle}
-          // 用于routes
-          const generateRoutes = ${generateRoutes};
-          // 用于导出
-          const findDefaultRoute = ${findDefaultRouteHandle};
-
-          ${findParentRouteHandle}
-          ${findDefaultRouteHandle}
-          const routes = [${routes.join(',\n')}];
-          export { routes, findDefaultRoute };
-          export default routes;
-        `
-
-        moduleCache.set(id, code)
-        return code
-      }
-    },
-  }
+  )
 }
 
 export default createAutoRoutesPlugin
