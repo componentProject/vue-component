@@ -335,6 +335,9 @@ watch(
       document.removeEventListener('mousedown', handleOutsideClick)
     }
   },
+  {
+    immediate: true,
+  },
 )
 
 /**

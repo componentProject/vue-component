@@ -37,9 +37,14 @@ const form = createForm({
 })
 
 // 同步外部 v-model 到表单
-watch(() => props.modelValue, (v) => {
-  form.setValues(v || {})
-}, {deep: true})
+watch(
+  () => props.modelValue,
+  (v) => {
+    form.setValues(v || {})
+  }, {
+    immediate: true,
+    deep: true
+  })
 
 
 const {SchemaField} = createSchemaField({

@@ -1,0 +1,64 @@
+{
+  "name": "@moluoxixi/utils",
+  "version": "0.0.5",
+  "description": "all components are settled here",
+  "main": "index.ts",
+  "module": "index.ts",
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
+  },
+  "scripts": {
+    "build": "tsx scripts/buildComponent.mts",
+    "build:only": "tsx _scripts/buildComponent.mts build",
+    "build:publish": "tsx _scripts/buildComponent.mts publish"
+  },
+  "dependencies": {
+    "form-data": "^4.0.4",
+    "moment": "catalog:build",
+    "radash": "catalog:build",
+    "lodash": "catalog:build",
+    "axios": "catalog:build",
+    "dayjs": "catalog:build"
+  },
+  "devDependencies": {
+    "qs": "catalog:dev",
+    "@tailwindcss/postcss": "catalog:dev",
+    "tailwindcss": "catalog:dev",
+    "postcss": "catalog:dev",
+    "@types/lodash": "catalog:type",
+    "eslint": "catalog:dev",
+    "eslint-plugin-format": "catalog:dev",
+    "sass": "catalog:dev",
+    "sass-embedded": "catalog:dev",
+    "sass-loader": "catalog:dev",
+    "typescript": "catalog:dev",
+    "vite-plugin-compression": "catalog:dev",
+    "vite-plugin-imagemin": "catalog:dev",
+    "@types/file-saver": "catalog:type",
+    "@vue-macros/volar": "catalog:dev",
+    "rollup-plugin-visualizer": "catalog:dev",
+    "unplugin-vue-components": "catalog:dev",
+    "unplugin-auto-import": "catalog:dev",
+    "@antfu/eslint-config": "^4.16.1",
+    "@vitejs/plugin-vue": "catalog:dev",
+    "@vitejs/plugin-vue-jsx": "catalog:dev",
+    "dependency-cruiser": "^15.3.0",
+    "fast-glob": "catalog:dev",
+    "rollup-obfuscator": "^4.1.0",
+    "autoprefixer": "catalog:dev",
+    "vite": "catalog:dev",
+    "vite-plugin-qiankun": "catalog:dev",
+    "vite-plugin-cdn-import": "^1.0.1",
+    "vite-plugin-css-injected-by-js": "^3.5.1",
+    "dotenv": "catalog:dev",
+    "vite-plugin-dts": "^4.5.4",
+    "vite-plugin-html": "^3.2.2",
+    "vite-plugin-vue-devtools": "^7.7.2"
+  },
+  "postcss": {
+    "plugins": {
+      "@tailwindcss/postcss": {},
+      "autoprefixer": {}
+    }
+  }
+}

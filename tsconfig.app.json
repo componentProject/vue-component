@@ -18,7 +18,7 @@
       "@moluoxixi/element": ["packages/element-plus"],
       "@moluoxixi/render": ["play/render"],
       "@moluoxixi/docs": ["docs/vitepress"],
-      "@moluoxixi/storybook": ["docs/storybook"],
+      "@moluoxixi/storybook": ["docs/storybook"]
     },
     "allowJs": true,
     "strict": true,
@@ -39,11 +39,7 @@
       "@vue-macros/volar/define-emits"
     ]
   },
-  "include": [
-    "./**/*"
-  ],
   "exclude": [
-    "./ViteConfig/**/*",
-    "./EslintConfig/**/*"
+    "./packages/utils/**/*"
   ]
 }

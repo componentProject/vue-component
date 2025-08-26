@@ -22,7 +22,6 @@
     "monaco-editor": "0.49.0",
     "prettier": "^3.3.3",
     "prettier-plugin-sql": "^0.16.0",
-    "qs": "^6.14.0",
     "screenfull": "^6.0.2",
     "sortablejs": "^1.15.6",
     "constrained-editor-plugin": "^1.4.0",
@@ -61,26 +60,19 @@
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
+    "qs": "catalog:dev",
     "@tailwindcss/postcss": "catalog:dev",
     "tailwindcss": "catalog:dev",
     "postcss": "catalog:dev",
     "@types/lodash": "catalog:type",
     "@types/uuid": "catalog:type",
-    "eslint": "catalog:dev",
-    "eslint-plugin-format": "catalog:dev",
     "sass": "catalog:dev",
     "sass-embedded": "catalog:dev",
     "sass-loader": "catalog:dev",
     "typescript": "catalog:dev",
-    "vite-plugin-compression": "catalog:dev",
-    "vite-plugin-imagemin": "catalog:dev",
     "@types/file-saver": "catalog:type",
-    "@vue-macros/volar": "catalog:dev",
-    "rollup-plugin-visualizer": "catalog:dev",
     "unplugin-vue-components": "catalog:dev",
     "unplugin-auto-import": "catalog:dev",
-    "@antfu/eslint-config": "^4.16.1",
-    "@sentry/vite-plugin": "^3.5.0",
     "@vitejs/plugin-vue": "catalog:dev",
     "@vitejs/plugin-vue-jsx": "catalog:dev",
     "dependency-cruiser": "^15.3.0",
@@ -88,15 +80,13 @@
     "rollup-obfuscator": "^4.1.0",
     "autoprefixer": "catalog:dev",
     "vite": "catalog:dev",
-    "vite-plugin-cdn-import": "^1.0.1",
+    "vite-plugin-imagemin": "catalog:dev",
     "vite-plugin-css-injected-by-js": "^3.5.1",
-    "vite-plugin-dts": "^4.5.4",
-    "vite-plugin-html": "^3.2.2",
-    "vite-plugin-vue-devtools": "^7.7.2"
+    "vite-plugin-dts": "^4.5.4"
   },
   "postcss": {
     "plugins": {
-      "tailwindcss": {},
+      "@tailwindcss/postcss": {},
       "autoprefixer": {}
     }
   }

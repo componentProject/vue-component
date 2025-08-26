@@ -7,12 +7,11 @@
     ],
     "baseUrl": ".",
     "paths": {
-
-      "@moluoxixi/components": [
-        "./"
+      "@moluoxixi/utils": [
+        "./packages/utils"
       ],
-      "@moluoxixi/components/*": [
-        "./*"
+      "@moluoxixi/utils/*": [
+        "./packages/utils/*"
       ]
     },
     "module": "ESNext",
@@ -30,7 +29,6 @@
     "allowImportingTsExtensions": true
   },
   "include": [
-    "./ViteConfig/**/*",
-    "./EslintConfig/**/*",
+    "./packages/utils/**/*"
   ]
 }

@@ -56,7 +56,7 @@ export function createApiDialog(DialogComponent?: Component) {
           modelValue={props.modelValue}
           title={props.title}
           width={props.width}
-          onUpdateModelValue={(val: boolean) => {
+          onUpdate:modelValue={(val: boolean) => {
             emit('update:modelValue', val)
             if (!val) {
               handleClose()
