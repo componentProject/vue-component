@@ -2,32 +2,21 @@
   "compilerOptions": {
     "target": "ESNext",
     "jsx": "preserve",
-    "jsxImportSource": "vue",
     "lib": [
-      "DOM",
       "ESNext"
     ],
     "baseUrl": ".",
     "paths": {
-      "@/*": [
-        "src/*"
+      "@moluoxixi/utils": [
+        "./packages/utils"
       ],
-      "~/*": [
-        "src/*"
-      ],
-      "@moluoxixi/components": [
-        "packages/components"
-      ],
-      "@moluoxixi/components/*": [
-        "packages/components/*"
+      "@moluoxixi/utils/*": [
+        "./packages/utils/*"
       ]
     },
     "module": "ESNext",
-    "moduleResolution": "Bundler",
+    "moduleResolution": "nodenext",
     "resolveJsonModule": true,
-    "types": [
-      "vite/client"
-    ],
     "allowJs": true,
     "strict": true,
     "strictNullChecks": true,
@@ -38,5 +27,8 @@
     "isolatedModules": true,
     "skipLibCheck": true,
     "allowImportingTsExtensions": true
-  }
+  },
+  "include": [
+    "./packages/utils/**/*"
+  ]
 }

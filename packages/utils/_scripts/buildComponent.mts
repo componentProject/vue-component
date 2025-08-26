@@ -34,7 +34,7 @@ const entryBaseUrl = '/'
 /**
  * 别名或者外部包的路径
  */
-const aliasComponentPath = '@moluoxixi/components'
+const aliasComponentPath = '@moluoxixi/utils'
 /**
  * 是否分包，与preserveModules冲突，如果preserveModules开启，则需按preserveModules的目录结构分包
  */

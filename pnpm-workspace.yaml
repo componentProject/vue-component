@@ -53,6 +53,7 @@ catalogs:
     vite-plugin-imagemin: ^0.6.1
     '@vitejs/plugin-vue-jsx': ^4.1.2
     '@vitejs/plugin-vue': ^5.0.4
+    'qs': ^6.14.0
     #other
     '@antfu/eslint-config': ^4.16.1
     'fast-glob': ^3.3.2
