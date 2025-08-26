@@ -70,9 +70,9 @@ export default function createViteConfig(Config: ViteConfigType) {
       Components({
         resolvers: [
           ElementPlusResolver({
-            exclude: new RegExp(
-              (useDoc ? [] : config.unpluginVueComponentsOptions?.elementExcludes || ['ElButton', 'ElDrawer', 'ElDialog']).map((item: string) => `^${item}$`).join('|'),
-            ),
+            exclude: !useDoc && config.unpluginVueComponentsOptions?.elementExcludes ?
+              new RegExp(config.unpluginVueComponentsOptions?.elementExcludes.map((item: string) => `^${item}$`).join('|'))
+              : undefined,
           }),
         ],
         globs: [
@@ -250,9 +250,7 @@ export default function createViteConfig(Config: ViteConfigType) {
       resolve: {
         extensions: ['.js', '.jsx', '.ts', '.tsx', '.vue'],
         alias: {
-          '@': path.resolve(rootPath, './src'),
-          '@moluoxixi/components': path.resolve(__dirname, '../../'),
-          '@moluoxixi/components/*': path.resolve(__dirname, '../../*'),
+          '@': path.resolve(rootPath, './src')
         },
       },
       server: {

@@ -1,5 +1,10 @@
 //#region use v4 如果用它，需要修改依赖tailwindcss和@tailwindcss/postcss为"^4.1.8"
 @forward 'tailwindcss';
+
+@theme {
+  --spacing: 1px;
+}
+
 @layer base {
   html {
     font-size: 4px;
@@ -14,7 +19,7 @@
 }
 @layer utilities {
   .flex {
-    @apply flex flex-none!;
+    @apply flex flex-none;
   }
   .flex-1-hidden {
     @apply flex-1 overflow-hidden;
