@@ -21,7 +21,7 @@ import Components from 'unplugin-vue-components/vite'
 import viteImagemin from 'vite-plugin-imagemin'
 import { obfuscator } from 'rollup-obfuscator'
 import cssInjectedByJsPlugin from 'vite-plugin-css-injected-by-js'
-import { UploadEvent } from './UploadComponent'
+const { UploadEvent } = await import('./UploadComponent.ts')
 
 // === 组件库命名空间配置 ===
 const LIB_NAMESPACE = 'moluoxixi'

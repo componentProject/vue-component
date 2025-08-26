@@ -6,8 +6,8 @@ const httpApi: any = getHttpService({
   getToken: () => null,
   // 响应字段配置
   responseFields: {
-    code: 'statusCode',
-    message: 'message',
+    code: 'Code',
+    message: 'Message',
     data: 'data',
   },
 })
@@ -22,8 +22,8 @@ const httpApi2: any = getHttpService({
   getToken: () => null,
   // 响应字段配置
   responseFields: {
-    code: 'statusCode',
-    message: 'message',
+    code: 'Code',
+    message: 'Message',
     data: 'data',
   },
 })

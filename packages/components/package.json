@@ -76,7 +76,7 @@
     "sass-embedded": "catalog:dev",
     "sass-loader": "catalog:dev",
     "tailwindcss": "catalog:dev",
-    "tsx": "3.12.7",
+    "tsx": "^4.20.3",
     "typescript": "catalog:dev",
     "unplugin-auto-import": "catalog:dev",
     "unplugin-vue-components": "catalog:dev",
