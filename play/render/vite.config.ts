@@ -9,8 +9,9 @@ export default viteConfig(
   ({ mode }) => {
     const env = loadEnv(mode!, process.cwd())
     const viteEnv = wrapperEnv(env)
+    const rootPath = path.resolve()
     return {
-      rootPath: path.resolve(),
+      rootPath,
       mode: {
         base: {
           VITE_AUTO_ROUTES: true,
@@ -32,6 +33,13 @@ export default viteConfig(
       viteConfig: {
         build: {
           outDir: '../../dist',
+        },
+        resolve: {
+          extensions: ['.js', '.jsx', '.ts', '.tsx', '.vue'],
+          alias: {
+            '@moluoxixi/components': path.resolve(rootPath, '../../packages/components'),
+            '@moluoxixi/components/*': path.resolve(rootPath, '../../packages/components/*'),
+          },
         },
         plugins: [
           viteEnv.VITE_SENTRY
