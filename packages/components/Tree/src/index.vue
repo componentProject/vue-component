@@ -1,6 +1,7 @@
 <template>
   <div class="wl-tree">
     <ElTreeV2
+      ref="treeRef"
       :data="treeData"
       :value="props.rowField"
       :label="props.labelField"
@@ -10,10 +11,16 @@
       :expand-on-click-node="false"
       highlight-current
       @node-click="onRowClick"
+      :props="{
+        class: treeClass
+      }"
       v-bind="$attrs"
     >
       <template #default="{ node, data }">
-        <div class="wl-tree__row flex space-between items-center pr-8 w-full" style="padding-right: 8px">
+        <div
+          class="wl-tree__row flex space-between items-center pr-8 w-full"
+          style="padding-right: 8px"
+        >
           <div class="flex items-center flex-1-hidden">
             <ElIcon v-if="props.icon" class="wl-tree__icon">
               <component :is="props.icon(data)"/>
@@ -62,12 +69,12 @@
 </template>
 
 <script setup lang="ts">
-import { computed, defineComponent, ref } from 'vue'
-import { ElTreeV2, ElButton, ElTooltip, ElIcon } from 'element-plus'
-import type { TreeNodeData, TreeNode } from 'element-plus'
-import type { Component as VueComponent } from 'vue'
-import type { ButtonsItem, TreeProps } from './types'
-import { Plus, Edit, Delete } from '@element-plus/icons-vue'
+import type {Component as VueComponent} from 'vue'
+import {computed, defineComponent, ref} from 'vue'
+import type {TreeNode, TreeNodeData} from 'element-plus'
+import {ElButton, ElIcon, ElTooltip, ElTreeV2} from 'element-plus'
+import type {ButtonsItem, TreeProps} from './types'
+import {Delete, Edit, Plus} from '@element-plus/icons-vue'
 
 const Render = defineComponent<{ render: () => any }>({
   name: 'WlRender',
@@ -91,12 +98,17 @@ const props = withDefaults(defineProps<TreeProps>(), {
 })
 
 const emit = defineEmits<{
-  (e: 'node-click', data: TreeNodeData, node: TreeNode, e: MouseEvent): void
+  (event: 'node-click', data: TreeNodeData, node: TreeNode, evt: MouseEvent): void
+  (event: 'change', rows: any[]): void
 }>()
 
 const isLeaf = (nodeData: Record<string, any>) => {
   const list = nodeData?.[props.childrenField] as any[] | undefined
   return !list || list.length === 0
+}
+
+function treeClass(data: TreeNodeData){
+  return {'is-cascade-highlight': isHighlighted(data)}
 }
 
 function getButtons(nodeData: Record<string, any>): ButtonsItem[] {
@@ -106,6 +118,80 @@ function getButtons(nodeData: Record<string, any>): ButtonsItem[] {
 const indent = props.indent
 const height = props.height
 const activeNode = ref<any | null>(null)
+const treeRef = ref<any | null>(null)
+
+// 级联高亮相关
+const highlightedKeySet = ref<Set<any>>(new Set())
+
+const idMaps = computed(() => {
+  const idToNodeMap = new Map<any, any>()
+  const idToParentIdMap = new Map<any, any>()
+  const childrenKey = props.childrenField
+  const idKey = props.rowField
+  const traverse = (nodes: any[], parentId: any | null) => {
+    for (const n of nodes || []) {
+      const id = (n as any)?.[idKey]
+      idToNodeMap.set(id, n)
+      if (parentId !== null && parentId !== undefined) idToParentIdMap.set(id, parentId)
+      const children = (n as any)?.[childrenKey] as any[] | undefined
+      if (children && children.length) traverse(children, id)
+    }
+  }
+  traverse(treeData.value || [], null)
+  return { idToNodeMap, idToParentIdMap }
+})
+
+function isHighlighted(row: any) {
+  const idKey = props.rowField
+  return highlightedKeySet.value.has((row as any)?.[idKey])
+}
+
+function getDescendantIds(id: any): any[] {
+  const result: any[] = []
+  const { idToNodeMap } = idMaps.value
+  const childrenKey = props.childrenField
+  const stack: any[] = []
+  const start = idToNodeMap.get(id)
+  if (!start) return result
+  stack.push(start)
+  while (stack.length) {
+    const node = stack.pop()
+    const nid = node?.[props.rowField]
+    if (nid !== id) result.push(nid)
+    const children = node?.[childrenKey] as any[] | undefined
+    if (children && children.length) {
+      for (let i = children.length - 1; i >= 0; i--) stack.push(children[i])
+    }
+  }
+  return result
+}
+
+function hasAncestorHighlighted(id: any): boolean {
+  const { idToParentIdMap } = idMaps.value
+  let pid = idToParentIdMap.get(id)
+  while (pid !== undefined && pid !== null) {
+    if (highlightedKeySet.value.has(pid)) return true
+    pid = idToParentIdMap.get(pid)
+  }
+  return false
+}
+
+function emitChange() {
+  const { idToNodeMap } = idMaps.value
+  const rows: any[] = []
+  highlightedKeySet.value.forEach((k) => {
+    const n = idToNodeMap.get(k)
+    if (n) rows.push(n)
+  })
+  emit('change', rows)
+}
+
+function clearTreeCurrent() {
+  const inst: any = treeRef.value
+  if (!inst) return
+  inst.setCurrentKey()
+  inst.setCurrentNode()
+}
 
 // 将扁平数据转换为树
 const treeData = computed<any[]>(() => {
@@ -156,8 +242,31 @@ function resolveButtonIcon(btn: ButtonsItem): VueComponent | string | undefined 
 }
 
 function onRowClick(data: TreeNodeData, node: TreeNode, e: MouseEvent) {
-  if (props.showType !== 'click') return
-  activeNode.value = activeNode.value === data ? null : data
+  // 级联选择逻辑
+  if (props.levelSelect) {
+    const id = (data as any)?.[props.rowField]
+    const already = highlightedKeySet.value.has(id)
+    const ancestorHighlighted = hasAncestorHighlighted(id)
+    if (!already) {
+      // 新点击：高亮自身与所有子孙
+      highlightedKeySet.value = new Set<any>([id, ...getDescendantIds(id)])
+    } else {
+      if (ancestorHighlighted) {
+        // 祖先已高亮：只保留当前节点及其子孙
+        highlightedKeySet.value = new Set<any>([id, ...getDescendantIds(id)])
+      } else {
+        // 否则取消所有高亮并取消树选中
+        highlightedKeySet.value = new Set<any>()
+        clearTreeCurrent()
+      }
+    }
+    emitChange()
+  }
+
+  // 按钮显示交互：仅在 showType=click 下处理
+  if (props.showType === 'click') {
+    activeNode.value = activeNode.value === data ? null : data
+  }
   emit('node-click', data, node, e)
 }
 
@@ -173,6 +282,9 @@ function onRowClick(data: TreeNodeData, node: TreeNode, e: MouseEvent) {
 }
 .wl-tree__row {
   position: relative;
+}
+:deep(.is-cascade-highlight) {
+  background-color: var(--el-color-primary-light-9);
 }
 .wl-tree__buttons--hover {
   opacity: 0;

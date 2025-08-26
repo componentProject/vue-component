@@ -23,6 +23,10 @@ export interface TreeProps<T = any> {
   buttons?: (nodeData: T) => ButtonsItem[]
   indent?: number
   height?: number
+  /**
+   * 层级选择：点击某节点时高亮该节点及其所有子孙节点
+   */
+  levelSelect?: boolean
 }
 
 
