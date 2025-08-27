@@ -52,6 +52,10 @@ const useObfuscator = false
  */
 const useExternal = false
 /**
+ * 必须要排除依赖的工具包
+ */
+const requireExternalPacks = []
+/**
  * 需要项目预设的依赖
  */
 const presetGlobals = useExternal
@@ -640,7 +644,7 @@ async function analyzeComponentDeps(comp: string) {
         newExternalDeps.set(dep, version)
       }
     }
-    const isExternal = useExternal
+    const isExternal = useExternal || requireExternalPacks.includes(comp)
     if (!isExternal) {
       newExternalDeps.clear()
     }
@@ -976,7 +980,7 @@ async function bundleComponentModule({
           const isVueDep = ['vue', '@vue/runtime-core', '@vue/runtime-dom'].includes(id)
           // Node.js核心模块，标记为外部依赖
           const isNodeBuiltin = id.startsWith('node:')
-            || ['path', 'fs', 'os', 'util', 'events', 'stream', 'buffer', 'crypto', 'zlib', 'http', 'https', 'url', 'querystring', 'child_process'].includes(id)
+            || ['path', 'module', 'fs', 'os', 'util', 'events', 'stream', 'buffer', 'crypto', 'zlib', 'http', 'https', 'url', 'querystring', 'child_process'].includes(id)
 
           // 检查@/components路径
           if (id.startsWith(`${aliasComponentPath}/`)) {
@@ -992,14 +996,14 @@ async function bundleComponentModule({
             const componentMatch = id.match(new RegExp(`${aliasComponentPath.replace(/\//g, '\\/')}\\/([A-Z][a-zA-Z0-9]+)`))
             return !(componentMatch && componentMatch[1] === currentComponent)
           }
-          const isExternal = useExternal
+          const isExternal = useExternal || requireExternalPacks.includes(comp)
           if (!isExternal) {
             return isVueDep || isNodeBuiltin
           }
           // 检查@moluoxixi/xxx路径（转换后的内部组件依赖）
           const isTransformedInternalComponent = id.startsWith(`@${LIB_NAMESPACE}/`)
 
-          return isExternalDep || isTransformedInternalComponent || isVueDep || isNodeBuiltin
+          return isExternalDep || isTransformedInternalComponent || isVueDep || isNodeBuiltin || peerDepList.includes(id)
         },
         output: {
           preserveModules,
