@@ -2,6 +2,8 @@
   <div>
     <div class="title">调试与演示</div>
     <div class="main">
+      <div>13131</div>
+      <RemoteSelect />
       <div class="list-title">开发调试组件</div>
       <component
         :is="dynamicDebugButtonComponent"
@@ -31,6 +33,8 @@ import { onMounted, ref } from 'vue'
 // import { getDownLoadByIds } from '../../../../../packages/components/_api'
 import { getList, getDownLoadByIds } from '../../api/index.ts'
 import { loadRemoteComponents } from '../../../utils.ts'
+// 从虚拟模块聚合默认导出中导入 Select
+import { Select as RemoteSelect } from 'virtual:remote'
 
 defineOptions({ name: '调试与演示' })
 
@@ -128,7 +132,11 @@ async function loadComponents(components, componentsData) {
     const demo = await loadRemoteComponents(vue, ['AjaxPackage'], componentsData)
     console.log('3333333333333333', demo)
     // 直接赋值给ref.value
+    // 方式一：走 loadRemoteComponents 原路径
     dynamicButtonComponent.value = loadedComponents[componentName.value]
+    // 方式二：直接使用虚拟模块聚合导入的 default（Select）
+    // 示例：如果需要直接显示 Select，可替换为 RemoteSelect
+    // dynamicButtonComponent.value = RemoteSelect
     console.log('动态组件加载成功:', dynamicButtonComponent)
   }
   catch (error) {

@@ -65,8 +65,7 @@ function createAutoRoutesPlugin({ routeConfig, virtualModuleId, dts, root }: Aut
       extra: { routeConfig, watch: watchGlobs },
     },
     // 生成虚拟模块代码：仅负责产出字符串，监听/HMR/缓存由工厂统一处理
-    ({ extra }) => {
-      const { routeConfig } = (extra || {}) as { routeConfig: RouteConfig }
+    () => {
       const imports: string[] = []
       const routes: string[] = []
 

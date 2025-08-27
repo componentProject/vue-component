@@ -116,15 +116,12 @@ export interface VirtualPluginUserConfig<TExtra = any> {
 }
 
 type GenerateDts<TExtra> = (params: {
-  dts: string | boolean | undefined
-  root: string
-  typeContent?: any
-  extra: TExtra | undefined
+  config: ResolvedConfig
 }) => string
 
 type GenerateModule<TExtra> = (params: {
-  virtualModuleId: string
-  extra: TExtra | undefined
+  id: string
+  config: ResolvedConfig
 }) => string
 
 export function createVirtualPlugin<TExtra = any>(
@@ -150,6 +147,8 @@ export function createVirtualPlugin<TExtra = any>(
     resolveId(id: string) {
       if (id === VIRTUAL_MODULE_ID)
         return VIRTUAL_MODULE_ID
+      if (id.startsWith(`${VIRTUAL_MODULE_ID}/`))
+        return id
     },
 
     configResolved(config: ResolvedConfig) {
@@ -175,7 +174,7 @@ export function createVirtualPlugin<TExtra = any>(
           }
 
           const content = generateDts
-            ? generateDts({ dts, root: rootDir, typeContent, extra })
+            ? generateDts({ config })
             : String(typeContent ?? '')
 
           const normalized = normalizePath(dtsPath)
@@ -217,7 +216,25 @@ export function createVirtualPlugin<TExtra = any>(
         server,
         watchPatterns,
         isWatchedPath,
-        () => { if (!isServerClosing) invalidateVirtualModuleInDev(server, VIRTUAL_MODULE_ID, moduleCache) },
+        () => {
+          if (isServerClosing)
+            return
+          // 失效所有以 VIRTUAL_MODULE_ID 开头的虚拟模块
+          const ids = Array.from(moduleCache.keys()).filter(k => k === VIRTUAL_MODULE_ID || k.startsWith(`${VIRTUAL_MODULE_ID}/`))
+          if (ids.length === 0) {
+            invalidateVirtualModuleInDev(server, VIRTUAL_MODULE_ID, moduleCache)
+            return
+          }
+          for (const vid of ids) {
+            moduleCache.delete(vid)
+            const mod = server.moduleGraph.getModuleById(vid)
+            if (mod) {
+              server.moduleGraph.invalidateModule(mod)
+              try { (server as any).reloadModule?.(mod) } catch {}
+            }
+          }
+          if (ids.length === 0) server.ws.send({ type: 'full-reload' })
+        },
         50,
       )
     },
@@ -228,14 +245,19 @@ export function createVirtualPlugin<TExtra = any>(
       const abs = normalizePath(path.isAbsolute(ctx.file) ? ctx.file : path.resolve(rootDir, ctx.file))
       if (!isWatchedPath(abs))
         return
-      const mod: ModuleNode | undefined = server.moduleGraph.getModuleById(VIRTUAL_MODULE_ID)
-      if (mod) {
-        if (!isServerClosing) {
-          moduleCache.delete(VIRTUAL_MODULE_ID)
-          server.moduleGraph.invalidateModule(mod)
-          return [mod]
+      if (isServerClosing)
+        return
+      const ids = Array.from(moduleCache.keys()).filter(k => k === VIRTUAL_MODULE_ID || k.startsWith(`${VIRTUAL_MODULE_ID}/`))
+      const mods: ModuleNode[] = []
+      for (const vid of ids) {
+        moduleCache.delete(vid)
+        const m = server.moduleGraph.getModuleById(vid)
+        if (m) {
+          server.moduleGraph.invalidateModule(m)
+          mods.push(m)
         }
       }
+      return mods
     },
 
     watchChange(id: string) {
@@ -244,7 +266,11 @@ export function createVirtualPlugin<TExtra = any>(
         const absId = normalizePath(path.isAbsolute(id) ? id : path.resolve(rootDir, id))
         if (isWatchedPath(absId)) {
           if (!isServerClosing) {
-            moduleCache.delete(VIRTUAL_MODULE_ID)
+            // 删除所有缓存的相关虚拟模块
+            for (const k of Array.from(moduleCache.keys())) {
+              if (k === VIRTUAL_MODULE_ID || k.startsWith(`${VIRTUAL_MODULE_ID}/`))
+                moduleCache.delete(k)
+            }
           }
         }
       }
@@ -252,8 +278,8 @@ export function createVirtualPlugin<TExtra = any>(
     },
 
     load(id: string) {
-      if (id === VIRTUAL_MODULE_ID) {
-        const code = generateModule({ virtualModuleId: VIRTUAL_MODULE_ID, extra })
+      if (id === VIRTUAL_MODULE_ID || id.startsWith(`${VIRTUAL_MODULE_ID}/`)) {
+        const code = generateModule({ id, config: resolvedViteConfig as ResolvedConfig })
         moduleCache.set(id, code)
         return code
       }
