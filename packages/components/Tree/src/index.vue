@@ -17,51 +17,65 @@
       v-bind="$attrs"
     >
       <template #default="{ node, data }">
-        <div
-          class="wl-tree__row flex space-between items-center pr-8 w-full"
-          style="padding-right: 8px"
-        >
-          <div class="flex items-center flex-1-hidden">
-            <ElIcon v-if="props.icon" class="wl-tree__icon">
-              <component :is="props.icon(data)"/>
-            </ElIcon>
-            <ElIcon v-else-if="isLeaf(data) && props.childIcon" class="wl-tree__icon">
-              <component :is="props.childIcon"/>
-            </ElIcon>
-            <ElIcon v-else-if="!isLeaf(data) && props.parentIcon" class="wl-tree__icon">
-              <component :is="props.parentIcon"/>
-            </ElIcon>
+        <slot name="default" v-bind="{ node, data }">
+          <div
+            class="wl-tree__row flex space-between items-center pr-8 h-full w-full"
+            style="padding-right: 8px"
+          >
+            <template v-if="props.showLine" v-for="item in node.level -1" :key="item">
+              <div v-if="item === 1" class="wl-tree_line" :style="{
+              width: node.isLeaf?`${props.indent * 2 - 4}px` : `${props.indent - 2}px`,
+              left:`${-props.indent * 2 + 2 }px`,
+            }"/>
+              <div v-else class="wl-tree_left_line" :style="{
+              left:`${-props.indent * (item + 1) + 2}px`
+            }"/>
+            </template>
+            <div :class="{ 'flex-1-hidden': !props.showRowLine }" class="flex items-center">
+              <ElIcon v-if="props.icon" class="wl-tree__icon">
+                <component :is="props.icon(data)"/>
+              </ElIcon>
+              <ElIcon v-else-if="isLeaf(data) && props.childIcon" class="wl-tree__icon">
+                <component :is="props.childIcon"/>
+              </ElIcon>
+              <ElIcon v-else-if="!isLeaf(data) && props.parentIcon" class="wl-tree__icon">
+                <component :is="props.parentIcon"/>
+              </ElIcon>
 
-            <span class="ml-4" style="margin-left: 4px">
-            <slot name="label" :node="node" :data="data">{{(data as any)[props.labelField] ?? '' }}</slot>
-          </span>
-          </div>
-
-          <span
-            class="wl-tree__buttons"
-            :class="{
+              <span class="ml-4" style="margin-left: 4px">
+                <slot name="label" :node="node" :data="data">{{(data as any)[props.labelField] ?? '' }}</slot>
+              </span>
+            </div>
+            <div v-if="props.showRowLine" class="flex-1-hidden wl-right_line" />
+            <span
+              class="wl-tree__buttons h-full"
+              :class="{
               'wl-tree__buttons--hover': props.showType === 'hover',
             }"
-            v-show="props.showType !== 'click' || data[props.rowField] === activeNode?.[props.rowField]"
-          >
-            <template v-for="btn in getButtons(data)" :key="btn.type || btn.tooltip || (typeof btn.slot === 'string' ? btn.slot : '') || (typeof btn.icon === 'string' ? btn.icon : '') || 'btn'">
-              <ElTooltip :disabled="!btn.tooltip" :content="btn.tooltip" placement="top">
-                <slot v-if="typeof btn.slot === 'string' && btn.slot" :name="btn.slot as string" :data="data" :node="node" />
-                <Render v-else-if="typeof btn.slot === 'function'" :render="() => (btn.slot as any)(data, node)" />
-                <ElButton
-                  v-else
-                  link
-                  size="small"
-                  @click.stop="() => btn.event && btn.event(data, node)"
-                >
-                  <ElIcon>
-                    <component :is="resolveButtonIcon(btn)" />
-                  </ElIcon>
-                </ElButton>
-              </ElTooltip>
-            </template>
+              v-show="props.showType !== 'click' || data[props.rowField] === activeNode?.[props.rowField]"
+            >
+              <template v-for="btn in getButtons(data)"
+                        :key="btn.type || btn.tooltip || (typeof btn.slot === 'string' ? btn.slot : '') || (typeof btn.icon === 'string' ? btn.icon : '') || 'btn'">
+                <ElTooltip :disabled="!btn.tooltip" :content="btn.tooltip" placement="top">
+                  <slot v-if="typeof btn.slot === 'string' && btn.slot" :name="btn.slot as string"
+                        :data="data" :node="node"/>
+                  <Render v-else-if="typeof btn.slot === 'function'"
+                          :render="() => (btn.slot as any)(data, node)"/>
+                  <ElButton
+                    v-else
+                    link
+                    size="small"
+                    @click.stop="() => btn.event && btn.event(data, node)"
+                  >
+                    <ElIcon>
+                      <component :is="resolveButtonIcon(btn)"/>
+                    </ElIcon>
+                  </ElButton>
+                </ElTooltip>
+              </template>
           </span>
-        </div>
+          </div>
+        </slot>
       </template>
     </ElTreeV2>
   </div>
@@ -95,6 +109,8 @@ const props = withDefaults(defineProps<TreeProps>(), {
   showType: 'default',
   indent: 16,
   height: 360,
+  showLine: false,
+  showRowLine: false
 })
 
 const emit = defineEmits<{
@@ -108,7 +124,9 @@ const isLeaf = (nodeData: Record<string, any>) => {
 }
 
 function treeClass(data: TreeNodeData){
-  return {'is-cascade-highlight': isHighlighted(data)}
+  return {
+    'is-cascade-highlight': isHighlighted(data),
+  }
 }
 
 function getButtons(nodeData: Record<string, any>): ButtonsItem[] {
@@ -242,6 +260,7 @@ function resolveButtonIcon(btn: ButtonsItem): VueComponent | string | undefined 
 }
 
 function onRowClick(data: TreeNodeData, node: TreeNode, e: MouseEvent) {
+  console.log('node', node)
   // 级联选择逻辑
   if (props.levelSelect) {
     const id = (data as any)?.[props.rowField]
@@ -275,23 +294,53 @@ function onRowClick(data: TreeNodeData, node: TreeNode, e: MouseEvent) {
 
 <style scoped lang="scss">
 @forward '@moluoxixi/components/_assets/styles/tailwind.scss';
-.wl-tree__buttons {
-  :deep(.el-button){
-    margin-left: 4px;
-  }
-}
-.wl-tree__row {
-  position: relative;
-}
+
 :deep(.is-cascade-highlight) {
   background-color: var(--el-color-primary-light-9);
 }
-.wl-tree__buttons--hover {
-  opacity: 0;
-  transition: opacity .15s ease;
-}
-.wl-tree__row:hover .wl-tree__buttons--hover {
-  opacity: 1;
+.wl-tree{
+  :deep(.el-icon){
+    position: relative;
+    z-index: 1;
+  }
+
+  .wl-tree__row {
+    position: relative;
+
+    .wl-tree__buttons {
+      :deep(.el-button) {
+        margin-left: 4px;
+      }
+
+      &.wl-tree__buttons--hover {
+        opacity: 0;
+        transition: opacity .15s ease;
+      }
+    }
+
+    .wl-tree_line {
+      position: absolute;
+      height: 100%;
+      top: -50%;
+      border-bottom: 1px dashed #dddddd;
+      border-left: 1px dashed #dddddd;
+    }
+
+    .wl-tree_left_line {
+      position: absolute;
+      height: 100%;
+      top: -50%;
+      border-left: 1px dashed #dddddd;
+    }
+    .wl-right_line{
+      border-top: 1px dashed #dddddd;
+    }
+
+    &:hover .wl-tree__buttons--hover {
+      opacity: 1;
+    }
+  }
+
 }
 </style>
 

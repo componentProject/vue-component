@@ -15,6 +15,11 @@
       <Tree :data="treeList" children-field="children" label-field="name" :buttons="renderButtons" show-type="click" />
     </div>
 
+    <h3>显示虚线</h3>
+    <div class="block">
+      <Tree show-line show-row-line :data="treeList" children-field="children" label-field="name" :buttons="renderButtons" />
+    </div>
+
     <h3>扁平数据（rowField + parentField 覆盖 childrenField）+ 函数 icon</h3>
     <div class="block">
       <Tree :data="flatList" row-field="id" parent-field="pid" label-field="name" :buttons="renderButtons" :icon="iconByType" />
@@ -35,7 +40,7 @@
         :data="treeList"
         children-field="children"
         label-field="name"
-        :cascade-select="true"
+        levelSelect
         @change="onCascadeChange"
       />
       <div style="margin-top: 8px">已选节点（name）: {{ selectedNames }}</div>
@@ -49,7 +54,7 @@ import Tree from '@moluoxixi/components/Tree/index.ts'
 import { ref, computed } from 'vue'
 import { Folder, Document } from '@element-plus/icons-vue'
 import { ElButton } from 'element-plus'
-
+import type { ButtonsItem } from './types/index.ts'
 const ChildIcon = Document
 const ParentIcon = Folder
 
@@ -123,7 +128,7 @@ function iconByType(row: any) {
   return row.type === 'dir' ? Folder : Document
 }
 
-function renderButtons(row: any) {
+function renderButtons(row: any): ButtonsItem[] {
   return [
     {
       type: 'add',
@@ -143,7 +148,7 @@ function renderButtons(row: any) {
   ]
 }
 
-function renderCustomButtons(row: any) {
+function renderCustomButtons(row: any): ButtonsItem[] {
   return [
     {
       slot: 'customSlot',
