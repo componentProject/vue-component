@@ -134,7 +134,7 @@ export function createVirtualPlugin<TExtra = any>(
 ): Plugin {
   const { name, virtualModuleId, dts, root, typeContent, extra } = userConfig
   const VIRTUAL_MODULE_ID = virtualModuleId
-  const RESOLVED_VIRTUAL_MODULE_ID = `\0${VIRTUAL_MODULE_ID}`
+  const RESOLVED_VIRTUAL_MODULE_ID = VIRTUAL_MODULE_ID
 
   const moduleCache: Map<string, string> = new Map()
 
