@@ -1,5 +1,17 @@
-import axiosApi from './axiosApi'
+import { getHttpService } from '../../utils/AjaxPackage/netseriver.js'
 import FormData from 'form-data'
+
+const httpApi: any = getHttpService({
+  baseURL: 'http://192.168.209.103:10019/',
+  timeout: 3000,
+  getToken: () => null,
+  // 响应字段配置
+  responseFields: {
+    code: 'Code',
+    message: 'Message',
+    data: 'data',
+  },
+})
 
 //上传组件
 export function setWebUpload(data: any) {
@@ -18,10 +30,7 @@ export function setWebUpload(data: any) {
 
   // 获取form-data生成的headers
   const formHeaders = formData.getHeaders()
-  return axiosApi({
-    url: '/ts-fm/file/webUpload',
-    method: 'post',
-    data: formData,
+  return httpApi.post('/ts-fm/file/webUpload',formData, {
     headers: {
       ...formHeaders,
     },
@@ -29,25 +38,11 @@ export function setWebUpload(data: any) {
 }
 //获取组件列表
 export function getList(data: any) {
-  return axiosApi({
-    url: '/ts-fm/file/getList',
-    method: 'post',
-    data,
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  })
+  return httpApi.post('/ts-fm/file/getList', data)
 }
 
 //获取组件实例
 export function getDownLoadByIds(data: any) {
-  return axiosApi({
-    url: '/ts-fm/file/downLoadByIds',
-    method: 'post',
-    data,
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  })
+  return httpApi.post('/ts-fm/file/downLoadByIds', data)
 }
 

@@ -34,7 +34,7 @@ export async function UploadEvent(url: string, buildName: string) {
         backups: '1',
         paraMeters: {
           productCode: 'webFile_his',
-          Vue: 'Vue3',
+          Vue: 'UtilityClass',
           componentCode: buildName,
         },
       },

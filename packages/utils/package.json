@@ -2,8 +2,23 @@
   "name": "@moluoxixi/utils",
   "version": "0.0.5",
   "description": "all components are settled here",
-  "main": "index.ts",
-  "module": "index.ts",
+  "main": "dist/index.js",
+  "module": "dist/index.es.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "require": "./dist/index.js",
+      "import": "./dist/index.es.js"
+    },
+    "./AjaxPackage": {
+      "require": "./dist/AjaxPackage/index.js",
+      "import": "./dist/AjaxPackage/index.es.js"
+    }
+  },
+  "files": [
+    "dist",
+    "AjaxPackage"
+  ],
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
   },
@@ -14,6 +29,7 @@
   },
   "dependencies": {
     "form-data": "^4.0.4",
+    "element-plus": "catalog:build",
     "moment": "catalog:build",
     "radash": "catalog:build",
     "lodash": "catalog:build",
@@ -53,7 +69,8 @@
     "dotenv": "catalog:dev",
     "vite-plugin-dts": "^4.5.4",
     "vite-plugin-html": "^3.2.2",
-    "vite-plugin-vue-devtools": "^7.7.2"
+    "vite-plugin-vue-devtools": "^7.7.2",
+    "tsx": "^4.20.5"
   },
   "postcss": {
     "plugins": {

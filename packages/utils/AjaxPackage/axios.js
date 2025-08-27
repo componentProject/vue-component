@@ -157,5 +157,5 @@ export function createAxiosInstance(baseURL, timeout = 5000, options = {}) {
 }
 
 // 默认导出保持不变
-export const defaultAxiosInstance = createAxiosInstance(import.meta.env.VITE_APP || '')
+export const defaultAxiosInstance = createAxiosInstance('')
 export { axios as baseAxios }

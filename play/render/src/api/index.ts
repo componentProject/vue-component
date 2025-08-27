@@ -1,4 +1,4 @@
-import { getHttpService } from '../apiPackage/netseriver.js'
+import { getHttpService } from '../../../../packages/utils/AjaxPackage/netseriver.js'
 
 const httpApi: any = getHttpService({
   baseURL: 'http://192.168.209.103:10019/',

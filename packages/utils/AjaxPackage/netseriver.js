@@ -14,7 +14,7 @@ import { HttpRequest } from './http.js'
  */
 function createHttpService(options = {}) {
   const defaultConfig = {
-    baseURL: import.meta.env.VITE_APP || '',
+    baseURL: options.baseURL || '',
     timeout: 5000,
     getToken: () => localStorage.getItem('token') || '',
     onLoginRequired: () => {

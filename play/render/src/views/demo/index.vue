@@ -125,6 +125,8 @@ async function loadComponents(components, componentsData) {
     // 接收并使用loadRemoteComponents的返回值
     // 注意：Vue 3不再需要传入Vue构造函数
     const loadedComponents = await loadRemoteComponents(vue, components, componentsData)
+    const demo = await loadRemoteComponents(vue, ['AjaxPackage'], componentsData)
+    console.log('3333333333333333', demo)
     // 直接赋值给ref.value
     dynamicButtonComponent.value = loadedComponents[componentName.value]
     console.log('动态组件加载成功:', dynamicButtonComponent)
