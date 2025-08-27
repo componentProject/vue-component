@@ -1,5 +1,4 @@
 import type { Plugin } from 'vite'
-// no-op
 // autoRoutes/index.ts
 import { findDefaultRouteHandle, findParentRouteHandle, generateRoutes } from './routeGenerator.ts'
 import { createVirtualPlugin } from '../utils/virtual.ts'
@@ -81,7 +80,7 @@ function createAutoRoutesPlugin({ routeConfig, virtualModuleId, dts, root }: Aut
         routes.push(`...generateRoutes(${varName}, '${prefix}',${JSON.stringify(baseRoute)})`)
       })
 
-      const code = `
+      return `
         ${imports.join('\n')}
         const findParentRoute = ${findParentRouteHandle}
         // 用于routes
@@ -95,8 +94,6 @@ function createAutoRoutesPlugin({ routeConfig, virtualModuleId, dts, root }: Aut
         export { routes, findDefaultRoute };
         export default routes;
       `
-
-      return code
     },
   )
 }

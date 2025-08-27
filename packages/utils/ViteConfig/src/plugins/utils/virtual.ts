@@ -134,7 +134,6 @@ export function createVirtualPlugin<TExtra = any>(
 ): Plugin {
   const { name, virtualModuleId, dts, root, typeContent, extra } = userConfig
   const VIRTUAL_MODULE_ID = virtualModuleId
-  const RESOLVED_VIRTUAL_MODULE_ID = VIRTUAL_MODULE_ID
 
   const moduleCache: Map<string, string> = new Map()
 
@@ -150,7 +149,7 @@ export function createVirtualPlugin<TExtra = any>(
 
     resolveId(id: string) {
       if (id === VIRTUAL_MODULE_ID)
-        return RESOLVED_VIRTUAL_MODULE_ID
+        return VIRTUAL_MODULE_ID
     },
 
     configResolved(config: ResolvedConfig) {
@@ -218,7 +217,7 @@ export function createVirtualPlugin<TExtra = any>(
         server,
         watchPatterns,
         isWatchedPath,
-        () => { if (!isServerClosing) invalidateVirtualModuleInDev(server, RESOLVED_VIRTUAL_MODULE_ID, moduleCache) },
+        () => { if (!isServerClosing) invalidateVirtualModuleInDev(server, VIRTUAL_MODULE_ID, moduleCache) },
         50,
       )
     },
@@ -229,10 +228,10 @@ export function createVirtualPlugin<TExtra = any>(
       const abs = normalizePath(path.isAbsolute(ctx.file) ? ctx.file : path.resolve(rootDir, ctx.file))
       if (!isWatchedPath(abs))
         return
-      const mod: ModuleNode | undefined = server.moduleGraph.getModuleById(RESOLVED_VIRTUAL_MODULE_ID)
+      const mod: ModuleNode | undefined = server.moduleGraph.getModuleById(VIRTUAL_MODULE_ID)
       if (mod) {
         if (!isServerClosing) {
-          moduleCache.delete(RESOLVED_VIRTUAL_MODULE_ID)
+          moduleCache.delete(VIRTUAL_MODULE_ID)
           server.moduleGraph.invalidateModule(mod)
           return [mod]
         }
@@ -245,7 +244,7 @@ export function createVirtualPlugin<TExtra = any>(
         const absId = normalizePath(path.isAbsolute(id) ? id : path.resolve(rootDir, id))
         if (isWatchedPath(absId)) {
           if (!isServerClosing) {
-            moduleCache.delete(RESOLVED_VIRTUAL_MODULE_ID)
+            moduleCache.delete(VIRTUAL_MODULE_ID)
           }
         }
       }
@@ -253,7 +252,7 @@ export function createVirtualPlugin<TExtra = any>(
     },
 
     load(id: string) {
-      if (id === RESOLVED_VIRTUAL_MODULE_ID) {
+      if (id === VIRTUAL_MODULE_ID) {
         const code = generateModule({ virtualModuleId: VIRTUAL_MODULE_ID, extra })
         moduleCache.set(id, code)
         return code
