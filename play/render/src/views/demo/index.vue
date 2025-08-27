@@ -2,8 +2,8 @@
   <div>
     <div class="title">调试与演示</div>
     <div class="main">
-      <div>13131</div>
-      <RemoteSelect />
+      <div>虚拟模块里导出的组件</div>
+      <RemoteSelect/>
       <div class="list-title">开发调试组件</div>
       <component
         :is="dynamicDebugButtonComponent"
@@ -33,8 +33,6 @@ import { onMounted, ref } from 'vue'
 // import { getDownLoadByIds } from '../../../../../packages/components/_api'
 import { getList, getDownLoadByIds } from '../../api/index.ts'
 import { loadRemoteComponents } from '../../../utils.ts'
-// 从虚拟模块聚合默认导出中导入 Select
-import { Select as RemoteSelect } from 'virtual:remote'
 
 defineOptions({ name: '调试与演示' })
 
