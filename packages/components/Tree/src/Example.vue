@@ -85,7 +85,6 @@ const treeList = [
           { id: 112, name: '子 1-1-2' },
         ],
       },
-      { id: 12, name: '子 1-2' },
     ],
   },
   {
@@ -169,7 +168,6 @@ function onAlert(message: string) {
 const selectedRows = ref<any[]>([])
 const selectedNames = computed(() => selectedRows.value.map((r: any) => r?.name).filter(Boolean).join(', '))
 function onCascadeChange(rows: any[]) {
-  console.log('rows', rows)
   selectedRows.value = rows.map(item=>{
     const {children,...i} = item;
     return i;

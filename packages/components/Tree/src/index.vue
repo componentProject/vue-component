@@ -3,23 +3,23 @@
     <ElTreeV2
       ref="treeRef"
       :data="treeData"
-      :value="props.rowField"
-      :label="props.labelField"
-      :children="props.childrenField"
       :height="height"
       :indent="indent"
       :expand-on-click-node="false"
       highlight-current
       @node-click="onRowClick"
       :props="{
-        class: treeClass
+        class: treeClass,
+        label: props.labelField,
+        children: props.childrenField,
+        value: props.rowField,
       }"
       v-bind="$attrs"
     >
       <template #default="{ node, data }">
         <slot name="default" v-bind="{ node, data }">
           <div
-            class="wl-tree__row flex space-between items-center pr-8 h-full w-full"
+            class="wl-tree__row flex space-between items-center pr-8 h-full flex-1!"
             style="padding-right: 8px"
           >
             <template v-if="props.showLine" v-for="item in node.level -1" :key="item">
@@ -27,7 +27,7 @@
               width: node.isLeaf?`${props.indent * 2 - 4}px` : `${props.indent - 2}px`,
               left:`${-props.indent * 2 + 2 }px`,
             }"/>
-              <div v-else class="wl-tree_left_line" :style="{
+              <div v-else-if="leftLineShow(item,node)" class="wl-tree_left_line" :style="{
               left:`${-props.indent * (item + 1) + 2}px`
             }"/>
             </template>
@@ -83,7 +83,7 @@
 </template>
 
 <script setup lang="ts">
-import type {Component as VueComponent} from 'vue'
+import {Component as VueComponent, useTemplateRef} from 'vue'
 import {computed, defineComponent, ref} from 'vue'
 import type {TreeNode, TreeNodeData} from 'element-plus'
 import {ElButton, ElIcon, ElTooltip, ElTreeV2} from 'element-plus'
@@ -126,6 +126,7 @@ const isLeaf = (nodeData: Record<string, any>) => {
 function treeClass(data: TreeNodeData){
   return {
     'is-cascade-highlight': isHighlighted(data),
+    'is-cascade': props.levelSelect,
   }
 }
 
@@ -136,7 +137,7 @@ function getButtons(nodeData: Record<string, any>): ButtonsItem[] {
 const indent = props.indent
 const height = props.height
 const activeNode = ref<any | null>(null)
-const treeRef = ref<any | null>(null)
+const treeRef = useTemplateRef('treeRef')
 
 // 级联高亮相关
 const highlightedKeySet = ref<Set<any>>(new Set())
@@ -158,7 +159,14 @@ const idMaps = computed(() => {
   traverse(treeData.value || [], null)
   return { idToNodeMap, idToParentIdMap }
 })
-
+function leftLineShow(item:number,node: TreeNode & {parent: any }){
+  if(item === 1){
+    console.log('aaaaaaaa', node)
+    return node.parent?.[props.childrenField]?.length > 1
+  }else{
+    return leftLineShow(item - 1,node.parent)
+  }
+}
 function isHighlighted(row: any) {
   const idKey = props.rowField
   return highlightedKeySet.value.has((row as any)?.[idKey])
@@ -207,8 +215,7 @@ function emitChange() {
 function clearTreeCurrent() {
   const inst: any = treeRef.value
   if (!inst) return
-  inst.setCurrentKey?.()
-  inst.setCurrentNode?.()
+  inst.setCurrentKey(null)
 }
 
 // 将扁平数据转换为树
@@ -260,7 +267,7 @@ function resolveButtonIcon(btn: ButtonsItem): VueComponent | string | undefined 
 }
 
 function onRowClick(data: TreeNodeData, node: TreeNode, e: MouseEvent) {
-  console.log('node', node)
+  console.log('data',data,node)
   // 级联选择逻辑
   if (props.levelSelect) {
     const id = (data as any)?.[props.rowField]
@@ -295,13 +302,22 @@ function onRowClick(data: TreeNodeData, node: TreeNode, e: MouseEvent) {
 <style scoped lang="scss">
 @forward '@moluoxixi/components/_assets/styles/tailwind.scss';
 
-:deep(.is-cascade-highlight) {
-  background-color: var(--el-color-primary-light-9);
-}
+
 .wl-tree{
-  :deep(.el-icon){
-    position: relative;
-    z-index: 1;
+  :deep(.el-tree){
+    .el-icon {
+      position: relative;
+      z-index: 1;
+    }
+
+    .is-cascade{
+      .el-tree-node__content{
+        background-color: unset;
+      }
+    }
+    .is-cascade-highlight {
+      background-color: var(--el-color-primary-light-9);
+    }
   }
 
   .wl-tree__row {
