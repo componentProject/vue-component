@@ -207,8 +207,8 @@ function emitChange() {
 function clearTreeCurrent() {
   const inst: any = treeRef.value
   if (!inst) return
-  inst.setCurrentKey()
-  inst.setCurrentNode()
+  inst.setCurrentKey?.()
+  inst.setCurrentNode?.()
 }
 
 // 将扁平数据转换为树

@@ -169,6 +169,7 @@ function onAlert(message: string) {
 const selectedRows = ref<any[]>([])
 const selectedNames = computed(() => selectedRows.value.map((r: any) => r?.name).filter(Boolean).join(', '))
 function onCascadeChange(rows: any[]) {
+  console.log('rows', rows)
   selectedRows.value = rows.map(item=>{
     const {children,...i} = item;
     return i;
