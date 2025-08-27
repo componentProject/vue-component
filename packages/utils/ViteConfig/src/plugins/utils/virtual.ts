@@ -48,27 +48,58 @@ export function setupDevAllWatcher(
   onInvalidate: () => void,
   debounceMs = 50,
 ): void {
-  try {
-    if (watchPatterns.length > 0) {
-      server.watcher.add(watchPatterns)
-    }
-  }
-  catch {}
-
   let timer: NodeJS.Timeout | undefined
   const schedule = () => {
     clearTimeout(timer)
     timer = setTimeout(onInvalidate, debounceMs)
+    ;(timer as any)?.unref?.()
   }
+  let watcherReady = false
+  let netReady = false
+  let enabled = false
 
-  server.watcher.on('all', (eventName: string, file: string) => {
-    if (eventName === 'add' || eventName === 'addDir' || eventName === 'change' || eventName === 'unlink' || eventName === 'unlinkDir') {
-      const abs = normalizePath(path.isAbsolute(file) ? file : path.resolve(server.config.root, file))
-      if (isWatchedPath(abs)) {
-        schedule()
+  const maybeEnable = () => {
+    if (enabled)
+      return
+    if (!watcherReady || !netReady)
+      return
+
+    enabled = true
+    try {
+      if (watchPatterns.length > 0)
+        server.watcher.add(watchPatterns)
+    } catch {}
+
+    const onAll = (eventName: string, file: string) => {
+      if (
+        eventName === 'change'
+        || eventName === 'unlink'
+        || eventName === 'unlinkDir'
+        || (watcherReady && (eventName === 'add' || eventName === 'addDir'))
+      ) {
+        const abs = normalizePath(path.isAbsolute(file) ? file : path.resolve(server.config.root, file))
+        if (isWatchedPath(abs))
+          schedule()
       }
     }
-  })
+
+    try { server.watcher.on('all', onAll) } catch {}
+
+    const removeAll = () => {
+      try { (server.watcher as any).off?.('all', onAll) } catch {}
+      try { (server.watcher as any).removeListener?.('all', onAll) } catch {}
+    }
+    try { server.watcher.once('close', removeAll) } catch {}
+    try { server.httpServer?.once('close', removeAll) } catch {}
+  }
+
+  try { server.watcher.once('ready', () => { watcherReady = true; maybeEnable() }) } catch {}
+  try { server.httpServer?.once('listening', () => { netReady = true; maybeEnable() }) } catch {}
+  try {
+    const wsAny = (server.ws as any)
+    if (typeof wsAny?.on === 'function')
+      wsAny.once('connection', () => { netReady = true; maybeEnable() })
+  } catch {}
 }
 
 // =========================
@@ -103,7 +134,6 @@ export function createVirtualPlugin<TExtra = any>(
 ): Plugin {
   const { name, virtualModuleId, dts, root, typeContent, extra } = userConfig
   const VIRTUAL_MODULE_ID = virtualModuleId
-  const RESOLVED_VIRTUAL_MODULE_ID = `\0${VIRTUAL_MODULE_ID}`
 
   const moduleCache: Map<string, string> = new Map()
 
@@ -111,13 +141,15 @@ export function createVirtualPlugin<TExtra = any>(
   let watchPatterns: string[] = []
   let watchPrefixes: string[] = []
   let isWatchedPath: PathMatcher = () => true
+  // 标记服务器是否正在关闭，避免关闭阶段再触发无效操作
+  let isServerClosing = false
 
   return {
     name,
 
     resolveId(id: string) {
       if (id === VIRTUAL_MODULE_ID)
-        return RESOLVED_VIRTUAL_MODULE_ID
+        return VIRTUAL_MODULE_ID
     },
 
     configResolved(config: ResolvedConfig) {
@@ -159,11 +191,33 @@ export function createVirtualPlugin<TExtra = any>(
     },
 
     configureServer(server: ViteDevServer) {
+      // 进程信号优雅退出：先关闭 vite server，再退出进程，避免端口占用/卡住
+      try {
+        const onSignal = () => {
+          if (isServerClosing)
+            return
+          isServerClosing = true
+          Promise.resolve((server as any)?.close?.())
+            .finally(() => { try { process.exit(0) } catch {} })
+        }
+        process.once('SIGINT', onSignal)
+        process.once('SIGTERM', onSignal)
+      }
+      catch {}
+
+      // httpServer 关闭时仅标记，不直接退出；退出由信号处理统一执行
+      try {
+        server.httpServer?.once('close', () => {
+          isServerClosing = true
+        })
+      }
+      catch {}
+
       setupDevAllWatcher(
         server,
         watchPatterns,
         isWatchedPath,
-        () => invalidateVirtualModuleInDev(server, RESOLVED_VIRTUAL_MODULE_ID, moduleCache),
+        () => { if (!isServerClosing) invalidateVirtualModuleInDev(server, VIRTUAL_MODULE_ID, moduleCache) },
         50,
       )
     },
@@ -174,11 +228,13 @@ export function createVirtualPlugin<TExtra = any>(
       const abs = normalizePath(path.isAbsolute(ctx.file) ? ctx.file : path.resolve(rootDir, ctx.file))
       if (!isWatchedPath(abs))
         return
-      const mod: ModuleNode | undefined = server.moduleGraph.getModuleById(RESOLVED_VIRTUAL_MODULE_ID)
+      const mod: ModuleNode | undefined = server.moduleGraph.getModuleById(VIRTUAL_MODULE_ID)
       if (mod) {
-        moduleCache.delete(RESOLVED_VIRTUAL_MODULE_ID)
-        server.moduleGraph.invalidateModule(mod)
-        return [mod]
+        if (!isServerClosing) {
+          moduleCache.delete(VIRTUAL_MODULE_ID)
+          server.moduleGraph.invalidateModule(mod)
+          return [mod]
+        }
       }
     },
 
@@ -187,14 +243,16 @@ export function createVirtualPlugin<TExtra = any>(
         const rootDir = root || resolvedViteConfig?.root || process.cwd()
         const absId = normalizePath(path.isAbsolute(id) ? id : path.resolve(rootDir, id))
         if (isWatchedPath(absId)) {
-          moduleCache.delete(RESOLVED_VIRTUAL_MODULE_ID)
+          if (!isServerClosing) {
+            moduleCache.delete(VIRTUAL_MODULE_ID)
+          }
         }
       }
       catch {}
     },
 
     load(id: string) {
-      if (id === RESOLVED_VIRTUAL_MODULE_ID) {
+      if (id === VIRTUAL_MODULE_ID) {
         const code = generateModule({ virtualModuleId: VIRTUAL_MODULE_ID, extra })
         moduleCache.set(id, code)
         return code

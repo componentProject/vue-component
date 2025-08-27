@@ -456,7 +456,7 @@ function processExports(code: string, allExports: analyzeExportsResult): process
 /**
  * 处理组件的导入和导出
  * @param componentNames
- * @param baseUrl
+ * @param componentobj
  */
 async function replaceImportsAndExports(componentNames: string[], componentobj: any) {
   const processedComponents: Record<string, string | null> = {}
@@ -527,7 +527,7 @@ async function replaceImportsAndExports(componentNames: string[], componentobj: 
  * 加载远程组件
  * @param Vue
  * @param componentNames
- * @param baseUrl
+ * @param componentobj
  */
 export async function loadRemoteComponents(Vue: any, componentNames: string[], componentobj: any) {
   componentMapping.Vue = Vue
