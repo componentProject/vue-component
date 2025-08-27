@@ -122,7 +122,7 @@ export default function createViteConfig(Config: ViteConfigType) {
         enableInDevMode: viteEnv.VITE_USE_CDN_IS_DEV,
         prodUrl: `${viteEnv.VITE_CDN_BASE_URL}/{name}@{version}{path}`,
         modules,
-        generateScriptTag: (name, scriptUrl) => {
+        generateScriptTag: (_name, scriptUrl) => {
           const esmArr = ['esm', '.mjs']
           const isESM = esmArr.some(item => scriptUrl.includes(item))
           if (isESM) {
