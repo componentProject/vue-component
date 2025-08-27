@@ -1,6 +1,12 @@
 <template>
   <div>
-    <PopoverTableSelect v-model="popoverModel" :virtual-ref="computedVirtualRef" v-bind="$attrs" @enter="handleEnter">
+    <PopoverTableSelect
+      v-model="popoverModel"
+      :virtual-ref="computedVirtualRef"
+      :z-index="3000"
+      v-bind="$attrs"
+      @enter="handleEnter"
+    >
       <template v-for="name in slotNames" #[name]="slotParams" :key="name">
         <slot :name="name" v-bind="slotParams" />
       </template>
@@ -47,7 +53,7 @@ const props = defineProps({
    */
   options: {
     type: Object as PropType<DebounceSettingsLeading | ThrottleSettingsLeading>,
-    default: () => ({}),
+    default: () => ({ trailing: true, leading: false }),
   },
   /**
    * 当类型为input时，默认显示输入框
@@ -104,6 +110,9 @@ watch(
   (val) => {
     currentInputValue.value = val
     cacheInputValue.value = val
+  },
+  {
+    immediate: true,
   },
 )
 const computedPlaceholder = computed(() => {

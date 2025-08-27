@@ -40,6 +40,9 @@
       "@vue-macros/volar/define-emits"
     ]
   },
+  "include": [
+    "./**/*"
+  ],
   "exclude": [
     "dist",
     "node_modules",

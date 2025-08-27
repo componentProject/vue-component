@@ -1,4 +1,4 @@
-import viteConfig, { wrapperEnv } from '../../packages/components//ViteConfig/index.ts'
+import viteConfig, { wrapperEnv } from '../../packages/utils/ViteConfig/index.ts'
 import path from 'node:path'
 import process from 'node:process'
 import { loadEnv } from 'vite'
@@ -9,8 +9,9 @@ export default viteConfig(
   ({ mode }) => {
     const env = loadEnv(mode!, process.cwd())
     const viteEnv = wrapperEnv(env)
+    const rootPath = path.resolve()
     return {
-      rootPath: path.resolve(),
+      rootPath,
       mode: {
         base: {
           VITE_AUTO_ROUTES: true,
@@ -32,6 +33,13 @@ export default viteConfig(
       viteConfig: {
         build: {
           outDir: '../../dist',
+        },
+        resolve: {
+          extensions: ['.js', '.jsx', '.ts', '.tsx', '.vue'],
+          alias: {
+            '@moluoxixi/components': path.resolve(rootPath, '../../packages/components'),
+            '@moluoxixi/components/*': path.resolve(rootPath, '../../packages/components/*'),
+          },
         },
         plugins: [
           viteEnv.VITE_SENTRY
@@ -55,6 +63,17 @@ export default viteConfig(
                   })
                 })
               },
+            },
+            '/ai-application': {
+              // target: 'http://192.168.31.46:19061',
+              target: 'http://192.168.209.101:19061',
+              // target: 'http://192.168.31.218:19061',
+              changeOrigin: true,
+            },
+            '/sso': {
+              // target: 'http://192.168.211.135:8080',
+              target: 'http://192.168.209.103:9099',
+              changeOrigin: true,
             },
           },
         },

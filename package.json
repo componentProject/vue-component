@@ -5,7 +5,7 @@
     "docs/*"
   ],
   "private": true,
-  "packageManager": "pnpm@9.15.4",
+  "packageManager": "pnpm@10.8.0",
   "version": "1.3.1",
   "engines": {
     "node": ">=20.18.0"
@@ -19,9 +19,12 @@
     "docs:build": "pnpm run -C docs/vitepress build",
     "storybook:dev": "pnpm run -C docs/storybook build",
     "storybook:build": "pnpm run -C docs/storybook build",
-    "component:build&publish": "pnpm run -C packages/components build",
-    "component:build": "pnpm run -C packages/components build:only",
-    "component:publish": "pnpm run -C packages/components build:publish",
+    "components:build": "pnpm run -C packages/components build:only",
+    "components:publish": "pnpm run -C packages/components build:publish",
+    "components:build-publish": "pnpm run -C packages/components build",
+    "utils:build": "pnpm run -C packages/utils build:only",
+    "utils:publish": "pnpm run -C packages/utils build:publish",
+    "utils:build-publish": "pnpm run -C packages/utils build",
     "type-check": "vue-tsc --build",
     "lint-check": "eslint --inspect-config",
     "lint:eslint": "eslint . --fix",
@@ -71,14 +74,15 @@
     "template"
   ],
   "devDependencies": {
-    "eslint": "catalog:dev",
-    "eslint-plugin-format": "catalog:dev",
-    "@moluoxixi/eslintconfig": "catalog:dev",
+    "@antfu/eslint-config": "catalog:dev",
     "@commitlint/cli": "^19.8.0",
     "@commitlint/config-conventional": "^19.8.0",
+    "@vue-macros/volar": "catalog:dev",
     "commitizen": "^4.3.1",
     "compressing": "^1.10.1",
     "cz-customizable": "^7.4.0",
+    "eslint": "catalog:dev",
+    "eslint-plugin-format": "catalog:dev",
     "husky": "^9.1.7",
     "lint-staged": "^15.5.1",
     "npm-run-all2": "^7.0.2",
@@ -87,6 +91,7 @@
     "stylelint-config-standard-less": "^3.0.1",
     "stylelint-config-standard-scss": "^14.0.0",
     "stylelint-config-standard-vue": "^1.0.0",
-    "tsx": "^4.20.3"
+    "tsx": "^4.20.5",
+    "typescript": "catalog:dev"
   }
 }

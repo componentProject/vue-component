@@ -41,8 +41,8 @@ catalogs:
     sass-loader: 13.1.0
     postcss: ^8.5.3
     'autoprefixer': ^10.4.21
-    tailwindcss: ^4.1.5
-    '@tailwindcss/postcss': ^4.1.5
+    tailwindcss: npm:tailwindcss@4
+    '@tailwindcss/postcss': npm:@tailwindcss/postcss@4
     # vite插件
     vite: ^6.2.4
     unplugin-auto-import: ^19.3.0
@@ -53,19 +53,21 @@ catalogs:
     vite-plugin-imagemin: ^0.6.1
     '@vitejs/plugin-vue-jsx': ^4.1.2
     '@vitejs/plugin-vue': ^5.0.4
+    'qs': ^6.14.0
     #other
+    '@antfu/eslint-config': ^4.16.1
     'fast-glob': ^3.3.2
     '@vue-macros/volar': 3.0.0-beta.15
     '@moluoxixi/eslintconfig': latest
     '@moluoxixi/viteconfig': ^0.0.17
     dotenv: ^16.5.0
     jiti: ^2.4.2
-    eslint: ^9.22.0
+    eslint: ^9.5
     eslint-plugin-format: ^1.0.1
+    typescript: ~5.8.0
   type:
     '@types/lodash': ^4.17.17
     '@types/uuid': ^10.0.0
-    typescript: ~5.8.0
     '@types/node': ^22.14.0
     '@types/crypto-js': ^4.2.2
     '@types/js-cookie': ^3.0.3

@@ -3,6 +3,8 @@
   <div class="h-full w-full flex-1 overflow-hidden">
     <VxeGrid
       ref="xTable"
+      :header-cell-config="{ height: '30px' }"
+      :cell-config="{ height: '30px' }"
       v-bind="gridProps"
       @checkbox-all="handleCheckboxAll"
       @checkbox-change="handleCheckboxChange"

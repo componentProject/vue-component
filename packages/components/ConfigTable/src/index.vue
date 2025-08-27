@@ -1,5 +1,5 @@
 <template>
-  <div class="config-table">
+  <div class="w-full">
     <!-- 表格区域 -->
     <ElTable
       ref="tableRef"
@@ -9,6 +9,14 @@
       stripe
       highlight-current-row
       height="100%"
+      :header-cell-style="{
+        height: '30px',
+        padding: '0',
+      }"
+      :cell-style="{
+        height: '30px',
+        padding: '0',
+      }"
       v-bind="$attrs"
       @sort-change="handleSortChange"
       @selection-change="handleSelectionChange"
@@ -64,7 +72,7 @@
     </ElTable>
 
     <!-- 分页区域 -->
-    <div v-if="showPagination" class="table-pagination">
+    <div v-if="showPagination" class="flex justify-end mt-8!">
       <ElConfigProvider :locale="ZhCn">
         <ElPagination
           :current-page="pagination.pageIndex"
@@ -218,13 +226,5 @@ defineExpose({
 </script>
 
 <style scoped>
-.config-table {
-  width: 100%;
-}
-
-.table-pagination {
-  margin-top: 16px;
-  display: flex;
-  justify-content: flex-end;
-}
+@forward '@moluoxixi/components/_assets/styles/tailwind.scss';
 </style>

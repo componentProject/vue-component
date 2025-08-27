@@ -27,13 +27,15 @@
 <script setup lang="ts">
 import * as vue from 'vue'
 import { onMounted, ref } from 'vue'
-import { getDownLoadByIds, getList } from '../../../../../packages/components/_api'
+// import { getDownLoadByIds, getList } from '../../../../../packages/components/_api'
+// import { getDownLoadByIds } from '../../../../../packages/components/_api'
+import { getList, getDownLoadByIds } from '../../api/index.ts'
 import { loadRemoteComponents } from '../../../utils.ts'
 
 defineOptions({ name: '调试与演示' })
 
 // 使用ref替代data属性
-const componentName = ref('PopoverTableSelect') // 调试与演示组件库的组件，直接修改组件名
+const componentName = ref('AIAgent') // 调试与演示组件库的组件，直接修改组件名
 const componentsData = ref<any>(null) // 组件库数据对象
 const dynamicDebugButtonComponent = ref<any>(null) // 调试组件
 const dynamicButtonComponent = ref<any>(null) // 用于存储动态组件
@@ -118,14 +120,16 @@ async function loadDebugButtonComponent() {
   }
 }
 
-async function loadComponents(components: string[], componentsData: any) {
+async function loadComponents(components, componentsData) {
   try {
     // 接收并使用loadRemoteComponents的返回值
     // 注意：Vue 3不再需要传入Vue构造函数
     const loadedComponents = await loadRemoteComponents(vue, components, componentsData)
+    const demo = await loadRemoteComponents(vue, ['AjaxPackage'], componentsData)
+    console.log('3333333333333333', demo)
     // 直接赋值给ref.value
     dynamicButtonComponent.value = loadedComponents[componentName.value]
-    console.log('动态组件加载成功:', dynamicButtonComponent.value)
+    console.log('动态组件加载成功:', dynamicButtonComponent)
   }
   catch (error) {
     console.error('加载动态组件失败:', error)
@@ -136,9 +140,10 @@ async function getDownLoadByIdsEvent(res: any) {
   const params = res.map((item: any) => item.id)
   try {
     const obj = await getDownLoadByIds(params)
-    console.log('获取组件实例成功', obj.data.data)
-    componentsData.value = obj.data.data
-  } catch (error) {
+    console.log('获取组件实例成功', obj)
+    componentsData.value = obj
+  }
+  catch (error) {
     console.error('获取组件实例失败', error)
   }
 }
@@ -150,9 +155,10 @@ async function getListEvent() {
   }
   try {
     const res = await getList(params)
-    console.log('获取组件列表成功', res.data.data.Vue3) // 注意：这里改为Vue3
-    await getDownLoadByIdsEvent(res.data.data.Vue3) // 注意：这里改为Vue3
-  } catch (error) {
+    console.log('获取组件列表成功', res) // 注意：这里改为Vue3
+    await getDownLoadByIdsEvent(res.Vue3) // 注意：这里改为Vue3
+  }
+  catch (error) {
     console.error('获取组件列表失败', error)
   }
 }
