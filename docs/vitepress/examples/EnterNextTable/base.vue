@@ -4,7 +4,13 @@
     :data="tableData"
     :columns="columns"
     height="300"
+    :showPagination="true"
     @no-next-input="handleNoNextInput"
+    :pagination="paginationConfig"
+    :pageSizes="pageSizes"
+    :paginationLayout="paginationLayout"
+    @sizeChange="handleSizeChange"
+    @currentChange="handleCurrentChange"
   >
     <ElTableColumn
       v-for="column in columns"
@@ -26,6 +32,17 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { ElInput, ElTableColumn } from 'element-plus'
+
+//分页配置
+const paginationConfig = ref({
+  currentPage: 1,
+  pageSize: 10,
+  total: 0,
+});
+
+// 分页选项配置
+const pageSizes = ref([10, 20, 30, 50]);
+const paginationLayout = ref("total, sizes, prev, pager, next, jumper");
 
 const tableData = ref([
   { id: 1, name: '张三', age: 25, email: 'zhangsan@example.com', department: '技术部' },
@@ -50,4 +67,12 @@ function handleNoNextInput({ rowIndex }) {
     message.value = ''
   }, 3000)
 }
+
+const handleSizeChange = (size: number) => {
+  paginationConfig.value.pageSize = size;
+};
+
+const handleCurrentChange = (current: number) => {
+  paginationConfig.value.currentPage = current;
+};
 </script>
