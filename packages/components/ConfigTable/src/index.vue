@@ -155,7 +155,7 @@ const props = defineProps({
   // 是否展示分页
   showPagination: {
     type: Boolean,
-    default: true,
+    default: false,
   },
   // 分页配置
   pagination: {

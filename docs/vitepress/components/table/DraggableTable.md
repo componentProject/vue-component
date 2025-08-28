@@ -149,6 +149,10 @@ DraggableTable/expose/getTable
 | filterable | 是否启用过滤功能 | Boolean | false |
 | filterType | 过滤类型 | String | 'filter' |
 | filterLayout | 筛选器布局配置，支持 input、checkbox、select | Array | ['input','checkbox'] |
+| showPagination   | 是否显示分页 | Boolean | `false`                                     |
+| pagination      | 分页配置 | Object | `{ pageIndex: 1, pageSize: 10, total: 0 }` |
+| pageSizes       | 每页显示条数选项 | Array | `[10, 20, 50, 100]`                        |
+| paginationLayout | 分页布局 | String | `total, sizes, prev, pager, next, jumper`  |
 | ...attrs | 其他属性透传给[vxe-grid](https://vxetable.cn/#/grid/api) | - | - |
 
 ### columns 配置
@@ -173,6 +177,9 @@ DraggableTable/expose/getTable
 | resizableChange | 列宽变化事件 | ^[Function]`(params: ResizableChangeParams) => void` |
 | checkboxChange | 复选框变化事件 | ^[Function]`(params: CheckboxChangeParams) => void` |
 | checkboxAll | 复选框全选事件 | ^[Function]`(params: CheckboxAllParams) => void` |
+| size-change | 每页条数变化 | ^[Function]`(size: number) => void` |
+| current-change | 当前页变化 | ^[Function]`(current: number) => void` |
+| update:pagination | 分页受控更新 | ^[Function]`(pagination: { pageIndex: number; pageSize: number; total: number }) => void` |
 
 ### Slots
 

@@ -4,6 +4,20 @@
     <!-- 使用默认插槽渲染表格内容 -->
     <slot />
   </ElTable>
+  <!-- 分页区域 -->
+    <div v-if="showPagination" class="flex justify-end mt-8!">
+      <ElConfigProvider :locale="ZhCn">
+        <ElPagination
+          :current-page="pagination.pageIndex"
+          :page-size="pagination.pageSize"
+          :page-sizes="pageSizes"
+          :layout="paginationLayout"
+          :total="pagination.total"
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"
+        />
+      </ElConfigProvider>
+    </div>
 
   <!-- 为表格中的每一行创建EnterNextContainer -->
   <EnterNextContainer
@@ -20,6 +34,7 @@
 import { ElTable } from 'element-plus'
 import { nextTick, ref, watch } from 'vue'
 import EnterNextContainer from '@moluoxixi/components/EnterNextContainer/index.ts'
+import ZhCn from 'element-plus/dist/locale/zh-cn.mjs'
 import type {
   noNextInputParams,
   noSelectValueParams,
@@ -45,6 +60,30 @@ const props = defineProps({
       return ['row', 'table'].includes(value)
     },
   },
+  // 是否展示分页
+  showPagination: {
+    type: Boolean,
+    default: false,
+  },
+  // 分页配置
+  pagination: {
+    type: Object,
+    default: () => ({
+      pageIndex: 1,
+      pageSize: 10,
+      total: 0,
+    }),
+  },
+  // 每页显示条数选项
+  pageSizes: {
+    type: Array,
+    default: () => [10, 20, 50, 100],
+  },
+  // 分页布局
+  paginationLayout: {
+    type: String,
+    default: 'total, sizes, prev, pager, next, jumper',
+  },
 })
 
 const emit = defineEmits<{
@@ -52,6 +91,10 @@ const emit = defineEmits<{
   (e: 'noNextInput', { row, rowIndex, colIndex }: noNextInputParams): void
   // 当在表格中select下拉为空时触发
   (e: 'noSelectValue', { row, rowIndex, colIndex }: noSelectValueParams): void
+
+  (e: 'sizeChange', obj: any): void
+  (e: 'currentChange', obj: any): void
+  (e: 'pagination', obj: any): void
 }>()
 
 // 防抖函数，正确定义类型
@@ -161,6 +204,18 @@ watch(() => props.containerType, () => {
     debouncedCollectTableRows()
   })
 })
+
+// 每页条数改变事件
+function handleSizeChange(size) {
+  emit('update:pagination', { ...props.pagination, pageSize: size, pageIndex: 1 })
+  emit('sizeChange', size)
+}
+
+// 页码改变事件
+function handleCurrentChange(current) {
+  emit('update:pagination', { ...props.pagination, pageIndex: current })
+  emit('currentChange', current)
+}
 
 // 暴露方法给父组件
 defineExpose({

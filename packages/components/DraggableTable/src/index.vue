@@ -23,10 +23,34 @@
           <span class="absolute left-1/2 top-1/3 -translate-x-1/2 -translate-y-1/2">加载中...</span>
         </slot>
       </template>
-      <template v-if="!isEmpty(props.pagerConfig)" #pager>
+      <!-- <div v-if="showPagination" class="flex justify-end mt-8!">
+      <ElConfigProvider :locale="ZhCn">
+        <ElPagination
+          :current-page="pagination.pageIndex"
+          :page-size="pagination.pageSize"
+          :page-sizes="pagination.pageSizes"
+          :layout="paginationLayout"
+          :total="pagination.total"
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"
+        />
+      </ElConfigProvider>
+    </div> -->
+      <template v-if="showPagination" #pager>
         <slot name="pager">
           <div style="padding-top: 12px;overflow:auto;">
-            <ElPagination
+            <ElConfigProvider :locale="ZhCn">
+              <ElPagination
+                :current-page="pagination.pageIndex"
+                :page-size="pagination.pageSize"
+                :page-sizes="pageSizes"
+                :layout="paginationLayout"
+                :total="pagination.total"
+                @size-change="handleSizeChange"
+                @current-change="handleCurrentChange"
+              />
+            </ElConfigProvider>
+            <!-- <ElPagination
               v-if="props.pageType === 'el-pagination'"
               :current-page="props.pagerConfig.currentPage"
               :page-size="props.pagerConfig.pageSize"
@@ -35,7 +59,7 @@
               :layout="transformLayouts(props.pagerConfig.layouts)"
               @current-change="handleElPaginationPageChange"
               @size-change="handleElPaginationSizeChange"
-            />
+            /> -->
           </div>
         </slot>
       </template>
@@ -56,6 +80,7 @@
 
 <script lang="ts" setup>
 import type { PropType } from 'vue'
+import ZhCn from 'element-plus/dist/locale/zh-cn.mjs'
 import type {
   VxeGridInstance,
   VxeGridProps,
@@ -397,6 +422,30 @@ const props = defineProps({
     default: null,
   },
   //#endregion
+  // 是否展示分页
+  showPagination: {
+    type: Boolean,
+    default: false,
+  },
+  // 分页配置
+  pagination: {
+    type: Object,
+    default: () => ({
+      pageIndex: 1,
+      pageSize: 10,
+      total: 0,
+    }),
+  },
+  // 每页显示条数选项
+  pageSizes: {
+    type: Array,
+    default: () => [10, 20, 50, 100],
+  },
+  // 分页布局
+  paginationLayout: {
+    type: String,
+    default: 'total, sizes, prev, pager, next, jumper',
+  },
 })
 
 // 组件事件
@@ -410,6 +459,9 @@ const emit = defineEmits([
   'headerCellMenu',
   'pageChange',
   'headerContextMenu',
+  'sizeChange',
+  'update:pagination',
+  'currentChange',
 ])
 
 // 获取插槽
@@ -1320,6 +1372,18 @@ watch(
   },
 )
 //#endregion
+
+// 每页条数改变事件
+function handleSizeChange(size:any) {
+  emit('update:pagination', { ...props.pagination, pageSize: size, pageIndex: 1 })
+  emit('sizeChange', size)
+}
+
+// 页码改变事件
+function handleCurrentChange(current:any) {
+  emit('update:pagination', { ...props.pagination, pageIndex: current })
+  emit('currentChange', current)
+}
 
 /**
  * 暴露给父组件的方法和属性

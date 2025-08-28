@@ -6,3 +6,9 @@ export const demo1 = () => {
 export const demo2 = () => {
   console.log('测试2', moment(new Date()).format('YYYY-MM-DD'))
 }
+
+
+export default {
+  demo1,
+  demo2
+}
