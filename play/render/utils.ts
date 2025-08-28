@@ -515,7 +515,7 @@ async function replaceImportsAndExports(componentCode: string, componentName: st
   return processedComponents
 }
 export async function load(Vue: any, allComponentList: allComponentListType[], originComponentNames: string[]) {
-  const componentNames = originComponentNames?.length > 1 ? originComponentNames : allComponentList.map(i => i.componentCode)
+  const componentNames = originComponentNames?.length > 0 ? originComponentNames : allComponentList.map(i => i.componentCode)
   // 预先为所有组件添加依赖映射
   allComponentList.forEach((item) => {
     const packageName = getPackageNameFromComponentName(item.componentCode)
@@ -537,6 +537,7 @@ export async function loadRemoteComponents(Vue: any, allComponentList: allCompon
     const orginComponentCode = componentRes.content
     const componentName = componentRes.name
     const componentsCode = await replaceImportsAndExports(orginComponentCode, componentName, allComponentList)
+    console.log('componentsCode', componentsCode)
     // 组件结果对象，这将作为函数的返回值
     for (const [name, code] of Object.entries(componentsCode)) {
       if (!code)
