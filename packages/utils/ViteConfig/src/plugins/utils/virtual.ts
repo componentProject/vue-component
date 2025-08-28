@@ -1,4 +1,5 @@
 import type { HmrContext, ModuleNode, Plugin, ResolvedConfig, ViteDevServer } from 'vite'
+import { getType } from '../../../../_utils/index.ts'
 import { normalizePath } from 'vite'
 import path from 'node:path'
 import fs from 'node:fs'
@@ -68,7 +69,8 @@ export function setupDevAllWatcher(
     try {
       if (watchPatterns.length > 0)
         server.watcher.add(watchPatterns)
-    } catch {}
+    }
+    catch {}
 
     const onAll = (eventName: string, file: string) => {
       if (
@@ -83,53 +85,84 @@ export function setupDevAllWatcher(
       }
     }
 
-    try { server.watcher.on('all', onAll) } catch {}
+    try {
+      server.watcher.on('all', onAll)
+    }
+    catch {}
 
     const removeAll = () => {
-      try { (server.watcher as any).off?.('all', onAll) } catch {}
-      try { (server.watcher as any).removeListener?.('all', onAll) } catch {}
+      try {
+        (server.watcher as any).off?.('all', onAll)
+      }
+      catch {}
+      try {
+        (server.watcher as any).removeListener?.('all', onAll)
+      }
+      catch {}
     }
-    try { server.watcher.once('close', removeAll) } catch {}
-    try { server.httpServer?.once('close', removeAll) } catch {}
+    try {
+      server.watcher.once('close', removeAll)
+    }
+    catch {}
+    try {
+      server.httpServer?.once('close', removeAll)
+    }
+    catch {}
   }
 
-  try { server.watcher.once('ready', () => { watcherReady = true; maybeEnable() }) } catch {}
-  try { server.httpServer?.once('listening', () => { netReady = true; maybeEnable() }) } catch {}
   try {
-    const wsAny = (server.ws as any)
-    if (typeof wsAny?.on === 'function')
-      wsAny.once('connection', () => { netReady = true; maybeEnable() })
-  } catch {}
+    server.watcher.once('ready', () => {
+      watcherReady = true
+      maybeEnable()
+    })
+  }
+  catch {}
+  try {
+    server.httpServer?.once('listening', () => {
+      netReady = true
+      maybeEnable()
+    })
+  }
+  catch {}
+  try {
+    const wsAny = server.ws as any
+    if (typeof wsAny?.on === 'function') {
+      wsAny.once('connection', () => {
+        netReady = true
+        maybeEnable()
+      })
+    }
+  }
+  catch {}
 }
 
 // =========================
 // 通用虚拟模块插件工厂
 // =========================
 
-export interface VirtualPluginUserConfig<TExtra = any> {
+export interface VirtualPluginUserConfig {
   name: string
   virtualModuleId: string
   dts?: string | boolean
   root?: string
   typeContent?: any
-  extra?: TExtra
+  watch?: string | string[]
 }
 
-type GenerateDts<TExtra> = (params: {
+type GenerateDts = (params: {
   config: ResolvedConfig
 }) => string
-
-type GenerateModule<TExtra> = (params: {
+type GenerateModule = (params: {
   id: string
   config: ResolvedConfig
-}) => string
+}) => string | Promise<string>
 
-export function createVirtualPlugin<TExtra = any>(
-  userConfig: VirtualPluginUserConfig<TExtra>,
-  generateModule: GenerateModule<TExtra>,
-  generateDts?: GenerateDts<TExtra>,
+export function createVirtualPlugin(
+  userConfig: VirtualPluginUserConfig,
+  generateModule: GenerateModule,
+  generateDts?: GenerateDts,
 ): Plugin {
-  const { name, virtualModuleId, dts, root, typeContent, extra } = userConfig
+  const { name, virtualModuleId, dts, root, typeContent, watch } = userConfig
   const VIRTUAL_MODULE_ID = virtualModuleId
 
   const moduleCache: Map<string, string> = new Map()
@@ -155,9 +188,7 @@ export function createVirtualPlugin<TExtra = any>(
       resolvedViteConfig = config
       const rootDir = root || config.root
 
-      // 监听路径从 extra?.watch 读取（可选）
-      const watchInput = (extra as any)?.watch as string | string[] | undefined
-      const patterns = Array.isArray(watchInput) ? watchInput : (watchInput ? [watchInput] : [])
+      const patterns = Array.isArray(watch) ? watch : (watch ? [watch] : [])
       watchPatterns = resolvePatternsToAbsolute(patterns, rootDir)
       watchPrefixes = watchPatterns.map(extractStaticPrefixFromGlob)
       isWatchedPath = watchPrefixes.length === 0 ? () => true : createMatcher(watchPrefixes)
@@ -197,7 +228,12 @@ export function createVirtualPlugin<TExtra = any>(
             return
           isServerClosing = true
           Promise.resolve((server as any)?.close?.())
-            .finally(() => { try { process.exit(0) } catch {} })
+            .finally(() => {
+              try {
+                process.exit(0)
+              }
+              catch {}
+            })
         }
         process.once('SIGINT', onSignal)
         process.once('SIGTERM', onSignal)
@@ -230,10 +266,15 @@ export function createVirtualPlugin<TExtra = any>(
             const mod = server.moduleGraph.getModuleById(vid)
             if (mod) {
               server.moduleGraph.invalidateModule(mod)
-              try { (server as any).reloadModule?.(mod) } catch {}
+              try {
+                (server as any).reloadModule?.(mod)
+              }
+              catch {}
             }
           }
-          if (ids.length === 0) server.ws.send({ type: 'full-reload' })
+
+          if (ids.length === 0)
+            server.ws.send({ type: 'full-reload' })
         },
         50,
       )
@@ -277,9 +318,15 @@ export function createVirtualPlugin<TExtra = any>(
       catch {}
     },
 
-    load(id: string) {
+    async load(id: string) {
       if (id === VIRTUAL_MODULE_ID || id.startsWith(`${VIRTUAL_MODULE_ID}/`)) {
-        const code = generateModule({ id, config: resolvedViteConfig as ResolvedConfig })
+        let code: string
+        if (getType(generateModule, 'asyncfunction')) {
+          code = await generateModule({ id, config: resolvedViteConfig as ResolvedConfig })
+        }
+        else {
+          code = generateModule({ id, config: resolvedViteConfig as ResolvedConfig }) as string
+        }
         moduleCache.set(id, code)
         return code
       }

@@ -62,7 +62,7 @@ function createAutoRoutesPlugin({ routeConfig, virtualModuleId, dts, root }: Aut
       dts,
       root,
       typeContent: dtsTemplate,
-      extra: { routeConfig, watch: watchGlobs },
+      watch: watchGlobs,
     },
     // 生成虚拟模块代码：仅负责产出字符串，监听/HMR/缓存由工厂统一处理
     () => {

@@ -23,7 +23,7 @@
 <script setup lang="ts">
 import type {FormItemConfig} from '@moluoxixi/components/ConfigForm/src/types'
 import {computed, ref, watch} from 'vue'
-import {isType} from "@moluoxixi/components/_utils";
+import {isType} from "@moluoxixi/utils/_utils";
 
 defineOptions({
   name: 'WlInput',

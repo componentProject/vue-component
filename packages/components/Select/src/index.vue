@@ -34,7 +34,7 @@
 import { computed, ref, watch } from 'vue'
 import getServerOptions from '@moluoxixi/components/Select/src/uitls'
 import type { objType } from '@moluoxixi/components/_types'
-import { getType, getTypeDefault } from '@moluoxixi/components/_utils'
+import { getType, getTypeDefault } from '@moluoxixi/utils/_utils'
 
 defineOptions({
   name: 'Select',

@@ -70,8 +70,8 @@ export default function createViteConfig(Config: ViteConfigType) {
       Components({
         resolvers: [
           ElementPlusResolver({
-            exclude: !useDoc && config.unpluginVueComponentsOptions?.elementExcludes ?
-              new RegExp(config.unpluginVueComponentsOptions?.elementExcludes.map((item: string) => `^${item}$`).join('|'))
+            exclude: !useDoc && config.unpluginVueComponentsOptions?.elementExcludes
+              ? new RegExp(config.unpluginVueComponentsOptions?.elementExcludes.map((item: string) => `^${item}$`).join('|'))
               : undefined,
           }),
         ],
@@ -250,7 +250,7 @@ export default function createViteConfig(Config: ViteConfigType) {
       resolve: {
         extensions: ['.js', '.jsx', '.ts', '.tsx', '.vue'],
         alias: {
-          '@': path.resolve(rootPath, './src')
+          '@': path.resolve(rootPath, './src'),
         },
       },
       server: {

@@ -18,7 +18,6 @@
     "@formily/core": "catalog:build",
     "@formily/json-schema": "catalog:build",
     "@formily/vue": "catalog:build",
-    "@moluoxixi/element": "workspace:*",
     "axios": "catalog:build",
     "constrained-editor-plugin": "^1.4.0",
     "dayjs": "catalog:build",
@@ -60,6 +59,8 @@
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
+    "@moluoxixi/element": "workspace:*",
+    "@moluoxixi/components": "workspace:*",
     "@tailwindcss/postcss": "catalog:dev",
     "@types/file-saver": "catalog:type",
     "@types/lodash": "catalog:type",

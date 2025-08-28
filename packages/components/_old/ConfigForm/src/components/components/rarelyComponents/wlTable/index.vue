@@ -36,7 +36,7 @@
 <script setup lang="ts">
 import type { configType, FormModelProps } from '@moluoxixi/components/ConfigForm/src/types'
 import { computed, onBeforeMount, ref, watch } from 'vue'
-import { isType } from '@moluoxixi/components/_utils'
+import { isType } from '@moluoxixi/utils/_utils'
 
 const props = withDefaults(
   defineProps<{

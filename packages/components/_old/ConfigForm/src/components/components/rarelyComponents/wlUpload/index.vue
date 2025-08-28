@@ -12,7 +12,7 @@
 <script setup lang="ts">
 import type { configType, FormModelProps } from '@moluoxixi/components/ConfigForm/src/types'
 import { ref, watch } from 'vue'
-import { isType } from '@moluoxixi/components/_utils'
+import { isType } from '@moluoxixi/utils/_utils'
 
 defineOptions({
   name: 'WlUpload',

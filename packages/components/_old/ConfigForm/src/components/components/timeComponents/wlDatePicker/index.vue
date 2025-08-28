@@ -11,7 +11,7 @@
 <script setup lang="ts">
 import type { configType, FormModelProps } from '@moluoxixi/components/ConfigForm/src/types'
 import { computed, ref, watch } from 'vue'
-import { isType } from '@moluoxixi/components/_utils'
+import { isType } from '@moluoxixi/utils/_utils'
 import yearDatePicker from '../yearDatePicker/index.vue'
 
 const props = withDefaults(

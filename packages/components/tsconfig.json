@@ -16,10 +16,16 @@
         "./*"
       ],
       "@moluoxixi/utils": [
-        "./../utils"
+        "../utils"
       ],
       "@moluoxixi/utils/*": [
-        "./../utils/*"
+        "../utils/*"
+      ],
+      "@moluoxixi/element": [
+        "../element-plus"
+      ],
+      "@moluoxixi/element/*": [
+        "../element-plus/*"
       ]
     },
     "module": "ESNext",
