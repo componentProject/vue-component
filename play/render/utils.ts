@@ -1,5 +1,5 @@
 //#region 从远程服务器加载资源并替换
-import { getDownLoadByIds } from '@/api'
+import { getDownLoadByIds } from './src/api/index.ts'
 
 interface DependencyMap {
   [key: string]: string
@@ -565,6 +565,58 @@ export async function loadRemoteComponents(Vue: any, allComponentList: allCompon
         if (name) {
           componentMapping[name] = component
         }
+      }
+      catch (error: any) {
+        console.error(`加载组件 ${name} 失败:`, error)
+        console.error('错误详情:', error.message)
+        // 输出更详细的错误信息以帮助调试
+        if (error.stack)
+          console.error('错误堆栈:', error.stack)
+      }
+    }
+  }
+  // 使用前面定义的函数加载组件代码
+
+  return componentResults
+}
+
+export async function loadCodeStr(Vue: any, allComponentList: allComponentListType[], originComponentNames: string[]) {
+  const componentNames = originComponentNames?.length > 0 ? originComponentNames : allComponentList.map(i => i.componentCode)
+  // 预先为所有组件添加依赖映射
+  allComponentList.forEach((item) => {
+    const packageName = getPackageNameFromComponentName(item.componentCode)
+    addToDependencyMapping(packageName, item.componentCode)
+  })
+  componentMapping.Vue = Vue
+  return await loadRemoteComponentsStr(Vue, allComponentList, componentNames)
+}
+
+/**
+ * 加载远程组件
+ * @param Vue
+ * @param allComponentList 所有组件集合{id, componentCode}
+ * @param componentNames 当前要加载的组件集合
+ */
+export async function loadRemoteComponentsStr(Vue: any, allComponentList: allComponentListType[], componentNames: string[]) {
+  const componentDownList = await getDownLoadByIds(allComponentList.filter((item: any) => componentNames.includes(item.componentCode)).map((i: any) => i.id))
+  const componentResults: Record<string, any> = {}
+  for (const componentRes of componentDownList) {
+    const orginComponentCode = componentRes.content
+    const componentName = componentRes.name
+    const componentsCode = await replaceImportsAndExports(orginComponentCode, componentName, allComponentList)
+    // 组件结果对象，这将作为函数的返回值
+    for (const [name, code] of Object.entries(componentsCode)) {
+      if (!code)
+        continue // 跳过加载失败的组件
+
+      try {
+        // 预处理代码，替换可能存在的process.env.XXX判断
+        // 确保code是字符串
+        const codeString = typeof code === 'string' ? code : String(code)
+
+        // 再次清理所有可能的import语句（双重保障）
+        cleanImports(codeString)
+        componentResults[name] = codeString
       }
       catch (error: any) {
         console.error(`加载组件 ${name} 失败:`, error)

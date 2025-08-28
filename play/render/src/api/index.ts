@@ -1,4 +1,4 @@
-import { getHttpService } from '@moluoxixi/utils/AjaxPackage'
+import { getHttpService } from '../../../../packages/utils/AjaxPackage/index.ts'
 
 //import { getHttpService } from '@moluoxixi/AjaxPackage'
 

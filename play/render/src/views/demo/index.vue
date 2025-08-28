@@ -5,7 +5,7 @@
     </div>
     <div class="main">
       <div>虚拟模块里导出的组件</div>
-      <RemoteSelect />
+      <PopoverTableSelect1 />
       <div class="list-title">
         开发调试组件
       </div>
@@ -35,16 +35,14 @@
 import * as vue from 'vue'
 import { onMounted, ref } from 'vue'
 // 允许在 Vue SFC 中使用 .ts 扩展导入
-import { getDownLoadByIds, getList } from '../../api/index.ts'
+import { getList } from '../../api/index.ts'
 // 允许在 Vue SFC 中使用 .ts 扩展导入
 import { load } from '../../../utils.ts'
 // 虚拟模块由 Vite 插件在运行时提供
-// import { AIAgent } from 'virtual:remote'
-// 虚拟模块由 Vite 插件在运行时提供
-// import demo from 'virtual:remote/demo'
+import PopoverTableSelect1 from 'virtual:remote/Select'
 
 defineOptions({ name: '调试与演示' })
-// console.log('demo', demo)
+console.log('PopoverTableSelect1', PopoverTableSelect1)
 // 使用ref替代data属性
 const componentName = ref('PopoverTableSelect') // 调试与演示组件库的组件，直接修改组件名
 const localComponent = ref<any>(null) // 调试组件
@@ -148,25 +146,6 @@ async function loadComponents(components: string[]) {
   }
   catch (error) {
     console.error('加载动态组件失败:', error)
-  }
-}
-
-/**
- * @param components 要加载的组件文件名集合
- */
-async function getComponentCode(components: string[]) {
-  try {
-    const params = listRes.Vue3.filter((item: any) => components.includes(item.componentCode)).map((i: any) => i.id)
-    const componentNames = listRes.Vue3.map((i: any) => i.componentCode)
-    const componentCode = await getDownLoadByIds(params)
-    console.log('获取组件代码成功', componentCode)
-    return {
-      componentCode,
-      componentNames,
-    }
-  }
-  catch (error) {
-    console.error('获取组件代码失败', error)
   }
 }
 
