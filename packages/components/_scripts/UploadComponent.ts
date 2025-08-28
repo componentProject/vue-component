@@ -46,7 +46,7 @@ export async function UploadEvent(url: string, buildName: string) {
 
     // 调用现有的上传函数
     const res = await setWebUpload(params)
-    console.log('UploadEvent: 上传成功', res.data)
+    console.log('UploadEvent: 上传成功', res)
 
     return res
   }
