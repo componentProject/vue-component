@@ -28,6 +28,8 @@
   "author": "wocwin",
   "license": "MIT",
   "devDependencies": {
+    "@moluoxixi/components": "workspace:*",
+    "@moluoxixi/utils": "workspace:*",
     "@highlightjs/vue-plugin": "^2.1.0",
     "@types/js-cookie": "^3.0.3",
     "@types/markdown-it": "^12.2.3",
@@ -52,7 +54,6 @@
   "dependencies": {
     "moment": "catalog:build",
     "highlight.js": "^11.9.0",
-    "@moluoxixi/components": "workspace:*",
     "element-plus": "catalog:build",
     "@element-plus/icons-vue": "catalog:build",
     "vxe-table": "catalog:build"
