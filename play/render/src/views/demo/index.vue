@@ -171,8 +171,8 @@ async function getComponentCode(components: string[]) {
 }
 
 onMounted(async () => {
-  await loadLocalComponent(componentName.value.name)
-  await loadComponents([componentName.value], componentsData.value)
+  await loadLocalComponent(componentName.value)
+  await loadComponents([componentName.value])
 })
 </script>
 
