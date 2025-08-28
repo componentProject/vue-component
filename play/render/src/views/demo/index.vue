@@ -1,26 +1,31 @@
 <template>
   <div>
-    <div class="title">调试与演示</div>
+    <div class="title">
+      调试与演示
+    </div>
     <div class="main">
       <div>虚拟模块里导出的组件</div>
-      <RemoteSelect/>
-      <div class="list-title">开发调试组件</div>
+      <RemoteSelect />
+      <div class="list-title">
+        开发调试组件
+      </div>
       <component
-        :is="dynamicDebugButtonComponent"
-        popType="input"
+        :is="localComponent"
+        v-if="localComponent"
+        pop-type="input"
         :columns="columns"
         :data="tableData"
-        v-if="dynamicDebugButtonComponent"
       />
     </div>
     <div class="main">
-      <div class="list-title">引用组件库解析的组件</div>
+      <div class="list-title">
+        引用组件库解析的组件
+      </div>
       <component
-        :is="dynamicButtonComponent"
-        popType="input"
+        :is="dynamicComponent"
+        pop-type="input"
         :columns="columns"
         :data="tableData"
-        v-if="dynamicButtonComponent"
       />
     </div>
   </div>
@@ -29,18 +34,22 @@
 <script setup lang="ts">
 import * as vue from 'vue'
 import { onMounted, ref } from 'vue'
-// import { getDownLoadByIds, getList } from '../../../../../packages/components/_api'
-// import { getDownLoadByIds } from '../../../../../packages/components/_api'
-import { getList, getDownLoadByIds } from '../../api/index.ts'
+// 允许在 Vue SFC 中使用 .ts 扩展导入
+import { getDownLoadByIds, getList } from '../../api/index.ts'
+// 允许在 Vue SFC 中使用 .ts 扩展导入
 import { loadRemoteComponents } from '../../../utils.ts'
+// 虚拟模块由 Vite 插件在运行时提供
+// import { AIAgent } from 'virtual:remote'
+// 虚拟模块由 Vite 插件在运行时提供
+// import { date as AIAgentDate } from 'virtual:remote/AIAgent'
 
 defineOptions({ name: '调试与演示' })
 
 // 使用ref替代data属性
 const componentName = ref('AIAgent') // 调试与演示组件库的组件，直接修改组件名
 const componentsData = ref<any>(null) // 组件库数据对象
-const dynamicDebugButtonComponent = ref<any>(null) // 调试组件
-const dynamicButtonComponent = ref<any>(null) // 用于存储动态组件
+const localComponent = ref<any>(null) // 调试组件
+const dynamicComponent = ref<any>(null) // 用于存储动态组件
 
 const columns = [
   { field: 'id', title: 'ID', width: 60 },
@@ -111,10 +120,13 @@ const tableData = [
   { id: 3, name: '王五', age: 22 },
 ]
 
-async function loadDebugButtonComponent() {
+/**
+ * @param componentName 要加载的组件文件名
+ */
+async function loadLocalComponent(componentName: string) {
   try {
-    const buttonModule = await import(`../../../../../packages/components/${componentName.value}/index.ts`)
-    dynamicDebugButtonComponent.value = buttonModule.default
+    const buttonModule = await import(`../../../../../packages/components/${componentName}/index.ts`)
+    localComponent.value = buttonModule.default
   }
   catch (error) {
     console.error('加载调试组件失败:', error)
@@ -122,56 +134,44 @@ async function loadDebugButtonComponent() {
   }
 }
 
-async function loadComponents(components, componentsData) {
+/**
+ * @param components 要加载的组件文件名集合
+ */
+async function loadComponents(components: string[]) {
   try {
-    // 接收并使用loadRemoteComponents的返回值
-    // 注意：Vue 3不再需要传入Vue构造函数
+    const componentsData = await getComponentCode(components)
     const loadedComponents = await loadRemoteComponents(vue, components, componentsData)
-    const demo = await loadRemoteComponents(vue, ['AjaxPackage'], componentsData)
-    console.log('3333333333333333', demo)
-    // 直接赋值给ref.value
-    // 方式一：走 loadRemoteComponents 原路径
-    dynamicButtonComponent.value = loadedComponents[componentName.value]
-    // 方式二：直接使用虚拟模块聚合导入的 default（Select）
-    // 示例：如果需要直接显示 Select，可替换为 RemoteSelect
-    // dynamicButtonComponent.value = RemoteSelect
-    console.log('动态组件加载成功:', dynamicButtonComponent)
+    dynamicComponent.value = loadedComponents[componentName.value]
+    console.log('动态组件加载成功:', dynamicComponent)
   }
   catch (error) {
     console.error('加载动态组件失败:', error)
   }
 }
 
-async function getDownLoadByIdsEvent(res: any) {
-  const params = res.map((item: any) => item.id)
+/**
+ * @param components 要加载的组件文件名集合
+ */
+async function getComponentCode(components: string[]) {
+  const idParams = {
+    productCode: 'webFile_his',
+    vue: ['Vue3'],
+  }
+  const _res = await getList(idParams)
+  console.log('params', _res)
+  const params = _res.Vue3.filter((item: any) => components.includes(item.componentCode)).map((i: any) => i.id)
   try {
     const obj = await getDownLoadByIds(params)
     console.log('获取组件实例成功', obj)
-    componentsData.value = obj
+    return obj
   }
   catch (error) {
     console.error('获取组件实例失败', error)
   }
 }
 
-async function getListEvent() {
-  const params = {
-    productCode: 'webFile_his',
-    vue: ['Vue3'],
-  }
-  try {
-    const res = await getList(params)
-    console.log('获取组件列表成功', res) // 注意：这里改为Vue3
-    await getDownLoadByIdsEvent(res.Vue3) // 注意：这里改为Vue3
-  }
-  catch (error) {
-    console.error('获取组件列表失败', error)
-  }
-}
-
 onMounted(async () => {
-  await getListEvent()
-  await loadDebugButtonComponent()
+  await loadLocalComponent(componentName.value.name)
   await loadComponents([componentName.value], componentsData.value)
 })
 </script>
