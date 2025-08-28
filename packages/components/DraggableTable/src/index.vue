@@ -82,7 +82,7 @@ import {
 } from 'vue'
 import { VxeGrid } from 'vxe-table'
 import 'vxe-table/lib/style.css'
-import { dispatchEvents, getClass, getStringObj, getType } from '@moluoxixi/components/_utils'
+import { dispatchEvents, getClass, getStringObj, getType } from '@moluoxixi/utils/_utils'
 import {
   getCustomType,
   handleGetColumn,

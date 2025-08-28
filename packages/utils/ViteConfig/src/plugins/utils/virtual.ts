@@ -1,4 +1,5 @@
 import type { HmrContext, ModuleNode, Plugin, ResolvedConfig, ViteDevServer } from 'vite'
+import { getType } from "@moluoxixi/utils/_utils/index.ts";
 import { normalizePath } from 'vite'
 import path from 'node:path'
 import fs from 'node:fs'
@@ -118,11 +119,10 @@ export interface VirtualPluginUserConfig<TExtra = any> {
 type GenerateDts<TExtra> = (params: {
   config: ResolvedConfig
 }) => string
-
 type GenerateModule<TExtra> = (params: {
   id: string
   config: ResolvedConfig
-}) => string
+}) => string|Promise<string>
 
 export function createVirtualPlugin<TExtra = any>(
   userConfig: VirtualPluginUserConfig<TExtra>,
@@ -277,9 +277,14 @@ export function createVirtualPlugin<TExtra = any>(
       catch {}
     },
 
-    load(id: string) {
+    async load(id: string) {
       if (id === VIRTUAL_MODULE_ID || id.startsWith(`${VIRTUAL_MODULE_ID}/`)) {
-        const code = generateModule({ id, config: resolvedViteConfig as ResolvedConfig })
+        let code:string;
+        if(getType(generateModule,'asyncfunction')){
+          code = await generateModule({id, config: resolvedViteConfig as ResolvedConfig})
+        }else{
+          code = generateModule({id, config: resolvedViteConfig as ResolvedConfig}) as string
+        }
         moduleCache.set(id, code)
         return code
       }

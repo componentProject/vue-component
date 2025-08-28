@@ -67,6 +67,7 @@ const presetGlobals = useExternal
     }
   : {
       vue: 'Vue',
+      vite: 'Vite',
     }
 const peerDepList = Object.keys(presetGlobals)
 const __filename = fileURLToPath(import.meta.url)
@@ -76,6 +77,13 @@ const rootDir = resolve(__dirname, '../../../')
  * 组件仓库所在路径
  */
 const packDir = resolve(__dirname, '../')
+const alias = {
+  '@moluoxixi/components': resolve(packDir, './'),
+  '@moluoxixi/components/*': resolve(packDir, './*'),
+  '@moluoxixi/utils': resolve(rootDir, './packages/utils'),
+  '@moluoxixi/utils/*': resolve(rootDir, './packages/utils/*'),
+}
+const aliasPacks = Object.keys(alias).filter((i: string) => !i.endsWith('*'))
 
 // 主函数
 async function main() {
@@ -145,7 +153,7 @@ async function getComponentNames() {
     onlyDirectories: true,
     ignore: [`${entryBaseUrl}_*`],
   })
-  const excludeDirs = ['node_modules','typings', LIB_NAMESPACE]
+  const excludeDirs = ['node_modules', 'typings', LIB_NAMESPACE]
   return componentDirs
     .map(dir => dir.split('/').pop() || '')
     .filter(dirName => !!dirName && !excludeDirs.includes(dirName))
@@ -221,10 +229,7 @@ function createBaseConfig(comp: string, internalDeps: string[]): InlineConfig {
     ],
     resolve: {
       extensions: ['.js', '.jsx', '.ts', '.tsx', '.vue'],
-      alias: {
-        '@moluoxixi/components': resolve(packDir, './'),
-        '@moluoxixi/components/*': resolve(packDir, './*'),
-      },
+      alias,
     },
     css: {
       postcss: {
@@ -865,49 +870,6 @@ function createComponentReferencePlugin(internalDeps: string[], currentComponent
 
       return hasChanges ? { code: transformedCode, map: null } : null
     },
-
-    // 处理external配置
-    options(opts: any) {
-      const originalExternal = opts.external || (() => false)
-
-      opts.external = (id: string, parentId?: string, isResolved?: boolean) => {
-        // 检查是否是${aliasComponentPath}路径引用
-        if (id.startsWith(`${aliasComponentPath}/`)) {
-          const pathParts = id.split('/')
-          const componentName = pathParts[2] // ${aliasComponentPath}/ComponentName
-
-          // 如果是共享模块（_utils、_types等），不标记为外部依赖，让它们被打包进来
-          if (componentName && componentName.startsWith('_')) {
-            return false
-          }
-
-          // 检查是否是组件引用（排除当前组件的自引用）
-          const componentMatch = id.match(new RegExp(`${aliasComponentPath.replace(/\//g, '\\/')}\\/([A-Z][a-zA-Z0-9]+)`))
-          return !(componentMatch && componentMatch[1] === currentComponent)
-          // 标记为外部依赖
-        }
-
-        // 检查是否是@moluoxixi/xxx路径引用（排除当前组件的自引用）
-        if (id.startsWith(`@${LIB_NAMESPACE}/`)) {
-          const componentMatch = id.match(new RegExp(`@${LIB_NAMESPACE}/([a-z][a-zA-Z0-9]+)`))
-          return !(componentMatch && componentMatch[1] === currentComponent.toLowerCase())
-          // 标记为外部依赖
-        }
-
-        // 调用原始的external函数
-        if (typeof originalExternal === 'function') {
-          return originalExternal(id, parentId, isResolved)
-        }
-
-        if (Array.isArray(originalExternal)) {
-          return originalExternal.includes(id)
-        }
-
-        return originalExternal
-      }
-
-      return opts
-    },
   }
 }
 
@@ -974,36 +936,34 @@ async function bundleComponentModule({
           useObfuscator && obfuscator(),
         ],
         external: (id: string) => {
-          // 检查外部依赖
-          const isExternalDep = Object.keys(dependencies.external).includes(id)
+          // 检查@${LIB_NAMESPACE}/xxx路径（转换后的内部组件依赖）
+          if (id.startsWith(`@${LIB_NAMESPACE}`)) {
+            const item = aliasPacks.find((i: string) => id.startsWith(`${i}`))
+            if (item) {
+              const pathParts = id.split('/')
+              const componentName = pathParts[2] // ${item}/ComponentName/...
+
+              // 检查是否是组件引用（排除当前组件的自引用）
+              return componentName === currentComponent
+            }
+            else {
+              const componentMatch = id.match(new RegExp(`@${LIB_NAMESPACE}/([a-z][a-zA-Z0-9]+)`))
+              return !(componentMatch && componentMatch[1] === currentComponent.toLowerCase())
+            }
+          }
           // 检查Vue相关依赖
           const isVueDep = ['vue', '@vue/runtime-core', '@vue/runtime-dom'].includes(id)
           // Node.js核心模块，标记为外部依赖
           const isNodeBuiltin = id.startsWith('node:')
-            || ['path', 'module', 'fs', 'os', 'util', 'events', 'stream', 'buffer', 'crypto', 'zlib', 'http', 'https', 'url', 'querystring', 'child_process'].includes(id)
+            || ['path', 'module', 'fs', 'os', 'events', 'stream', 'buffer', 'crypto', 'zlib', 'http', 'https', 'url', 'querystring', 'child_process'].includes(id)
 
-          // 检查@/components路径
-          if (id.startsWith(`${aliasComponentPath}/`)) {
-            const pathParts = id.split('/')
-            const componentName = pathParts[2] // ${aliasComponentPath}/ComponentName/...
-
-            // 如果是共享模块（_utils、_types等），不标记为外部依赖，让它们被打包进来
-            if (componentName && componentName.startsWith('_')) {
-              return false
-            }
-
-            // 检查是否是组件引用（排除当前组件的自引用）
-            const componentMatch = id.match(new RegExp(`${aliasComponentPath.replace(/\//g, '\\/')}\\/([A-Z][a-zA-Z0-9]+)`))
-            return !(componentMatch && componentMatch[1] === currentComponent)
+          if (isVueDep || isNodeBuiltin || peerDepList.includes(id)) {
+            return true
           }
           const isExternal = useExternal || requireExternalPacks.includes(comp)
-          if (!isExternal) {
-            return isVueDep || isNodeBuiltin
+          if (isExternal) {
+            return Object.keys(dependencies.external).includes(id)
           }
-          // 检查@moluoxixi/xxx路径（转换后的内部组件依赖）
-          const isTransformedInternalComponent = id.startsWith(`@${LIB_NAMESPACE}/`)
-
-          return isExternalDep || isTransformedInternalComponent || isVueDep || isNodeBuiltin || peerDepList.includes(id)
         },
         output: {
           preserveModules,
@@ -1252,10 +1212,10 @@ async function buildComponent(
     // 写入package.json
     await fsp.writeFile(resolve(outputDir, 'package.json'), JSON.stringify(pkgJson, null, 2), 'utf-8')
     const fileUrl = path.resolve(`${outputDir}/es/index.mjs`)
-    await UploadEvent(fileUrl, buildName)
     console.log(`==========  ${buildName} 打包完成 ==========`)
     // 如果需要发布，执行发布
     if (shouldPublish) {
+      await UploadEvent(fileUrl, buildName)
       console.log(`准备发布 ${buildName}，版本：${currentVersion} -> ${newVersion}`)
 
       await writeComponentVersions({

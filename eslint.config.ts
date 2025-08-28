@@ -1,4 +1,4 @@
-import EslintConfig from './packages/components/EslintConfig'
+import EslintConfig from './packages/utils/EslintConfig/index.ts'
 
 export default EslintConfig(
   {

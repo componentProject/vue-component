@@ -30,7 +30,7 @@ import type { PropType } from 'vue'
 import moment from 'moment'
 import { isEmpty } from 'radash'
 import { computed, ref, useTemplateRef, watch } from 'vue'
-import { dateIsBefore, formatDateRange, getTypeDefault, validateDate } from '@moluoxixi/components/_utils'
+import { dateIsBefore, formatDateRange, getTypeDefault, validateDate } from '@moluoxixi/utils/_utils'
 
 defineOptions({
   name: 'DateRangePicker',

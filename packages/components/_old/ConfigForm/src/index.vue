@@ -13,7 +13,7 @@ import type {
 import {defineAsyncComponent, reactive, computed} from 'vue'
 import wlComponent from '@moluoxixi/components/ConfigForm/src/components/components.ts'
 import wlPopComponent from '@moluoxixi/components/ConfigForm/src/components/popComponents.ts'
-import {getType} from '@moluoxixi/components/_utils'
+import {getType} from '@moluoxixi/utils/_utils'
 import {ElForm,ElFormItem,ElRow,ElCol} from "element-plus";
 // 定义组件名称
 defineOptions({

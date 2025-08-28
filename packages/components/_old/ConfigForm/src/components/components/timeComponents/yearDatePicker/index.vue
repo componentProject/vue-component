@@ -93,7 +93,7 @@
 
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
-import { isType } from '@moluoxixi/components/_utils'
+import { isType } from '@moluoxixi/utils/_utils'
 
 const props = defineProps<{
   width?: number

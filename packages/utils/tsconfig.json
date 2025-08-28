@@ -12,6 +12,12 @@
       ],
       "@moluoxixi/utils/*": [
         "./*"
+      ],
+      "@moluoxixi/components": [
+        "../components"
+      ],
+      "@moluoxixi/components/*": [
+        "../components/*"
       ]
     },
     "module": "ESNext",

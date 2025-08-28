@@ -4,7 +4,7 @@ import { ElButton, ElCheckbox, ElInput } from 'element-plus'
 import { groupBy } from 'lodash'
 import type { PropType } from 'vue'
 import { computed, defineComponent, ref, watch } from 'vue'
-import { getTypeDefault } from '@moluoxixi/components/_utils'
+import { getTypeDefault } from '@moluoxixi/utils/_utils'
 
 interface ColValItem {
   checked: boolean

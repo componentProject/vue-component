@@ -19,6 +19,7 @@
     "@formily/json-schema": "catalog:build",
     "@formily/vue": "catalog:build",
     "@moluoxixi/element": "workspace:*",
+    "@moluoxixi/components": "workspace:*",
     "axios": "catalog:build",
     "constrained-editor-plugin": "^1.4.0",
     "dayjs": "catalog:build",

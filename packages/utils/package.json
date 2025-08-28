@@ -30,6 +30,7 @@
   "dependencies": {
     "form-data": "^4.0.4",
     "element-plus": "catalog:build",
+    "vue": "catalog:build",
     "moment": "catalog:build",
     "radash": "catalog:build",
     "lodash": "catalog:build",
