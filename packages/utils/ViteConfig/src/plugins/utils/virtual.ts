@@ -146,6 +146,7 @@ export interface VirtualPluginUserConfig {
   dts?: string | boolean
   root?: string
   typeContent?: any
+  watch?: string | string[]
 }
 
 type GenerateDts = (params: {
@@ -161,7 +162,7 @@ export function createVirtualPlugin(
   generateModule: GenerateModule,
   generateDts?: GenerateDts,
 ): Plugin {
-  const { name, virtualModuleId, dts, root, typeContent, extra } = userConfig
+  const { name, virtualModuleId, dts, root, typeContent, watch } = userConfig
   const VIRTUAL_MODULE_ID = virtualModuleId
 
   const moduleCache: Map<string, string> = new Map()
@@ -187,9 +188,7 @@ export function createVirtualPlugin(
       resolvedViteConfig = config
       const rootDir = root || config.root
 
-      // 监听路径从 extra?.watch 读取（可选）
-      const watchInput = (extra as any)?.watch as string | string[] | undefined
-      const patterns = Array.isArray(watchInput) ? watchInput : (watchInput ? [watchInput] : [])
+      const patterns = Array.isArray(watch) ? watch : (watch ? [watch] : [])
       watchPatterns = resolvePatternsToAbsolute(patterns, rootDir)
       watchPrefixes = watchPatterns.map(extractStaticPrefixFromGlob)
       isWatchedPath = watchPrefixes.length === 0 ? () => true : createMatcher(watchPrefixes)
