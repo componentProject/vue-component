@@ -179,7 +179,7 @@ ConfigTable/expose/setCurrentRow
 | `operationWidth`   | 操作列宽度 | Number\|String | -                                          |
 | `operationFixed`   | 操作列固定位置 | String | `right`                                    |
 | `operationAlign`   | 操作列对齐方式 | String | `center`                                   |
-| `showPagination`   | 是否显示分页 | Boolean | `true`                                     |
+| `showPagination`   | 是否显示分页 | Boolean | `false`                                     |
 | `pagination`       | 分页配置 | Object | `{ pageIndex: 1, pageSize: 10, total: 0 }` |
 | `pageSizes`        | 每页显示条数选项 | Array | `[10, 20, 50, 100]`                        |
 | `paginationLayout` | 分页布局 | String | `total, sizes, prev, pager, next, jumper`  |

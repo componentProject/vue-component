@@ -45,6 +45,10 @@ EnterNextTable/expose/refreshRows
 | --- | --- | --- | --- |
 | data | 表格数据 | Array | [] |
 | containerType | 容器类型，用于确定EnterNextContainer的作用范围 | 'row' \| 'table' | 'row' |
+| showPagination   | 是否显示分页 | Boolean | `false`                                     |
+| pagination      | 分页配置 | Object | `{ pageIndex: 1, pageSize: 10, total: 0 }` |
+| pageSizes       | 每页显示条数选项 | Array | `[10, 20, 50, 100]`                        |
+| paginationLayout | 分页布局 | String | `total, sizes, prev, pager, next, jumper`  |
 | ...attrs | 其他属性会透传给内部的ElTable组件 | - | - |
 
 ### Events
@@ -53,6 +57,9 @@ EnterNextTable/expose/refreshRows
 | --- | --- | --- |
 | noNextInput | 当没有下一个输入元素时触发 | ^[Function]`(payload: { row: any; rowIndex: number; colIndex: number }) => void` |
 | noSelectValue | 当select下拉框没有选中值时但按了回车触发 | ^[Function]`(payload: { row: any; rowIndex: number; colIndex: number }) => void` |
+| size-change | 每页条数变化 | ^[Function]`(size: number) => void` |
+| current-change | 当前页变化 | ^[Function]`(current: number) => void` |
+| update:pagination | 分页受控更新 | ^[Function]`(pagination: { pageIndex: number; pageSize: number; total: number }) => void` |
 
 ### Slots
 
