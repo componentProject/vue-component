@@ -1,5 +1,7 @@
 import { getHttpService } from '../../../../packages/utils/AjaxPackage/netseriver.js'
 
+//import { getHttpService } from '@moluoxixi/AjaxPackage'
+
 const httpApi: any = getHttpService({
   baseURL: 'http://192.168.209.103:10019/',
   timeout: 3000,

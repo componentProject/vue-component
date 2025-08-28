@@ -60,6 +60,7 @@ catalogs:
     '@vue-macros/volar': 3.0.0-beta.15
     '@moluoxixi/eslintconfig': latest
     '@moluoxixi/viteconfig': ^0.0.17
+    '@moluoxixi/ajaxpackage': ^0.0.2
     dotenv: ^16.5.0
     jiti: ^2.4.2
     eslint: ^9.5
