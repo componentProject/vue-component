@@ -1,5 +1,5 @@
 import type { HmrContext, ModuleNode, Plugin, ResolvedConfig, ViteDevServer } from 'vite'
-import { getType } from '@moluoxixi/utils/_utils/index.ts'
+import { getType } from '../../../../_utils/index.ts'
 import { normalizePath } from 'vite'
 import path from 'node:path'
 import fs from 'node:fs'
