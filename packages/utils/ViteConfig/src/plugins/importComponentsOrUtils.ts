@@ -1,8 +1,6 @@
 import type { Plugin } from 'vite'
 import { createVirtualPlugin } from './utils/virtual.ts'
 import { getList } from '../../../_api/index.ts'
-import { loadCodeStr } from '../../../../../play/render/utils.ts'
-import * as Vue from 'vue'
 
 export interface ImportComponentsOrUtilsOptions {
   /** 虚拟模块 id，默认 'virtual:remote' */
@@ -46,47 +44,48 @@ export default function importComponentsOrUtils(options: ImportComponentsOrUtils
         import * as Vue from 'vue';
         const name = "${name}";
         export default defineAsyncComponent(async () => {
-           const componentRes = await window.$load(Vue, [name])
+           const componentRes = await window.$remoteLoad(Vue, [name])
            return componentRes[name]
         })
       `
   }
 
-  async function getComponentCodeByStr(name: string): Promise<string> {
-    try {
-      const listRes = await getList({
-        productCode: 'webFile_his',
-        vue: ['Vue3'],
-      })
-      const params = listRes.Vue3.filter((item: any) => name === item.componentCode).map((i: any) => i.id)
-      if (!params || params.length === 0) {
-        throw new Error(`未找到组件${name}`)
-      }
-      const componentDownList = await loadCodeStr(Vue, listRes.Vue3, [name])
-      const rawCode = componentDownList[name]
-      if (!rawCode)
-        throw new Error(`未获取到组件${name}的代码`)
-
-      const codeJson = JSON.stringify(String(rawCode))
-
-      return `
-        import * as Vue from 'vue';
-        const componentMapping = {Vue};
-        const __code = ${codeJson};
-        const __res = new Function('Vue', 'process', 'componentMapping', __code)(Vue, { env: { NODE_ENV: 'production' } }, componentMapping);
-        const __default = __res && (__res.__esModule ? __res.default : __res.default);
-        export default __default;
-      `
-    }
-    catch (error) {
-      const errorString = String(error)
-      return `
-       const error = "${errorString}"
-       console.error(error)
-       export default error
-      `
-    }
-  }
+  // //#region
+  // async function getComponentCodeByStr(name: string): Promise<string> {
+  //   try {
+  //     const listRes = await getList({
+  //       productCode: 'webFile_his',
+  //       vue: ['Vue3'],
+  //     })
+  //     const params = listRes.Vue3.filter((item: any) => name === item.componentCode).map((i: any) => i.id)
+  //     if (!params || params.length === 0) {
+  //       throw new Error(`未找到组件${name}`)
+  //     }
+  //     const componentDownList = await loadCodeStr(Vue, listRes.Vue3, [name])
+  //     const rawCode = componentDownList[name]
+  //     if (!rawCode)
+  //       throw new Error(`未获取到组件${name}的代码`)
+  //
+  //     const codeJson = JSON.stringify(String(rawCode))
+  //
+  //     return `
+  //       import * as Vue from 'vue';
+  //       const componentMapping = {Vue};
+  //       const __code = ${codeJson};
+  //       const __res = new Function('Vue', 'process', 'componentMapping', __code)(Vue, { env: { NODE_ENV: 'production' } }, componentMapping);
+  //       const __default = __res && (__res.__esModule ? __res.default : __res.default);
+  //       export default __default;
+  //     `
+  //   } catch (error) {
+  //     const errorString = String(error)
+  //     return `
+  //      const error = "${errorString}"
+  //      console.error(error)
+  //      export default error
+  //     `
+  //   }
+  // }
+  // //#endregion
 
   return createVirtualPlugin(
     {
