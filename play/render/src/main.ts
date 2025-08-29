@@ -24,6 +24,7 @@ import '@/assets/styles/main.css'
 import 'vxe-table/lib/style.css'
 
 import 'moment/dist/locale/zh-cn' // 中文化
+import { load } from '../utils.ts'
 
 moment.locale('zh-cn')
 
@@ -91,6 +92,7 @@ async function render(props: QiankunProps) {
   const { container } = props
   proxy(container as HTMLElement)
   app = createApp(App)
+  window.$load = load
   // 注册指令
   directives(app)
 

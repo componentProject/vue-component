@@ -16,10 +16,12 @@
       ref="inputRef"
       v-bind="props.inputProps"
       v-model="currentInputValue"
+      clearable
       :placeholder="computedPlaceholder"
       @focus="handleFocus"
       @blur="handleBlur"
       @input="computedInput"
+      @clear="handleClear"
     />
   </div>
 </template>
@@ -93,7 +95,7 @@ const props = defineProps({
     default: '',
   },
 })
-const emits = defineEmits(['focus', 'input', 'blur', 'enter'])
+const emits = defineEmits(['focus', 'input', 'blur', 'enter', 'clear'])
 // 获取插槽
 const slots = defineSlots<slotsType>()
 const slotNames = computed<string[]>(() => Object.keys(slots) as string[])
@@ -152,6 +154,13 @@ function handleInput(val: string) {
     popoverModel.value = true
   }
   emits('input', val)
+}
+
+function handleClear() {
+  cacheInputValue.value = ''
+  currentInputValue.value = ''
+  popoverModel.value = false
+  emits('clear')
 }
 
 const computedInput = computed(() => {

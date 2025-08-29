@@ -1,7 +1,7 @@
 <template>
   <div class="example-container">
     <h3>基本用法（default：按钮常显）</h3>
-    <div class="block">
+    <div class="block" style="height: 100px !important;">
       <Tree :data="treeList" children-field="children" label-field="name" :child-icon="ChildIcon" :parent-icon="ParentIcon" :buttons="renderButtons" />
     </div>
 
@@ -29,7 +29,9 @@
     <div class="block">
       <Tree :data="treeList" children-field="children" label-field="name" :buttons="renderCustomButtons">
         <template #customSlot="{ data }">
-          <ElButton link size="small" @click.stop="() => onAlert('slot: ' + data.name)">自定义</ElButton>
+          <ElButton link size="small" @click.stop="() => onAlert(`slot: ${data.name}`)">
+            自定义
+          </ElButton>
         </template>
       </Tree>
     </div>
@@ -40,21 +42,24 @@
         :data="treeList"
         children-field="children"
         label-field="name"
-        levelSelect
+        level-select
         @change="onCascadeChange"
       />
-      <div style="margin-top: 8px">已选节点（name）: {{ selectedNames }}</div>
+      <div style="margin-top: 8px">
+        已选节点（name）: {{ selectedNames }}
+      </div>
       <pre style="margin-top: 8px">{{ selectedRows }}</pre>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import Tree from '@moluoxixi/components/Tree/index.ts'
-import { ref, computed } from 'vue'
-import { Folder, Document } from '@element-plus/icons-vue'
+import Tree from './index.vue'
+import { computed, ref } from 'vue'
+import { Document, Folder } from '@element-plus/icons-vue'
 import { ElButton } from 'element-plus'
 import type { ButtonsItem } from './types/index.ts'
+
 const ChildIcon = Document
 const ParentIcon = Folder
 
@@ -132,17 +137,17 @@ function renderButtons(row: any): ButtonsItem[] {
     {
       type: 'add',
       tooltip: '新增子节点',
-      event: () => alert('add: ' + row.name),
+      event: () => alert(`add: ${row.name}`),
     },
     {
       type: 'edit',
       tooltip: '编辑',
-      event: () => alert('edit: ' + row.name),
+      event: () => alert(`edit: ${row.name}`),
     },
     {
       type: 'delete',
       tooltip: '删除',
-      event: () => alert('delete: ' + row.name),
+      event: () => alert(`delete: ${row.name}`),
     },
   ]
 }
@@ -155,7 +160,7 @@ function renderCustomButtons(row: any): ButtonsItem[] {
     {
       icon: Document,
       tooltip: '函数按钮',
-      event: () => alert('function btn: ' + row.name),
+      event: () => alert(`function btn: ${row.name}`),
     },
   ]
 }
@@ -168,9 +173,9 @@ function onAlert(message: string) {
 const selectedRows = ref<any[]>([])
 const selectedNames = computed(() => selectedRows.value.map((r: any) => r?.name).filter(Boolean).join(', '))
 function onCascadeChange(rows: any[]) {
-  selectedRows.value = rows.map(item=>{
-    const {children,...i} = item;
-    return i;
+  selectedRows.value = rows.map((item) => {
+    const { children, ...i } = item
+    return i
   })
 }
 </script>
@@ -185,5 +190,3 @@ function onCascadeChange(rows: any[]) {
   margin-bottom: 16px;
 }
 </style>
-
-
