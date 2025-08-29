@@ -5,13 +5,16 @@
     </div>
     <div class="main">
       <div>虚拟模块里导出的组件</div>
-      <PopoverTableSelect1 />
+      <PopoverTableSelect
+        pop-type="input"
+        :columns="columns"
+        :data="tableData"
+      />
       <div class="list-title">
         开发调试组件
       </div>
       <component
         :is="localComponent"
-        v-if="localComponent"
         pop-type="input"
         :columns="columns"
         :data="tableData"
@@ -35,14 +38,13 @@
 import * as vue from 'vue'
 import { onMounted, ref } from 'vue'
 // 允许在 Vue SFC 中使用 .ts 扩展导入
-import { getList } from '../../api/index.ts'
 // 允许在 Vue SFC 中使用 .ts 扩展导入
 import { load } from '../../../utils.ts'
 // 虚拟模块由 Vite 插件在运行时提供
-import PopoverTableSelect1 from 'virtual:remote/Select'
+import PopoverTableSelect from 'virtual:remote/PopoverTableSelect'
 
 defineOptions({ name: '调试与演示' })
-console.log('PopoverTableSelect1', PopoverTableSelect1)
+console.log('PopoverTableSelect1', PopoverTableSelect)
 // 使用ref替代data属性
 const componentName = ref('PopoverTableSelect') // 调试与演示组件库的组件，直接修改组件名
 const localComponent = ref<any>(null) // 调试组件
@@ -136,11 +138,7 @@ async function loadLocalComponent(componentName: string) {
  */
 async function loadComponents(components: string[]) {
   try {
-    const listRes = await getList({
-      productCode: 'webFile_his',
-      vue: ['Vue3'],
-    })
-    const loadedComponents = await load(vue, listRes.Vue3, components)
+    const loadedComponents = await load(vue, components)
     dynamicComponent.value = loadedComponents[componentName.value]
     console.log('动态组件加载成功:', dynamicComponent)
   }

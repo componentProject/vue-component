@@ -16,6 +16,7 @@
       ref="inputRef"
       v-bind="props.inputProps"
       v-model="currentInputValue"
+      clearable
       :placeholder="computedPlaceholder"
       @focus="handleFocus"
       @blur="handleBlur"

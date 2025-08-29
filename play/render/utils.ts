@@ -1,5 +1,6 @@
 //#region 从远程服务器加载资源并替换
 import { getDownLoadByIds } from './src/api/index.ts'
+import { getList } from './src/api/index.ts'
 
 interface DependencyMap {
   [key: string]: string
@@ -25,7 +26,7 @@ const dependencyMapping: DependencyMap = {
  * @param packageName - 包名
  * @param componentName - 组件名
  */
-function addToDependencyMapping(packageName: string, componentName: string) {
+export function addToDependencyMapping(packageName: string, componentName: string) {
   if (!dependencyMapping[packageName]) {
     dependencyMapping[packageName] = componentName
     console.log(`已添加组件映射: ${packageName} -> ${componentName}`)
@@ -37,7 +38,7 @@ function addToDependencyMapping(packageName: string, componentName: string) {
  * @param componentName - 组件名称
  * @returns 对应的包名
  */
-function getPackageNameFromComponentName(componentName: string): string {
+export function getPackageNameFromComponentName(componentName: string): string {
   // 将驼峰命名转换为短横线命名，并添加前缀
   return `@moluoxixi/${componentName.replace(/([A-Z])/g, '$1').toLowerCase().replace(/^-/, '')}`
 }
@@ -514,7 +515,12 @@ async function replaceImportsAndExports(componentCode: string, componentName: st
 
   return processedComponents
 }
-export async function load(Vue: any, allComponentList: allComponentListType[], originComponentNames: string[]) {
+export async function load(Vue: any, originComponentNames: string[]) {
+  const listRes = await getList({
+    productCode: 'webFile_his',
+    vue: ['Vue3'],
+  })
+  const allComponentList = listRes.Vue3
   const componentNames = originComponentNames?.length > 0 ? originComponentNames : allComponentList.map(i => i.componentCode)
   // 预先为所有组件添加依赖映射
   allComponentList.forEach((item) => {

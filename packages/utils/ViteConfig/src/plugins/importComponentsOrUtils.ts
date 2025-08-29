@@ -12,13 +12,14 @@ export interface ImportComponentsOrUtilsOptions {
   /** 可选的文件监听通配，透传给工厂（通常不需要） */
   watch?: string | string[]
 }
+
 /**
  * 远程代码虚拟模块插件（严格内置远程拉取与缓存，不接受外部传入代码）。
  * 使用：import { date } from 'virtual:remote/date'
  */
 export default function importComponentsOrUtils(options: ImportComponentsOrUtilsOptions = {}): Plugin {
   const virtualModuleId = options.virtualModuleId || 'virtual:remote'
-
+  let listRes: any
   const normalizeRequestName = (id: string): string | null => {
     if (id === virtualModuleId)
       return null
@@ -28,7 +29,30 @@ export default function importComponentsOrUtils(options: ImportComponentsOrUtils
     return raw.split('?')[0]
   }
 
+  async function getListRes() {
+    if (listRes)
+      return listRes
+    listRes = await getList({
+      productCode: 'webFile_his',
+      vue: ['Vue3'],
+    })
+
+    return listRes
+  }
+
   async function getComponentCode(name: string): Promise<string> {
+    return `
+        import { defineAsyncComponent } from 'vue';
+        import * as Vue from 'vue';
+        const name = "${name}";
+        export default defineAsyncComponent(async () => {
+           const componentRes = await window.$load(Vue, [name])
+           return componentRes[name]
+        })
+      `
+  }
+
+  async function getComponentCodeByStr(name: string): Promise<string> {
     try {
       const listRes = await getList({
         productCode: 'webFile_his',
@@ -44,7 +68,8 @@ export default function importComponentsOrUtils(options: ImportComponentsOrUtils
         throw new Error(`未获取到组件${name}的代码`)
 
       const codeJson = JSON.stringify(String(rawCode))
-      const componentCode = `
+
+      return `
         import * as Vue from 'vue';
         const componentMapping = {Vue};
         const __code = ${codeJson};
@@ -52,7 +77,6 @@ export default function importComponentsOrUtils(options: ImportComponentsOrUtils
         const __default = __res && (__res.__esModule ? __res.default : __res.default);
         export default __default;
       `
-      return componentCode
     }
     catch (error) {
       const errorString = String(error)
@@ -74,7 +98,7 @@ export default function importComponentsOrUtils(options: ImportComponentsOrUtils
     },
     async ({ id }): Promise<string> => {
       const name = normalizeRequestName(id)
-
+      await getListRes()
       if (name) {
         // 读取或拉取代码
         return await getComponentCode(name)
