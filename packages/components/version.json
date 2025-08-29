@@ -19,5 +19,6 @@
   "components": "1.3.10",
   "ApiDialog": "0.0.4",
   "Splitter": "0.0.2",
-  "Tree": "0.0.4"
+  "Tree": "0.0.4",
+  "AIAgent": "0.0.6"
 }

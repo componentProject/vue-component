@@ -1215,7 +1215,7 @@ async function buildComponent(
     console.log(`==========  ${buildName} 打包完成 ==========`)
     // 如果需要发布，执行发布
     if (shouldPublish) {
-      await UploadEvent(fileUrl, buildName)
+      await UploadEvent(fileUrl, buildName, 'Vue3')
       console.log(`准备发布 ${buildName}，版本：${currentVersion} -> ${newVersion}`)
 
       await writeComponentVersions({
