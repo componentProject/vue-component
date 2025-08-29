@@ -21,7 +21,7 @@ export interface TreeProps<T = any> {
   icon?: (nodeData: T) => Component | string
   showType?: 'hover' | 'click' | 'default'
   buttons?: (nodeData: T) => ButtonsItem[]
-  indent?: number
+  indent?: number | string
   height?: number
   /**
    * 是否显示左侧连接线
@@ -36,5 +36,3 @@ export interface TreeProps<T = any> {
    */
   levelSelect?: boolean
 }
-
-

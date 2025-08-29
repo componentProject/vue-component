@@ -18,8 +18,6 @@ export interface ImportComponentsOrUtilsOptions {
  */
 export default function importComponentsOrUtils(options: ImportComponentsOrUtilsOptions = {}): Plugin {
   const virtualModuleId = options.virtualModuleId || 'virtual:remote'
-  // 缓存：{ 文件名称: 代码 }
-  const codeCache: Record<string, string> = {}
 
   const normalizeRequestName = (id: string): string | null => {
     if (id === virtualModuleId)
@@ -31,9 +29,6 @@ export default function importComponentsOrUtils(options: ImportComponentsOrUtils
   }
 
   async function getComponentCode(name: string): Promise<string> {
-    // 命中缓存
-    // if (codeCache[name])
-    //   return codeCache[name]
     try {
       const listRes = await getList({
         productCode: 'webFile_his',
@@ -57,7 +52,6 @@ export default function importComponentsOrUtils(options: ImportComponentsOrUtils
         const __default = __res && (__res.__esModule ? __res.default : __res.default);
         export default __default;
       `
-      codeCache[name] = componentCode
       return componentCode
     }
     catch (error) {
@@ -81,16 +75,17 @@ export default function importComponentsOrUtils(options: ImportComponentsOrUtils
     async ({ id }): Promise<string> => {
       const name = normalizeRequestName(id)
 
-      if (!name) {
+      if (name) {
+        // 读取或拉取代码
+        return await getComponentCode(name)
+      }
+      else {
         return `
           const error = "不存在该文件"
           console.error(error)
           export default error
         `
       }
-
-      // 读取或拉取代码
-      return await getComponentCode(name)
     },
   )
 }

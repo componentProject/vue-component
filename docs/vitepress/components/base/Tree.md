@@ -2,7 +2,7 @@
 
 ## 组件示例
 
-树形组件，支持扁平/嵌套数据、行内操作按钮、自定义图标、级联高亮、连线样式与缩进等。
+树形组件，内部使用TreeV2，支持扁平/嵌套数据、行内操作按钮、自定义图标、级联高亮、连线样式与缩进等，高度跟随父元素高度，无法自定义。
 
 ### 基础
 
@@ -52,18 +52,12 @@ Tree/display/showType-hover
 Tree/display/showType-click
 ::::
 
-### 布局与样式（indent/height/showLine/showRowLine）
+### 布局与样式（indent/showLine/showRowLine）
 
 缩进间距：通过 `indent` 控制层级缩进。
 
 ::::demo
 Tree/layout/indent
-::::
-
-滚动高度：通过 `height` 控制可视高度。
-
-::::demo
-Tree/layout/height
 ::::
 
 连线：显示左侧父子连接虚线。
@@ -157,7 +151,6 @@ Tree/events/node-click
 | showType | 行按钮展示方式 | `'hover'` \| `'click'` \| `'default'` | `'default'` |
 | buttons | 为每一行返回按钮数组 | ^[Function]`(row: any) => ButtonsItem[]` | `undefined` |
 | indent | 每级缩进像素 | `number` | `16` |
-| height | 列表可视高度 | `number` | `360` |
 | showLine | 是否显示左侧父子连接线 | `boolean` | `false` |
 | showRowLine | 是否显示每一行右侧延伸线 | `boolean` | `false` |
 | levelSelect | 是否开启级联高亮与 `change` 事件 | `boolean` | `false` |
