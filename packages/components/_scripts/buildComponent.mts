@@ -21,7 +21,7 @@ import Components from 'unplugin-vue-components/vite'
 import viteImagemin from 'vite-plugin-imagemin'
 import { obfuscator } from 'rollup-obfuscator'
 import cssInjectedByJsPlugin from 'vite-plugin-css-injected-by-js'
-import { UploadEvent } from '@moluoxixi/utils/_utils/UploadComponent.ts'
+import { UploadEvent } from '../../utils/_utils/UploadComponent.ts'
 
 // === 组件库命名空间配置 ===
 const LIB_NAMESPACE = 'moluoxixi'
@@ -222,7 +222,7 @@ function createBaseConfig(comp: string, internalDeps: string[]): InlineConfig {
       dts({
         root: packDir,
         entryRoot: `.${entryBaseUrl}${comp}`,
-        tsconfigPath: './tsconfig.json',
+        tsconfigPath: './tsconfig.base.json',
         declarationOnly: false,
       }),
       cssInjectedByJsPlugin(),

@@ -220,7 +220,7 @@ function createBaseConfig(comp: string, internalDeps: string[]): InlineConfig {
       dts({
         root: packDir,
         entryRoot: `.${entryBaseUrl}${comp}`,
-        tsconfigPath: './tsconfig.json',
+        tsconfigPath: './tsconfig.base.json',
         declarationOnly: false,
       }),
       cssInjectedByJsPlugin(),
