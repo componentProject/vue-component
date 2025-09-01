@@ -1,6 +1,6 @@
 import type { Plugin } from 'vite'
-import { createVirtualPlugin } from './utils/virtual.ts'
-import { getList } from '../../../_api/index.ts'
+import { createVirtualPlugin } from './utils/virtual'
+import { getList } from '../../../_api'
 
 export interface ImportComponentsOrUtilsOptions {
   /** 虚拟模块 id，默认 'virtual:remote' */
@@ -15,8 +15,8 @@ export interface ImportComponentsOrUtilsOptions {
  * 远程代码虚拟模块插件（严格内置远程拉取与缓存，不接受外部传入代码）。
  * 使用：import { date } from 'virtual:remote/date'
  */
-export default function importComponentsOrUtils(options: ImportComponentsOrUtilsOptions = {}): Plugin {
-  const virtualModuleId = options.virtualModuleId || 'virtual:remote'
+export default function importComponents(options: ImportComponentsOrUtilsOptions = {}): Plugin {
+  const virtualModuleId = options.virtualModuleId || 'virtual:components'
   let listRes: any
   const normalizeRequestName = (id: string): string | null => {
     if (id === virtualModuleId)
@@ -40,12 +40,29 @@ export default function importComponentsOrUtils(options: ImportComponentsOrUtils
 
   async function getComponentCode(name: string): Promise<string> {
     return `
-        import { defineAsyncComponent } from 'vue';
+        import { defineAsyncComponent,h } from 'vue';
         import * as Vue from 'vue';
         const name = "${name}";
-        export default defineAsyncComponent(async () => {
-           const componentRes = await window.$remoteLoad(Vue, [name])
-           return componentRes[name]
+        const loadingComponent = {
+          name: 'AsyncLoading',
+          setup() {
+            return () => h('div', { style: { padding: '8px', color: '#999' } }, '加载中...');
+          },
+        };
+        const errorComponent = {
+          name: 'AsyncError',
+          props: { error: Object },
+          setup() {
+            return () => h('div', { style: { padding: '8px', color: '#c00' } }, '${name}组件加载报错，请联系开发人员');
+          },
+        };
+        export default defineAsyncComponent({
+          async loader(){
+             const componentRes = await window.$remoteLoad(Vue, [name])
+             return componentRes[name]
+          },
+          loadingComponent,
+          errorComponent
         })
       `
   }

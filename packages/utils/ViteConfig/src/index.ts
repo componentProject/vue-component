@@ -26,7 +26,7 @@ import scopedCssPrefixPlugin from './plugins/addScopedAndReplacePrefix.ts'
 
 // 自动路由
 import autoRoutesPlugin from './plugins/autoRoutes/index.ts'
-import importComponentsOrUtils from './plugins/importComponentsOrUtils.ts'
+import importComponentsOrUtils from './plugins/importComponents.ts'
 
 import type { PluginMap, PluginType, ViteConfigType } from './_types/index.ts'
 
