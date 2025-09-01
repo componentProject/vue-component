@@ -4,7 +4,7 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 //上传组件至服务器
-export async function UploadEvent(url: string, buildName: string) {
+export async function UploadEvent(url: string, buildName: string, type: string) {
   console.log('UploadEvent: 开始上传操作')
   try {
     // 处理 file:// 协议并获取文件路径
@@ -34,7 +34,7 @@ export async function UploadEvent(url: string, buildName: string) {
         backups: '1',
         paraMeters: {
           productCode: 'webFile_his',
-          Vue: 'UtilityClass',
+          Vue: type,
           componentCode: buildName,
         },
       },
