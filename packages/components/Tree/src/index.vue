@@ -125,8 +125,15 @@ const emit = defineEmits<{
 
 const height = ref()
 const treeContainer = useTemplateRef('treeContainer')
+function resizeChange() {
+  height.value = Math.ceil(treeContainer.value?.getBoundingClientRect().height)
+}
 onMounted(() => {
   height.value = Math.ceil(treeContainer.value?.getBoundingClientRect().height)
+  window.addEventListener('resize', resizeChange)
+})
+onUnmounted(() => {
+  window.removeEventListener('resize', resizeChange)
 })
 
 const Render = defineComponent<{ render: () => any }>({
@@ -179,8 +186,7 @@ const idMaps = computed(() => {
 })
 function leftLineShow(item: number, node: TreeNode & { parent: any }) {
   if (item === 1) {
-    console.log('aaaaaaaa', node)
-    return node.parent?.[props.childrenField]?.length > 1
+    return node.parent[props.childrenField].findIndex(i => i === node) < node.parent[props.childrenField].length - 1
   }
   else {
     return leftLineShow(item - 1, node.parent)
@@ -294,7 +300,6 @@ function resolveButtonIcon(btn: ButtonsItem): VueComponent | string | undefined 
 }
 
 function onRowClick(data: TreeNodeData, node: TreeNode, e: MouseEvent) {
-  console.log('data', data, node)
   // 级联选择逻辑
   if (props.levelSelect) {
     const id = (data as any)?.[props.rowField]

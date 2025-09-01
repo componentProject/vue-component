@@ -41,7 +41,7 @@ import { onMounted, ref } from 'vue'
 // 允许在 Vue SFC 中使用 .ts 扩展导入
 import { load } from '../../../utils.ts'
 // 虚拟模块由 Vite 插件在运行时提供
-import PopoverTableSelect from 'virtual:remote/PopoverTableSelect'
+import PopoverTableSelect from 'virtual:components/PopoverTableSelect'
 
 defineOptions({ name: '调试与演示' })
 console.log('PopoverTableSelect1', PopoverTableSelect)

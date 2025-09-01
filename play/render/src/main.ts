@@ -92,7 +92,7 @@ async function render(props: QiankunProps) {
   const { container } = props
   proxy(container as HTMLElement)
   app = createApp(App)
-  window.$load = load
+  window.$remoteLoad = load
   // 注册指令
   directives(app)
 

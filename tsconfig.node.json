@@ -1,34 +1,6 @@
 {
-  "compilerOptions": {
-    "target": "ESNext",
-    "jsx": "preserve",
-    "lib": [
-      "ESNext"
-    ],
-    "baseUrl": ".",
-    "paths": {
-      "@moluoxixi/utils": [
-        "./packages/utils"
-      ],
-      "@moluoxixi/utils/*": [
-        "./packages/utils/*"
-      ]
-    },
-    "module": "ESNext",
-    "moduleResolution": "nodenext",
-    "resolveJsonModule": true,
-    "allowJs": true,
-    "strict": true,
-    "strictNullChecks": true,
-    "noUnusedLocals": true,
-    "noEmit": true,
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "isolatedModules": true,
-    "skipLibCheck": true,
-    "allowImportingTsExtensions": true
-  },
+  "extends": "./tsconfig.base.json",
   "include": [
-    "./packages/utils/**/*"
+    "packages/utils"
   ]
 }
