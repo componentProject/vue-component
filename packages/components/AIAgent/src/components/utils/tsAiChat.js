@@ -50,6 +50,9 @@ class TsAiAgent {
                         const jsonStr = line.replace('data:Message', '').trim();
                         const json = JSON.parse(jsonStr);
                         onMessage(json);
+                    } else {
+                        console.warn('解析失败:', line);
+                        onComplete?.(false, line || '数据解析错误');
                     }
                 } catch (err) {
                     console.warn('解析失败:', err);

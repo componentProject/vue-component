@@ -1,6 +1,7 @@
 import { keywords } from './keyword'
 import { themeRules, themeName } from './theme'
-import * as monaco from 'monaco-editor';
+// 按需引入 Monaco Editor 模块
+import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
 import { getSuggestions } from './suggestions';
 import { getGhostTextCompletion } from './ghostText';
 import { codeAction, ActionId } from './codeAction';

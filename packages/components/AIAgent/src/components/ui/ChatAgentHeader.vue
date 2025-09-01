@@ -8,7 +8,11 @@
             <i class="ai-iconfont icon-star1" style="color: #ffd100" v-if="isStar == 2" @click="handleStar"></i>
             <i class="ai-iconfont icon-star" v-else @click="handleStar"></i>
         </div>
-        <TipsPopover @about-click="handleAboutClick" @notice-click="handleNoticeClick" />
+        <TipsPopover
+            @about-click="handleAboutClick"
+            @notice-click="handleNoticeClick"
+            @shepherd-click="handleShepherdClick"
+        />
     </div>
 </template>
 <script>
@@ -42,6 +46,9 @@ export default {
         },
         handleNoticeClick() {
             this.$emit('notice-click');
+        },
+        handleShepherdClick() {
+            this.$emit('shepherd-click');
         }
     }
 };

@@ -10,11 +10,11 @@ import MarkdownItMark from 'markdown-it-mark';
 import MarkdownItTasklists from 'markdown-it-task-lists';
 import MarkdownItContainer from 'markdown-it-container';
 import MarkdownItLinkAttributes from './markdown-it-link-attributes';
-import MarkdownItMermaid from './markdown-it-plugin-mermaid';
+// import MarkdownItMermaid from './markdown-it-plugin-mermaid';
 import MarkdownItHighlight from './markdown-it-highlight';
 import MarkdownItImage from './markdown-it-image';
 import { copyValue } from '../ui/toast/index';
-import mermaid from 'mermaid';
+// import mermaid from 'mermaid';
 import 'github-markdown-css'
 // import 'markdown-it-latex/dist/index.css'
 
@@ -27,9 +27,9 @@ const DEFAULT_OPTIONS_LINK_ATTRIBUTES = {
 };
 const DEFAULT_OPTIONS_TASKLISTS = null;
 
-const DEFAULT_OPTIONS_MERMAID = {
-    theme: 'default'
-};
+// const DEFAULT_OPTIONS_MERMAID = {
+//     theme: 'default'
+// };
 const DEFAULT_OPTIONS_IMAGE = {
     hAlign: 'left',
     viewer: true
@@ -50,7 +50,7 @@ export default {
                     },
                     linkAttributes: DEFAULT_OPTIONS_LINK_ATTRIBUTES,
                     tasklists: DEFAULT_OPTIONS_TASKLISTS,
-                    mermaid: DEFAULT_OPTIONS_MERMAID
+                    // mermaid: DEFAULT_OPTIONS_MERMAID
                 };
             }
         }
@@ -59,7 +59,7 @@ export default {
         const optMarkdownIt = this.options.markdownIt;
         const linkAttributes = this.options.linkAttributes || DEFAULT_OPTIONS_LINK_ATTRIBUTES;
         const optTasklists = this.options.tasklists || DEFAULT_OPTIONS_TASKLISTS;
-        const optMermaid = this.options.mermaid || DEFAULT_OPTIONS_MERMAID;
+        // const optMermaid = this.options.mermaid || DEFAULT_OPTIONS_MERMAID;
         const optImage = this.options.image || DEFAULT_OPTIONS_IMAGE;
         optImage.urlSet = new Set();
 
@@ -73,7 +73,7 @@ export default {
             .use(MarkdownItInsert)
             .use(MarkdownItMark)
             .use(MarkdownItHighlight)
-            .use(MarkdownItMermaid, optMermaid)
+            // .use(MarkdownItMermaid, optMermaid)
             // .use(MarkdownItEcharts)
             .use(MarkdownItLinkAttributes, linkAttributes)
             .use(MarkdownItTasklists, optTasklists)
@@ -171,7 +171,7 @@ export default {
                 });
 
                 // render mermaid
-                mermaid.init(undefined, document.querySelectorAll('.mermaid'));
+                // mermaid.init(undefined, document.querySelectorAll('.mermaid'));
 
                 let list = [];
                 for (const i of this.urlSet) {

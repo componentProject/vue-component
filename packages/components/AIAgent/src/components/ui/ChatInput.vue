@@ -1,5 +1,5 @@
 <template>
-    <div class="chat-input">
+    <div class="chat-input" id="tsAiAgent-chat-input">
         <div class="chat-textarea">
             <textarea
                 class="chat-textarea__inner"
@@ -24,6 +24,7 @@
                 :class="{ 'chat-is-disabled': submitDisabled }"
                 @click="sendMessage"
                 v-if="!stopDisabled"
+                id="tsAiAgent-chat-input-send"
             >
                 <i class="ai-iconfont icon-arrowup chat-icon"></i>
             </div>

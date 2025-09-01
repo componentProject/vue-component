@@ -4,8 +4,12 @@
         :style="{ maxHeight: showSubmit ? '190px' : '130px', marginBottom: showSubmit ? '0' : '16px' }"
         v-if="visible"
     >
-        <div class="params-panel-content">
-            <div class="params-panel-content-item" v-for="param in params" :key="param.id">
+        <div class="params-panel-content" id="tsAiAgent-params-panel">
+            <div
+                class="params-panel-content-item"
+                v-for="param in params.filter(item => item.paramType == 2)"
+                :key="param.id"
+            >
                 <div class="params-panel-content-item-title">
                     {{ param.paramExplain || param.paramName }}
                     <span class="required-icon" v-if="param.isRequired == 1">*</span>

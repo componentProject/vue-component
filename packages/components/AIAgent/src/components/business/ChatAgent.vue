@@ -3,7 +3,12 @@
         <div class="chat-agent-container">
             <div class="chat-agent-content">
                 <div class="chat-list-container">
-                    <div class="chat-list-content" @scroll="handleScroll" ref="chatList">
+                    <div
+                        class="chat-list-content"
+                        @scroll="handleScroll"
+                        ref="chatList"
+                        id="tsAiAgent-chat-list-content"
+                    >
                         <div class="chat-list">
                             <!-- <t-chat-item role="assistant" content="提示词" v-if="chatList.length === 0"> </t-chat-item> -->
                             <Bubble
@@ -31,7 +36,7 @@
                     />
                 </div>
                 <div class="chat-footer">
-                    <div class="page-config">
+                    <div class="page-config" id="tsAiAgent-page-config">
                         <div
                             v-if="pageConfig.showEditWord == 'Y'"
                             class="config-btn"
@@ -180,7 +185,14 @@ export default {
                 conversationList: [], // 历史对话列表
                 isEditPrompt: false, //是否在编辑提示词
                 cueWordDetail: '', //提示词详情
-                pageConfig: {}, //页面配置
+                pageConfig: {
+                    showDialogBox: 'Y',
+                    shrinkDialogBox: 'N',
+                    showNewConversation: 'N',
+                    showEditWord: 'Y',
+                    showHistoryConversation: 'Y',
+                    showReplenishInformation: 'Y'
+                }, //页面配置
                 isShrinkInput: false, //是否收起输入框
                 hasCustomParams: false, //是否存在自定义参数
                 showParamsPanel: false, //是否显示参数面板
@@ -308,7 +320,11 @@ export default {
             try {
                 const params = {};
                 for (let param of this.configParams) {
-                    params[param.paramName] = param.paramValue;
+                    if (param.paramType == 2) {
+                        params[param.paramName] = param.paramValue;
+                    } else if (param.paramType == 9) {
+                        params[param.paramName] = param.defaultValue;
+                    }
                 }
                 // params.prompt = this.cueWordDetail.wordContent;
                 // 调用 chatStream 方法获取流
@@ -454,14 +470,14 @@ export default {
                     showNewConversation: 'N',
                     showEditWord: 'Y',
                     showHistoryConversation: 'Y'
-
+                    // showReplenishInformation: 'N'
                     // showReplenishInformation: 'N',
                     // outputType: '1',
                     // pageTemplate: ''
                 };
             }
-            const configParams = (res.configParam?.agentConfigParamList || []).filter(item => item.paramType == 2);
-            if (configParams && configParams.length > 0) {
+            const configParams = res.configParam?.agentConfigParamList || [];
+            if (configParams.filter(item => item.paramType == 2).length > 0) {
                 this.hasCustomParams = true;
                 this.configParams = JSON.parse(JSON.stringify(configParams));
                 if (res.agentConfig.callbackUrl) {
@@ -472,7 +488,7 @@ export default {
         async getCueWordDetail() {
             const res = await findAiCueWordDetailByAgentId(this.agent.agentInfo.id);
             if (res.statusCode == 200) {
-                this.cueWordDetail = res.object;
+                this.cueWordDetail = res.object[0];
             }
         },
         async handleWordSave(wordContent) {

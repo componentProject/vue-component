@@ -1,5 +1,5 @@
 <template>
-    <div class="edit-prompt">
+    <div class="edit-prompt" id="tsAiAgent-edit-prompt">
         <div class="edit-prompt-textarea">
             <textarea
                 class="edit-prompt-textarea__inner"

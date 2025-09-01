@@ -173,9 +173,11 @@ export default {
 }
 
 .section-sub-title {
+    line-height: 2;
     color: #333;
     font-size: 14px;
     font-weight: bold;
+    padding-top: 8px;
 }
 
 .section-content {

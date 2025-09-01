@@ -1,5 +1,5 @@
 <template>
-    <div class="conversations-container">
+    <div class="conversations-container" id="tsAiAgent-conversations-container">
         <div class="conversations-header">
             <span>历史对话</span>
         </div>

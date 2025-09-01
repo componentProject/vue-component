@@ -1,5 +1,6 @@
 import { keywords } from './keyword'
-import * as monaco from 'monaco-editor';
+// 按需引入 Monaco Editor 模块
+import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
 
 export const getSuggestions = () => {
     const suggestions = []

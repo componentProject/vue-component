@@ -11,11 +11,13 @@ const defaultConfig = {
     // 这里是创建了一个默认的 导航组件
     defaultStepOptions: {
         classes: 'shepherd-theme-arrows', // 可以自定义类名，方便调整一些样式什么的不会影响到其他的
+        // 高亮目标是否可点击（禁用点击穿透）
+        canClickTarget: false,
         // 显示关闭按钮
         cancelIcon: {
             enabled: false,
         },
-        scrollTo: { behavior: 'smooth', block: 'center' },
+        // scrollTo: { behavior: 'smooth', block: 'top' },
         // 高亮元素四周要填充的空白像素
         modalOverlayOpeningPadding: 8,
         // 空白像素的圆角
@@ -26,7 +28,8 @@ const defaultConfig = {
                     return this.back()
                 },
                 text: '上一步'
-            }, {
+            },
+            {
                 action() {
                     return this.next()
                 },

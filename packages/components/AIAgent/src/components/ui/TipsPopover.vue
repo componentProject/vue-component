@@ -18,6 +18,7 @@
                     <div class="popover-item" @click="handleAboutClick">关于</div>
                     <div class="popover-item" @click="handleGuideClick">系统指南</div>
                     <div class="popover-item" @click="handleNoticeClick">用户须知</div>
+                    <div class="popover-item" @click="handleShepherdClick">用户引导</div>
                 </div>
             </div>
         </div>
@@ -77,6 +78,10 @@ export default {
         handleNoticeClick() {
             this.$emit('notice-click');
             this.showVersionPopover = false;
+        },
+        // 用户引导点击
+        handleShepherdClick() {
+            this.$emit('shepherd-click');
         }
     },
     beforeDestroy() {

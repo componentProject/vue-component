@@ -24,7 +24,13 @@
 </template>
 
 <script>
-import * as monaco from 'monaco-editor';
+// 按需引入 Monaco Editor 核心模块
+import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
+import 'monaco-editor/esm/vs/editor/contrib/contextmenu/browser/contextmenu.js';
+import 'monaco-editor/esm/vs/editor/contrib/inlineCompletions/browser/ghostTextController.js';
+// import 'monaco-editor/esm/vs/editor/contrib/suggest/browser/suggestController.js'; // 代码联想提示
+// import 'monaco-editor/esm/vs/editor/contrib/tokenization/browser/tokenization.js'; // 代码联想提示
+
 import Loading from '../../ui/Loading.vue';
 import {
     getModelField,
@@ -36,7 +42,6 @@ import {
 import MedicalLanguage from '../js/editorConfig/language';
 import { themeName } from '../js/editorConfig/theme';
 import { dealTabCommand } from '../js/editorConfig/command';
-import { initConstrainedEditor } from '../js/editorConfig/constrained';
 import contextMenuManager from '../js/editorConfig/contextMenu';
 let editorInstance = null;
 export default {
