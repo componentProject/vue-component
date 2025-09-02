@@ -1,6 +1,8 @@
 <template>
   <div class="container" style="height: 350px;">
-    <ElButton @click="visible = true">可缩放弹窗</ElButton>
+    <ElButton @click="visible = true">
+      可缩放弹窗
+    </ElButton>
 
     <DragModalDialog
       v-model:visible="visible"

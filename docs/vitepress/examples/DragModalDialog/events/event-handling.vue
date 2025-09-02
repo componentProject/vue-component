@@ -1,6 +1,8 @@
 <template>
   <div class="container" style="height: 350px;">
-    <ElButton @click="visible = true">事件处理示例</ElButton>
+    <ElButton @click="visible = true">
+      事件处理示例
+    </ElButton>
 
     <div style="margin-top: 10px;">
       <p>事件日志：</p>
@@ -31,7 +33,7 @@ import { ref } from 'vue'
 const visible = ref(false)
 const eventLogs = ref<string[]>([])
 
-const addLog = (message: string) => {
+function addLog(message: string) {
   const timestamp = new Date().toLocaleTimeString()
   eventLogs.value.unshift(`[${timestamp}] ${message}`)
 

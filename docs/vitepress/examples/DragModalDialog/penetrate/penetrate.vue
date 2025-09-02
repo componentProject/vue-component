@@ -1,7 +1,11 @@
 <template>
   <div class="container" style="height: 350px;">
-    <ElButton @click="visible = true">遮罩层穿透弹窗</ElButton>
-    <ElButton type="primary" @click="showMessage">测试下方按钮</ElButton>
+    <ElButton @click="visible = true">
+      遮罩层穿透弹窗
+    </ElButton>
+    <ElButton type="primary" @click="showMessage">
+      测试下方按钮
+    </ElButton>
 
     <DragModalDialog
       v-model:visible="visible"
@@ -18,7 +22,7 @@ import { ElMessage } from 'element-plus'
 
 const visible = ref(false)
 
-const showMessage = () => {
+function showMessage() {
   ElMessage.success('遮罩层穿透成功，可以触发下方元素事件')
 }
 </script>

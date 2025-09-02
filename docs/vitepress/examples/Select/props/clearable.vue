@@ -1,15 +1,17 @@
 <template>
   <div class="container">
-    <Select
+    <WlSelect
       v-model="val"
       :options="options"
       :clearable="true"
       :filterable="false"
-      :label="'label'"
-      :value="'value'"
+      label="label"
+      value="value"
       @change="onChange"
     />
-    <p class="tip">当前值：<code>{{ val }}</code></p>
+    <p class="tip">
+      当前值：<code>{{ val }}</code>
+    </p>
   </div>
 </template>
 
@@ -28,8 +30,12 @@ function onChange(v: string) {
 </script>
 
 <style scoped>
-.container { padding: 8px; }
-.tip { margin-top: 8px; font-size: 12px; color: #666; }
+.container {
+  padding: 8px;
+}
+.tip {
+  margin-top: 8px;
+  font-size: 12px;
+  color: #666;
+}
 </style>
-
-

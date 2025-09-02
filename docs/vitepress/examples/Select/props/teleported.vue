@@ -1,13 +1,15 @@
 <template>
   <div class="container">
-    <Select
+    <WlSelect
       v-model="val"
       :options="options"
       :teleported="false"
-      :label="'label'"
-      :value="'value'"
+      label="label"
+      value="value"
     />
-    <p class="tip">下拉不 Teleport 到 body</p>
+    <p class="tip">
+      下拉不 Teleport 到 body
+    </p>
   </div>
 </template>
 
@@ -22,8 +24,12 @@ const options = ref([
 </script>
 
 <style scoped>
-.container { padding: 8px; }
-.tip { margin-top: 8px; font-size: 12px; color: #666; }
+.container {
+  padding: 8px;
+}
+.tip {
+  margin-top: 8px;
+  font-size: 12px;
+  color: #666;
+}
 </style>
-
-

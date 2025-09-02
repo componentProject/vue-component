@@ -1,13 +1,15 @@
 <template>
   <div class="container">
-    <Select
+    <WlSelect
       v-model="val"
       :options="options"
       :disabled-handler="disabledHandler"
-      :label="'label'"
-      :value="'value'"
+      label="label"
+      value="value"
     />
-    <p class="tip">自定义禁用：禁用所有以 w 开头的选项</p>
+    <p class="tip">
+      自定义禁用：禁用所有以 w 开头的选项
+    </p>
   </div>
 </template>
 
@@ -27,8 +29,12 @@ function disabledHandler({ label }: { label: string }) {
 </script>
 
 <style scoped>
-.container { padding: 8px; }
-.tip { margin-top: 8px; font-size: 12px; color: #666; }
+.container {
+  padding: 8px;
+}
+.tip {
+  margin-top: 8px;
+  font-size: 12px;
+  color: #666;
+}
 </style>
-
-

@@ -26,8 +26,7 @@ import { debounce as wlDebounce, throttle as wlThrottle } from '@moluoxixi/utils
 import type { DebounceSettings, ThrottleSettings } from 'lodash'
 
 defineOptions({
-  // eslint-disable-next-line vue/no-reserved-component-names
-  name: 'Button',
+  name: 'WlButton',
   inheritAttrs: false,
 })
 

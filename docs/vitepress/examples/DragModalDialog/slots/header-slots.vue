@@ -1,6 +1,8 @@
 <template>
   <div class="container" style="height: 350px;">
-    <ElButton @click="visible = true">自定义头部内容</ElButton>
+    <ElButton @click="visible = true">
+      自定义头部内容
+    </ElButton>
 
     <DragModalDialog
       v-model:visible="visible"
@@ -8,10 +10,14 @@
       :height="300"
     >
       <!-- 完全自定义头部 -->
-      <template #header="{ close, title }">
+      <template #header="{ close }">
         <div class="custom-header">
-          <h3 style="margin: 0; color: #409EFF;">🎯 自定义标题</h3>
-          <ElButton type="danger" size="small" @click="close">关闭</ElButton>
+          <h3 style="margin: 0; color: #409EFF;">
+            🎯 自定义标题
+          </h3>
+          <ElButton type="danger" size="small" @click="close">
+            关闭
+          </ElButton>
         </div>
       </template>
 
@@ -21,7 +27,9 @@
       </div>
     </DragModalDialog>
 
-    <ElButton @click="visible2 = true" style="margin-left: 10px;">头部左右插槽</ElButton>
+    <ElButton style="margin-left: 10px;" @click="visible2 = true">
+      头部左右插槽
+    </ElButton>
 
     <DragModalDialog
       v-model:visible="visible2"
@@ -30,14 +38,18 @@
       <!-- 自定义左侧内容 -->
       <template #header-left="{ title }">
         <div style="display: flex; align-items: center;">
-          <ElIcon style="margin-right: 8px; color: #67C23A;"><SuccessFilled /></ElIcon>
+          <ElIcon style="margin-right: 8px; color: #67C23A;">
+            <SuccessFilled />
+          </ElIcon>
           <span>{{ title }}</span>
         </div>
       </template>
 
       <!-- 自定义右侧内容 -->
       <template #header-right="{ close }">
-        <ElButton type="primary" size="small" @click="close">确认关闭</ElButton>
+        <ElButton type="primary" size="small" @click="close">
+          确认关闭
+        </ElButton>
       </template>
 
       <p>通过 header-left 和 header-right 插槽分别自定义头部左右区域</p>

@@ -1,14 +1,16 @@
 <template>
   <div class="container">
-    <Select
+    <WlSelect
       v-model="val"
       :options="options"
       :filterable="true"
-      :label="'label'"
-      :value="'value'"
+      label="label"
+      value="value"
       @change="onChange"
     />
-    <p class="tip">支持输入过滤</p>
+    <p class="tip">
+      支持输入过滤
+    </p>
   </div>
 </template>
 
@@ -28,8 +30,12 @@ function onChange(v: string) {
 </script>
 
 <style scoped>
-.container { padding: 8px; }
-.tip { margin-top: 8px; font-size: 12px; color: #666; }
+.container {
+  padding: 8px;
+}
+.tip {
+  margin-top: 8px;
+  font-size: 12px;
+  color: #666;
+}
 </style>
-
-

@@ -37,8 +37,7 @@ import type { objType } from '@moluoxixi/components/_types'
 import { getType, getTypeDefault } from '@moluoxixi/utils/_utils'
 
 defineOptions({
-  // eslint-disable-next-line vue/no-reserved-component-names
-  name: 'Select',
+  name: 'WlSelect',
 })
 /**
  * 定义组件的props

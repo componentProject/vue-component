@@ -1,13 +1,13 @@
 <template>
   <div class="container">
-    <Select
+    <WlSelect
       v-model="vals"
       :options="options"
       :filterable="true"
       :collapse-tags="true"
       :collapse-tags-tooltip="true"
-      :label="'label'"
-      :value="'value'"
+      label="label"
+      value="value"
       multiple
     />
   </div>
@@ -26,7 +26,7 @@ const options = ref([
 </script>
 
 <style scoped>
-.container { padding: 8px; }
+.container {
+  padding: 8px;
+}
 </style>
-
-
