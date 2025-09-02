@@ -17,8 +17,9 @@ import ConfigForm from '@moluoxixi/components/ConfigForm'
 import Tree from '@moluoxixi/components/Tree'
 
 export {
-  ConfigTable,
+  Button,
   ConfigForm,
+  ConfigTable,
   DateRangePicker,
   DraggableTable,
   EnterNextContainer,
@@ -27,7 +28,6 @@ export {
   ExportExcel,
   ImportExcel,
   KeepAllAlive,
-  Button,
   PopoverTableSelect,
   Select,
   Tabs,

@@ -8,154 +8,153 @@
 
 基本用法：传入嵌套数据，显示名称字段。
 
-::::demo
+:::demo
 Tree/base/basic
-::::
+:::
 
 ### 数据（data）
 
-自定义子节点字段名为 `nodes`。
+自定义子节点字段名：通过 `childrenField` 指定。
 
-::::demo
+:::demo
 Tree/data/childrenField
-::::
+:::
 
-传入扁平数据，通过 `rowField` + `parentField` 自动构建树。
+扁平数据自动构建：同时提供 `rowField` 与 `parentField` 时自动构建树结构。
 
-::::demo
+:::demo
 Tree/data/row-parent
-::::
+:::
 
-自定义显示字段 `labelField=name`。
+自定义显示字段：通过 `labelField` 指定展示文本字段。
 
-::::demo
+:::demo
 Tree/data/labelField
-::::
+:::
 
 ### 展示交互（showType）
 
-默认：按钮常显。
+默认展示：按钮常显。
 
-::::demo
+:::demo
 Tree/display/showType-default
-::::
+:::
 
-悬浮：仅悬浮时显示按钮。
+悬浮展示：仅鼠标悬浮时显示按钮。
 
-::::demo
+:::demo
 Tree/display/showType-hover
-::::
+:::
 
-点击：点击某一行显示其按钮，再次点击收起。
+点击展示：点击某一行显示其按钮，再次点击收起。
 
-::::demo
+:::demo
 Tree/display/showType-click
-::::
+:::
 
 ### 布局与样式（indent/showLine/showRowLine）
 
-缩进间距：通过 `indent` 控制层级缩进。
+缩进间距：通过 `indent` 控制层级缩进（像素）。
 
-::::demo
+:::demo
 Tree/layout/indent
-::::
+:::
 
-连线：显示左侧父子连接虚线。
+父子连线：显示左侧父子连接虚线。
 
-::::demo
+:::demo
 Tree/layout/showLine
-::::
+:::
 
 行内连线：显示每一行右侧延伸虚线。
 
-::::demo
+:::demo
 Tree/layout/showRowLine
-::::
+:::
 
 ### 图标（childIcon/parentIcon/icon）
 
 子节点图标：为叶子节点设置图标。
 
-::::demo
+:::demo
 Tree/icons/childIcon
-::::
+:::
 
 父节点图标：为非叶子节点设置图标。
 
-::::demo
+:::demo
 Tree/icons/parentIcon
-::::
+:::
 
 函数图标：根据行数据返回不同图标。
 
-::::demo
+:::demo
 Tree/icons/icon-function
-::::
+:::
 
 ### 行内按钮（buttons）
 
-内置三种类型：`add`/`edit`/`delete`，自动匹配图标，可设置 `tooltip` 与 `event`。
+内置类型按钮：`add`\|`edit`\|`delete`，自动匹配图标，可设置 `tooltip` 与 `event`。
 
-::::demo
+:::demo
 Tree/buttons/types
-::::
+:::
 
-自定义图标：通过 `icon` 传入组件或字符串图标。
+自定义图标按钮：通过 `icon` 传入组件或字符串图标。
 
-::::demo
+:::demo
 Tree/buttons/customIcon
-::::
+:::
 
 插槽（字符串）按钮：在按钮区域渲染具名插槽内容。
 
-::::demo
+:::demo
 Tree/buttons/slotString
-::::
+:::
 
 插槽（函数）按钮：通过函数返回自定义 vnode。
 
-::::demo
+:::demo
 Tree/buttons/slotFunction
-::::
+:::
 
 ### 级联选择（levelSelect）
 
-点击某节点时高亮该节点及其所有子孙；再次点击取消，`change` 返回当前所有高亮的行数组。
+级联高亮：点击节点高亮自身与所有子孙；再次点击取消，`change` 返回当前所有高亮的行数组。
 
-::::demo
+:::demo
 Tree/levelSelect/levelSelect
-::::
+:::
 
 ### 事件（node-click/change）
 
-节点点击：返回节点数据、内部节点信息与鼠标事件。
+节点点击事件：返回节点数据、内部节点信息与鼠标事件。
 
-::::demo
+:::demo
 Tree/events/node-click
-::::
+:::
 
 ## API
 
 ### Props
 
-| 参数 | 说明 | 类型 | 默认值 |
-| --- | --- | --- | --- |
-| data | 树数据（扁平或嵌套） | `any[]` | `[]` |
-| childrenField | 子节点字段名 | `string` | `'children'` |
-| rowField | 行主键字段名 | `string` | `'id'` |
-| parentField | 父主键字段名（与 `rowField` 同用时将忽略 `childrenField` 并自动构建树） | `string` | `''` |
-| labelField | 显示文本字段名 | `string` | `'label'` |
-| childIcon | 叶子节点图标 | `Component` \| `string` | `undefined` |
-| parentIcon | 非叶子节点图标 | `Component` \| `string` | `undefined` |
-| icon | 根据行数据返回图标 | ^[Function]`(row: any) => Component | string` | `undefined` |
-| showType | 行按钮展示方式 | `'hover'` \| `'click'` \| `'default'` | `'default'` |
-| buttons | 为每一行返回按钮数组 | ^[Function]`(row: any) => ButtonsItem[]` | `undefined` |
-| indent | 每级缩进像素 | `number` | `16` |
-| showLine | 是否显示左侧父子连接线 | `boolean` | `false` |
-| showRowLine | 是否显示每一行右侧延伸线 | `boolean` | `false` |
-| levelSelect | 是否开启级联高亮与 `change` 事件 | `boolean` | `false` |
+| 参数            | 说明 | 类型                                                                              | 默认值 |
+|---------------| --- |---------------------------------------------------------------------------------| --- |
+| data          | 树数据（扁平或嵌套） | `any[]`                                                                         | `[]` |
+| childrenField | 子节点字段名 | `string`                                                                        | `'children'` |
+| rowField      | 行主键字段名 | `string`                                                                        | `'id'` |
+| parentField   | 父主键字段名（与 `rowField` 同用时将忽略 `childrenField` 并自动构建树） | `string`                                                                        | `''` |
+| labelField    | 显示文本字段名 | `string`                                                                        | `'label'` |
+| childIcon     | 叶子节点图标 | `Component` \| `string`                                                         | `undefined` |
+| parentIcon    | 非叶子节点图标 | `Component` \| `string`                                                         | `undefined` |
+| icon          | 根据行数据返回图标 | ^[Function]`(row: any) => Component                                             | string` | `undefined` |
+| showType      | 行按钮展示方式 | `'hover'` \| `'click'` \| `'default'`                                           | `'default'` |
+| buttons       | 为每一行返回按钮数组 | ^[Function]`(row: any) => { type?: 'add'\|'edit' \|'delete'; slot?: string\| ((...args:any[])=>any); icon?: Component \| string; event?: (data?: any, node?: any) => void; tooltip?: string}[]}` | `undefined` |
+| indent        | 每级缩进像素 | `number`                                                                        | `16` |
+| showLine      | 是否显示左侧父子连接线 | `boolean`                                                                       | `false` |
+| showRowLine   | 是否显示每一行右侧延伸线 | `boolean`                                                                       | `false` |
+| levelSelect   | 是否开启级联高亮与 `change` 事件 | `boolean`                                                                       | `false` |
 
-> `ButtonsItem` 结构：`{ type?: 'add'|'edit'|'delete'; slot?: string \| ((...args:any[])=>any); icon?: Component \| string; event?: (data?: any, node?: any) => void; tooltip?: string }`
 
 ### Events
 
@@ -174,6 +173,8 @@ Tree/events/node-click
 
 ### Expose
 
-该组件暂无暴露方法。
+| 名称 | 说明 | 类型 |
+| --- | --- | --- |
+| getTree | 获取内部 `ElTreeV2` 实例 | ^[Function]`() => any` |
 
 

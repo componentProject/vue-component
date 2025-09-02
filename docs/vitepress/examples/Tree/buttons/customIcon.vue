@@ -4,7 +4,6 @@
 </template>
 
 <script setup lang="ts">
-import Tree from '@moluoxixi/components/Tree/index.ts'
 import { Document } from '@element-plus/icons-vue'
 import type { ButtonsItem } from '@moluoxixi/components/Tree/src/types/index.ts'
 

@@ -98,7 +98,7 @@ import type { ButtonsItem, TreeProps } from './types'
 import { Delete, Edit, Plus } from '@element-plus/icons-vue'
 
 defineOptions({
-  name: 'WlTree',
+  name: 'Tree',
   inheritAttrs: false,
 })
 
