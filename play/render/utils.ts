@@ -18,7 +18,7 @@ interface allComponentListType {
  * @returns - 组件代码映射
  */
 const dependencyMapping: DependencyMap = {
-  vue: 'Vue',
+  vue: '$_Vue',
 }
 
 /**
@@ -492,7 +492,7 @@ async function replaceImportsAndExports(componentCode: string, componentName: st
     // 一次性加载所有未加载的依赖组件
     if (dependencies.length > 0) {
       console.log(`正在加载${componentName}的依赖组件:`, dependencies)
-      await loadRemoteComponents(componentMapping.Vue, allComponentList, dependencies)
+      await loadRemoteComponents(componentMapping.$_Vue, allComponentList, dependencies)
     }
     const allExports = analyzeExports(componentCode)
     console.log(`${componentName}所有解析的export语句:`, allExports)
@@ -515,7 +515,7 @@ async function replaceImportsAndExports(componentCode: string, componentName: st
 
   return processedComponents
 }
-export async function load(Vue: any, originComponentNames: string[]) {
+export async function load($_Vue: any, originComponentNames: string[]) {
   const listRes = await getList({
     productCode: 'webFile_his',
     vue: ['Vue3'],
@@ -527,21 +527,22 @@ export async function load(Vue: any, originComponentNames: string[]) {
     const packageName = getPackageNameFromComponentName(item.componentCode)
     addToDependencyMapping(packageName, item.componentCode)
   })
-  componentMapping.Vue = Vue
-  return await loadRemoteComponents(Vue, allComponentList, componentNames)
+  componentMapping.$_Vue = $_Vue
+  return await loadRemoteComponents($_Vue, allComponentList, componentNames)
 }
 /**
  * 加载远程组件
- * @param Vue
+ * @param $_Vue
  * @param allComponentList 所有组件集合{id, componentCode}
  * @param componentNames 当前要加载的组件集合
  */
-export async function loadRemoteComponents(Vue: any, allComponentList: allComponentListType[], componentNames: string[]) {
+export async function loadRemoteComponents($_Vue: any, allComponentList: allComponentListType[], componentNames: string[]) {
   const componentDownList = await getDownLoadByIds(allComponentList.filter((item: any) => componentNames.includes(item.componentCode)).map((i: any) => i.id))
   const componentResults: Record<string, any> = {}
   for (const componentRes of componentDownList) {
     const orginComponentCode = componentRes.content
     const componentName = componentRes.name
+    console.log('99999999999999999999', orginComponentCode)
     const componentsCode = await replaceImportsAndExports(orginComponentCode, componentName, allComponentList)
     console.log('componentsCode', componentsCode)
     // 组件结果对象，这将作为函数的返回值
@@ -559,11 +560,13 @@ export async function loadRemoteComponents(Vue: any, allComponentList: allCompon
 
         // 注入process对象和组件映射对象
         // eslint-disable-next-line no-new-func
-        const componentsCodeResult = new Function('Vue', 'process', 'componentMapping', codeString)(Vue, {
+        console.log('11111111', codeString);
+        const componentsCodeResult = new Function('$_Vue', 'process', 'componentMapping', codeString)($_Vue, {
           env: {
             NODE_ENV: 'production',
           },
         }, componentMapping)
+        console.log('22222222222222', $_Vue)
         const { default: component } = componentsCodeResult
         componentResults[name] = component
 
@@ -586,24 +589,24 @@ export async function loadRemoteComponents(Vue: any, allComponentList: allCompon
   return componentResults
 }
 
-export async function loadCodeStr(Vue: any, allComponentList: allComponentListType[], originComponentNames: string[]) {
+export async function loadCodeStr($_Vue: any, allComponentList: allComponentListType[], originComponentNames: string[]) {
   const componentNames = originComponentNames?.length > 0 ? originComponentNames : allComponentList.map(i => i.componentCode)
   // 预先为所有组件添加依赖映射
   allComponentList.forEach((item) => {
     const packageName = getPackageNameFromComponentName(item.componentCode)
     addToDependencyMapping(packageName, item.componentCode)
   })
-  componentMapping.Vue = Vue
-  return await loadRemoteComponentsStr(Vue, allComponentList, componentNames)
+  componentMapping.$_Vue = $_Vue
+  return await loadRemoteComponentsStr($_Vue, allComponentList, componentNames)
 }
 
 /**
  * 加载远程组件
- * @param Vue
+ * @param $_Vue
  * @param allComponentList 所有组件集合{id, componentCode}
  * @param componentNames 当前要加载的组件集合
  */
-export async function loadRemoteComponentsStr(Vue: any, allComponentList: allComponentListType[], componentNames: string[]) {
+export async function loadRemoteComponentsStr($_Vue: any, allComponentList: allComponentListType[], componentNames: string[]) {
   const componentDownList = await getDownLoadByIds(allComponentList.filter((item: any) => componentNames.includes(item.componentCode)).map((i: any) => i.id))
   const componentResults: Record<string, any> = {}
   for (const componentRes of componentDownList) {
