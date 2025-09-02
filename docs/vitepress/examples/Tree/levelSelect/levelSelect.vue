@@ -5,7 +5,6 @@
 </template>
 
 <script setup lang="ts">
-import Tree from '@moluoxixi/components/Tree/index.ts'
 import { ref, computed } from 'vue'
 
 const tree = [

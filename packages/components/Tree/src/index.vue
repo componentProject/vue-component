@@ -7,12 +7,7 @@
       :height="height"
       :expand-on-click-node="false"
       highlight-current
-      :props="{
-        class: treeClass,
-        label: props.labelField,
-        children: props.childrenField,
-        value: props.rowField,
-      }"
+      :props="treeProps"
       v-bind="$attrs"
       @node-click="onRowClick"
     >
@@ -103,7 +98,7 @@ import type { ButtonsItem, TreeProps } from './types'
 import { Delete, Edit, Plus } from '@element-plus/icons-vue'
 
 defineOptions({
-  name: 'WlTree',
+  name: 'Tree',
   inheritAttrs: false,
 })
 
@@ -112,6 +107,7 @@ const props = withDefaults(defineProps<TreeProps>(), {
   rowField: 'id',
   parentField: '',
   labelField: 'label',
+  childrenField: 'children',
   showType: 'default',
   indent: 16,
   showLine: false,
@@ -122,6 +118,23 @@ const emit = defineEmits<{
   (event: 'nodeClick', data: TreeNodeData, node: TreeNode, evt: MouseEvent): void
   (event: 'change', rows: any[]): void
 }>()
+
+const treeProps = computed(() => {
+  const { class: _classNames, ...rest } = props.props || {}
+  const classNames = typeof _classNames === 'function' ? _classNames : () => _classNames
+  return {
+    class: (data: TreeNodeData) => {
+      return {
+        ...treeClass(data),
+        ...classNames(data),
+      }
+    },
+    label: props.labelField,
+    children: props.childrenField,
+    value: props.rowField,
+    ...rest,
+  }
+})
 
 const height = ref()
 const treeContainer = useTemplateRef('treeContainer')

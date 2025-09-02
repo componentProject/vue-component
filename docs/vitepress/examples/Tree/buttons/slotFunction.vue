@@ -4,7 +4,6 @@
 </template>
 
 <script setup lang="tsx">
-import Tree from '@moluoxixi/components/Tree/index.ts'
 import type { ButtonsItem } from '@moluoxixi/components/Tree/src/types/index.ts'
 
 const tree = [

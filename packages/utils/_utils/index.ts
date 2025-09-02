@@ -2,6 +2,10 @@ import moment from 'moment'
 import type { App, Component } from 'vue'
 import { Fragment } from 'vue'
 
+import type { DebounceSettings, ThrottleSettings } from 'lodash'
+//#region 时间控制：节流/防抖
+import { debounce as lodashDebounce, throttle as lodashThrottle } from 'lodash'
+
 export type DateType = string | Date | moment.Moment
 
 export function filterEmpty(children = []) {
@@ -314,3 +318,105 @@ export function withInstall<T extends Component>(component: T): WithInstall<T> {
   }
   return component as WithInstall<T>
 }
+
+type ThrottleExtraOptions = ThrottleSettings & { promise?: boolean }
+
+/**
+ * 节流：默认使用 lodash 节流，配置 { trailing: true, leading: false }，可自定义；
+ * 当开启 promise 模式时，需等待上一次 Promise 完成（成功或失败）后，才会进行下一次执行，且仍遵循 wait 与 leading/trailing 语义。
+ */
+export function throttle<F extends (...args: any[]) => any>(
+  fn: F,
+  wait = 300,
+  options: ThrottleExtraOptions = { trailing: true, leading: false },
+): (...args: Parameters<F>) => ReturnType<F> | Promise<ReturnType<F>> {
+  const { promise, ...rest } = options
+  const merged: ThrottleSettings = { trailing: true, leading: false, ...rest }
+  if (!promise) {
+    // 直接返回 lodash 的节流函数
+    return lodashThrottle(fn, wait, merged) as unknown as (...args: Parameters<F>) => ReturnType<F>
+  }
+  else {
+    return promiseThrottle(fn, wait, merged)
+  }
+}
+
+export function promiseThrottle<F extends (...args: any[]) => any>(
+  fn: F,
+  wait = 300,
+  options: ThrottleSettings = { trailing: true, leading: false },
+): (...args: Parameters<F>) => ReturnType<F> | Promise<ReturnType<F>> {
+  // 校验与规范化配置：不允许 leading=false
+  if (options && 'leading' in options && options.leading === false)
+    throw new Error('[promiseThrottle] 不支持 leading=false（轻量无定时器模式要求 leading=true）')
+  // 上一次“实际开始执行”的时间戳（ms），作为时间窗基准
+  let lastInvokeTime = 0
+  // 当前正在执行中的 Promise（存在表示互斥锁），复用以避免并发执行
+  let inFlightPromise: Promise<any> | null = null
+  // 最近一次真正执行（完成 canInvoke）时返回的 Promise
+  let lastResultPromise: Promise<any> | null = null
+  // 记录窗口期内延后执行的调用闭包（避免直接给 this 起别名）
+  let lastCall: (() => Promise<ReturnType<F>>) | null = null
+  // 是否应该立即执行：
+  // - 首次调用：由 leading 决定
+  // - 非首次：距离上次开始时间已超过 wait
+  function shouldInvoke(now: number) {
+    return lastInvokeTime === 0 || (now - lastInvokeTime) >= wait
+  }
+
+  // 立即执行一次，并维护状态；执行结束后若有挂起则尝试补发
+  function invokeNow(thisArg: any, args: Parameters<F>) {
+    lastInvokeTime = Date.now()
+    const result = fn.apply(thisArg, args)
+    const p = Promise.resolve(result)
+    inFlightPromise = p
+    lastResultPromise = p
+
+    p.finally(() => {
+      inFlightPromise = null
+      // 轻量“无定时器”模式：仅在 finally 时机尝试一次 trailing 补发
+      if (lastCall) {
+        const now = Date.now()
+        if (shouldInvoke(now)) {
+          const call = lastCall
+          lastCall = null
+          return call()
+        }
+      }
+    })
+
+    return p as Promise<ReturnType<F>>
+  }
+
+  // 以“上次开始时间”为基准：仅当上一轮已完成且距上次开始时间已过 wait 才允许再次执行
+  return function throttled(this: any, ...args: Parameters<F>) {
+    const now = Date.now()
+    lastCall = () => invokeNow(this, args)
+
+    const canInvoke = !inFlightPromise && shouldInvoke(now)
+    if (canInvoke) {
+      return invokeNow(this, args)
+    }
+
+    if (inFlightPromise)
+      return inFlightPromise as Promise<ReturnType<F>>
+
+    if (lastResultPromise)
+      return lastResultPromise as Promise<ReturnType<F>>
+
+    return Promise.resolve(undefined as unknown as ReturnType<F>)
+  }
+}
+
+/**
+ * 防抖：默认使用 lodash 防抖，配置 { trailing: true, leading: false }，可自定义
+ */
+export function debounce<F extends (...args: any[]) => any>(
+  fn: F,
+  wait = 300,
+  options: DebounceSettings = { trailing: true, leading: false },
+): (...args: Parameters<F>) => ReturnType<F> {
+  const merged: DebounceSettings = { trailing: true, leading: false, ...options }
+  return lodashDebounce(fn, wait, merged) as unknown as (...args: Parameters<F>) => ReturnType<F>
+}
+//#endregion

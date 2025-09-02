@@ -4,7 +4,6 @@
 </template>
 
 <script setup lang="ts">
-import Tree from '@moluoxixi/components/Tree/index.ts'
 import { Folder as Parent } from '@element-plus/icons-vue'
 
 const tree = [

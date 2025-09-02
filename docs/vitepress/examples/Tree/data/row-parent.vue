@@ -4,7 +4,6 @@
 </template>
 
 <script setup lang="ts">
-import Tree from '@moluoxixi/components/Tree/index.ts'
 
 const list = [
   { id: 1, pid: null, name: '根 1' },
