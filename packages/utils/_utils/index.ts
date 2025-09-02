@@ -347,31 +347,95 @@ export function promiseThrottle<F extends (...args: any[]) => any>(
   options: ThrottleSettings = { trailing: true, leading: false },
 ): (...args: Parameters<F>) => ReturnType<F> | Promise<ReturnType<F>> {
   const merged: ThrottleSettings = { trailing: true, leading: false, ...options }
+  const leading = merged.leading ?? false
+  const trailing = merged.trailing ?? true
+
   let lastStartTime = 0
   let inFlightPromise: Promise<any> | null = null
+  let lastExecutedPromise: Promise<any> | null = null
+  let pendingArgs: Parameters<F> | null = null
+  let trailingTimer: any = null
+
+  function clearTrailingTimer() {
+    if (trailingTimer) {
+      clearTimeout(trailingTimer)
+      trailingTimer = null
+    }
+  }
+
+  function invokeNow(args: Parameters<F>) {
+    lastStartTime = Date.now()
+    const result = fn(...args)
+    const p = Promise.resolve(result)
+    inFlightPromise = p
+    lastExecutedPromise = p
+
+    p.finally(() => {
+      inFlightPromise = null
+      // 执行完成后，若存在挂起请求且开启 trailing，则在满足窗口后尝试补发
+      if (trailing && pendingArgs) {
+        tryInvokePending()
+      }
+    })
+
+    return p as Promise<ReturnType<F>>
+  }
+
+  function scheduleTrailing(remainingMs: number) {
+    clearTrailingTimer()
+    trailingTimer = setTimeout(() => {
+      trailingTimer = null
+      tryInvokePending()
+    }, Math.max(0, remainingMs))
+  }
+
+  function tryInvokePending() {
+    if (!trailing || !pendingArgs)
+      return
+    if (inFlightPromise) {
+      // 等待进行中的执行结束后，finally 会再次触发检查
+      return
+    }
+    const now = Date.now()
+    const timeSinceStart = now - lastStartTime
+    if (lastStartTime === 0 ? leading : timeSinceStart > wait) {
+      const args = pendingArgs
+      pendingArgs = null
+      invokeNow(args as Parameters<F>)
+    }
+    else {
+      scheduleTrailing(wait - timeSinceStart)
+    }
+  }
 
   // 以“上次开始时间”为基准：仅当上一轮已完成且距上次开始时间已过 wait 才允许再次执行
-  return async (...args: Parameters<F>) => {
+  return (...args: Parameters<F>) => {
     const now = Date.now()
-    const canInvoke = !inFlightPromise && (now - lastStartTime > wait)
+    const timeSinceStart = now - lastStartTime
+    const firstCall = lastStartTime === 0
+    const canInvoke = !inFlightPromise && (firstCall ? !!leading : timeSinceStart > wait)
+
     if (canInvoke) {
-      lastStartTime = now
-      const result = fn(...args)
-      const p = Promise.resolve(result)
-      inFlightPromise = p
-
-      p.finally(() => {
-        inFlightPromise = null
-      })
-
-      return p as Promise<ReturnType<F>>
+      clearTrailingTimer()
+      return invokeNow(args)
     }
 
-    // 若正有执行中的调用，则复用其 Promise；否则返回一个已解析的 undefined
+    // 记录挂起参数以便 trailing 在窗口结束后进行一次补发
+    if (trailing) {
+      pendingArgs = args
+      if (!inFlightPromise) {
+        const remaining = firstCall ? wait : Math.max(0, wait - timeSinceStart)
+        scheduleTrailing(remaining)
+      }
+    }
+
+    // 若正有执行中的调用，则复用其 Promise；否则根据配置返回上一次 canInvoke 的 Promise 或 undefined
     if (inFlightPromise)
       return inFlightPromise as Promise<ReturnType<F>>
 
-    // 尚未执行过或刚完成但未到 wait，返回一个已解析的 undefined
+    if (trailing && lastExecutedPromise)
+      return lastExecutedPromise as Promise<ReturnType<F>>
+
     return Promise.resolve(undefined as unknown as ReturnType<F>)
   }
 }

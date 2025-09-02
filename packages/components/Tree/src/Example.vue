@@ -104,6 +104,16 @@ const treeList = [
           // },
         ],
       },
+      {
+        id: 12,
+        name: '子 1-2',
+        children: [
+          {
+            id: 121,
+            name: '子 1-2-1',
+          },
+        ],
+      },
     ],
   },
 ]
@@ -120,27 +130,24 @@ function iconByType(row: any) {
   return row.type === 'dir' ? Folder : Document
 }
 
-function renderButtons(row: any): ButtonsItem[] {
+function renderButtons(): ButtonsItem[] {
   return [
     {
       type: 'add',
       tooltip: '新增子节点',
-      event: () => alert(`add: ${row.name}`),
     },
     {
       type: 'edit',
       tooltip: '编辑',
-      event: () => alert(`edit: ${row.name}`),
     },
     {
       type: 'delete',
       tooltip: '删除',
-      event: () => alert(`delete: ${row.name}`),
     },
   ]
 }
 
-function renderCustomButtons(row: any): ButtonsItem[] {
+function renderCustomButtons(): ButtonsItem[] {
   return [
     {
       slot: 'customSlot',
@@ -148,14 +155,11 @@ function renderCustomButtons(row: any): ButtonsItem[] {
     {
       icon: Document,
       tooltip: '函数按钮',
-      event: () => alert(`function btn: ${row.name}`),
     },
   ]
 }
 
-function onAlert(message: string) {
-  // 使用显式函数避免在模板中直接访问全局对象导致的类型提示问题
-  window.alert(message)
+function onAlert() {
 }
 
 const selectedRows = ref<any[]>([])
