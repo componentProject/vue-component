@@ -2,6 +2,10 @@ import moment from 'moment'
 import type { App, Component } from 'vue'
 import { Fragment } from 'vue'
 
+import type { DebounceSettings, ThrottleSettings } from 'lodash'
+//#region 时间控制：节流/防抖
+import { debounce as lodashDebounce, throttle as lodashThrottle } from 'lodash'
+
 export type DateType = string | Date | moment.Moment
 
 export function filterEmpty(children = []) {
@@ -314,3 +318,73 @@ export function withInstall<T extends Component>(component: T): WithInstall<T> {
   }
   return component as WithInstall<T>
 }
+
+type ThrottleExtraOptions = ThrottleSettings & { promise?: boolean }
+
+/**
+ * 节流：默认使用 lodash 节流，配置 { trailing: true, leading: false }，可自定义；
+ * 当开启 promise 模式时，需等待上一次 Promise 完成（成功或失败）后，才会进行下一次执行，且仍遵循 wait 与 leading/trailing 语义。
+ */
+export function throttle<F extends (...args: any[]) => any>(
+  fn: F,
+  wait = 300,
+  options: ThrottleExtraOptions = { trailing: true, leading: false },
+): (...args: Parameters<F>) => ReturnType<F> | Promise<ReturnType<F>> {
+  const { promise, ...rest } = options
+  const merged: ThrottleSettings = { trailing: true, leading: false, ...rest }
+  if (!promise) {
+    // 直接返回 lodash 的节流函数
+    return lodashThrottle(fn, wait, merged) as unknown as (...args: Parameters<F>) => ReturnType<F>
+  }
+  else {
+    return promiseThrottle(fn, wait, merged)
+  }
+}
+
+export function promiseThrottle<F extends (...args: any[]) => any>(
+  fn: F,
+  wait = 300,
+  options: ThrottleSettings = { trailing: true, leading: false },
+): (...args: Parameters<F>) => ReturnType<F> | Promise<ReturnType<F>> {
+  const merged: ThrottleSettings = { trailing: true, leading: false, ...options }
+  let lastStartTime = 0
+  let inFlightPromise: Promise<any> | null = null
+
+  // 以“上次开始时间”为基准：仅当上一轮已完成且距上次开始时间已过 wait 才允许再次执行
+  return async (...args: Parameters<F>) => {
+    const now = Date.now()
+    const canInvoke = !inFlightPromise && (now - lastStartTime > wait)
+    if (canInvoke) {
+      lastStartTime = now
+      const result = fn(...args)
+      const p = Promise.resolve(result)
+      inFlightPromise = p
+
+      p.finally(() => {
+        inFlightPromise = null
+      })
+
+      return p as Promise<ReturnType<F>>
+    }
+
+    // 若正有执行中的调用，则复用其 Promise；否则返回一个已解析的 undefined
+    if (inFlightPromise)
+      return inFlightPromise as Promise<ReturnType<F>>
+
+    // 尚未执行过或刚完成但未到 wait，返回一个已解析的 undefined
+    return Promise.resolve(undefined as unknown as ReturnType<F>)
+  }
+}
+
+/**
+ * 防抖：默认使用 lodash 防抖，配置 { trailing: true, leading: false }，可自定义
+ */
+export function debounce<F extends (...args: any[]) => any>(
+  fn: F,
+  wait = 300,
+  options: DebounceSettings = { trailing: true, leading: false },
+): (...args: Parameters<F>) => ReturnType<F> {
+  const merged: DebounceSettings = { trailing: true, leading: false, ...options }
+  return lodashDebounce(fn, wait, merged) as unknown as (...args: Parameters<F>) => ReturnType<F>
+}
+//#endregion
