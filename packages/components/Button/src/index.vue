@@ -7,7 +7,7 @@
     <template #reference>
       <ElButton
         v-bind="$attrs"
-        :disabled="isDisabled"
+        :disabled="props.disabled"
         @click="onClick"
       >
         <slot />
@@ -20,7 +20,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, useAttrs } from 'vue'
+import { computed } from 'vue'
 import { ElButton, ElPopover } from 'element-plus'
 import { debounce as wlDebounce, throttle as wlThrottle } from '@moluoxixi/utils/_utils'
 import type { DebounceSettings, ThrottleSettings } from 'lodash'
@@ -35,17 +35,18 @@ const props = withDefaults(defineProps<{
   showType?: ShowType
   content?: string
   popoverProps?: Record<string, any>
-
+  disabled?: boolean
   // 交互增强：参考 PopoverTableSelect；二者若同时传入，优先防抖
   debounce?: number
   throttle?: number
   options?: ThrottleOrDebounceOptions
 }>(), {
-  showType: 'disabled',
+  showType: 'content',
   content: '',
   popoverProps: () => ({ placement: 'top', trigger: 'hover' }),
   debounce: 0,
   throttle: 300,
+  disabled: false,
   options: () => ({}),
 })
 
@@ -57,14 +58,14 @@ type ThrottleOrDebounceOptions = Partial<DebounceSettings & ThrottleSettings> & 
 
 type ShowType = 'disabled' | 'content'
 
-const attrs = useAttrs()
-const isDisabled = computed(() => Boolean((attrs as any)?.disabled))
-
 const computedShowPopover = computed(() => {
+  if (!props.content) {
+    return false
+  }
   if (props.showType === 'content')
     return true
   // disabled 模式：当按钮被禁用时展示 popover
-  return props.showType === 'disabled' && isDisabled.value
+  return props.showType === 'disabled' && props.disabled
 })
 
 const computedOptions = computed<ThrottleOrDebounceOptions>(() => {

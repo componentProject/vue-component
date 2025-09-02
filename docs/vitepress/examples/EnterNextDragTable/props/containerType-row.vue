@@ -7,7 +7,7 @@
       height="300"
     >
       <template #input="{ row, column }">
-        <ElInput v-model="row[column.field]" />
+        <ElInput v-model="row[column.field]" size="small" />
       </template>
     </EnterNextDragTable>
   </div>

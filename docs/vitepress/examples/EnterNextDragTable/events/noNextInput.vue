@@ -8,7 +8,7 @@
       @no-next-input="last = $event"
     >
       <template #input="{ row, column }">
-        <ElInput v-model="row[column.field]" />
+        <ElInput v-model="row[column.field]" size="small" />
       </template>
     </EnterNextDragTable>
     <div class="value">

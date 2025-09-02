@@ -37,7 +37,7 @@ function handleAsyncInput(v: string) {
     setTimeout(() => {
       lastInput.value = v
       resolve()
-    }, 500)
+    }, 800)
   })
 }
 </script>

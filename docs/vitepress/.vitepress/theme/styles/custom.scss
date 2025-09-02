@@ -17,6 +17,10 @@
 }
 
 .vp-doc {
+  p {
+    white-space: pre-wrap;
+  }
+
   table {
     display: table !important;
     width: 100%;

@@ -140,7 +140,7 @@ PopoverTableSelect/popoverProps/width
 | offset | 偏移量 | Number | 12 |
 | transition | 动画 | String | 'el-fade-in-linear' |
 | showArrow | 是否显示箭头 | Boolean | true |
-| popperOptions | Popper.js 配置 | Object | `{ modifiers: [{ name: 'computeStyles', options: { gpuAcceleration: false } }] }` |
+| popperOptions | Popper.js 配置 | Object | ^[Object]`{ modifiers: [{ name: 'computeStyles', options: { gpuAcceleration: false } }] }` |
 | popperClass | 自定义 class | String | '' |
 | popperStyle | 自定义样式 | String\|Object | '' |
 | showAfter | 显示延迟 | Number | 0 |

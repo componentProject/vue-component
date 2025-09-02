@@ -8,7 +8,7 @@
     "dev": "vitepress dev",
     "build": "vitepress build",
     "preview": "vitepress preview",
-    "eslint": "eslint . --ext .vue,.js,.jsx,.ts,.tsx --fix"
+    "eslint": "eslint . --ext .vue,.js,.jsx,.ts,.tsx,.md --fix"
   },
   "repository": {
     "type": "git",
