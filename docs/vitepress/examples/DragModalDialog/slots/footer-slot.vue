@@ -1,6 +1,8 @@
 <template>
   <div class="container" style="height: 100px;">
-    <ElButton @click="visible = true">自定义底部操作区</ElButton>
+    <ElButton @click="visible = true">
+      自定义底部操作区
+    </ElButton>
 
     <DragModalDialog
       v-model:visible="visible"
@@ -12,9 +14,15 @@
 
       <template #footer>
         <div style="padding: 10px 20px; text-align: right;">
-          <ElButton @click="visible = false">取消</ElButton>
-          <ElButton type="success" @click="handleSave">保存</ElButton>
-          <ElButton type="primary" @click="handleSubmit">提交</ElButton>
+          <ElButton @click="visible = false">
+            取消
+          </ElButton>
+          <ElButton type="success" @click="handleSave">
+            保存
+          </ElButton>
+          <ElButton type="primary" @click="handleSubmit">
+            提交
+          </ElButton>
         </div>
       </template>
     </DragModalDialog>
@@ -23,17 +31,17 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import DragModalDialog from '@moluoxixi/components/DragModalDialog'
+
 import { ElButton } from 'element-plus'
 
 const visible = ref(false)
 
-const handleSave = () => {
+function handleSave() {
   ElMessage.success('保存成功')
   visible.value = false
 }
 
-const handleSubmit = () => {
+function handleSubmit() {
   ElMessage.success('提交成功')
   visible.value = false
 }

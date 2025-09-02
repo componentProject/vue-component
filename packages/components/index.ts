@@ -14,6 +14,7 @@ import Button from '@moluoxixi/components/Button'
 import ConfigTable from '@moluoxixi/components/ConfigTable'
 import ConfigForm from '@moluoxixi/components/ConfigForm'
 import Tree from '@moluoxixi/components/Tree'
+import DragModalDialog from '@moluoxixi/components/DragModalDialog'
 
 export {
   Button,
@@ -21,6 +22,7 @@ export {
   ConfigTable,
   DateRangePicker,
   DraggableTable,
+  DragModalDialog,
   EnterNextContainer,
   EnterNextDragTable,
   EnterNextTable,
@@ -32,7 +34,7 @@ export {
   Tree,
 }
 
-const components: Component[] = [ConfigTable, ConfigForm, DateRangePicker, DraggableTable, EnterNextContainer, EnterNextDragTable, EnterNextTable, ExportExcel, ImportExcel, Button, PopoverTableSelect, Select, Tabs, Tree]
+const components: Component[] = [DragModalDialog, ConfigTable, ConfigForm, DateRangePicker, DraggableTable, EnterNextContainer, EnterNextDragTable, EnterNextTable, ExportExcel, ImportExcel, Button, PopoverTableSelect, Select, Tabs, Tree]
 
 export default {
   install(app: App) {

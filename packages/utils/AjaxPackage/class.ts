@@ -27,15 +27,15 @@ export default class BaseApi {
     this.setupInterceptors()
   }
 
-  processRequestConfig(config: InternalAxiosRequestConfig) {
+  abstract processRequestConfig(config: InternalAxiosRequestConfig) {
     return config
   }
 
-  processResponseConfig(data: AxiosResponse['data']): AxiosResponse['data'] {
+  abstract processResponseConfig(data: AxiosResponse['data']): AxiosResponse['data'] {
     return data
   }
 
-  async processResponseError(error: AxiosError): Promise<AxiosError> {
+  abstract async processResponseError(error: AxiosError): Promise<AxiosError> {
     return error
   }
 

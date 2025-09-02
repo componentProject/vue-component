@@ -1,6 +1,8 @@
 <template>
   <div class="container" style="height: 300px;">
-    <ElButton @click="visible = true">事件处理示例</ElButton>
+    <ElButton @click="visible = true">
+      事件处理示例
+    </ElButton>
 
     <div style="margin-top: 10px;">
       <p>事件日志：</p>
@@ -27,13 +29,13 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import DragModalDialog from '@moluoxixi/components/DragModalDialog'
+
 import { ElButton } from 'element-plus'
 
 const visible = ref(false)
 const eventLogs = ref<string[]>([])
 
-const addLog = (message: string) => {
+function addLog(message: string) {
   const timestamp = new Date().toLocaleTimeString()
   eventLogs.value.unshift(`[${timestamp}] ${message}`)
 

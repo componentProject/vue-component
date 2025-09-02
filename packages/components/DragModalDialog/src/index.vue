@@ -6,7 +6,7 @@
         class="modal-overlay"
         :class="[
           { 'modal-overlay-draggable': draggable },
-          { 'modal-overlay-penetrate': penetrate }
+          { 'modal-overlay-penetrate': penetrate },
         ]"
         :style="overlayStyle"
         @click="handleOverlayClick"
@@ -149,6 +149,36 @@
 <script setup lang="ts">
 import { computed, nextTick, onMounted, ref, watch } from 'vue'
 
+defineOptions({
+  name: 'DragModalDialog',
+})
+const props = withDefaults(defineProps<Props>(), {
+  visible: false,
+  title: '提示',
+  content: '',
+  size: 'medium',
+  draggable: false,
+  resizable: false,
+  showClose: true,
+  showFooter: true,
+  showCancel: true,
+  showConfirm: true,
+  cancelText: '取消',
+  confirmText: '确定',
+  confirmDisabled: false,
+  mask: true,
+  maskClosable: true,
+  zIndex: 1000,
+  minWidth: 300,
+  minHeight: 200,
+  margin: 16,
+  rememberPosition: false,
+  positionKey: '',
+  penetrate: false,
+})
+
+const emit = defineEmits<Emits>()
+
 interface Props {
   /** 控制对话框显示/隐藏 */
   visible?: boolean
@@ -220,33 +250,6 @@ interface Emits {
   (e: 'update:left', left: string | number): void
 }
 
-const props = withDefaults(defineProps<Props>(), {
-  visible: false,
-  title: '提示',
-  content: '',
-  size: 'medium',
-  draggable: false,
-  resizable: false,
-  showClose: true,
-  showFooter: true,
-  showCancel: true,
-  showConfirm: true,
-  cancelText: '取消',
-  confirmText: '确定',
-  confirmDisabled: false,
-  mask: true,
-  maskClosable: true,
-  zIndex: 1000,
-  minWidth: 300,
-  minHeight: 200,
-  margin: 16,
-  rememberPosition: false,
-  positionKey: '',
-  penetrate: false,
-})
-
-const emit = defineEmits<Emits>()
-
 // 状态管理
 const modalRef = ref<HTMLElement>()
 const isDragging = ref(false)
@@ -280,7 +283,7 @@ interface PositionData {
 const interactionEndTime = ref(0)
 
 // 修改 handleOverlayClick 函数
-function handleOverlayClick(event: MouseEvent) {
+function handleOverlayClick() {
   // 如果正在拖拽或调整大小，不关闭弹窗
   if (isDragging.value || isResizing.value) {
     return
@@ -757,12 +760,13 @@ const overlayStyle = computed(() => {
   // 根据mask属性决定是否显示背景色
   if (props.mask) {
     style.backgroundColor = 'rgba(0, 0, 0, 0.5)'
-  } else {
+  }
+  else {
     style.backgroundColor = 'transparent'
   }
 
   // 添加穿透样式
-if (props.penetrate && !props.mask) {
+  if (props.penetrate && !props.mask) {
     style.pointerEvents = 'none'
   }
 
@@ -780,12 +784,13 @@ function clearPosition() {
     nextTick(() => {
       initPosition()
     })
-  } catch (error) {
+  }
+  catch (error) {
     console.warn('Failed to clear modal position from localStorage:', error)
   }
 }
 defineExpose({
-  clearPosition
+  clearPosition,
 })
 </script>
 

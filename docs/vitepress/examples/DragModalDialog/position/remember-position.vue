@@ -1,7 +1,11 @@
 <template>
   <div class="container" style="height: 100px;">
-    <ElButton @click="visible = true">位置记忆示例</ElButton>
-    <ElButton @click="clearPosition" style="margin-left: 10px;">清除位置记忆</ElButton>
+    <ElButton @click="visible = true">
+      位置记忆示例
+    </ElButton>
+    <ElButton style="margin-left: 10px;" @click="clearPosition">
+      清除位置记忆
+    </ElButton>
 
     <p style="margin: 10px 0; color: #666;">
       拖拽或调整大小后关闭，再次打开会记住上次的位置和大小
@@ -22,13 +26,13 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import DragModalDialog from '@moluoxixi/components/DragModalDialog'
+
 import { ElButton } from 'element-plus'
 
 const visible = ref(false)
 const dialogRef = ref()
 
-const clearPosition = () => {
+function clearPosition() {
   if (dialogRef.value) {
     dialogRef.value.clearPosition()
   }

@@ -1,6 +1,8 @@
 <template>
   <div class="container" style="height: 100px;">
-    <ElButton type="primary" @click="visible = true">打开基础弹窗</ElButton>
+    <ElButton type="primary" @click="visible = true">
+      打开基础弹窗
+    </ElButton>
 
     <DragModalDialog
       v-model:visible="visible"
@@ -15,16 +17,15 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import DragModalDialog from '@moluoxixi/components/DragModalDialog'
 
 const visible = ref(false)
 
-const handleConfirm = () => {
+function handleConfirm() {
   console.log('确认按钮被点击')
   visible.value = false
 }
 
-const handleCancel = () => {
+function handleCancel() {
   console.log('取消按钮被点击')
   visible.value = false
 }

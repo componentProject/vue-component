@@ -1374,13 +1374,13 @@ watch(
 //#endregion
 
 // 每页条数改变事件
-function handleSizeChange(size:any) {
+function handleSizeChange(size: any) {
   emit('update:pagination', { ...props.pagination, pageSize: size, pageIndex: 1 })
   emit('sizeChange', size)
 }
 
 // 页码改变事件
-function handleCurrentChange(current:any) {
+function handleCurrentChange(current: any) {
   emit('update:pagination', { ...props.pagination, pageIndex: current })
   emit('currentChange', current)
 }

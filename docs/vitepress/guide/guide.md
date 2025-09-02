@@ -12,24 +12,18 @@
 
 ```bash
 # npm
-npm install @moluoxixi/components
+npm install @moluoxixi/想用的组件名小写
 
 # yarn  
-yarn add @moluoxixi/components
+yarn add @moluoxixi/想用的组件名小写
 
 # pnpm
-pnpm add @moluoxixi/components
+pnpm add @moluoxixi/想用的组件名小写
 ```
 
 ## 🔨 使用
 
 ```ts
 // main.ts
-import {createApp} from 'vue'
-import MoluoxixiComponents from '@moluoxixi/components'
-import App from './App.vue'
-
-const app = createApp(App)
-app.use(MoluoxixiComponents)
-app.mount('#app')
+import 组件名 from '@moluoxixi/想用的组件名小写'
 ```
