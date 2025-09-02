@@ -346,95 +346,63 @@ export function promiseThrottle<F extends (...args: any[]) => any>(
   wait = 300,
   options: ThrottleSettings = { trailing: true, leading: false },
 ): (...args: Parameters<F>) => ReturnType<F> | Promise<ReturnType<F>> {
-  const merged: ThrottleSettings = { trailing: true, leading: false, ...options }
-  const leading = merged.leading ?? false
-  const trailing = merged.trailing ?? true
-
-  let lastStartTime = 0
+  // 校验与规范化配置：不允许 leading=false
+  if (options && 'leading' in options && options.leading === false)
+    throw new Error('[promiseThrottle] 不支持 leading=false（轻量无定时器模式要求 leading=true）')
+  // 上一次“实际开始执行”的时间戳（ms），作为时间窗基准
+  let lastInvokeTime = 0
+  // 当前正在执行中的 Promise（存在表示互斥锁），复用以避免并发执行
   let inFlightPromise: Promise<any> | null = null
-  let lastExecutedPromise: Promise<any> | null = null
-  let pendingArgs: Parameters<F> | null = null
-  let trailingTimer: any = null
-
-  function clearTrailingTimer() {
-    if (trailingTimer) {
-      clearTimeout(trailingTimer)
-      trailingTimer = null
-    }
+  // 最近一次真正执行（完成 canInvoke）时返回的 Promise
+  let lastResultPromise: Promise<any> | null = null
+  // 记录窗口期内延后执行的调用闭包（避免直接给 this 起别名）
+  let lastCall: (() => Promise<ReturnType<F>>) | null = null
+  // 是否应该立即执行：
+  // - 首次调用：由 leading 决定
+  // - 非首次：距离上次开始时间已超过 wait
+  function shouldInvoke(now: number) {
+    return lastInvokeTime === 0 || (now - lastInvokeTime) >= wait
   }
 
-  function invokeNow(args: Parameters<F>) {
-    lastStartTime = Date.now()
-    const result = fn(...args)
+  // 立即执行一次，并维护状态；执行结束后若有挂起则尝试补发
+  function invokeNow(thisArg: any, args: Parameters<F>) {
+    lastInvokeTime = Date.now()
+    const result = fn.apply(thisArg, args)
     const p = Promise.resolve(result)
     inFlightPromise = p
-    lastExecutedPromise = p
+    lastResultPromise = p
 
     p.finally(() => {
       inFlightPromise = null
-      // 执行完成后，若存在挂起请求且开启 trailing，则在满足窗口后尝试补发
-      if (trailing && pendingArgs) {
-        tryInvokePending()
+      // 轻量“无定时器”模式：仅在 finally 时机尝试一次 trailing 补发
+      if (lastCall) {
+        const now = Date.now()
+        if (shouldInvoke(now)) {
+          const call = lastCall
+          lastCall = null
+          return call()
+        }
       }
     })
 
     return p as Promise<ReturnType<F>>
   }
 
-  function scheduleTrailing(remainingMs: number) {
-    clearTrailingTimer()
-    trailingTimer = setTimeout(() => {
-      trailingTimer = null
-      tryInvokePending()
-    }, Math.max(0, remainingMs))
-  }
-
-  function tryInvokePending() {
-    if (!trailing || !pendingArgs)
-      return
-    if (inFlightPromise) {
-      // 等待进行中的执行结束后，finally 会再次触发检查
-      return
-    }
-    const now = Date.now()
-    const timeSinceStart = now - lastStartTime
-    if (lastStartTime === 0 ? leading : timeSinceStart > wait) {
-      const args = pendingArgs
-      pendingArgs = null
-      invokeNow(args as Parameters<F>)
-    }
-    else {
-      scheduleTrailing(wait - timeSinceStart)
-    }
-  }
-
   // 以“上次开始时间”为基准：仅当上一轮已完成且距上次开始时间已过 wait 才允许再次执行
-  return (...args: Parameters<F>) => {
+  return function throttled(this: any, ...args: Parameters<F>) {
     const now = Date.now()
-    const timeSinceStart = now - lastStartTime
-    const firstCall = lastStartTime === 0
-    const canInvoke = !inFlightPromise && (firstCall ? !!leading : timeSinceStart > wait)
+    lastCall = () => invokeNow(this, args)
 
+    const canInvoke = !inFlightPromise && shouldInvoke(now)
     if (canInvoke) {
-      clearTrailingTimer()
-      return invokeNow(args)
+      return invokeNow(this, args)
     }
 
-    // 记录挂起参数以便 trailing 在窗口结束后进行一次补发
-    if (trailing) {
-      pendingArgs = args
-      if (!inFlightPromise) {
-        const remaining = firstCall ? wait : Math.max(0, wait - timeSinceStart)
-        scheduleTrailing(remaining)
-      }
-    }
-
-    // 若正有执行中的调用，则复用其 Promise；否则根据配置返回上一次 canInvoke 的 Promise 或 undefined
     if (inFlightPromise)
       return inFlightPromise as Promise<ReturnType<F>>
 
-    if (trailing && lastExecutedPromise)
-      return lastExecutedPromise as Promise<ReturnType<F>>
+    if (lastResultPromise)
+      return lastResultPromise as Promise<ReturnType<F>>
 
     return Promise.resolve(undefined as unknown as ReturnType<F>)
   }
