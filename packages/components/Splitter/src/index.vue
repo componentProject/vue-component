@@ -20,7 +20,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { ElSplitter } from 'element-plus'
+import { ElSplitter, ElSplitterPanel } from 'element-plus'
 import type { slotsType } from '@moluoxixi/components/_types'
 
 // 面板配置接口
@@ -35,7 +35,7 @@ interface PanelConfig {
 
 // 定义组件选项
 defineOptions({
-  name: 'WlSplitter',
+  name: 'Splitter',
   inheritAttrs: false,
 })
 
