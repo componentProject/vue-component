@@ -20,5 +20,6 @@
   "ApiDialog": "0.0.4",
   "Splitter": "0.0.2",
   "Tree": "0.0.6",
-  "AIAgent": "0.0.5"
+  "AIAgent": "0.0.6",
+  "DragModalDialog": "0.0.2"
 }
