@@ -32,7 +32,7 @@ import type { InputInstance, InputProps, PopoverProps } from 'element-plus'
 import type { ComponentInternalInstance, ComponentPublicInstance, PropType } from 'vue'
 import { ElInput } from 'element-plus'
 import { debounce as wlDebounce, throttle as wlThrottle } from '@moluoxixi/utils/_utils'
-import type { DebounceSettingsLeading, ThrottleSettingsLeading } from 'lodash'
+import type { DebounceSettings, ThrottleSettings } from 'lodash'
 import { computed, ref, useTemplateRef, watch } from 'vue'
 import PopoverTableSelect from '@moluoxixi/components/PopoverTableSelect/src/base/index.vue'
 import type { slotsType } from '@moluoxixi/components/_types'
@@ -48,7 +48,7 @@ const props = defineProps({
    * @see https://github.com/pikax/vue-throttle-debounce#throttle
    * @see https://github.com/pikax/vue-throttle-debounce#debounce
    */
-  options: { type: Object as PropType<DebounceSettingsLeading | ThrottleSettingsLeading>, default: () => ({ trailing: true, leading: false }) },
+  options: { type: Object as PropType<ThrottleOrDebounceOptions>, default: () => ({}) },
   /**
    * 当类型为input时，默认显示输入框
    */
@@ -94,9 +94,14 @@ const props = defineProps({
     type: Function,
   },
 })
+
 const emits = defineEmits(['focus', 'blur', 'enter', 'clear'])
+
 // 获取插槽
 const slots = defineSlots<slotsType>()
+
+type ThrottleOrDebounceOptions = Partial<DebounceSettings & ThrottleSettings> & { promise?: boolean }
+
 const slotNames = computed<string[]>(() => Object.keys(slots) as string[])
 
 const popoverModel = defineModel({
@@ -163,11 +168,20 @@ function handleClear() {
   emits('clear')
 }
 
+const computedOptions = computed<ThrottleOrDebounceOptions>(() => {
+  const o = props.options || {}
+  if ((o as any).promise) {
+    // promiseThrottle 要求 leading=true
+    return { trailing: true, ...o, leading: true }
+  }
+  return { trailing: true, leading: false, ...o }
+})
+
 const computedInput = computed(() => {
   if (props.debounce)
-    return wlDebounce(handleInput, props.debounce, props.options)
+    return wlDebounce(handleInput, props.debounce, computedOptions.value)
   if (props.throttle) {
-    return wlThrottle(handleInput, props.throttle, props.options)
+    return wlThrottle(handleInput, props.throttle, computedOptions.value)
   }
   return handleInput
 })

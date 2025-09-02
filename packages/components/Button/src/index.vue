@@ -23,7 +23,7 @@
 import { computed, useAttrs } from 'vue'
 import { ElButton, ElPopover } from 'element-plus'
 import { debounce as wlDebounce, throttle as wlThrottle } from '@moluoxixi/utils/_utils'
-import type { DebounceSettingsLeading, ThrottleSettingsLeading } from 'lodash'
+import type { DebounceSettings, ThrottleSettings } from 'lodash'
 
 defineOptions({
   name: 'WlButton',
@@ -39,19 +39,21 @@ const props = withDefaults(defineProps<{
   // 交互增强：参考 PopoverTableSelect；二者若同时传入，优先防抖
   debounce?: number
   throttle?: number
-  options?: (DebounceSettingsLeading | ThrottleSettingsLeading) & { promise?: boolean }
+  options?: ThrottleOrDebounceOptions
 }>(), {
   showType: 'disabled',
   content: '',
   popoverProps: () => ({ placement: 'top', trigger: 'hover' }),
   debounce: 0,
   throttle: 300,
-  options: () => ({ trailing: true, leading: false }),
+  options: () => ({}),
 })
 
 const emit = defineEmits<{
   (e: 'click', ev: MouseEvent): void
 }>()
+
+type ThrottleOrDebounceOptions = Partial<DebounceSettings & ThrottleSettings> & { promise?: boolean }
 
 type ShowType = 'disabled' | 'content'
 
@@ -65,13 +67,22 @@ const computedShowPopover = computed(() => {
   return props.showType === 'disabled' && isDisabled.value
 })
 
+const computedOptions = computed<ThrottleOrDebounceOptions>(() => {
+  const o = props.options || {}
+  if (o.promise) {
+    // promiseThrottle 要求 leading=true
+    return { trailing: true, ...o, leading: true }
+  }
+  return { trailing: true, leading: false, ...o }
+})
+
 const onClick = (() => {
   const handler = (ev: MouseEvent) => emit('click', ev)
   if (props.debounce) {
-    return wlDebounce(handler, props.debounce, props.options)
+    return wlDebounce(handler, props.debounce, computedOptions.value)
   }
   if (props.throttle) {
-    return wlThrottle(handler, props.throttle, props.options)
+    return wlThrottle(handler, props.throttle, computedOptions.value)
   }
   return handler
 })()
