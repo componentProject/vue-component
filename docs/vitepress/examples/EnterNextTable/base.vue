@@ -4,13 +4,13 @@
     :data="tableData"
     :columns="columns"
     height="300"
-    :showPagination="true"
-    @no-next-input="handleNoNextInput"
+    :show-pagination="true"
     :pagination="paginationConfig"
-    :pageSizes="pageSizes"
-    :paginationLayout="paginationLayout"
-    @sizeChange="handleSizeChange"
-    @currentChange="handleCurrentChange"
+    :page-sizes="pageSizes"
+    :pagination-layout="paginationLayout"
+    @no-next-input="handleNoNextInput"
+    @size-change="handleSizeChange"
+    @current-change="handleCurrentChange"
   >
     <ElTableColumn
       v-for="column in columns"
@@ -38,11 +38,11 @@ const paginationConfig = ref({
   currentPage: 1,
   pageSize: 10,
   total: 0,
-});
+})
 
 // 分页选项配置
-const pageSizes = ref([10, 20, 30, 50]);
-const paginationLayout = ref("total, sizes, prev, pager, next, jumper");
+const pageSizes = ref([10, 20, 30, 50])
+const paginationLayout = ref('total, sizes, prev, pager, next, jumper')
 
 const tableData = ref([
   { id: 1, name: '张三', age: 25, email: 'zhangsan@example.com', department: '技术部' },
@@ -68,11 +68,11 @@ function handleNoNextInput({ rowIndex }) {
   }, 3000)
 }
 
-const handleSizeChange = (size: number) => {
-  paginationConfig.value.pageSize = size;
-};
+function handleSizeChange(size: number) {
+  paginationConfig.value.pageSize = size
+}
 
-const handleCurrentChange = (current: number) => {
-  paginationConfig.value.currentPage = current;
-};
+function handleCurrentChange(current: number) {
+  paginationConfig.value.currentPage = current
+}
 </script>

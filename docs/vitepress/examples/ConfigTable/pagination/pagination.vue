@@ -23,8 +23,12 @@ const columns = ref([
 
 const pagination = reactive({ pageIndex: 1, pageSize: 10, total: tableData.value.length })
 
-function onSizeChange(size: number) { pagination.pageSize = size }
-function onCurrentChange(page: number) { pagination.pageIndex = page }
+function onSizeChange(size: number) {
+  pagination.pageSize = size
+}
+function onCurrentChange(page: number) {
+  pagination.pageIndex = page
+}
 </script>
 
 <style scoped>

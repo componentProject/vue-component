@@ -6,7 +6,11 @@
       <ElTableColumn prop="address" label="地址" />
     </ElTable>
     <div class="actions">
-      <ExportExcel :table-data="tableData" :columns="columns" file-name="基本用法" />
+      <ExportExcel
+        :table-data="tableData"
+        :columns="columns"
+        file-name="基本用法"
+      />
     </div>
   </div>
 </template>
@@ -27,5 +31,7 @@ const columns = ref([
 </script>
 
 <style scoped>
-.actions { margin-top: 12px; }
+.actions {
+  margin-top: 12px;
+}
 </style>

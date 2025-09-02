@@ -18,7 +18,9 @@ const columns = ref([
   { prop: 'name', label: '姓名', minWidth: 120 },
   { prop: 'age', label: '年龄', width: 80, sortable: true },
 ])
-function onSort(payload: any) { result.value = `\`${JSON.stringify(payload)}\`` }
+function onSort(payload: any) {
+  result.value = `\`${JSON.stringify(payload)}\``
+}
 </script>
 
 <style scoped>

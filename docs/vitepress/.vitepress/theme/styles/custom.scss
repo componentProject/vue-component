@@ -1,4 +1,6 @@
-*, *::before, *::after{
+*,
+*::before,
+*::after {
   margin: unset;
 }
 :root {
@@ -19,26 +21,29 @@
     display: table !important;
     width: 100%;
     //兼容vxe-table，el-table
-    &[class*=el-], &[class*=vxe-] {
+    &[class*='el-'],
+    &[class*='vxe-'] {
       margin: 0 !important;
     }
   }
 
   th {
-    &[class*=el-], &[class*=vxe-] {
+    &[class*='el-'],
+    &[class*='vxe-'] {
       font-size: unset !important;
     }
   }
 
-  th, td {
-    &[class*=vxe-] {
+  th,
+  td {
+    &[class*='vxe-'] {
       border: unset;
       padding: unset;
     }
   }
 
   ul {
-    &[class*=el-] {
+    &[class*='el-'] {
       padding: 0 !important;
       margin: 0 !important;
       li + li {
@@ -46,6 +51,4 @@
       }
     }
   }
-
 }
-

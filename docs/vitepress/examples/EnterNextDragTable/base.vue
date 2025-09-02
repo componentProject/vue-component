@@ -3,13 +3,13 @@
     v-model="tableData"
     :columns="columns"
     height="300"
-    :showPagination="true"
-    @no-next-input="handleNoNextInput"
+    :show-pagination="true"
     :pagination="paginationConfig"
-    :pageSizes="pageSizes"
-    :paginationLayout="paginationLayout"
-    @sizeChange="handleSizeChange"
-    @currentChange="handleCurrentChange"
+    :page-sizes="pageSizes"
+    :pagination-layout="paginationLayout"
+    @no-next-input="handleNoNextInput"
+    @size-change="handleSizeChange"
+    @current-change="handleCurrentChange"
   >
     <template #input="{ row, column }">
       <ElInput v-model="row[column.field]" />
@@ -26,11 +26,11 @@ const paginationConfig = ref({
   currentPage: 1,
   pageSize: 10,
   total: 0,
-});
+})
 
 // 分页选项配置
-const pageSizes = ref([10, 20, 30, 50]);
-const paginationLayout = ref("total, sizes, prev, pager, next, jumper");
+const pageSizes = ref([10, 20, 30, 50])
+const paginationLayout = ref('total, sizes, prev, pager, next, jumper')
 
 const tableData = ref([
   { id: 1, name: '张三', age: 25 },
@@ -60,13 +60,13 @@ const columns = ref([
 
 function handleNoNextInput() {
   console.log('已到达最后一个可编辑单元格')
-}ßß
+}
 
-const handleSizeChange = (size: number) => {
-  paginationConfig.value.pageSize = size;
-};
+function handleSizeChange(size: number) {
+  paginationConfig.value.pageSize = size
+}
 
-const handleCurrentChange = (current: number) => {
-  paginationConfig.value.currentPage = current;
-};
+function handleCurrentChange(current: number) {
+  paginationConfig.value.currentPage = current
+}
 </script>

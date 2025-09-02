@@ -15,7 +15,9 @@ const columns = ref([
   { prop: 'name', label: '姓名', minWidth: 120 },
 ])
 const pagination = reactive({ pageIndex: 1, pageSize: 10, total: tableData.value.length })
-function onCurrentChange(p: number) { page.value = p }
+function onCurrentChange(p: number) {
+  page.value = p
+}
 </script>
 
 <style scoped>

@@ -6,8 +6,8 @@
       :input-value="val"
       :data="tableData"
       :columns="columns"
-      @select="onSelect"
       placeholder="通过输入框触发"
+      @select="onSelect"
     />
   </div>
 </template>

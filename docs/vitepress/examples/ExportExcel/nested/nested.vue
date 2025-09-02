@@ -3,10 +3,14 @@
     <ElTable :data="tableData" border>
       <ElTableColumn prop="name" label="姓名" />
       <ElTableColumn label="年龄">
-        <template #default="{ row }">{{ row.info.age }}</template>
+        <template #default="{ row }">
+          {{ row.info.age }}
+        </template>
       </ElTableColumn>
       <ElTableColumn label="地址">
-        <template #default="{ row }">{{ row.info.address }}</template>
+        <template #default="{ row }">
+          {{ row.info.address }}
+        </template>
       </ElTableColumn>
     </ElTable>
     <div class="actions">
@@ -31,5 +35,7 @@ const columns = ref([
 </script>
 
 <style scoped>
-.actions { margin-top: 12px; }
+.actions {
+  margin-top: 12px;
+}
 </style>
