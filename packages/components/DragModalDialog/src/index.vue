@@ -277,6 +277,25 @@ interface PositionData {
   timestamp: number
 }
 
+const interactionEndTime = ref(0)
+
+// 修改 handleOverlayClick 函数
+function handleOverlayClick(event: MouseEvent) {
+  // 如果正在拖拽或调整大小，不关闭弹窗
+  if (isDragging.value || isResizing.value) {
+    return
+  }
+
+  // 如果刚刚结束交互（300ms内），不关闭弹窗，防止误触
+  if (Date.now() - interactionEndTime.value < 300) {
+    return
+  }
+
+  if (props.maskClosable) {
+    handleClose()
+  }
+}
+
 // 生成存储键名
 function getStorageKey(): string {
   const key = props.positionKey || `modal-position-${props.title || 'default'}`
@@ -384,12 +403,6 @@ function handleClose() {
   emit('close')
 }
 
-function handleOverlayClick() {
-  if (props.maskClosable) {
-    handleClose()
-  }
-}
-
 function handleCancel() {
   emit('cancel')
   handleClose()
@@ -413,6 +426,9 @@ function startDrag(e: MouseEvent) {
     left: currentLeft.value || rect.left,
     top: currentTop.value || rect.top,
   }
+
+  // 阻止事件冒泡，防止触发遮罩层点击
+  e.stopPropagation()
 
   document.addEventListener('mousemove', onDrag)
   document.addEventListener('mouseup', stopDrag)
@@ -450,6 +466,7 @@ function onDrag(e: MouseEvent) {
 
 function stopDrag() {
   isDragging.value = false
+  interactionEndTime.value = Date.now()
   document.removeEventListener('mousemove', onDrag)
   document.removeEventListener('mouseup', stopDrag)
   document.body.style.cursor = ''
@@ -476,6 +493,9 @@ function startResize(e: MouseEvent, direction: string) {
     startLeft: currentLeft.value || rect.left,
     startTop: currentTop.value || rect.top,
   }
+
+  // 阻止事件冒泡，防止触发遮罩层点击
+  e.stopPropagation()
 
   document.addEventListener('mousemove', onResize)
   document.addEventListener('mouseup', stopResize)
@@ -597,6 +617,7 @@ function onResize(e: MouseEvent) {
 
 function stopResize() {
   isResizing.value = false
+  interactionEndTime.value = Date.now()
   document.removeEventListener('mousemove', onResize)
   document.removeEventListener('mouseup', stopResize)
   document.body.style.cursor = ''
@@ -746,6 +767,25 @@ if (props.penetrate && !props.mask) {
   }
 
   return style
+})
+
+function clearPosition() {
+  if (!props.rememberPosition || !props.positionKey) {
+    return
+  }
+
+  try {
+    localStorage.removeItem(`drag-modal-${props.positionKey}`)
+    // 重置为默认居中位置
+    nextTick(() => {
+      initPosition()
+    })
+  } catch (error) {
+    console.warn('Failed to clear modal position from localStorage:', error)
+  }
+}
+defineExpose({
+  clearPosition
 })
 </script>
 

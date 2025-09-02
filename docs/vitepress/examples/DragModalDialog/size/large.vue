@@ -1,5 +1,5 @@
 <template>
-  <div class="container" style="height: 350px;">
+  <div class="container" style="height: 100px;">
     <ElButton @click="visible = true">大尺寸弹窗</ElButton>
 
     <DragModalDialog
@@ -13,6 +13,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import DragModalDialog from '@moluoxixi/components/DragModalDialog'
 
 const visible = ref(false)
 </script>

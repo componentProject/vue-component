@@ -1,5 +1,5 @@
 <template>
-  <div class="container" style="height: 350px;">
+  <div class="container" style="height: 100px;">
     <ElButton @click="visible = true">自定义底部操作区</ElButton>
 
     <DragModalDialog
@@ -23,7 +23,8 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { ElMessage } from 'element-plus'
+import DragModalDialog from '@moluoxixi/components/DragModalDialog'
+import { ElButton } from 'element-plus'
 
 const visible = ref(false)
 

@@ -1,5 +1,5 @@
 <template>
-  <div class="container" style="height: 350px;">
+  <div class="container" style="height: 100px;">
     <ElButton @click="visible = true">位置记忆示例</ElButton>
     <ElButton @click="clearPosition" style="margin-left: 10px;">清除位置记忆</ElButton>
 
@@ -22,6 +22,8 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import DragModalDialog from '@moluoxixi/components/DragModalDialog'
+import { ElButton } from 'element-plus'
 
 const visible = ref(false)
 const dialogRef = ref()

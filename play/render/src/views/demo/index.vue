@@ -13,36 +13,37 @@
       <div class="list-title">
         开发调试组件
       </div>
-      <!-- <div @click="showModal = true">按钮</div>
+      <div @click="showModal = true">按钮</div>
       <component
         :is="localComponent"
         v-model:visible="showModal"
         title="可拖拽可缩放弹窗"
-        draggable
         resizable
-        penetrate
-        :maskClosable="false"
         :mask="false"
         @confirm="handleConfirm"
         @cancel="handleCancel"
+      >
+        <p>弹窗内容</p>
+        <template #footer>
+          <button @click="showModal = false">关闭</button>
+        </template>
+      </component>
+      <!-- <component
+        :is="localComponent"
+        pop-type="input"
+        :columns="columns"
+        :data="tableData"
       /> -->
     </div>
     <div class="main">
       <div class="list-title">
         引用组件库解析的组件
       </div>
-      <div @click="showModal = true">按钮</div>
       <component
         :is="dynamicComponent"
-        v-model:visible="showModal"
-        title="可拖拽可缩放弹窗"
-        draggable
-        resizable
-        penetrate
-        :maskClosable="false"
-        :mask="false"
-        @confirm="handleConfirm"
-        @cancel="handleCancel"
+        pop-type="input"
+        :columns="columns"
+        :data="tableData"
       />
     </div>
   </div>
@@ -165,6 +166,7 @@ async function loadComponents(components: string[]) {
 
 onMounted(async () => {
   await loadLocalComponent(componentName.value)
+  return
   await loadComponents([componentName.value])
 })
 </script>

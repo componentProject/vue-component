@@ -1,5 +1,5 @@
 <template>
-  <div class="container" style="height: 350px;">
+  <div class="container" style="height: 100px;">
     <ElButton @click="visible = true">自定义头部内容</ElButton>
 
     <DragModalDialog
@@ -49,6 +49,7 @@
 import { ref } from 'vue'
 import { ElButton, ElIcon } from 'element-plus'
 import { SuccessFilled } from '@element-plus/icons-vue'
+import DragModalDialog from '@moluoxixi/components/DragModalDialog'
 
 const visible = ref(false)
 const visible2 = ref(false)

@@ -1,5 +1,5 @@
 <template>
-  <div class="container" style="height: 350px;">
+  <div class="container" style="height: 100px;">
     <ElButton @click="visible = true">遮罩层穿透弹窗</ElButton>
     <ElButton type="primary" @click="showMessage">测试下方按钮</ElButton>
 
@@ -14,7 +14,8 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { ElMessage } from 'element-plus'
+import DragModalDialog from '@moluoxixi/components/DragModalDialog'
+import { ElButton } from 'element-plus'
 
 const visible = ref(false)
 

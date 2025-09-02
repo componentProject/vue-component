@@ -1,5 +1,5 @@
 <template>
-  <div class="container" style="height: 350px;">
+  <div class="container" style="height: 100px;">
     <ElButton type="primary" @click="visible = true">打开基础弹窗</ElButton>
 
     <DragModalDialog

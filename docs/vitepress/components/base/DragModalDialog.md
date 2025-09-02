@@ -98,7 +98,6 @@ DragModalDialog/events/event-handling
 DragModalDialog/position/remember-position
 :::
 
-## API
 
 ### Props
 
@@ -152,9 +151,9 @@ DragModalDialog/position/remember-position
 | 插槽名 | 说明 | 参数 |
 | --- | --- | --- |
 | default | 对话框内容区域 | - |
-| header | 完全自定义头部内容 | { close: () => void, title: string } |
-| header-left | 自定义头部左侧内容 | { title: string } |
-| header-right | 自定义头部右侧内容 | { close: () => void } |
+| header | 完全自定义头部内容 | '{ close: () => void, title: string }' |
+| header-left | 自定义头部左侧内容 | '{ title: string }' |
+| header-right | 自定义头部右侧内容 | '{ close: () => void }' |
 | footer | 自定义底部操作区 | - |
 
 ### Expose

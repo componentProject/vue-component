@@ -1,5 +1,5 @@
 <template>
-  <div class="container" style="height: 350px;">
+  <div class="container" style="height: 300px;">
     <ElButton @click="visible = true">事件处理示例</ElButton>
 
     <div style="margin-top: 10px;">
@@ -27,6 +27,8 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import DragModalDialog from '@moluoxixi/components/DragModalDialog'
+import { ElButton } from 'element-plus'
 
 const visible = ref(false)
 const eventLogs = ref<string[]>([])
