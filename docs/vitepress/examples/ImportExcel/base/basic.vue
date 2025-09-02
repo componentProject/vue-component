@@ -28,5 +28,3 @@ function onSuccess(data: any[]) {
   rows.value = data
 }
 </script>
-
-

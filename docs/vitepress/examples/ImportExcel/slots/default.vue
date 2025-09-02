@@ -20,5 +20,3 @@ const tableColumns = ref([
   { prop: 'age', label: '年龄' },
 ])
 </script>
-
-

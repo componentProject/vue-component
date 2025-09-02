@@ -17,7 +17,9 @@ const columns = ref([
   { prop: 'id', label: 'ID', width: 80 },
   { prop: 'name', label: '姓名', minWidth: 120 },
 ])
-function onSelectionChange(rows: any[]) { selected.value = rows }
+function onSelectionChange(rows: any[]) {
+  selected.value = rows
+}
 </script>
 
 <style scoped>

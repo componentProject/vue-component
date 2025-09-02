@@ -27,10 +27,10 @@
 import type { VxeTableDefines } from 'vxe-table'
 import type { EnterNextDragTableProps, NoNextInputParams, NoSelectValueParams } from './_types'
 import { computed, nextTick, ref, useTemplateRef, watch } from 'vue'
-import DraggableTable from '@moluoxixi/components/DraggableTable/index.ts'
-import EnterNextContainer from '@moluoxixi/components/EnterNextContainer/index.ts'
+import DraggableTable from '@moluoxixi/components/DraggableTable'
+import EnterNextContainer from '@moluoxixi/components/EnterNextContainer'
 import type { slotsType } from '@moluoxixi/components/_types'
-import {debounce} from "lodash";
+import { debounce } from 'lodash'
 
 defineOptions({
   name: 'EnterNextDragTable',

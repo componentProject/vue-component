@@ -8,7 +8,7 @@
       @no-select-value="last = $event"
     >
       <template #input="{ row, column }">
-        <ElSelect v-model="row[column.field]">
+        <ElSelect v-model="row[column.field]" size="small">
           <ElOption label="张三" value="张三" />
           <ElOption label="李四" value="李四" />
           <ElOption label="王五" value="王五" />

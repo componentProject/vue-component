@@ -15,7 +15,9 @@ const columns = ref([
   { prop: 'name', label: '姓名', minWidth: 120 },
 ])
 const pagination = reactive({ pageIndex: 1, pageSize: 10, total: tableData.value.length })
-function onSizeChange(s: number) { size.value = s }
+function onSizeChange(s: number) {
+  size.value = s
+}
 </script>
 
 <style scoped>

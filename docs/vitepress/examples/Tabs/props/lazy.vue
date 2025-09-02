@@ -1,8 +1,12 @@
 <template>
   <div class="container">
     <Tabs v-model="active" :tab-list="tabList">
-      <template #A>面板 A</template>
-      <template #B>面板 B（懒加载）</template>
+      <template #A>
+        面板 A
+      </template>
+      <template #B>
+        面板 B（懒加载）
+      </template>
     </Tabs>
   </div>
 </template>
@@ -18,7 +22,7 @@ const tabList = [
 </script>
 
 <style scoped>
-.container { padding: 8px; }
+.container {
+  padding: 8px;
+}
 </style>
-
-

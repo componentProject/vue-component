@@ -27,7 +27,7 @@ const tableData = ref([
 </script>
 
 <style scoped>
-.container { padding: 8px; }
+.container {
+  padding: 8px;
+}
 </style>
-
-

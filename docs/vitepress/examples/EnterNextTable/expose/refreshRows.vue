@@ -1,6 +1,8 @@
 <template>
   <div class="container">
-    <button class="btn" @click="addRow">添加一行并刷新容器收集</button>
+    <button class="btn" @click="addRow">
+      添加一行并刷新容器收集
+    </button>
     <EnterNextTable ref="refTable" :data="tableData" border>
       <ElTableColumn prop="id" label="ID" width="80" />
       <ElTableColumn prop="name" label="姓名">
@@ -31,8 +33,11 @@ function addRow() {
 </script>
 
 <style scoped>
-.container { padding: 8px; }
-.btn { padding: 6px 10px; margin-bottom: 8px; }
+.container {
+  padding: 8px;
+}
+.btn {
+  padding: 6px 10px;
+  margin-bottom: 8px;
+}
 </style>
-
-

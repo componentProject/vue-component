@@ -33,5 +33,7 @@ const columns = ref([
 </script>
 
 <style scoped>
-.actions { margin-top: 12px; }
+.actions {
+  margin-top: 12px;
+}
 </style>

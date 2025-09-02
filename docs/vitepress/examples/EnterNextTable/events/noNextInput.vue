@@ -8,7 +8,9 @@
         </template>
       </ElTableColumn>
     </EnterNextTable>
-    <div class="value">noNextInput: {{ last }}</div>
+    <div class="value">
+      noNextInput: {{ last }}
+    </div>
   </div>
 </template>
 
@@ -24,8 +26,12 @@ const last = ref<any>(null)
 </script>
 
 <style scoped>
-.container { padding: 8px; }
-.value { margin-top: 8px; font-size: 12px; color: #555; }
+.container {
+  padding: 8px;
+}
+.value {
+  margin-top: 8px;
+  font-size: 12px;
+  color: #555;
+}
 </style>
-
-
