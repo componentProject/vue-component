@@ -13,22 +13,36 @@
       <div class="list-title">
         开发调试组件
       </div>
+      <!-- <div @click="showModal = true">按钮</div>
       <component
         :is="localComponent"
-        pop-type="input"
-        :columns="columns"
-        :data="tableData"
-      />
+        v-model:visible="showModal"
+        title="可拖拽可缩放弹窗"
+        draggable
+        resizable
+        penetrate
+        :maskClosable="false"
+        :mask="false"
+        @confirm="handleConfirm"
+        @cancel="handleCancel"
+      /> -->
     </div>
     <div class="main">
       <div class="list-title">
         引用组件库解析的组件
       </div>
+      <div @click="showModal = true">按钮</div>
       <component
         :is="dynamicComponent"
-        pop-type="input"
-        :columns="columns"
-        :data="tableData"
+        v-model:visible="showModal"
+        title="可拖拽可缩放弹窗"
+        draggable
+        resizable
+        penetrate
+        :maskClosable="false"
+        :mask="false"
+        @confirm="handleConfirm"
+        @cancel="handleCancel"
       />
     </div>
   </div>
@@ -46,9 +60,11 @@ import PopoverTableSelect from 'virtual:components/PopoverTableSelect'
 defineOptions({ name: '调试与演示' })
 console.log('PopoverTableSelect1', PopoverTableSelect)
 // 使用ref替代data属性
-const componentName = ref('AIAgent') // 调试与演示组件库的组件，直接修改组件名
+const componentName = ref('DragModalDialog') // 调试与演示组件库的组件，直接修改组件名
 const localComponent = ref<any>(null) // 调试组件
 const dynamicComponent = ref<any>(null) // 用于存储动态组件
+const showModal = ref(false)
+
 
 const columns = [
   { field: 'id', title: 'ID', width: 60 },

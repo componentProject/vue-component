@@ -542,9 +542,7 @@ export async function loadRemoteComponents($_Vue: any, allComponentList: allComp
   for (const componentRes of componentDownList) {
     const orginComponentCode = componentRes.content
     const componentName = componentRes.name
-    console.log('99999999999999999999', orginComponentCode)
     const componentsCode = await replaceImportsAndExports(orginComponentCode, componentName, allComponentList)
-    console.log('componentsCode', componentsCode)
     // 组件结果对象，这将作为函数的返回值
     for (const [name, code] of Object.entries(componentsCode)) {
       if (!code)
@@ -560,13 +558,11 @@ export async function loadRemoteComponents($_Vue: any, allComponentList: allComp
 
         // 注入process对象和组件映射对象
         // eslint-disable-next-line no-new-func
-        console.log('11111111', codeString);
         const componentsCodeResult = new Function('$_Vue', 'process', 'componentMapping', codeString)($_Vue, {
           env: {
             NODE_ENV: 'production',
           },
         }, componentMapping)
-        console.log('22222222222222', $_Vue)
         const { default: component } = componentsCodeResult
         componentResults[name] = component
 
