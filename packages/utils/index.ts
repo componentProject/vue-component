@@ -12,13 +12,12 @@ import Select from '@moluoxixi/components/Select'
 import Tabs from '@moluoxixi/components/Tabs'
 import KeepAllAlive from '@moluoxixi/components/KeepAllAlive'
 import ConfigTable from '@moluoxixi/components/ConfigTable'
-import ConfigForm from '@moluoxixi/components/ConfigForm'
 // 导出AjaxPackage
 import * as AjaxPackage from './AjaxPackage'
 
 export {
+  AjaxPackage,
   ConfigTable,
-  ConfigForm,
   DateRangePicker,
   DraggableTable,
   EnterNextContainer,
@@ -30,10 +29,9 @@ export {
   PopoverTableSelect,
   Select,
   Tabs,
-  AjaxPackage
 }
 
-const components: Component[] = [ConfigTable, ConfigForm, DateRangePicker, DraggableTable, EnterNextContainer, EnterNextDragTable, EnterNextTable, ExportExcel, ImportExcel, KeepAllAlive, PopoverTableSelect, Select, Tabs]
+const components: Component[] = [ConfigTable, DateRangePicker, DraggableTable, EnterNextContainer, EnterNextDragTable, EnterNextTable, ExportExcel, ImportExcel, KeepAllAlive, PopoverTableSelect, Select, Tabs]
 
 export default {
   install(app: App) {

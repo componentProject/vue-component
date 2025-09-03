@@ -12,7 +12,7 @@ import Select from '@moluoxixi/components/Select'
 import Tabs from '@moluoxixi/components/Tabs'
 import Button from '@moluoxixi/components/Button'
 import ConfigTable from '@moluoxixi/components/ConfigTable'
-import ConfigForm from '@moluoxixi/components/ConfigForm'
+import ConfigForm from '@moluoxixi/components/_old/ConfigForm-formily'
 import Tree from '@moluoxixi/components/Tree'
 import DragModalDialog from '@moluoxixi/components/DragModalDialog'
 
