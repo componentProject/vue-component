@@ -1,12 +1,11 @@
 import type * as monaco from 'monaco-editor/esm/vs/editor/editor.api'
 import { buildMonacoOptions } from './common'
 
-export interface CreateMonacoDiffEditorOptions {
+export interface CreateMonacoDiffEditorOptions extends Partial<monaco.editor.IDiffEditorConstructionOptions> {
   originalValue: string
   modifiedValue: string
   language: string
   theme?: string
-  renderSideBySide?: boolean
 }
 
 export function createMonacoDiffEditor(
@@ -14,21 +13,21 @@ export function createMonacoDiffEditor(
   monacoInstance: typeof monaco,
   options: CreateMonacoDiffEditorOptions,
 ): monaco.editor.IStandaloneDiffEditor {
+  const { theme, originalValue, modifiedValue, language, ...restOptions } = options
   const diffOptions = buildMonacoOptions<monaco.editor.IDiffEditorConstructionOptions>({
-    originalEditable: false,
-    renderSideBySide: options.renderSideBySide ?? true,
+    ...(restOptions as Partial<monaco.editor.IDiffEditorConstructionOptions>),
   })
   const diffEditor = monacoInstance.editor.createDiffEditor(container, diffOptions)
-  if (options.theme)
-    monacoInstance.editor.setTheme(options.theme)
+  if (theme)
+    monacoInstance.editor.setTheme(theme)
 
   const originalModel = monacoInstance.editor.createModel(
-    options.originalValue ?? '',
-    options.language,
+    originalValue ?? '',
+    language,
   )
   const modifiedModel = monacoInstance.editor.createModel(
-    options.modifiedValue ?? '',
-    options.language,
+    modifiedValue ?? '',
+    language,
   )
 
   diffEditor.setModel({ original: originalModel, modified: modifiedModel })
