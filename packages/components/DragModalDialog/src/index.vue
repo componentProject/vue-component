@@ -1,8 +1,11 @@
 <template>
   <Teleport :to="teleportTo">
-    <Transition name="modal-fade">
+    <Transition
+      name="modal-fade"
+      @after-leave="handleAfterLeave"
+    >
       <div
-        v-if="visible"
+        v-if="renderModal && visible"
         class="modal-overlay"
         :class="[
           { 'modal-overlay-draggable': draggable },
@@ -15,7 +18,7 @@
           ref="modalRef"
           class="modal-dialog"
           :class="[
-            `modal-${size}`,
+            { [`modal-${size}`]: !props.width },
             { 'modal-draggable': draggable },
           ]"
           :style="modalStyle"
@@ -102,7 +105,9 @@
 
           <!-- 内容区域 -->
           <div class="modal-body">
-            <slot>{{ content }}</slot>
+            <div class="modal-body-content">
+              <slot>{{ content }}</slot>
+            </div>
           </div>
 
           <!-- 底部操作区 -->
@@ -152,6 +157,7 @@ import { computed, nextTick, onMounted, ref, watch } from 'vue'
 defineOptions({
   name: 'DragModalDialog',
 })
+
 const props = withDefaults(defineProps<Props>(), {
   visible: false,
   title: '提示',
@@ -176,6 +182,7 @@ const props = withDefaults(defineProps<Props>(), {
   positionKey: '',
   penetrate: false,
   teleportTo: 'body',
+  destroyOnClose: false,
 })
 
 const emit = defineEmits<Emits>()
@@ -239,6 +246,29 @@ interface Props {
   penetrate?: boolean
   /** 指定弹窗挂载的目标元素，可以是 CSS 选择器字符串或 DOM 元素，默认挂载到 body */
   teleportTo?: string
+  /** 关闭时是否销毁对话框内容 */
+  destroyOnClose?: boolean
+}
+
+const renderModal = ref(false)
+
+// 监听 visible 变化，控制渲染
+watch(() => props.visible, (newVal: any) => {
+  if (newVal) {
+    renderModal.value = true
+  }
+  else if (!props.destroyOnClose) {
+    // 如果不是 destroyOnClose 模式，保持渲染
+    renderModal.value = true
+  }
+}, { immediate: true })
+
+// 处理动画完成后的销毁
+function handleAfterLeave() {
+  if (props.destroyOnClose) {
+    renderModal.value = false
+  }
+  emit('closed')
 }
 
 interface Emits {
@@ -453,15 +483,21 @@ function onDrag(e: MouseEvent) {
   let newLeft = dragStartPos.value.left + deltaX
   let newTop = dragStartPos.value.top + deltaY
 
-  // 边界检查 - 添加20px边距保护
+  // 边界检查 - 限制在内容区域内（考虑边距）
   const windowWidth = window.innerWidth
   const windowHeight = window.innerHeight
   const modalWidth = modalRef.value?.offsetWidth || 0
   const modalHeight = modalRef.value?.offsetHeight || 0
 
-  // 限制在视窗内，保持20px边距
-  newLeft = Math.max(props.margin, Math.min(newLeft, windowWidth - modalWidth - props.margin))
-  newTop = Math.max(props.margin, Math.min(newTop, windowHeight - modalHeight - props.margin))
+  // 内容区域边界
+  const maxLeft = windowWidth - props.margin - modalWidth
+  const maxTop = windowHeight - props.margin - modalHeight
+  const minLeft = props.margin
+  const minTop = props.margin
+
+  // 限制在内容区域内
+  newLeft = Math.max(minLeft, Math.min(newLeft, maxLeft))
+  newTop = Math.max(minTop, Math.min(newTop, maxTop))
 
   currentLeft.value = newLeft
   currentTop.value = newTop
@@ -695,56 +731,68 @@ function initPosition() {
     return
   }
 
-  // 如果没有保存的位置，使用传入的top/left或默认居中
-  const rect = modalRef.value.getBoundingClientRect()
+  // 计算可用的最大尺寸（内容区域 = 视窗 - 边距）
   const windowWidth = window.innerWidth
   const windowHeight = window.innerHeight
 
-  // 计算可用的最大尺寸（容器减去边距）
-  const maxAvailableWidth = windowWidth - props.margin * 2
-  const maxAvailableHeight = windowHeight - props.margin * 2
+  // 内容区域边界（考虑边距限制）
+  const contentArea = {
+    width: windowWidth - props.margin * 2,
+    height: windowHeight - props.margin * 2,
+    left: props.margin,
+    top: props.margin,
+  }
 
-  // 计算最终最大尺寸，优先使用传入的maxWidth/maxHeight
-  const finalMaxWidth = props.maxWidth !== undefined ? Math.min(props.maxWidth, maxAvailableWidth) : maxAvailableWidth
-  const finalMaxHeight = props.maxHeight !== undefined ? Math.min(props.maxHeight, maxAvailableHeight) : maxAvailableHeight
-
-  // 计算宽度：优先使用 width 属性，其次使用 size 属性，最后使用默认
+  // 计算宽度：优先使用 width 属性，其次使用 size 属性
   let targetWidth: number
   if (props.width) {
-    targetWidth = typeof props.width === 'number' ? props.width : parsePositionValue(props.width, windowWidth)
-  } else {
-    // 使用 size 属性对应的宽度
+    targetWidth = typeof props.width === 'number' ? props.width : parsePositionValue(props.width, contentArea.width)
+  }
+  else {
     targetWidth = getSizeWidth(props.size)
   }
 
-  // 计算高度：优先使用 height 属性，其次使用默认
+  // 计算高度：优先使用 height 属性
   let targetHeight: number
   if (props.height) {
-    targetHeight = typeof props.height === 'number' ? props.height : parsePositionValue(props.height, windowHeight)
+    targetHeight = typeof props.height === 'number' ? props.height : parsePositionValue(props.height, contentArea.height)
   }
   else {
-    targetHeight = rect.height || props.minHeight || 200
+    targetHeight = 200 // 默认高度
   }
 
-  // 确保尺寸在限制范围内
-  targetWidth = Math.max(props.minWidth, Math.min(targetWidth, finalMaxWidth))
-  targetHeight = Math.max(props.minHeight, Math.min(targetHeight, finalMaxHeight))
+  // 确保尺寸在内容区域内
+  targetWidth = Math.max(props.minWidth, Math.min(targetWidth, contentArea.width))
+  targetHeight = Math.max(props.minHeight, Math.min(targetHeight, contentArea.height))
 
-  // 优先使用传入的top/left值，如果没有则居中
-  let left = (windowWidth - targetWidth) / 2
-  let top = (windowHeight - targetHeight) / 2
+  // 计算位置：确保在内容区域内
+  let targetLeft: number
+  let targetTop: number
 
-  // 如果传入了top/left，解析百分比或像素值
-  if (props.top !== undefined) {
-    top = parsePositionValue(props.top, windowHeight)
-  }
+  // 如果传入了 left，解析并限制在内容区域内
   if (props.left !== undefined) {
-    left = parsePositionValue(props.left, windowWidth)
+    const requestedLeft = typeof props.left === 'number' ? props.left : parsePositionValue(props.left, windowWidth)
+    // 限制在内容区域内：确保不会超出右边界
+    targetLeft = Math.max(contentArea.left, Math.min(requestedLeft, contentArea.left + contentArea.width - targetWidth))
+  }
+  else {
+    // 默认居中在内容区域内
+    targetLeft = contentArea.left + (contentArea.width - targetWidth) / 2
   }
 
-  // 应用边距限制
-  currentLeft.value = Math.max(props.margin, left)
-  currentTop.value = Math.max(props.margin, top)
+  // 如果传入了 top，解析并限制在内容区域内
+  if (props.top !== undefined) {
+    const requestedTop = typeof props.top === 'number' ? props.top : parsePositionValue(props.top, windowHeight)
+    // 限制在内容区域内：确保不会超出下边界
+    targetTop = Math.max(contentArea.top, Math.min(requestedTop, contentArea.top + contentArea.height - targetHeight))
+  }
+  else {
+    // 默认居中在内容区域内
+    targetTop = contentArea.top + (contentArea.height - targetHeight) / 2
+  }
+
+  currentLeft.value = targetLeft
+  currentTop.value = targetTop
   currentWidth.value = targetWidth
   currentHeight.value = targetHeight
 }
@@ -856,6 +904,7 @@ defineExpose({
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  max-height: 100vh; /* 限制最大高度为视窗高度 */
 }
 
 /* 尺寸变体 */
@@ -913,8 +962,45 @@ defineExpose({
 
 /* 内容区域 */
 .modal-body {
-  flex: 1;
+  flex: 1 1 auto; /* 允许内容区域自动填充剩余空间 */
+  min-height: 0; /* 防止 flex 子项溢出 */
+  overflow: hidden; /* 防止内容溢出 */
+}
+
+/* 内容包装器，支持滚动 */
+.modal-body-content {
+  height: 100%;
+  overflow-y: auto; /* 垂直滚动始终启用 */
+  overflow-x: auto; /* 水平滚动按需显示 */
   padding: 24px;
+  box-sizing: border-box;
+}
+
+/* 添加滚动条样式优化 */
+/* 优化滚动条样式 - 同时支持水平和垂直 */
+.modal-body-content::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.modal-body-content::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.modal-body-content::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+
+  &:hover {
+    background: #a8a8a8;
+  }
+}
+
+/* 针对 Firefox 的滚动条样式 */
+.modal-body-content {
+  scrollbar-width: auto; /* 从 thin 改为 auto，支持水平和垂直滚动 */
+  scrollbar-color: #c1c1c1 #f1f1f1;
 }
 
 /* 底部操作区 */
@@ -925,6 +1011,7 @@ defineExpose({
   padding: 10px 16px;
   border-top: 1px solid #f0f0f0;
   background: #fafafa;
+  flex-shrink: 0;
 }
 
 .modal-btn {
