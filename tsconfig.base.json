@@ -28,6 +28,7 @@
       "@moluoxixi/utils": ["packages/utils"],
       "@moluoxixi/utils/*": ["packages/utils/*"],
       "@moluoxixi/element": ["packages/element-plus"],
+      "@moluoxixi/prototypes": ["packages/prototypes"],
       "@moluoxixi/render": [ "play/render"],
       "@moluoxixi/docs": [ "docs/vitepress"],
       "@moluoxixi/storybook": ["docs/storybook"]
