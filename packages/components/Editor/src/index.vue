@@ -6,7 +6,7 @@
 <script setup lang="ts">
 import type { languageType, themeType } from './_types'
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api'
-import { createMonacoEditor } from './_utils/editor.ts'
+import { createMonacoEditor } from './_utils/editor'
 import { toMonacoLanguage } from './_utils/language'
 import { formatWithPrettier } from './_utils/format'
 import './_utils/workers'
@@ -18,12 +18,16 @@ defineOptions({
 const props = withDefaults(defineProps<{
   language?:
   languageType
+  originalValue?: string
+  modifiedValue?: string
   autoFormat?: boolean
   modelValue?: string
   theme?: themeType
 }>(), {
   language: 'js',
   modelValue: '',
+  originalValue: '',
+  modifiedValue: '',
   autoFormat: true,
   theme: 'vs',
 })
