@@ -1,6 +1,6 @@
-@import '../__builtins__/styles/common.scss';
+@use '../__builtins__/styles/common.scss';
 
-.#{$moluoxixi-prefix}-space {
+.#{common.$moluoxixi-prefix}-space {
   display: inline-flex;
 
   &-vertical {

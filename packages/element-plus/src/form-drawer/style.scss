@@ -1,6 +1,7 @@
-@import '../__builtins__/styles/common.scss';
+@use '../__builtins__/styles/common.scss';
+@use '../__builtins__/styles/element-plus.scss' as ElementPlus;
 
-.#{$moluoxixi-prefix}-form-drawer {
+.#{common.$moluoxixi-prefix}-form-drawer {
   .el-drawer__body {
     display: flex;
     flex-direction: column;
@@ -9,11 +10,11 @@
   &-body {
     flex: 1;
     overflow: auto;
-    padding: $--dialog-padding-primary;
+    padding: ElementPlus.$dialog-padding-primary;
   }
 
   &-footer {
-    padding: $--dialog-padding-primary;
+    padding: ElementPlus.$dialog-padding-primary;
     display: flex;
     justify-content: flex-end;
     align-items: center;

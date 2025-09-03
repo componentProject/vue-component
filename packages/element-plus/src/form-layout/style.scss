@@ -1,6 +1,6 @@
-@import '../__builtins__/styles/common.scss';
+@use '../__builtins__/styles/common.scss';
 
-.#{$moluoxixi-prefix}-form-inline {
+.#{common.$moluoxixi-prefix}-form-inline {
   display: flex;
   flex-wrap: wrap;
 }

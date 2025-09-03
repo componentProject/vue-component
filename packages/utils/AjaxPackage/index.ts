@@ -3,7 +3,7 @@
 import { baseAxios, createAxiosInstance, defaultAxiosInstance } from './axios.js'
 import { http, HttpRequest } from './http.js'
 import VueAxiosPlugin, { createHttpService, getHttpService } from './netseriver.js'
-import { BaseApi } from './class.ts'
+import BaseApi from './class.ts'
 
 // 导出所有功能
 export {

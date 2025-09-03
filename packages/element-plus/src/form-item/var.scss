@@ -1,17 +1,20 @@
-$form-item-prefix: '#{$moluoxixi-prefix}-form-item';
+@use '../__builtins__/styles/common.scss';
+@use '../__builtins__/styles/element-plus.scss' as ElementPlus;
 
-$--form-font-size: $--font-size-base !default;
+$form-item-prefix: '#{common.$moluoxixi-prefix}-form-item';
 
-$--form-label-font-size: $--form-font-size !default;
+$form-font-size: ElementPlus.$font-size-base !default;
 
-$--form-item-large-line-height: 40px;
+$--form-label-font-size: $form-font-size !default;
 
-$--form-item-medium-line-height: 32px;
+$form-item-large-line-height: 40px;
 
-$--form-item-small-line-height: 24px;
+$form-item-medium-line-height: 32px;
 
-$--form-item-label-top-line-height: 40px;
+$form-item-small-line-height: 24px;
 
-$--form-error-line-height: 22px !default;
+$form-item-label-top-line-height: 40px;
 
-$--form-item-margin-bottom: $--form-error-line-height !default;
+$form-error-line-height: 22px !default;
+
+$form-item-margin-bottom: $form-error-line-height !default;
