@@ -1,5 +1,5 @@
-@import '../__builtins__/styles/common.scss';
+@use '../__builtins__/styles/common.scss';
 
-.#{$moluoxixi-prefix}-form-grid {
+.#{common.$moluoxixi-prefix}-form-grid {
   display: grid;
 }

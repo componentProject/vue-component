@@ -1,9 +1,9 @@
-@import '../__builtins__/styles/common.scss';
+@use '../__builtins__/styles/common.scss';
 
-$array-table-prefix-cls: '#{$moluoxixi-prefix}-array-tabs';
+$array-table-prefix-cls: '#{common.$moluoxixi-prefix}-array-tabs';
 
 .#{$array-table-prefix-cls} {
-  .#{$moluoxixi-prefix}-array-tabs-addition {
+  .#{common.$moluoxixi-prefix}-array-tabs-addition {
     position: absolute;
     right: -56px;
     top: -1px;

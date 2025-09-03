@@ -1,17 +1,18 @@
-@import '../__builtins__/styles/common.scss';
+@use '../__builtins__/styles/common.scss';
+@use '../__builtins__/styles/element-plus.scss' as ElementPlus;
 
-$editable-prefix-cls: '#{$moluoxixi-prefix}-editable';
+$editable-prefix-cls: '#{common.$moluoxixi-prefix}-editable';
 
 .#{$editable-prefix-cls} {
   cursor: pointer;
   display: inline-block !important;
 
-  .#{$moluoxixi-prefix}-form-text {
-    .#{$moluoxixi-prefix}-tag {
+  .#{common.$moluoxixi-prefix}-form-text {
+    .#{common.$moluoxixi-prefix}-tag {
       transition: none !important;
     }
 
-    .#{$moluoxixi-prefix}-tag:last-child {
+    .#{common.$moluoxixi-prefix}-tag:last-child {
       margin-right: 0 !important;
     }
   }
@@ -35,11 +36,11 @@ $editable-prefix-cls: '#{$moluoxixi-prefix}-editable';
     height: 14px;
 
     &:hover {
-      color: $--color-primary;
+      color: ElementPlus.$color-primary;
     }
   }
 
-  .#{$moluoxixi-prefix}-form-text {
+  .#{common.$moluoxixi-prefix}-form-text {
     display: flex;
     align-items: center;
   }

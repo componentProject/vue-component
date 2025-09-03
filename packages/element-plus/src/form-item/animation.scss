@@ -1,3 +1,5 @@
+@use './var.scss';
+
 @-webkit-keyframes antShowHelpIn {
   0% {
     -webkit-transform: translateY(-5px);
@@ -12,8 +14,8 @@
   }
 }
 
-.#{$form-item-prefix}-help-appear,
-.#{$form-item-prefix}-help-enter {
+.#{var.$form-item-prefix}-help-appear,
+.#{var.$form-item-prefix}-help-enter {
   -webkit-animation-duration: 0.3s;
   animation-duration: 0.3s;
   -webkit-animation-fill-mode: both;
@@ -22,21 +24,21 @@
   animation-play-state: paused;
 }
 
-.#{$form-item-prefix}-help-appear.#{$form-item-prefix}-help-appear-active,
-.#{$form-item-prefix}-help-enter.#{$form-item-prefix}-help-enter-active {
+.#{var.$form-item-prefix}-help-appear.#{var.$form-item-prefix}-help-appear-active,
+.#{var.$form-item-prefix}-help-enter.#{var.$form-item-prefix}-help-enter-active {
   -webkit-animation-name: antShowHelpIn;
   animation-name: antShowHelpIn;
   -webkit-animation-play-state: running;
   animation-play-state: running;
 }
 
-.#{$form-item-prefix}-help-appear,
-.#{$form-item-prefix}-help-enter {
+.#{var.$form-item-prefix}-help-appear,
+.#{var.$form-item-prefix}-help-enter {
   opacity: 0;
 }
 
-.#{$form-item-prefix}-help-appear,
-.#{$form-item-prefix}-help-enter {
+.#{var.$form-item-prefix}-help-appear,
+.#{var.$form-item-prefix}-help-enter {
   -webkit-animation-timing-function: cubic-bezier(0.645, 0.045, 0.355, 1);
   animation-timing-function: cubic-bezier(0.645, 0.045, 0.355, 1);
 }

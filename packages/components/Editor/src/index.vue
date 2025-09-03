@@ -6,7 +6,7 @@
 <script setup lang="ts">
 import type { languageType, themeType } from './_types'
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api'
-import { createMonacoEditor } from './_utils/init'
+import { createMonacoEditor } from './_utils/editor.ts'
 import { toMonacoLanguage } from './_utils/language'
 import { formatWithPrettier } from './_utils/format'
 import './_utils/workers'
