@@ -131,7 +131,7 @@ DragModalDialog/position/remember-position
 | rememberPosition | 是否启用位置记忆功能 | boolean | false |
 | positionKey | 位置记忆的唯一标识符 | string | '' |
 | penetrate | 是否允许遮罩层穿透 | boolean | false |
-
+| teleportTo | 指定弹窗挂载的目标元素，可以是 CSS 选择器字符串或 DOM 元素 | string | 默认挂载到 body |
 ### Events
 
 | 事件名 | 说明 | 回调参数 |

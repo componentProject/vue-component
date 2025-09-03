@@ -1,5 +1,5 @@
 <template>
-  <Teleport to="body">
+  <Teleport :to="teleportTo">
     <Transition name="modal-fade">
       <div
         v-if="visible"
@@ -175,6 +175,7 @@ const props = withDefaults(defineProps<Props>(), {
   rememberPosition: false,
   positionKey: '',
   penetrate: false,
+  teleportTo: 'body',
 })
 
 const emit = defineEmits<Emits>()
@@ -236,6 +237,8 @@ interface Props {
   positionKey?: string
   /** 是否允许遮罩层穿透，开启后点击事件可传递到下方元素 */
   penetrate?: boolean
+  /** 指定弹窗挂载的目标元素，可以是 CSS 选择器字符串或 DOM 元素，默认挂载到 body */
+  teleportTo?: string
 }
 
 interface Emits {
@@ -665,6 +668,16 @@ function parsePositionValue(value: string | number | undefined, total: number): 
   return 0
 }
 
+// 工具函数：根据 size 获取对应的宽度
+function getSizeWidth(size: 'small' | 'medium' | 'large'): number {
+  const sizeMap = {
+    small: 400,
+    medium: 520,
+    large: 720,
+  }
+  return sizeMap[size] || 520 // 默认为 medium
+}
+
 // 初始化位置
 function initPosition() {
   if (!modalRef.value)
@@ -695,13 +708,31 @@ function initPosition() {
   const finalMaxWidth = props.maxWidth !== undefined ? Math.min(props.maxWidth, maxAvailableWidth) : maxAvailableWidth
   const finalMaxHeight = props.maxHeight !== undefined ? Math.min(props.maxHeight, maxAvailableHeight) : maxAvailableHeight
 
-  // 使用实际尺寸或默认尺寸，但不超过最大可用尺寸
-  const modalWidth = Math.min(Math.max(rect.width || props.minWidth || 300, props.minWidth), finalMaxWidth)
-  const modalHeight = Math.min(Math.max(rect.height || props.minHeight || 200, props.minHeight), finalMaxHeight)
+  // 计算宽度：优先使用 width 属性，其次使用 size 属性，最后使用默认
+  let targetWidth: number
+  if (props.width) {
+    targetWidth = typeof props.width === 'number' ? props.width : parsePositionValue(props.width, windowWidth)
+  } else {
+    // 使用 size 属性对应的宽度
+    targetWidth = getSizeWidth(props.size)
+  }
+
+  // 计算高度：优先使用 height 属性，其次使用默认
+  let targetHeight: number
+  if (props.height) {
+    targetHeight = typeof props.height === 'number' ? props.height : parsePositionValue(props.height, windowHeight)
+  }
+  else {
+    targetHeight = rect.height || props.minHeight || 200
+  }
+
+  // 确保尺寸在限制范围内
+  targetWidth = Math.max(props.minWidth, Math.min(targetWidth, finalMaxWidth))
+  targetHeight = Math.max(props.minHeight, Math.min(targetHeight, finalMaxHeight))
 
   // 优先使用传入的top/left值，如果没有则居中
-  let left = (windowWidth - modalWidth) / 2
-  let top = (windowHeight - modalHeight) / 2
+  let left = (windowWidth - targetWidth) / 2
+  let top = (windowHeight - targetHeight) / 2
 
   // 如果传入了top/left，解析百分比或像素值
   if (props.top !== undefined) {
@@ -714,8 +745,8 @@ function initPosition() {
   // 应用边距限制
   currentLeft.value = Math.max(props.margin, left)
   currentTop.value = Math.max(props.margin, top)
-  currentWidth.value = modalWidth
-  currentHeight.value = modalHeight
+  currentWidth.value = targetWidth
+  currentHeight.value = targetHeight
 }
 
 // 生命周期
@@ -774,12 +805,8 @@ const overlayStyle = computed(() => {
 })
 
 function clearPosition() {
-  if (!props.rememberPosition || !props.positionKey) {
-    return
-  }
-
   try {
-    localStorage.removeItem(`drag-modal-${props.positionKey}`)
+    localStorage.removeItem(getStorageKey())
     // 重置为默认居中位置
     nextTick(() => {
       initPosition()
