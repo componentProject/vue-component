@@ -1,8 +1,11 @@
 <template>
   <Teleport :to="teleportTo">
-    <Transition name="modal-fade">
+    <Transition
+      name="modal-fade"
+      @after-leave="handleAfterLeave"
+    >
       <div
-        v-if="visible"
+        v-if="renderModal && visible"
         class="modal-overlay"
         :class="[
           { 'modal-overlay-draggable': draggable },
@@ -154,6 +157,7 @@ import { computed, nextTick, onMounted, ref, watch } from 'vue'
 defineOptions({
   name: 'DragModalDialog',
 })
+
 const props = withDefaults(defineProps<Props>(), {
   visible: false,
   title: '提示',
@@ -178,6 +182,7 @@ const props = withDefaults(defineProps<Props>(), {
   positionKey: '',
   penetrate: false,
   teleportTo: 'body',
+  destroyOnClose: false,
 })
 
 const emit = defineEmits<Emits>()
@@ -241,6 +246,29 @@ interface Props {
   penetrate?: boolean
   /** 指定弹窗挂载的目标元素，可以是 CSS 选择器字符串或 DOM 元素，默认挂载到 body */
   teleportTo?: string
+  /** 关闭时是否销毁对话框内容 */
+  destroyOnClose?: boolean
+}
+
+const renderModal = ref(false)
+
+// 监听 visible 变化，控制渲染
+watch(() => props.visible, (newVal: any) => {
+  if (newVal) {
+    renderModal.value = true
+  }
+  else if (!props.destroyOnClose) {
+    // 如果不是 destroyOnClose 模式，保持渲染
+    renderModal.value = true
+  }
+}, { immediate: true })
+
+// 处理动画完成后的销毁
+function handleAfterLeave() {
+  if (props.destroyOnClose) {
+    renderModal.value = false
+  }
+  emit('closed')
 }
 
 interface Emits {
@@ -712,14 +740,15 @@ function initPosition() {
     width: windowWidth - props.margin * 2,
     height: windowHeight - props.margin * 2,
     left: props.margin,
-    top: props.margin
+    top: props.margin,
   }
 
   // 计算宽度：优先使用 width 属性，其次使用 size 属性
   let targetWidth: number
   if (props.width) {
     targetWidth = typeof props.width === 'number' ? props.width : parsePositionValue(props.width, contentArea.width)
-  } else {
+  }
+  else {
     targetWidth = getSizeWidth(props.size)
   }
 
@@ -745,7 +774,8 @@ function initPosition() {
     const requestedLeft = typeof props.left === 'number' ? props.left : parsePositionValue(props.left, windowWidth)
     // 限制在内容区域内：确保不会超出右边界
     targetLeft = Math.max(contentArea.left, Math.min(requestedLeft, contentArea.left + contentArea.width - targetWidth))
-  } else {
+  }
+  else {
     // 默认居中在内容区域内
     targetLeft = contentArea.left + (contentArea.width - targetWidth) / 2
   }
@@ -755,7 +785,8 @@ function initPosition() {
     const requestedTop = typeof props.top === 'number' ? props.top : parsePositionValue(props.top, windowHeight)
     // 限制在内容区域内：确保不会超出下边界
     targetTop = Math.max(contentArea.top, Math.min(requestedTop, contentArea.top + contentArea.height - targetHeight))
-  } else {
+  }
+  else {
     // 默认居中在内容区域内
     targetTop = contentArea.top + (contentArea.height - targetHeight) / 2
   }
