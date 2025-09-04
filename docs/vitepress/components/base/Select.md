@@ -53,6 +53,13 @@ Select/props/disabled
 Select/props/disabledHandler
 ::::
 
+### 下拉加载更多
+
+示例：自定义规则禁用（演示：禁用以 w 开头）
+::::demo
+Select/props/loadMore
+::::
+
 ## API
 
 ### Props
@@ -74,6 +81,9 @@ Select/props/disabledHandler
 | `options` | 本地选项数据 | Array | `[]` |
 | `filterFields` | 参与本地筛选的字段名集合 | Array | `[]` |
 | `serverProps` | 远程数据配置 | ^[Object]`objType` | - |
+| `enableLoadMore` | 开启加载更多 | Boolean | `false` |
+| `hasMore` | 是否还有更多数据 | Boolean | `false` |
+| `loading` | 加载中状态 | Boolean | `false` |
 
 ### v-model
 
