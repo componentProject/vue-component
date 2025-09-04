@@ -4,8 +4,10 @@
       v-model="popoverModel"
       :virtual-ref="computedVirtualRef"
       :z-index="3000"
+      :loading="loading"
       :popover-props="props.popoverProps"
       v-bind="$attrs"
+      @scroll-boundary="handleScrollBoundary"
       @enter="handleEnter"
     >
       <template v-for="name in slotNames" #[name]="slotParams" :key="name">
@@ -93,9 +95,27 @@ const props = defineProps({
   onInput: {
     type: Function,
   },
+  scrollY: {
+    type: Object as PropType<{ enabled: boolean, threshold: number }>,
+    default: () => ({}),
+  },
+  enableLoadMore: {
+    type: Boolean,
+    default: false,
+  },
+  // 是否还有更多数据
+  hasMore: {
+    type: Boolean,
+    default: false,
+  },
+  // 加载中
+  loading: {
+    type: Boolean,
+    default: false,
+  },
 })
 
-const emits = defineEmits(['focus', 'blur', 'enter', 'clear'])
+const emits = defineEmits(['focus', 'blur', 'enter', 'clear', 'load-more'])
 
 // 获取插槽
 const slots = defineSlots<slotsType>()
@@ -185,6 +205,12 @@ const computedInput = computed(() => {
   }
   return handleInput
 })
+
+function handleScrollBoundary(obj) {
+  if(props.enableLoadMore && props.hasMore && obj.direction === 'bottom'){
+    emits('load-more')
+  }
+}
 </script>
 
 <style scoped lang="scss">

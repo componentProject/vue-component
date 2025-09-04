@@ -98,6 +98,11 @@ PopoverTableSelect/events/enter
 PopoverTableSelect/events/focus-blur-clear
 ::::
 
+示例：下拉加载更多（enableLoadMore、hasMore、loading、virtualYConfig）
+::::demo
+PopoverTableSelect/events/loadMore
+::::
+
 ### Popover 透传属性（popoverProps）
 
 示例：弹出位置 `placement`
@@ -154,6 +159,11 @@ PopoverTableSelect/popoverProps/width
 | id | 传给 DraggableTable 的唯一标识 | String | 'popoverTableSelect' |
 | columns | vxe-grid 列配置 | ^[Array]`ColumnType[]` | [] |
 | data | 表格数据 | Array | [] |
+| enableLoadMore | 开启加载更多 | Boolean | `false` |
+| hasMore | 是否还有更多数据 | Boolean | `false` |
+| loading | 加载中状态 | Boolean | `false` |
+| virtualYConfig | 虚拟滚动配置 | ^[Object]`{ enabled: boolean, threshold: number }` | `{ enabled: false(下拉加载更多时必须关闭虚拟滚动), threshold: 30（表格距离底部还有多少px触发） }` |
+
 
 ### Events
 
@@ -165,6 +175,7 @@ PopoverTableSelect/popoverProps/width
 | clear  | 清空输入时触发 | ^[Function]`() => void` |
 | select | 选中指定行时触发        | ^[Function]`(selectedRow: any) => void` |
 | enter  | 按下回车键或选择行时触发 | ^[Function]`(selectedRow: any) => void` |
+| loadMore | 加载更多数据时触发 | ^[Function]`() => void` |
 
 ### Slots
 

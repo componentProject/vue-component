@@ -53,9 +53,9 @@ Select/props/disabled
 Select/props/disabledHandler
 ::::
 
-### 下拉加载更多
+### 下拉加载更多（enableLoadMore、hasMore、loading）
 
-示例：自定义规则禁用（演示：禁用以 w 开头）
+示例：enableLoadMore开启加载更多，hasMore是否还有待加载数据， loading加载中
 ::::demo
 Select/props/loadMore
 ::::
