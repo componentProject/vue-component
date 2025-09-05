@@ -3,6 +3,7 @@
     <div class="title">
       调试与演示
     </div>
+    <el-button type="primary" @click="handleClick">删除组件库组件</el-button>
     <div class="main">
       <div>虚拟模块里导出的组件</div>
       <PopoverTableSelect
@@ -13,27 +14,12 @@
       <div class="list-title">
         开发调试组件
       </div>
-      <div @click="showModal = true">按钮</div>
       <component
-        :is="localComponent"
-        v-model:visible="showModal"
-        title="可拖拽可缩放弹窗"
-        resizable
-        :mask="false"
-        @confirm="handleConfirm"
-        @cancel="handleCancel"
-      >
-        <p>弹窗内容</p>
-        <template #footer>
-          <button @click="showModal = false">关闭</button>
-        </template>
-      </component>
-      <!-- <component
         :is="localComponent"
         pop-type="input"
         :columns="columns"
         :data="tableData"
-      /> -->
+      />
     </div>
     <div class="main">
       <div class="list-title">
@@ -57,15 +43,14 @@ import { onMounted, ref } from 'vue'
 import { load } from '../../../utils.ts'
 // 虚拟模块由 Vite 插件在运行时提供
 import PopoverTableSelect from 'virtual:components/PopoverTableSelect'
+import { setDeleteByPathAndCode } from '../../../../../packages/utils/_api/index.ts'
 
 defineOptions({ name: '调试与演示' })
 console.log('PopoverTableSelect1', PopoverTableSelect)
 // 使用ref替代data属性
-const componentName = ref('DragModalDialog') // 调试与演示组件库的组件，直接修改组件名
+const componentName = ref('PopoverTableSelect') // 调试与演示组件库的组件，直接修改组件名
 const localComponent = ref<any>(null) // 调试组件
 const dynamicComponent = ref<any>(null) // 用于存储动态组件
-const showModal = ref(false)
-
 
 const columns = [
   { field: 'id', title: 'ID', width: 60 },
@@ -163,10 +148,21 @@ async function loadComponents(components: string[]) {
     console.error('加载动态组件失败:', error)
   }
 }
+const handleClick = async () => {
+   const params = {
+    code:"webfile",
+    paraMeters:{
+      productCode:"webFile_his",
+      Vue:"Vue3",
+      componentCode:"ConfigTable"
+    }
+  }
+  //ConfigTable、
+  await setDeleteByPathAndCode(params)
+}
 
 onMounted(async () => {
   await loadLocalComponent(componentName.value)
-  return
   await loadComponents([componentName.value])
 })
 </script>

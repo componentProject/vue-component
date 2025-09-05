@@ -27,3 +27,21 @@ pnpm add @moluoxixi/想用的组件名小写
 // main.ts
 import 组件名 from '@moluoxixi/想用的组件名小写'
 ```
+
+示例：新壳子子应用使用
+```ts
+// main.ts
+import App from './App.vue'
+import * as vue from 'vue'
+let app
+
+
+async function render(props) {
+  app = createApp(App)
+  //组件库全局引入(主应用下发方式)
+  await props.fn?.globalComponents?.(vue, app)
+  //组件库全局引入(window挂载方式)
+  await window?.$globalLoad?.(vue, app)
+}
+
+```
