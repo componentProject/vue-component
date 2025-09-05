@@ -509,7 +509,7 @@ function handleElPaginationSizeChange(size: number) {
 
 function transformPageSizes(pageSizes: VxePagerProps['pageSizes']): number[] | undefined {
   if (props.pageType === 'el-pagination') {
-    return pageSizes?.map((item) => {
+    return pageSizes?.map((item: any) => {
       if (typeof item === 'number') {
         return item
       }
@@ -527,7 +527,7 @@ function transformLayouts(layouts: VxePagerProps['layouts']): string | undefined
     PrevJump,
      PrevPage, Number, JumpNumber, NextPage, NextJump, End, Sizes, Jump, FullJump, PageCount, Total
     * */
-    const ElPaginationLayoutsMap = {
+    const ElPaginationLayoutsMap: Record<string, any> = {
       PrevPage: 'prev',
       Number: 'pager',
       NextPage: 'next',
@@ -542,7 +542,7 @@ function transformLayouts(layouts: VxePagerProps['layouts']): string | undefined
       Jump: '',
       PageCount: '',
     }
-    return layouts?.map((item) => {
+    return layouts?.map((item: any) => {
       return ElPaginationLayoutsMap[item]
     }).join(',')
   }
@@ -567,8 +567,8 @@ function transformLayouts(layouts: VxePagerProps['layouts']): string | undefined
  */
 const computedColumns = computed<ColumnType[]>(() => {
   const typeSet = new Set<types | undefined>([])
-  const columns = cloneDeep(props.columns)
-    .filter((i) => {
+  const columns: any[] = cloneDeep(props.columns)
+    .filter((i: any) => {
       if (i.type && typeSet.has(i.type)) {
         return false
       }
@@ -767,7 +767,7 @@ const gridProps = computed<VxeGridProps>(() => {
   const isEditEnabled = props.editable || props.editConfig?.enabled
 
   if (isEditEnabled && localColumns.value.length > 0) {
-    localColumns.value.forEach((column) => {
+    localColumns.value.forEach((column: ColumnType) => {
       // 检查列是否有 field 且有验证规则
       if (column.field && (column.required === true || column.min !== undefined || column.max !== undefined)) {
         const rules: any[] = []
@@ -844,15 +844,15 @@ const gridProps = computed<VxeGridProps>(() => {
       showGuidesStatus: true,
       showIcon: false,
       trigger: 'row',
-      dragEndMethod: (params) => {
+      dragEndMethod: (params: any) => {
         const isDrag = props.rowDragEndMethod ? props.rowDragEndMethod(params) : true
         if (isDrag) {
           emit('rowDragend', params)
         }
         const { newRow, oldRow, dragToChild } = params
         if (!dragToChild) {
-          const oldIndex = tableData.value.findIndex(item => item === oldRow)
-          const newIndex = tableData.value.findIndex(item => item === newRow)
+          const oldIndex = tableData.value.findIndex((item: any) => item === oldRow)
+          const newIndex = tableData.value.findIndex((item: any) => item === newRow)
           if (oldIndex !== -1 && newIndex !== -1) {
             tableData.value.splice(newIndex, 0, tableData.value.splice(oldIndex, 1)[0])
           }
@@ -884,7 +884,7 @@ const gridProps = computed<VxeGridProps>(() => {
       showGuidesStatus: true,
       showIcon: false,
       trigger: 'cell',
-      dragEndMethod: (params) => {
+      dragEndMethod: (params: any) => {
         const isDrag = props.columnDragEndMethod ? props.columnDragEndMethod(params) : true
         // Vxe自带逻辑，无须添加
         // const { oldColumn, newColumn } = params
@@ -899,7 +899,7 @@ const gridProps = computed<VxeGridProps>(() => {
         }
         return isDrag
       },
-      disabledMethod(params) {
+      disabledMethod(params: any) {
         return props.columnDragDisabledMethod?.(params)
       },
       ...props.columnDragConfig,
@@ -923,7 +923,7 @@ const gridProps = computed<VxeGridProps>(() => {
       ...props.menuConfig,
     },
     sortConfig: {
-      iconVisibleMethod(params) {
+      iconVisibleMethod(params: any) {
         const {
           column: { field },
         } = params
@@ -933,7 +933,7 @@ const gridProps = computed<VxeGridProps>(() => {
       ...props.sortConfig,
     },
     filterConfig: {
-      iconVisibleMethod(params) {
+      iconVisibleMethod(params: any) {
         const {
           column: { field },
         } = params
@@ -1029,9 +1029,9 @@ function handleSaveColumnsToStorage() {
     // 只保存必要的列属性
     const columns = computedColumns.value
       .filter((item: ColumnType) => item.title || item.type)
-      .map((i) => {
+      .map((i: ColumnType) => {
         const oldCol = handleGetColumn(i)
-        const col = fullColumn.find(item => item.field === i.field && item.type === i.type && item.title === i.title)
+        const col = fullColumn.find((item: ColumnType) => item.field === i.field && item.type === i.type && item.title === i.title)
         if (col) {
           col.width = oldCol.width!
         }
@@ -1094,7 +1094,7 @@ function handleColumnResizableChange(params: VxeTableDefines.ResizableChangePara
  */
 watch(
   () => computedColumns.value,
-  (newColumns) => {
+  (newColumns: ColumnType) => {
     // 如果启用了本地存储，不保存
     if (props.customConfig.storage) {
       localColumns.value = cloneDeep(newColumns)
@@ -1124,7 +1124,7 @@ watch(
 
 watch(
   () => localColumns.value,
-  (newVal) => {
+  (newVal: ColumnType) => {
     nextTick(() => {
       xTable.value?.loadColumn(newVal)
       handleSaveColumnsToStorage()
@@ -1315,7 +1315,7 @@ onBeforeUnmount(() => {
 // 监听拖拽配置变化，动态更新拖拽功能
 watch(
   () => props.dragable,
-  (newVal) => {
+  (newVal: boolean) => {
     if (props.dragType !== 'draggable')
       return
     if (newVal) {
@@ -1335,7 +1335,7 @@ watch(
 
 watch(
   () => props.rowdragable,
-  (newVal) => {
+  (newVal: boolean) => {
     if (props.dragType !== 'draggable')
       return
     if (newVal) {
@@ -1355,7 +1355,7 @@ watch(
 
 watch(
   () => props.columndragable,
-  (newVal) => {
+  (newVal: boolean) => {
     if (props.dragType !== 'draggable')
       return
     if (newVal) {

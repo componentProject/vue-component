@@ -5,6 +5,7 @@
       v-model="model"
       :rule="props.rule"
       :option="props.option"
+      :config="config"
       v-bind="$attrs"
     />
   </div>
@@ -18,13 +19,16 @@ import install from '@form-create/element-ui/auto-import'
 defineOptions({
   name: 'ConfigFrom',
 })
-
 // 允许用户传入 form-create 的 rule 与 option（运行时声明，避免类型参数解析问题）
 const props = defineProps({
   rule: { type: Array as any, default: () => [] },
   option: { type: Object as any, default: () => ({}) },
 })
-
+const config = ref({
+  ai: {
+    token: 'fc-7156c78aa76dd63bdebfcf62f54a965d/c3c67935',
+  },
+})
 const model = defineModel<Record<string, any>>({ default: {} })
 const isReady = ref(false)
 
