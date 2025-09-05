@@ -63,6 +63,16 @@ import 'vue-template-components/dist/style.css'
 - Tabs - 标签页
 - Watermark - 水印组件
 
+### 新增
+- ConfigFrom - 配置化表单（基于 form-create + Element UI）
+- ConfigFromPlayground - 配置化表单可视化设计器（基于 form-create designer）
+
+依赖（若未安装）：
+
+```bash
+pnpm -C packages/components add @form-create/element-ui @form-create/designer -w
+```
+
 ## 开发与贡献
 
 1. 克隆仓库

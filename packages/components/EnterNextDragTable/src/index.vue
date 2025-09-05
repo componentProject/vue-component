@@ -14,9 +14,9 @@
   </DraggableTable>
 
   <EnterNextContainer
-    v-for="(row, index) in tableRows"
+    v-for="(virtualRef, index) in tableVirtualRefs"
     :key="`row-${index}`"
-    :virtual-ref="row"
+    :virtual-ref="virtualRef"
     :allow-select-next-in-empty="props.allowSelectNextInEmpty"
     @no-next-input="handleNoNextInput"
     @no-select-value="handleNoSelectValue"
@@ -59,10 +59,10 @@ const tableData = defineModel({
 
 const slotNames = computed<string[]>(() => Object.keys(slots) as string[])
 const tableRef = useTemplateRef<typeof DraggableTable>('tableRef')
-const tableRows = ref<HTMLElement[]>([])
+const tableVirtualRefs = ref<HTMLElement[]>([])
 
 // 获取表格中所有的行元素
-function collectTableRows() {
+function collectTableVirtualRefs() {
   try {
     if (!tableRef.value) {
       return
@@ -77,25 +77,22 @@ function collectTableRows() {
     const tables = Array.from(table.querySelectorAll('tbody')) as HTMLElement[]
     // 获取所有tr元素(不包括表头tr)
     const rows = Array.from(table.querySelectorAll('tbody tr')) as HTMLElement[]
-    const containerTypeMap = {
-      row: rows,
-      table: tables,
-    }
-    tableRows.value = containerTypeMap[props.containerType]
+
+    tableVirtualRefs.value = props.containerType === 'row' ? rows : tables
   }
   catch (error) {
     console.error('EnterNextDragTable: 收集行元素时出错', error)
   }
 }
 
-// 创建防抖版本的collectTableRows
-const debouncedCollectTableRows = debounce(collectTableRows, 200)
+// 创建防抖版本的collectTableVirtualRefs
+const debouncedCollectTableVirtualRefs = debounce(collectTableVirtualRefs, 200)
 
 // 当找不到下一个输入元素时的处理
 function handleNoNextInput(element: HTMLElement) {
   // 查找当前行的索引
   const row = element.closest('.vxe-body--row') as HTMLElement
-  const rowIndex = row ? tableRows.value.indexOf(row) : -1
+  const rowIndex = row ? tableVirtualRefs.value.indexOf(row) : -1
   // 获取当前元素最近的td祖先
   const td = element.closest('td')
   // 获取所有td元素
@@ -118,7 +115,7 @@ function handleNoNextInput(element: HTMLElement) {
 function handleNoSelectValue(element: HTMLElement) {
   // 查找当前行的索引
   const row = element.closest('tr')
-  const rowIndex = row ? tableRows.value.indexOf(row) : -1
+  const rowIndex = row ? tableVirtualRefs.value.indexOf(row) : -1
   // 获取当前元素最近的td祖先
   const td = element.closest('td')
   // 获取所有td元素
@@ -140,7 +137,7 @@ watch(
   () => tableData.value,
   () => {
     nextTick(() => {
-      debouncedCollectTableRows()
+      debouncedCollectTableVirtualRefs()
     })
   },
   { deep: true, immediate: true },
@@ -148,7 +145,7 @@ watch(
 // 为了处理表格渲染完成后的场景
 function handleTableRendered(params: VxeTableDefines.ToggleRowExpandEventParams) {
   nextTick(() => {
-    debouncedCollectTableRows()
+    debouncedCollectTableVirtualRefs()
   })
   emit('toggleTreeExpand', params)
 }
@@ -156,9 +153,9 @@ function handleTableRendered(params: VxeTableDefines.ToggleRowExpandEventParams)
 // 暴露方法给父组件
 defineExpose({
   // 允许外部手动刷新行收集
-  refreshRows: debouncedCollectTableRows,
+  refreshRows: debouncedCollectTableVirtualRefs,
   // 暴露内部tableRef，以便外部可以访问DraggableTable的方法
-  getTableRef: () => tableRef.value,
+  getTable: () => tableRef.value?.getTable?.(),
 })
 </script>
 

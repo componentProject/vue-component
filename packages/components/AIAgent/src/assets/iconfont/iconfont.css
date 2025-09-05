@@ -1,200 +1,200 @@
 @font-face {
-    font-family: 'ai-iconfont'; /* Project id 4940645 */
-    src: url('iconfont.ttf?t=1755152280009') format('truetype');
+  font-family: 'ai-iconfont'; /* Project id 4940645 */
+  src: url('iconfont.ttf?t=1755152280009') format('truetype');
 }
 
 .ai-iconfont {
-    font-family: 'ai-iconfont' !important;
-    font-size: 16px;
-    font-style: normal;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+  font-family: 'ai-iconfont' !important;
+  font-size: 16px;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 .icon-bangzhu:before {
-    content: '\e606';
+  content: '\e606';
 }
 
 .icon-wenhaofill:before {
-    content: '\e72c';
+  content: '\e72c';
 }
 
 .icon-wenhao:before {
-    content: '\e72d';
+  content: '\e72d';
 }
 
 .icon-statistics:before {
-    content: '\e86b';
+  content: '\e86b';
 }
 
 .icon-icon:before {
-    content: '\e64b';
+  content: '\e64b';
 }
 
 .icon-yiliaoweisheng-:before {
-    content: '\ed78';
+  content: '\ed78';
 }
 
 .icon-yiliao:before {
-    content: '\e6ef';
+  content: '\e6ef';
 }
 
 .icon-sharpicons_medical-note:before {
-    content: '\e80f';
+  content: '\e80f';
 }
 
 .icon-tubiao_-:before {
-    content: '\e6fe';
+  content: '\e6fe';
 }
 
 .icon-yiliao_yiliaowendang:before {
-    content: '\e642';
+  content: '\e642';
 }
 
 .icon-star1:before {
-    content: '\e62c';
+  content: '\e62c';
 }
 
 .icon-check:before {
-    content: '\e645';
+  content: '\e645';
 }
 
 .icon-shuaxin:before {
-    content: '\e600';
+  content: '\e600';
 }
 
 .icon-arrowup:before {
-    content: '\e9d3';
+  content: '\e9d3';
 }
 
 .icon-cc-thumbs-down:before {
-    content: '\e6a7';
+  content: '\e6a7';
 }
 
 .icon-cc-thumbs-up:before {
-    content: '\e6a8';
+  content: '\e6a8';
 }
 
 .icon-upload:before {
-    content: '\e669';
+  content: '\e669';
 }
 
 .icon-arrow-down:before {
-    content: '\e604';
+  content: '\e604';
 }
 
 .icon-star:before {
-    content: '\e61c';
+  content: '\e61c';
 }
 
 .icon-user:before {
-    content: '\e60a';
+  content: '\e60a';
 }
 
 .icon-download:before {
-    content: '\e7ef';
+  content: '\e7ef';
 }
 
 .icon-server:before {
-    content: '\f0ac';
+  content: '\f0ac';
 }
 
 .icon-comment-dots:before {
-    content: '\e629';
+  content: '\e629';
 }
 
 .icon-stopcircle-fill:before {
-    content: '\e7cc';
+  content: '\e7cc';
 }
 
 .icon-exclamation-circle:before {
-    content: '\e6ee';
+  content: '\e6ee';
 }
 
 .icon-refresh:before {
-    content: '\e6a2';
+  content: '\e6a2';
 }
 
 .icon-arrow-left:before {
-    content: '\e699';
+  content: '\e699';
 }
 
 .icon-arrow-right:before {
-    content: '\e69a';
+  content: '\e69a';
 }
 
 .icon-times:before {
-    content: '\e83c';
+  content: '\e83c';
 }
 
 .icon-play-circle:before {
-    content: '\e601';
+  content: '\e601';
 }
 
 .icon-sign-out-alt:before {
-    content: '\e6b2';
+  content: '\e6b2';
 }
 
 .icon-robot:before {
-    content: '\e602';
+  content: '\e602';
 }
 
 .icon-send:before {
-    content: '\e688';
+  content: '\e688';
 }
 
 .icon-times-circle:before {
-    content: '\e79f';
+  content: '\e79f';
 }
 
 .icon-plus:before {
-    content: '\e685';
+  content: '\e685';
 }
 
 .icon-arrow_up:before {
-    content: '\e612';
+  content: '\e612';
 }
 
 .icon-chart_bar:before {
-    content: '\e63b';
+  content: '\e63b';
 }
 
 .icon-history:before {
-    content: '\e674';
+  content: '\e674';
 }
 
 .icon-import:before {
-    content: '\e675';
+  content: '\e675';
 }
 
 .icon-info-circle:before {
-    content: '\eb2f';
+  content: '\eb2f';
 }
 
 .icon-exchange-alt:before {
-    content: '\e6be';
+  content: '\e6be';
 }
 
 .icon-cloud-upload-alt:before {
-    content: '\e673';
+  content: '\e673';
 }
 
 .icon-copy:before {
-    content: '\e77c';
+  content: '\e77c';
 }
 
 .icon-angle-right:before {
-    content: '\e603';
+  content: '\e603';
 }
 
 .icon-angle-down:before {
-    content: '\e605';
+  content: '\e605';
 }
 
 .icon-exclamation-circle1:before {
-    content: '\e62a';
+  content: '\e62a';
 }
 
 .icon-office_baozhizhedie_newspaper-folding_linear:before {
-    content: '\e6ca';
+  content: '\e6ca';
 }
