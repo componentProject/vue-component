@@ -1,18 +1,19 @@
 import mermaid from 'mermaid'
 
-const mermaidChart = (code) => {
+function mermaidChart(code) {
   try {
     mermaid.parse(code)
     return `<div class="mermaid">${code}</div>`
-  } catch ({ str, hash }) {
+  }
+  catch ({ str, hash }) {
     return `<pre>${str}</pre>`
   }
 }
 
-const MermaidPlugin = (md, opts) => {
+function MermaidPlugin(md, opts) {
   md.mermaid = mermaid
   opts = opts || {
-    theme: 'default'
+    theme: 'default',
   }
   mermaid.initialize(opts)
 
