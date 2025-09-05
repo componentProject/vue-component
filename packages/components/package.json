@@ -62,7 +62,9 @@
     "core-js": "^3.8.3",
     "dexie": "^4.0.11",
     "flowchart.js": "^1.15.0",
-    "font-awesome-icon-chars": "^2.6.0"
+    "font-awesome-icon-chars": "^2.6.0",
+    "@form-create/element-ui": "^3.1.0",
+    "@form-create/designer": "^3.1.0"
   },
   "devDependencies": {
     "@moluoxixi/element": "workspace:*",
