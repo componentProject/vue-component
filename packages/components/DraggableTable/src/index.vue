@@ -9,11 +9,7 @@
       @checkbox-change="handleCheckboxChange"
       @resizable-change="handleColumnResizableChange"
       @header-cell-menu.prevent="handleHeaderCellMenu"
-<<<<<<< HEAD
-=======
-      @page-change="handlePageChange"
       @toggle-tree-expand="handleTableRendered"
->>>>>>> 2351a9f234617e2dc919da74a83554304731210c
     >
       <template #loading="params">
         <slot name="loading" v-bind="params">
@@ -56,21 +52,16 @@
 
 <script lang="ts" setup>
 import type { PropType } from 'vue'
-<<<<<<< HEAD
-=======
-import ZhCn from 'element-plus/dist/locale/zh-cn.mjs'
 import type {
   VxeGridInstance,
   VxeGridProps,
   VxeGridPropTypes,
-  VxePagerDefines,
   VxeTableConstructor,
   VxeTableDefines,
   VxeTablePropTypes,
 } from 'vxe-table'
->>>>>>> 2351a9f234617e2dc919da74a83554304731210c
 import type { ColumnType, types } from '@moluoxixi/components/DraggableTable/src/_types'
-import { ElMessage, ElPagination } from 'element-plus'
+import { ElMessage } from 'element-plus'
 
 import { cloneDeep, groupBy } from 'lodash'
 import { diff, isEmpty } from 'radash'
@@ -87,12 +78,8 @@ import {
 import { VxeGrid } from 'vxe-table'
 import { VxePager } from 'vxe-pc-ui'
 import 'vxe-table/lib/style.css'
-<<<<<<< HEAD
 import 'vxe-pc-ui/lib/style.css'
-import { dispatchEvents, getClass, getStringObj, getType } from '@moluoxixi/utils/_utils'
-=======
 import { debounce, dispatchEvents, getClass, getStringObj, getType } from '@moluoxixi/utils/_utils'
->>>>>>> 2351a9f234617e2dc919da74a83554304731210c
 import {
   getCustomType,
   handleGetColumn,
@@ -418,30 +405,6 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
-<<<<<<< HEAD
-=======
-  // 分页配置
-  pagination: {
-    type: Object,
-    default: () => ({
-      pageIndex: 1,
-      pageSize: 10,
-      total: 0,
-    }),
-  },
-  // 每页显示条数选项
-  pageSizes: {
-    type: Array,
-    default: () => [10, 20, 50, 100],
-  },
-  // 分页布局
-  paginationLayout: {
-    type: String,
-    default: 'total, sizes, prev, pager, next, jumper',
-  },
-  //#endregion
-
-  //#region 回车下一个容器相关
   //#endregion
   allowSelectNextInEmpty: {
     type: Boolean,
@@ -451,7 +414,6 @@ const props = defineProps({
     type: String as PropType<'row' | 'table'>,
     default: 'row',
   },
->>>>>>> 2351a9f234617e2dc919da74a83554304731210c
 })
 
 // 组件事件
@@ -490,8 +452,6 @@ const tableData = defineModel({
 function handlePageChange(params: any) {
   emit('pageChange', params)
 }
-<<<<<<< HEAD
-=======
 
 //#region 回车下一个功能
 const tableVirtualRefs = ref<HTMLElement[]>([])
@@ -593,77 +553,6 @@ function handleTableRendered(params: VxeTableDefines.ToggleRowExpandEventParams)
   })
   emit('toggleTreeExpand', params)
 }
-//#endregion
-/*//#region pagnation转换，暂时摒弃
-/!**
- * 处理ElPagination的分页变化事件
- * @param page 当前页码
- *!/
-function handleElPaginationPageChange(page: number) {
-  // 构造vxe-grid的page-change事件参数
-  const pageChangeParams = {
-    type: 'current',
-    currentPage: page,
-    pageSize: props.pagerConfig.pageSize,
-  }
-  emit('pageChange', pageChangeParams)
-}
-
-/!**
- * 处理ElPagination的每页条数变化事件
- * @param size 每页条数
- *!/
-function handleElPaginationSizeChange(size: number) {
-  // 构造vxe-grid的page-change事件参数
-  const pageChangeParams = {
-    type: 'size',
-    currentPage: 1,
-    pageSize: size,
-  }
-  emit('pageChange', pageChangeParams)
-}
-
-function transformPageSizes(pageSizes: VxePagerProps['pageSizes']): number[] | undefined {
-  if (props.pageType === 'el-pagination') {
-    return pageSizes?.map((item: any) => {
-      if (typeof item === 'number') {
-        return item
-      } else {
-        return +item.value!
-      }
-    })
-  }
-}
-
-function transformLayouts(layouts: VxePagerProps['layouts']): string | undefined {
-  if (props.pageType === 'el-pagination') {
-    /!*
-    Home,
-    PrevJump,
-     PrevPage, Number, JumpNumber, NextPage, NextJump, End, Sizes, Jump, FullJump, PageCount, Total
-    * *!/
-    const ElPaginationLayoutsMap: Record<string, any> = {
-      PrevPage: 'prev',
-      Number: 'pager',
-      NextPage: 'next',
-      Sizes: 'sizes',
-      FullJump: 'jumper',
-      Total: 'total',
-      Home: '',
-      End: '',
-      PrevJump: '',
-      NextJump: '',
-      JumpNumber: '',
-      Jump: '',
-      PageCount: '',
-    }
-    return layouts?.map((item: any) => {
-      return ElPaginationLayoutsMap[item]
-    }).join(',')
-  }
-}
-//#endregion*/
->>>>>>> 2351a9f234617e2dc919da74a83554304731210c
 
 /**
  * 计算后的columns，用于提供额外功能，目前功能如下：
