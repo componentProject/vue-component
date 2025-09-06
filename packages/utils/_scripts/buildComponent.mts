@@ -51,6 +51,8 @@ const useObfuscator = false
  * 是否启用依赖排除,不启用时，仅排除核心依赖（vue模块，node模块）
  */
 const useExternal = false
+// 控制是否排除重型插件（由 main() 解析 args[2] 决定）
+let EXCLUDE_HEAVY_PLUGINS = false
 /**
  * 必须要排除依赖的工具包
  */
@@ -83,15 +85,29 @@ const alias = {
 }
 const aliasPacks = Object.keys(alias).filter((i: string) => !i.endsWith('*'))
 
+// 简单延迟函数，用于在批量打包时给 GC 和系统 I/O 缓冲时间
+function sleep(ms: number): Promise<void> {
+  return new Promise(resolve => setTimeout(resolve, ms))
+}
+
+function parseBoolean(input: string | undefined, defaultValue = false): boolean {
+  if (typeof input === 'undefined')
+    return defaultValue
+  const v = String(input).toLowerCase()
+  return v === 'true' || v === '1'
+}
+
 // 主函数
 async function main() {
   // 获取命令行参数
   const args = process.argv.slice(2)
   const command = args[0] || 'build-publish' // 默认命令是build
   const mode = args[1] || 'all' // 默认模式是all
+  // 第三个参数：是否排除重型插件（布尔），默认 false
+  EXCLUDE_HEAVY_PLUGINS = parseBoolean(args[2], false)
 
   // 验证模式是否有效
-  if (mode !== 'all' && mode !== 'library') {
+  if (mode !== 'all' && mode !== 'library' && mode !== 'allComponent') {
     // 如果不是all或library，则检查是否是有效的组件名
     const componentNames = await getComponentNames()
     if (!componentNames.includes(mode)) {
@@ -207,22 +223,31 @@ function createBaseConfig(comp: string, internalDeps: string[]): InlineConfig {
         ],
         dts: path.resolve(packDir, './_typings/components.d.ts'),
       }),
-      viteImagemin({
-        gifsicle: { optimizationLevel: 7, interlaced: false },
-        optipng: { optimizationLevel: 7 },
-        mozjpeg: { quality: 20 },
-        pngquant: { quality: [0.8, 0.9], speed: 4 },
-        svgo: {
-          plugins: [{ name: 'removeViewBox' }, { name: 'removeEmptyAttrs', active: false }],
-        },
-      }),
-      // 添加类型声明生成插件
-      dts({
-        root: packDir,
-        entryRoot: `.${entryBaseUrl}${comp}`,
-        tsconfigPath: './tsconfig.base.json',
-        declarationOnly: false,
-      }),
+      // 按需启用图片压缩（重型插件）
+      ...(!EXCLUDE_HEAVY_PLUGINS
+        ? [
+            viteImagemin({
+              gifsicle: { optimizationLevel: 7, interlaced: false },
+              optipng: { optimizationLevel: 7 },
+              mozjpeg: { quality: 20 },
+              pngquant: { quality: [0.8, 0.9], speed: 4 },
+              svgo: {
+                plugins: [{ name: 'removeViewBox' }, { name: 'removeEmptyAttrs', active: false }],
+              },
+            }),
+          ]
+        : []),
+      // 按需启用类型声明生成（重型插件）
+      ...(!EXCLUDE_HEAVY_PLUGINS
+        ? [
+            dts({
+              root: packDir,
+              entryRoot: `.${entryBaseUrl}${comp}`,
+              tsconfigPath: './tsconfig.base.json',
+              declarationOnly: false,
+            }),
+          ]
+        : []),
       cssInjectedByJsPlugin(),
     ],
     resolve: {
@@ -958,9 +983,7 @@ async function bundleComponentModule({
           if (isVueDep || isNodeBuiltin || peerDepList.includes(id)) {
             return true
           }
-
           const isExternal = useExternal || requireExternalPacks.includes(comp)
-
           if (isExternal) {
             return Object.keys(dependencies.external).includes(id)
           }
@@ -1245,6 +1268,16 @@ async function buildComponent(
 }
 
 /**
+ * 组件库打包
+ * @param shouldPublish
+ */
+async function buildLibrary(shouldPublish: boolean) {
+  // 打包整个组件库
+  const { entry, outputDir, dependencies } = await getComponentConfig('')
+  return await buildComponent('', entry, outputDir, dependencies, shouldPublish)
+}
+
+/**
  * 打包所有单个组件
  * @param shouldPublish 是否发布组件
  * @returns 是否全部成功
@@ -1265,6 +1298,9 @@ async function buildAllComponents(shouldPublish = false) {
         const success = await buildComponent(comp || '', entry, outputDir, dependencies, shouldPublish)
         if (success)
           successCount++
+
+        // 每个组件打包完成后，主动等待 15 秒
+        await sleep(15000)
       }
       catch (error) {
         console.error(`组件 ${comp} ${shouldPublish ? '打包发布' : '打包'}失败:`, error)
@@ -1289,17 +1325,17 @@ async function buildAllComponents(shouldPublish = false) {
 async function doBuild(mode = 'all', shouldPublish = false) {
   try {
     if (mode === 'all') {
-      // 打包整个组件库
-      const { entry, outputDir, dependencies } = await getComponentConfig('')
-      const librarySuccess = await buildComponent('', entry, outputDir, dependencies, shouldPublish)
-      // 打包所有单个组件
+      const librarySuccess = await buildLibrary(shouldPublish)
+      // 每个组件打包完成后，主动等待 15 秒
+      await sleep(15000)
       const componentsSuccess = await buildAllComponents(shouldPublish)
       return componentsSuccess && librarySuccess
     }
+    else if (mode === 'allComponent') {
+      return await buildAllComponents(shouldPublish)
+    }
     else if (mode === 'library') {
-      const { entry, outputDir, dependencies } = await getComponentConfig('')
-      // 打包整个组件库
-      return await buildComponent('', entry, outputDir, dependencies, shouldPublish)
+      return await buildLibrary(shouldPublish)
     }
     else {
       // 打包单个组件
