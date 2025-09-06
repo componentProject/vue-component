@@ -13,9 +13,6 @@
         <slot />
       </ElButton>
     </template>
-    <slot name="content">
-      {{ props.content }}
-    </slot>
   </ElPopover>
 </template>
 
@@ -43,7 +40,16 @@ const props = withDefaults(defineProps<{
 }>(), {
   showType: 'content',
   content: '',
-  popoverProps: () => ({ placement: 'top', trigger: 'hover' }),
+  popoverProps: () => ({
+    placement: 'top',
+    trigger: 'hover',
+    width: 'auto',
+    popperStyle: {
+      maxWidth: '400px',
+      whiteSpace: 'pre-wrap',
+    },
+  }),
+
   debounce: 0,
   throttle: 300,
   disabled: false,
