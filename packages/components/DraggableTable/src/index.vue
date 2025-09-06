@@ -1,5 +1,4 @@
 <template>
-  <!--  <DraggableTable /> -->
   <div class="h-full w-full flex-1 overflow-hidden">
     <VxeGrid
       ref="xTable"
@@ -10,58 +9,21 @@
       @checkbox-change="handleCheckboxChange"
       @resizable-change="handleColumnResizableChange"
       @header-cell-menu.prevent="handleHeaderCellMenu"
-      @page-change="handlePageChange"
     >
-      <!--      <template #empty> -->
-      <!--        <span style="color: red;"> -->
-      <!--          <img src="https://vxeui.com/resource/img/546.gif"> -->
-      <!--          <p>不用再看了，没有更多数据了！</p> -->
-      <!--        </span> -->
-      <!--      </template> -->
       <template #loading="params">
         <slot name="loading" v-bind="params">
           <span class="absolute left-1/2 top-1/3 -translate-x-1/2 -translate-y-1/2">加载中...</span>
         </slot>
       </template>
-      <!-- <div v-if="showPagination" class="flex justify-end mt-8!">
-      <ElConfigProvider :locale="ZhCn">
-        <ElPagination
-          :current-page="pagination.pageIndex"
-          :page-size="pagination.pageSize"
-          :page-sizes="pagination.pageSizes"
-          :layout="paginationLayout"
-          :total="pagination.total"
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
+      <template v-if="gridProps.pagerConfig.enabled" #pager>
+        <vxe-pager
+          :current-page="gridProps.pagerConfig.currentPage"
+          :page-size="gridProps.pagerConfig.pageSize"
+          :total="gridProps.pagerConfig.total"
+          :page-sizes="gridProps.pagerConfig.pageSizes"
+          :layouts="gridProps.pagerConfig.layouts"
+          @page-change="handlePageChange"
         />
-      </ElConfigProvider>
-    </div> -->
-      <template v-if="showPagination" #pager>
-        <slot name="pager">
-          <div style="padding-top: 12px;overflow:auto;">
-            <ElConfigProvider :locale="ZhCn">
-              <ElPagination
-                :current-page="pagination.pageIndex"
-                :page-size="pagination.pageSize"
-                :page-sizes="pageSizes"
-                :layout="paginationLayout"
-                :total="pagination.total"
-                @size-change="handleSizeChange"
-                @current-change="handleCurrentChange"
-              />
-            </ElConfigProvider>
-            <!-- <ElPagination
-              v-if="props.pageType === 'el-pagination'"
-              :current-page="props.pagerConfig.currentPage"
-              :page-size="props.pagerConfig.pageSize"
-              :total="props.pagerConfig.total"
-              :page-sizes="transformPageSizes(props.pagerConfig.pageSizes)"
-              :layout="transformLayouts(props.pagerConfig.layouts)"
-              @current-change="handleElPaginationPageChange"
-              @size-change="handleElPaginationSizeChange"
-            /> -->
-          </div>
-        </slot>
       </template>
       <!-- 使用插槽方式渲染自定义内容 -->
       <template v-for="name in slotNames" #[name]="slotParams" :key="name">
@@ -80,17 +42,6 @@
 
 <script lang="ts" setup>
 import type { PropType } from 'vue'
-import ZhCn from 'element-plus/dist/locale/zh-cn.mjs'
-import type {
-  VxeGridInstance,
-  VxeGridProps,
-  VxeGridPropTypes,
-  VxePagerDefines,
-  VxePagerProps,
-  VxeTableConstructor,
-  VxeTableDefines,
-  VxeTablePropTypes,
-} from 'vxe-table'
 import type { ColumnType, types } from '@moluoxixi/components/DraggableTable/src/_types'
 import { ElMessage, ElPagination } from 'element-plus'
 import { cloneDeep, groupBy } from 'lodash'
@@ -106,7 +57,9 @@ import {
   watch,
 } from 'vue'
 import { VxeGrid } from 'vxe-table'
+import { VxePager } from 'vxe-pc-ui'
 import 'vxe-table/lib/style.css'
+import 'vxe-pc-ui/lib/style.css'
 import { dispatchEvents, getClass, getStringObj, getType } from '@moluoxixi/utils/_utils'
 import {
   getCustomType,
@@ -125,6 +78,7 @@ import type { slotsType } from '@moluoxixi/components/_types'
 defineOptions({
   name: 'DraggableTable',
 })
+
 // 定义组件属性
 const props = defineProps({
   //#region 其他原始配置加默认值
@@ -407,44 +361,26 @@ const props = defineProps({
     type: Object as PropType<VxeTablePropTypes.MouseConfig>,
     default: () => ({}),
   },
-  //#endregion
   //#region 分页配置
-  pageType: {
-    type: String,
-    default: 'el-pagination',
-  },
   pagerConfig: {
     type: Object as PropType<VxeGridPropTypes.PagerConfig>,
     /**
      * layouts 可选值：Home, PrevJump, PrevPage, Number, JumpNumber, NextPage, NextJump, End, Sizes, Jump, FullJump, PageCount, Total
      * @see https://vxetable.cn/#/grid/api?q=pager-config
      */
-    default: null,
+    default: () => ({
+      currentPage: 1,
+      pageSize: 10,
+      total: 100,
+      pageSizes: [10, 20, 30, 50, 100],
+      layouts: ['Home', 'PrevJump', 'PrevPage', 'Number', 'NextPage', 'NextJump', 'End', 'Sizes', 'FullJump', 'Total'],
+    }),
   },
   //#endregion
   // 是否展示分页
   showPagination: {
     type: Boolean,
     default: false,
-  },
-  // 分页配置
-  pagination: {
-    type: Object,
-    default: () => ({
-      pageIndex: 1,
-      pageSize: 10,
-      total: 0,
-    }),
-  },
-  // 每页显示条数选项
-  pageSizes: {
-    type: Array,
-    default: () => [10, 20, 50, 100],
-  },
-  // 分页布局
-  paginationLayout: {
-    type: String,
-    default: 'total, sizes, prev, pager, next, jumper',
   },
 })
 
@@ -476,76 +412,8 @@ const tableData = defineModel({
   default: [],
 })
 
-function handlePageChange(params: VxePagerDefines.PageChangeEventParams) {
+function handlePageChange(params: any) {
   emit('pageChange', params)
-}
-/**
- * 处理ElPagination的分页变化事件
- * @param page 当前页码
- */
-function handleElPaginationPageChange(page: number) {
-  // 构造vxe-grid的page-change事件参数
-  const pageChangeParams = {
-    type: 'current',
-    currentPage: page,
-    pageSize: props.pagerConfig.pageSize,
-  }
-  emit('pageChange', pageChangeParams)
-}
-
-/**
- * 处理ElPagination的每页条数变化事件
- * @param size 每页条数
- */
-function handleElPaginationSizeChange(size: number) {
-  // 构造vxe-grid的page-change事件参数
-  const pageChangeParams = {
-    type: 'size',
-    currentPage: 1,
-    pageSize: size,
-  }
-  emit('pageChange', pageChangeParams)
-}
-
-function transformPageSizes(pageSizes: VxePagerProps['pageSizes']): number[] | undefined {
-  if (props.pageType === 'el-pagination') {
-    return pageSizes?.map((item: any) => {
-      if (typeof item === 'number') {
-        return item
-      }
-      else {
-        return +item.value!
-      }
-    })
-  }
-}
-
-function transformLayouts(layouts: VxePagerProps['layouts']): string | undefined {
-  if (props.pageType === 'el-pagination') {
-    /*
-    Home,
-    PrevJump,
-     PrevPage, Number, JumpNumber, NextPage, NextJump, End, Sizes, Jump, FullJump, PageCount, Total
-    * */
-    const ElPaginationLayoutsMap: Record<string, any> = {
-      PrevPage: 'prev',
-      Number: 'pager',
-      NextPage: 'next',
-      Sizes: 'sizes',
-      FullJump: 'jumper',
-      Total: 'total',
-      Home: '',
-      End: '',
-      PrevJump: '',
-      NextJump: '',
-      JumpNumber: '',
-      Jump: '',
-      PageCount: '',
-    }
-    return layouts?.map((item: any) => {
-      return ElPaginationLayoutsMap[item]
-    }).join(',')
-  }
 }
 
 /**
@@ -812,11 +680,9 @@ const gridProps = computed<VxeGridProps>(() => {
     customConfig: {
       ...props.customConfig,
     },
-    pagerConfig: {
-      total: tableData.value.length,
-      currentPage: 1,
-      pageSize: 10,
-      layouts: ['Home', 'PrevJump', 'PrevPage', 'Number', 'NextPage', 'NextJump', 'End', 'Sizes', 'FullJump', 'Total'],
+    pagerConfig:{
+      enabled: props.showPagination,
+      ...props.pagerConfig
     },
     editConfig: {
       enabled: props.editable,
@@ -909,13 +775,15 @@ const gridProps = computed<VxeGridProps>(() => {
       ...props.resizableConfig,
     },
     virtualXConfig: {
-      enabled: true,
-      gt: 15,
+      enabled: false,
+      gt: 0,
+      threshold: 30,
       ...props.virtualXConfig,
     },
     virtualYConfig: {
-      enabled: true,
-      gt: 30,
+      enabled: false,
+      gt: 0,
+      threshold: 30,
       ...props.virtualYConfig,
     },
     menuConfig: {

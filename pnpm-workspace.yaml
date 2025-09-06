@@ -33,7 +33,7 @@ catalogs:
     'vue-demi': ^0.12.5
     'vue-i18n': ^11.1.1
     'vue-router': 4.5.0
-    'vxe-table': 4.13.39
+    'vxe-table': 4.16.7
     'crypto-js': ^4.2.0
     'pinia': 2.3.0
     'pinia-plugin-persistedstate': ^4.2.0

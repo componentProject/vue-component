@@ -7,7 +7,6 @@
       :data="tableData"
       :columns="columns"
       :popover-props="{ width: 520 }"
-      :virtualYConfig="{ enabled: false, threshold: 30 }"
       :enable-load-more="true"
       :has-more="hasMore"
       :loading="isLoading"

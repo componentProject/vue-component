@@ -162,7 +162,7 @@ PopoverTableSelect/popoverProps/width
 | enableLoadMore | 开启加载更多 | Boolean | `false` |
 | hasMore | 是否还有更多数据 | Boolean | `false` |
 | loading | 加载中状态 | Boolean | `false` |
-| virtualYConfig | 虚拟滚动配置 | ^[Object]`{ enabled: boolean, threshold: number }` | `{ enabled: false(下拉加载更多时必须关闭虚拟滚动), threshold: 30（表格距离底部还有多少px触发） }` |
+| virtualYConfig | 滚动配置 | ^[Object]`{ threshold: number }` | `{ threshold: 30（表格距离头部、底部还有多少px触发） }` |
 
 
 ### Events
