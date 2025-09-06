@@ -6,8 +6,8 @@
   >
     <template #reference>
       <ElButton
+        :class="{ 'is-disabled': props.disabled }"
         v-bind="$attrs"
-        :disabled="props.disabled"
         @click="onClick"
       >
         <slot />
@@ -84,7 +84,13 @@ const computedOptions = computed<ThrottleOrDebounceOptions>(() => {
 })
 
 const onClick = (() => {
-  const handler = (ev: MouseEvent) => emit('click', ev)
+  const handler = (ev: MouseEvent) => {
+    ev.preventDefault()
+    ev.stopPropagation()
+    if (props.disabled)
+      return
+    emit('click', ev)
+  }
   if (props.debounce) {
     return wlDebounce(handler, props.debounce, computedOptions.value)
   }
