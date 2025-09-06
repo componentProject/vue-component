@@ -6,16 +6,13 @@
   >
     <template #reference>
       <ElButton
+        :class="{ 'is-disabled': props.disabled }"
         v-bind="$attrs"
-        :disabled="props.disabled"
         @click="onClick"
       >
         <slot />
       </ElButton>
     </template>
-    <slot name="content">
-      {{ props.content }}
-    </slot>
   </ElPopover>
 </template>
 
@@ -43,7 +40,16 @@ const props = withDefaults(defineProps<{
 }>(), {
   showType: 'content',
   content: '',
-  popoverProps: () => ({ placement: 'top', trigger: 'hover' }),
+  popoverProps: () => ({
+    placement: 'top',
+    trigger: 'hover',
+    width: 'auto',
+    popperStyle: {
+      maxWidth: '400px',
+      whiteSpace: 'pre-wrap',
+    },
+  }),
+
   debounce: 0,
   throttle: 300,
   disabled: false,
@@ -78,7 +84,13 @@ const computedOptions = computed<ThrottleOrDebounceOptions>(() => {
 })
 
 const onClick = (() => {
-  const handler = (ev: MouseEvent) => emit('click', ev)
+  const handler = (ev: MouseEvent) => {
+    ev.preventDefault()
+    ev.stopPropagation()
+    if (props.disabled)
+      return
+    emit('click', ev)
+  }
   if (props.debounce) {
     return wlDebounce(handler, props.debounce, computedOptions.value)
   }

@@ -30,11 +30,6 @@ EnterNextDragTable/props/containerType-table
 EnterNextDragTable/events/noNextInput
 :::
 
-示例：select 未选择值（noSelectValue）
-:::demo
-EnterNextDragTable/events/noSelectValue
-:::
-
 ## API
 
 ### Props

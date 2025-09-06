@@ -1,6 +1,6 @@
 # DraggableTable
 
-可拖拽表格组件，基于VXE-Grid封装，支持行列拖拽、编辑、过滤等功能。
+可拖拽表格组件，基于[VXE-Grid](https://vxetable.cn/#/grid/api),[EnterNextContainer](../base/EnterNextContainer.md)封装，支持行列拖拽、编辑、过滤等功能。
 
 ## 组件示例
 
@@ -74,6 +74,24 @@ DraggableTable/drag/columnDragDisabledMethod
 示例：启用全局排序（sortable=true）
 :::demo
 DraggableTable/sort/sortable
+:::
+
+
+### 回车下一个
+
+示例：容器类型为行（containerType='row'）
+:::demo
+DraggableTable/props/containerType-row
+:::
+
+示例：容器类型为整表（containerType='table'）
+:::demo
+DraggableTable/props/containerType-table
+:::
+
+示例：无下一个输入控件（noNextInput）
+:::demo
+DraggableTable/events/noNextInput
 :::
 
 ### 插槽（动态命名插槽与内置前缀插槽）

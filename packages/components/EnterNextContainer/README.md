@@ -137,6 +137,14 @@ function handleNoNextInput(element) {
 | noNextInput   | element: HTMLElement                          | 当用户在最后一个输入元素上按下Enter键，或者只有一个输入元素时触发 |
 | noSelectValue | {row:objType,rowIndex:number,colIndex:number} | 当select下拉框没有选中值时但按了回车触发             |
 
+## Slots
+
+该组件不提供插槽。
+
+## Expose
+
+该组件没有暴露任何方法或属性。
+
 ## 工作原理
 
 1. 组件使用MutationObserver监听DOM变化，实时收集所有input和select元素

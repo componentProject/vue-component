@@ -1,6 +1,15 @@
 # ExportExcel 导出Excel组件
-
 一个用于从el-table数据导出Excel的Vue 3组件。
+
+## 基础示例
+
+```vue
+<template>
+  <ExportExcel :table-data="tableData" :columns="columns" file-name="用户数据" />
+</template>
+```
+
+（更多示例与说明见下文）
 
 ## 特性
 
@@ -25,6 +34,8 @@ npm install xlsx file-saver
 ```
 
 ## 使用方法
+
+（以下保留原有详细示例与说明）
 
 ### 基本用法
 
@@ -57,7 +68,6 @@ const columns = ref([
   { prop: 'address', label: '地址' },
 ])
 </script>
-```
 
 ### 自定义按钮样式
 
@@ -182,7 +192,7 @@ const columns = ref([
 </export-excel>
 ```
 
-## 配置项
+## Props
 
 | 参数             | 说明                       | 类型    | 可选值     | 默认值           |
 | ---------------- | -------------------------- | ------- | ---------- | ---------------- |
@@ -196,7 +206,7 @@ const columns = ref([
 | allowEmptyExport | 是否允许导出空数据         | Boolean | true/false | true             |
 | emptyMessage     | 空数据时的提示信息         | String  | —          | '暂无数据可导出' |
 
-## 列配置项
+### 列配置项（columns）
 
 | 参数      | 说明                             | 类型     | 默认值 |
 | --------- | -------------------------------- | -------- | ------ |
@@ -204,24 +214,16 @@ const columns = ref([
 | label     | 列标题                           | String   | -      |
 | formatter | 格式化函数，可用于自定义数据格式 | Function | -      |
 
-格式化函数接收三个参数：
+## Events
 
-- `row`: 当前行数据
-- `column`: 当前列配置
-- `index`: 当前行索引
+该组件不触发事件。
 
-例如，添加序号列：
+## Slots
 
-```js
-{
-  prop: 'index',
-  label: '序号',
-  formatter: (row, column, index) => index + 1
-}
-```
+| 名称 | 说明 |
+| --- | --- |
+| default | 自定义按钮内容 |
 
-此外，组件支持传递任意el-button的属性，如type、size、icon、plain、round等，这些属性会直接应用到内部的按钮上。
+## Expose
 
-## 默认插槽
-
-组件提供了默认插槽，用于自定义按钮文本内容。如果提供了默认插槽，将使用插槽内容替代buttonText属性。
+该组件未暴露实例方法。

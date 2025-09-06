@@ -1,37 +1,33 @@
 <template>
   <div class="container">
-    <EnterNextDragTable
+    <DraggableTable
       v-model="tableData"
       :columns="columns"
       container-type="row"
       height="300"
-      @no-select-value="last = $event"
+      @no-next-input="last = $event"
     >
       <template #input="{ row, column }">
-        <ElSelect v-model="row[column.field]" size="small">
-          <ElOption label="张三" value="张三" />
-          <ElOption label="李四" value="李四" />
-          <ElOption label="王五" value="王五" />
-        </ElSelect>
+        <ElInput v-model="row[column.field]" size="small" />
       </template>
-    </EnterNextDragTable>
+    </DraggableTable>
     <div class="value">
-      noSelectValue: {{ last }}
+      noNextInput: {{ last }}
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { ElOption, ElSelect } from 'element-plus'
+import { ElInput } from 'element-plus'
 
 const last = ref<any>(null)
 
 const tableData = ref([
-  { id: 1, name: '', age: 25 },
-  { id: 2, name: '', age: 30 },
-  { id: 3, name: '', age: 28 },
-  { id: 4, name: '', age: 26 },
+  { id: 1, name: '张三', age: 25 },
+  { id: 2, name: '李四', age: 30 },
+  { id: 3, name: '王五', age: 28 },
+  { id: 4, name: '赵六', age: 26 },
 ])
 
 const columns = ref([

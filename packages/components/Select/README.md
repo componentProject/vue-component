@@ -1,114 +1,44 @@
-# Select 组件
+# Select 选择器
 
-基于Element Plus的Select选择器组件的二次封装，支持本地数据和远程接口数据源。
+基于 Element Plus 的下拉选择器二次封装，增强本地筛选、禁用规则、远程选项与多选标签显示能力。
 
-## 基本用法
+## 基础示例
 
 ```vue
 <template>
   <Select v-model="value" :options="options" />
 </template>
-
-<script setup>
-import { ref } from 'vue'
-import { Select } from '@moluoxixi/components/Select'
-
-const value = ref('')
-const options = [
-  { label: '选项1', value: '1' },
-  { label: '选项2', value: '2' },
-  { label: '选项3', value: '3' }
-]
-</script>
 ```
 
-## 远程数据源
-
-```vue
-<template>
-  <Select 
-    v-model="value" 
-    :serverProps="{ 
-      serverType: 'base', 
-      optionsParams: { dictType: 'COMMON_YES_NO' } 
-    }" 
-  />
-</template>
-
-<script setup>
-import { ref } from 'vue'
-import { Select } from '@moluoxixi/components/Select'
-
-const value = ref('')
-</script>
-```
-
-## 全局配置
-
-在应用的入口文件（如main.ts）中，可以配置全局的远程数据源：
-
-```ts
-import { createApp } from 'vue'
-import App from './App.vue'
-import axios from 'axios'
-import { configureServerOptions } from '@moluoxixi/components/Select/src/uitls'
-
-// 配置Select组件的全局选项
-configureServerOptions({
-  // 配置服务类型和对应的API端点
-  serverMap: {
-    base: '/api/common/dict',
-    users: '/api/users',
-    departments: '/api/departments',
-    // 添加更多自定义服务类型...
-  },
-  
-  // 自定义请求处理函数
-  requestHandler: async (url, params) => {
-    try {
-      // 使用axios或其他HTTP客户端
-      const response = await axios.post(url, params)
-      // 根据自己的API返回格式处理结果
-      if (response.data.code === 200) {
-        return response.data.data.list || []
-      }
-      return []
-    } catch (error) {
-      console.error('Failed to fetch options:', error)
-      return []
-    }
-  }
-})
-
-const app = createApp(App)
-app.mount('#app')
-```
-
-## 组件属性
+## Props
 
 | 属性名 | 说明 | 类型 | 默认值 |
-|--------|------|------|--------|
-| modelValue / v-model | 选中项绑定值 | string / number / boolean / object | — |
-| options | 下拉框选项数据 | Array | [] |
-| label | 选项标签的键名 | string | 'label' |
-| value | 选项值的键名 | string | 'value' |
-| clearable | 是否可以清空选项 | boolean | true |
+| --- | --- | --- | --- |
+| modelValue | 选中项绑定值 | any | - |
+| options | 本地选项数据 | any[] | [] |
+| label/value | 选项显示/值字段名 | string | 'label'/'value' |
+| clearable | 是否可清空 | boolean | true |
 | filterable | 是否可搜索 | boolean | true |
-| filterMethod | 自定义搜索方法 | function | — |
-| collapseTags | 多选时是否将选中值按文字形式展示 | boolean | true |
-| collapseTagsTooltip | 当鼠标悬停于折叠标签的文本时，是否显示所有选中的标签 | boolean | true |
-| teleported | 是否将下拉菜单插入至body元素 | boolean | true |
-| serverProps | 远程数据源配置 | object | — |
+| filterMethod | 自定义本地筛选 | `(keyword:string)=>void` | - |
+| collapseTags/collapseTagsTooltip | 多选折叠与提示 | boolean | true |
+| teleported | Teleport 到 body | boolean | true |
+| serverProps | 远程数据配置 | `{ serverType:string; optionsParams?:object }` | - |
+| tagType | Tag 类型 | `'success'|'info'|'warning'|'danger'` | 'primary' |
+| filterFields | 本地筛选字段集合 | string[] | [] |
+| disabledValues/disabledLabels | 按值/标签禁用 | any[] | [] |
+| disabledHandler | 自定义禁用规则 | `({ label, value, data? })=>boolean` | - |
+| enableLoadMore/hasMore/loading | 下拉加载更多控制 | boolean | false |
 
-### serverProps 属性
-
-| 属性名 | 说明 | 类型 | 默认值 |
-|--------|------|------|--------|
-| serverType | 服务类型，对应全局配置中的键名 | string | — |
-| optionsParams | 请求参数 | object | {} |
-
-## 事件
+## Events
 
 | 事件名 | 说明 | 回调参数 |
-|--------|------|----------|
-| change | 选中值变化时触发 | 当前选中值 | 
+| --- | --- | --- |
+| change | 选项变化 | `(value:any) => void` |
+
+## Slots
+
+该组件无自定义插槽。
+
+## Expose
+
+无。 

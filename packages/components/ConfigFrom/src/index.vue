@@ -5,7 +5,6 @@
       v-model="model"
       :rule="props.rule"
       :option="props.option"
-      :config="config"
       v-bind="$attrs"
     />
   </div>
@@ -24,11 +23,7 @@ const props = defineProps({
   rule: { type: Array as any, default: () => [] },
   option: { type: Object as any, default: () => ({}) },
 })
-const config = ref({
-  ai: {
-    token: 'fc-7156c78aa76dd63bdebfcf62f54a965d/c3c67935',
-  },
-})
+
 const model = defineModel<Record<string, any>>({ default: {} })
 const isReady = ref(false)
 

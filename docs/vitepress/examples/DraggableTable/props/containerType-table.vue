@@ -1,15 +1,15 @@
 <template>
   <div class="container">
-    <EnterNextDragTable
+    <DraggableTable
       v-model="tableData"
       :columns="columns"
-      container-type="row"
+      container-type="table"
       height="300"
     >
       <template #input="{ row, column }">
         <ElInput v-model="row[column.field]" size="small" />
       </template>
-    </EnterNextDragTable>
+    </DraggableTable>
   </div>
 </template>
 

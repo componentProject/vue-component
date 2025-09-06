@@ -21,6 +21,7 @@
     "storybook:build": "pnpm run -C docs/storybook build",
     "components:build": "pnpm run -C packages/components build:only",
     "components:publish": "pnpm run -C packages/components build:publish",
+    "allComponents:publish": "pnpm run -C packages/components publish:allComponent",
     "components:build-publish": "pnpm run -C packages/components build",
     "utils:build": "pnpm run -C packages/utils build:only",
     "utils:publish": "pnpm run -C packages/utils build:publish",
