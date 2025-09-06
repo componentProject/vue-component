@@ -1,6 +1,6 @@
 # DraggableTable
 
-可拖拽表格组件，基于[VXE-Grid](https://vxetable.cn/#/grid/api),[EnterNextContainer](./EnterNextContainer.md)封装，支持行列拖拽、编辑、过滤等功能。
+可拖拽表格组件，基于[VXE-Grid](https://vxetable.cn/#/grid/api),[EnterNextContainer](../base/EnterNextContainer.md)封装，支持行列拖拽、编辑、过滤等功能。
 
 ## 组件示例
 
