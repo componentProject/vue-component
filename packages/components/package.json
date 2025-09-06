@@ -10,7 +10,8 @@
   "scripts": {
     "build": "tsx _scripts/buildComponent.mts build-publish",
     "build:only": "tsx _scripts/buildComponent.mts build",
-    "build:publish": "tsx _scripts/buildComponent.mts publish"
+    "build:publish": "tsx _scripts/buildComponent.mts publish",
+    "publish:allComponent": "tsx _scripts/buildComponent.mts build-publish allComponent"
   },
   "dependencies": {
     "@codemirror/view": "^6.36.5",

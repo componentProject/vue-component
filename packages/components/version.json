@@ -21,5 +21,6 @@
   "Splitter": "0.0.2",
   "AIAgent": "0.0.8",
   "DragModalDialog": "0.0.7",
-  "Tree": "0.0.7"
+  "Tree": "0.0.7",
+  "Button": "0.0.2"
 }

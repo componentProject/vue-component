@@ -93,7 +93,7 @@ async function main() {
   const mode = args[1] || 'all' // 默认模式是all
 
   // 验证模式是否有效
-  if (mode !== 'all' && mode !== 'library') {
+  if (mode !== 'all' && mode !== 'library' && mode !== 'allComponent') {
     // 如果不是all或library，则检查是否是有效的组件名
     const componentNames = await getComponentNames()
     if (!componentNames.includes(mode)) {
@@ -1245,6 +1245,15 @@ async function buildComponent(
 }
 
 /**
+ * 组件库打包
+ * @param shouldPublish
+ */
+async function buildLibrary(shouldPublish) {
+  // 打包整个组件库
+  const { entry, outputDir, dependencies } = await getComponentConfig('')
+  return await buildComponent('', entry, outputDir, dependencies, shouldPublish)
+}
+/**
  * 打包所有单个组件
  * @param shouldPublish 是否发布组件
  * @returns 是否全部成功
@@ -1289,17 +1298,15 @@ async function buildAllComponents(shouldPublish = false) {
 async function doBuild(mode = 'all', shouldPublish = false) {
   try {
     if (mode === 'all') {
-      // 打包整个组件库
-      const { entry, outputDir, dependencies } = await getComponentConfig('')
-      const librarySuccess = await buildComponent('', entry, outputDir, dependencies, shouldPublish)
-      // 打包所有单个组件
+      const librarySuccess = await buildLibrary(shouldPublish)
       const componentsSuccess = await buildAllComponents(shouldPublish)
       return componentsSuccess && librarySuccess
     }
+    else if (mode === 'allComponent') {
+      return await buildAllComponents(shouldPublish)
+    }
     else if (mode === 'library') {
-      const { entry, outputDir, dependencies } = await getComponentConfig('')
-      // 打包整个组件库
-      return await buildComponent('', entry, outputDir, dependencies, shouldPublish)
+      return await buildLibrary(shouldPublish)
     }
     else {
       // 打包单个组件

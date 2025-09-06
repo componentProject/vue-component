@@ -24,7 +24,8 @@ npm-build-deploy:
     - . /root/.nvm/nvm-0.39.3/nvm.sh # 使用nvm切换node.js版本
     - nvm use 20.12.0
     - pnpm install # 指定python版本
-    - pnpm run docs:build
+    - pnpm docs:build
+    - pnpm components:build-publish Button
     - current_date=$(date +"%Y-%m-%d-%H-%M-%S")
     - echo $current_date
     - ssh root@192.168.209.103 "[ -d '/data/opt/hip/nginx/html/${systemCode}_BAK' ] || mkdir -p '/data/opt/hip/nginx/html/${systemCode}_BAK'"

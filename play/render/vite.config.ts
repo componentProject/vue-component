@@ -84,8 +84,20 @@ export default viteConfig(
       autoRoutes: {
         routeConfig: {
           componentExamples: {
-            glob: ['/../../packages/components/**/Example.vue', '!/../../packages/components/**/components/*'],
+            glob: [
+              '/../../packages/components/**/Example.vue',
+              '!/../../packages/components/**/components/*',
+              '!/../../packages/components/**/_*/*',
+              '!/../../packages/components/AllTestOrNoPublishComponents/*',
+            ],
             baseRoute: '组件示例',
+          },
+          AllTestComponentExamples: {
+            glob: [
+              '/../../packages/components/AllTestOrNoPublishComponents/**/Example.vue',
+              '!/../../packages/components/AllTestOrNoPublishComponents/**/components/*',
+            ],
+            baseRoute: '待发布/测试组件示例(放一些demo，也许后面会发布)',
           },
         },
       },
