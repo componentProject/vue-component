@@ -5,16 +5,16 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script setup>
 import { ref } from 'vue'
 import ConfigFrom from './index.vue'
 
-const model = ref<Record<string, any>>({})
-const rule = ref<any[]>([
-  { type: 'input', field: 'name', title: '姓名', props: { placeholder: '请输入姓名' } },
-  { type: 'input', field: 'age', title: '年龄', props: { type: 'number', min: 0 } },
+const model = ref({})
+const rule = ref([
+  { type: 'input', field: 'name', title: '姓名', col: { span: 12 }, props: { placeholder: '请输入姓名' } },
+  { type: 'input', field: 'age', title: '年龄', col: { span: 12 }, props: { type: 'number', min: 0 } },
 ])
-const option = ref<Record<string, any>>({ submitBtn: false, form: { labelWidth: '80px' } })
+const option = ref({ submitBtn: false, form: { labelWidth: '80px' }, row: { gutter: 16 } })
 </script>
 
 <style scoped>

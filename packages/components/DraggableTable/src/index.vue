@@ -11,6 +11,7 @@
       @resizable-change="handleColumnResizableChange"
       @header-cell-menu.prevent="handleHeaderCellMenu"
       @page-change="handlePageChange"
+      @toggle-tree-expand="handleTableRendered"
     >
       <!--      <template #empty> -->
       <!--        <span style="color: red;"> -->
@@ -75,6 +76,15 @@
       @menu-confirm="handleMenuConfirm"
       @header-context-menu="handleHeaderContextMenu"
     />
+
+    <EnterNextContainer
+      v-for="(virtual, index) in tableVirtualRefs"
+      :key="`row-${index}`"
+      :virtual-ref="virtual"
+      :allow-select-next-in-empty="props.allowSelectNextInEmpty"
+      @no-next-input="handleNoNextInput"
+      @no-select-value="handleNoSelectValue"
+    />
   </div>
 </template>
 
@@ -86,13 +96,13 @@ import type {
   VxeGridProps,
   VxeGridPropTypes,
   VxePagerDefines,
-  VxePagerProps,
   VxeTableConstructor,
   VxeTableDefines,
   VxeTablePropTypes,
 } from 'vxe-table'
 import type { ColumnType, types } from '@moluoxixi/components/DraggableTable/src/_types'
 import { ElMessage, ElPagination } from 'element-plus'
+
 import { cloneDeep, groupBy } from 'lodash'
 import { diff, isEmpty } from 'radash'
 import Sortable from 'sortablejs'
@@ -107,7 +117,7 @@ import {
 } from 'vue'
 import { VxeGrid } from 'vxe-table'
 import 'vxe-table/lib/style.css'
-import { dispatchEvents, getClass, getStringObj, getType } from '@moluoxixi/utils/_utils'
+import { debounce, dispatchEvents, getClass, getStringObj, getType } from '@moluoxixi/utils/_utils'
 import {
   getCustomType,
   handleGetColumn,
@@ -121,6 +131,11 @@ import ContextMenu from './components/ContextMenu/index.vue'
 // 导入自定义渲染器
 import './renderers'
 import type { slotsType } from '@moluoxixi/components/_types'
+import EnterNextContainer from '@moluoxixi/components/EnterNextContainer'
+import type {
+  NoNextInputParams,
+  NoSelectValueParams,
+} from '@moluoxixi/components/EnterNextDragTable/src/_types'
 
 defineOptions({
   name: 'DraggableTable',
@@ -421,7 +436,6 @@ const props = defineProps({
      */
     default: null,
   },
-  //#endregion
   // 是否展示分页
   showPagination: {
     type: Boolean,
@@ -446,23 +460,40 @@ const props = defineProps({
     type: String,
     default: 'total, sizes, prev, pager, next, jumper',
   },
+  //#endregion
+
+  //#region 回车下一个容器相关
+  //#endregion
+  allowSelectNextInEmpty: {
+    type: Boolean,
+    default: false,
+  },
+  containerType: {
+    type: String as PropType<'row' | 'table'>,
+    default: 'row',
+  },
 })
 
 // 组件事件
-const emit = defineEmits([
-  'update:tableData',
-  'columnDragend',
-  'rowDragend',
-  'resizableChange',
-  'checkboxChange',
-  'checkboxAll',
-  'headerCellMenu',
-  'pageChange',
-  'headerContextMenu',
-  'sizeChange',
-  'update:pagination',
-  'currentChange',
-])
+const emit = defineEmits<{
+  (e: 'currentChange', params: number): void
+  (e: 'update:pagination', params: number): void
+  (e: 'sizeChange', params: number): void
+  (e: 'pageChange', params: number): void
+  (e: 'headerContextMenu', params: HTMLElement): void
+  (e: 'headerCellMenu', params: VxeTableDefines.HeaderCellMenuParams & { cell?: HTMLElement }): void
+  (e: 'checkboxAll', params: VxeTableDefines.CheckboxAllParams): void
+  (e: 'checkboxChange', params: VxeTableDefines.CheckboxAllParams): void
+  (e: 'resizableChange', params: VxeTableDefines.ResizableChangeParams): void
+  (e: 'rowDragend', params: any): void
+  (e: 'columnDragend', params: any): void
+  (e: 'update:tableData', params: any[]): void
+  // 当在表格中最后一个输入元素按下Enter键时触发
+  (e: 'noNextInput', params: NoNextInputParams): void
+  // 当在表格中select下拉为空时触发
+  (e: 'noSelectValue', params: NoSelectValueParams): void
+  (e: 'toggleTreeExpand', params: VxeTableDefines.ToggleRowExpandEventParams): void
+}>()
 
 // 获取插槽
 const slots = defineSlots<slotsType>()
@@ -479,10 +510,113 @@ const tableData = defineModel({
 function handlePageChange(params: VxePagerDefines.PageChangeEventParams) {
   emit('pageChange', params)
 }
-/**
+
+//#region 回车下一个功能
+const tableVirtualRefs = ref<HTMLElement[]>([])
+
+// 获取表格中所有的行元素
+function collectTableVirtualRefs() {
+  try {
+    if (!xTable.value) {
+      return
+    }
+
+    // 获取表格元素
+    const table = xTable.value?.$el as HTMLElement
+    if (!table) {
+      return
+    }
+
+    const tables = Array.from(table.querySelectorAll('tbody')) as HTMLElement[]
+    // 获取所有tr元素(不包括表头tr)
+    const rows = Array.from(table.querySelectorAll('tbody tr')) as HTMLElement[]
+
+    if (props.containerType === 'row') {
+      tableVirtualRefs.value = rows
+    }
+    else if (props.containerType === 'table') {
+      tableVirtualRefs.value = tables
+    }
+    else {
+      tableVirtualRefs.value = []
+    }
+  }
+  catch (error) {
+    console.error('EnterNextDragTable: 收集行元素时出错', error)
+  }
+}
+
+// 创建防抖版本的collectTableVirtualRefs
+const debouncedCollectTableVirtualRefs = debounce(collectTableVirtualRefs, 200)
+
+// 当找不到下一个输入元素时的处理
+function handleNoNextInput(element: HTMLElement) {
+  // 查找当前行的索引
+  const row = element.closest('.vxe-body--row') as HTMLElement
+  const rowIndex = row ? tableVirtualRefs.value.indexOf(row) : -1
+  // 获取当前元素最近的td祖先
+  const td = element.closest('td')
+  // 获取所有td元素
+  const tds = row ? Array.from(row.querySelectorAll('td')) : []
+
+  // 计算td在所有td中的索引位置（从0开始）
+  const colIndex = td ? tds.indexOf(td as HTMLTableCellElement) : -1
+
+  // 向外传递事件，并包含更多信息
+  if (rowIndex !== -1 && tableData.value) {
+    emit('noNextInput', {
+      row: tableData.value[rowIndex],
+      rowIndex,
+      colIndex,
+    })
+  }
+}
+
+// 当找不到下拉框输入元素值时的处理
+function handleNoSelectValue(element: HTMLElement) {
+  // 查找当前行的索引
+  const row = element.closest('tr')
+  const rowIndex = row ? tableVirtualRefs.value.indexOf(row) : -1
+  // 获取当前元素最近的td祖先
+  const td = element.closest('td')
+  // 获取所有td元素
+  const tds = row ? Array.from(row.querySelectorAll('td')) : []
+
+  // 计算td在所有td中的索引位置（从0开始）
+  const colIndex = td ? tds.indexOf(td as HTMLTableCellElement) : -1
+  console.log(`当前元素位于第 ${colIndex + 1} 个td中`)
+  // 向外传递事件，并包含更多信息
+  emit('noSelectValue', {
+    row: tableData.value[rowIndex],
+    rowIndex,
+    colIndex,
+  })
+}
+
+// 当表格数据变化时，重新收集行元素
+watch(
+  () => tableData.value,
+  () => {
+    nextTick(() => {
+      debouncedCollectTableVirtualRefs()
+    })
+  },
+  { deep: true, immediate: true },
+)
+
+// 为了处理表格渲染完成后的场景
+function handleTableRendered(params: VxeTableDefines.ToggleRowExpandEventParams) {
+  nextTick(() => {
+    debouncedCollectTableVirtualRefs()
+  })
+  emit('toggleTreeExpand', params)
+}
+//#endregion
+/*//#region pagnation转换，暂时摒弃
+/!**
  * 处理ElPagination的分页变化事件
  * @param page 当前页码
- */
+ *!/
 function handleElPaginationPageChange(page: number) {
   // 构造vxe-grid的page-change事件参数
   const pageChangeParams = {
@@ -493,10 +627,10 @@ function handleElPaginationPageChange(page: number) {
   emit('pageChange', pageChangeParams)
 }
 
-/**
+/!**
  * 处理ElPagination的每页条数变化事件
  * @param size 每页条数
- */
+ *!/
 function handleElPaginationSizeChange(size: number) {
   // 构造vxe-grid的page-change事件参数
   const pageChangeParams = {
@@ -512,8 +646,7 @@ function transformPageSizes(pageSizes: VxePagerProps['pageSizes']): number[] | u
     return pageSizes?.map((item: any) => {
       if (typeof item === 'number') {
         return item
-      }
-      else {
+      } else {
         return +item.value!
       }
     })
@@ -522,11 +655,11 @@ function transformPageSizes(pageSizes: VxePagerProps['pageSizes']): number[] | u
 
 function transformLayouts(layouts: VxePagerProps['layouts']): string | undefined {
   if (props.pageType === 'el-pagination') {
-    /*
+    /!*
     Home,
     PrevJump,
      PrevPage, Number, JumpNumber, NextPage, NextJump, End, Sizes, Jump, FullJump, PageCount, Total
-    * */
+    * *!/
     const ElPaginationLayoutsMap: Record<string, any> = {
       PrevPage: 'prev',
       Number: 'pager',
@@ -547,6 +680,7 @@ function transformLayouts(layouts: VxePagerProps['layouts']): string | undefined
     }).join(',')
   }
 }
+//#endregion*/
 
 /**
  * 计算后的columns，用于提供额外功能，目前功能如下：
@@ -1374,13 +1508,13 @@ watch(
 //#endregion
 
 // 每页条数改变事件
-function handleSizeChange(size: any) {
+function handleSizeChange(size: number) {
   emit('update:pagination', { ...props.pagination, pageSize: size, pageIndex: 1 })
   emit('sizeChange', size)
 }
 
 // 页码改变事件
-function handleCurrentChange(current: any) {
+function handleCurrentChange(current: number) {
   emit('update:pagination', { ...props.pagination, pageIndex: current })
   emit('currentChange', current)
 }

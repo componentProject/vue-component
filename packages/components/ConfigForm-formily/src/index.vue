@@ -1,19 +1,19 @@
 <template>
   <FormProvider :form="form">
     <SchemaField :schema="schema">
-      <slot/>
+      <slot />
     </SchemaField>
   </FormProvider>
 </template>
 
 <script setup lang="ts">
-import type {ISchema} from '@formily/json-schema'
-import {createForm} from '@formily/core'
-import {createSchemaField, FormProvider} from '@formily/vue'
+import type { ISchema } from '@formily/json-schema'
+import { createForm } from '@formily/core'
+import { createSchemaField, FormProvider } from '@formily/vue'
 import * as ElementPlusComponents from '@moluoxixi/element'
-import {watch} from 'vue'
+import { watch } from 'vue'
 
-defineOptions({name: 'ConfigForm'})
+defineOptions({ name: 'ConfigForm' })
 
 // props
 const props = withDefaults(defineProps<{
@@ -41,15 +41,16 @@ watch(
   () => props.modelValue,
   (v) => {
     form.setValues(v || {})
-  }, {
+  },
+  {
     immediate: true,
-    deep: true
-  })
+    deep: true,
+  },
+)
 
-
-const {SchemaField} = createSchemaField({
+const { SchemaField } = createSchemaField({
   components: {
-    ...ElementPlusComponents
+    ...ElementPlusComponents,
   },
 })
 
@@ -58,10 +59,8 @@ function submit() {
   emit('submit', form.values)
 }
 
-defineExpose({submit, form})
+defineExpose({ submit, form })
 </script>
 
 <style scoped>
 </style>
-
-
