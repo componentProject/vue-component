@@ -19,7 +19,7 @@
 
 <script setup>
 defineOptions({
-  name: 'AppTitle',
+  name: 'Title',
 })
 const props = defineProps({
   fontSize: {
