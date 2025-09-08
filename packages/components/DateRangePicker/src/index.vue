@@ -30,7 +30,15 @@ import type { PropType } from 'vue'
 import moment from 'moment'
 import { isEmpty } from 'radash'
 import { computed, ref, useTemplateRef, watch } from 'vue'
-import { dateIsBefore, formatDateRange, getTypeDefault, validateDate } from '@moluoxixi/utils/_utils'
+import type {
+  DateType,
+} from '@moluoxixi/utils/_utils'
+import {
+  dateIsBefore,
+  formatDateRange,
+  getTypeDefault,
+  validateDate,
+} from '@moluoxixi/utils/_utils'
 
 defineOptions({
   name: 'DateRangePicker',
@@ -467,7 +475,7 @@ function handleDateChange(val: any) {
   emit('change', singleDateTypes.includes(props.type) ? formattedDates[0] : formattedDates)
 }
 
-function getLocalDateValue(date: any[] | any) {
+function getLocalDateValue(date: DateType | DateType[]) {
   return singleDateTypes.includes(props.type) ? (Array.isArray(date) ? date[0] : date) : date
 }
 
