@@ -5,10 +5,22 @@ packages:
 
 # 该分类仅包含多pack共用依赖
 catalogs:
+  type:
+    '@types/markdown-it': ^12.2.3
+    '@types/markdown-it-container': ^2.0.5
+    '@types/lodash': ^4.17.17
+    '@types/uuid': ^10.0.0
+    '@types/node': ^22.14.0
+    '@types/crypto-js': ^4.2.2
+    '@types/js-cookie': ^3.0.3
+    '@types/file-saver': ^2.0.7
   build:
     #element-plus
     element-plus: ^2.10.1
     '@element-plus/icons-vue': ^2.3.1
+    #markdown
+    markdown-it: ^13.0.1
+    markdown-it-container: ^3.0.0
     #formily
     '@formily/core': ^2.3.7
     '@formily/grid': ^2.1.5
@@ -20,23 +32,25 @@ catalogs:
     '@formily/vue': ^2.3.7
     '@designable/shared': 1.0.0-beta.45
     '@designable/core': 1.0.0-beta.45
-    #其他
-    'classnames': latest
+    #vue官方包
+    vue: ^3.5.13
+    'vue-demi': ^0.12.5
+    'vue-i18n': ^11.1.1
+    'vue-router': 4.5.0
+    'vxe-table': 4.16.7
+    'pinia': 2.3.0
+    #vue的npm包
+    vuedraggable: ^4.1.0
+    'pinia-plugin-persistedstate': ^4.2.0
+    #utils
+    classnames: latest
     axios: ^1.9.0
     dayjs: ^1.11.13
     lodash: npm:lodash-es@4.17.21
     moment: ^2.30.1
     radash: ^12.1.0
     uuid: ^11.1.0
-    vuedraggable: ^4.1.0
-    vue: ^3.5.13
-    'vue-demi': ^0.12.5
-    'vue-i18n': ^11.1.1
-    'vue-router': 4.5.0
-    'vxe-table': 4.16.7
     'crypto-js': ^4.2.0
-    'pinia': 2.3.0
-    'pinia-plugin-persistedstate': ^4.2.0
 
   dev:
     #regin 样式
@@ -70,10 +84,3 @@ catalogs:
     eslint: ^9.5
     eslint-plugin-format: ^1.0.1
     typescript: ~5.8.0
-  type:
-    '@types/lodash': ^4.17.17
-    '@types/uuid': ^10.0.0
-    '@types/node': ^22.14.0
-    '@types/crypto-js': ^4.2.2
-    '@types/js-cookie': ^3.0.3
-    '@types/file-saver': ^2.0.7
