@@ -6,7 +6,7 @@
 
 ### 分页（showPagination / editAutoFocus）
 
-示例：开启编辑（editable=true）
+示例：开启分页（showPagination=true）
 :::demo
 DraggableTable/base/index
 :::
