@@ -13,7 +13,7 @@ interface TreeOptionProps {
   }
 }
 export interface ButtonsItem {
-  type?: ButtonType
+  btnType?: ButtonType
   slot?: string | ((...args: any[]) => any)
   icon?: Component | string
   event?: (data?: any, node?: any) => void

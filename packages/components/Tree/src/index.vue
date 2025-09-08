@@ -56,31 +56,7 @@
                 'wl-tree__buttons--hover': props.showType === 'hover',
               }"
             >
-              <template
-                v-for="btn in getButtons(data)"
-                :key="btn.type || btn.tooltip || (typeof btn.slot === 'string' ? btn.slot : '') || (typeof btn.icon === 'string' ? btn.icon : '') || 'btn'"
-              >
-                <ElTooltip :disabled="!btn.tooltip" :content="btn.tooltip" placement="top">
-                  <slot
-                    v-if="typeof btn.slot === 'string' && btn.slot" :name="btn.slot as string"
-                    :data="data" :node="node"
-                  />
-                  <Render
-                    v-else-if="typeof btn.slot === 'function'"
-                    :render="() => (btn.slot as any)(data, node)"
-                  />
-                  <ElButton
-                    v-else
-                    link
-                    size="small"
-                    @click.stop="() => btn.event && btn.event(data, node)"
-                  >
-                    <ElIcon>
-                      <component :is="resolveButtonIcon(btn)" />
-                    </ElIcon>
-                  </ElButton>
-                </ElTooltip>
-              </template>
+              <Buttons size="small" link :buttons="getButtons(data)" :resolve-button-icon="resolveButtonIcon" />
             </span>
           </div>
         </slot>
@@ -91,10 +67,11 @@
 
 <script setup lang="ts">
 import type { Component as VueComponent } from 'vue'
-import { computed, defineComponent, onMounted, ref, useTemplateRef } from 'vue'
+import { computed, onMounted, ref, useTemplateRef } from 'vue'
 import type { TreeNode, TreeNodeData } from 'element-plus'
-import { ElButton, ElIcon, ElTooltip, ElTreeV2 } from 'element-plus'
+import { ElIcon, ElTreeV2 } from 'element-plus'
 import type { ButtonsItem, TreeProps } from './types'
+import { Buttons } from '@moluoxixi/components/_utilComponents'
 import { Delete, Edit, Plus } from '@element-plus/icons-vue'
 
 defineOptions({
@@ -107,7 +84,6 @@ const props = withDefaults(defineProps<TreeProps>(), {
   rowField: 'id',
   parentField: '',
   labelField: 'label',
-  childrenField: 'children',
   showType: 'default',
   indent: 16,
   showLine: false,
@@ -147,12 +123,6 @@ onMounted(() => {
 })
 onUnmounted(() => {
   window.removeEventListener('resize', resizeChange)
-})
-
-const Render = defineComponent<{ render: () => any }>({
-  name: 'WlRender',
-  props: { render: { type: Function as unknown as () => () => any, required: true } },
-  setup: props => () => props.render(),
 })
 
 function isLeaf(nodeData: Record<string, any>) {
@@ -300,7 +270,7 @@ function resolveButtonIcon(btn: ButtonsItem): VueComponent | string | undefined 
     return undefined
   if (btn.icon)
     return btn.icon
-  switch (btn.type) {
+  switch (btn.btnType) {
     case 'add':
       return Plus
     case 'edit':

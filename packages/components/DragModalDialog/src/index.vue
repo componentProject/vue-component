@@ -113,21 +113,24 @@
           <!-- 底部操作区 -->
           <div v-if="$slots.footer || showFooter" class="modal-footer">
             <slot name="footer">
-              <button
-                v-if="showCancel"
-                class="modal-btn modal-btn-secondary"
-                @click="handleCancel"
-              >
-                {{ cancelText }}
-              </button>
-              <button
-                v-if="showConfirm"
-                class="modal-btn modal-btn-primary"
-                :disabled="confirmDisabled"
-                @click="handleConfirm"
-              >
-                {{ confirmText }}
-              </button>
+              <Buttons v-if="props.buttons" :buttons="props.buttons" />
+              <template v-else>
+                <button
+                  v-if="showCancel"
+                  class="modal-btn modal-btn-secondary"
+                  @click="handleCancel"
+                >
+                  {{ cancelText }}
+                </button>
+                <button
+                  v-if="showConfirm"
+                  class="modal-btn modal-btn-primary"
+                  :disabled="confirmDisabled"
+                  @click="handleConfirm"
+                >
+                  {{ confirmText }}
+                </button>
+              </template>
             </slot>
           </div>
 
@@ -153,6 +156,7 @@
 
 <script setup lang="ts">
 import { computed, nextTick, onMounted, ref, watch } from 'vue'
+import { Buttons } from '@moluoxixi/components/_utilComponents'
 
 defineOptions({
   name: 'DragModalDialog',
@@ -187,7 +191,16 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<Emits>()
 
+type ButtonType = 'confirm' | 'cancel'
+interface ButtonsItem {
+  type?: ButtonType
+  slot?: string | ((...args: any[]) => any)
+  icon?: Component | string
+  event?: (data?: any, node?: any) => void
+  tooltip?: string
+}
 interface Props {
+  buttons: ButtonsItem[]
   /** 控制对话框显示/隐藏 */
   visible?: boolean
   /** 对话框标题 */
