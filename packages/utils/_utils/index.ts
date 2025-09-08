@@ -215,23 +215,23 @@ export function getMomentIsValidIsNoNum(dateStr: DateType, format?: string, stri
 /**
  * 校验日期范围格式
  * @param dateStr 日期
- * @param format moment格式
+ * @param valueFormat moment格式
  * @param strictType 强制校验dateStr是否满足该类型
  */
 export function validateDate(
   dateStr: DateType,
-  format: string = 'YYYY-MM-DD HH:mm:ss',
+  valueFormat: string = 'YYYY-MM-DD HH:mm:ss',
   strictType: string,
 ) {
   if (!dateStr)
     return false
 
   if (Array.isArray(dateStr)) {
-    return dateStr.every(date => getMomentIsValid(date, format, strictType))
+    return dateStr.every(date => getMomentIsValid(date, valueFormat, strictType))
   }
   else {
     // 单个日期值 xxx
-    return getMomentIsValid(dateStr, format, strictType)
+    return getMomentIsValid(dateStr, valueFormat, strictType)
   }
 }
 
@@ -240,52 +240,81 @@ type DateOperationType = 'startOf' | 'endOf'
 /**
  * 判断一个日期字符串是否满足某个moment格式
  * @param dateStr 日期
- * @param format moment格式
+ * @param valueFormat moment格式
  * @param type startOf\endOf
  * @param dateType day\month\year
- * @param onlyFormat 是否只返回格式化后的日期
  */
-export function getFormatDate(
+export function getFormatDateByType(
   dateStr: DateType,
-  format: string = 'YYYY-MM-DD HH:mm:ss',
+  valueFormat: string = 'YYYY-MM-DD HH:mm:ss',
   type: DateOperationType = 'startOf',
   dateType: moment.unitOfTime.StartOf = 'day',
-  onlyFormat = false,
 ) {
-  const momentDate = getMomentIsValid(dateStr, format)
+  const momentDate = getMomentIsValid(dateStr, valueFormat)
   if (!momentDate)
-    return false
-
-  const formatDateStr = momentDate.format(format)
-  if (formatDateStr === dateStr || onlyFormat)
-    return formatDateStr
-  return momentDate[type](dateType).format(format)
+    return null
+  return momentDate[type](dateType).format(valueFormat)
 }
 
 /**
  * 格式化返回的日期范围
  * @param date 日期
- * @param format moment格式
+ * @param valueFormat moment格式
  * @param dateType day\month\year
- * @param onlyFormat 是否只返回格式化后的日期
  */
-export function formatDateRange(
+export function formatDateRangeByType(
   date: DateType | DateType[],
-  format: string = 'YYYY-MM-DD HH:mm:ss',
+  valueFormat: string = 'YYYY-MM-DD HH:mm:ss',
   dateType: moment.unitOfTime.StartOf = 'day',
-  onlyFormat: boolean,
 ) {
   if (!date)
     return []
   const [start, end] = Array.isArray(date) ? date : [date, date]
-  const startDate = getFormatDate(start, format, 'startOf', dateType, onlyFormat)
-  const endDate = getFormatDate(end, format, 'endOf', dateType, onlyFormat)
+  const startDate = getFormatDateByType(start, valueFormat, 'startOf', dateType)
+  const endDate = getFormatDateByType(end, valueFormat, 'endOf', dateType)
   if (startDate && endDate) {
     return [startDate, endDate]
   }
   else {
     console.error('日期格式不正确')
     return []
+  }
+}
+
+/**
+ * 判断一个日期字符串是否满足某个moment格式
+ * @param dateStr 日期
+ * @param format moment格式
+ * @param valueFormat
+ */
+export function getFormatDate(
+  dateStr: DateType,
+  format: string | DateOperationType = 'YYYY-MM-DD HH:mm:ss',
+  valueFormat: string = 'YYYY-MM-DD HH:mm:ss',
+): DateType {
+  const momentDate = getMomentIsValid(dateStr, valueFormat)
+  if (!momentDate)
+    return ''
+  return moment(momentDate.format(format)).format(valueFormat)
+}
+
+/**
+ * 格式化返回的日期范围
+ * @param date 日期
+ * @param format moment格式
+ * @param valueFormat
+ */
+export function formatDateRange(
+  date: DateType | DateType[],
+  format: string | string[] = 'YYYY-MM-DD HH:mm:ss',
+  valueFormat: string = 'YYYY-MM-DD HH:mm:ss',
+): DateType | DateType[] {
+  const dateIsArray = Array.isArray(date)
+  if (Array.isArray(format)) {
+    return format.map((item, index) => getFormatDate(dateIsArray ? date[index] : date, item, valueFormat))
+  }
+  else {
+    return getFormatDate(dateIsArray ? date[0] : date, format, valueFormat)
   }
 }
 
