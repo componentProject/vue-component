@@ -1,0 +1,46 @@
+{
+  "name": "@moluoxixi/element-playground",
+  "version": "1.0.0-beta.2",
+  "description": "",
+  "main": "src/index.ts",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "eslint": "eslint . --ext .vue,.js,.jsx,.ts,.tsx,.md --fix"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@designable/core": "catalog:build",
+    "@designable/formily-transformer": "1.0.0-beta.45",
+    "@designable/shared": "catalog:build",
+    "@formily/core": "catalog:build",
+    "@formily/grid": "catalog:build",
+    "@guolao/vue-monaco-editor": "^0.0.5",
+    "classnames": "catalog:build",
+    "element-plus": "catalog:build",
+    "resize-observer-polyfill": "^1.5.1",
+    "vue": "catalog:build",
+    "vue-demi": "catalog:build",
+    "vue-slicksort": "^2.0.0-alpha.5",
+    "vuedraggable": "catalog:build"
+  },
+  "devDependencies": {
+    "@formily/vue": "catalog:build",
+    "@moluoxixi/element": "workspace:*",
+    "@moluoxixi/element-prototypes": "workspace:*",
+    "@moluoxixi/element-renderer": "workspace:*",
+    "@moluoxixi/element-settings-form": "workspace:*",
+    "@vitejs/plugin-vue": "catalog:dev",
+    "@vitejs/plugin-vue-jsx": "catalog:dev",
+    "core-js": "^3.22.5",
+    "less": "^4.4.1",
+    "sass": "catalog:dev",
+    "sass-loader": "catalog:dev",
+    "ts-node": "^10.7.0",
+    "typescript": "catalog:dev",
+    "vite": "catalog:dev"
+  }
+}

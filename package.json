@@ -1,6 +1,7 @@
 {
   "workspaces": [
     "packages/*",
+    "packages/formily/*",
     "play/*",
     "docs/*"
   ],
