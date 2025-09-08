@@ -63,6 +63,7 @@
       :editable="editable"
       :filterable="filterable"
       :sortable="sortable"
+      show-pagination
     >
       <!-- 自定义操作列插槽 -->
       <template #aaa>
@@ -271,7 +272,7 @@ onMounted(() => {
 // 添加新行
 function addRow() {
   const newId
-    = tableData.value.length > 0 ? Math.max(...tableData.value.map(item => item.id)) + 1 : 1
+    = tableData.value.length > 0 ? Math.max(...tableData.value.map((item: string) => item.id)) + 1 : 1
 
   const newRow = {
     id: newId,

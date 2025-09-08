@@ -16,16 +16,6 @@
           <span class="absolute left-1/2 top-1/3 -translate-x-1/2 -translate-y-1/2">加载中...</span>
         </slot>
       </template>
-      <template v-if="gridProps.pagerConfig.enabled" #pager>
-        <vxe-pager
-          :current-page="gridProps.pagerConfig.currentPage"
-          :page-size="gridProps.pagerConfig.pageSize"
-          :total="gridProps.pagerConfig.total"
-          :page-sizes="gridProps.pagerConfig.pageSizes"
-          :layouts="gridProps.pagerConfig.layouts"
-          @page-change="handlePageChange"
-        />
-      </template>
       <!-- 使用插槽方式渲染自定义内容 -->
       <template v-for="name in slotNames" #[name]="slotParams" :key="name">
         <slot :name="name" v-bind="slotParams" />
@@ -76,7 +66,7 @@ import {
   watch,
 } from 'vue'
 import { VxeGrid } from 'vxe-table'
-import { VxePager } from 'vxe-pc-ui'
+import { VxePager, VxeTooltip, VxeUI } from 'vxe-pc-ui'
 import 'vxe-table/lib/style.css'
 import 'vxe-pc-ui/lib/style.css'
 import { debounce, dispatchEvents, getClass, getStringObj, getType } from '@moluoxixi/utils/_utils'
@@ -97,12 +87,11 @@ import EnterNextContainer from '@moluoxixi/components/EnterNextContainer'
 import type {
   NoNextInputParams,
   NoSelectValueParams,
-} from '@moluoxixi/components/EnterNextDragTable/src/_types'
+} from './_types'
 
 defineOptions({
   name: 'DraggableTable',
 })
-
 // 定义组件属性
 const props = defineProps({
   //#region 其他原始配置加默认值
@@ -415,7 +404,6 @@ const props = defineProps({
     default: 'row',
   },
 })
-
 // 组件事件
 const emit = defineEmits<{
   (e: 'currentChange', params: number): void
@@ -436,9 +424,10 @@ const emit = defineEmits<{
   (e: 'noSelectValue', params: NoSelectValueParams): void
   (e: 'toggleTreeExpand', params: VxeTableDefines.ToggleRowExpandEventParams): void
 }>()
-
 // 获取插槽
 const slots = defineSlots<slotsType>()
+VxeUI.component(VxePager)
+VxeUI.component(VxeTooltip)
 
 const attrs = useAttrs()
 
@@ -448,10 +437,6 @@ const tableData = defineModel({
   type: Array,
   default: [],
 })
-
-function handlePageChange(params: any) {
-  emit('pageChange', params)
-}
 
 //#region 回车下一个功能
 const tableVirtualRefs = ref<HTMLElement[]>([])
@@ -818,9 +803,9 @@ const gridProps = computed<VxeGridProps>(() => {
     customConfig: {
       ...props.customConfig,
     },
-    pagerConfig:{
+    pagerConfig: {
       enabled: props.showPagination,
-      ...props.pagerConfig
+      ...props.pagerConfig,
     },
     editConfig: {
       enabled: props.editable,
@@ -1100,7 +1085,7 @@ function handleColumnResizableChange(params: VxeTableDefines.ResizableChangePara
  */
 watch(
   () => computedColumns.value,
-  (newColumns: ColumnType) => {
+  (newColumns: ColumnType[]) => {
     // 如果启用了本地存储，不保存
     if (props.customConfig.storage) {
       localColumns.value = cloneDeep(newColumns)
@@ -1178,7 +1163,7 @@ function initRowDraggable() {
     animation: 150,
     handle: 'tr',
     filter: getClass(props.rowDisabledClass, true),
-    onEnd: ({ oldIndex = 0, newIndex = 0, item }) => {
+    onEnd: ({ oldIndex = 0, newIndex = 0, item }: Record<string, any>) => {
       if (oldIndex === newIndex || !xTable.value)
         return
       // 获取源数据副本
@@ -1250,7 +1235,7 @@ function initColumnDraggable() {
   columnSortableInstance.value = Sortable.create(headerTr, {
     animation: 150,
     handle: 'th',
-    onEnd: ({ oldIndex = 0, newIndex = 0, item }) => {
+    onEnd: ({ oldIndex = 0, newIndex = 0, item }: Record<string, any>) => {
       if (oldIndex === newIndex || !xTable.value)
         return
 
@@ -1378,18 +1363,6 @@ watch(
   },
 )
 //#endregion
-
-// 每页条数改变事件
-function handleSizeChange(size: number) {
-  emit('update:pagination', { ...props.pagination, pageSize: size, pageIndex: 1 })
-  emit('sizeChange', size)
-}
-
-// 页码改变事件
-function handleCurrentChange(current: number) {
-  emit('update:pagination', { ...props.pagination, pageIndex: current })
-  emit('currentChange', current)
-}
 
 /**
  * 暴露给父组件的方法和属性

@@ -51,7 +51,6 @@
     "typescript": "catalog:dev",
     "vite-plugin-compression": "catalog:dev",
     "vite-plugin-imagemin": "catalog:dev",
-    "@types/file-saver": "catalog:type",
     "@vue-macros/volar": "catalog:dev",
     "rollup-plugin-visualizer": "catalog:dev",
     "unplugin-vue-components": "catalog:dev",

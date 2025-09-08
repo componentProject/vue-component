@@ -21,6 +21,7 @@ import Components from 'unplugin-vue-components/vite'
 import viteImagemin from 'vite-plugin-imagemin'
 import { obfuscator } from 'rollup-obfuscator'
 import cssInjectedByJsPlugin from 'vite-plugin-css-injected-by-js'
+import { lazyImport, VxeResolver } from 'vite-plugin-lazy-import'
 import { UploadEvent } from '../../utils/_utils/UploadComponent.ts'
 
 // === 组件库命名空间配置 ===
@@ -200,6 +201,16 @@ function createBaseConfig(comp: string, internalDeps: string[]): InlineConfig {
         },
       }),
       vueJsx(),
+      lazyImport({
+        resolvers: [
+          VxeResolver({
+            libraryName: 'vxe-pc-ui',
+          }),
+          VxeResolver({
+            libraryName: 'vxe-table',
+          }),
+        ],
+      }),
       // 自动引入
       AutoImport({
         imports: ['vue'],
