@@ -55,7 +55,7 @@
     "md-editor-v3": "^5.4.5",
     "mermaid": "^8.9.2",
     "moment": "catalog:build",
-    "monaco-editor": "0.33.0",
+    "monaco-editor": "0.30.1",
     "prettier": "^3.3.3",
     "prettier-plugin-sql": "^0.16.0",
     "radash": "catalog:build",
