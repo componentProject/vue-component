@@ -1,14 +1,27 @@
 packages:
   - packages/*
+  - packages/formily/*
   - play/*
   - docs/*
 
 # 该分类仅包含多pack共用依赖
 catalogs:
+  type:
+    '@types/markdown-it': ^12.2.3
+    '@types/markdown-it-container': ^2.0.5
+    '@types/lodash': ^4.17.17
+    '@types/uuid': ^10.0.0
+    '@types/node': ^22.14.0
+    '@types/crypto-js': ^4.2.2
+    '@types/js-cookie': ^3.0.3
+    '@types/file-saver': ^2.0.7
   build:
     #element-plus
     element-plus: ^2.10.1
     '@element-plus/icons-vue': ^2.3.1
+    #markdown
+    markdown-it: ^13.0.1
+    markdown-it-container: ^3.0.0
     #formily
     '@formily/core': ^2.3.7
     '@formily/grid': ^2.1.5
@@ -18,25 +31,34 @@ catalogs:
     '@formily/shared': ^2.1.5
     '@formily/validator': ^2.1.5
     '@formily/vue': ^2.3.7
-    #其他
+    '@designable/shared': 1.0.0-beta.45
+    '@designable/core': 1.0.0-beta.45
+    #vue官方包
+    vue: ^3.5.13
+    '@vue/runtime-dom': ^3.5.21
+    '@vue/runtime-core': ^3.5.21
+    '@babel/parser': ^7.28.3
+    'vue-demi': ^0.12.5
+    'vue-i18n': ^11.1.1
+    'vue-router': 4.5.0
+    'vxe-table': 4.16.7
+    pinia: 2.3.0
+    #vue的npm包
+    vuedraggable: ^4.1.0
+    'pinia-plugin-persistedstate': ^4.2.0
+    #utils
+    classnames: latest
     axios: ^1.9.0
     dayjs: ^1.11.13
     lodash: npm:lodash-es@4.17.21
     moment: ^2.30.1
     radash: ^12.1.0
     uuid: ^11.1.0
-    vuedraggable: ^4.1.0
-    vue: ^3.5.13
-    'vue-i18n': ^11.1.1
-    'vue-router': 4.5.0
-    'vxe-table': 4.13.39
     'crypto-js': ^4.2.0
-    'pinia': 2.3.0
-    'pinia-plugin-persistedstate': ^4.2.0
 
   dev:
     #regin 样式
-    sass: 1.32.13
+    sass: ^1.34.1
     sass-embedded: ^1.87.0
     sass-loader: 13.1.0
     postcss: ^8.5.3
@@ -53,22 +75,18 @@ catalogs:
     vite-plugin-imagemin: ^0.6.1
     '@vitejs/plugin-vue-jsx': ^4.1.2
     '@vitejs/plugin-vue': ^5.0.4
-    'qs': ^6.14.0
-    #other
+    #eslint
+    eslint: ^9.5
     '@antfu/eslint-config': ^4.16.1
-    'fast-glob': ^3.3.2
-    '@vue-macros/volar': 3.0.0-beta.15
+    eslint-plugin-format: ^1.0.1
+    #组件/工具包的npm化
     '@moluoxixi/eslintconfig': latest
     '@moluoxixi/viteconfig': ^0.0.17
+    '@moluoxixi/ajaxpackage': ^0.0.2
+    #other
+    'qs': ^6.14.0
+    'fast-glob': ^3.3.2
+    '@vue-macros/volar': 3.0.0-beta.15
     dotenv: ^16.5.0
     jiti: ^2.4.2
-    eslint: ^9.5
-    eslint-plugin-format: ^1.0.1
     typescript: ~5.8.0
-  type:
-    '@types/lodash': ^4.17.17
-    '@types/uuid': ^10.0.0
-    '@types/node': ^22.14.0
-    '@types/crypto-js': ^4.2.2
-    '@types/js-cookie': ^3.0.3
-    '@types/file-saver': ^2.0.7

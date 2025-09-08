@@ -6,9 +6,10 @@
       <ElInput v-model="form.email" class="ipt" placeholder="请输入邮箱" />
       <ElInput v-model="form.address" class="ipt" placeholder="请输入地址" />
     </EnterNextContainer>
-    <div class="msg">{{ noNextMessage }}</div>
+    <div class="msg">
+      {{ noNextMessage }}
+    </div>
   </div>
-
 </template>
 
 <script setup lang="ts">
@@ -27,7 +28,16 @@ function handleNoNextInput() {
 </script>
 
 <style scoped>
-.container { padding: 8px; }
-.ipt { display: block; margin-bottom: 8px; }
-.msg { margin-top: 6px; font-size: 12px; color: #555; }
+.container {
+  padding: 8px;
+}
+.ipt {
+  display: block;
+  margin-bottom: 8px;
+}
+.msg {
+  margin-top: 6px;
+  font-size: 12px;
+  color: #555;
+}
 </style>

@@ -1,6 +1,13 @@
 <template>
   <div class="container">
-    <PopoverTableSelect v-model="visible" :data="tableData" :columns="columns" pop-type="input" :input-value="val" @select="onSelect">
+    <PopoverTableSelect
+      v-model="visible"
+      :data="tableData"
+      :columns="columns"
+      pop-type="input"
+      :input-value="val"
+      @select="onSelect"
+    >
       <template #default>
         <div style="margin: 8px 0">
           <ElSelect v-model="val" :teleported="false" placeholder="请选择">

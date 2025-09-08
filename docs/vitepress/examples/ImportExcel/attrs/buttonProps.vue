@@ -1,6 +1,8 @@
 <template>
   <div>
-    <ImportExcel :columns="columns" type="primary" size="small" @success="rows = $event">导入 Excel</ImportExcel>
+    <ImportExcel :columns="columns" type="primary" size="small" @success="rows = $event">
+      导入 Excel
+    </ImportExcel>
     <ConfigTable v-if="rows.length" :data="rows" :columns="tableColumns" :show-pagination="false" />
   </div>
 </template>
@@ -18,5 +20,3 @@ const tableColumns = ref([
   { prop: 'age', label: '年龄' },
 ])
 </script>
-
-

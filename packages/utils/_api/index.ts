@@ -45,4 +45,7 @@ export function getList(data: any) {
 export function getDownLoadByIds(data: any) {
   return httpApi.post('/ts-fm/file/downLoadByIds', data)
 }
-
+//删除组件库组件
+export function setDeleteByPathAndCode(data: any) {
+  return httpApi.post('/ts-fm/file/deleteByPathAndCode', data)
+}

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <ImportExcel :columns="columns" :titles="['label','title']" @success="onSuccess" />
+    <ImportExcel :columns="columns" :titles="['label', 'title']" @success="onSuccess" />
     <ConfigTable v-if="rows.length" :data="rows" :columns="tableColumns" :show-pagination="false" />
   </div>
 </template>
@@ -20,7 +20,7 @@ const tableColumns = ref([
   { prop: 'age', label: '年龄' },
 ])
 
-function onSuccess(data: any[]){ rows.value = data }
+function onSuccess(data: any[]) {
+  rows.value = data
+}
 </script>
-
-

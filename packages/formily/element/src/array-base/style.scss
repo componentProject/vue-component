@@ -1,0 +1,33 @@
+@use '../__builtins__/styles/common.scss';
+@use '../__builtins__/styles/element-plus.scss' as ElementPlus;
+
+$array-base-prefix-cls: '#{common.$moluoxixi-prefix}-array-base';
+
+.#{$array-base-prefix-cls}-addition {
+  transition: ElementPlus.$all-transition;
+}
+
+.#{$array-base-prefix-cls}-remove {
+  i {
+    font-size: ElementPlus.$font-size-base;
+  }
+}
+
+.#{$array-base-prefix-cls}-move-down {
+  i {
+    font-size: ElementPlus.$font-size-base;
+  }
+}
+
+.#{$array-base-prefix-cls}-move-up {
+  i {
+    font-size: ElementPlus.$font-size-base;
+  }
+}
+
+.#{$array-base-prefix-cls}-sort-handle {
+  i {
+    font-size: ElementPlus.$font-size-base;
+    cursor: move;
+  }
+}

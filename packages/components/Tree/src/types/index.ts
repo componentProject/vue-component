@@ -1,7 +1,17 @@
 import type { Component } from 'vue'
+import type { TreeNode, TreeNodeData } from 'element-plus'
 
 export type ButtonType = 'add' | 'edit' | 'delete'
 
+interface TreeOptionProps {
+  children?: string
+  label?: string
+  value?: string
+  disabled?: string
+  class?: (data: TreeNodeData, node: TreeNode) => string | {
+    [key: string]: boolean
+  }
+}
 export interface ButtonsItem {
   type?: ButtonType
   slot?: string | ((...args: any[]) => any)
@@ -21,8 +31,9 @@ export interface TreeProps<T = any> {
   icon?: (nodeData: T) => Component | string
   showType?: 'hover' | 'click' | 'default'
   buttons?: (nodeData: T) => ButtonsItem[]
-  indent?: number
+  indent?: number | string
   height?: number
+  props?: TreeOptionProps
   /**
    * 是否显示左侧连接线
    */
@@ -36,5 +47,3 @@ export interface TreeProps<T = any> {
    */
   levelSelect?: boolean
 }
-
-

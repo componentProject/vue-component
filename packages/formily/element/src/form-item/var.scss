@@ -1,0 +1,20 @@
+@use '../__builtins__/styles/common.scss';
+@use '../__builtins__/styles/element-plus.scss' as ElementPlus;
+
+$form-item-prefix: '#{common.$moluoxixi-prefix}-form-item';
+
+$form-font-size: ElementPlus.$font-size-base !default;
+
+$--form-label-font-size: $form-font-size !default;
+
+$form-item-large-line-height: 40px;
+
+$form-item-medium-line-height: 32px;
+
+$form-item-small-line-height: 24px;
+
+$form-item-label-top-line-height: 40px;
+
+$form-error-line-height: 22px !default;
+
+$form-item-margin-bottom: $form-error-line-height !default;

@@ -1,8 +1,15 @@
 # DraggableTable
 
-可拖拽表格组件，基于VXE-Grid封装，支持行列拖拽、编辑、过滤等功能。
+可拖拽表格组件，基于[VXE-Grid](https://vxetable.cn/#/grid/api),[EnterNextContainer](../base/EnterNextContainer.md)封装，支持行列拖拽、编辑、过滤等功能。
 
 ## 组件示例
+
+### 分页（showPagination / editAutoFocus）
+
+示例：开启编辑（editable=true）
+:::demo
+DraggableTable/base/index
+:::
 
 ### 编辑（editable / editAutoFocus）
 
@@ -67,6 +74,24 @@ DraggableTable/drag/columnDragDisabledMethod
 示例：启用全局排序（sortable=true）
 :::demo
 DraggableTable/sort/sortable
+:::
+
+
+### 回车下一个
+
+示例：容器类型为行（containerType='row'）
+:::demo
+DraggableTable/props/containerType-row
+:::
+
+示例：容器类型为整表（containerType='table'）
+:::demo
+DraggableTable/props/containerType-table
+:::
+
+示例：无下一个输入控件（noNextInput）
+:::demo
+DraggableTable/events/noNextInput
 :::
 
 ### 插槽（动态命名插槽与内置前缀插槽）
@@ -149,6 +174,7 @@ DraggableTable/expose/getTable
 | filterable | 是否启用过滤功能 | Boolean | false |
 | filterType | 过滤类型 | String | 'filter' |
 | filterLayout | 筛选器布局配置，支持 input、checkbox、select | Array | ['input','checkbox'] |
+| showPagination   | 是否显示分页 | Boolean | `false`|
 | ...attrs | 其他属性透传给[vxe-grid](https://vxetable.cn/#/grid/api) | - | - |
 
 ### columns 配置
@@ -173,6 +199,9 @@ DraggableTable/expose/getTable
 | resizableChange | 列宽变化事件 | ^[Function]`(params: ResizableChangeParams) => void` |
 | checkboxChange | 复选框变化事件 | ^[Function]`(params: CheckboxChangeParams) => void` |
 | checkboxAll | 复选框全选事件 | ^[Function]`(params: CheckboxAllParams) => void` |
+| size-change | 每页条数变化 | ^[Function]`(size: number) => void` |
+| current-change | 当前页变化 | ^[Function]`(current: number) => void` |
+| update:pagination | 分页受控更新 | ^[Function]`(pagination: { pageIndex: number; pageSize: number; total: number }) => void` |
 
 ### Slots
 

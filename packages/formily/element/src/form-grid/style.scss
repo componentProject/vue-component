@@ -1,0 +1,5 @@
+@use '../__builtins__/styles/common.scss';
+
+.#{common.$moluoxixi-prefix}-form-grid {
+  display: grid;
+}

@@ -1,0 +1,520 @@
+@use 'sass:math';
+@use '../__builtins__/styles/common.scss';
+@use '../__builtins__/styles/element-plus.scss' as ElementPlus;
+@use './var.scss';
+@use './grid.scss';
+@use './animation.scss';
+
+.#{var.$form-item-prefix} {
+  display: flex;
+  margin-bottom: var.$form-item-margin-bottom;
+  position: relative;
+  line-height: var.$form-item-medium-line-height;
+  font-size: var.$form-font-size;
+
+  &-label * {
+    line-height: var.$form-item-medium-line-height;
+  }
+
+  &-label-content {
+    min-height: var.$form-item-medium-line-height;
+  }
+
+  &-content-component {
+    line-height: var.$form-item-medium-line-height;
+  }
+
+  .#{common.$namespace}-input,
+  .#{common.$namespace}-input-number,
+  .#{common.$namespace}-input-number.is-controls-right,
+  .#{common.$namespace}-select,
+  .#{common.$namespace}-cascader,
+  .#{common.$namespace}-date-editor--daterange,
+  .#{common.$namespace}-date-editor--timerange,
+  .#{common.$namespace}-date-editor--datetimerange,
+  .#{common.$namespace}-date-editor.#{common.$namespace}-input,
+  .#{common.$namespace}-date-editor.#{common.$namespace}-input__inner,
+  .#{common.$namespace}-tree-select {
+    width: 100%;
+  }
+
+  .#{common.$namespace}-input-group {
+    vertical-align: top;
+  }
+}
+
+.#{var.$form-item-prefix}-label {
+  position: relative;
+  display: flex;
+
+  &-content {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &-tooltip {
+    cursor: help;
+
+    * {
+      cursor: help;
+    }
+
+    label {
+      border-bottom: 1px dashed currentColor;
+    }
+  }
+}
+
+.#{var.$form-item-prefix}-label label {
+  color: var(--el-text-color-regular);
+}
+
+.#{var.$form-item-prefix}-label-align-left {
+  > .#{var.$form-item-prefix}-label {
+    justify-content: flex-start;
+  }
+}
+
+.#{var.$form-item-prefix}-label-align-right {
+  > .#{var.$form-item-prefix}-label {
+    justify-content: flex-end;
+  }
+}
+
+.#{var.$form-item-prefix}-label-wrap {
+  .#{var.$form-item-prefix}-label {
+    label {
+      white-space: pre-line;
+    }
+  }
+}
+
+.#{var.$form-item-prefix}-feedback-layout-terse {
+  margin-bottom: 8px;
+
+  &.#{var.$form-item-prefix}-feedback-has-text:not(.#{var.$form-item-prefix}-inset) {
+    margin-bottom: 0;
+  }
+}
+
+.#{var.$form-item-prefix}-feedback-layout-loose {
+  margin-bottom: var.$form-error-line-height;
+
+  &.#{var.$form-item-prefix}-feedback-has-text:not(.#{var.$form-item-prefix}-inset) {
+    margin-bottom: 0;
+  }
+}
+
+.#{var.$form-item-prefix}-feedback-layout-none {
+  margin-bottom: 0;
+
+  &.#{var.$form-item-prefix}-feedback-has-text:not(.#{var.$form-item-prefix}-inset) {
+    margin-bottom: 0;
+  }
+}
+
+.#{var.$form-item-prefix}-control {
+  width: 100%;
+  flex: 1;
+
+  .#{var.$form-item-prefix}-control-content {
+    display: flex;
+
+    .#{var.$form-item-prefix}-control-content-component {
+      width: 100%;
+      min-height: var.$form-item-medium-line-height;
+      line-height: var.$form-item-medium-line-height;
+
+      &-has-feedback-icon {
+        flex: 1;
+        position: relative;
+        display: flex;
+        align-items: center;
+      }
+    }
+
+    .#{var.$form-item-prefix}-addon-before {
+      margin-right: 8px;
+      display: inline-flex;
+      align-items: center;
+      min-height: var.$form-item-medium-line-height;
+      flex-shrink: 0;
+    }
+
+    .#{var.$form-item-prefix}-addon-after {
+      margin-left: 8px;
+      display: inline-flex;
+      align-items: center;
+      min-height: var.$form-item-medium-line-height;
+      flex-shrink: 0;
+    }
+  }
+}
+
+.#{var.$form-item-prefix}-size-small {
+  font-size: common.$font-size-extra-small;
+
+  .#{var.$form-item-prefix}-label * {
+    line-height: var.$form-item-small-line-height;
+  }
+
+  .#{var.$form-item-prefix}-label-content {
+    min-height: var.$form-item-small-line-height;
+  }
+
+  .#{var.$form-item-prefix}-control-content {
+    .#{var.$form-item-prefix}-control-content-component {
+      line-height: var.$form-item-small-line-height;
+      min-height: var.$form-item-small-line-height;
+    }
+  }
+
+  .#{var.$form-item-prefix}-help,
+  .#{var.$form-item-prefix}-extra {
+    min-height: var.$form-error-line-height;
+  }
+
+  .#{var.$form-item-prefix}-control-content {
+    min-height: var.$form-item-small-line-height;
+  }
+
+  .#{var.$form-item-prefix}-label > label {
+    height: var.$form-item-small-line-height;
+  }
+
+  .#{common.$namespace}-input {
+    input {
+      height: var.$form-item-small-line-height;
+      line-height: var.$form-item-small-line-height;
+    }
+  }
+
+  .#{common.$namespace}-input-number {
+    line-height: var.$form-item-small-line-height;
+    &.is-controls-right {
+      .#{common.$namespace}-input-number__increase,
+      .#{common.$namespace}-input-number__decrease {
+        line-height: math.div(var.$form-item-small-line-height, 2);
+        height: math.div(var.$form-item-small-line-height, 2);
+        font-size: common.$font-size-extra-small;
+        box-sizing: border-box;
+      }
+    }
+  }
+}
+
+.#{var.$form-item-prefix}-size-large {
+  font-size: common.$font-size-medium;
+
+  .#{var.$form-item-prefix}-label * {
+    line-height: var.$form-item-large-line-height;
+  }
+
+  .#{var.$form-item-prefix}-label-content {
+    min-height: var.$form-item-large-line-height;
+  }
+
+  .#{var.$form-item-prefix}-control-content {
+    .#{var.$form-item-prefix}-control-content-component {
+      line-height: var.$form-item-large-line-height;
+      min-height: var.$form-item-large-line-height;
+    }
+  }
+
+  .#{var.$form-item-prefix}-help,
+  .#{var.$form-item-prefix}-extra {
+    min-height: var.$form-error-line-height;
+  }
+
+  .#{var.$form-item-prefix}-control-content {
+    min-height: var.$form-item-large-line-height;
+  }
+
+  .#{common.$namespace}-input {
+    input {
+      height: var.$form-item-large-line-height;
+      line-height: var.$form-item-large-line-height;
+    }
+  }
+
+  .#{common.$namespace}-select {
+    input {
+      height: var.$form-item-large-line-height !important;
+      line-height: var.$form-item-large-line-height;
+    }
+  }
+
+  .#{common.$namespace}-select__tags .el-tag {
+    height: var.$form-item-large-line-height - 12px;
+    line-height: var.$form-item-large-line-height - 12px;
+  }
+
+  .#{common.$namespace}-input-number {
+    line-height: var.$form-item-large-line-height;
+    &.is-controls-right {
+      .#{common.$namespace}-input-number__increase,
+      .#{common.$namespace}-input-number__decrease {
+        line-height: math.div(var.$form-item-large-line-height, 2) - 1;
+        font-size: common.$font-size-medium;
+      }
+    }
+  }
+}
+
+.#{var.$form-item-prefix} {
+  &-layout-vertical {
+    display: block;
+
+    .#{var.$form-item-prefix}-label * {
+      line-height: var.$form-item-label-top-line-height;
+    }
+
+    .#{var.$form-item-prefix}-label-content {
+      min-height: var.$form-item-label-top-line-height;
+    }
+  }
+}
+
+.#{var.$form-item-prefix}-feedback-layout-popover {
+  margin-bottom: 8px;
+}
+
+.#{var.$form-item-prefix}-label-tooltip {
+  margin-left: 4px;
+  color: ElementPlus.$color-text-secondary;
+  display: flex;
+  align-items: center;
+  height: var.$form-item-medium-line-height;
+  cursor: pointer;
+  i {
+    line-height: 1;
+  }
+}
+
+.#{var.$form-item-prefix}-control-align-left {
+  .#{var.$form-item-prefix}-control-content {
+    justify-content: flex-start;
+  }
+}
+
+.#{var.$form-item-prefix}-control-align-right {
+  .#{var.$form-item-prefix}-control-content {
+    justify-content: flex-end;
+  }
+}
+
+.#{var.$form-item-prefix}-control-wrap {
+  .#{var.$form-item-prefix}-control {
+    white-space: pre-line;
+  }
+}
+
+.#{var.$form-item-prefix}-asterisk {
+  color: ElementPlus.$color-danger;
+  margin-right: 4px;
+  display: inline-block;
+  font-family: SimSun, sans-serif;
+}
+
+.#{var.$form-item-prefix}-colon {
+  margin-left: 2px;
+  margin-right: 8px;
+}
+
+.#{var.$form-item-prefix}-help,
+.#{var.$form-item-prefix}-extra {
+  clear: both;
+  min-height: var.$form-error-line-height;
+  line-height: var.$form-error-line-height;
+  color: ElementPlus.$color-text-secondary;
+  transition: ElementPlus.$color-transition-base;
+  padding-top: 0;
+}
+
+.#{var.$form-item-prefix}-fullness {
+  > .#{var.$form-item-prefix}-control {
+    > .#{var.$form-item-prefix}-control-content {
+      > .#{var.$form-item-prefix}-control-content-component {
+        > *:first-child {
+          width: 100%;
+        }
+      }
+    }
+  }
+}
+
+.#{var.$form-item-prefix}-control-content-component-has-feedback-icon {
+  border-radius: ElementPlus.$border-radius-base;
+  border: ElementPlus.$border-base;
+  padding-right: 8px;
+  transition: ElementPlus.$all-transition;
+  touch-action: manipulation;
+  outline: none;
+
+  .#{common.$namespace}-input-number,
+  .#{common.$namespace}-date-editor .#{common.$namespace}-input__inner,
+  .#{common.$namespace}-select .#{common.$namespace}-input__inner,
+  .#{common.$namespace}-input .#{common.$namespace}-input__inner {
+    border: none !important;
+    box-shadow: none !important;
+  }
+  .#{common.$namespace}-input-number.is-controls-right .#{common.$namespace}-input__inner {
+    padding-right: 40px;
+  }
+  .#{common.$namespace}-input-number.is-controls-right,
+  .#{common.$namespace}-input-number__increase {
+    top: 0;
+    right: 8px;
+    border-right: ElementPlus.$border-base;
+  }
+
+  .#{common.$namespace}-input-number.is-controls-right,
+  .#{common.$namespace}-input-number__decrease {
+    bottom: 0;
+    right: 8px;
+    border-right: ElementPlus.$border-base;
+  }
+}
+
+.#{var.$form-item-prefix} {
+  &:hover {
+    .#{var.$form-item-prefix}-control-content-component-has-feedback-icon {
+      @include common.hover;
+    }
+  }
+}
+
+.#{var.$form-item-prefix}-active {
+  .#{var.$form-item-prefix}-control-content-component-has-feedback-icon {
+    @include common.active;
+  }
+}
+
+.#{var.$form-item-prefix}-error {
+  & .#{common.$namespace}-input__inner,
+  & .#{common.$namespace}-textarea__inner {
+    &,
+    &.hover {
+      border-color: ElementPlus.$color-danger;
+    }
+  }
+
+  & .#{common.$namespace}-input__inner,
+  & .#{common.$namespace}-textarea__inner {
+    &:focus {
+      border-color: ElementPlus.$color-danger;
+    }
+  }
+
+  & .#{common.$namespace}-input-group__append,
+  & .#{common.$namespace}-input-group__prepend {
+    & .#{common.$namespace}-input__inner {
+      border-color: transparent;
+    }
+  }
+  .#{common.$namespace}-input__validateIcon {
+    color: ElementPlus.$color-danger !important;
+  }
+}
+
+.#{var.$form-item-prefix}-error-help,
+.#{var.$form-item-prefix}-warning-help,
+.#{var.$form-item-prefix}-success-help {
+  i {
+    margin-right: 8px;
+  }
+}
+
+.#{var.$form-item-prefix}-error-help {
+  color: ElementPlus.$color-danger;
+}
+
+.#{var.$form-item-prefix}-warning-help {
+  color: ElementPlus.$color-warning;
+}
+
+.#{var.$form-item-prefix}-success-help {
+  color: ElementPlus.$color-success;
+}
+
+.#{var.$form-item-prefix}-warning {
+  & .#{common.$namespace}-input__inner,
+  & .#{common.$namespace}-textarea__inner {
+    &,
+    &.hover {
+      border-color: ElementPlus.$color-warning;
+    }
+  }
+
+  & .#{common.$namespace}-input__inner,
+  & .#{common.$namespace}-textarea__inner {
+    &:focus {
+      border-color: ElementPlus.$color-warning;
+    }
+  }
+
+  & .#{common.$namespace}-input-group__append,
+  & .#{common.$namespace}-input-group__prepend {
+    & .#{common.$namespace}-input__inner {
+      border-color: transparent;
+    }
+  }
+  .#{common.$namespace}-input__validateIcon {
+    color: ElementPlus.$color-warning !important;
+  }
+}
+
+.#{var.$form-item-prefix}-success {
+  & .#{common.$namespace}-input__inner,
+  & .#{common.$namespace}-textarea__inner {
+    &,
+    &.hover {
+      border-color: ElementPlus.$color-success;
+    }
+  }
+
+  & .#{common.$namespace}-input__inner,
+  & .#{common.$namespace}-textarea__inner {
+    &:focus {
+      border-color: ElementPlus.$color-success;
+    }
+  }
+
+  & .#{common.$namespace}-input-group__append,
+  & .#{common.$namespace}-input-group__prepend {
+    & .#{common.$namespace}-input__inner {
+      border-color: transparent;
+    }
+  }
+  .#{common.$namespace}-input__validateIcon {
+    color: ElementPlus.$color-success !important;
+  }
+}
+
+.#{var.$form-item-prefix}-bordered-none {
+  .#{common.$namespace}-input__inner {
+    border: none !important;
+  }
+
+  .#{common.$namespace}-input-number__decrease,
+  .#{common.$namespace}-input-number__increase {
+    border: none !important;
+    background: transparent !important;
+  }
+}
+
+.#{var.$form-item-prefix}-inset {
+  border-radius: ElementPlus.$border-radius-base;
+  border: ElementPlus.$border-base;
+  padding-left: 12px;
+  transition: 0.3s all;
+
+  &:hover {
+    @include common.hover;
+  }
+}
+
+.#{var.$form-item-prefix}-inset-active {
+  @include common.active;
+}

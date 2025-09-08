@@ -91,4 +91,7 @@ export default class BaseApi {
   public async put<R>(url: string, data?: any, params?: any, config?: AxiosRequestConfig): Promise<AxiosResponse['data']> {
     return this.request<R>({ ...config, url, method: 'put', data, params })
   }
+
+  // 缺失取消函数
+  // 缺失批量请求
 }

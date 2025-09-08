@@ -1,0 +1,84 @@
+@use '../__builtins__/styles/common.scss';
+@use '../__builtins__/styles/element-plus.scss' as ElementPlus;
+
+$array-table-prefix-cls: '#{common.$moluoxixi-prefix}-array-table';
+
+.#{$array-table-prefix-cls} {
+  .#{common.$moluoxixi-prefix}-form-item:not(.#{common.$moluoxixi-prefix}-form-item-feedback-layout-popover) {
+    margin-bottom: 0 !important;
+  }
+
+  &-status-select-dropdown {
+    .#{common.$namespace}-badge {
+      line-height: 1;
+    }
+  }
+
+  &-pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: 8px;
+
+    .#{$array-table-prefix-cls}-status-select.has-error {
+      .#{common.$namespace}-input__inner {
+        border-color: ElementPlus.$color-danger !important;
+      }
+    }
+  }
+
+  .#{common.$namespace}-table {
+    .cell {
+      overflow: visible;
+      &.el-tooltip {
+        overflow: hidden;
+      }
+    }
+
+    &__fixed {
+      box-shadow: 10px 0 10px -10px rgb(0 0 0 / 12%);
+    }
+
+    &__fixed-right {
+      box-shadow: -10px 0 10px -10px rgb(0 0 0 / 12%);
+    }
+  }
+
+  .#{common.$moluoxixi-prefix}-form-item-help {
+    position: absolute;
+    font-size: 12px;
+    top: 100%;
+    background: #fff;
+    width: 100%;
+    margin-top: 3px;
+    padding: 3px;
+    z-index: 2;
+    border-radius: 3px;
+    box-shadow: 0 0 10px #eee;
+  }
+
+  .#{common.$moluoxixi-prefix}-array-base-addition {
+    margin-top: 8px;
+    width: 100%;
+    border: ElementPlus.$border-width-base dashed ElementPlus.$border-color-base;
+
+    &:hover {
+      background-color: ElementPlus.$color-white;
+      border-color: ElementPlus.$border-color-hover;
+    }
+
+    &:active,
+    &:focus {
+      background-color: ElementPlus.$color-white;
+      border-color: ElementPlus.$color-primary;
+    }
+  }
+
+  .#{common.$moluoxixi-prefix}-form-item-feedback-layout-popover {
+    margin-bottom: 0;
+  }
+
+  &-inner-asterisk {
+    color: ElementPlus.$color-danger;
+    font-weight: ElementPlus.$font-weight-primary;
+  }
+}

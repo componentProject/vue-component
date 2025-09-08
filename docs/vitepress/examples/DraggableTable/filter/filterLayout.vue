@@ -4,7 +4,7 @@
       v-model="tableData"
       :columns="columns"
       :filterable="true"
-      :filter-layout="['input','checkbox','select']"
+      :filter-layout="['input', 'checkbox', 'select']"
     />
   </div>
 </template>
@@ -26,7 +26,7 @@ const columns = ref([
 </script>
 
 <style scoped>
-.container { padding: 8px; }
+.container {
+  padding: 8px;
+}
 </style>
-
-

@@ -1,10 +1,10 @@
 <template>
   <span class="inline-flex items-center">
     <code class="api-typing mr-1">
-      {{ type }}
+      {{ props.type }}
     </code>
     <ClientOnly>
-      <ElTooltip v-if="details" effect="light" trigger="click">
+      <ElTooltip v-if="props.details" effect="light" trigger="click">
         <ElButton
           text
           :icon="Warning"
@@ -13,14 +13,9 @@
         />
         <template #content>
           <slot>
-            <div class="m-1" style="max-width: 600px">
-              <code
-                style="
-                  color: var(--code-tooltip-color);
-                  background-color: var(--code-tooltip-bg-color);
-                "
-              >
-                {{ details }}
+            <div class="m-1">
+              <code style="word-wrap:break-word;word-break:break-all;">
+                {{ props.details }}
               </code>
             </div>
           </slot>
@@ -32,8 +27,9 @@
 
 <script setup lang="ts">
 import { Warning } from '@element-plus/icons-vue'
+import { ElButton, ElTooltip } from 'element-plus'
 
-defineProps({
+const props = defineProps({
   type: String,
   details: String,
 })

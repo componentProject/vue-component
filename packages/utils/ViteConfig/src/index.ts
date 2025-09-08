@@ -26,6 +26,7 @@ import scopedCssPrefixPlugin from './plugins/addScopedAndReplacePrefix.ts'
 
 // 自动路由
 import autoRoutesPlugin from './plugins/autoRoutes/index.ts'
+import importComponentsOrUtils from './plugins/importComponents.ts'
 
 import type { PluginMap, PluginType, ViteConfigType } from './_types/index.ts'
 
@@ -70,8 +71,8 @@ export default function createViteConfig(Config: ViteConfigType) {
       Components({
         resolvers: [
           ElementPlusResolver({
-            exclude: !useDoc && config.unpluginVueComponentsOptions?.elementExcludes ?
-              new RegExp(config.unpluginVueComponentsOptions?.elementExcludes.map((item: string) => `^${item}$`).join('|'))
+            exclude: !useDoc && config.unpluginVueComponentsOptions?.elementExcludes
+              ? new RegExp(config.unpluginVueComponentsOptions?.elementExcludes.map((item: string) => `^${item}$`).join('|'))
               : undefined,
           }),
         ],
@@ -175,6 +176,9 @@ export default function createViteConfig(Config: ViteConfigType) {
         ...performancePlugins,
         ...monitorPlugins,
         ...qianKunPlugins,
+        importComponentsOrUtils({
+          dts: path.resolve(rootPath, './src/typings/virtual-remote.d.ts'),
+        }),
         viteEnv.VITE_AUTO_ROUTES && autoRoutesPlugin({
           root: rootPath,
           routeConfig: {
@@ -250,7 +254,7 @@ export default function createViteConfig(Config: ViteConfigType) {
       resolve: {
         extensions: ['.js', '.jsx', '.ts', '.tsx', '.vue'],
         alias: {
-          '@': path.resolve(rootPath, './src')
+          '@': path.resolve(rootPath, './src'),
         },
       },
       server: {
@@ -264,10 +268,10 @@ export default function createViteConfig(Config: ViteConfigType) {
     const viteConfig = typeof config.viteConfig === 'function'
       ? config.viteConfig(params)
       : config.viteConfig
-    const viteConfigPluginNames = (viteConfig?.plugins || []).map((i) => {
+    const viteConfigPluginNames = (viteConfig?.plugins || []).map((i: any) => {
       return Array.isArray(i) ? (i[0] as PluginType)?.name : (i as PluginType)?.name
     })
-    const defaultPluginNamesMap = (defaultConfig.plugins || []).reduce((nameMap, i) => {
+    const defaultPluginNamesMap = (defaultConfig.plugins || []).reduce((nameMap: Record<string, any>, i: any) => {
       const name: string = Array.isArray(i) ? (i[0] as PluginType)?.name : (i as PluginType)?.name
       nameMap[name] = i
       return nameMap

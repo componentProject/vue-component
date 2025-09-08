@@ -21,7 +21,6 @@
   "dependencies": {
     "@sentry/vite-plugin": "^3.5.0",
     "@sentry/vue": "^9.27.0",
-    "@moluoxixi/components": "workspace:*",
     "@element-plus/icons-vue": "catalog:build",
     "axios": "catalog:build",
     "crypto-js": "catalog:build",
@@ -38,11 +37,14 @@
     "vxe-table": "catalog:build"
   },
   "devDependencies": {
+    "@moluoxixi/components": "workspace:*",
+    "@moluoxixi/utils": "workspace:*",
     "@tailwindcss/postcss": "catalog:dev",
     "tailwindcss": "catalog:dev",
     "postcss": "catalog:dev",
     "@moluoxixi/eslintconfig": "catalog:dev",
     "@moluoxixi/viteconfig": "catalog:dev",
+    "@moluoxixi/ajaxpackage": "catalog:dev",
     "@types/crypto-js": "catalog:type",
     "@types/lodash": "catalog:type",
     "@types/node": "catalog:type",

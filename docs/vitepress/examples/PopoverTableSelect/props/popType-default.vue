@@ -1,6 +1,11 @@
 <template>
   <div class="container">
-    <ElInput ref="ipt" v-model="val" class="ipt" placeholder="外部输入框作为触发器" />
+    <ElInput
+      ref="ipt"
+      v-model="val"
+      class="ipt"
+      placeholder="外部输入框作为触发器"
+    />
     <PopoverTableSelect
       v-model="visible"
       pop-type="default"

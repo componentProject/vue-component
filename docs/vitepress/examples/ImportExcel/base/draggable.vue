@@ -1,7 +1,7 @@
 <template>
   <div>
     <ImportExcel :columns="columns" @success="onSuccess" />
-    <div class="container" v-if="rows.length">
+    <div v-if="rows.length" class="container">
       <DraggableTable v-model="rows" :columns="dragColumns" :sortable="true" />
     </div>
   </div>
@@ -22,11 +22,14 @@ const dragColumns = ref([
   { field: 'age', title: '年龄' },
 ])
 
-function onSuccess(data: any[]) { rows.value = data }
+function onSuccess(data: any[]) {
+  rows.value = data
+}
 </script>
 
 <style scoped>
-.container { margin-top: 12px; height: 300px; }
+.container {
+  margin-top: 12px;
+  height: 300px;
+}
 </style>
-
-

@@ -74,6 +74,8 @@ export function createAxiosInstance(baseURL, timeout = 5000, options = {}) {
         ElMessage({
           message,
           type: 'error',
+          duration: 100 * 1000,
+          center: true,
         })
         return Promise.reject(new Error(message || 'Error'))
       }

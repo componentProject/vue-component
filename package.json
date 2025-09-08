@@ -1,6 +1,7 @@
 {
   "workspaces": [
     "packages/*",
+    "packages/formily/*",
     "play/*",
     "docs/*"
   ],
@@ -19,12 +20,11 @@
     "docs:build": "pnpm run -C docs/vitepress build",
     "storybook:dev": "pnpm run -C docs/storybook build",
     "storybook:build": "pnpm run -C docs/storybook build",
-    "components:build": "pnpm run -C packages/components build:only",
-    "components:publish": "pnpm run -C packages/components build:publish",
-    "components:build-publish": "pnpm run -C packages/components build",
-    "utils:build": "pnpm run -C packages/utils build:only",
-    "utils:publish": "pnpm run -C packages/utils build:publish",
-    "utils:build-publish": "pnpm run -C packages/utils build",
+    "components:build": "pnpm run -C packages/components build",
+    "components:publish": "pnpm run -C packages/components publish",
+    "allComponents:publish": "pnpm run -C packages/components publish:allComponent",
+    "utils:build": "pnpm run -C packages/utils build",
+    "utils:publish": "pnpm run -C packages/utils publish",
     "type-check": "vue-tsc --build",
     "lint-check": "eslint --inspect-config",
     "lint:eslint": "eslint . --fix",
@@ -74,6 +74,7 @@
     "template"
   ],
   "devDependencies": {
+    "vite": "catalog:dev",
     "@antfu/eslint-config": "catalog:dev",
     "@commitlint/cli": "^19.8.0",
     "@commitlint/config-conventional": "^19.8.0",

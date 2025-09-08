@@ -7,7 +7,9 @@
       :columndragable="true"
       @column-dragend="last = $event"
     />
-    <div class="value">columnDragend: {{ last }}</div>
+    <div class="value">
+      columnDragend: {{ last }}
+    </div>
   </div>
 </template>
 
@@ -24,8 +26,12 @@ const columns = ref([
 </script>
 
 <style scoped>
-.container { padding: 8px; }
-.value { margin-top: 8px; font-size: 12px; color: #555; }
+.container {
+  padding: 8px;
+}
+.value {
+  margin-top: 8px;
+  font-size: 12px;
+  color: #555;
+}
 </style>
-
-

@@ -17,7 +17,7 @@ const tableColumns = ref([
   { prop: 'name', label: '姓名' },
   { prop: 'age', label: '年龄' },
 ])
-function onSuccess(data: any[]){ rows.value = data }
+function onSuccess(data: any[]) {
+  rows.value = data
+}
 </script>
-
-

@@ -1,0 +1,23 @@
+@use './element-plus.scss' as ElementPlus;
+@use 'element-plus/theme-chalk/src/common/var.scss';
+
+$moluoxixi-prefix: 'moluoxixi-element-plus';
+$namespace: 'el';
+
+@mixin active {
+  border-color: ElementPlus.$color-primary;
+  outline: 0;
+  border-right-width: ElementPlus.$border-width-base !important;
+}
+
+@mixin hover {
+  border-color: ElementPlus.$border-color-hover;
+  outline: 0;
+  border-right-width: ElementPlus.$border-width-base !important;
+}
+
+$font-size-extra-small: var(--el-font-size-extra-small);
+$--font-size-extra-large: var(--el-font-size-extra-large);
+$--font-size-large: var(--el-font-size-large);
+$font-size-medium: var(--el-font-size-medium);
+$--font-size-small: var(--el-font-size-small);

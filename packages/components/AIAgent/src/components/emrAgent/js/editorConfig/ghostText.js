@@ -1,7 +1,7 @@
-import MedicalLanguage from "./language";
+import MedicalLanguage from './language'
 
-export const getGhostTextCompletion = (model, position) => {
-  const items = [];
+export function getGhostTextCompletion(model, position) {
+  const items = []
   const lineContent = model.getLineContent(position.lineNumber)
   const ghostObject = MedicalLanguage.lastGhostObject
   const lineBeforeContent = lineContent.substring(0, position.column - 1)
@@ -16,10 +16,10 @@ export const getGhostTextCompletion = (model, position) => {
         startLineNumber: position.lineNumber,
         startColumn: position.column,
         endLineNumber: position.lineNumber,
-        endColumn: position.column == maxColumn ? maxColumn : maxColumn - 1
+        endColumn: position.column == maxColumn ? maxColumn : maxColumn - 1,
       },
-      command: undefined
-    });
+      command: undefined,
+    })
   }
   if (items.length) {
     console.groupCollapsed('getGhostTextCompletion')
@@ -29,5 +29,5 @@ export const getGhostTextCompletion = (model, position) => {
     console.log('column', position.column)
     console.groupEnd()
   }
-  return { items };
+  return { items }
 }

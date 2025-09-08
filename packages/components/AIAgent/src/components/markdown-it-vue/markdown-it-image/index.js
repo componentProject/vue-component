@@ -1,17 +1,17 @@
 function parseNextNumber(str, pos, max) {
-  var code,
-    start = pos,
-    result = {
-      ok: false,
-      pos: pos,
-      value: ''
-    }
+  let code
+  const start = pos
+  const result = {
+    ok: false,
+    pos,
+    value: '',
+  }
 
   code = str.charCodeAt(pos)
 
   while (
-    (pos < max && code >= 0x30 /* 0 */ && code <= 0x39 /* 9 */) ||
-    code === 0x25 /* % */
+    (pos < max && code >= 0x30 /* 0 */ && code <= 0x39 /* 9 */)
+    || code === 0x25 /* % */
   ) {
     code = str.charCodeAt(++pos)
   }
@@ -24,13 +24,13 @@ function parseNextNumber(str, pos, max) {
 }
 
 function parseImageSize(str, pos, max) {
-  var code,
-    result = {
-      ok: false,
-      pos: 0,
-      width: '',
-      height: ''
-    }
+  let code
+  const result = {
+    ok: false,
+    pos: 0,
+    width: '',
+    height: '',
+  }
 
   if (pos >= max) {
     return result
@@ -38,7 +38,7 @@ function parseImageSize(str, pos, max) {
 
   code = str.charCodeAt(pos)
 
-  if (code !== 0x3d /* = */) {
+  if (code !== 0x3D /* = */) {
     return result
   }
 
@@ -54,7 +54,7 @@ function parseImageSize(str, pos, max) {
   }
 
   // parse width
-  var resultW = parseNextNumber(str, pos, max)
+  const resultW = parseNextNumber(str, pos, max)
   pos = resultW.pos
 
   // next charactor must be 'x'
@@ -66,7 +66,7 @@ function parseImageSize(str, pos, max) {
   pos++
 
   // parse height
-  var resultH = parseNextNumber(str, pos, max)
+  const resultH = parseNextNumber(str, pos, max)
   pos = resultH.pos
 
   result.width = resultW.value
@@ -76,31 +76,31 @@ function parseImageSize(str, pos, max) {
   return result
 }
 
-export default (md , options) => {
+export default (md, options) => {
   md.inline.ruler.before('emphasis', 'image', (state, silent) => {
-    var attrs,
-      code,
-      content,
-      label,
-      labelEnd,
-      labelStart,
-      pos,
-      ref,
-      res,
-      title,
-      token,
-      tokens,
-      start,
-      href = '',
-      oldPos = state.pos,
-      max = state.posMax,
-      width = '',
-      height = ''
+    let attrs
+    let code
+    let content
+    let label
+    let labelEnd
+    let labelStart
+    let pos
+    let ref
+    let res
+    let title
+    let token
+    let tokens
+    let start
+    let href = ''
+    const oldPos = state.pos
+    const max = state.posMax
+    let width = ''
+    let height = ''
 
     if (state.src.charCodeAt(state.pos) !== 0x21 /* ! */) {
       return false
     }
-    if (state.src.charCodeAt(state.pos + 1) !== 0x5b /* [ */) {
+    if (state.src.charCodeAt(state.pos + 1) !== 0x5B /* [ */) {
       return false
     }
 
@@ -123,7 +123,7 @@ export default (md , options) => {
       pos++
       for (; pos < max; pos++) {
         code = state.src.charCodeAt(pos)
-        if (!md.utils.isSpace(code) && code !== 0x0a) {
+        if (!md.utils.isSpace(code) && code !== 0x0A) {
           break
         }
       }
@@ -139,7 +139,8 @@ export default (md , options) => {
         href = state.md.normalizeLink(res.str)
         if (state.md.validateLink(href)) {
           pos = res.pos
-        } else {
+        }
+        else {
           href = ''
         }
       }
@@ -149,7 +150,7 @@ export default (md , options) => {
       start = pos
       for (; pos < max; pos++) {
         code = state.src.charCodeAt(pos)
-        if (!md.utils.isSpace(code) && code !== 0x0a) {
+        if (!md.utils.isSpace(code) && code !== 0x0A) {
           break
         }
       }
@@ -165,11 +166,12 @@ export default (md , options) => {
         //                         ^^ skipping these spaces
         for (; pos < max; pos++) {
           code = state.src.charCodeAt(pos)
-          if (!md.utils.isSpace(code) && code !== 0x0a) {
+          if (!md.utils.isSpace(code) && code !== 0x0A) {
             break
           }
         }
-      } else {
+      }
+      else {
         title = ''
       }
 
@@ -191,7 +193,7 @@ export default (md , options) => {
             //                              ^^ skipping these spaces
             for (; pos < max; pos++) {
               code = state.src.charCodeAt(pos)
-              if (code !== 0x20 && code !== 0x0a) {
+              if (code !== 0x20 && code !== 0x0A) {
                 break
               }
             }
@@ -204,7 +206,8 @@ export default (md , options) => {
         return false
       }
       pos++
-    } else {
+    }
+    else {
       //
       // Link reference
       //
@@ -212,15 +215,17 @@ export default (md , options) => {
         return false
       }
 
-      if (pos < max && state.src.charCodeAt(pos) === 0x5b /* [ */) {
+      if (pos < max && state.src.charCodeAt(pos) === 0x5B /* [ */) {
         start = pos + 1
         pos = state.md.helpers.parseLinkLabel(state, pos)
         if (pos >= 0) {
           label = state.src.slice(start, pos++)
-        } else {
+        }
+        else {
           pos = labelEnd + 1
         }
-      } else {
+      }
+      else {
         pos = labelEnd + 1
       }
 
@@ -248,16 +253,16 @@ export default (md , options) => {
 
       state.md.inline.parse(content, state.md, state.env, (tokens = []))
 
-      let div = state.push('image-container-open', 'div', 1)
+      const div = state.push('image-container-open', 'div', 1)
       div.block = true
       div.attrs = [
-        ['style', `text-align: ${options.hAlign}`]
+        ['style', `text-align: ${options.hAlign}`],
       ]
 
       token = state.push('image', 'img', 0)
       token.attrs = attrs = [
         ['src', href],
-        ['alt', '']
+        ['alt', ''],
       ]
       token.children = tokens
       token.content = content

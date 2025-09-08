@@ -1,31 +1,37 @@
 @import 'shepherd.js/dist/css/shepherd.css';
 .shepherd-element {
-    // 通过transform调整位置
-    &.shepherd-theme-arrows {
-        transform: translate(18px, 18px); // x轴右移18px，y轴下移18px
-    }
+  // 通过transform调整位置
+  &.shepherd-theme-arrows {
+    transform: translate(18px, 18px); // x轴右移18px，y轴下移18px
+  }
 }
 
 // 或者针对不同方向的引导框
 .shepherd-element[data-popper-placement^='bottom'] {
-    transform: translateY(18px); // 当引导框在元素下方时，额外向下偏移18px
+  transform: translateY(18px); // 当引导框在元素下方时，额外向下偏移18px
 }
 
 .shepherd-element[data-popper-placement^='top'] {
-    transform: translateY(-18px); // 当引导框在元素上方时，额外向上偏移18px
+  transform: translateY(-18px); // 当引导框在元素上方时，额外向上偏移18px
 }
 
 .shepherd-element[data-popper-placement^='left'] {
-    transform: translateX(-18px); // 当引导框在元素左侧时，额外向左偏移18px
+  transform: translateX(-18px); // 当引导框在元素左侧时，额外向左偏移18px
 }
 
 .shepherd-element[data-popper-placement^='right'] {
-    transform: translateX(18px); // 当引导框在元素右侧时，额外向右偏移18px
+  transform: translateX(18px); // 当引导框在元素右侧时，额外向右偏移18px
 }
 .shepherd-footer {
-    padding: 12px;
+  padding: 12px;
 }
 .shepherd-button {
-    padding: 4px 12px;
-    background-color: #3a77ff;
+  padding: 4px 12px;
+  background-color: #3a77ff;
+  margin-right: 8px;
+}
+.shepherd-text {
+  font-size: 14px;
+  line-height: 20px;
+  padding: 12px;
 }

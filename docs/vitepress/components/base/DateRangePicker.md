@@ -228,10 +228,10 @@ DateRangePicker/expose/focus
 
 ### Events
 
-| 事件名 | 说明 | 回调参数 |
-| --- | --- | --- |
-| update:modelValue | 绑定值更新 | ^[Function]`(value: string[] | string) => void` |
-| change | 用户确认选定的值时触发 | ^[Function]`(value: string[] | string) => void` |
+| 事件名 | 说明 | 回调参数                                                                 |
+| --- | --- |----------------------------------------------------------------------|
+| update:modelValue | 绑定值更新 | ^[Function]`(value: string[] \| string) => void`|
+| change | 用户确认选定的值时触发 | ^[Function]`(value: string[]\| string) => void` |
 
 ### Slots
 

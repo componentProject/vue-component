@@ -23,7 +23,7 @@ const columns = ref([
 </script>
 
 <style scoped>
-.container { padding: 8px; }
+.container {
+  padding: 8px;
+}
 </style>
-
-

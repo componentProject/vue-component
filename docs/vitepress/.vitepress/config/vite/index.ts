@@ -72,6 +72,7 @@ const viteConfig = {
   resolve: {
     alias: {
       '@moluoxixi/components': path.resolve(rootPath, './packages/components'),
+      '@moluoxixi/utils': path.resolve(rootPath, './packages/utils'),
     },
   },
   css: {

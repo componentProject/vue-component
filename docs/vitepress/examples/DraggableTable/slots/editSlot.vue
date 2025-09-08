@@ -2,7 +2,7 @@
   <div class="container" style="height: 350px;">
     <DraggableTable v-model="tableData" :columns="columns" :editable="true">
       <template #edit-name="{ row }">
-        <input v-model="row.name" />
+        <input v-model="row.name">
       </template>
     </DraggableTable>
   </div>
@@ -23,8 +23,11 @@ const columns = ref([
 </script>
 
 <style scoped>
-.container { padding: 8px; }
-input { width: 100%; box-sizing: border-box; }
+.container {
+  padding: 8px;
+}
+input {
+  width: 100%;
+  box-sizing: border-box;
+}
 </style>
-
-

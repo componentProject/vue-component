@@ -1,5 +1,4 @@
 <template>
-  <!--  <DraggableTable /> -->
   <div class="h-full w-full flex-1 overflow-hidden">
     <VxeGrid
       ref="xTable"
@@ -10,33 +9,11 @@
       @checkbox-change="handleCheckboxChange"
       @resizable-change="handleColumnResizableChange"
       @header-cell-menu.prevent="handleHeaderCellMenu"
-      @page-change="handlePageChange"
+      @toggle-tree-expand="handleTableRendered"
     >
-      <!--      <template #empty> -->
-      <!--        <span style="color: red;"> -->
-      <!--          <img src="https://vxeui.com/resource/img/546.gif"> -->
-      <!--          <p>不用再看了，没有更多数据了！</p> -->
-      <!--        </span> -->
-      <!--      </template> -->
       <template #loading="params">
         <slot name="loading" v-bind="params">
           <span class="absolute left-1/2 top-1/3 -translate-x-1/2 -translate-y-1/2">加载中...</span>
-        </slot>
-      </template>
-      <template v-if="!isEmpty(props.pagerConfig)" #pager>
-        <slot name="pager">
-          <div style="padding-top: 12px;overflow:auto;">
-            <ElPagination
-              v-if="props.pageType === 'el-pagination'"
-              :current-page="props.pagerConfig.currentPage"
-              :page-size="props.pagerConfig.pageSize"
-              :total="props.pagerConfig.total"
-              :page-sizes="transformPageSizes(props.pagerConfig.pageSizes)"
-              :layout="transformLayouts(props.pagerConfig.layouts)"
-              @current-change="handleElPaginationPageChange"
-              @size-change="handleElPaginationSizeChange"
-            />
-          </div>
         </slot>
       </template>
       <!-- 使用插槽方式渲染自定义内容 -->
@@ -51,6 +28,15 @@
       @menu-confirm="handleMenuConfirm"
       @header-context-menu="handleHeaderContextMenu"
     />
+
+    <EnterNextContainer
+      v-for="(virtual, index) in tableVirtualRefs"
+      :key="`row-${index}`"
+      :virtual-ref="virtual"
+      :allow-select-next-in-empty="props.allowSelectNextInEmpty"
+      @no-next-input="handleNoNextInput"
+      @no-select-value="handleNoSelectValue"
+    />
   </div>
 </template>
 
@@ -60,14 +46,13 @@ import type {
   VxeGridInstance,
   VxeGridProps,
   VxeGridPropTypes,
-  VxePagerDefines,
-  VxePagerProps,
   VxeTableConstructor,
   VxeTableDefines,
   VxeTablePropTypes,
 } from 'vxe-table'
 import type { ColumnType, types } from '@moluoxixi/components/DraggableTable/src/_types'
-import { ElMessage, ElPagination } from 'element-plus'
+import { ElMessage } from 'element-plus'
+
 import { cloneDeep, groupBy } from 'lodash'
 import { diff, isEmpty } from 'radash'
 import Sortable from 'sortablejs'
@@ -81,8 +66,10 @@ import {
   watch,
 } from 'vue'
 import { VxeGrid } from 'vxe-table'
+import { VxePager, VxeTooltip, VxeUI } from 'vxe-pc-ui'
 import 'vxe-table/lib/style.css'
-import { dispatchEvents, getClass, getStringObj, getType } from '@moluoxixi/components/_utils'
+import 'vxe-pc-ui/lib/style.css'
+import { debounce, dispatchEvents, getClass, getStringObj, getType } from '@moluoxixi/utils/_utils'
 import {
   getCustomType,
   handleGetColumn,
@@ -96,6 +83,11 @@ import ContextMenu from './components/ContextMenu/index.vue'
 // 导入自定义渲染器
 import './renderers'
 import type { slotsType } from '@moluoxixi/components/_types'
+import EnterNextContainer from '@moluoxixi/components/EnterNextContainer'
+import type {
+  NoNextInputParams,
+  NoSelectValueParams,
+} from './_types'
 
 defineOptions({
   name: 'DraggableTable',
@@ -382,38 +374,60 @@ const props = defineProps({
     type: Object as PropType<VxeTablePropTypes.MouseConfig>,
     default: () => ({}),
   },
-  //#endregion
   //#region 分页配置
-  pageType: {
-    type: String,
-    default: 'el-pagination',
-  },
   pagerConfig: {
     type: Object as PropType<VxeGridPropTypes.PagerConfig>,
     /**
      * layouts 可选值：Home, PrevJump, PrevPage, Number, JumpNumber, NextPage, NextJump, End, Sizes, Jump, FullJump, PageCount, Total
      * @see https://vxetable.cn/#/grid/api?q=pager-config
      */
-    default: null,
+    default: () => ({
+      currentPage: 1,
+      pageSize: 10,
+      total: 100,
+      pageSizes: [10, 20, 30, 50, 100],
+      layouts: ['Home', 'PrevJump', 'PrevPage', 'Number', 'NextPage', 'NextJump', 'End', 'Sizes', 'FullJump', 'Total'],
+    }),
+  },
+  // 是否展示分页
+  showPagination: {
+    type: Boolean,
+    default: false,
   },
   //#endregion
+  allowSelectNextInEmpty: {
+    type: Boolean,
+    default: false,
+  },
+  containerType: {
+    type: String as PropType<'row' | 'table'>,
+    default: 'row',
+  },
 })
-
 // 组件事件
-const emit = defineEmits([
-  'update:tableData',
-  'columnDragend',
-  'rowDragend',
-  'resizableChange',
-  'checkboxChange',
-  'checkboxAll',
-  'headerCellMenu',
-  'pageChange',
-  'headerContextMenu',
-])
-
+const emit = defineEmits<{
+  (e: 'currentChange', params: number): void
+  (e: 'update:pagination', params: number): void
+  (e: 'sizeChange', params: number): void
+  (e: 'pageChange', params: number): void
+  (e: 'headerContextMenu', params: HTMLElement): void
+  (e: 'headerCellMenu', params: VxeTableDefines.HeaderCellMenuParams & { cell?: HTMLElement }): void
+  (e: 'checkboxAll', params: VxeTableDefines.CheckboxAllParams): void
+  (e: 'checkboxChange', params: VxeTableDefines.CheckboxAllParams): void
+  (e: 'resizableChange', params: VxeTableDefines.ResizableChangeParams): void
+  (e: 'rowDragend', params: any): void
+  (e: 'columnDragend', params: any): void
+  (e: 'update:tableData', params: any[]): void
+  // 当在表格中最后一个输入元素按下Enter键时触发
+  (e: 'noNextInput', params: NoNextInputParams): void
+  // 当在表格中select下拉为空时触发
+  (e: 'noSelectValue', params: NoSelectValueParams): void
+  (e: 'toggleTreeExpand', params: VxeTableDefines.ToggleRowExpandEventParams): void
+}>()
 // 获取插槽
 const slots = defineSlots<slotsType>()
+VxeUI.component(VxePager)
+VxeUI.component(VxeTooltip)
 
 const attrs = useAttrs()
 
@@ -424,76 +438,105 @@ const tableData = defineModel({
   default: [],
 })
 
-function handlePageChange(params: VxePagerDefines.PageChangeEventParams) {
-  emit('pageChange', params)
-}
-/**
- * 处理ElPagination的分页变化事件
- * @param page 当前页码
- */
-function handleElPaginationPageChange(page: number) {
-  // 构造vxe-grid的page-change事件参数
-  const pageChangeParams = {
-    type: 'current',
-    currentPage: page,
-    pageSize: props.pagerConfig.pageSize,
+//#region 回车下一个功能
+const tableVirtualRefs = ref<HTMLElement[]>([])
+
+// 获取表格中所有的行元素
+function collectTableVirtualRefs() {
+  try {
+    if (!xTable.value) {
+      return
+    }
+
+    // 获取表格元素
+    const table = xTable.value?.$el as HTMLElement
+    if (!table) {
+      return
+    }
+
+    const tables = Array.from(table.querySelectorAll('tbody')) as HTMLElement[]
+    // 获取所有tr元素(不包括表头tr)
+    const rows = Array.from(table.querySelectorAll('tbody tr')) as HTMLElement[]
+
+    if (props.containerType === 'row') {
+      tableVirtualRefs.value = rows
+    }
+    else if (props.containerType === 'table') {
+      tableVirtualRefs.value = tables
+    }
+    else {
+      tableVirtualRefs.value = []
+    }
   }
-  emit('pageChange', pageChangeParams)
+  catch (error) {
+    console.error('EnterNextDragTable: 收集行元素时出错', error)
+  }
 }
 
-/**
- * 处理ElPagination的每页条数变化事件
- * @param size 每页条数
- */
-function handleElPaginationSizeChange(size: number) {
-  // 构造vxe-grid的page-change事件参数
-  const pageChangeParams = {
-    type: 'size',
-    currentPage: 1,
-    pageSize: size,
-  }
-  emit('pageChange', pageChangeParams)
-}
+// 创建防抖版本的collectTableVirtualRefs
+const debouncedCollectTableVirtualRefs = debounce(collectTableVirtualRefs, 200)
 
-function transformPageSizes(pageSizes: VxePagerProps['pageSizes']): number[] | undefined {
-  if (props.pageType === 'el-pagination') {
-    return pageSizes?.map((item) => {
-      if (typeof item === 'number') {
-        return item
-      }
-      else {
-        return +item.value!
-      }
+// 当找不到下一个输入元素时的处理
+function handleNoNextInput(element: HTMLElement) {
+  // 查找当前行的索引
+  const row = element.closest('.vxe-body--row') as HTMLElement
+  const rowIndex = row ? tableVirtualRefs.value.indexOf(row) : -1
+  // 获取当前元素最近的td祖先
+  const td = element.closest('td')
+  // 获取所有td元素
+  const tds = row ? Array.from(row.querySelectorAll('td')) : []
+
+  // 计算td在所有td中的索引位置（从0开始）
+  const colIndex = td ? tds.indexOf(td as HTMLTableCellElement) : -1
+
+  // 向外传递事件，并包含更多信息
+  if (rowIndex !== -1 && tableData.value) {
+    emit('noNextInput', {
+      row: tableData.value[rowIndex],
+      rowIndex,
+      colIndex,
     })
   }
 }
 
-function transformLayouts(layouts: VxePagerProps['layouts']): string | undefined {
-  if (props.pageType === 'el-pagination') {
-    /*
-    Home,
-    PrevJump,
-     PrevPage, Number, JumpNumber, NextPage, NextJump, End, Sizes, Jump, FullJump, PageCount, Total
-    * */
-    const ElPaginationLayoutsMap = {
-      PrevPage: 'prev',
-      Number: 'pager',
-      NextPage: 'next',
-      Sizes: 'sizes',
-      FullJump: 'jumper',
-      Total: 'total',
-      Home: '',
-      End: '',
-      PrevJump: '',
-      NextJump: '',
-      JumpNumber: '',
-      Jump: '',
-      PageCount: '',
-    }
-    return layouts?.map((item) => {
-      return ElPaginationLayoutsMap[item]
-    }).join(',')
-  }
+// 当找不到下拉框输入元素值时的处理
+function handleNoSelectValue(element: HTMLElement) {
+  // 查找当前行的索引
+  const row = element.closest('tr')
+  const rowIndex = row ? tableVirtualRefs.value.indexOf(row) : -1
+  // 获取当前元素最近的td祖先
+  const td = element.closest('td')
+  // 获取所有td元素
+  const tds = row ? Array.from(row.querySelectorAll('td')) : []
+
+  // 计算td在所有td中的索引位置（从0开始）
+  const colIndex = td ? tds.indexOf(td as HTMLTableCellElement) : -1
+  console.log(`当前元素位于第 ${colIndex + 1} 个td中`)
+  // 向外传递事件，并包含更多信息
+  emit('noSelectValue', {
+    row: tableData.value[rowIndex],
+    rowIndex,
+    colIndex,
+  })
+}
+
+// 当表格数据变化时，重新收集行元素
+watch(
+  () => tableData.value,
+  () => {
+    nextTick(() => {
+      debouncedCollectTableVirtualRefs()
+    })
+  },
+  { deep: true, immediate: true },
+)
+
+// 为了处理表格渲染完成后的场景
+function handleTableRendered(params: VxeTableDefines.ToggleRowExpandEventParams) {
+  nextTick(() => {
+    debouncedCollectTableVirtualRefs()
+  })
+  emit('toggleTreeExpand', params)
 }
 
 /**
@@ -515,8 +558,8 @@ function transformLayouts(layouts: VxePagerProps['layouts']): string | undefined
  */
 const computedColumns = computed<ColumnType[]>(() => {
   const typeSet = new Set<types | undefined>([])
-  const columns = cloneDeep(props.columns)
-    .filter((i) => {
+  const columns: any[] = cloneDeep(props.columns)
+    .filter((i: any) => {
       if (i.type && typeSet.has(i.type)) {
         return false
       }
@@ -715,7 +758,7 @@ const gridProps = computed<VxeGridProps>(() => {
   const isEditEnabled = props.editable || props.editConfig?.enabled
 
   if (isEditEnabled && localColumns.value.length > 0) {
-    localColumns.value.forEach((column) => {
+    localColumns.value.forEach((column: ColumnType) => {
       // 检查列是否有 field 且有验证规则
       if (column.field && (column.required === true || column.min !== undefined || column.max !== undefined)) {
         const rules: any[] = []
@@ -761,10 +804,8 @@ const gridProps = computed<VxeGridProps>(() => {
       ...props.customConfig,
     },
     pagerConfig: {
-      total: tableData.value.length,
-      currentPage: 1,
-      pageSize: 10,
-      layouts: ['Home', 'PrevJump', 'PrevPage', 'Number', 'NextPage', 'NextJump', 'End', 'Sizes', 'FullJump', 'Total'],
+      enabled: props.showPagination,
+      ...props.pagerConfig,
     },
     editConfig: {
       enabled: props.editable,
@@ -792,15 +833,15 @@ const gridProps = computed<VxeGridProps>(() => {
       showGuidesStatus: true,
       showIcon: false,
       trigger: 'row',
-      dragEndMethod: (params) => {
+      dragEndMethod: (params: any) => {
         const isDrag = props.rowDragEndMethod ? props.rowDragEndMethod(params) : true
         if (isDrag) {
           emit('rowDragend', params)
         }
         const { newRow, oldRow, dragToChild } = params
         if (!dragToChild) {
-          const oldIndex = tableData.value.findIndex(item => item === oldRow)
-          const newIndex = tableData.value.findIndex(item => item === newRow)
+          const oldIndex = tableData.value.findIndex((item: any) => item === oldRow)
+          const newIndex = tableData.value.findIndex((item: any) => item === newRow)
           if (oldIndex !== -1 && newIndex !== -1) {
             tableData.value.splice(newIndex, 0, tableData.value.splice(oldIndex, 1)[0])
           }
@@ -832,7 +873,7 @@ const gridProps = computed<VxeGridProps>(() => {
       showGuidesStatus: true,
       showIcon: false,
       trigger: 'cell',
-      dragEndMethod: (params) => {
+      dragEndMethod: (params: any) => {
         const isDrag = props.columnDragEndMethod ? props.columnDragEndMethod(params) : true
         // Vxe自带逻辑，无须添加
         // const { oldColumn, newColumn } = params
@@ -847,7 +888,7 @@ const gridProps = computed<VxeGridProps>(() => {
         }
         return isDrag
       },
-      disabledMethod(params) {
+      disabledMethod(params: any) {
         return props.columnDragDisabledMethod?.(params)
       },
       ...props.columnDragConfig,
@@ -857,13 +898,15 @@ const gridProps = computed<VxeGridProps>(() => {
       ...props.resizableConfig,
     },
     virtualXConfig: {
-      enabled: true,
-      gt: 15,
+      enabled: false,
+      gt: 0,
+      threshold: 30,
       ...props.virtualXConfig,
     },
     virtualYConfig: {
-      enabled: true,
-      gt: 30,
+      enabled: false,
+      gt: 0,
+      threshold: 30,
       ...props.virtualYConfig,
     },
     menuConfig: {
@@ -871,7 +914,7 @@ const gridProps = computed<VxeGridProps>(() => {
       ...props.menuConfig,
     },
     sortConfig: {
-      iconVisibleMethod(params) {
+      iconVisibleMethod(params: any) {
         const {
           column: { field },
         } = params
@@ -881,7 +924,7 @@ const gridProps = computed<VxeGridProps>(() => {
       ...props.sortConfig,
     },
     filterConfig: {
-      iconVisibleMethod(params) {
+      iconVisibleMethod(params: any) {
         const {
           column: { field },
         } = params
@@ -977,9 +1020,9 @@ function handleSaveColumnsToStorage() {
     // 只保存必要的列属性
     const columns = computedColumns.value
       .filter((item: ColumnType) => item.title || item.type)
-      .map((i) => {
+      .map((i: ColumnType) => {
         const oldCol = handleGetColumn(i)
-        const col = fullColumn.find(item => item.field === i.field && item.type === i.type && item.title === i.title)
+        const col = fullColumn.find((item: ColumnType) => item.field === i.field && item.type === i.type && item.title === i.title)
         if (col) {
           col.width = oldCol.width!
         }
@@ -1042,7 +1085,7 @@ function handleColumnResizableChange(params: VxeTableDefines.ResizableChangePara
  */
 watch(
   () => computedColumns.value,
-  (newColumns) => {
+  (newColumns: ColumnType[]) => {
     // 如果启用了本地存储，不保存
     if (props.customConfig.storage) {
       localColumns.value = cloneDeep(newColumns)
@@ -1072,7 +1115,7 @@ watch(
 
 watch(
   () => localColumns.value,
-  (newVal) => {
+  (newVal: ColumnType) => {
     nextTick(() => {
       xTable.value?.loadColumn(newVal)
       handleSaveColumnsToStorage()
@@ -1120,7 +1163,7 @@ function initRowDraggable() {
     animation: 150,
     handle: 'tr',
     filter: getClass(props.rowDisabledClass, true),
-    onEnd: ({ oldIndex = 0, newIndex = 0, item }) => {
+    onEnd: ({ oldIndex = 0, newIndex = 0, item }: Record<string, any>) => {
       if (oldIndex === newIndex || !xTable.value)
         return
       // 获取源数据副本
@@ -1192,7 +1235,7 @@ function initColumnDraggable() {
   columnSortableInstance.value = Sortable.create(headerTr, {
     animation: 150,
     handle: 'th',
-    onEnd: ({ oldIndex = 0, newIndex = 0, item }) => {
+    onEnd: ({ oldIndex = 0, newIndex = 0, item }: Record<string, any>) => {
       if (oldIndex === newIndex || !xTable.value)
         return
 
@@ -1263,7 +1306,7 @@ onBeforeUnmount(() => {
 // 监听拖拽配置变化，动态更新拖拽功能
 watch(
   () => props.dragable,
-  (newVal) => {
+  (newVal: boolean) => {
     if (props.dragType !== 'draggable')
       return
     if (newVal) {
@@ -1283,7 +1326,7 @@ watch(
 
 watch(
   () => props.rowdragable,
-  (newVal) => {
+  (newVal: boolean) => {
     if (props.dragType !== 'draggable')
       return
     if (newVal) {
@@ -1303,7 +1346,7 @@ watch(
 
 watch(
   () => props.columndragable,
-  (newVal) => {
+  (newVal: boolean) => {
     if (props.dragType !== 'draggable')
       return
     if (newVal) {

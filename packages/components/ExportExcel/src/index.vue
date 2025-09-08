@@ -14,7 +14,7 @@ import { ElButton, ElMessage } from 'element-plus'
 import fileSaver from 'file-saver'
 import { computed } from 'vue'
 import * as XLSX from 'xlsx'
-import { getTypeDefault } from '@moluoxixi/components/_utils/index.ts'
+import { getTypeDefault } from '@moluoxixi/utils/_utils/index.ts'
 
 // 设置组件不继承属性到根元素，而是手动通过$attrs绑定
 defineOptions({

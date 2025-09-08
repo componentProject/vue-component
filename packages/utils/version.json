@@ -1,4 +1,5 @@
 {
   "ViteConfig": "0.0.18",
-  "EslintConfig": "0.0.5"
+  "EslintConfig": "0.0.5",
+  "AjaxPackage": "0.0.6"
 }

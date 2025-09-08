@@ -1,0 +1,56 @@
+@use '../__builtins__/styles/common.scss';
+@use '../__builtins__/styles/element-plus.scss' as ElementPlus;
+
+$editable-prefix-cls: '#{common.$moluoxixi-prefix}-editable';
+
+.#{$editable-prefix-cls} {
+  cursor: pointer;
+  display: inline-block !important;
+
+  .#{common.$moluoxixi-prefix}-form-text {
+    .#{common.$moluoxixi-prefix}-tag {
+      transition: none !important;
+    }
+
+    .#{common.$moluoxixi-prefix}-tag:last-child {
+      margin-right: 0 !important;
+    }
+  }
+
+  &-content {
+    display: flex;
+    align-items: center;
+
+    > * {
+      margin-right: 3px;
+      &:last-child {
+        margin-right: 0;
+      }
+    }
+  }
+
+  .#{$editable-prefix-cls}-edit-btn,
+  .#{$editable-prefix-cls}-close-btn {
+    transition: all 0.25s ease-in-out;
+    width: 14px;
+    height: 14px;
+
+    &:hover {
+      color: ElementPlus.$color-primary;
+    }
+  }
+
+  .#{common.$moluoxixi-prefix}-form-text {
+    display: flex;
+    align-items: center;
+  }
+
+  .#{$editable-prefix-cls}-preview {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    word-break: break-all;
+    max-width: 100px;
+    display: block;
+  }
+}

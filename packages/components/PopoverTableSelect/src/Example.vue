@@ -53,11 +53,12 @@
       <h2>自带input用法</h2>
       <div class="w-[240px]!">
         <PopoverTableSelect
-          :throttle="2000"
+          :throttle="100"
           :input-value="inputValue1"
           pop-type="input"
           :columns="columns"
           :data="tableData"
+          :options="{ promise: true }"
           @select="handleInputSelect"
           @input="handleInput"
         />
@@ -162,7 +163,12 @@ function handleInputSelect(row: any) {
   inputValue1.value = row.name
 }
 function handleInput(val: string) {
-  console.log('input', val)
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      console.log('input', val)
+      resolve(123)
+    }, 2000)
+  })
 }
 //#endregion
 </script>

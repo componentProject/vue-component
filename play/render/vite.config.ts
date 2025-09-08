@@ -39,6 +39,9 @@ export default viteConfig(
           alias: {
             '@moluoxixi/components': path.resolve(rootPath, '../../packages/components'),
             '@moluoxixi/components/*': path.resolve(rootPath, '../../packages/components/*'),
+            '@moluoxixi/utils': path.resolve(rootPath, '../../packages/utils'),
+            '@moluoxixi/utils/*': path.resolve(rootPath, '../../packages/utils/*'),
+            '@/*': path.resolve(rootPath, './src/*'),
           },
         },
         plugins: [
@@ -81,8 +84,19 @@ export default viteConfig(
       autoRoutes: {
         routeConfig: {
           componentExamples: {
-            glob: ['/../../packages/components/**/Example.vue', '!/../../packages/components/**/components/*'],
+            glob: [
+              '/../../packages/components/**/Example.vue',
+              '!/../../packages/components/**/components/*',
+              '!/../../packages/components/**/_*/*',
+            ],
             baseRoute: '组件示例',
+          },
+          AllTestComponentExamples: {
+            glob: [
+              '/../../packages/components/_AllTestOrNoPublishComponents/**/Example.vue',
+              '!/../../packages/components/_AllTestOrNoPublishComponents/**/components/*',
+            ],
+            baseRoute: '待发布/测试组件示例(放一些demo，也许后面会发布)',
           },
         },
       },

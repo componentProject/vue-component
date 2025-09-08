@@ -4,7 +4,10 @@
       v-model="popoverModel"
       :virtual-ref="computedVirtualRef"
       :z-index="3000"
+      :loading="loading"
+      :popover-props="props.popoverProps"
       v-bind="$attrs"
+      @scroll-boundary="handleScrollBoundary"
       @enter="handleEnter"
     >
       <template v-for="name in slotNames" #[name]="slotParams" :key="name">
@@ -16,20 +19,22 @@
       ref="inputRef"
       v-bind="props.inputProps"
       v-model="currentInputValue"
+      clearable
       :placeholder="computedPlaceholder"
       @focus="handleFocus"
       @blur="handleBlur"
       @input="computedInput"
+      @clear="handleClear"
     />
   </div>
 </template>
 
 <script setup lang="ts">
-import type { InputInstance, InputProps } from 'element-plus'
+import type { InputInstance, InputProps, PopoverProps } from 'element-plus'
 import type { ComponentInternalInstance, ComponentPublicInstance, PropType } from 'vue'
 import { ElInput } from 'element-plus'
-import { debounce as _debounce, throttle as _throttle } from 'lodash'
-import type { DebounceSettingsLeading, ThrottleSettingsLeading } from 'lodash'
+import { debounce as wlDebounce, throttle as wlThrottle } from '@moluoxixi/utils/_utils'
+import type { DebounceSettings, ThrottleSettings } from 'lodash'
 import { computed, ref, useTemplateRef, watch } from 'vue'
 import PopoverTableSelect from '@moluoxixi/components/PopoverTableSelect/src/base/index.vue'
 import type { slotsType } from '@moluoxixi/components/_types'
@@ -38,23 +43,14 @@ defineOptions({
   name: 'PopoverTableSelect',
 })
 const props = defineProps({
-  debounce: {
-    type: Number,
-    default: 0,
-  },
-  throttle: {
-    type: Number,
-    default: 300,
-  },
+  debounce: { type: Number, default: 0 },
+  throttle: { type: Number, default: 300 },
   /**
    * 防抖节流的配置
    * @see https://github.com/pikax/vue-throttle-debounce#throttle
    * @see https://github.com/pikax/vue-throttle-debounce#debounce
    */
-  options: {
-    type: Object as PropType<DebounceSettingsLeading | ThrottleSettingsLeading>,
-    default: () => ({ trailing: true, leading: false }),
-  },
+  options: { type: Object as PropType<ThrottleOrDebounceOptions>, default: () => ({}) },
   /**
    * 当类型为input时，默认显示输入框
    */
@@ -65,6 +61,10 @@ const props = defineProps({
   placeholder: {
     type: String,
     default: '点击或按下方向键试试',
+  },
+  popoverProps: {
+    type: Object as PropType<PopoverProps>,
+    default: () => ({}),
   },
   inputProps: {
     type: Object as PropType<InputProps>,
@@ -92,10 +92,36 @@ const props = defineProps({
     type: String as PropType<'enter' | 'input'>,
     default: '',
   },
+  onInput: {
+    type: Function,
+  },
+  scrollY: {
+    type: Object as PropType<{ enabled: boolean, threshold: number }>,
+    default: () => ({}),
+  },
+  enableLoadMore: {
+    type: Boolean,
+    default: false,
+  },
+  // 是否还有更多数据
+  hasMore: {
+    type: Boolean,
+    default: false,
+  },
+  // 加载中
+  loading: {
+    type: Boolean,
+    default: false,
+  },
 })
-const emits = defineEmits(['focus', 'input', 'blur', 'enter'])
+
+const emits = defineEmits(['focus', 'blur', 'enter', 'clear', 'load-more'])
+
 // 获取插槽
 const slots = defineSlots<slotsType>()
+
+type ThrottleOrDebounceOptions = Partial<DebounceSettings & ThrottleSettings> & { promise?: boolean }
+
 const slotNames = computed<string[]>(() => Object.keys(slots) as string[])
 
 const popoverModel = defineModel({
@@ -130,7 +156,7 @@ function handleFocus() {
   currentInputValue.value = ''
   emits('focus')
   if (!popoverModel.value) {
-    emits('input', currentInputValue.value)
+    handleInput(currentInputValue.value)
   }
 }
 
@@ -146,25 +172,45 @@ function handleEnter(val: any) {
     popoverModel.value = true
   }
 }
-
 function handleInput(val: string) {
   if (props.successiveShowType === 'input') {
     popoverModel.value = true
   }
-  emits('input', val)
+  if (typeof props.onInput === 'function') {
+    return props.onInput(val)
+  }
 }
 
-const computedInput = computed(() => {
-  if (props.debounce) {
-    return _debounce(handleInput, props.debounce, props.options)
+function handleClear() {
+  cacheInputValue.value = ''
+  currentInputValue.value = ''
+  popoverModel.value = false
+  emits('clear')
+}
+
+const computedOptions = computed<ThrottleOrDebounceOptions>(() => {
+  const o = props.options || {}
+  if ((o as any).promise) {
+    // promiseThrottle 要求 leading=true
+    return { trailing: true, ...o, leading: true }
   }
-  else if (props.throttle) {
-    return _throttle(handleInput, props.throttle, props.options)
-  }
-  else {
-    return handleInput
-  }
+  return { trailing: true, leading: false, ...o }
 })
+
+const computedInput = computed(() => {
+  if (props.debounce)
+    return wlDebounce(handleInput, props.debounce, computedOptions.value)
+  if (props.throttle) {
+    return wlThrottle(handleInput, props.throttle, computedOptions.value)
+  }
+  return handleInput
+})
+
+function handleScrollBoundary(obj) {
+  if(props.enableLoadMore && props.hasMore && obj.direction === 'bottom'){
+    emits('load-more')
+  }
+}
 </script>
 
 <style scoped lang="scss">

@@ -96,35 +96,36 @@ hljs.registerLanguage('prolog', Prolog)
 hljs.registerLanguage('erlang', Erlang)
 hljs.registerLanguage('erlang-repl', ErlangRepl)
 
-const highlightPlugin = md => {
-    md.renderer.rules.fence = (tokens, idx) => {
-        const token = tokens[idx]
-        const code = token.content
-        const lang = token.info
-        const langObj = hljs.getLanguage(lang)
-        let cnt
-        if (langObj) {
-            cnt = hljs.highlight(lang, code).value
-        } else {
-            cnt = hljs.highlightAuto(code).value
-        }
-        // return `<pre class="hljs"><code>${cnt}</code></pre>`
-        // return `<div class="code-block">
-        //             <div class="code-block-header">
-        //                 <span class="code-block-lang">${lang}</span>
-        //                 <div class="operation-btn" data-type="copy"><i class="ai-iconfont icon-copy"></i> 复制</div>
-        //                 ${lang === 'html' ? `<div class="operation-btn" data-type="iframe"><i class="ai-iconfont icon-play-circle-o"></i> 预览</div>` : ''}
-        //             </div>
-        //             <pre class="hljs"><code>${cnt}</code></pre>
-        //         </div>`;
-        return `<div class="code-block">
+function highlightPlugin(md) {
+  md.renderer.rules.fence = (tokens, idx) => {
+    const token = tokens[idx]
+    const code = token.content
+    const lang = token.info
+    const langObj = hljs.getLanguage(lang)
+    let cnt
+    if (langObj) {
+      cnt = hljs.highlight(lang, code).value
+    }
+    else {
+      cnt = hljs.highlightAuto(code).value
+    }
+    // return `<pre class="hljs"><code>${cnt}</code></pre>`
+    // return `<div class="code-block">
+    //             <div class="code-block-header">
+    //                 <span class="code-block-lang">${lang}</span>
+    //                 <div class="operation-btn" data-type="copy"><i class="ai-iconfont icon-copy"></i> 复制</div>
+    //                 ${lang === 'html' ? `<div class="operation-btn" data-type="iframe"><i class="ai-iconfont icon-play-circle-o"></i> 预览</div>` : ''}
+    //             </div>
+    //             <pre class="hljs"><code>${cnt}</code></pre>
+    //         </div>`;
+    return `<div class="code-block">
                 <div class="code-block-header">
                     <span class="code-block-lang">${lang}</span>
                     <div class="operation-btn" data-type="copy"><i class="ai-iconfont icon-copy"></i> 复制</div>
                 </div>
                 <pre class="hljs"><code>${cnt}</code></pre>
-            </div>`;
-    }
+            </div>`
+  }
 }
 
 export default highlightPlugin

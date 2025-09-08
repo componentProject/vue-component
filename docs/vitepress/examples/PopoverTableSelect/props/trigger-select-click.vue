@@ -1,6 +1,11 @@
 <template>
   <div class="container">
-    <ElInput v-model="val" ref="ipt" class="ipt" placeholder="单击选择并关闭" />
+    <ElInput
+      ref="ipt"
+      v-model="val"
+      class="ipt"
+      placeholder="单击选择并关闭"
+    />
     <PopoverTableSelect
       v-model="visible"
       :data="tableData"
@@ -36,8 +41,10 @@ function onSelect(row: any) {
 </script>
 
 <style scoped>
-.container { padding: 8px; }
-.ipt { width: 220px; }
+.container {
+  padding: 8px;
+}
+.ipt {
+  width: 220px;
+}
 </style>
-
-

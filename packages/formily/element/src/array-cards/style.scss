@@ -1,0 +1,34 @@
+@use '../__builtins__/styles/common.scss';
+@use '../__builtins__/styles/element-plus.scss' as ElementPlus;
+
+$array-table-prefix-cls: '#{common.$moluoxixi-prefix}-array-cards';
+
+.#{$array-table-prefix-cls} {
+  .el-card__header {
+    padding-top: 12.5px;
+    padding-bottom: 12.5px;
+  }
+  .el-empty {
+    padding: 0;
+  }
+
+  .#{$array-table-prefix-cls}-item {
+    margin-bottom: 10px;
+  }
+
+  .#{common.$moluoxixi-prefix}-array-base-addition {
+    width: 100%;
+    border: ElementPlus.$border-width-base dashed ElementPlus.$border-color-base;
+
+    &:hover {
+      background-color: ElementPlus.$color-white;
+      border-color: ElementPlus.$border-color-hover;
+    }
+
+    &:active,
+    &:focus {
+      background-color: ElementPlus.$color-white;
+      border-color: ElementPlus.$color-primary;
+    }
+  }
+}

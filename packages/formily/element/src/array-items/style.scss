@@ -1,0 +1,76 @@
+@use '../__builtins__/styles/common.scss';
+@use '../__builtins__/styles/element-plus.scss' as ElementPlus;
+
+$array-items-prefix-cls: '#{common.$moluoxixi-prefix}-array-items';
+
+.#{$array-items-prefix-cls}-item-inner {
+  visibility: visible;
+}
+
+.#{$array-items-prefix-cls} {
+  .#{common.$moluoxixi-prefix}-array-base-addition {
+    width: 100%;
+    border: ElementPlus.$border-width-base dashed ElementPlus.$border-color-base;
+
+    &:hover {
+      background-color: ElementPlus.$color-white;
+      border-color: ElementPlus.$border-color-hover;
+    }
+
+    &:active,
+    &:focus {
+      background-color: ElementPlus.$color-white;
+      border-color: ElementPlus.$color-primary;
+    }
+  }
+}
+
+.#{$array-items-prefix-cls}-card {
+  display: flex;
+  border: 1px solid ElementPlus.$card-border-color;
+  margin-bottom: 10px;
+  padding: 3px 6px;
+  background: ElementPlus.$color-white;
+  justify-content: space-between;
+
+  .#{common.$moluoxixi-prefix}-form-item:not(.#{common.$moluoxixi-prefix}-form-item-feedback-layout-popover) {
+    margin-bottom: 0 !important;
+
+    .#{common.$moluoxixi-prefix}-form-item-help {
+      position: absolute;
+      font-size: 12px;
+      top: 100%;
+      background: ElementPlus.$color-white;
+      width: 100%;
+      margin-top: 3px;
+      padding: 3px;
+      z-index: 1;
+      border-radius: 3px;
+      box-shadow: 0 0 10px ElementPlus.$border-color-base;
+    }
+  }
+}
+
+.#{$array-items-prefix-cls}-divide {
+  display: flex;
+  border-bottom: 1px solid ElementPlus.$card-border-color;
+  padding: 10px 0;
+  justify-content: space-between;
+
+  .#{common.$moluoxixi-prefix}-form-item:not(.#{common.$moluoxixi-prefix}-form-item-feedback-layout-popover) {
+    margin-bottom: 0 !important;
+
+    .#{common.$moluoxixi-prefix}-form-item-help {
+      position: absolute;
+      font-size: 12px;
+      top: 100%;
+      background: ElementPlus.$color-white;
+      width: 100%;
+      margin-top: 3px;
+      padding: 3px;
+      z-index: 1;
+      border-radius: 3px;
+      box-shadow: 0 0 10px ElementPlus.$card-border-color;
+    }
+  }
+}

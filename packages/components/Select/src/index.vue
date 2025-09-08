@@ -2,6 +2,7 @@
   <div>
     <el-select
       v-model="data"
+      :id="selectId"
       append-to="#app"
       :clearable="props.clearable"
       :filterable="props.filterable"
@@ -12,6 +13,7 @@
       :collapse-tags-tooltip="props.collapseTagsTooltip"
       v-bind="$attrs"
       @change="handleSelectChange"
+      @visible-change="handleVisibleChange"
     >
       <el-option
         v-for="(item) in computedOptions"
@@ -26,22 +28,27 @@
           })
         "
       />
+      <div
+        v-if="props.enableLoadMore && props.hasMore"
+        ref="loadMoreTrigger"
+        class="load-more-trigger"
+      >
+        <span v-if="props.loading">加载中...</span>
+      </div>
     </el-select>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, onUnmounted, ref, watch, nextTick } from 'vue'
 import getServerOptions from '@moluoxixi/components/Select/src/uitls'
 import type { objType } from '@moluoxixi/components/_types'
-import { getType, getTypeDefault } from '@moluoxixi/components/_utils'
+import { getType, getTypeDefault } from '@moluoxixi/utils/_utils'
 
 defineOptions({
-  name: 'Select',
+  name: 'WlSelect',
 })
-/**
- * 定义组件的props
- */
+
 const props = defineProps({
   tagType: {
     type: String as () => 'success' | 'info' | 'warning' | 'danger',
@@ -66,23 +73,14 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
-  /**
-   * 多选时是否将选中值按文字的形式展示
-   */
   collapseTags: {
     type: Boolean,
     default: true,
   },
-  /**
-   * 展示下拉框的数据
-   */
   label: {
     type: String,
     default: 'label',
   },
-  /**
-   * 下拉框选择的值
-   */
   value: {
     type: String,
     default: 'value',
@@ -98,9 +96,6 @@ const props = defineProps({
   disabledHandler: {
     type: Function,
   },
-  /**
-   * 下拉框数据
-   */
   options: {
     type: Array,
     default: () => [],
@@ -109,17 +104,38 @@ const props = defineProps({
     type: Array,
     default: () => [],
   },
-  /**
-   * 是否启用远程搜索
-   *
-   */
   serverProps: {
     type: Object as PropType<objType | null>,
   },
+  // 开启加载更多
+  enableLoadMore: {
+    type: Boolean,
+    default: false,
+  },
+  // 是否还有更多数据
+  hasMore: {
+    type: Boolean,
+    default: false,
+  },
+  // 加载中
+  loading: {
+    type: Boolean,
+    default: false,
+  },
 })
-const emits = defineEmits(['change'])
+
+const selectId = `select-${Math.random().toString(36).substr(2, 9)}`
+
+const emits = defineEmits(['change', 'load-more'])
+
 const data = defineModel<any>()
 const keyword = ref('')
+
+const loadMoreTrigger = ref<HTMLElement>()
+const observer = ref<IntersectionObserver>()
+const isDropdownVisible = ref(false)
+const hasTriggeredLoadMore = ref(false)
+
 const allFilterFields = computed(() => {
   return Array.from(
     new Set(
@@ -135,8 +151,10 @@ const allFilterFields = computed(() => {
     ),
   )
 })
+
 const valueType = ref<string>()
 const serverOrLocalOptions = ref<any[]>([])
+
 watch(
   () => [props.serverProps, props.options],
   async ([newVal, newOptions]) => {
@@ -181,7 +199,119 @@ function handleSelectChange(value: any) {
   }
 }
 
+function handleVisibleChange(visible: boolean) {
+  isDropdownVisible.value = visible
+
+  if (visible) {
+    hasTriggeredLoadMore.value = false
+
+    if (props.enableLoadMore && props.hasMore && !props.loading) {
+      setTimeout(() => {
+        setupIntersectionObserver()
+      }, 100)
+    }
+  }
+  else {
+    cleanupObserver()
+  }
+}
+
+function setupIntersectionObserver() {
+  if (!loadMoreTrigger.value || !props.hasMore || props.loading || hasTriggeredLoadMore.value) {
+    return
+  }
+
+  cleanupObserver()
+
+  // 使用 nextTick 确保 DOM 更新完成
+  nextTick(() => {
+    // 方法1: 通过 popper 属性查找当前激活的下拉框
+    let dropdown = null
+
+    // 获取当前 Select 元素
+    const currentSelect = document.getElementById(selectId)
+    if (!currentSelect) {
+      console.warn('找不到当前 Select 元素')
+      return
+    }
+
+    // 查找所有下拉框
+    const allDropdowns = document.querySelectorAll('.el-select-dropdown')
+
+    // 通过可见性判断当前激活的下拉框
+    const activeDropdowns = Array.from(allDropdowns).filter(d => {
+      const style = window.getComputedStyle(d)
+      return style.display !== 'none' && style.visibility !== 'hidden'
+    })
+
+    // 如果有多个激活的下拉框，选择最后一个（最新打开的）
+    if (activeDropdowns.length > 0) {
+      dropdown = activeDropdowns[activeDropdowns.length - 1]
+    }
+
+    // 确保找到下拉框的滚动容器
+    if (dropdown) {
+      const wrap = dropdown.querySelector('.el-select-dropdown__wrap') || dropdown
+      dropdown = wrap
+    }
+
+    if (!dropdown) {
+      console.warn('无法找到对应的下拉框容器')
+      return
+    }
+
+    // 清理之前的调试代码
+    observer.value = new IntersectionObserver((entries) => {
+      const entry = entries[0]
+
+      if (entry.isIntersecting
+        && entry.intersectionRatio >= 0.1  // 降低阈值
+        && props.enableLoadMore
+        && props.hasMore
+        && !props.loading
+        && !hasTriggeredLoadMore.value) {
+
+        hasTriggeredLoadMore.value = true
+        emits('load-more')
+
+        // 3秒后重置状态
+        setTimeout(() => {
+          hasTriggeredLoadMore.value = false
+        }, 1000)
+      }
+    }, {
+      root: dropdown,
+      rootMargin: '0px',
+      threshold: [0.1],
+    })
+
+    observer.value.observe(loadMoreTrigger.value)
+  })
+}
+
+function cleanupObserver() {
+  if (observer.value) {
+    observer.value.disconnect()
+    observer.value = undefined
+  }
+}
+
 const computedDisabledHandler = computed(() => {
   return getTypeDefault(props.disabledHandler, 'function') || defaultDisabledHandler
 })
+
+onUnmounted(() => {
+  cleanupObserver()
+})
 </script>
+
+<style scoped>
+.load-more-trigger {
+  padding: 8px 12px;
+  text-align: center;
+  color: #606266;
+  font-size: 14px;
+  border-top: 1px solid #eee;
+  user-select: none;
+}
+</style>

@@ -1,4 +1,5 @@
 import type { HmrContext, ModuleNode, Plugin, ResolvedConfig, ViteDevServer } from 'vite'
+import { getType } from '../../../../_utils/index.ts'
 import { normalizePath } from 'vite'
 import path from 'node:path'
 import fs from 'node:fs'
@@ -68,7 +69,8 @@ export function setupDevAllWatcher(
     try {
       if (watchPatterns.length > 0)
         server.watcher.add(watchPatterns)
-    } catch {}
+    }
+    catch {}
 
     const onAll = (eventName: string, file: string) => {
       if (
@@ -83,56 +85,84 @@ export function setupDevAllWatcher(
       }
     }
 
-    try { server.watcher.on('all', onAll) } catch {}
+    try {
+      server.watcher.on('all', onAll)
+    }
+    catch {}
 
     const removeAll = () => {
-      try { (server.watcher as any).off?.('all', onAll) } catch {}
-      try { (server.watcher as any).removeListener?.('all', onAll) } catch {}
+      try {
+        (server.watcher as any).off?.('all', onAll)
+      }
+      catch {}
+      try {
+        (server.watcher as any).removeListener?.('all', onAll)
+      }
+      catch {}
     }
-    try { server.watcher.once('close', removeAll) } catch {}
-    try { server.httpServer?.once('close', removeAll) } catch {}
+    try {
+      server.watcher.once('close', removeAll)
+    }
+    catch {}
+    try {
+      server.httpServer?.once('close', removeAll)
+    }
+    catch {}
   }
 
-  try { server.watcher.once('ready', () => { watcherReady = true; maybeEnable() }) } catch {}
-  try { server.httpServer?.once('listening', () => { netReady = true; maybeEnable() }) } catch {}
   try {
-    const wsAny = (server.ws as any)
-    if (typeof wsAny?.on === 'function')
-      wsAny.once('connection', () => { netReady = true; maybeEnable() })
-  } catch {}
+    server.watcher.once('ready', () => {
+      watcherReady = true
+      maybeEnable()
+    })
+  }
+  catch {}
+  try {
+    server.httpServer?.once('listening', () => {
+      netReady = true
+      maybeEnable()
+    })
+  }
+  catch {}
+  try {
+    const wsAny = server.ws as any
+    if (typeof wsAny?.on === 'function') {
+      wsAny.once('connection', () => {
+        netReady = true
+        maybeEnable()
+      })
+    }
+  }
+  catch {}
 }
 
 // =========================
 // 通用虚拟模块插件工厂
 // =========================
 
-export interface VirtualPluginUserConfig<TExtra = any> {
+export interface VirtualPluginUserConfig {
   name: string
   virtualModuleId: string
   dts?: string | boolean
   root?: string
   typeContent?: any
-  extra?: TExtra
+  watch?: string | string[]
 }
 
-type GenerateDts<TExtra> = (params: {
-  dts: string | boolean | undefined
-  root: string
-  typeContent?: any
-  extra: TExtra | undefined
+type GenerateDts = (params: {
+  config: ResolvedConfig
 }) => string
+type GenerateModule = (params: {
+  id: string
+  config: ResolvedConfig
+}) => string | Promise<string>
 
-type GenerateModule<TExtra> = (params: {
-  virtualModuleId: string
-  extra: TExtra | undefined
-}) => string
-
-export function createVirtualPlugin<TExtra = any>(
-  userConfig: VirtualPluginUserConfig<TExtra>,
-  generateModule: GenerateModule<TExtra>,
-  generateDts?: GenerateDts<TExtra>,
+export function createVirtualPlugin(
+  userConfig: VirtualPluginUserConfig,
+  generateModule: GenerateModule,
+  generateDts?: GenerateDts,
 ): Plugin {
-  const { name, virtualModuleId, dts, root, typeContent, extra } = userConfig
+  const { name, virtualModuleId, dts, root, typeContent, watch } = userConfig
   const VIRTUAL_MODULE_ID = virtualModuleId
 
   const moduleCache: Map<string, string> = new Map()
@@ -150,15 +180,15 @@ export function createVirtualPlugin<TExtra = any>(
     resolveId(id: string) {
       if (id === VIRTUAL_MODULE_ID)
         return VIRTUAL_MODULE_ID
+      if (id.startsWith(`${VIRTUAL_MODULE_ID}/`))
+        return id
     },
 
     configResolved(config: ResolvedConfig) {
       resolvedViteConfig = config
       const rootDir = root || config.root
 
-      // 监听路径从 extra?.watch 读取（可选）
-      const watchInput = (extra as any)?.watch as string | string[] | undefined
-      const patterns = Array.isArray(watchInput) ? watchInput : (watchInput ? [watchInput] : [])
+      const patterns = Array.isArray(watch) ? watch : (watch ? [watch] : [])
       watchPatterns = resolvePatternsToAbsolute(patterns, rootDir)
       watchPrefixes = watchPatterns.map(extractStaticPrefixFromGlob)
       isWatchedPath = watchPrefixes.length === 0 ? () => true : createMatcher(watchPrefixes)
@@ -175,7 +205,7 @@ export function createVirtualPlugin<TExtra = any>(
           }
 
           const content = generateDts
-            ? generateDts({ dts, root: rootDir, typeContent, extra })
+            ? generateDts({ config })
             : String(typeContent ?? '')
 
           const normalized = normalizePath(dtsPath)
@@ -198,7 +228,12 @@ export function createVirtualPlugin<TExtra = any>(
             return
           isServerClosing = true
           Promise.resolve((server as any)?.close?.())
-            .finally(() => { try { process.exit(0) } catch {} })
+            .finally(() => {
+              try {
+                process.exit(0)
+              }
+              catch {}
+            })
         }
         process.once('SIGINT', onSignal)
         process.once('SIGTERM', onSignal)
@@ -217,7 +252,30 @@ export function createVirtualPlugin<TExtra = any>(
         server,
         watchPatterns,
         isWatchedPath,
-        () => { if (!isServerClosing) invalidateVirtualModuleInDev(server, VIRTUAL_MODULE_ID, moduleCache) },
+        () => {
+          if (isServerClosing)
+            return
+          // 失效所有以 VIRTUAL_MODULE_ID 开头的虚拟模块
+          const ids = Array.from(moduleCache.keys()).filter(k => k === VIRTUAL_MODULE_ID || k.startsWith(`${VIRTUAL_MODULE_ID}/`))
+          if (ids.length === 0) {
+            invalidateVirtualModuleInDev(server, VIRTUAL_MODULE_ID, moduleCache)
+            return
+          }
+          for (const vid of ids) {
+            moduleCache.delete(vid)
+            const mod = server.moduleGraph.getModuleById(vid)
+            if (mod) {
+              server.moduleGraph.invalidateModule(mod)
+              try {
+                (server as any).reloadModule?.(mod)
+              }
+              catch {}
+            }
+          }
+
+          if (ids.length === 0)
+            server.ws.send({ type: 'full-reload' })
+        },
         50,
       )
     },
@@ -228,14 +286,19 @@ export function createVirtualPlugin<TExtra = any>(
       const abs = normalizePath(path.isAbsolute(ctx.file) ? ctx.file : path.resolve(rootDir, ctx.file))
       if (!isWatchedPath(abs))
         return
-      const mod: ModuleNode | undefined = server.moduleGraph.getModuleById(VIRTUAL_MODULE_ID)
-      if (mod) {
-        if (!isServerClosing) {
-          moduleCache.delete(VIRTUAL_MODULE_ID)
-          server.moduleGraph.invalidateModule(mod)
-          return [mod]
+      if (isServerClosing)
+        return
+      const ids = Array.from(moduleCache.keys()).filter(k => k === VIRTUAL_MODULE_ID || k.startsWith(`${VIRTUAL_MODULE_ID}/`))
+      const mods: ModuleNode[] = []
+      for (const vid of ids) {
+        moduleCache.delete(vid)
+        const m = server.moduleGraph.getModuleById(vid)
+        if (m) {
+          server.moduleGraph.invalidateModule(m)
+          mods.push(m)
         }
       }
+      return mods
     },
 
     watchChange(id: string) {
@@ -244,16 +307,26 @@ export function createVirtualPlugin<TExtra = any>(
         const absId = normalizePath(path.isAbsolute(id) ? id : path.resolve(rootDir, id))
         if (isWatchedPath(absId)) {
           if (!isServerClosing) {
-            moduleCache.delete(VIRTUAL_MODULE_ID)
+            // 删除所有缓存的相关虚拟模块
+            for (const k of Array.from(moduleCache.keys())) {
+              if (k === VIRTUAL_MODULE_ID || k.startsWith(`${VIRTUAL_MODULE_ID}/`))
+                moduleCache.delete(k)
+            }
           }
         }
       }
       catch {}
     },
 
-    load(id: string) {
-      if (id === VIRTUAL_MODULE_ID) {
-        const code = generateModule({ virtualModuleId: VIRTUAL_MODULE_ID, extra })
+    async load(id: string) {
+      if (id === VIRTUAL_MODULE_ID || id.startsWith(`${VIRTUAL_MODULE_ID}/`)) {
+        let code: string
+        if (getType(generateModule, 'asyncfunction')) {
+          code = await generateModule({ id, config: resolvedViteConfig as ResolvedConfig })
+        }
+        else {
+          code = generateModule({ id, config: resolvedViteConfig as ResolvedConfig }) as string
+        }
         moduleCache.set(id, code)
         return code
       }

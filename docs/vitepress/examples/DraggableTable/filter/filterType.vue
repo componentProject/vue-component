@@ -1,6 +1,11 @@
 <template>
   <div class="container" style="height: 350px;">
-    <DraggableTable v-model="tableData" :columns="columns" :filterable="true" filter-type="full" />
+    <DraggableTable
+      v-model="tableData"
+      :columns="columns"
+      :filterable="true"
+      filter-type="full"
+    />
   </div>
 </template>
 
@@ -21,7 +26,7 @@ const columns = ref([
 </script>
 
 <style scoped>
-.container { padding: 8px; }
+.container {
+  padding: 8px;
+}
 </style>
-
-
