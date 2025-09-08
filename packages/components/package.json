@@ -74,12 +74,12 @@
     "@tailwindcss/postcss": "catalog:dev",
     "@types/file-saver": "catalog:type",
     "@types/lodash": "catalog:type",
+    "@types/markdown-it": "catalog:type",
+    "@types/markdown-it-container": "catalog:type",
     "@types/uuid": "catalog:type",
     "@vitejs/plugin-vue": "catalog:dev",
     "@vitejs/plugin-vue-jsx": "catalog:dev",
     "autoprefixer": "catalog:dev",
-    "@types/markdown-it-container": "catalog:type",
-    "@types/markdown-it": "catalog:type",
     "dependency-cruiser": "^15.3.0",
     "fast-glob": "catalog:dev",
     "postcss": "catalog:dev",
@@ -96,7 +96,8 @@
     "vite": "catalog:dev",
     "vite-plugin-css-injected-by-js": "^3.5.1",
     "vite-plugin-dts": "^4.5.4",
-    "vite-plugin-imagemin": "catalog:dev"
+    "vite-plugin-imagemin": "catalog:dev",
+    "vite-plugin-lazy-import": "^1.0.7"
   },
   "postcss": {
     "plugins": {

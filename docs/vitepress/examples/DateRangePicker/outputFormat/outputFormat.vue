@@ -1,7 +1,7 @@
 <template>
   <ElConfigProvider :locale="zhCn" :empty-values="[undefined, [], '']">
     <div class="container">
-      <DateRangePicker v-model="val" type="date" :default-datetime-range="false" />
+      <DateRangePicker v-model="val" type="daterange" output-format="YYYY-MM-DD HH:mm:ss" />
       <div class="value">
         v-model：{{ val }}
       </div>

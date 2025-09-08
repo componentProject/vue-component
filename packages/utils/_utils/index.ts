@@ -5,6 +5,7 @@ import { Fragment } from 'vue'
 import type { DebounceSettings, ThrottleSettings } from 'lodash'
 //#region 时间控制：节流/防抖
 import { debounce as lodashDebounce, throttle as lodashThrottle } from 'lodash'
+import type { functionType } from '@moluoxixi/components/_types'
 
 export type DateType = string | Date | moment.Moment
 
@@ -298,6 +299,17 @@ export function getFormatDate(
   return moment(momentDate.format(format)).format(valueFormat)
 }
 
+function getFormat(format: functionType | string | string[], index = 0): string {
+  if (typeof format === 'function') {
+    return format(index)
+  }
+  else if (Array.isArray(format)) {
+    return format[index]
+  }
+  else {
+    return format
+  }
+}
 /**
  * 格式化返回的日期范围
  * @param date 日期
@@ -306,15 +318,14 @@ export function getFormatDate(
  */
 export function formatDateRange(
   date: DateType | DateType[],
-  format: string | string[] = 'YYYY-MM-DD HH:mm:ss',
+  format: functionType | string | string[] = 'YYYY-MM-DD HH:mm:ss',
   valueFormat: string = 'YYYY-MM-DD HH:mm:ss',
 ): DateType | DateType[] {
-  const dateIsArray = Array.isArray(date)
-  if (Array.isArray(format)) {
-    return format.map((item, index) => getFormatDate(dateIsArray ? date[index] : date, item, valueFormat))
+  if (Array.isArray(date)) {
+    return date.map((item, index) => getFormatDate(item, getFormat(format, index), valueFormat))
   }
   else {
-    return getFormatDate(dateIsArray ? date[0] : date, format, valueFormat)
+    return getFormatDate(date, getFormat(format), valueFormat)
   }
 }
 
