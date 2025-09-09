@@ -56,6 +56,27 @@ export interface BuildContext {
   aliasPacks: string[]
 }
 
+export type ModuleFormat = 'es' | 'cjs'
+
+export interface ComponentDependencies {
+  internal: string[]
+  external: Record<string, string>
+  peerDependencies: Record<string, string>
+}
+
+export interface BundleComponentModuleOptions {
+  comp: string
+  entry: string
+  outDir: string
+  format: ModuleFormat
+  dependencies: ComponentDependencies
+  globals: Record<string, string>
+  baseConfig: any
+  entryFileNames: string
+  chunkFileNames: string
+  exportsType?: string
+}
+
 // 简单延迟函数，用于在批量打包时给 GC 和系统 I/O 缓冲时间
 function sleep(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms))
@@ -851,22 +872,7 @@ async function bundleComponentModule(ctx: BuildContext, {
   entryFileNames,
   chunkFileNames,
   exportsType,
-}: {
-  comp: string
-  entry: string
-  outDir: string
-  format: 'es' | 'cjs'
-  dependencies: {
-    internal: string[]
-    external: Record<string, string>
-    peerDependencies: Record<string, string>
-  }
-  globals: Record<string, string>
-  baseConfig: any
-  entryFileNames: string
-  chunkFileNames: string
-  exportsType?: string
-}) {
+}: BundleComponentModuleOptions) {
   const currentComponent = comp
   await build({
     ...baseConfig,
@@ -952,7 +958,13 @@ async function bundleComponentModule(ctx: BuildContext, {
  * @param comp 组件名
  * @returns 组件的配置信息
  */
-async function getComponentConfig(ctx: BuildContext, comp: string) {
+export interface ComponentConfigResult {
+  entry: string
+  outputDir: string
+  dependencies: ComponentDependencies
+}
+
+async function getComponentConfig(ctx: BuildContext, comp: string): Promise<ComponentConfigResult> {
   const componentName = comp
 
   // 获取入口文件
@@ -971,21 +983,13 @@ async function getComponentConfig(ctx: BuildContext, comp: string) {
   const outputDir = resolve(ctx.packDir, `${ctx.LIB_NAMESPACE}/${comp ? `/packages/${componentName}` : ''}`)
 
   // 分析组件依赖
-  let dependencies: {
-    internal: string[]
-    external: Record<string, string>
-    peerDependencies: Record<string, string>
-  } = {
+  let dependencies: ComponentDependencies = {
     internal: [],
     external: {},
     peerDependencies: {},
   }
   try {
-    const analyzed = await analyzeComponentDeps(ctx, comp) as {
-      internal: string[]
-      external: Record<string, string>
-      peerDependencies: Record<string, string>
-    }
+    const analyzed = await analyzeComponentDeps(ctx, comp) as ComponentDependencies
     dependencies = {
       internal: analyzed.internal || [],
       external: analyzed.external || {},
