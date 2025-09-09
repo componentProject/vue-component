@@ -79,22 +79,10 @@ export interface BundleComponentModuleOptions {
   exportsType?: string
 }
 
-// 简单延迟函数，用于在批量打包时给 GC 和系统 I/O 缓冲时间
+//#region 通用配置
+/** 简单延迟函数，用于在批量打包时给 GC 和系统 I/O 缓冲时间 */
 function sleep(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms))
-}
-
-// 获取组件列表（只分目录的组件）
-async function getComponentNames(ctx: BuildContext) {
-  const componentDirs = await glob([`.${ctx.entryBaseUrl}*`, `!.${ctx.entryBaseUrl}_*`], {
-    cwd: ctx.packDir,
-    onlyDirectories: true,
-    ignore: [`${ctx.entryBaseUrl}_*`],
-  })
-  const excludeDirs = ['node_modules', 'typings', ctx.LIB_NAMESPACE]
-  return componentDirs
-    .map(dir => dir.split('/').pop() || '')
-    .filter(dirName => !!dirName && !excludeDirs.includes(dirName))
 }
 
 /**
@@ -210,6 +198,20 @@ function createBaseConfig(ctx: BuildContext, comp: string, internalDeps: string[
     },
   }
 }
+
+/** 获取组件列表（只分目录的组件） */
+async function getComponentNames(ctx: BuildContext) {
+  const componentDirs = await glob([`.${ctx.entryBaseUrl}*`, `!.${ctx.entryBaseUrl}_*`], {
+    cwd: ctx.packDir,
+    onlyDirectories: true,
+    ignore: [`${ctx.entryBaseUrl}_*`],
+  })
+  const excludeDirs = ['node_modules', 'typings', ctx.LIB_NAMESPACE]
+  return componentDirs
+    .map(dir => dir.split('/').pop() || '')
+    .filter(dirName => !!dirName && !excludeDirs.includes(dirName))
+}
+//#endregion
 
 //#region 版本管理
 /**
@@ -1287,6 +1289,7 @@ async function doBuild(ctx: BuildContext, mode = 'all', shouldPublish = false) {
     return false
   }
 }
+//#endregion
 export interface BuildOptions {
   /** 模式：all、library、或具体组件名（默认 all） */
   mode?: 'all' | 'library' | string
@@ -1323,7 +1326,6 @@ export interface BuildOptions {
   /** 上传类型（用于 UploadEvent），默认 'Vue3' */
   uploadType?: string
 }
-
 /**
  * 对外暴露的打包函数：根据入参配置执行打包
  * - 所有必填入参缺失时会抛出错误
