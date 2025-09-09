@@ -23,7 +23,7 @@ const option = ref({ submitBtn: false, form: { labelWidth: '80px' }, row: { gutt
 function callback() {
   console.log('你好')
 }
-const { off } = onHotkeys(['a', 'b'], callback)
+const { off } = onHotkeys(['f11'], callback)
 onUnmounted(() => {
   off()
 })

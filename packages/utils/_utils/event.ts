@@ -156,20 +156,25 @@ function buildRequired(keys: string[]): Set<string> {
   return set
 }
 
+export interface OnHotkeysOptions {
+  /** 指定监听目标；默认 document */
+  target?: Document | HTMLElement
+}
+
 /**
  * 同时按下指定键数组时触发的组合快捷键监听
  * - 仅使用 KeyboardEvent.key（小写）进行匹配
- * - 在 document 上监听 keydown/keyup
- * 使用：onHotkeys(keys, callback) → () => void
+ * - 在指定 target（默认 document）上监听 keydown/keyup
+ * 使用：onHotkeys(keys, callback, { target? }) → () => void
  */
-export function onHotkeys(keys: string[], callback: (e: KeyboardEvent) => void): () => void {
+export function onHotkeys(keys: string[], callback: (e: KeyboardEvent) => void, options?: OnHotkeysOptions): () => void {
   const hasWindow = typeof window !== 'undefined'
   if (!hasWindow) {
     return () => {}
   }
 
   const requiredKeys = buildRequired(keys)
-  const target = document
+  const target = (options && options.target) || document
 
   const pressedKeys = new Set<string>()
   /** 是否触发过 */
@@ -194,6 +199,7 @@ export function onHotkeys(keys: string[], callback: (e: KeyboardEvent) => void):
    * - 命中组合后触发回调
    */
   const onKeyDown = (e: KeyboardEvent) => {
+    e.preventDefault()
     const k = e.key ? e.key.toLowerCase() : ''
     console.log('Down', k)
 
@@ -212,6 +218,7 @@ export function onHotkeys(keys: string[], callback: (e: KeyboardEvent) => void):
    * - 从 pressedKeys 中移除当前键
    */
   const onKeyUp = (e: KeyboardEvent) => {
+    e.preventDefault()
     const k = e.key ? e.key.toLowerCase() : ''
     console.log('Up', k)
 
