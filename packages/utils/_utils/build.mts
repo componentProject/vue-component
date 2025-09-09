@@ -201,7 +201,7 @@ function createBaseConfig(ctx: BuildContext, comp: string, internalDeps: string[
 
 /** 获取组件列表（只分目录的组件） */
 async function getComponentNames(ctx: BuildContext) {
-  const componentDirs = await glob([`.${ctx.entryBaseUrl}*`, `!.${ctx.entryBaseUrl}_*`], {
+  const componentDirs = await glob([`.${ctx.entryBaseUrl}*`, `!.${ctx.entryBaseUrl}_*`, '!moluoxixi', '!node_modules', '!typings', '!_typings'], {
     cwd: ctx.packDir,
     onlyDirectories: true,
     ignore: [`${ctx.entryBaseUrl}_*`],
@@ -391,8 +391,8 @@ async function analyzeComponentDeps(ctx: BuildContext, comp: string) {
   try {
     console.log(`开始分析组件 ${comp} 的完整依赖关系...`)
 
-    // 获取所有组件列表作为内部组件参考
-    const allComponents = await getComponentNames(ctx)
+    // 获取所有组件列表作为内部组件参考，用于内部依赖排除,库模式置空，避免内部依赖排除
+    const allComponents = comp ? await getComponentNames(ctx) : []
 
     // 组件目录和入口文件
     const componentDir = resolve(ctx.packDir, `.${ctx.entryBaseUrl}${comp}`)
@@ -473,8 +473,8 @@ async function analyzeComponentDeps(ctx: BuildContext, comp: string) {
     }
 
     // 补充：直接扫描代码中的import语句（作为backup + 扩展分析）
-    console.log('补充扫描import语句...')
-    const files = await glob(['**/*.{vue,ts,tsx,js,jsx}'], {
+    console.log(`补充扫描import语句...,${componentDir}`)
+    const files = await glob(['**/*.{vue,ts,tsx,js,jsx}', '!moluoxixi', '!node_modules', '!typings', '!_typings'], {
       cwd: componentDir,
       absolute: true,
     })
@@ -792,53 +792,55 @@ function createComponentReferencePlugin(ctx: BuildContext, internalDeps: string[
         }
       }
 
-      // 第二步：将 ${aliasComponentPath}/xxx 转换为 @/moluoxixi/xxx（仅对组件，不包括_utils、_types等）
-      const componentImportRegex = /import\s[^"']*from\s+['"]([^'"]+)['"]/g
-      let componentMatch: RegExpExecArray | null
-      const componentReplacements: Array<{
-        oldImport: string
-        newImport: string
-        componentName: string
-        oldPath: string
-        newPath: string
-      }> = []
+      // 第二步：仅在单组件模式下，将 ${aliasComponentPath}/xxx 转换为 @${ctx.LIB_NAMESPACE}/xxx
+      if (currentComponent) {
+        const componentImportRegex = /import\s[^"']*from\s+['"]([^'"]+)['"]/g
+        let componentMatch: RegExpExecArray | null
+        const componentReplacements: Array<{
+          oldImport: string
+          newImport: string
+          componentName: string
+          oldPath: string
+          newPath: string
+        }> = []
 
-      // eslint-disable-next-line no-cond-assign
-      while ((componentMatch = componentImportRegex.exec(transformedCode)) !== null) {
-        const importPath = componentMatch[1]
+        // eslint-disable-next-line no-cond-assign
+        while ((componentMatch = componentImportRegex.exec(transformedCode)) !== null) {
+          const importPath = componentMatch[1]
 
-        // 检查是否是 ${aliasComponentPath}/xxx 路径
-        if (importPath.startsWith(`${ctx.aliasComponentPath}/`)) {
-          const pathParts = importPath.split('/')
-          const componentName = pathParts[2] // ${aliasComponentPath}/ComponentName/...
+          // 检查是否是 ${aliasComponentPath}/xxx 路径
+          if (importPath.startsWith(`${ctx.aliasComponentPath}/`)) {
+            const pathParts = importPath.split('/')
+            const componentName = pathParts[2] // ${aliasComponentPath}/ComponentName/...
 
-          // 转换组件引用（排除_utils、_types等共享模块，它们应该被打包进来）
-          if (componentName && !componentName.startsWith('_') && internalDeps.includes(componentName)) {
-            // 将组件名转换为小写，符合npm包命名规范
-            const npmPackageName = componentName.toLowerCase()
-            const newPath = `@${ctx.LIB_NAMESPACE}/${npmPackageName}`
-            componentReplacements.push({
-              oldImport: componentMatch[0],
-              newImport: componentMatch[0].replace(importPath, newPath),
-              componentName,
-              oldPath: importPath,
-              newPath,
-            })
-          }
-          // 对于_utils、_types等共享模块，保持@/components路径，让它们被打包进来
-          else if (componentName && componentName.startsWith('_')) {
-            console.log(`✓ 保持共享模块引用: ${importPath} (文件: ${id})`)
+            // 转换组件引用（排除_utils、_types等共享模块，它们应该被打包进来）
+            if (componentName && !componentName.startsWith('_') && internalDeps.includes(componentName)) {
+              // 将组件名转换为小写，符合npm包命名规范
+              const npmPackageName = componentName.toLowerCase()
+              const newPath = `@${ctx.LIB_NAMESPACE}/${npmPackageName}`
+              componentReplacements.push({
+                oldImport: componentMatch[0],
+                newImport: componentMatch[0].replace(importPath, newPath),
+                componentName,
+                oldPath: importPath,
+                newPath,
+              })
+            }
+            // 对于_utils、_types等共享模块，保持@/components路径，让它们被打包进来
+            else if (componentName && componentName.startsWith('_')) {
+              console.log(`✓ 保持共享模块引用: ${importPath} (文件: ${id})`)
+            }
           }
         }
-      }
 
-      // 执行组件路径替换
-      for (const replacement of componentReplacements) {
-        const newCode = transformedCode.replace(replacement.oldImport, replacement.newImport)
-        if (newCode !== transformedCode) {
-          transformedCode = newCode
-          hasChanges = true
-          console.log(`✓ 转换组件引用: ${replacement.oldPath} -> ${replacement.newPath} (文件: ${id})`)
+        // 执行组件路径替换
+        for (const replacement of componentReplacements) {
+          const newCode = transformedCode.replace(replacement.oldImport, replacement.newImport)
+          if (newCode !== transformedCode) {
+            transformedCode = newCode
+            hasChanges = true
+            console.log(`✓ 转换组件引用: ${replacement.oldPath} -> ${replacement.newPath} (文件: ${id})`)
+          }
         }
       }
 
@@ -896,8 +898,8 @@ async function bundleComponentModule(ctx: BuildContext, {
           ctx.useObfuscator && obfuscator(),
         ],
         external: (id: string) => {
-          // 检查@${LIB_NAMESPACE}/xxx路径（转换后的内部组件依赖）
-          if (id.startsWith(`@${ctx.LIB_NAMESPACE}`)) {
+          // 仅单组件打包，检查@${LIB_NAMESPACE}/xxx路径（转换后的内部组件依赖）
+          if (currentComponent && id.startsWith(`@${ctx.LIB_NAMESPACE}`)) {
             const item = ctx.aliasPacks.find((i: string) => id.startsWith(`${i}`))
             if (item) {
               const pathParts = id.split('/')
@@ -931,7 +933,7 @@ async function bundleComponentModule(ctx: BuildContext, {
           preserveModulesRoot: resolve(ctx.packDir, `.${ctx.entryBaseUrl}${comp}`),
           entryFileNames,
           chunkFileNames,
-          globals: Object.assign(globals, ctx.presetGlobals),
+          globals,
           ...(exportsType ? { exports: exportsType } : {}),
           // 禁用手动分块，避免文件拆分
           manualChunks: (id: string) => {
@@ -1054,11 +1056,9 @@ async function buildComponent(
     const deps = dependencies
 
     // 构建 globals 配置
-    const globals: Record<string, string> = {
-      vue: 'Vue',
-    }
+    const globals: Record<string, string> = Object.assign({}, ctx.presetGlobals)
     for (const compName of deps.internal) {
-      // 排除当前组件的自引用
+      // 当打包的是组件时，排除当前组件的自引用
       if (compName !== comp) {
         globals[`${ctx.aliasComponentPath}/${compName}`] = `@${ctx.LIB_NAMESPACE}/${compName.toLowerCase()}`
       }
@@ -1177,7 +1177,7 @@ async function buildComponent(
     console.log(`==========  ${buildName} 打包完成 ==========`)
     // 如果需要发布，执行发布
     if (shouldPublish) {
-      await UploadEvent(fileUrl, buildName, ctx.uploadType)
+      await UploadEvent(fileUrl, buildName, ctx.uploadType || 'Vue3')
       console.log(`准备发布 ${buildName}，版本：${currentVersion} -> ${newVersion}`)
 
       await writeComponentVersions(ctx, {
