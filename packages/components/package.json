@@ -65,11 +65,12 @@
     "vxe-pc-ui": "^4.9.17",
     "vxe-table": "catalog:build",
     "xe-utils": "3",
+    "@designable/core": "catalog:build",
+    "@moluoxixi/components": "workspace:*",
+    "@moluoxixi/element": "1.0.4",
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
-    "@moluoxixi/components": "workspace:*",
-    "@moluoxixi/element": "workspace:*",
     "@types/file-saver": "catalog:type",
     "@types/lodash": "catalog:type",
     "@types/markdown-it": "catalog:type",
