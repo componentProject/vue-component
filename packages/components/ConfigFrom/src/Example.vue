@@ -1,13 +1,17 @@
 <template>
   <div class="p-4">
+    <ElButton @click="aaa">
+      点击
+    </ElButton>
     <ConfigFrom v-model="model" :rule="rule" :option="option" />
     <pre class="mt-4">{{ model }}</pre>
   </div>
 </template>
 
-<script setup>
-import { ref } from 'vue'
+<script setup lang="ts">
+import { onUnmounted, ref } from 'vue'
 import ConfigFrom from './index.vue'
+import { onHotkeys } from '@moluoxixi/utils/_utils'
 
 const model = ref({})
 const rule = ref([
@@ -15,6 +19,14 @@ const rule = ref([
   { type: 'input', field: 'age', title: '年龄', col: { span: 12 }, props: { type: 'number', min: 0 } },
 ])
 const option = ref({ submitBtn: false, form: { labelWidth: '80px' }, row: { gutter: 16 } })
+
+function callback() {
+  console.log('你好')
+}
+const { off } = onHotkeys(['a', 'b'], callback)
+onUnmounted(() => {
+  off()
+})
 </script>
 
 <style scoped>

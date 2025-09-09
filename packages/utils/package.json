@@ -37,6 +37,7 @@
     "dayjs": "catalog:build"
   },
   "devDependencies": {
+    "@types/node": "catalog:type",
     "@moluoxixi/utils": "workspace:*",
     "qs": "catalog:dev",
     "@tailwindcss/postcss": "catalog:dev",

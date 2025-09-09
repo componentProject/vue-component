@@ -30,7 +30,6 @@
     "file-saver": "^2.0.5",
     "flowchart.js": "^1.15.0",
     "font-awesome-icon-chars": "^2.6.0",
-    "form-data": "^4.0.4",
     "github-markdown-css": "^4.0.0",
     "highlight.js": "^10.7.2",
     "lodash": "catalog:build",
