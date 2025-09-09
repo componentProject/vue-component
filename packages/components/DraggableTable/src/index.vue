@@ -1,5 +1,10 @@
 <template>
-  <div class="h-full w-full flex-1 overflow-hidden">
+  <div
+    class="h-full w-full flex-1 overflow-hidden table-container"
+    :data-component-id="id"
+    tabindex="0"
+    @keydown="handleKeyDown"
+  >
     <VxeGrid
       ref="xTable"
       :header-cell-config="{ height: '30px' }"
@@ -11,13 +16,19 @@
       @header-cell-menu.prevent="handleHeaderCellMenu"
       @toggle-tree-expand="handleTableRendered"
     >
+      <template v-if="isCustomConfig" #customDefault="{ columns }">
+        <CustomConfig ref="customConfigRef" :data="columns" :custom-row-config="customRowConfig" />
+      </template>
+      <template v-if="isCustomConfig" #customFooter>
+        <CustomConfigFooter @custom-action="handleCustomAction" />
+      </template>
       <template #loading="params">
         <slot name="loading" v-bind="params">
           <span class="absolute left-1/2 top-1/3 -translate-x-1/2 -translate-y-1/2">加载中...</span>
         </slot>
       </template>
       <template v-if="gridProps.pagerConfig.enabled" #pager>
-        <vxe-pager
+        <VxePager
           :current-page="gridProps.pagerConfig.currentPage"
           :page-size="gridProps.pagerConfig.pageSize"
           :total="gridProps.pagerConfig.total"
@@ -98,6 +109,9 @@ import type {
   NoNextInputParams,
   NoSelectValueParams,
 } from '@moluoxixi/components/EnterNextDragTable/src/_types'
+import CustomConfig from './components/CustomConfig/index.vue'
+import CustomConfigFooter from './components/CustomConfig/CustomConfigFooter.vue'
+import { getMemoryQuery, setMemoryUpload } from '../../../utils/_api/index.ts'
 
 defineOptions({
   name: 'DraggableTable',
@@ -330,7 +344,9 @@ const props = defineProps({
    */
   columnConfig: {
     type: Object as PropType<VxeTablePropTypes.ColumnConfig>,
-    default: () => ({}),
+    default: () => ({
+      resizable: false,
+    }),
   },
   //#endregion
   //#region 虚拟列表配置
@@ -414,6 +430,39 @@ const props = defineProps({
     type: String as PropType<'row' | 'table'>,
     default: 'row',
   },
+  /**
+   * 复选框配置对象
+   * @default {}
+   */
+  checkboxConfig: {
+    type: Object as PropType<VxeTablePropTypes.CheckboxConfig>,
+    default: () => ({}),
+  },
+  //是否开启快捷键列配置
+  isShortcuts: { type: Boolean, default: () => false },
+  //快捷键打开个性化列配置功能
+  shortcuts: { type: String, default: () => 'ctrl+shift+alt+f12' },
+  //是否开启组件自定义列配置
+  isCustomConfig: { type: Boolean, default: () => false },
+  //自定义列配置参数
+  customRowConfig: { type: Object, default: () => ({}) },
+  onCustomConfigSave: {
+    type: Function as PropType<(columns: ColumnType[]) => Promise<void>>,
+    default: undefined,
+  },
+  // 自定义列配置获取方法（可选）
+  onCustomConfigLoad: {
+    type: Function as PropType<() => Promise<ColumnType[]>>,
+    default: undefined,
+  },
+  pageId: {
+    type: String,
+    default: () => '',
+  },
+  userId: {
+    type: String,
+    default: () => '',
+  },
 })
 
 // 组件事件
@@ -455,6 +504,7 @@ function handlePageChange(params: any) {
 
 //#region 回车下一个功能
 const tableVirtualRefs = ref<HTMLElement[]>([])
+const customConfigRef = ref<HTMLElement>(null)
 
 // 获取表格中所有的行元素
 function collectTableVirtualRefs() {
@@ -817,10 +867,24 @@ const gridProps = computed<VxeGridProps>(() => {
     },
     customConfig: {
       ...props.customConfig,
+      storage: true,
+      mode: props.toolbarConfig?.mode ?? props.isCustomConfig ? 'modal' : undefined,
+      ...(props.isCustomConfig
+        ? {
+            slots: {
+              default: 'customDefault',
+              footer: 'customFooter',
+            },
+          }
+        : {}),
     },
-    pagerConfig:{
+    pagerConfig: {
       enabled: props.showPagination,
-      ...props.pagerConfig
+      ...props.pagerConfig,
+    },
+    toolbarConfig: {
+      ...props.toolbarConfig,
+      custom: props.isCustomConfig ?? props.toolbarConfig?.custom,
     },
     editConfig: {
       enabled: props.editable,
@@ -882,6 +946,9 @@ const gridProps = computed<VxeGridProps>(() => {
       resizable: props.resizable,
       drag: props.dragType === 'vxe' && (props.columndragable || props.dragable),
       ...props.columnConfig,
+    },
+    checkboxConfig: {
+      ...props.checkboxConfig,
     },
     columnDragConfig: {
       isCrossDrag: true,
@@ -956,6 +1023,12 @@ const gridProps = computed<VxeGridProps>(() => {
     }),
   } as VxeGridProps
 })
+
+const paramsObj = {
+  pageId: props.pageId,
+  widgetId: props.id,
+  userId: props.userId,
+}
 
 /**
  * 表头右键事件
@@ -1095,35 +1168,53 @@ function handleColumnResizableChange(params: VxeTableDefines.ResizableChangePara
   emit('resizableChange', params)
 }
 
+async function getCustomConfig() {
+  const customColumns = await props.onCustomConfigLoad()
+  if (props.isCustomConfig) {
+    if (props.onCustomConfigLoad) {
+      props.onCustomConfigLoad()
+      return
+    }
+    const customConfig = await getMemoryQuery(paramsObj)
+    const customColumns = JSON.parse(customConfig)
+    localColumns.value = customColumns.map((item: ColumnType) => ({
+      ...item,
+      ...props.columns.find(el => el.field === item.field),
+    }))
+  }
+}
+getCustomConfig()
 /**
  * 监听props.columns的变化
  */
 watch(
   () => computedColumns.value,
   (newColumns: ColumnType) => {
-    // 如果启用了本地存储，不保存
-    if (props.customConfig.storage) {
-      localColumns.value = cloneDeep(newColumns)
-      return
-    }
-    // 尝试从本地存储获取列配置
-    const storedColumns = handleGetStoredColumns()
-    if (!isEmpty(newColumns)) {
-      // 对比本地存储的列配置和props.columns
-      // 检查每列的field, title, fixed, sortable是否变化
-      const shouldUseStored = handleCompareColumns(newColumns, storedColumns)
-      // 使用props.columns并保存到本地
-      if (shouldUseStored) {
-        console.log('shouldUseStored', computedColumns.value, storedColumns)
-        handleSavePropsColumns()
+    // 添加防抖处理
+    debounce(() => {
+      if (props.isCustomConfig) {
+        return
       }
-      else {
-        localColumns.value = storedColumns.map((item: any) => {
-          item.width = item.resizeWidth ? Math.ceil(item.resizeWidth) : item.width
-          return item
-        })
+
+      if (props.customConfig.storage) {
+        localColumns.value = cloneDeep(newColumns)
+        return
       }
-    }
+
+      const storedColumns = handleGetStoredColumns()
+      if (!isEmpty(newColumns)) {
+        const shouldUseStored = handleCompareColumns(newColumns, storedColumns)
+        if (shouldUseStored) {
+          handleSavePropsColumns()
+        }
+        else {
+          localColumns.value = storedColumns.map((item: any) => ({
+            ...item,
+            width: item.resizeWidth ? Math.ceil(item.resizeWidth) : item.width,
+          }))
+        }
+      }
+    }, 100)()
   },
   { deep: true, immediate: true },
 )
@@ -1377,18 +1468,129 @@ watch(
     immediate: true,
   },
 )
-//#endregion
 
-// 每页条数改变事件
-function handleSizeChange(size: number) {
-  emit('update:pagination', { ...props.pagination, pageSize: size, pageIndex: 1 })
-  emit('sizeChange', size)
+// 当前按下的键
+const pressedKeys = ref<Set<string>>(new Set())
+
+function handleKeyDown(event: KeyboardEvent) {
+  event.stopPropagation()
+
+  const key = event.key.toLowerCase()
+  pressedKeys.value.add(key)
+
+  // 添加修饰键
+  if (event.ctrlKey)
+    pressedKeys.value.add('ctrl')
+  if (event.altKey)
+    pressedKeys.value.add('alt')
+  if (event.shiftKey)
+    pressedKeys.value.add('shift')
+  if (event.metaKey)
+    pressedKeys.value.add('meta')
+
+  checkShortcut()
 }
 
-// 页码改变事件
-function handleCurrentChange(current: number) {
-  emit('update:pagination', { ...props.pagination, pageIndex: current })
-  emit('currentChange', current)
+function handleKeyUp(event: KeyboardEvent) {
+  event.stopPropagation()
+
+  const key = event.key.toLowerCase()
+  pressedKeys.value.delete(key)
+
+  // 移除修饰键
+  if (!event.ctrlKey)
+    pressedKeys.value.delete('ctrl')
+  if (!event.altKey)
+    pressedKeys.value.delete('alt')
+  if (!event.shiftKey)
+    pressedKeys.value.delete('shift')
+  if (!event.metaKey)
+    pressedKeys.value.delete('meta')
+}
+
+function checkShortcut() {
+  if (!props.isShortcuts) {
+    return
+  }
+  const expectedKeys = props.shortcuts.toLowerCase().split('+').map((k: string) => k.trim())
+
+  // 检查是否所有期望的键都被按下
+  const matches = expectedKeys.every((key: any) => pressedKeys.value.has(key))
+
+  if (matches) {
+    xTable.value?.openCustom()
+  }
+}
+// 添加事件监听
+onMounted(() => {
+  const container = document.querySelector(`[data-component-id="${props.id}"]`)
+  if (container) {
+    container.addEventListener('keydown', event => handleKeyDown(event as KeyboardEvent))
+    container.addEventListener('keyup', event => handleKeyUp(event as KeyboardEvent))
+  }
+})
+
+onUnmounted(() => {
+  const container = document.querySelector(`[data-component-id="${props.id}"]`)
+  if (container) {
+    container.removeEventListener('keydown', handleKeyDown as EventListener)
+    container.removeEventListener('keyup', handleKeyUp as EventListener)
+  }
+})
+
+async function customConfigSave(obj: any) {
+  const params = obj.map((item: any) => {
+    const { field, fixed, type, align, resizable, visible } = item
+    return {
+      field,
+      fixed,
+      type,
+      align,
+      resizable,
+      visible,
+    }
+  })
+  await setMemoryUpload({
+    ...paramsObj,
+    data: JSON.stringify(params),
+  })
+}
+
+function handleCustomAction(action: 'confirm' | 'cancel' | 'reset') {
+  switch (action) {
+    case 'confirm':
+      handleCustomConfirm()
+      break
+    case 'cancel':
+      // 原有的 handleCustomCancel 逻辑
+      xTable.value?.closeCustom()
+      break
+    case 'reset':
+      // 原有的 handleCustomReset 逻辑
+      localColumns.value = [...computedColumns.value]
+      xTable.value?.closeCustom()
+      break
+  }
+}
+
+async function handleCustomConfirm() {
+  const tableDataObj = customConfigRef.value.getTableData()?.tableData || []
+  if (props.onCustomConfigSave) {
+    props.onCustomConfigSave(tableDataObj)
+    return
+  }
+  await customConfigSave(tableDataObj)
+  localColumns.value = [...tableDataObj]
+  xTable.value?.closeCustom()
+}
+
+function handleCustomCancel() {
+  xTable.value?.closeCustom()
+}
+
+function handleCustomReset() {
+  localColumns.value = [...computedColumns.value]
+  xTable.value?.closeCustom()
 }
 
 /**
@@ -1402,4 +1604,10 @@ defineExpose({
 
 <style scoped lang="scss">
 @forward '@moluoxixi/components/_assets/styles/tailwind.scss';
+.table-container {
+  outline: none;
+  &:focus {
+    outline: none;
+  }
+}
 </style>

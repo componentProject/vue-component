@@ -49,3 +49,25 @@ export function getDownLoadByIds(data: any) {
 export function setDeleteByPathAndCode(data: any) {
   return httpApi.post('/ts-fm/file/deleteByPathAndCode', data)
 }
+
+const memoryApi: any = getHttpService({
+  baseURL: 'http://192.168.209.103:10016/',
+  timeout: 3000,
+  getToken: () => null,
+  // 响应字段配置
+  responseFields: {
+    code: 'Code',
+    message: 'Message',
+    data: 'data',
+  },
+})
+
+//获取表格自定义列
+export function getMemoryQuery(data: any) {
+  return memoryApi.post('/ts-cache/memory/query', data)
+}
+
+//上传表格自定义列
+export function setMemoryUpload(data: any) {
+  return memoryApi.post('/ts-cache/memory/upload', data)
+}
