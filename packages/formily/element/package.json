@@ -22,6 +22,7 @@
     "@formily/shared": "catalog:build",
     "@formily/validator": "catalog:build",
     "@formily/vue": "catalog:build",
-    "element-plus": "catalog:build"
+    "element-plus": "catalog:build",
+    "vue-demi": "catalog:build"
   }
 }

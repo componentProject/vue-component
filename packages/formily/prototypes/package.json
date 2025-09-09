@@ -15,13 +15,14 @@
   "dependencies": {
     "@designable/core": "catalog:build",
     "@designable/shared": "catalog:build",
-    "@formily/reactive-vue": "catalog:build",
     "@formily/reactive": "catalog:build",
+    "@formily/reactive-vue": "catalog:build",
     "element-plus": "catalog:build",
     "dayjs": "catalog:build",
     "@vue/runtime-dom": "catalog:build",
     "@vue/runtime-core": "catalog:build",
-    "classnames": "catalog:build"
+    "classnames": "catalog:build",
+    "vue-demi": "catalog:build"
   },
   "devDependencies": {
     "@moluoxixi/element": "workspace:*"

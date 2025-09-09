@@ -15,8 +15,8 @@
   "license": "ISC",
   "dependencies": {
     "@designable/core": "catalog:build",
-    "@designable/formily-transformer": "1.0.0-beta.45",
     "@designable/shared": "catalog:build",
+    "@designable/formily-transformer": "1.0.0-beta.45",
     "@formily/core": "catalog:build",
     "@formily/grid": "catalog:build",
     "@guolao/vue-monaco-editor": "^0.0.5",

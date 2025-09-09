@@ -16,6 +16,9 @@
     "vue": "^3.2.24"
   },
   "dependencies": {
+    "@babel/parser": "catalog:build",
+    "@designable/core": "catalog:build",
+    "@designable/shared": "catalog:build",
     "@formily/core": "catalog:build",
     "@formily/grid": "catalog:build",
     "@formily/json-schema": "catalog:build",
@@ -23,10 +26,12 @@
     "@formily/reactive-vue": "catalog:build",
     "@formily/shared": "catalog:build",
     "@formily/vue": "catalog:build",
-    "@babel/parser": "catalog:build",
-    "classnames": "catalog:build",
     "@guolao/vue-monaco-editor": "^0.0.5",
     "@monaco-editor/loader": "1.5.0",
+    "@vue/runtime-dom": "catalog:build",
+    "classnames": "catalog:build",
+    "element-plus": "catalog:build",
+    "vue-demi": "catalog:build",
     "vue-slicksort": "^1.2.0"
   },
   "devDependencies": {

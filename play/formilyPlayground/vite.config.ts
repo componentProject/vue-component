@@ -24,6 +24,21 @@ export default viteConfig(
         development: {},
         production: {},
       },
+      viteConfig: {
+        resolve: {
+          dedupe: ['vue', 'vue-demi', 'element-plus'],
+        },
+        optimizeDeps: {
+          include: [
+            'vue-demi',
+            '@vue/runtime-dom',
+            '@vue/runtime-core',
+            'element-plus',
+            '@designable/shared',
+            '@designable/core',
+          ],
+        },
+      },
     }
   },
 )
