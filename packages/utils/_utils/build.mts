@@ -54,6 +54,8 @@ export interface BuildContext {
   alias: Record<string, string>
   /** 路径别名（无 * 的包前缀集合） */
   aliasPacks: string[]
+  /** 上传类型（用于 UploadEvent），默认 'Vue3' */
+  uploadType?: string
 }
 
 export type ModuleFormat = 'es' | 'cjs'
@@ -1173,7 +1175,7 @@ async function buildComponent(
     console.log(`==========  ${buildName} 打包完成 ==========`)
     // 如果需要发布，执行发布
     if (shouldPublish) {
-      await UploadEvent(fileUrl, buildName, 'Vue3')
+      await UploadEvent(fileUrl, buildName, ctx.uploadType)
       console.log(`准备发布 ${buildName}，版本：${currentVersion} -> ${newVersion}`)
 
       await writeComponentVersions(ctx, {
@@ -1318,6 +1320,8 @@ export interface BuildOptions {
   presetGlobals?: Record<string, string>
   /** Peer 依赖列表（可选，传入则覆盖自动推导） */
   peerDepList?: string[]
+  /** 上传类型（用于 UploadEvent），默认 'Vue3' */
+  uploadType?: string
 }
 
 /**
@@ -1334,13 +1338,14 @@ export async function buildComponentsWithOptions(options: BuildOptions): Promise
     alias: aliasMap = {},
     rootDir,
     packDir,
-    isChunck: chunk = false,
-    preserveModules: preserve = false,
-    useObfuscator: obfuscate = false,
-    useExternal: external = false,
+    isChunck = false,
+    preserveModules = false,
+    useObfuscator = false,
+    useExternal = false,
     requireExternalPacks: reqExternal = [],
     entryBaseUrl: ebu = '/',
     presetGlobals: presetGlobalsArg,
+    uploadType = 'Vue3',
   } = options || ({} as BuildOptions)
 
   // 必填参数校验
@@ -1353,7 +1358,7 @@ export async function buildComponentsWithOptions(options: BuildOptions): Promise
   if (!packDir)
     throw new Error('缺少必填参数：packDir')
 
-  const presetGlobals = external
+  const presetGlobals = useExternal
     ? {
         'vxe-table': 'VXETable',
         'element-plus': 'ElementPlus',
@@ -1371,10 +1376,10 @@ export async function buildComponentsWithOptions(options: BuildOptions): Promise
   const ctx: BuildContext = {
     LIB_NAMESPACE: libNamespace,
     aliasComponentPath: aliasPath,
-    isChunck: chunk,
-    preserveModules: preserve,
-    useObfuscator: obfuscate,
-    useExternal: external,
+    isChunck,
+    preserveModules,
+    useObfuscator,
+    useExternal,
     excludeHeavyPlugins,
     requireExternalPacks: Array.isArray(reqExternal) ? reqExternal : [],
     presetGlobals,
@@ -1388,6 +1393,7 @@ export async function buildComponentsWithOptions(options: BuildOptions): Promise
       ...aliasMap,
     },
     aliasPacks: [],
+    uploadType,
   }
   ctx.aliasPacks = Object.keys(ctx.alias).filter((i: string) => !i.endsWith('*'))
 
@@ -1395,7 +1401,7 @@ export async function buildComponentsWithOptions(options: BuildOptions): Promise
   if (mode !== 'all' && mode !== 'library' && mode !== 'allComponent') {
     const componentNames = await getComponentNames(ctx)
     if (!componentNames.includes(mode)) {
-      throw new Error(`错误: 无效的模式或组件名 "${mode}"，可用组件: ${componentNames.join(', ')}`)
+      throw new Error(`错误: 无效的模式或文件夹名称 "${mode}"，可用文件夹名称: ${componentNames.join(', ')}`)
     }
   }
 
