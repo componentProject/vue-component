@@ -21,20 +21,6 @@ export default viteConfig(
           VITE_IMAGEMIN: true,
           VITE_BUILD_GZIP: true,
         },
-        development: {},
-        production: {},
-      },
-      viteConfig: {
-        resolve: {
-          dedupe: ['vue', 'vue-demi', 'element-plus'],
-        },
-        optimizeDeps: {
-          include: [
-            'vue-demi',
-            '@vue/runtime-dom',
-            '@vue/runtime-core',
-          ],
-        },
       },
     }
   },
