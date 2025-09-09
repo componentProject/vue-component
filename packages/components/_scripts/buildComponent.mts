@@ -26,12 +26,6 @@ import { UploadEvent } from '../../utils/_utils/UploadComponent.ts'
 
 // === 组件库命名空间配置 ===
 const LIB_NAMESPACE = 'moluoxixi'
-// const entryBaseUrl = '/src/components'
-// const aliasComponentPath = 'src/components'
-/**
- * 组件的入口文件路径,需要以/开头，/结尾，相对于组件库根目录
- */
-const entryBaseUrl = '/'
 /**
  * 别名或者外部包的路径
  */
@@ -75,11 +69,13 @@ const presetGlobals = useExternal
 const peerDepList = Object.keys(presetGlobals)
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
+/** 项目根目录，用于获取依赖版本信息 */
 const rootDir = resolve(__dirname, '../../../')
-/**
- * 组件仓库所在路径
- */
+/** 组件仓库所在路径  */
 const packDir = resolve(__dirname, '../')
+/** 组件的入口文件路径,需要以/开头，/结尾，相对于packDir */
+const entryBaseUrl = '/'
+/** 路径别名 */
 const alias = {
   '@moluoxixi/components': resolve(packDir, './'),
   '@moluoxixi/components/*': resolve(packDir, './*'),
