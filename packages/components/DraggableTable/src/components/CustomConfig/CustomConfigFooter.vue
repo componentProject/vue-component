@@ -1,6 +1,6 @@
 <template>
   <div class="custom-config-footer">
-    <el-checkbox v-model="checked2" style="margin-right: 40px;" label="作为统一配置" size="large" />
+    <el-checkbox v-model="unifyCustomConfig" style="margin-right: 40px;" label="作为统一配置" size="large" />
     <el-button @click="handleEvent('reset')">
       恢复默认
     </el-button>
@@ -14,9 +14,12 @@
 </template>
 
 <script lang="ts" setup>
+import { ref } from 'vue'
+
 const emit = defineEmits(['customAction'])
+const unifyCustomConfig = ref(false)
 function handleEvent(str: string) {
-  emit('customAction', str)
+  emit('customAction', str, unifyCustomConfig.value)
 }
 </script>
 

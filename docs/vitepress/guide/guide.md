@@ -40,8 +40,6 @@ async function render(props) {
   app = createApp(App)
   //组件库全局引入(主应用下发方式)
   await props.fn?.globalComponents?.(vue, app)
-  //组件库全局引入(window挂载方式)
-  await window?.$globalLoad?.(vue, app)
 }
 
 ```

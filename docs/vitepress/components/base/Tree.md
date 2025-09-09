@@ -138,22 +138,22 @@ Tree/events/node-click
 
 ### Props
 
-| 参数            | 说明 | 类型                                                                              | 默认值 |
-|---------------| --- |---------------------------------------------------------------------------------| --- |
-| data          | 树数据（扁平或嵌套） | `any[]`                                                                         | `[]` |
-| childrenField | 子节点字段名 | `string`                                                                        | `'children'` |
-| rowField      | 行主键字段名 | `string`                                                                        | `'id'` |
-| parentField   | 父主键字段名（与 `rowField` 同用时将忽略 `childrenField` 并自动构建树） | `string`                                                                        | `''` |
-| labelField    | 显示文本字段名 | `string`                                                                        | `'label'` |
-| childIcon     | 叶子节点图标 | `Component` \| `string`                                                         | `undefined` |
-| parentIcon    | 非叶子节点图标 | `Component` \| `string`                                                         | `undefined` |
-| icon          | 根据行数据返回图标 | ^[Function]`(row: any) => Component                                             | string` | `undefined` |
-| showType      | 行按钮展示方式 | `'hover'` \| `'click'` \| `'default'`                                           | `'default'` |
-| buttons       | 为每一行返回按钮数组 | ^[Function]`(row: any) => { type?: 'add'\|'edit' \|'delete'; slot?: string\| ((...args:any[])=>any); icon?: Component \| string; event?: (data?: any, node?: any) => void; tooltip?: string}[]}` | `undefined` |
-| indent        | 每级缩进像素 | `number`                                                                        | `16` |
-| showLine      | 是否显示左侧父子连接线 | `boolean`                                                                       | `false` |
-| showRowLine   | 是否显示每一行右侧延伸线 | `boolean`                                                                       | `false` |
-| levelSelect   | 是否开启级联高亮与 `change` 事件 | `boolean`                                                                       | `false` |
+| 参数            | 说明 | 类型                                                                                                                                                                                                  | 默认值 |
+|---------------| --- |-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------| --- |
+| data          | 树数据（扁平或嵌套） | `any[]`                                                                                                                                                                                             | `[]` |
+| childrenField | 子节点字段名 | `string`                                                                                                                                                                                            | `'children'` |
+| rowField      | 行主键字段名 | `string`                                                                                                                                                                                            | `'id'` |
+| parentField   | 父主键字段名（与 `rowField` 同用时将忽略 `childrenField` 并自动构建树） | `string`                                                                                                                                                                                            | `''` |
+| labelField    | 显示文本字段名 | `string`                                                                                                                                                                                            | `'label'` |
+| childIcon     | 叶子节点图标 | `Component` \| `string`                                                                                                                                                                             | `undefined` |
+| parentIcon    | 非叶子节点图标 | `Component` \| `string`                                                                                                                                                                             | `undefined` |
+| icon          | 根据行数据返回图标 | ^[Function]`(row: any) => Component                                                                                                                                                                 | string` | `undefined` |
+| showType      | 行按钮展示方式 | `'hover'` \| `'click'` \| `'default'`                                                                                                                                                               | `'default'` |
+| buttons       | 为每一行返回按钮数组 | ^[Function]`(row: any) => { btnType?: 'add'\|'edit' \|'delete'; slot?: string\| ((...args:any[])=>any); icon?: Component \| string; event?: (data?: any, node?: any) => void; tooltip?: string}[]}` | `undefined` |
+| indent        | 每级缩进像素 | `number`                                                                                                                                                                                            | `16` |
+| showLine      | 是否显示左侧父子连接线 | `boolean`                                                                                                                                                                                           | `false` |
+| showRowLine   | 是否显示每一行右侧延伸线 | `boolean`                                                                                                                                                                                           | `false` |
+| levelSelect   | 是否开启级联高亮与 `change` 事件 | `boolean`                                                                                                                                                                                           | `false` |
 
 
 ### Events

@@ -18,6 +18,18 @@
 
       <div class="example-item">
         <div class="label">
+          自定义输出格式：
+        </div>
+        <div class="component">
+          <DateRangePicker v-model="dateRange10" type="datetime" />
+        </div>
+        <div class="value">
+          选中值: {{ dateRange10 }}
+        </div>
+      </div>
+
+      <div class="example-item">
+        <div class="label">
           默认返回今天：
         </div>
         <div class="component">
@@ -142,35 +154,6 @@
         </div>
       </div>
     </div>
-
-    <div class="example-section">
-      <h3>6. 尺寸和禁用</h3>
-      <div class="example-item">
-        <div class="label">
-          小尺寸：
-        </div>
-        <div class="component">
-          <DateRangePicker v-model="dateRange10" type="daterange" size="small" />
-        </div>
-      </div>
-
-      <div class="example-item">
-        <div class="label">
-          禁用状态：
-        </div>
-        <div class="component">
-          <DateRangePicker
-            v-model="dateRange11"
-            type="daterange"
-            :disabled="true"
-            :default-today="true"
-          />
-        </div>
-        <div class="value">
-          选中值: {{ dateRange11 }}
-        </div>
-      </div>
-    </div>
   </div>
 </template>
 
@@ -182,6 +165,7 @@ import DateRangePicker from './index.vue'
 // 日期范围选择器
 const dateRange1 = ref([])
 const dateRange2 = ref([])
+const dateRange10 = ref([])
 
 // 自定义日期范围
 const dateRange3 = ref([])
@@ -198,10 +182,6 @@ const dateRange8 = ref([])
 
 // 快速选择选项
 const dateRange9 = ref([])
-
-// 尺寸和禁用
-const dateRange10 = ref([])
-const dateRange11 = ref([])
 </script>
 
 <style scoped>

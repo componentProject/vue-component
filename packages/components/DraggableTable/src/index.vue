@@ -20,22 +20,12 @@
         <CustomConfig ref="customConfigRef" :data="columns" :custom-row-config="customRowConfig" />
       </template>
       <template v-if="isCustomConfig" #customFooter>
-        <CustomConfigFooter @custom-action="handleCustomAction" />
+        <CustomConfigFooter ref="customConfigFooterRef" @custom-action="handleCustomAction" />
       </template>
       <template #loading="params">
         <slot name="loading" v-bind="params">
           <span class="absolute left-1/2 top-1/3 -translate-x-1/2 -translate-y-1/2">加载中...</span>
         </slot>
-      </template>
-      <template v-if="gridProps.pagerConfig.enabled" #pager>
-        <VxePager
-          :current-page="gridProps.pagerConfig.currentPage"
-          :page-size="gridProps.pagerConfig.pageSize"
-          :total="gridProps.pagerConfig.total"
-          :page-sizes="gridProps.pagerConfig.pageSizes"
-          :layouts="gridProps.pagerConfig.layouts"
-          @page-change="handlePageChange"
-        />
       </template>
       <!-- 使用插槽方式渲染自定义内容 -->
       <template v-for="name in slotNames" #[name]="slotParams" :key="name">
@@ -87,7 +77,7 @@ import {
   watch,
 } from 'vue'
 import { VxeGrid } from 'vxe-table'
-import { VxePager } from 'vxe-pc-ui'
+import { VxePager, VxeTooltip, VxeUI } from 'vxe-pc-ui'
 import 'vxe-table/lib/style.css'
 import 'vxe-pc-ui/lib/style.css'
 import { debounce, dispatchEvents, getClass, getStringObj, getType } from '@moluoxixi/utils/_utils'
@@ -116,7 +106,6 @@ import { getMemoryQuery, setMemoryUpload } from '../../../utils/_api/index.ts'
 defineOptions({
   name: 'DraggableTable',
 })
-
 // 定义组件属性
 const props = defineProps({
   //#region 其他原始配置加默认值
@@ -464,7 +453,6 @@ const props = defineProps({
     default: () => '',
   },
 })
-
 // 组件事件
 const emit = defineEmits<{
   (e: 'currentChange', params: number): void
@@ -485,9 +473,10 @@ const emit = defineEmits<{
   (e: 'noSelectValue', params: NoSelectValueParams): void
   (e: 'toggleTreeExpand', params: VxeTableDefines.ToggleRowExpandEventParams): void
 }>()
-
 // 获取插槽
 const slots = defineSlots<slotsType>()
+VxeUI.component(VxePager)
+VxeUI.component(VxeTooltip)
 
 const attrs = useAttrs()
 
@@ -497,10 +486,6 @@ const tableData = defineModel({
   type: Array,
   default: [],
 })
-
-function handlePageChange(params: any) {
-  emit('pageChange', params)
-}
 
 //#region 回车下一个功能
 const tableVirtualRefs = ref<HTMLElement[]>([])
@@ -1025,9 +1010,9 @@ const gridProps = computed<VxeGridProps>(() => {
 })
 
 const paramsObj = {
-  pageId: props.pageId,
+  pageId: props.id,
   widgetId: props.id,
-  userId: props.userId,
+  userId: props.id,
 }
 
 /**
@@ -1167,16 +1152,22 @@ function handleColumnResizableChange(params: VxeTableDefines.ResizableChangePara
   dispatchEvents(document, ['mousedown', 'mouseup', 'click'])
   emit('resizableChange', params)
 }
-
+const customConfigFooterRef = ref(null);
 async function getCustomConfig() {
-  const customColumns = await props.onCustomConfigLoad()
   if (props.isCustomConfig) {
     if (props.onCustomConfigLoad) {
       props.onCustomConfigLoad()
       return
     }
     const customConfig = await getMemoryQuery(paramsObj)
-    const customColumns = JSON.parse(customConfig)
+    if (customConfigFooterRef.value) {
+      customConfigFooterRef.value.unifyCustomConfig = customConfig?.isExist !== 1
+    }
+    if (!customConfig.data) {
+      localColumns.value = props.columns
+      return
+    }
+    const customColumns = JSON.parse(customConfig.data)
     localColumns.value = customColumns.map((item: ColumnType) => ({
       ...item,
       ...props.columns.find(el => el.field === item.field),
@@ -1269,7 +1260,7 @@ function initRowDraggable() {
     animation: 150,
     handle: 'tr',
     filter: getClass(props.rowDisabledClass, true),
-    onEnd: ({ oldIndex = 0, newIndex = 0, item }) => {
+    onEnd: ({ oldIndex = 0, newIndex = 0, item }: Record<string, any>) => {
       if (oldIndex === newIndex || !xTable.value)
         return
       // 获取源数据副本
@@ -1341,7 +1332,7 @@ function initColumnDraggable() {
   columnSortableInstance.value = Sortable.create(headerTr, {
     animation: 150,
     handle: 'th',
-    onEnd: ({ oldIndex = 0, newIndex = 0, item }) => {
+    onEnd: ({ oldIndex = 0, newIndex = 0, item }: Record<string, any>) => {
       if (oldIndex === newIndex || !xTable.value)
         return
 
@@ -1538,7 +1529,7 @@ onUnmounted(() => {
   }
 })
 
-async function customConfigSave(obj: any) {
+async function customConfigSave(obj: any, type: boolean) {
   const params = obj.map((item: any) => {
     const { field, fixed, type, align, resizable, visible } = item
     return {
@@ -1552,14 +1543,15 @@ async function customConfigSave(obj: any) {
   })
   await setMemoryUpload({
     ...paramsObj,
+    userId: !type ? props.userId : '',
     data: JSON.stringify(params),
   })
 }
 
-function handleCustomAction(action: 'confirm' | 'cancel' | 'reset') {
+function handleCustomAction(action: 'confirm' | 'cancel' | 'reset',type: boolean) {
   switch (action) {
     case 'confirm':
-      handleCustomConfirm()
+      handleCustomConfirm(type)
       break
     case 'cancel':
       // 原有的 handleCustomCancel 逻辑
@@ -1573,26 +1565,16 @@ function handleCustomAction(action: 'confirm' | 'cancel' | 'reset') {
   }
 }
 
-async function handleCustomConfirm() {
+async function handleCustomConfirm(type: boolean) {
   const tableDataObj = customConfigRef.value.getTableData()?.tableData || []
   if (props.onCustomConfigSave) {
     props.onCustomConfigSave(tableDataObj)
     return
   }
-  await customConfigSave(tableDataObj)
+  await customConfigSave(tableDataObj, type)
   localColumns.value = [...tableDataObj]
   xTable.value?.closeCustom()
 }
-
-function handleCustomCancel() {
-  xTable.value?.closeCustom()
-}
-
-function handleCustomReset() {
-  localColumns.value = [...computedColumns.value]
-  xTable.value?.closeCustom()
-}
-
 /**
  * 暴露给父组件的方法和属性
  */
