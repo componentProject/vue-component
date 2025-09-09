@@ -1281,13 +1281,11 @@ async function doBuild(ctx: BuildContext, mode = 'all', shouldPublish = false) {
     return false
   }
 }
-
-export type BuildCommand = 'build' | 'build-publish'
 export interface BuildOptions {
-  /** 命令：仅构建/构建并发布（默认构建并发布） */
-  command?: BuildCommand
   /** 模式：all、library、或具体组件名（默认 all） */
   mode?: 'all' | 'library' | string
+  /** 是否发布，由外层决定 */
+  shouldPublish?: boolean
   /** 是否排除重型插件（图片压缩、dts 生成） */
   excludeHeavyPlugins?: boolean
   /** 组件库命名空间（必填） */
@@ -1321,18 +1319,17 @@ export interface BuildOptions {
 /**
  * 对外暴露的打包函数：根据入参配置执行打包
  * - 所有必填入参缺失时会抛出错误
- * - 内部自动计算 __filename 与 __dirname
  */
 export async function buildComponentsWithOptions(options: BuildOptions): Promise<boolean> {
   const {
-    command = 'build-publish',
     mode = 'all',
+    shouldPublish = false,
     excludeHeavyPlugins = false,
     libNamespace,
     aliasComponentPath: aliasPath,
     alias: aliasMap = {},
-    rootDir: rootDirArg,
-    packDir: packDirArg,
+    rootDir,
+    packDir,
     isChunck: chunk = false,
     preserveModules: preserve = false,
     useObfuscator: obfuscate = false,
@@ -1340,7 +1337,6 @@ export async function buildComponentsWithOptions(options: BuildOptions): Promise
     requireExternalPacks: reqExternal = [],
     entryBaseUrl: ebu = '/',
     presetGlobals: presetGlobalsArg,
-    peerDepList: peerDepListArg,
   } = options || ({} as BuildOptions)
 
   // 必填参数校验
@@ -1348,11 +1344,25 @@ export async function buildComponentsWithOptions(options: BuildOptions): Promise
     throw new Error('缺少必填参数：libNamespace')
   if (!aliasPath)
     throw new Error('缺少必填参数：aliasComponentPath')
-  if (!rootDirArg)
+  if (!rootDir)
     throw new Error('缺少必填参数：rootDir')
-  if (!packDirArg)
+  if (!packDir)
     throw new Error('缺少必填参数：packDir')
 
+  const presetGlobals = external
+    ? {
+        'vxe-table': 'VXETable',
+        'element-plus': 'ElementPlus',
+        'vite': 'Vite',
+        'vue': 'Vue',
+        ...presetGlobalsArg,
+      }
+    : {
+        vue: 'Vue',
+        vite: 'Vite',
+        ...presetGlobalsArg,
+      }
+  const peerDepList = Object.keys(presetGlobals)
   // 生成上下文
   const ctx: BuildContext = {
     LIB_NAMESPACE: libNamespace,
@@ -1363,16 +1373,14 @@ export async function buildComponentsWithOptions(options: BuildOptions): Promise
     useExternal: external,
     excludeHeavyPlugins,
     requireExternalPacks: Array.isArray(reqExternal) ? reqExternal : [],
-    presetGlobals: presetGlobalsArg || (external
-      ? { 'vxe-table': 'VXETable', 'element-plus': 'ElementPlus', 'vite': 'Vite', 'vue': 'Vue' }
-      : { vue: 'Vue', vite: 'Vite' }),
-    peerDepList: peerDepListArg || Object.keys(presetGlobalsArg || (external ? { 'vxe-table': 'VXETable', 'element-plus': 'ElementPlus', 'vite': 'Vite', 'vue': 'Vue' } : { vue: 'Vue', vite: 'Vite' })),
-    rootDir: resolve(rootDirArg),
-    packDir: resolve(packDirArg),
+    presetGlobals,
+    peerDepList,
+    rootDir,
+    packDir,
     entryBaseUrl: ebu.startsWith('/') ? ebu : `/${ebu}`,
     alias: {
-      [aliasPath]: resolve(packDirArg, './'),
-      [`${aliasPath}/*`]: resolve(packDirArg, './*'),
+      [aliasPath]: resolve(packDir, './'),
+      [`${aliasPath}/*`]: resolve(packDir, './*'),
       ...aliasMap,
     },
     aliasPacks: [],
@@ -1387,6 +1395,5 @@ export async function buildComponentsWithOptions(options: BuildOptions): Promise
     }
   }
 
-  const shouldPublish = command === 'build-publish'
   return await doBuild(ctx, mode, shouldPublish)
 }

@@ -42,26 +42,11 @@ async function main() {
 
   // 根据命令执行不同的操作
   switch (command) {
-    case 'build': {
-      // 只构建
-      const buildSuccess = await buildComponentsWithOptions({
-        command: 'build',
-        mode,
-        excludeHeavyPlugins,
-        libNamespace: LIB_NAMESPACE,
-        aliasComponentPath,
-        alias,
-        rootDir,
-        packDir,
-      })
-      return buildSuccess ? 0 : 1
-    }
-
+    case 'build':
     case 'build-publish': {
-      // 构建并发布
-      const buildPublishResult = await buildComponentsWithOptions({
-        command: 'build-publish',
+      const result = await buildComponentsWithOptions({
         mode,
+        shouldPublish: command === 'build-publish',
         excludeHeavyPlugins,
         libNamespace: LIB_NAMESPACE,
         aliasComponentPath,
@@ -69,7 +54,7 @@ async function main() {
         rootDir,
         packDir,
       })
-      return buildPublishResult ? 0 : 1
+      return result ? 0 : 1
     }
 
     default:
