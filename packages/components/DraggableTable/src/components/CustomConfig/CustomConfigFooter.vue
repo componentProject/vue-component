@@ -1,6 +1,6 @@
 <template>
   <div class="custom-config-footer">
-    <el-checkbox v-model="unifyCustomConfig" style="margin-right: 40px;" label="作为统一配置" size="large" />
+    <el-checkbox v-if="isUnifyConfig" v-model="unifyCustomConfig" style="margin-right: 40px;" label="作为统一配置" size="large" />
     <el-button @click="handleEvent('reset')">
       恢复默认
     </el-button>

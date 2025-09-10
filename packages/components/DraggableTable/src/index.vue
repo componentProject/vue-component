@@ -15,6 +15,7 @@
       @resizable-change="handleColumnResizableChange"
       @header-cell-menu.prevent="handleHeaderCellMenu"
       @toggle-tree-expand="handleTableRendered"
+      @page-change="handlePageChange"
     >
       <template v-if="isCustomConfig" #customDefault="{ columns }">
         <CustomConfig ref="customConfigRef" :data="columns" :custom-row-config="customRowConfig" />
@@ -435,6 +436,7 @@ const props = defineProps({
   isCustomConfig: { type: Boolean, default: () => false },
   //自定义列配置参数
   customRowConfig: { type: Object, default: () => ({}) },
+  //自定义列配置保存方法（可选）
   onCustomConfigSave: {
     type: Function as PropType<(columns: ColumnType[]) => Promise<void>>,
     default: undefined,
@@ -444,14 +446,18 @@ const props = defineProps({
     type: Function as PropType<() => Promise<ColumnType[]>>,
     default: undefined,
   },
+  // 页面id
   pageId: {
     type: String,
     default: () => '',
   },
+  // 用户id
   userId: {
     type: String,
     default: () => '',
   },
+  //是否有统一配置权限选项
+  isUnifyConfig: { type: Boolean, default: () => false },
 })
 // 组件事件
 const emit = defineEmits<{
@@ -869,7 +875,7 @@ const gridProps = computed<VxeGridProps>(() => {
     },
     toolbarConfig: {
       ...props.toolbarConfig,
-      custom: props.isCustomConfig ?? props.toolbarConfig?.custom,
+      custom: props.isShortcuts ? props.toolbarConfig?.custom : props.isCustomConfig,
     },
     editConfig: {
       enabled: props.editable,
@@ -965,13 +971,13 @@ const gridProps = computed<VxeGridProps>(() => {
       ...props.resizableConfig,
     },
     virtualXConfig: {
-      enabled: false,
+      enabled: true,
       gt: 0,
       threshold: 30,
       ...props.virtualXConfig,
     },
     virtualYConfig: {
-      enabled: false,
+      enabled: true,
       gt: 0,
       threshold: 30,
       ...props.virtualYConfig,
@@ -1010,9 +1016,9 @@ const gridProps = computed<VxeGridProps>(() => {
 })
 
 const paramsObj = {
-  pageId: props.id,
+  pageId: props.pageId,
   widgetId: props.id,
-  userId: props.id,
+  userId: props.userId,
 }
 
 /**
@@ -1152,7 +1158,7 @@ function handleColumnResizableChange(params: VxeTableDefines.ResizableChangePara
   dispatchEvents(document, ['mousedown', 'mouseup', 'click'])
   emit('resizableChange', params)
 }
-const customConfigFooterRef = ref(null);
+const customConfigFooterRef = ref(null)
 async function getCustomConfig() {
   if (props.isCustomConfig) {
     if (props.onCustomConfigLoad) {
@@ -1161,7 +1167,8 @@ async function getCustomConfig() {
     }
     const customConfig = await getMemoryQuery(paramsObj)
     if (customConfigFooterRef.value) {
-      customConfigFooterRef.value.unifyCustomConfig = customConfig?.isExist !== 1
+      //当前用户没有统一配置权限，默认是false，如果有就是接口返回的配置对象（个人||统一）
+      customConfigFooterRef.value.unifyCustomConfig = !props.isUnifyConfig ? false : customConfig?.isExist !== 1;
     }
     if (!customConfig.data) {
       localColumns.value = props.columns
@@ -1548,25 +1555,23 @@ async function customConfigSave(obj: any, type: boolean) {
   })
 }
 
-function handleCustomAction(action: 'confirm' | 'cancel' | 'reset',type: boolean) {
+function handleCustomAction(action: 'confirm' | 'cancel' | 'reset', type: boolean) {
   switch (action) {
     case 'confirm':
-      handleCustomConfirm(type)
+      handleCustomConfirm(action, type)
       break
     case 'cancel':
-      // 原有的 handleCustomCancel 逻辑
       xTable.value?.closeCustom()
       break
     case 'reset':
-      // 原有的 handleCustomReset 逻辑
-      localColumns.value = [...computedColumns.value]
+      handleCustomConfirm(action, type)
       xTable.value?.closeCustom()
       break
   }
 }
 
-async function handleCustomConfirm(type: boolean) {
-  const tableDataObj = customConfigRef.value.getTableData()?.tableData || []
+async function handleCustomConfirm(action: 'confirm' | 'reset', type: boolean) {
+  const tableDataObj = action === 'confirm' ? customConfigRef.value.getTableData()?.tableData || [] : props.columns
   if (props.onCustomConfigSave) {
     props.onCustomConfigSave(tableDataObj)
     return
@@ -1574,6 +1579,9 @@ async function handleCustomConfirm(type: boolean) {
   await customConfigSave(tableDataObj, type)
   localColumns.value = [...tableDataObj]
   xTable.value?.closeCustom()
+}
+function handlePageChange(params: any) {
+  emit('pageChange', params)
 }
 /**
  * 暴露给父组件的方法和属性

@@ -28,6 +28,8 @@
         }"
       />-->
       <component
+        pageId="1234567"
+        userId="1234567"
         id="1234567"
         :is="localComponent"
         :columns="columns"

@@ -4,7 +4,7 @@
 
 ## 组件示例
 
-### 分页（showPagination / editAutoFocus）
+### 分页（showPagination）
 
 示例：开启分页（showPagination=true）
 :::demo
@@ -138,6 +138,11 @@ DraggableTable/events/resizableChange
 DraggableTable/events/checkbox
 :::
 
+示例：自定义列配置（isCustomConfig/shortcuts/isShortcuts）
+:::demo 快捷键配置和自定义列配置(也可以分开使用)
+DraggableTable/events/customConfig
+:::
+
 ### 暴露方法（getTable）
 
 示例：通过 ref 获取 VXE 表格实例
@@ -149,32 +154,41 @@ DraggableTable/expose/getTable
 
 ### Props
 
-| 参数 | 说明 | 类型 | 默认值 |
-| --- | --- | --- | --- |
-| v-model | 表格数据 | Array | [] |
-| id | 表格唯一ID，用于本地存储识别 | String | - |
-| dragable | 是否启用拖拽（行列都启用） | Boolean | false |
-| resizable | 是否允许列宽拖拽 | Boolean | true |
-| editable | 是否允许编辑 | Boolean | false |
-| sortable | 是否启用排序 | Boolean | false |
-| rowdragable | 是否启用行拖拽 | Boolean | false |
-| dragType | 拖拽模式（'vxe'\|'draggable'） | String | 'vxe' |
-| rowDisabledClass | 需要禁用拖拽的行class | String | '' |
-| rowDragDisabledMethod | 行拖拽禁用方法 | ^[Function]`Function` | - |
-| rowDragEndMethod | 行拖拽结束回调方法 | ^[Function]`Function` | - |
-| columndragable | 是否启用列拖拽 | Boolean | false |
-| columnDragDisabledMethod | 列拖拽禁用方法 | ^[Function]`Function` | - |
-| columnDragEndMethod | 列拖拽结束回调方法 | ^[Function]`Function` | - |
-| columns | 列配置数组 | Array\<ColumnType\> | [] |
-| border | 是否显示表格边框 | Boolean | true |
-| showOverflow | 表格内容溢出隐藏并显示 tooltip | Boolean\|String | true |
-| showHeaderOverflow | 头部溢出隐藏并显示 tooltip | Boolean\|String | true |
-| showFooterOverflow | 底部溢出隐藏并显示 tooltip | Boolean\|String | true |
-| editAutoFocus | 触发编辑后是否自动聚焦 | Boolean | true |
-| filterable | 是否启用过滤功能 | Boolean | false |
-| filterType | 过滤类型 | String | 'filter' |
-| filterLayout | 筛选器布局配置，支持 input、checkbox、select | Array | ['input','checkbox'] |
-| showPagination   | 是否显示分页 | Boolean | `false`|
+| 参数 | 说明 | 类型 | 默认值 | 是否必填 |
+| --- | --- | --- | --- | --- |
+| v-model | 表格数据 | Array | [] | 是 |
+| columns | 列配置数组 | Array\<ColumnType\> | [] | 是 |
+| id | 表格唯一ID，用于自定义列配置存储识别 | String | - | 是 |
+| pageId | 分页唯一ID，用于自定义列配置存储识别 | String | - | 是 |
+| userId | 用户唯一ID，用于自定义列配置存储识别 | String | - | 是 |
+| dragable | 是否启用拖拽（行列都启用） | Boolean | false | 否 |
+| resizable | 是否允许列宽拖拽 | Boolean | true | 否 |
+| editable | 是否允许编辑 | Boolean | false | 否 |
+| sortable | 是否启用排序 | Boolean | false | 否 |
+| rowdragable | 是否启用行拖拽 | Boolean | false | 否 |
+| dragType | 拖拽模式（'vxe'\|'draggable'） | String | 'vxe' | 否 |
+| rowDisabledClass | 需要禁用拖拽的行class | String | '' | 否 |
+| rowDragDisabledMethod | 行拖拽禁用方法 | ^[Function]`Function` | - | 否 |
+| rowDragEndMethod | 行拖拽结束回调方法 | ^[Function]`Function` | - | 否 |
+| columndragable | 是否启用列拖拽 | Boolean | false | 否 |
+| columnDragDisabledMethod | 列拖拽禁用方法 | ^[Function]`Function` | - | 否 |
+| columnDragEndMethod | 列拖拽结束回调方法 | ^[Function]`Function` | - | 否 |
+| isUnifyConfig | 是否有统一配置权限选项 | Boolean | false | 否 |
+| border | 是否显示表格边框 | Boolean | true | 否 |
+| showOverflow | 表格内容溢出隐藏并显示 tooltip | Boolean\|String | true | 否 |
+| showHeaderOverflow | 头部溢出隐藏并显示 tooltip | Boolean\|String | true | 否 |
+| showFooterOverflow | 底部溢出隐藏并显示 tooltip | Boolean\|String | true | 否 |
+| editAutoFocus | 触发编辑后是否自动聚焦 | Boolean | true | 否 |
+| filterable | 是否启用过滤功能 | Boolean | false | 否 |
+| filterType | 过滤类型 | String | 'filter' | 否 |
+| filterLayout | 筛选器布局配置，支持 input、checkbox、select | Array | ['input','checkbox'] | 否 |
+| showPagination   | 是否显示分页 | Boolean | `false`| 否 |
+| isCustomConfig | 是否开启组件自定义列配置 | Boolean | `false` | 否 |
+| customRowConfig | 自定义列配置参数 | Object | {} | 否 |
+| onCustomConfigSave | 自定义列配置保存方法（可选） | ^[Function]`(columns: ColumnType[]) => Promise<void>` | - | 否 |
+| onCustomConfigLoad | 自定义列配置获取方法（可选） | ^[Function]`() => Promise<ColumnType[]>` | - | 否 |
+| isShortcuts | 是否开启快捷键列配置 | Boolean | `false` | 否 |
+| shortcuts | 快捷键打开个性化列配置功能 | String | 'ctrl+shift+alt+f12' | 否 |
 | ...attrs | 其他属性透传给[vxe-grid](https://vxetable.cn/#/grid/api) | - | - |
 
 ### columns 配置
@@ -199,9 +213,7 @@ DraggableTable/expose/getTable
 | resizableChange | 列宽变化事件 | ^[Function]`(params: ResizableChangeParams) => void` |
 | checkboxChange | 复选框变化事件 | ^[Function]`(params: CheckboxChangeParams) => void` |
 | checkboxAll | 复选框全选事件 | ^[Function]`(params: CheckboxAllParams) => void` |
-| size-change | 每页条数变化 | ^[Function]`(size: number) => void` |
-| current-change | 当前页变化 | ^[Function]`(current: number) => void` |
-| update:pagination | 分页受控更新 | ^[Function]`(pagination: { pageIndex: number; pageSize: number; total: number }) => void` |
+| page-change | 分页变化事件 | ^[Function]`(params: PageChangeParams) => void` |
 
 ### Slots
 
