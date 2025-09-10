@@ -501,9 +501,7 @@ export default {
       if (configParams.filter(item => item.paramType == 2).length > 0) {
         this.hasCustomParams = true
         this.configParams = JSON.parse(JSON.stringify(configParams))
-        if (res.agentConfig.callbackUrl) {
-          this.setConfigParams(res.agentConfig.callbackUrl)
-        }
+        this.setConfigParams(res.agentConfig.callbackUrl)
       }
     },
     async getCueWordDetail() {
@@ -528,16 +526,24 @@ export default {
     },
 
     async setConfigParams(url) {
-      const res = await getCommonSysDetailsData(url, this.commonSysData)
-      if (JSON.stringify(res) == '{}') {
-        return
-      }
-      for (const item of this.configParams) {
-        if (res[item.paramName]) {
-          item.paramValue = res[item.paramName]
+      if (url) {
+        const res = await getCommonSysDetailsData(url, this.commonSysData)
+        if (JSON.stringify(res) == '{}') {
+          return
+        }
+        for (const item of this.configParams) {
+          if (res[item.paramName]) {
+            item.paramValue = res[item.paramName]
+          }
+        }
+        this.sendMessage(this.inputContent)
+      } else {
+        for (const item of this.configParams) {
+          if (this.commonSysData[item.paramName]) {
+            item.paramValue = this.commonSysData[item.paramName]
+          }
         }
       }
-      this.sendMessage(this.inputContent)
     },
 
     resetChat() {
