@@ -491,7 +491,7 @@ html {
     width: 100vw;
     height: 100vh;
     background: transparent;
-    z-index: 9;
+    z-index: 202508;
 
     // 只有拖拽的元素可以交互
     .floating-button,

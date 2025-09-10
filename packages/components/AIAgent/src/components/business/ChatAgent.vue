@@ -358,7 +358,6 @@ export default {
         // 1. 检查Content-Type是否是事件流
         const contentType = stream.headers.get('content-type') || ''
         const isStream = contentType.includes('text/event-stream')
-
         // 2. 如果是普通JSON响应则直接处理
         if (!isStream) {
           try {
@@ -367,8 +366,9 @@ export default {
               this.onComplete(false, res.message || '请求失败', lastItem)
             }
             else {
-              const key = Object.keys(res.object)[0]
-              lastItem.content = res.object[key]
+              const outputs = res.object.outputs || {}
+              const key = Object.keys(outputs)[0]
+              lastItem.content = outputs[key]
               lastItem.markedContent = this.md.render(lastItem.content)
               this.onComplete(true, res.object, lastItem)
             }
@@ -395,6 +395,13 @@ export default {
               lastItem.content += res.data?.text
               lastItem.conversationId = res.task_id
               lastItem.message_id = res.task_id
+            }
+            if (res.choices && res.choices.length > 0) {
+              lastItem.content += res.choices[0]?.delta?.content || ''
+            }
+            if (res.event == 'error') {
+              this.onComplete(false, res.message || '请求失败', lastItem)
+              return
             }
             lastItem.markedContent = this.md.render(lastItem.content)
             this.initPlugin()
