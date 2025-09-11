@@ -20,7 +20,7 @@ export default viteConfig(
           VITE_DEVTOOLS: false,
           VITE_PURE_CONSOLE_AND_DEBUGGER: false,
           VITE_PORT: 3300,
-          VITE_OPEN: true,
+          VITE_OPEN: false,
           VITE_USE_QIANKUN: true,
           VITE_QIANKUN_DEV: false,
           VITE_COMPRESS: true,
@@ -40,8 +40,7 @@ export default viteConfig(
             '@moluoxixi/components': path.resolve(rootPath, '../../packages/components'),
             '@moluoxixi/components/*': path.resolve(rootPath, '../../packages/components/*'),
             '@moluoxixi/utils': path.resolve(rootPath, '../../packages/utils'),
-            '@moluoxixi/utils/*': path.resolve(rootPath, '../../packages/utils/*'),
-            '@/*': path.resolve(rootPath, './src/*'),
+            '@moluoxixi/utils/*': path.resolve(rootPath, '../../packages/utils/*')
           },
         },
         plugins: [

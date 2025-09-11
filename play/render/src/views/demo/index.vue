@@ -3,9 +3,7 @@
     <div class="title">
       调试与演示
     </div>
-    <el-button type="primary" @click="handleClick">
-      删除组件库组件
-    </el-button>
+    <el-button type="primary" @click="handleClick">删除组件库组件</el-button>
     <div class="main" style="height: 300px">
       <div>虚拟模块里导出的组件</div>
       <!-- <PopoverTableSelect
@@ -16,28 +14,11 @@
       <div class="list-title">
         开发调试组件
       </div>
-      <!-- <component
-        :is="localComponent"
-        :columns="columns"
-        :data="tableData"
-        :resizable="true"
-        :custom-config="{
-          slots: {
-            default: 'customDefault',
-          },
-        }"
-      />-->
       <component
-        pageId="1234567"
-        userId="1234567"
-        id="1234567"
         :is="localComponent"
         :columns="columns"
         :data="tableData"
         :resizable="true"
-        :is-shortcuts="true"
-        shortcuts="a+s"
-        :isCustomConfig="true"
       />
     </div>
     <div class="main">
@@ -97,47 +78,47 @@ const tableData = [
   { id: 18, name: '王五', age: 22 },
   { id: 19, name: '王五', age: 22 },
   { id: 20, name: '王五', age: 22 },
-  { id: 21, name: '王五', age: 22 },
-  { id: 22, name: '王五', age: 22 },
-  { id: 23, name: '王五', age: 22 },
-  { id: 24, name: '王五', age: 22 },
-  { id: 25, name: '王五', age: 22 },
-  { id: 26, name: '王五', age: 22 },
-  { id: 27, name: '王五', age: 22 },
-  { id: 28, name: '王五', age: 22 },
-  { id: 29, name: '王五', age: 22 },
-  { id: 30, name: '王五', age: 22 },
-  { id: 31, name: '王五', age: 22 },
-  { id: 32, name: '王五', age: 22 },
-  { id: 33, name: '王五', age: 22 },
-  { id: 34, name: '王五', age: 22 },
-  { id: 35, name: '王五', age: 22 },
-  { id: 36, name: '王五', age: 22 },
-  { id: 37, name: '王五', age: 22 },
-  { id: 38, name: '王五', age: 22 },
-  { id: 39, name: '王五', age: 22 },
-  { id: 40, name: '王五', age: 22 },
-  { id: 41, name: '王五', age: 22 },
-  { id: 42, name: '王五', age: 22 },
-  { id: 43, name: '王五', age: 22 },
-  { id: 44, name: '王五', age: 22 },
-  { id: 45, name: '王五', age: 22 },
-  { id: 46, name: '王五', age: 22 },
-  { id: 47, name: '王五', age: 22 },
-  { id: 48, name: '王五', age: 22 },
-  { id: 49, name: '王五', age: 22 },
-  { id: 50, name: '王五', age: 22 },
-  { id: 51, name: '王五', age: 22 },
-  { id: 52, name: '王五', age: 22 },
-  { id: 53, name: '王五', age: 22 },
-  { id: 54, name: '王五', age: 22 },
-  { id: 55, name: '王五', age: 22 },
-  { id: 56, name: '王五', age: 22 },
-  { id: 57, name: '王五', age: 22 },
-  { id: 58, name: '王五', age: 22 },
-  { id: 59, name: '王五', age: 22 },
-  { id: 60, name: '王五', age: 22 },
-  { id: 61, name: '王五', age: 22 },
+  // { id: 21, name: '王五', age: 22 },
+  // { id: 22, name: '王五', age: 22 },
+  // { id: 23, name: '王五', age: 22 },
+  // { id: 24, name: '王五', age: 22 },
+  // { id: 25, name: '王五', age: 22 },
+  // { id: 26, name: '王五', age: 22 },
+  // { id: 27, name: '王五', age: 22 },
+  // { id: 28, name: '王五', age: 22 },
+  // { id: 29, name: '王五', age: 22 },
+  // { id: 30, name: '王五', age: 22 },
+  // { id: 31, name: '王五', age: 22 },
+  // { id: 32, name: '王五', age: 22 },
+  // { id: 33, name: '王五', age: 22 },
+  // { id: 34, name: '王五', age: 22 },
+  // { id: 35, name: '王五', age: 22 },
+  // { id: 36, name: '王五', age: 22 },
+  // { id: 37, name: '王五', age: 22 },
+  // { id: 38, name: '王五', age: 22 },
+  // { id: 39, name: '王五', age: 22 },
+  // { id: 40, name: '王五', age: 22 },
+  // { id: 41, name: '王五', age: 22 },
+  // { id: 42, name: '王五', age: 22 },
+  // { id: 43, name: '王五', age: 22 },
+  // { id: 44, name: '王五', age: 22 },
+  // { id: 45, name: '王五', age: 22 },
+  // { id: 46, name: '王五', age: 22 },
+  // { id: 47, name: '王五', age: 22 },
+  // { id: 48, name: '王五', age: 22 },
+  // { id: 49, name: '王五', age: 22 },
+  // { id: 50, name: '王五', age: 22 },
+  // { id: 51, name: '王五', age: 22 },
+  // { id: 52, name: '王五', age: 22 },
+  // { id: 53, name: '王五', age: 22 },
+  // { id: 54, name: '王五', age: 22 },
+  // { id: 55, name: '王五', age: 22 },
+  // { id: 56, name: '王五', age: 22 },
+  // { id: 57, name: '王五', age: 22 },
+  // { id: 58, name: '王五', age: 22 },
+  // { id: 59, name: '王五', age: 22 },
+  // { id: 60, name: '王五', age: 22 },
+  // { id: 61, name: '王五', age: 22 },
 ]
 
 /**
@@ -167,14 +148,14 @@ async function loadComponents(components: string[]) {
     console.error('加载动态组件失败:', error)
   }
 }
-async function handleClick() {
-  const params = {
-    code: 'webfile',
-    paraMeters: {
-      productCode: 'webFile_his',
-      Vue: 'Vue3',
-      componentCode: 'ConfigTable',
-    },
+const handleClick = async () => {
+   const params = {
+    code:"webfile",
+    paraMeters:{
+      productCode:"webFile_his",
+      Vue:"Vue3",
+      componentCode:"ConfigTable"
+    }
   }
   //ConfigTable、
   await setDeleteByPathAndCode(params)
