@@ -803,9 +803,9 @@ const gridProps = computed<VxeGridProps>(() => {
     customConfig: {
       ...props.customConfig,
     },
-    pagerConfig:{
+    pagerConfig: {
       enabled: props.showPagination,
-      ...props.pagerConfig
+      ...props.pagerConfig,
     },
     editConfig: {
       enabled: props.editable,
@@ -1085,7 +1085,7 @@ function handleColumnResizableChange(params: VxeTableDefines.ResizableChangePara
  */
 watch(
   () => computedColumns.value,
-  (newColumns: ColumnType) => {
+  (newColumns: ColumnType[]) => {
     // 如果启用了本地存储，不保存
     if (props.customConfig.storage) {
       localColumns.value = cloneDeep(newColumns)
