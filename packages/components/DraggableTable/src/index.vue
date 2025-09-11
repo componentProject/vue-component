@@ -99,7 +99,7 @@ import EnterNextContainer from '@moluoxixi/components/EnterNextContainer'
 import type {
   NoNextInputParams,
   NoSelectValueParams,
-} from '@moluoxixi/components/EnterNextDragTable/src/_types'
+} from './_types'
 import CustomConfig from './components/CustomConfig/index.vue'
 import CustomConfigFooter from './components/CustomConfig/CustomConfigFooter.vue'
 import { getMemoryQuery, setMemoryUpload } from '../../../utils/_api/index.ts'
@@ -728,6 +728,7 @@ const computedColumns = computed<ColumnType[]>(() => {
     }
     //#endregion
 
+    console.log('aaaaaaaaaaaa', props.filterable, !item.filters, !item.slots.edit, isEmpty(item.filterRender))
     //#region 添加基于field的自定义筛选器渲染器,该渲染器基于当前列显示的内容进行筛选，支持input搜索，checkbox多选，可通过filterLayout配置
     if (props.filterable && !item.filters && !item.slots.edit && isEmpty(item.filterRender)) {
       item.filters = [
@@ -1168,7 +1169,7 @@ async function getCustomConfig() {
     const customConfig = await getMemoryQuery(paramsObj)
     if (customConfigFooterRef.value) {
       //当前用户没有统一配置权限，默认是false，如果有就是接口返回的配置对象（个人||统一）
-      customConfigFooterRef.value.unifyCustomConfig = !props.isUnifyConfig ? false : customConfig?.isExist !== 1;
+      customConfigFooterRef.value.unifyCustomConfig = !props.isUnifyConfig ? false : customConfig?.isExist !== 1
     }
     if (!customConfig.data) {
       localColumns.value = props.columns
