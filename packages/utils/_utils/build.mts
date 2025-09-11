@@ -123,7 +123,7 @@ function createBaseConfig(ctx: BuildContext, comp: string, internalDeps: string[
       AutoImport({
         imports: ['vue'],
         resolvers: [ElementPlusResolver()],
-        dts: path.resolve(ctx.packDir, './typings/auto-imports.d.ts'),
+        dts: path.resolve(ctx.packDir, './_typings/auto-imports.d.ts'),
       } as any),
       // 与自定义element组件冲突
       Components({
