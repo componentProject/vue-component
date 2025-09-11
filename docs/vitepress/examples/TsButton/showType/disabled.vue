@@ -1,8 +1,8 @@
 <template>
   <div class="container">
-    <WlButton content="按钮用途说明：点击执行操作">
-      悬浮总是显示说明
-    </WlButton>
+    <TsButton show-type="disabled" disabled content="按钮已禁用，原因说明">
+      禁用按钮（悬浮有说明）
+    </TsButton>
   </div>
 </template>
 

@@ -23,7 +23,7 @@ import { debounce as wlDebounce, throttle as wlThrottle } from '@moluoxixi/utils
 import type { DebounceSettings, ThrottleSettings } from 'lodash'
 
 defineOptions({
-  name: 'WlButton',
+  name: 'TsButton',
   inheritAttrs: false,
 })
 

@@ -1,8 +1,8 @@
 <template>
   <div class="container">
-    <WlButton content="这是按钮的说明文本">
+    <TsButton content="这是按钮的说明文本">
       带说明的按钮
-    </WlButton>
+    </TsButton>
   </div>
 </template>
 

@@ -3,7 +3,7 @@
     v-if="configOption.token"
     class="ai-agent"
     :class="{ 'ai-agent-dragging': isDragging, 'drag-disabled': !drag }"
-    data-v="1.6.4"
+    data-v="1.6.7"
   >
     <!-- 浮动按钮 -->
     <FloatingButton
@@ -491,7 +491,7 @@ html {
     width: 100vw;
     height: 100vh;
     background: transparent;
-    z-index: 9;
+    z-index: 202508;
 
     // 只有拖拽的元素可以交互
     .floating-button,

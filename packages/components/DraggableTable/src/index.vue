@@ -104,9 +104,8 @@ import EnterNextContainer from '@moluoxixi/components/EnterNextContainer'
 import type {
   NoNextInputParams,
   NoSelectValueParams,
-} from '@moluoxixi/components/EnterNextDragTable/src/_types'
+} from './_types'
 import CustomConfig from './components/CustomConfig/index.vue'
-import CustomConfigFooter from './components/CustomConfig/CustomConfigFooter.vue'
 import { getMemoryQuery, setMemoryUpload } from '../../../utils/_api/index.ts'
 
 defineOptions({
@@ -732,6 +731,7 @@ const computedColumns = computed<ColumnType[]>(() => {
     }
     //#endregion
 
+    console.log('aaaaaaaaaaaa', props.filterable, !item.filters, !item.slots.edit, isEmpty(item.filterRender))
     //#region 添加基于field的自定义筛选器渲染器,该渲染器基于当前列显示的内容进行筛选，支持input搜索，checkbox多选，可通过filterLayout配置
     if (props.filterable && !item.filters && !item.slots.edit && isEmpty(item.filterRender)) {
       item.filters = [
@@ -1200,9 +1200,9 @@ watch(
   (newColumns: ColumnType) => {
     // 添加防抖处理
     debounce(() => {
-      if (props.isCustomConfig) {
-        return
-      }
+      // if (props.isCustomConfig) {
+      //   return
+      // }
 
       if (props.customConfig.storage) {
         localColumns.value = cloneDeep(newColumns)

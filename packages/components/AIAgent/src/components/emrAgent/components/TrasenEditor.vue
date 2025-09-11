@@ -21,7 +21,7 @@
     <div class="monaco-editor-container">
       <div ref="editorContainer" class="monaco-editor" />
     </div>
-    <Loading :visible="isGeneratingEmr" />
+    <AILoading :visible="isGeneratingEmr" />
   </div>
 </template>
 
@@ -33,7 +33,7 @@ import 'monaco-editor/esm/vs/editor/contrib/inlineCompletions/ghostTextControlle
 // import 'monaco-editor/esm/vs/editor/contrib/suggest/browser/suggestController.js'; // 代码联想提示
 // import 'monaco-editor/esm/vs/editor/contrib/tokenization/browser/tokenization.js'; // 代码联想提示
 
-import Loading from '../../ui/Loading.vue'
+import AILoading from '../../ui/Loading.vue'
 import {
   getModelField,
   updateEmrContentByLineNumber,
@@ -47,7 +47,7 @@ let editorInstance = null
 export default {
   name: 'TrasenEditor',
   components: {
-    Loading,
+    AILoading,
   },
   props: {
     emr_data: {

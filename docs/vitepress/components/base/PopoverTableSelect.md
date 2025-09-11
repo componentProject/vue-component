@@ -7,113 +7,113 @@
 ### 外观与触发（popType）
 
 示例：外部输入框作为触发器（`popType='default'`，`virtualRef` 指向输入框）
-::::demo
+:::demo
 PopoverTableSelect/props/popType-default
-::::
+:::
 
 示例：内置输入框作为触发器（`popType='input'`）
-::::demo
+:::demo
 PopoverTableSelect/props/popType-input
-::::
+:::
 
 ### 关闭弹窗的方式（selectTrigger）
 
 示例：单击选中关闭（`selectTrigger='click'`）
-::::demo
+:::demo
 PopoverTableSelect/props/trigger-select-click
-::::
+:::
 
 示例：双击选中关闭（`selectTrigger='dblclick'`）
-::::demo
+:::demo
 PopoverTableSelect/props/trigger-select-dblclick
-::::
+:::
 
 ### 连续展示（successiveShowType）
 
 示例：按回车后继续展示（`successiveShowType='enter'`）
-::::demo
+:::demo
 PopoverTableSelect/props/successiveShowType-enter
-::::
+:::
 
 示例：输入时实时展示（`successiveShowType='input'`）
-::::demo
+:::demo
 PopoverTableSelect/props/successiveShowType-input
-::::
+:::
 
 ### 输入体验（debounce / throttle / options）
 
 示例：防抖 400ms（`debounce=400`）
-::::demo
+:::demo
 PopoverTableSelect/props/debounce
-::::
+:::
 
 示例：节流 500ms（`throttle=500`）
-::::demo
+:::demo
 PopoverTableSelect/props/throttle
-::::
+:::
 
 示例：Promise 模式（`options={ promise: true }`）
-::::demo
+:::demo
 PopoverTableSelect/props/options-promise
-::::
+:::
 
 ### 输入框配置（inputProps / placeholder）
 
 示例：自定义占位符（`placeholder='请输入姓名关键字'`）
-::::demo
+:::demo
 PopoverTableSelect/props/placeholder
-::::
+:::
 
 示例：透传输入框属性（`inputProps`）
-::::demo
+:::demo
 PopoverTableSelect/props/inputProps
-::::
+:::
 
 ### 插槽（slots）
 
 示例：默认插槽在表格上方自定义区域
-::::demo
+:::demo
 PopoverTableSelect/slots/default
-::::
+:::
 
 ### 事件（emits）
 
 示例：选中行触发 `select`
-::::demo
+:::demo
 PopoverTableSelect/events/select
-::::
+:::
 
 示例：输入触发 `input`
-::::demo
+:::demo
 PopoverTableSelect/events/input
-::::
+:::
 
 示例：回车触发 `enter`
-::::demo
+:::demo
 PopoverTableSelect/events/enter
-::::
+:::
 
 示例：焦点与清空（`focus`/`blur`/`clear`）
-::::demo
+:::demo
 PopoverTableSelect/events/focus-blur-clear
-::::
+:::
 
 示例：下拉加载更多（enableLoadMore、hasMore、loading、virtualYConfig）
-::::demo
+:::demo
 PopoverTableSelect/events/loadMore
-::::
+:::
 
 ### Popover 透传属性（popoverProps）
 
 示例：弹出位置 `placement`
-::::demo
+:::demo
 PopoverTableSelect/popoverProps/placement
-::::
+:::
 
 示例：弹窗宽度 `width`
-::::demo
+:::demo
 PopoverTableSelect/popoverProps/width
-::::
+:::
 
 ## API
 

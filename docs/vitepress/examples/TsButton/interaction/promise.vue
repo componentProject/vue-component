@@ -1,8 +1,8 @@
 <template>
   <div class="container">
-    <WlButton :throttle="600" :options="{ promise: true }" @click="onClickAsync">
+    <TsButton :throttle="600" :options="{ promise: true }" @click="onClickAsync">
       Promise 节流（异步完成前不接受下一次）
-    </WlButton>
+    </TsButton>
     <p class="tip">
       状态：<code>{{ running ? '执行中' : '空闲' }}</code>；完成次数：<code>{{ done }}</code>
     </p>
