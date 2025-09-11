@@ -4,6 +4,7 @@
     :data-component-id="id"
     tabindex="0"
     @keydown="handleKeyDown"
+    @keyup="handleKeyUp"
   >
     <VxeGrid
       ref="xTable"
@@ -17,12 +18,6 @@
       @toggle-tree-expand="handleTableRendered"
       @page-change="handlePageChange"
     >
-      <template v-if="isCustomConfig" #customDefault="{ columns }">
-        <CustomConfig ref="customConfigRef" :data="columns" :custom-row-config="customRowConfig" />
-      </template>
-      <template v-if="isCustomConfig" #customFooter>
-        <CustomConfigFooter ref="customConfigFooterRef" @custom-action="handleCustomAction" />
-      </template>
       <template #loading="params">
         <slot name="loading" v-bind="params">
           <span class="absolute left-1/2 top-1/3 -translate-x-1/2 -translate-y-1/2">加载中...</span>
@@ -50,11 +45,21 @@
       @no-select-value="handleNoSelectValue"
     />
   </div>
+  <CustomConfig
+    v-if="isCustomConfig"
+    :id="`${id}customConfig`"
+    ref="customConfigRef"
+    :visible="visible"
+    :data="fullColumns"
+    :custom-row-config="customRowConfig"
+    @custom-action="handleCustomAction"
+  />
 </template>
 
 <script lang="ts" setup>
 import type { PropType } from 'vue'
 import type {
+  VxeColumnPropTypes,
   VxeGridInstance,
   VxeGridProps,
   VxeGridPropTypes,
@@ -77,7 +82,7 @@ import {
   useTemplateRef,
   watch,
 } from 'vue'
-import { VxeGrid } from 'vxe-table'
+import { VxeGrid, VxeToolbar } from 'vxe-table'
 import { VxePager, VxeTooltip, VxeUI } from 'vxe-pc-ui'
 import 'vxe-table/lib/style.css'
 import 'vxe-pc-ui/lib/style.css'
@@ -428,8 +433,6 @@ const props = defineProps({
     type: Object as PropType<VxeTablePropTypes.CheckboxConfig>,
     default: () => ({}),
   },
-  //是否开启快捷键列配置
-  isShortcuts: { type: Boolean, default: () => false },
   //快捷键打开个性化列配置功能
   shortcuts: { type: String, default: () => 'ctrl+shift+alt+f12' },
   //是否开启组件自定义列配置
@@ -483,6 +486,7 @@ const emit = defineEmits<{
 const slots = defineSlots<slotsType>()
 VxeUI.component(VxePager)
 VxeUI.component(VxeTooltip)
+VxeUI.component(VxeToolbar)
 
 const attrs = useAttrs()
 
@@ -859,15 +863,6 @@ const gridProps = computed<VxeGridProps>(() => {
     customConfig: {
       ...props.customConfig,
       storage: true,
-      mode: props.toolbarConfig?.mode ?? props.isCustomConfig ? 'modal' : undefined,
-      ...(props.isCustomConfig
-        ? {
-            slots: {
-              default: 'customDefault',
-              footer: 'customFooter',
-            },
-          }
-        : {}),
     },
     pagerConfig: {
       enabled: props.showPagination,
@@ -875,7 +870,7 @@ const gridProps = computed<VxeGridProps>(() => {
     },
     toolbarConfig: {
       ...props.toolbarConfig,
-      custom: props.isShortcuts ? props.toolbarConfig?.custom : props.isCustomConfig,
+      custom: props.isCustomConfig ? false : props.toolbarConfig?.custom,
     },
     editConfig: {
       enabled: props.editable,
@@ -956,8 +951,8 @@ const gridProps = computed<VxeGridProps>(() => {
         //   return false
         // }
         if (isDrag) {
+          handleSaveColumnsToStorage(props.isCustomConfig)
           emit('columnDragend', params)
-          handleSaveColumnsToStorage()
         }
         return isDrag
       },
@@ -1087,7 +1082,7 @@ function handleGetStoredColumns(): ColumnType[] {
 /**
  * 保存列配置到本地存储
  */
-function handleSaveColumnsToStorage() {
+function handleSaveColumnsToStorage(isCustomConfig?: boolean) {
   try {
     // 如果没有表格实例，或者启用了本地存储，不保存
     if (!xTable.value || props.customConfig.storage) {
@@ -1107,7 +1102,12 @@ function handleSaveColumnsToStorage() {
         }
         return col
       })
-    localStorage.setItem(getStorageKey(), JSON.stringify(columns))
+    if (isCustomConfig) {
+      customConfigSave(fullColumn, customConfigRef.value.unifyCustomConfig)
+    }
+    else {
+      localStorage.setItem(getStorageKey(), JSON.stringify(columns))
+    }
   }
   catch (error) {
     console.warn('保存列配置到本地存储失败:', error)
@@ -1154,11 +1154,16 @@ function handleCompareColumns(
  */
 function handleColumnResizableChange(params: VxeTableDefines.ResizableChangeParams) {
   // 保存到本地存储
-  handleSaveColumnsToStorage()
+  if (!props.isCustomConfig) {
+    handleSaveColumnsToStorage()
+  }
+  else {
+    const { fullColumn } = xTable.value.getTableColumn() || {}
+    customConfigSave(fullColumn, customConfigRef.value.unifyCustomConfig)
+  }
   dispatchEvents(document, ['mousedown', 'mouseup', 'click'])
   emit('resizableChange', params)
 }
-const customConfigFooterRef = ref(null)
 async function getCustomConfig() {
   if (props.isCustomConfig) {
     if (props.onCustomConfigLoad) {
@@ -1166,19 +1171,24 @@ async function getCustomConfig() {
       return
     }
     const customConfig = await getMemoryQuery(paramsObj)
-    if (customConfigFooterRef.value) {
+    if (customConfigRef.value) {
       //当前用户没有统一配置权限，默认是false，如果有就是接口返回的配置对象（个人||统一）
-      customConfigFooterRef.value.unifyCustomConfig = !props.isUnifyConfig ? false : customConfig?.isExist !== 1;
+      customConfigRef.value.unifyCustomConfig = !props.isUnifyConfig ? false : customConfig?.isExist !== 1
     }
     if (!customConfig.data) {
       localColumns.value = props.columns
       return
     }
     const customColumns = JSON.parse(customConfig.data)
-    localColumns.value = customColumns.map((item: ColumnType) => ({
-      ...item,
-      ...props.columns.find(el => el.field === item.field),
-    }))
+    localColumns.value = customColumns.map((item: ColumnType) => {
+      const matchedColumn = props.columns.find((el: { field: string | undefined }) => el.field === item.field)
+        || props.columns.find((el: { type: undefined }) => !item.field && el.type === item.type)
+        || props.columns.find((el: { title: VxeColumnPropTypes.Title | undefined }) => !item.field && !item.type && el.title === item.title)
+      return {
+        ...matchedColumn,
+        ...item,
+      }
+    })
   }
 }
 getCustomConfig()
@@ -1222,7 +1232,9 @@ watch(
   (newVal: ColumnType) => {
     nextTick(() => {
       xTable.value?.loadColumn(newVal)
-      handleSaveColumnsToStorage()
+      if (!props.isCustomConfig) {
+        handleSaveColumnsToStorage()
+      }
     })
   },
   {
@@ -1466,7 +1478,7 @@ watch(
     immediate: true,
   },
 )
-
+const visible = ref(false)
 // 当前按下的键
 const pressedKeys = ref<Set<string>>(new Set())
 
@@ -1475,7 +1487,6 @@ function handleKeyDown(event: KeyboardEvent) {
 
   const key = event.key.toLowerCase()
   pressedKeys.value.add(key)
-
   // 添加修饰键
   if (event.ctrlKey)
     pressedKeys.value.add('ctrl')
@@ -1507,52 +1518,46 @@ function handleKeyUp(event: KeyboardEvent) {
 }
 
 function checkShortcut() {
-  if (!props.isShortcuts) {
+  if (!props.isCustomConfig) {
     return
   }
   const expectedKeys = props.shortcuts.toLowerCase().split('+').map((k: string) => k.trim())
 
   // 检查是否所有期望的键都被按下
   const matches = expectedKeys.every((key: any) => pressedKeys.value.has(key))
-
   if (matches) {
-    xTable.value?.openCustom()
+    visible.value = true
   }
 }
-// 添加事件监听
-onMounted(() => {
-  const container = document.querySelector(`[data-component-id="${props.id}"]`)
-  if (container) {
-    container.addEventListener('keydown', event => handleKeyDown(event as KeyboardEvent))
-    container.addEventListener('keyup', event => handleKeyUp(event as KeyboardEvent))
-  }
-})
-
-onUnmounted(() => {
-  const container = document.querySelector(`[data-component-id="${props.id}"]`)
-  if (container) {
-    container.removeEventListener('keydown', handleKeyDown as EventListener)
-    container.removeEventListener('keyup', handleKeyUp as EventListener)
-  }
-})
 
 async function customConfigSave(obj: any, type: boolean) {
+  if (props.onCustomConfigSave) {
+    props.onCustomConfigSave(obj)
+    visible.value = false
+    return
+  }
   const params = obj.map((item: any) => {
-    const { field, fixed, type, align, resizable, visible } = item
+    const { field, fixed, title, type, align, resizable, visible } = item
     return {
       field,
       fixed,
+      title,
       type,
       align,
       resizable,
       visible,
     }
   })
+  localColumns.value = [...obj]
+  visible.value = false
+  return
   await setMemoryUpload({
     ...paramsObj,
     userId: !type ? props.userId : '',
     data: JSON.stringify(params),
   })
+  localColumns.value = [...obj]
+  visible.value = false
 }
 
 function handleCustomAction(action: 'confirm' | 'cancel' | 'reset', type: boolean) {
@@ -1561,24 +1566,17 @@ function handleCustomAction(action: 'confirm' | 'cancel' | 'reset', type: boolea
       handleCustomConfirm(action, type)
       break
     case 'cancel':
-      xTable.value?.closeCustom()
+      visible.value = false
       break
     case 'reset':
       handleCustomConfirm(action, type)
-      xTable.value?.closeCustom()
       break
   }
 }
 
 async function handleCustomConfirm(action: 'confirm' | 'reset', type: boolean) {
   const tableDataObj = action === 'confirm' ? customConfigRef.value.getTableData()?.tableData || [] : props.columns
-  if (props.onCustomConfigSave) {
-    props.onCustomConfigSave(tableDataObj)
-    return
-  }
   await customConfigSave(tableDataObj, type)
-  localColumns.value = [...tableDataObj]
-  xTable.value?.closeCustom()
 }
 function handlePageChange(params: any) {
   emit('pageChange', params)

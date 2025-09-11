@@ -1,46 +1,79 @@
 <template>
-  <DraggableTable ref="tableRef" min-height="200px" :columns="columnsConfig" :data="dataObj" :checkbox-config="checkboxConfig" :rowdragable="true">
-    <template #positiveNumber="{ row, column }">
-      <ElInput
-        :model-value="row[column.field]"
-        size="small"
-        maxlength="4"
-        :disabled="!row.resizable"
-        :placeholder="getPlaceholder(column.title)"
-        style="width: 100%"
-        @update:model-value="handlePositiveNumberInput(row, column.field, $event)"
-      />
-    </template>
-    <template #positiveSwitch="{ row, column }">
-      <ElSwitch
-        v-model="row[column.field]"
-        size="small"
-      />
-    </template>
-    <template #positiveSelect="{ row, column }">
-      <el-select
-        v-model="row[column.field]"
-        class="m-2"
-        placeholder="Select"
-        size="small"
-        :disabled="!row.resizable"
-        style="width: 100%"
-      >
-        <el-option
-          v-for="item in options"
-          :key="item.value"
-          :label="item.label"
-          :value="item.value"
-          @click.stop
-          @mousedown.stop
+  <DragModalDialog
+    v-model:visible="visible"
+    title="列配置"
+    size="large"
+    :height="500"
+    @close="handleEvent('cancel')"
+  >
+    <DraggableTable
+      ref="tableRef"
+      min-height="200px"
+      :id="id"
+      :columns="columnsConfig"
+      :data="dataObj"
+      :checkbox-config="checkboxConfig"
+      :rowdragable="true"
+      :row-drag-disabled-method="rowDragDisabledMethod"
+    >
+      <template #positiveNumber="{ row, column }">
+        <ElInput
+          :model-value="row[column.field]"
+          size="small"
+          maxlength="4"
+          :disabled="!row.resizable"
+          :placeholder="getPlaceholder(column.title)"
+          style="width: 100%"
+          @update:model-value="handlePositiveNumberInput(row, column.field, $event)"
         />
-      </el-select>
+      </template>
+      <template #positiveSwitch="{ row, column }">
+        <ElSwitch
+          v-model="row[column.field]"
+          size="small"
+        />
+      </template>
+      <template #positiveSelect="{ row, column }">
+        <el-select
+          v-model="row[column.field]"
+          class="m-2"
+          placeholder="Select"
+          size="small"
+          :disabled="!row.resizable"
+          style="width: 100%"
+        >
+          <el-option
+            v-for="item in options"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
+            @click.stop
+            @mousedown.stop
+          />
+        </el-select>
+      </template>
+    </DraggableTable>
+    <template #footer>
+      <div class="custom-config-footer">
+        <!-- <el-checkbox v-model="unifyCustomConfig" style="margin-right: 40px;" label="作为统一配置" size="large" /> -->
+        <el-checkbox v-if="isUnifyConfig" v-model="unifyCustomConfig" style="margin-right: 40px;" label="作为统一配置" size="large" />
+        <el-button @click="handleEvent('reset')">
+          恢复默认
+        </el-button>
+        <el-button type="primary" @click="handleEvent('confirm')">
+          确认
+        </el-button>
+        <el-button type="info" @click="handleEvent('cancel')">
+          取消
+        </el-button>
+      </div>
     </template>
-  </DraggableTable>
+  </DragModalDialog>
 </template>
 
 <script lang="ts" setup>
 import { computed, defineAsyncComponent, ref } from 'vue'
+import DragModalDialog from '@moluoxixi/components/DragModalDialog'
 
 const props = defineProps({
   data: {
@@ -52,6 +85,8 @@ const props = defineProps({
     default: () => [],
   },
 })
+
+const emit = defineEmits(['customAction'])
 
 const options = [
   {
@@ -70,6 +105,11 @@ const options = [
 
 const tableRef = ref<any>(null)
 const checkboxConfig = { checkField: 'visible' }
+const unifyCustomConfig = ref(false)
+
+function handleEvent(str: string) {
+  emit('customAction', str, unifyCustomConfig.value)
+}
 
 // 处理正整数输入
 function handlePositiveNumberInput(row: any, field: string, value: string) {
@@ -105,7 +145,7 @@ const columnsConfig = computed(() => {
 })
 
 const dataObj = computed(() => {
-  return props.data.map((item: any) => {
+  return props.data?.map((item: any) => {
     return {
       ...item,
       width: item.renderWidth,
@@ -116,6 +156,10 @@ const dataObj = computed(() => {
 const DraggableTable = defineAsyncComponent(() =>
   import('@moluoxixi/components/DraggableTable'),
 )
+
+function rowDragDisabledMethod({ row }: any) {
+  return !row?.field
+}
 defineExpose({
   // 暴露表格实例
   getTableData: () => {

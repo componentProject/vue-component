@@ -3,9 +3,9 @@
     <div class="title">
       调试与演示
     </div>
-    <el-button type="primary" @click="handleClick">
+    <!-- <el-button type="primary" @click="handleClick">
       删除组件库组件
-    </el-button>
+    </el-button> -->
     <div class="main" style="height: 300px">
       <div>虚拟模块里导出的组件</div>
       <!-- <PopoverTableSelect
@@ -28,9 +28,9 @@
         }"
       />-->
       <component
-        pageId="1234567"
-        userId="1234567"
-        id="1234567"
+        pageId="1234568"
+        userId="1234568"
+        id="1234568"
         :is="localComponent"
         :columns="columns"
         :data="tableData"
@@ -38,18 +38,38 @@
         :is-shortcuts="true"
         shortcuts="a+s"
         :isCustomConfig="true"
-      />
+        :columndragable="true"
+      >
+        <template #action="scope">
+          <el-button type="primary">
+            操作
+          </el-button>
+        </template>
+      </component>
     </div>
-    <div class="main">
+    <div class="main" style="height: 300px">
       <div class="list-title">
         引用组件库解析的组件
       </div>
       <component
         :is="dynamicComponent"
-        pop-type="input"
+        pageId="123456789"
+        userId="123456789"
+        id="123456789"
         :columns="columns"
-        :data="tableData"
-      />
+        :data="tableDataObj"
+        :resizable="true"
+        :is-shortcuts="true"
+        shortcuts="a+d"
+        :isUnifyConfig="true"
+        :isCustomConfig="true"
+      >
+      <template #action="scope">
+          <el-button type="primary">
+            操作1
+          </el-button>
+        </template>
+      </component>
     </div>
   </div>
 </template>
@@ -72,9 +92,19 @@ const localComponent = ref<any>(null) // 调试组件
 const dynamicComponent = ref<any>(null) // 用于存储动态组件
 
 const columns = [
-  { field: 'id', title: 'ID', width: 60 },
+  { field: 'id', title: 'ID1', width: 60 },
   { field: 'name', title: '姓名', width: 120 },
   { field: 'age', title: '年龄' },
+  { field: 'demo', title: '测试' },
+  {
+    fixed: 'right',
+    align: 'center',
+    title: '操作',
+    width: 110,
+    slots: {
+      default: 'action',
+    },
+  },
 ]
 const tableData = [
   { id: 1, name: '张三', age: 18 },
@@ -140,6 +170,16 @@ const tableData = [
   { id: 61, name: '王五', age: 22 },
 ]
 
+const tableDataObj = ref([])
+
+for (let i = 0; i < 100003; i++) {
+  tableDataObj.value.push({
+    id: i,
+    name: '王五',
+    age: 22,
+  })
+}
+
 /**
  * @param componentName 要加载的组件文件名
  */
@@ -173,7 +213,7 @@ async function handleClick() {
     paraMeters: {
       productCode: 'webFile_his',
       Vue: 'Vue3',
-      componentCode: 'ConfigTable',
+      componentCode: 'Button',
     },
   }
   //ConfigTable、
