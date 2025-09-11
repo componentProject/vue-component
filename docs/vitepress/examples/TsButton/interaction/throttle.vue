@@ -1,10 +1,10 @@
 <template>
   <div class="container">
-    <WlButton :debounce="600" :options="{ trailing: true }" @click="onClick">
-      防抖 600ms（连续点击仅触发一次）
-    </WlButton>
+    <TsButton :throttle="800" :options="{ trailing: true }" @click="onClick">
+      节流 800ms（高频点击限流）
+    </TsButton>
     <p class="tip">
-      点击次数：<code>{{ count }}</code>
+      触发次数：<code>{{ count }}</code>
     </p>
   </div>
 </template>

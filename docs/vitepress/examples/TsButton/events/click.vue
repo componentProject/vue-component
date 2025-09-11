@@ -1,8 +1,8 @@
 <template>
   <div class="container">
-    <WlButton @click="onClick">
+    <TsButton @click="onClick">
       点击触发事件
-    </WlButton>
+    </TsButton>
     <p class="tip">
       最近一次点击坐标：<code>{{ pos }}</code>
     </p>

@@ -7,58 +7,58 @@
 ### 可清空（clearable）
 
 示例：开启清空按钮
-::::demo
+:::demo
 Select/props/clearable
-::::
+:::
 
 ### 可筛选（filterable）
 
 示例：开启本地筛选，自动匹配 `label/value/pyCode/wbCode`
-::::demo
+:::demo
 Select/props/filterable
-::::
+:::
 
 ### 多选折叠（collapseTags/collapseTagsTooltip）
 
 示例：多选并折叠为 Tag，悬浮显示全部
-::::demo
+:::demo
 Select/props/collapseTags
-::::
+:::
 
 ### Tag 类型（tagType）
 
 示例：将多选 Tag 样式设为 `success`
-::::demo
+:::demo
 Select/props/tagType
-::::
+:::
 
 ### Teleport（teleported）
 
 示例：不将下拉弹层 Teleport 到 body
-::::demo
+:::demo
 Select/props/teleported
-::::
+:::
 
 ### 禁用项（disabledValues/disabledLabels）
 
 示例：通过值或标签禁用特定选项
-::::demo
+:::demo
 Select/props/disabled
-::::
+:::
 
 ### 自定义禁用回调（disabledHandler）
 
 示例：自定义规则禁用（演示：禁用以 w 开头）
-::::demo
+:::demo
 Select/props/disabledHandler
-::::
+:::
 
 ### 下拉加载更多（enableLoadMore、hasMore、loading）
 
 示例：enableLoadMore开启加载更多，hasMore是否还有待加载数据， loading加载中
-::::demo
+:::demo
 Select/props/loadMore
-::::
+:::
 
 ## API
 
