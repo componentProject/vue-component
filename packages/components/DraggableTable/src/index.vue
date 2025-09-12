@@ -1,5 +1,5 @@
 <template>
-  <div class="h-full w-full flex-1 overflow-hidden">
+  <div ref="container" class="h-full w-full flex-1 overflow-hidden">
     <VxeGrid
       ref="xTable"
       :header-cell-config="{ height: '30px' }"
@@ -37,6 +37,13 @@
       @no-next-input="handleNoNextInput"
       @no-select-value="handleNoSelectValue"
     />
+    <CustomConfigDialog
+      v-model="customConfigDialogVisible"
+      :columns="props.columns"
+      :computed-columns="fullColumns"
+      :custom-columns="props.customColumns"
+      @confirm="handleCustomConfigSave"
+    />
   </div>
 </template>
 
@@ -50,7 +57,7 @@ import type {
   VxeTableDefines,
   VxeTablePropTypes,
 } from 'vxe-table'
-import type { ColumnType, NoNextInputParams, NoSelectValueParams, types } from './_types'
+import type { ColumnType, customConfigType, NoNextInputParams, NoSelectValueParams, types } from './_types'
 import { ElMessage } from 'element-plus'
 
 import { cloneDeep, groupBy } from 'lodash'
@@ -60,6 +67,7 @@ import {
   computed,
   nextTick,
   onBeforeUnmount,
+  onMounted,
   ref,
   useAttrs,
   useTemplateRef,
@@ -69,21 +77,28 @@ import { VxeGrid } from 'vxe-table'
 import { VxePager, VxeTooltip, VxeUI } from 'vxe-pc-ui'
 import 'vxe-table/lib/style.css'
 import 'vxe-pc-ui/lib/style.css'
-import { debounce, dispatchEvents, getClass, getStringObj, getType } from '@moluoxixi/utils/_utils'
+import {
+  debounce,
+  dispatchEvents,
+  getClass,
+  getStringObj,
+  getType,
+  onHotkeys,
+} from '@moluoxixi/utils/_utils'
 import {
   getCustomType,
   handleGetColumn,
   handleGetRequiredFields,
 } from './_utils'
 
-/**
- * 自定义右键菜单
- */
+/** 自定义右键菜单 */
 import ContextMenu from './components/ContextMenu/index.vue'
 // 导入自定义渲染器
 import './renderers'
 import type { slotsType } from '@moluoxixi/components/_types'
 import EnterNextContainer from '@moluoxixi/components/EnterNextContainer'
+import CustomConfigDialog from './components/CustomConfigDialog.vue'
+import { getMemoryQuery, setMemoryUpload } from '@moluoxixi/utils/_api'
 
 defineOptions({
   name: 'DraggableTable',
@@ -91,34 +106,27 @@ defineOptions({
 // 定义组件属性
 const props = defineProps({
   //#region 其他原始配置加默认值
-  // 表格唯一ID，用于本地存储识别
-  id: {
-    type: String,
-  },
-  /**
-   * 是否显示表格边框
-   */
+  /** 是否显示表格边框 */
   border: {
     type: Boolean,
     default: true,
   },
-  /**
-   * 表格内容溢出隐藏并显示tooltip
-   */
+  /** 表格列对齐方式 */
+  align: {
+    type: String as PropType<VxeTablePropTypes.Align>,
+    default: 'left',
+  },
+  /** 表格内容溢出隐藏并显示tooltip */
   showOverflow: {
     type: [Boolean, String] as PropType<VxeTablePropTypes.ShowOverflow>,
     default: true,
   },
-  /**
-   * 头部溢出隐藏并显示tooltip
-   */
+  /** 头部溢出隐藏并显示tooltip */
   showHeaderOverflow: {
     type: [Boolean, String] as PropType<VxeTablePropTypes.ShowOverflow>,
     default: true,
   },
-  /**
-   * 底部溢出隐藏并显示tooltip
-   */
+  /** 底部溢出隐藏并显示tooltip */
   showFooterOverflow: {
     type: [Boolean, String] as PropType<VxeTablePropTypes.ShowOverflow>,
     default: true,
@@ -127,49 +135,35 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
-  /**
-   * 是否自动调整列宽
-   */
+  /** 是否自动调整列宽 */
   autoResize: {
     type: Boolean,
     default: true,
   },
-  /**
-   * 是否允许列宽拖拽
-   */
-  /**
-   * 列宽拖拽配置
-   */
+  /** 是否允许列宽拖拽 */
+  /** 列宽拖拽配置 */
   resizableConfig: {
     type: Object as PropType<VxeTablePropTypes.ResizableConfig>,
     default: () => ({}),
   },
   //#endregion
   //#region 编辑相关
-  /**
-   * 是否允许编辑
-   */
+  /** 是否允许编辑 */
   editable: {
     type: Boolean,
     default: () => false,
   },
-  /**
-   * 触发编辑后是否自动聚焦
-   */
+  /** 触发编辑后是否自动聚焦 */
   editAutoFocus: {
     type: Boolean,
     default: () => true,
   },
-  /**
-   * 编辑规则
-   */
+  /** 编辑规则 */
   editRules: {
     type: Object as PropType<VxeTablePropTypes.EditRules>,
     default: null,
   },
-  /**
-   * 编辑配置
-   */
+  /** 编辑配置 */
   editConfig: {
     type: Object as PropType<VxeTablePropTypes.EditConfig>,
     default: () => ({}),
@@ -180,18 +174,12 @@ const props = defineProps({
     type: Boolean,
     default: () => false,
   },
-  /**
-   * 筛选器类型,full 为匹配所有全量表格数据，filter 为匹配当前表格数据
-   * @default 'filter'
-   */
+  /** 筛选器类型,full 为匹配所有全量表格数据，filter 为匹配当前表格数据 */
   filterType: {
     type: String as PropType<'full' | 'filter'>,
     default: () => 'filter',
   },
-  /**
-   * 筛选器布局配置，支持 input, checkbox, select
-   * @default ['input', 'checkbox']
-   */
+  /** 筛选器布局配置，支持 input, checkbox, select */
   filterLayout: {
     type: Array as PropType<('input' | 'checkbox' | 'select')[]>,
     default: () => ['input', 'checkbox'],
@@ -206,18 +194,12 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
-  /**
-   * 是否启用行拖拽
-   * @default false
-   */
+  /** 是否启用行拖拽 */
   rowdragable: {
     type: Boolean,
     default: false,
   },
-  /**
-   * 是否启用列拖拽
-   * @default false
-   */
+  /** 是否启用列拖拽 */
   columndragable: {
     type: Boolean,
     default: false,
@@ -231,50 +213,34 @@ const props = defineProps({
     default: () => 'vxe',
     // default: () => 'draggable',
   },
-  /**
-   * 需要禁用拖拽的行class
-   */
+  /** 需要禁用拖拽的行class */
   rowDisabledClass: {
     type: String,
     default: () => '',
   },
-  /**
-   * 行拖拽禁用方法
-   */
+  /** 行拖拽禁用方法 */
   rowDragDisabledMethod: {
     type: Function,
   },
-  /**
-   * 行拖拽结束回调方法
-   */
+  /** 行拖拽结束回调方法 */
   rowDragEndMethod: {
     type: Function,
   },
-  /**
-   * 行拖拽配置对象
-   * @default {}
-   */
+  /** 行拖拽配置对象 */
   rowDragConfig: {
     type: Object as PropType<VxeTablePropTypes.RowDragConfig>,
     default: () => ({}),
   },
 
-  /**
-   * 列拖拽禁用方法
-   */
+  /** 列拖拽禁用方法 */
   columnDragDisabledMethod: {
     type: Function,
   },
-  /**
-   * 列拖拽结束回调方法
-   */
+  /** 列拖拽结束回调方法 */
   columnDragEndMethod: {
     type: Function,
   },
-  /**
-   * 列拖拽配置对象
-   * @default {}
-   */
+  /** 列拖拽配置对象 */
   columnDragConfig: {
     type: Object as PropType<VxeTablePropTypes.ColumnDragConfig>,
     default: () => ({}),
@@ -282,62 +248,43 @@ const props = defineProps({
 
   //#endregion
   //#region 行相关配置
-  /**
-   * 行的唯一标识字段
-   * @default '_X_ROW_KEY'
-   */
+  /** 行的唯一标识字段 */
   rowId: {
     type: String as PropType<VxeTablePropTypes.RowConfig['keyField']>,
     default: () => '_X_ROW_KEY',
   },
-  /**
-   * 行配置对象
-   * @default {}
-   */
+  /** 行配置对象 */
   rowConfig: {
     type: Object as PropType<VxeTablePropTypes.RowConfig>,
     default: () => ({}),
   },
   //#endregion
   //#region 列相关配置
-  /**
-   * 列配置数组
-   * @default []
-   */
+  /** 列配置数组 */
   columns: {
     type: Array as PropType<ColumnType[]>,
     default: () => [],
   },
-  /**
-   * 列配置对象
-   * @type {object}
-   * @default {}
-   */
+  /** 列配置对象 */
   columnConfig: {
     type: Object as PropType<VxeTablePropTypes.ColumnConfig>,
     default: () => ({}),
   },
   //#endregion
   //#region 虚拟列表配置
-  /**
-   * 列虚拟滚动配置
-   */
+  /** 列虚拟滚动配置 */
   virtualXConfig: {
     type: Object as PropType<VxeTablePropTypes.VirtualXConfig>,
     default: () => ({}),
   },
-  /**
-   * 行虚拟滚动配置
-   */
+  /** 行虚拟滚动配置 */
   virtualYConfig: {
     type: Object as PropType<VxeTablePropTypes.VirtualYConfig>,
     default: () => ({}),
   },
   //#endregion
   //#region 右键菜单配置
-  /**
-   * 头部右键菜单是否允许配置列隐藏显示
-   */
+  /** 头部右键菜单是否允许配置列隐藏显示 */
   menuConfigColumn: {
     type: Boolean,
     default: true,
@@ -360,9 +307,7 @@ const props = defineProps({
   //#region 自定义相关配置
   customConfig: {
     type: Object as PropType<VxeTablePropTypes.CustomConfig>,
-    default: () => ({
-      storage: true,
-    }),
+    default: () => ({}),
   },
   //#endregion
   //#region 鼠标相关配置
@@ -370,6 +315,7 @@ const props = defineProps({
     type: Object as PropType<VxeTablePropTypes.MouseConfig>,
     default: () => ({}),
   },
+  //#endregion
   //#region 分页配置
   pagerConfig: {
     type: Object as PropType<VxeGridPropTypes.PagerConfig>,
@@ -391,6 +337,7 @@ const props = defineProps({
     default: false,
   },
   //#endregion
+  //#region 回车容器相关
   allowSelectNextInEmpty: {
     type: Boolean,
     default: false,
@@ -399,6 +346,45 @@ const props = defineProps({
     type: String as PropType<'row' | 'table'>,
     default: 'row',
   },
+  //#endregion
+  //#region 存储相关
+  saveType: {
+    type: String as PropType<'local' | 'server'>,
+    default: 'server',
+  },
+  saveHotKeys: {
+    type: Array as PropType<string[]>,
+    default: () => ['shift', 'alt', 'ctrl', 'f12'],
+  },
+  getConfig: {
+    type: Function as PropType<(config: customConfigType) => Promise<ColumnType[]>>,
+  },
+  setConfig: {
+    type: Function as PropType<(config: customConfigType, columns: ColumnType[]) => Promise<any>>,
+  },
+  /** 自定义自定义存储弹窗的columns */
+  customColumns: {
+    type: Array as PropType<ColumnType[]>,
+    default: () => [
+      { type: 'checkbox', width: 40 },
+      { field: 'field', title: '字段' },
+      { field: 'title', title: '列名称', slots: { default: 'title' } },
+      { field: 'width', width: 100, title: '宽度', slots: { default: 'width' } },
+      { field: 'resizable', title: '可调整', slots: { default: 'resizable' } },
+      { field: 'align', title: '对齐方式', slots: { default: 'align' } },
+    ],
+  },
+  // 表格唯一ID，用于本地存储识别
+  id: {
+    type: String,
+  },
+  pageId: {
+    type: String,
+  },
+  userId: {
+    type: String,
+  },
+  //#endregion
 })
 // 组件事件
 const emit = defineEmits<{
@@ -425,6 +411,8 @@ const slots = defineSlots<slotsType>()
 VxeUI.component(VxePager)
 VxeUI.component(VxeTooltip)
 
+const customConfigDialogVisible = ref(false)
+
 const attrs = useAttrs()
 
 const slotNames = computed<string[]>(() => Object.keys(slots) as string[])
@@ -433,6 +421,9 @@ const tableData = defineModel({
   type: Array,
   default: [],
 })
+
+// 表格引用
+const xTable = useTemplateRef<VxeGridInstance>('xTable')
 
 //#region 回车下一个功能
 const tableVirtualRefs = ref<HTMLElement[]>([])
@@ -507,7 +498,6 @@ function handleNoSelectValue(element: HTMLElement) {
 
   // 计算td在所有td中的索引位置（从0开始）
   const colIndex = td ? tds.indexOf(td as HTMLTableCellElement) : -1
-  console.log(`当前元素位于第 ${colIndex + 1} 个td中`)
   // 向外传递事件，并包含更多信息
   emit('noSelectValue', {
     row: tableData.value[rowIndex],
@@ -534,7 +524,69 @@ function handleTableRendered(params: VxeTableDefines.ToggleRowExpandEventParams)
   })
   emit('toggleTreeExpand', params)
 }
+//#endregion
 
+//#region 表头配置弹窗功能
+const contextMenuVisible = ref(false)
+const fullColumns = computed<ColumnType[]>(() => {
+  if (!xTable.value)
+    return []
+  const { fullColumn } = xTable.value.getTableColumn()
+  return fullColumn as any[]
+})
+const virtualRef = ref<HTMLElement>()
+/**
+ * 表头右键事件
+ * @param params
+ */
+function handleHeaderCellMenu(
+  params: VxeTableDefines.HeaderCellMenuParams & { cell?: HTMLElement },
+) {
+  emit('headerCellMenu', params)
+  if (
+    isEmpty(props.menuConfig)
+    || isEmpty(props.menuConfig.header)
+    || props.menuConfig.header?.disabled
+  ) {
+    virtualRef.value = params.cell
+    contextMenuVisible.value = true
+  }
+}
+
+/**
+ * 表头右键菜单确定事件
+ * @param columns
+ */
+function handleMenuConfirm(columns: ColumnType[]) {
+  localColumns.value = columns
+}
+
+/** 表头右键菜单显示事件 */
+function handleHeaderContextMenu(params: HTMLElement) {
+  emit('headerContextMenu', params)
+}
+//#endregion
+
+//#region 多选功能
+/**
+ * 表格复选框全选事件
+ * @param params
+ */
+function handleCheckboxAll(params: VxeTableDefines.CheckboxAllParams) {
+  emit('checkboxChange', params)
+  emit('checkboxAll', params)
+}
+
+/**
+ * 表格复选框事件
+ * @param params
+ */
+function handleCheckboxChange(params: VxeTableDefines.CheckboxChangeParams) {
+  emit('checkboxChange', params)
+}
+//#endregion
+
+//#region 动态计算columns
 /**
  * 计算后的columns，用于提供额外功能，目前功能如下：
  * 1. 提供基于field的插槽，规则如下：
@@ -562,9 +614,7 @@ const computedColumns = computed<ColumnType[]>(() => {
       typeSet.add(i.type)
       return true
     })
-  /**
-   * 相同type的列只保留一个
-   */
+  /** 相同type的列只保留一个 */
   if (!getType(columns, 'array'))
     return []
   //#region 获取所有插槽的名称
@@ -590,9 +640,9 @@ const computedColumns = computed<ColumnType[]>(() => {
       delete item.type
     }
 
-    /**
-     * 提供默认排序
-     */
+    item.resizable = item.resizable ?? (props.resizable || props.columnConfig.resizable)
+    item.align = item.align ?? props.align
+    /** 提供默认排序 */
     item.sortable = item.sortable ?? props.sortable
     if (!item.field)
       return item
@@ -726,25 +776,9 @@ const computedColumns = computed<ColumnType[]>(() => {
     return item
   })
 })
+//#endregion
 
-const contextMenuVisible = ref(false)
-
-const virtualRef = ref<HTMLElement>()
-
-// 表格引用
-const xTable = useTemplateRef<VxeGridInstance>('xTable')
-const fullColumns = computed<ColumnType[]>(() => {
-  if (!xTable.value)
-    return []
-  const { fullColumn } = xTable.value.getTableColumn()
-  return fullColumn as any[]
-})
-
-// 本地保存的列配置
-const localColumns = ref<ColumnType[]>([])
-// 本地存储键名
-const getStorageKey = () => (props.id ? `table_columns_${props.id}` : ``)
-
+//#region 动态计算gridProps
 // 计算表格配置属性
 const gridProps = computed<VxeGridProps>(() => {
   // 生成默认的编辑验证规则
@@ -937,80 +971,72 @@ const gridProps = computed<VxeGridProps>(() => {
     }),
   } as VxeGridProps
 })
+//#endregion
 
-/**
- * 表头右键事件
- * @param params
- */
-function handleHeaderCellMenu(
-  params: VxeTableDefines.HeaderCellMenuParams & { cell?: HTMLElement },
-) {
-  emit('headerCellMenu', params)
-  if (
-    isEmpty(props.menuConfig)
-    || isEmpty(props.menuConfig.header)
-    || props.menuConfig.header?.disabled
-  ) {
-    virtualRef.value = params.cell
-    contextMenuVisible.value = true
-  }
+//#region 存储相关
+const container = useTemplateRef<HTMLElement>('container')
+const offEffect = ref()
+onMounted(() => {
+  offEffect.value = onHotkeys(props.saveHotKeys, () => customConfigDialogVisible.value = true, { target: container.value })
+})
+onBeforeUnmount(() => offEffect?.())
+// 本地保存的列配置
+const localColumns = ref<ColumnType[]>([])
+const customRestConfig = ref([])
+
+function handleCustomConfigSave({ customColumns, ...rest }: { customColumns: ColumnType[], rest: any[] }) {
+  localColumns.value = customColumns
+  customRestConfig.value = rest
 }
 
-/**
- * 表头右键菜单确定事件
- * @param columns
- */
-function handleMenuConfirm(columns: ColumnType[]) {
-  localColumns.value = columns
-}
+// 本地存储键名
+const getStorageKey = () => (props.id ? `table_columns_${props.id}` : ``)
 
-/**
- * 表头右键菜单显示事件
- */
-function handleHeaderContextMenu(params: HTMLElement) {
-  emit('headerContextMenu', params)
-}
-/**
- * 表格复选框全选事件
- * @param params
- */
-function handleCheckboxAll(params: VxeTableDefines.CheckboxAllParams) {
-  emit('checkboxChange', params)
-  emit('checkboxAll', params)
-}
-
-/**
- * 表格复选框事件
- * @param params
- */
-function handleCheckboxChange(params: VxeTableDefines.CheckboxChangeParams) {
-  emit('checkboxChange', params)
-}
-
-/**
- * 获取本地存储的列配置
- */
-function handleGetStoredColumns(): ColumnType[] {
+/** 获取本地存储的列配置 */
+async function handleGetStoredColumns(): Promise<ColumnType[]> {
   try {
-    const stored = localStorage.getItem(getStorageKey())
-    return stored ? JSON.parse(stored) : []
+    if (getType(props.getConfig, 'function')) {
+      return await props.getConfig({
+        pageId: props.pageId,
+        widgetId: getStorageKey(),
+        userId: props.userId,
+      })
+    }
+    else if (props.saveType === 'server') {
+      const res = await getMemoryQuery({
+        pageId: props.pageId,
+        widgetId: getStorageKey(),
+        userId: props.userId,
+      })
+      return (JSON.parse(res.data) || []) as ColumnType[]
+    }
+    else {
+      const stored = localStorage.getItem(getStorageKey())
+      return (stored ? JSON.parse(stored) : []) as ColumnType[]
+    }
   }
   catch (error) {
     console.error('获取本地存储的列配置失败:', error)
-    return []
+    return [] as ColumnType[]
   }
 }
 
-/**
- * 保存列配置到本地存储
- */
+async function handleSaveColumnsToServer(key: string, columns: string) {
+  const [isCommon] = customRestConfig.value || []
+  await setMemoryUpload({
+    pageId: props.pageId,
+    widgetId: key,
+    userId: !isCommon ? props.userId : '',
+    data: columns,
+  })
+}
+/** 保存列配置到本地存储 */
 function handleSaveColumnsToStorage() {
   try {
     // 如果没有表格实例，或者启用了本地存储，不保存
     if (!xTable.value || props.customConfig.storage) {
       return
     }
-
     // 直接从表格实例获取完整列配置
     const { fullColumn } = xTable.value.getTableColumn()
     // 只保存必要的列属性
@@ -1024,16 +1050,26 @@ function handleSaveColumnsToStorage() {
         }
         return col
       })
-    localStorage.setItem(getStorageKey(), JSON.stringify(columns))
+    if (getType(props.setConfig, 'function')) {
+      return await props.setConfig({
+        pageId: props.pageId,
+        widgetId: getStorageKey(),
+        userId: props.userId,
+      }, JSON.stringify(columns))
+    }
+    else if (props.saveType === 'server') {
+      handleSaveColumnsToServer(getStorageKey(), JSON.stringify(columns))
+    }
+    else if (props.saveType === 'local') {
+      localStorage.setItem(getStorageKey(), JSON.stringify(columns))
+    }
   }
   catch (error) {
     console.warn('保存列配置到本地存储失败:', error)
   }
 }
 
-/**
- * 没有本地存储的列配置，使用props.columns
- */
+/** 没有本地存储的列配置，使用props.columns */
 function handleSavePropsColumns() {
   localColumns.value = cloneDeep(computedColumns.value)
 }
@@ -1050,7 +1086,7 @@ function handleCompareColumns(
   if (computedColumns.length !== storedColumns.length) {
     return true
   }
-  const requiredFields: Array<keyof ColumnType> = handleGetRequiredFields()
+  const requiredFields: Array<keyof ColumnType> = handleGetRequiredFields(props.customColumns)
   return computedColumns.some((source) => {
     const target = storedColumns.find(
       item =>
@@ -1076,26 +1112,24 @@ function handleColumnResizableChange(params: VxeTableDefines.ResizableChangePara
   emit('resizableChange', params)
 }
 
-/**
- * 监听props.columns的变化
- */
+/** 监听props.columns的变化 */
 watch(
   () => computedColumns.value,
-  (newColumns: ColumnType[]) => {
+  async (newColumns: ColumnType[]) => {
     // 如果启用了本地存储，不保存
     if (props.customConfig.storage) {
       localColumns.value = cloneDeep(newColumns)
       return
     }
     // 尝试从本地存储获取列配置
-    const storedColumns = handleGetStoredColumns()
+    const storedColumns = await handleGetStoredColumns()
     if (!isEmpty(newColumns)) {
       // 对比本地存储的列配置和props.columns
       // 检查每列的field, title, fixed, sortable是否变化
       const shouldUseStored = handleCompareColumns(newColumns, storedColumns)
       // 使用props.columns并保存到本地
       if (shouldUseStored) {
-        console.log('shouldUseStored', computedColumns.value, storedColumns)
+        console.log('shouldUseStored')
         handleSavePropsColumns()
       }
       else {
@@ -1117,10 +1151,9 @@ watch(
       handleSaveColumnsToStorage()
     })
   },
-  {
-    immediate: true,
-  },
 )
+//#endregion
+
 //#region draggable模式逻辑
 // 保存拖拽实例的引用
 const rowSortableInstance = ref<Sortable | null>()
@@ -1360,9 +1393,7 @@ watch(
 )
 //#endregion
 
-/**
- * 暴露给父组件的方法和属性
- */
+/** 暴露给父组件的方法和属性 */
 defineExpose({
   // 暴露表格实例
   getTable: () => xTable.value,

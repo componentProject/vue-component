@@ -121,9 +121,7 @@ watch(
   },
 )
 
-/**
- * 设置事件监听器
- */
+/** 设置事件监听器 */
 function setupEventListeners() {
   virtualElement = (props.virtualRef as ComponentPublicInstance)?.$el || props.virtualRef
   if (virtualElement) {
@@ -131,9 +129,7 @@ function setupEventListeners() {
   }
 }
 
-/**
- * 清理事件监听器
- */
+/** 清理事件监听器 */
 function cleanupEventListeners() {
   if (virtualElement) {
     // 移除事件
@@ -143,9 +139,7 @@ function cleanupEventListeners() {
   document.removeEventListener('mousedown', handleOutsideClick)
 }
 
-/**
- * 处理点击外部区域，关闭popover
- */
+/** 处理点击外部区域，关闭popover */
 function handleOutsideClick(e: MouseEvent) {
   if (!popoverVisible.value)
     return

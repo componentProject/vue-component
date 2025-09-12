@@ -1,21 +1,32 @@
 <template>
   <ElDialog
     v-model="visible"
-    :title="title"
-    :width="dialogWidth"
     destroy-on-close
+    v-bind="computedDialogProps"
   >
     <VxeGrid
-      ref="tableRef"
+      id="custom"
+      border
       :header-cell-config="{ height: '30px' }"
       :cell-config="{ height: '30px' }"
       min-height="200px"
-      :columns="columnsConfig"
-      :data="dataObj"
+      :columns="tableColumns"
+      :data="tableData"
       :checkbox-config="checkboxConfig"
-      rowdragable
-      v-bind="vxeProps"
+      :row-config="{
+        useKey: true,
+        resizable: true,
+        drag: true,
+      }"
+      :row-drag-config="{
+        showGuidesStatus: true,
+        showIcon: false,
+        trigger: 'row',
+      }"
     >
+      <template #title="{ row }">
+        <div>{{ getTypeName(row.type) || row.title }}</div>
+      </template>
       <template #width="{ row, column }">
         <ElInput
           :model-value="row[column.field]"
@@ -76,16 +87,13 @@
 
 <script lang="ts" setup>
 import { computed, ref } from 'vue'
-import type { PropType } from 'vue'
-import type { VxeGridProps } from 'vxe-table'
+import { VxeGrid } from 'vxe-table'
 import { ElButton, ElCheckbox, ElDialog, ElInput, ElOption, ElSelect, ElSwitch } from 'element-plus'
-import { setMemoryUpload } from '@moluoxixi/utils/_api'
+import { getTypeName } from '@moluoxixi/components/DraggableTable/src/_utils'
+import { cloneDeep } from 'lodash'
+import type { ColumnType } from '@moluoxixi/components/DraggableTable/src/_types'
 
 const props = defineProps({
-  data: {
-    type: Array,
-    default: () => [],
-  },
   columns: {
     type: Array,
     default: () => [],
@@ -94,37 +102,29 @@ const props = defineProps({
     type: Array,
     default: () => [],
   },
-  columnsConfig: {
-    type: Array,
+  customColumns: {
+    type: Array as PropType<ColumnType[]>,
     default: () => [],
   },
-  title: {
-    type: String,
-    default: '个性化列配置',
-  },
-  dialogWidth: {
-    type: [String, Number],
-    default: '800px',
-  },
-  // 透传 VXE-Grid 配置，将会被 DraggableTable 接收并传递给 vxe-grid
-  vxeProps: {
-    type: Object as PropType<Partial<VxeGridProps>>,
-    default: () => ({}),
-  },
-  confirmText: {
-    type: String,
-    default: '保存',
-  },
-  cancelText: {
-    type: String,
-    default: '取消',
+  dialogProps: {
+    type: Object,
+    default: () => {
+      return {}
+    },
   },
 })
 
 const emit = defineEmits<{
-  (e: 'confirm', data: any[]): void
-  (e: 'cancel'): void
+  (e: 'confirm', customColumns: any[]): void
 }>()
+
+const computedDialogProps = computed(() => {
+  return {
+    width: '800px',
+    title: '个性化列配置',
+    ...props.dialogProps,
+  }
+})
 
 const visible = defineModel<boolean>({ default: false })
 
@@ -143,7 +143,6 @@ const options = [
   },
 ]
 
-const tableRef = ref<any>(null)
 const checkboxConfig = { checkField: 'visible' }
 
 // 处理正整数输入
@@ -160,65 +159,45 @@ function getPlaceholder(title: string) {
   return `请输入${title}（大于0）`
 }
 
-// 默认列配置
-const DEFAULT_COLUMNS = [
-  { type: 'checkbox', width: 40 },
-  { field: 'field', title: '字段' },
-  { field: 'title', title: '列名称' },
-  { field: 'width', width: 100, title: '宽度' },
-  { field: 'resizable', title: '可调整' },
-  { field: 'align', title: '对齐方式' },
-]
-
-const columnsConfig = computed(() => {
-  return props.columnsConfig?.length ? props.columnsConfig : DEFAULT_COLUMNS
+const tableColumns = computed(() => {
+  return props.customColumns || []
 })
 
 const tableData = ref([])
 
-const dataObj = computed(() => {
-  return props.data.map((item: any) => {
-    return {
-      ...item,
-      width: item.renderWidth,
-      align: item.align ?? 'left',
-    }
-  })
+watch(() => visible.value, (v) => {
+  if (v) {
+    console.log('props.computedColumns', props.computedColumns)
+    tableData.value = cloneDeep(props.computedColumns).map((item) => {
+      return {
+        ...item,
+        visible: item.visible ?? true,
+        width: item.width || Math.ceil(item.resizeWidth) || Math.ceil(item.renderWidth),
+      }
+    })
+  }
+}, {
+  immediate: true,
 })
-
-const isCommon = ref(false)
-
-async function customConfigSave(computedColumns: any, type: boolean) {
-  await setMemoryUpload({
-    pageId: props.pageId,
-    widgetId: props.id,
-    userId: !type ? props.userId : '',
-    data: JSON.stringify(computedColumns),
-  })
-}
 
 function handleEvent(type: 'confirm' | 'reset' | 'cancel') {
   switch (type) {
     case 'reset':
       tableData.value = props.columns
-      customConfigSave(props.columns, isCommon.value)
+      emit('confirm', {
+        customColumns: tableData.value,
+        isCommon: isCommon.value,
+      })
       break
     case 'confirm':
-      customConfigSave(tableData.value, isCommon.value)
+      emit('confirm', {
+        customColumns: tableData.value,
+        isCommon: isCommon.value,
+      })
       visible.value = false
       break
     case 'cancel':
       visible.value = false
   }
 }
-
-defineExpose({
-  // 暴露表格实例
-  getTable() {
-    return tableRef.value?.getTable()
-  },
-  getTableData() {
-    return tableRef.value?.getTable().getTableData()
-  },
-})
 </script>

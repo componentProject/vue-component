@@ -109,9 +109,7 @@ export function promiseThrottle<F extends (...args: any[]) => any>(
   }
 }
 
-/**
- * 防抖：默认使用 lodash 防抖，配置 { trailing: true, leading: false }，可自定义
- */
+/** 防抖：默认使用 lodash 防抖，配置 { trailing: true, leading: false }，可自定义 */
 export function debounce<F extends (...args: any[]) => any>(
   fn: F,
   wait = 300,
@@ -135,15 +133,63 @@ function normalizeInputKey(raw: string): string | null {
   if (!name) {
     return null
   }
-  return name
+  // 统一走特殊键映射，保证输入端与事件端一致（如 ctrl -> control）
+  return mapSpecialKey(name)
+}
+
+/**
+ * 将常见特殊键名映射到统一规范名
+ * - 输入端与事件端均需走此映射，保证一致性
+ */
+const KEY_ALIASES: Record<string, string> = {
+  // 修饰键
+  ctrl: 'ctrl',
+  control: 'ctrl',
+  cmd: 'meta',
+  command: 'meta',
+  win: 'win',
+  super: 'win',
+  meta: 'win',
+  alt: 'alt',
+  option: 'alt',
+  shift: 'shift',
+
+  // 常用功能键
+  esc: 'esc',
+  escape: 'esc',
+  return: 'enter',
+  enter: 'enter',
+  del: 'del',
+  delete: 'del',
+  backspace: 'backspace',
+  tab: 'tab',
+
+  // 方向与导航
+  arrowup: 'arrowup',
+  arrowdown: 'arrowdown',
+  arrowleft: 'arrowleft',
+  arrowright: 'arrowright',
+  pageup: 'pageup',
+  pagedown: 'pagedown',
+  home: 'home',
+  end: 'end',
+  insert: 'insert',
+
+  // 空格
+  space: 'space',
+  spacebar: 'space',
+}
+
+function mapSpecialKey(name: string): string {
+  if (name === ' ') {
+    return 'space'
+  }
+  return KEY_ALIASES[name] || name
 }
 
 // ---
 
-/**
- * 将用户传入的键数组构建为需求集合
- * - 全部小写化，直接加入集合
- */
+/** 将用户传入的键数组构建为需求集合（已规范化、映射后的键名） */
 function buildRequired(keys: string[]): Set<string> {
   const set = new Set<string>()
   for (const raw of keys) {
@@ -155,6 +201,8 @@ function buildRequired(keys: string[]): Set<string> {
   }
   return set
 }
+
+// ---
 
 export interface OnHotkeysOptions {
   /** 指定监听目标；默认 document */
@@ -175,6 +223,15 @@ export function onHotkeys(keys: string[], callback: (e: KeyboardEvent) => void, 
 
   const requiredKeys = buildRequired(keys)
   const target = (options && options.target) || document
+
+  // 若目标为元素且没有 tabindex，则补一个 tabindex=0；在 off 时清理
+  let addedTabIndex = false
+  if (typeof HTMLElement !== 'undefined' && target instanceof HTMLElement) {
+    if (!target.hasAttribute('tabindex')) {
+      target.setAttribute('tabindex', '0')
+      addedTabIndex = true
+    }
+  }
 
   const pressedKeys = new Set<string>()
   /** 是否触发过 */
@@ -200,7 +257,8 @@ export function onHotkeys(keys: string[], callback: (e: KeyboardEvent) => void, 
    */
   const onKeyDown = (e: KeyboardEvent) => {
     e.preventDefault()
-    const k = e.key ? e.key.toLowerCase() : ''
+    const raw = e.key ? e.key.toLowerCase() : ''
+    const k = raw ? mapSpecialKey(raw) : ''
     console.log('Down', k)
 
     if (k) {
@@ -219,8 +277,8 @@ export function onHotkeys(keys: string[], callback: (e: KeyboardEvent) => void, 
    */
   const onKeyUp = (e: KeyboardEvent) => {
     e.preventDefault()
-    const k = e.key ? e.key.toLowerCase() : ''
-    console.log('Up', k)
+    const raw = e.key ? e.key.toLowerCase() : ''
+    const k = raw ? mapSpecialKey(raw) : ''
 
     if (k) {
       pressedKeys.delete(k)
@@ -228,12 +286,9 @@ export function onHotkeys(keys: string[], callback: (e: KeyboardEvent) => void, 
     fired = false
   }
 
-  /**
-   * 当窗口失焦/标签页隐藏时，清理状态，避免长按或丢失事件导致的状态污染
-   */
+  /** 当窗口失焦/标签页隐藏时，清理状态，避免长按或丢失事件导致的状态污染 */
   const onBlur = () => {
     console.log('blur')
-
     pressedKeys.clear()
     fired = false
   }
@@ -251,6 +306,9 @@ export function onHotkeys(keys: string[], callback: (e: KeyboardEvent) => void, 
     target.removeEventListener('keydown', onKeyDown as any)
     target.removeEventListener('keyup', onKeyUp as any)
     window.removeEventListener('blur', onBlur)
+    if (addedTabIndex && typeof HTMLElement !== 'undefined' && target instanceof HTMLElement) {
+      target.removeAttribute('tabindex')
+    }
     pressedKeys.clear()
     fired = false
   }

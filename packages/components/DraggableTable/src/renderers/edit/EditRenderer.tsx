@@ -32,7 +32,6 @@ export default defineComponent({
     }
 
     function validateHandle() {
-      console.log('props.renderParams', props.renderParams)
       const xTable = props.renderParams?.$grid
       if (xTable) {
         xTable.validateField(currRow.value, currColumn.value.field).then()
