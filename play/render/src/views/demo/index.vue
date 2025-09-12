@@ -6,7 +6,7 @@
     <el-button type="primary" @click="handleClick">
       删除组件库组件
     </el-button>
-    <div class="main" style="height: 300px">
+    <div class="main" style="height: 200px">
       <div class="list-title">
         开发调试组件
       </div>
@@ -17,7 +17,7 @@
         :resizable="true"
       />
     </div>
-    <div class="main">
+    <div class="main" style="height: 200px">
       <div class="list-title">
         引用组件库解析的组件
       </div>
@@ -134,7 +134,7 @@ async function loadLocalComponent(componentName: string) {
  */
 async function loadComponents(components: string[]) {
   try {
-    const loadedComponents = await load(vue, components)
+    const loadedComponents = await load(vue, components, true)
     dynamicComponent.value = loadedComponents[componentName.value]
     console.log('动态组件加载成功:', dynamicComponent)
   }
@@ -157,7 +157,6 @@ async function handleClick() {
 
 onMounted(async () => {
   await loadLocalComponent(componentName.value)
-  return
   await loadComponents([componentName.value])
 })
 </script>

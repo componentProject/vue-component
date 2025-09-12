@@ -1,6 +1,12 @@
 //#region 从远程服务器加载资源并替换
-import { getDownLoadByIds } from './src/api/index.ts'
-import { getList } from './src/api/index.ts'
+// import fs from 'node:fs/promises'
+// import path from 'node:path'
+import { getDownLoadByIds, getList } from './src/api/index.ts'
+
+const modules = import.meta.glob('../../packages/components/moluoxixi/packages/*/es/index.mjs', {
+  query: '?raw',
+  eager: false,
+})
 
 interface DependencyMap {
   [key: string]: string
@@ -467,7 +473,7 @@ function processExports(code: string, allExports: analyzeExportsResult): process
  * @param componentName
  * @param allComponentList
  */
-async function replaceImportsAndExports(componentCode: string, componentName: string, allComponentList: allComponentListType[]) {
+async function replaceImportsAndExports(componentCode: string, componentName: string, allComponentList: allComponentListType[], isLongRange?: boolean) {
   const processedComponents: Record<string, string | null> = {}
   try {
     // 第一阶段：分析所有导入导出语句
@@ -492,7 +498,7 @@ async function replaceImportsAndExports(componentCode: string, componentName: st
     // 一次性加载所有未加载的依赖组件
     if (dependencies.length > 0) {
       console.log(`正在加载${componentName}的依赖组件:`, dependencies)
-      await loadRemoteComponents(componentMapping.$_Vue, allComponentList, dependencies)
+      await loadRemoteComponents(componentMapping.$_Vue, allComponentList, dependencies, isLongRange)
     }
     const allExports = analyzeExports(componentCode)
     console.log(`${componentName}所有解析的export语句:`, allExports)
@@ -515,7 +521,14 @@ async function replaceImportsAndExports(componentCode: string, componentName: st
 
   return processedComponents
 }
-export async function load($_Vue: any, originComponentNames: string[]) {
+/**
+ * 加载组件
+ * @param $_Vue vue实例对象
+ * @param originComponentNames 需要加载的组件名称集合
+ * @param isLongRange 本地调试的使用，默认false（加载本地打包后的组件）、true加载线上组件
+ * @returns 清理后的代码
+ */
+export async function load($_Vue: any, originComponentNames: string[], isLongRange?: boolean) {
   const listRes = await getList({
     productCode: 'webFile_his',
     vue: ['Vue3'],
@@ -528,21 +541,76 @@ export async function load($_Vue: any, originComponentNames: string[]) {
     addToDependencyMapping(packageName, item.componentCode)
   })
   componentMapping.$_Vue = $_Vue
-  return await loadRemoteComponents($_Vue, allComponentList, componentNames)
+  return await loadRemoteComponents($_Vue, allComponentList, componentNames, isLongRange)
 }
+
+/**
+ * 根据URL获取文件内容
+ * @param url 文件URL地址
+ * @returns 文件内容字符串
+ */
+/**
+ * 根据组件名获取文件内容
+ * @param componentName 组件名称
+ * @returns 文件内容字符串
+ */
+export async function fetchFileContent(componentName: string): Promise<string> {
+  try {
+    // 从glob中找到对应的模块
+    const moduleKey = Object.keys(modules).find(key =>
+      key.includes(`/packages/components/moluoxixi/packages/${componentName}/es/index.mjs`),
+    )
+
+    if (!moduleKey) {
+      throw new Error(`找不到组件 ${componentName} 的模块文件`)
+    }
+
+    // 动态导入模块
+    const module = await modules[moduleKey]()
+    console.log(`成功加载组件 ${componentName} 的文件内容`)
+    return module.default || module
+  } catch (error) {
+    console.error(`获取组件 ${componentName} 文件内容失败:`, error)
+    throw error
+  }
+}
+
 /**
  * 加载远程组件
  * @param $_Vue
  * @param allComponentList 所有组件集合{id, componentCode}
  * @param componentNames 当前要加载的组件集合
  */
-export async function loadRemoteComponents($_Vue: any, allComponentList: allComponentListType[], componentNames: string[]) {
-  const componentDownList = await getDownLoadByIds(allComponentList.filter((item: any) => componentNames.includes(item.componentCode)).map((i: any) => i.id))
+export async function loadRemoteComponents($_Vue: any, allComponentList: allComponentListType[], componentNames: string[], isLongRange?: boolean) {
+  let componentDownList
+  if (!isLongRange) {
+    componentDownList = await getDownLoadByIds(allComponentList.filter((item: any) => componentNames.includes(item.componentCode)).map((i: any) => i.id))
+  }
+  else {
+    if (componentNames && componentNames.length > 0) {
+      // 使用 Promise.all 来正确处理异步操作
+      const loadPromises = componentNames.map(async (item) => {
+        const component = allComponentList.find(i => i.componentCode === item)
+        if (component) {
+          const content = await fetchFileContent(item)
+          console.log('成功获取文件内容', content)
+          return {
+            ...component,
+            name: component.componentCode,
+            content,
+          }
+        }
+        return null
+      })
+      const results = await Promise.all(loadPromises)
+      componentDownList = results.filter(Boolean)
+    }
+  }
   const componentResults: Record<string, any> = {}
   for (const componentRes of componentDownList) {
     const orginComponentCode = componentRes.content
     const componentName = componentRes.name
-    const componentsCode = await replaceImportsAndExports(orginComponentCode, componentName, allComponentList)
+    const componentsCode = await replaceImportsAndExports(orginComponentCode, componentName, allComponentList, isLongRange)
     // 组件结果对象，这将作为函数的返回值
     for (const [name, code] of Object.entries(componentsCode)) {
       if (!code)
@@ -585,16 +653,16 @@ export async function loadRemoteComponents($_Vue: any, allComponentList: allComp
   return componentResults
 }
 
-export async function loadCodeStr($_Vue: any, allComponentList: allComponentListType[], originComponentNames: string[]) {
-  const componentNames = originComponentNames?.length > 0 ? originComponentNames : allComponentList.map(i => i.componentCode)
-  // 预先为所有组件添加依赖映射
-  allComponentList.forEach((item) => {
-    const packageName = getPackageNameFromComponentName(item.componentCode)
-    addToDependencyMapping(packageName, item.componentCode)
-  })
-  componentMapping.$_Vue = $_Vue
-  return await loadRemoteComponentsStr($_Vue, allComponentList, componentNames)
-}
+// export async function loadCodeStr($_Vue: any, allComponentList: allComponentListType[], originComponentNames: string[]) {
+//   const componentNames = originComponentNames?.length > 0 ? originComponentNames : allComponentList.map(i => i.componentCode)
+//   // 预先为所有组件添加依赖映射
+//   allComponentList.forEach((item) => {
+//     const packageName = getPackageNameFromComponentName(item.componentCode)
+//     addToDependencyMapping(packageName, item.componentCode)
+//   })
+//   componentMapping.$_Vue = $_Vue
+//   return await loadRemoteComponentsStr($_Vue, allComponentList, componentNames)
+// }
 
 /**
  * 加载远程组件
@@ -602,37 +670,37 @@ export async function loadCodeStr($_Vue: any, allComponentList: allComponentList
  * @param allComponentList 所有组件集合{id, componentCode}
  * @param componentNames 当前要加载的组件集合
  */
-export async function loadRemoteComponentsStr($_Vue: any, allComponentList: allComponentListType[], componentNames: string[]) {
-  const componentDownList = await getDownLoadByIds(allComponentList.filter((item: any) => componentNames.includes(item.componentCode)).map((i: any) => i.id))
-  const componentResults: Record<string, any> = {}
-  for (const componentRes of componentDownList) {
-    const orginComponentCode = componentRes.content
-    const componentName = componentRes.name
-    const componentsCode = await replaceImportsAndExports(orginComponentCode, componentName, allComponentList)
-    // 组件结果对象，这将作为函数的返回值
-    for (const [name, code] of Object.entries(componentsCode)) {
-      if (!code)
-        continue // 跳过加载失败的组件
+// export async function loadRemoteComponentsStr($_Vue: any, allComponentList: allComponentListType[], componentNames: string[]) {
+//   const componentDownList = await getDownLoadByIds(allComponentList.filter((item: any) => componentNames.includes(item.componentCode)).map((i: any) => i.id))
+//   const componentResults: Record<string, any> = {}
+//   for (const componentRes of componentDownList) {
+//     const orginComponentCode = componentRes.content
+//     const componentName = componentRes.name
+//     const componentsCode = await replaceImportsAndExports(orginComponentCode, componentName, allComponentList)
+//     // 组件结果对象，这将作为函数的返回值
+//     for (const [name, code] of Object.entries(componentsCode)) {
+//       if (!code)
+//         continue // 跳过加载失败的组件
 
-      try {
-        // 预处理代码，替换可能存在的process.env.XXX判断
-        // 确保code是字符串
-        const codeString = typeof code === 'string' ? code : String(code)
+//       try {
+//         // 预处理代码，替换可能存在的process.env.XXX判断
+//         // 确保code是字符串
+//         const codeString = typeof code === 'string' ? code : String(code)
 
-        // 再次清理所有可能的import语句（双重保障）
-        cleanImports(codeString)
-        componentResults[name] = codeString
-      }
-      catch (error: any) {
-        console.error(`加载组件 ${name} 失败:`, error)
-        console.error('错误详情:', error.message)
-        // 输出更详细的错误信息以帮助调试
-        if (error.stack)
-          console.error('错误堆栈:', error.stack)
-      }
-    }
-  }
-  // 使用前面定义的函数加载组件代码
+//         // 再次清理所有可能的import语句（双重保障）
+//         cleanImports(codeString)
+//         componentResults[name] = codeString
+//       }
+//       catch (error: any) {
+//         console.error(`加载组件 ${name} 失败:`, error)
+//         console.error('错误详情:', error.message)
+//         // 输出更详细的错误信息以帮助调试
+//         if (error.stack)
+//           console.error('错误堆栈:', error.stack)
+//       }
+//     }
+//   }
+//   // 使用前面定义的函数加载组件代码
 
-  return componentResults
-}
+//   return componentResults
+// }
