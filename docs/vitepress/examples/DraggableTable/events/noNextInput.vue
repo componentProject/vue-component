@@ -1,7 +1,9 @@
 <template>
   <div class="container">
     <DraggableTable
+      id="dt-events-noNextInput"
       v-model="tableData"
+      save-type="local"
       :columns="columns"
       container-type="row"
       height="300"

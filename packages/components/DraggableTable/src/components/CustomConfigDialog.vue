@@ -29,13 +29,11 @@
       </template>
       <template #width="{ row, column }">
         <ElInput
-          :model-value="row[column.field]"
+          v-model="row[column.field]"
           size="small"
-          maxlength="4"
           :disabled="!row.resizable"
           :placeholder="getPlaceholder(column.title)"
           style="width: 100%"
-          @update:model-value="handlePositiveNumberInput(row, column.field, $event)"
         />
       </template>
       <template #resizable="{ row, column }">
@@ -95,11 +93,11 @@ import type { ColumnType } from '@moluoxixi/components/DraggableTable/src/_types
 
 const props = defineProps({
   columns: {
-    type: Array,
+    type: Array as PropType<ColumnType[]>,
     default: () => [],
   },
   computedColumns: {
-    type: Array,
+    type: Array as PropType<ColumnType[]>,
     default: () => [],
   },
   customColumns: {
@@ -165,10 +163,9 @@ const tableColumns = computed(() => {
 
 const tableData = ref([])
 
-watch(() => visible.value, (v) => {
+watch(() => visible.value, (v: boolean) => {
   if (v) {
-    console.log('props.computedColumns', props.computedColumns)
-    tableData.value = cloneDeep(props.computedColumns).map((item) => {
+    tableData.value = cloneDeep(props.computedColumns).map((item: any) => {
       return {
         ...item,
         visible: item.visible ?? true,
@@ -179,6 +176,8 @@ watch(() => visible.value, (v) => {
 }, {
   immediate: true,
 })
+
+const isCommon = ref(false)
 
 function handleEvent(type: 'confirm' | 'reset' | 'cancel') {
   switch (type) {

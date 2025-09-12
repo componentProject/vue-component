@@ -1,10 +1,12 @@
 <template>
   <div class="container" style="height: 350px;">
     <DraggableTable
+      id="dt-drag-dragType-draggable"
       v-model="tableData"
       :columns="columns"
       drag-type="draggable"
-      :dragable="true"
+      dragable
+      save-type="local"
     />
   </div>
 </template>

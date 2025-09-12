@@ -9,12 +9,11 @@ import PopoverTableSelect from '@moluoxixi/components/PopoverTableSelect'
 import ConfigFrom from '@moluoxixi/components/ConfigFrom'
 import Select from '@moluoxixi/components/Select'
 import Tabs from '@moluoxixi/components/Tabs'
-import Button from '@moluoxixi/components/Button'
+import TsButton from '@moluoxixi/components/TsButton'
 import Tree from '@moluoxixi/components/Tree'
 import DragModalDialog from '@moluoxixi/components/DragModalDialog'
 
 export {
-  Button,
   ConfigFrom,
   DateRangePicker,
   DraggableTable,
@@ -26,9 +25,10 @@ export {
   Select,
   Tabs,
   Tree,
+  TsButton,
 }
 
-const components: Component[] = [DragModalDialog, ConfigFrom, DateRangePicker, DraggableTable, EnterNextContainer, ExportExcel, ImportExcel, Button, PopoverTableSelect, Select, Tabs, Tree]
+const components: Component[] = [DragModalDialog, ConfigFrom, DateRangePicker, DraggableTable, EnterNextContainer, ExportExcel, ImportExcel, TsButton, PopoverTableSelect, Select, Tabs, Tree]
 
 export default {
   install(app: App) {

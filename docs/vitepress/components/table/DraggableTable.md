@@ -94,6 +94,33 @@ DraggableTable/props/containerType-table
 DraggableTable/events/noNextInput
 :::
 
+### 存储（saveType / saveHotKeys / getConfig / setConfig / customColumns / id+pageId+userId）
+
+示例：使用浏览器本地存储保存个性化列配置（saveType='local'）
+:::demo
+DraggableTable/storage/saveType-local
+:::
+
+示例：通过回调接入服务端存储（saveType='server' + getConfig/setConfig）
+:::demo
+DraggableTable/storage/saveType-server
+:::
+
+示例：自定义个性化弹窗热键（saveHotKeys=['shift','k']）
+:::demo
+DraggableTable/storage/saveHotKeys-custom
+:::
+
+示例：自定义个性化弹窗的列集合（customColumns）
+:::demo
+DraggableTable/storage/customColumns
+:::
+
+示例：不同 userId 下独立保存（结合 id+pageId+userId）
+:::demo
+DraggableTable/storage/identity
+:::
+
 ### 插槽（动态命名插槽与内置前缀插槽）
 
 示例：默认（字段）插槽
@@ -138,11 +165,6 @@ DraggableTable/events/resizableChange
 DraggableTable/events/checkbox
 :::
 
-示例：自定义列配置（isCustomConfig/shortcuts/isShortcuts）
-:::demo 快捷键配置和自定义列配置(也可以分开使用)
-DraggableTable/events/customConfig
-:::
-
 ### 暴露方法（getTable）
 
 示例：通过 ref 获取 VXE 表格实例
@@ -166,29 +188,35 @@ DraggableTable/expose/getTable
 | editable | 是否允许编辑 | Boolean | false | 否 |
 | sortable | 是否启用排序 | Boolean | false | 否 |
 | rowdragable | 是否启用行拖拽 | Boolean | false | 否 |
-| dragType | 拖拽模式（'vxe'\|'draggable'） | String | 'vxe' | 否 |
-| rowDisabledClass | 需要禁用拖拽的行class | String | '' | 否 |
+| columndragable | 是否启用列拖拽 | Boolean | false | 否 |
+| dragType | 拖拽模式（'vxe'|'draggable'） | String | 'vxe' | 否 |
+| rowDisabledClass | 需要禁用拖拽的行 `class` | String | '' | 否 |
 | rowDragDisabledMethod | 行拖拽禁用方法 | ^[Function]`Function` | - | 否 |
 | rowDragEndMethod | 行拖拽结束回调方法 | ^[Function]`Function` | - | 否 |
-| columndragable | 是否启用列拖拽 | Boolean | false | 否 |
+| rowDragConfig | 行拖拽配置对象 | Object | {} | 否 |
 | columnDragDisabledMethod | 列拖拽禁用方法 | ^[Function]`Function` | - | 否 |
 | columnDragEndMethod | 列拖拽结束回调方法 | ^[Function]`Function` | - | 否 |
-| isUnifyConfig | 是否有统一配置权限选项 | Boolean | false | 否 |
-| border | 是否显示表格边框 | Boolean | true | 否 |
-| showOverflow | 表格内容溢出隐藏并显示 tooltip | Boolean\|String | true | 否 |
-| showHeaderOverflow | 头部溢出隐藏并显示 tooltip | Boolean\|String | true | 否 |
-| showFooterOverflow | 底部溢出隐藏并显示 tooltip | Boolean\|String | true | 否 |
-| editAutoFocus | 触发编辑后是否自动聚焦 | Boolean | true | 否 |
-| filterable | 是否启用过滤功能 | Boolean | false | 否 |
-| filterType | 过滤类型 | String | 'filter' | 否 |
-| filterLayout | 筛选器布局配置，支持 input、checkbox、select | Array | ['input','checkbox'] | 否 |
-| showPagination   | 是否显示分页 | Boolean | `false`| 否 |
-| isCustomConfig | 是否开启组件自定义列配置 | Boolean | `false` | 否 |
-| customRowConfig | 自定义列配置参数 | Object | {} | 否 |
-| onCustomConfigSave | 自定义列配置保存方法（可选） | ^[Function]`(columns: ColumnType[]) => Promise<void>` | - | 否 |
-| onCustomConfigLoad | 自定义列配置获取方法（可选） | ^[Function]`() => Promise<ColumnType[]>` | - | 否 |
-| isShortcuts | 是否开启快捷键列配置 | Boolean | `false` | 否 |
-| shortcuts | 快捷键打开个性化列配置功能 | String | 'ctrl+shift+alt+f12' | 否 |
+| columnDragConfig | 列拖拽配置对象 | Object | {} | 否 |
+| rowId | 行的唯一标识字段 | String | '_X_ROW_KEY' | 否 |
+| rowConfig | 行配置对象 | Object | {} | 否 |
+| columnConfig | 列配置对象 | Object | {} | 否 |
+| virtualXConfig | 列虚拟滚动配置 | Object | {} | 否 |
+| virtualYConfig | 行虚拟滚动配置 | Object | {} | 否 |
+| menuConfigColumn | 右键菜单是否允许配置列显隐 | Boolean | true | 否 |
+| menuConfig | 右键菜单配置 | Object | {} | 否 |
+| sortable | 是否启用排序 | Boolean | false | 否 |
+| sortConfig | 排序配置 | Object | {} | 否 |
+| customConfig | VXE 自定义配置 | Object | {} | 否 |
+| mouseConfig | 鼠标相关配置 | Object | {} | 否 |
+| pagerConfig | 分页配置 | Object | 见默认值 | 否 |
+| showPagination | 是否显示分页 | Boolean | false | 否 |
+| allowSelectNextInEmpty | 在空值时是否允许选择下一输入 | Boolean | false | 否 |
+| containerType | 回车容器类型（'row'|'table'） | String | 'row' | 否 |
+| saveType | 列配置存储类型（'local'|'server'） | String | 'server' | 否 |
+| saveHotKeys | 打开个性化列配置弹窗的按键组合 | String[] | `['shift','alt','ctrl','f12']` | 否 |
+| getConfig | 服务端获取列配置方法 | ^[Function]`(config: customConfigType) => Promise<ColumnType[]>` | - | 否 |
+| setConfig | 服务端保存列配置方法 | ^[Function]`(config: customConfigType, columns: ColumnType[]) => Promise<any>` | - | 否 |
+| customColumns | 自定义个性化弹窗的列集合 | `Array<ColumnType>` | 见源代码默认值 | 否 |
 | ...attrs | 其他属性透传给[vxe-grid](https://vxetable.cn/#/grid/api) | - | - |
 
 ### columns 配置
@@ -213,7 +241,15 @@ DraggableTable/expose/getTable
 | resizableChange | 列宽变化事件 | ^[Function]`(params: ResizableChangeParams) => void` |
 | checkboxChange | 复选框变化事件 | ^[Function]`(params: CheckboxChangeParams) => void` |
 | checkboxAll | 复选框全选事件 | ^[Function]`(params: CheckboxAllParams) => void` |
-| page-change | 分页变化事件 | ^[Function]`(params: PageChangeParams) => void` |
+| sizeChange | 分页尺寸变化事件 | ^[Function]`(size: number) => void` |
+| pageChange | 分页页码变化事件 | ^[Function]`(page: number) => void` |
+| currentChange | 当前行变化事件 | ^[Function]`(rowIndex: number) => void` |
+| update:pagination | 分页双向绑定事件 | ^[Function]`(page: number) => void` |
+| headerContextMenu | 表头右键菜单显示 | ^[Function]`(cell: HTMLElement) => void` |
+| headerCellMenu | 表头单元格右键（含 cell 信息） | ^[Function]`(params: HeaderCellMenuParams & { cell?: HTMLElement }) => void` |
+| noNextInput | 行内无下一个可聚焦输入时触发 | ^[Function]`(params: NoNextInputParams) => void` |
+| noSelectValue | select 下拉为空时触发 | ^[Function]`(params: NoSelectValueParams) => void` |
+| toggleTreeExpand | 树形展开切换时触发 | ^[Function]`(params: VxeTableDefines.ToggleRowExpandEventParams) => void` |
 
 ### Slots
 
@@ -222,7 +258,6 @@ DraggableTable/expose/getTable
 | 插槽名                 | 说明                | 参数         |
 | ------------------- | ----------------- | ---------- |
 | loading             | 自定义加载状态内容         | params     |
-| pager               | 自定义分页器内容          | -          |
 | `${field}`          | 列默认插槽，field为列字段名  | slotParams |
 | `header-${field}`   | 列表头插槽，field为列字段名  | slotParams |
 | `footer-${field}`   | 列底部插槽，field为列字段名  | slotParams |

@@ -1,10 +1,11 @@
 <template>
   <div class="container" style="height: 350px;">
     <DraggableTable
+      id="dt-drag-rowDisabledClass"
       v-model="tableData"
       :columns="columns"
-      drag-type="vxe"
-      :dragable="true"
+      dragable
+      save-type="local"
       row-disabled-class="no-drag"
       :row-class-name="rowClassName"
     />

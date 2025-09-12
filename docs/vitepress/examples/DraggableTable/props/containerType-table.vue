@@ -1,7 +1,9 @@
 <template>
   <div class="container">
     <DraggableTable
+      id="dt-props-containerType-table"
       v-model="tableData"
+      save-type="local"
       :columns="columns"
       container-type="table"
       height="300"

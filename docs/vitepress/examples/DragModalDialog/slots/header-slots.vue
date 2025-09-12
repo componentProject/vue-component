@@ -10,7 +10,7 @@
       :height="300"
     >
       <!-- 完全自定义头部 -->
-      <template #header="{ close, title }">
+      <template #header="{ close }">
         <div class="custom-header">
           <h3 style="margin: 0; color: #409EFF;">
             🎯 自定义标题

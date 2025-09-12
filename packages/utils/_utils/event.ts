@@ -256,10 +256,8 @@ export function onHotkeys(keys: string[], callback: (e: KeyboardEvent) => void, 
    * - 命中组合后触发回调
    */
   const onKeyDown = (e: KeyboardEvent) => {
-    e.preventDefault()
     const raw = e.key ? e.key.toLowerCase() : ''
     const k = raw ? mapSpecialKey(raw) : ''
-    console.log('Down', k)
 
     if (k) {
       pressedKeys.add(k)
@@ -276,7 +274,6 @@ export function onHotkeys(keys: string[], callback: (e: KeyboardEvent) => void, 
    * - 从 pressedKeys 中移除当前键
    */
   const onKeyUp = (e: KeyboardEvent) => {
-    e.preventDefault()
     const raw = e.key ? e.key.toLowerCase() : ''
     const k = raw ? mapSpecialKey(raw) : ''
 
@@ -288,7 +285,6 @@ export function onHotkeys(keys: string[], callback: (e: KeyboardEvent) => void, 
 
   /** 当窗口失焦/标签页隐藏时，清理状态，避免长按或丢失事件导致的状态污染 */
   const onBlur = () => {
-    console.log('blur')
     pressedKeys.clear()
     fired = false
   }

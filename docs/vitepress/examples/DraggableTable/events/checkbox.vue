@@ -1,7 +1,9 @@
 <template>
   <div class="container" style="height: 350px;">
     <DraggableTable
+      id="dt-events-checkbox"
       v-model="tableData"
+      save-type="local"
       :columns="columns"
       @checkbox-change="onChange"
     />

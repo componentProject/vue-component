@@ -1,12 +1,11 @@
 <template>
-  <div class="container" style="height: 350px;">
+  <div class="container" style="height: 360px">
     <DraggableTable
-      id="demo8"
+      id="hotkeys-demo"
       v-model="tableData"
-      save-type="local"
       :columns="columns"
-      editable
-      :edit-auto-focus="false"
+      save-type="local"
+      :show-pagination="false"
     />
   </div>
 </template>
@@ -15,14 +14,14 @@
 import { ref } from 'vue'
 
 const tableData = ref([
-  { id: 1, name: '张三', age: 25 },
-  { id: 2, name: '李四', age: 30 },
+  { id: 1, name: '张三', dept: '一部' },
+  { id: 2, name: '李四', dept: '二部' },
 ])
 
 const columns = ref([
   { field: 'id', title: 'ID', width: 70 },
-  { field: 'name', title: '姓名' },
-  { field: 'age', title: '年龄' },
+  { field: 'name', title: '姓名', width: 120 },
+  { field: 'dept', title: '部门', width: 120 },
 ])
 </script>
 

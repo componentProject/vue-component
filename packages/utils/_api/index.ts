@@ -2,7 +2,7 @@ import { getHttpService } from '../../utils/AjaxPackage/netseriver.js'
 import FormData from 'form-data'
 
 const httpApi: any = getHttpService({
-  baseURL: 'http://192.168.209.103:10019/',
+  baseURL: '/ts-fm',
   timeout: 3000,
   getToken: () => null,
   // 响应字段配置
@@ -30,7 +30,7 @@ export function setWebUpload(data: any) {
 
   // 获取form-data生成的headers
   const formHeaders = formData.getHeaders()
-  return httpApi.post('/ts-fm/file/webUpload', formData, {
+  return httpApi.post('/file/webUpload', formData, {
     headers: {
       ...formHeaders,
     },
@@ -38,20 +38,20 @@ export function setWebUpload(data: any) {
 }
 //获取组件列表
 export function getList(data: any) {
-  return httpApi.post('/ts-fm/file/getList', data)
+  return httpApi.post('/file/getList', data)
 }
 
 //获取组件实例
 export function getDownLoadByIds(data: any) {
-  return httpApi.post('/ts-fm/file/downLoadByIds', data)
+  return httpApi.post('/file/downLoadByIds', data)
 }
 //删除组件库组件
 export function setDeleteByPathAndCode(data: any) {
-  return httpApi.post('/ts-fm/file/deleteByPathAndCode', data)
+  return httpApi.post('/file/deleteByPathAndCode', data)
 }
 
 const memoryApi: any = getHttpService({
-  baseURL: 'http://192.168.209.103:10016/',
+  baseURL: '/ts-cache',
   timeout: 3000,
   getToken: () => null,
   // 响应字段配置
@@ -64,10 +64,10 @@ const memoryApi: any = getHttpService({
 
 //获取表格自定义列
 export function getMemoryQuery(data: any) {
-  return memoryApi.post('/ts-cache/memory/query', data)
+  return memoryApi.post('/memory/query', data)
 }
 
 //上传表格自定义列
 export function setMemoryUpload(data: any) {
-  return memoryApi.post('/ts-cache/memory/upload', data)
+  return memoryApi.post('/memory/upload', data)
 }

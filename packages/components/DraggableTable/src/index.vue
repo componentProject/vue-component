@@ -1031,7 +1031,7 @@ async function handleSaveColumnsToServer(key: string, columns: string) {
   })
 }
 /** 保存列配置到本地存储 */
-function handleSaveColumnsToStorage() {
+async function handleSaveColumnsToStorage() {
   try {
     // 如果没有表格实例，或者启用了本地存储，不保存
     if (!xTable.value || props.customConfig.storage) {
@@ -1051,14 +1051,14 @@ function handleSaveColumnsToStorage() {
         return col
       })
     if (getType(props.setConfig, 'function')) {
-      return await props.setConfig({
+      await props.setConfig({
         pageId: props.pageId,
         widgetId: getStorageKey(),
         userId: props.userId,
       }, JSON.stringify(columns))
     }
     else if (props.saveType === 'server') {
-      handleSaveColumnsToServer(getStorageKey(), JSON.stringify(columns))
+      await handleSaveColumnsToServer(getStorageKey(), JSON.stringify(columns))
     }
     else if (props.saveType === 'local') {
       localStorage.setItem(getStorageKey(), JSON.stringify(columns))

@@ -66,6 +66,14 @@ export default viteConfig(
                 })
               },
             },
+            '/ts-cache': {
+              changeOrigin: true,
+              target: 'http://192.168.209.103:84',
+            },
+            '/ts-fm': {
+              changeOrigin: true,
+              target: 'http://192.168.209.103:84',
+            },
             '/ai-application': {
               // target: 'http://192.168.31.46:19061',
               target: 'http://192.168.209.101:19061',

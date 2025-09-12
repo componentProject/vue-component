@@ -1,7 +1,9 @@
 <template>
   <div class="container" style="height: 350px;">
     <DraggableTable
+      id="dt-events-columnDragend"
       v-model="tableData"
+      save-type="local"
       :columns="columns"
       drag-type="vxe"
       :columndragable="true"

@@ -5,7 +5,7 @@
         获取并打印表格实例
       </ElButton>
     </div>
-    <DraggableTable ref="refTable" v-model="tableData" :columns="columns" />
+    <DraggableTable id="dt-expose-getTable" ref="refTable" v-model="tableData" save-type="local" :columns="columns" />
   </div>
 </template>
 

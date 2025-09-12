@@ -1,6 +1,6 @@
 <template>
   <div class="container" style="height: 350px;">
-    <DraggableTable v-model="tableData" :columns="columns" :filterable="true" />
+    <DraggableTable id="dt-filter-filterable" v-model="tableData" save-type="local" :columns="columns" :filterable="true" />
   </div>
 </template>
 

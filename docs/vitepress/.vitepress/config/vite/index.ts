@@ -75,6 +75,18 @@ const viteConfig = {
       '@moluoxixi/utils': path.resolve(rootPath, './packages/utils'),
     },
   },
+  server: {
+    proxy: {
+      '/ts-cache': {
+        changeOrigin: true,
+        target: 'http://192.168.209.103:84',
+      },
+      '/ts-fm': {
+        changeOrigin: true,
+        target: 'http://192.168.209.103:84',
+      },
+    },
+  },
   css: {
     preprocessorOptions: {
       scss: {

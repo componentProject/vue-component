@@ -1,9 +1,11 @@
 <template>
   <div class="container" style="height: 350px">
     <DraggableTable
+      id="demo7"
       v-model="tableData"
       :columns="columns"
-      :editable="true"
+      editable
+      save-type="local"
     />
   </div>
 </template>

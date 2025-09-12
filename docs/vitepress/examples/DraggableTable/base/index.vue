@@ -1,10 +1,12 @@
 <template>
   <div class="container" style="height: 350px">
     <DraggableTable
+      id="demo2"
       v-model="tableData"
       :columns="columns"
       :show-pagination="true"
-      :pagerConfig="pagerConfig"
+      save-type="local"
+      :pager-config="pagerConfig"
       @page-change="handlePageChange"
     />
   </div>
@@ -33,7 +35,7 @@ const pagerConfig = ref({
   layouts: ['Home', 'PrevJump', 'PrevPage', 'Number', 'NextPage', 'NextJump', 'End', 'Sizes', 'FullJump', 'Total'],
 })
 
-const handlePageChange = (params: any) => {
+function handlePageChange(params: any) {
   console.log('handlePageChange', params)
 }
 </script>
