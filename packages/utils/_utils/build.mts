@@ -24,7 +24,7 @@ import { lazyImport, VxeResolver } from 'vite-plugin-lazy-import'
 import { UploadEvent } from './UploadComponent.ts'
 
 /** 必须排除的文件 */
-const mustExcludeDirs = ['!moluoxixi', '!node_modules', '!typings', '!_typings']
+const mustExcludeDirs = ['moluoxixi', 'node_modules', 'typings', '_typings']
 export interface BuildContext {
   /** === 组件库命名空间配置 === */
   LIB_NAMESPACE: string
@@ -203,7 +203,7 @@ function createBaseConfig(ctx: BuildContext, comp: string, internalDeps: string[
 
 /** 获取组件列表（只分目录的组件） */
 async function getComponentNames(ctx: BuildContext) {
-  const componentDirs = await glob([`.${ctx.entryBaseUrl}*`, `!.${ctx.entryBaseUrl}_*`, ...mustExcludeDirs], {
+  const componentDirs = await glob([`.${ctx.entryBaseUrl}*`, `!.${ctx.entryBaseUrl}_*`, ...mustExcludeDirs.map(i => `!${i}`)], {
     cwd: ctx.packDir,
     onlyDirectories: true,
     ignore: [`${ctx.entryBaseUrl}_*`],
@@ -476,7 +476,7 @@ async function analyzeComponentDeps(ctx: BuildContext, comp: string) {
 
     // 补充：直接扫描代码中的import语句（作为backup + 扩展分析）
     console.log(`补充扫描import语句...,${componentDir}`)
-    const files = await glob(['**/*.{vue,ts,tsx,js,jsx}', ...mustExcludeDirs], {
+    const files = await glob(['**/*.{vue,ts,tsx,js,jsx}', ...mustExcludeDirs.map(i => `!${i}`)], {
       cwd: componentDir,
       absolute: true,
     })
@@ -1188,12 +1188,12 @@ async function buildComponent(
       })
 
       try {
-        console.log(`开始发布 ${pkgJson.name}@${pkgJson.version}...`)
-
-        // 发布组件
-        const packageDir = comp ? `${ctx.LIB_NAMESPACE}/packages/${comp}` : ctx.LIB_NAMESPACE
-        execSync(`cd ${packageDir} && npm publish --tag latest`, { stdio: 'inherit' })
-        console.log(`${pkgJson.name}@${pkgJson.version} 发布成功！`)
+        // console.log(`开始发布 ${pkgJson.name}@${pkgJson.version}...`)
+        //
+        // // 发布组件
+        // const packageDir = comp ? `${ctx.LIB_NAMESPACE}/packages/${comp}` : ctx.LIB_NAMESPACE
+        // execSync(`cd ${packageDir} && npm publish --tag latest`, { stdio: 'inherit' })
+        // console.log(`${pkgJson.name}@${pkgJson.version} 发布成功！`)
       }
       catch (error) {
         console.error('发布失败:', error)
