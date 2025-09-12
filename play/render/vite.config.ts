@@ -40,7 +40,7 @@ export default viteConfig(
             '@moluoxixi/components': path.resolve(rootPath, '../../packages/components'),
             '@moluoxixi/components/*': path.resolve(rootPath, '../../packages/components/*'),
             '@moluoxixi/utils': path.resolve(rootPath, '../../packages/utils'),
-            '@moluoxixi/utils/*': path.resolve(rootPath, '../../packages/utils/*')
+            '@moluoxixi/utils/*': path.resolve(rootPath, '../../packages/utils/*'),
           },
         },
         plugins: [

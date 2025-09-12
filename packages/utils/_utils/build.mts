@@ -23,6 +23,8 @@ import cssInjectedByJsPlugin from 'vite-plugin-css-injected-by-js'
 import { lazyImport, VxeResolver } from 'vite-plugin-lazy-import'
 import { UploadEvent } from './UploadComponent.ts'
 
+/** 必须排除的文件 */
+const mustExcludeDirs = ['!moluoxixi', '!node_modules', '!typings', '!_typings']
 export interface BuildContext {
   /** === 组件库命名空间配置 === */
   LIB_NAMESPACE: string
@@ -188,7 +190,7 @@ function createBaseConfig(ctx: BuildContext, comp: string, internalDeps: string[
           api: 'legacy',
           additionalData(content: string, filename: string) {
             if (filename.includes('element')) {
-              const addStr = `$namespace: el`
+              const addStr = `$namespace: el;`
               return `${addStr}\n${content}`
             }
             return content
@@ -201,12 +203,12 @@ function createBaseConfig(ctx: BuildContext, comp: string, internalDeps: string[
 
 /** 获取组件列表（只分目录的组件） */
 async function getComponentNames(ctx: BuildContext) {
-  const componentDirs = await glob([`.${ctx.entryBaseUrl}*`, `!.${ctx.entryBaseUrl}_*`, '!moluoxixi', '!node_modules', '!typings', '!_typings'], {
+  const componentDirs = await glob([`.${ctx.entryBaseUrl}*`, `!.${ctx.entryBaseUrl}_*`, ...mustExcludeDirs], {
     cwd: ctx.packDir,
     onlyDirectories: true,
     ignore: [`${ctx.entryBaseUrl}_*`],
   })
-  const excludeDirs = ['node_modules', 'typings', ctx.LIB_NAMESPACE]
+  const excludeDirs = [ctx.LIB_NAMESPACE, ...mustExcludeDirs]
   return componentDirs
     .map(dir => dir.split('/').pop() || '')
     .filter(dirName => !!dirName && !excludeDirs.includes(dirName))
@@ -474,7 +476,7 @@ async function analyzeComponentDeps(ctx: BuildContext, comp: string) {
 
     // 补充：直接扫描代码中的import语句（作为backup + 扩展分析）
     console.log(`补充扫描import语句...,${componentDir}`)
-    const files = await glob(['**/*.{vue,ts,tsx,js,jsx}', '!moluoxixi', '!node_modules', '!typings', '!_typings'], {
+    const files = await glob(['**/*.{vue,ts,tsx,js,jsx}', ...mustExcludeDirs], {
       cwd: componentDir,
       absolute: true,
     })

@@ -58,6 +58,7 @@ export default defineComponent({
           <DateRangePicker
             format={valueFormat.value}
             value-format={valueFormat.value}
+            size="small"
             type="date"
             {...renderOptsProps.value}
             modelValue={currRow.value[currColumn.value.field]}
@@ -75,6 +76,7 @@ export default defineComponent({
         propsOptions.value && (
           <Select
             class="w-full!"
+            size="small"
             options={propsOptions.value}
             {...renderOptsProps.value}
             teleported={false}
@@ -95,6 +97,7 @@ export default defineComponent({
         <>
           <ElInput
             onInput={validateHandle}
+            size="small"
             {...renderOptsProps.value}
             modelValue={currRow.value[currColumn.value.field]}
             onUpdate:modelValue={(val: any) => {

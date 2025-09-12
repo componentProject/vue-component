@@ -34,11 +34,11 @@
 
 <script setup lang="ts">
 import type { ComponentPublicInstance, PropType } from 'vue'
-import type { ColumnType, types } from '@moluoxixi/components/DraggableTable/src/_types'
+import type { ColumnType, types } from '../../_types'
 import { ElCheckbox, ElMessage, ElPopover } from 'element-plus'
 import { cloneDeep } from 'lodash'
 import { nextTick, onUnmounted, ref, useTemplateRef, watch } from 'vue'
-import { getTypeName } from '@moluoxixi/components/DraggableTable/src/_utils'
+import { getTypeName } from '../../_utils'
 
 const props = defineProps({
   virtualRef: {

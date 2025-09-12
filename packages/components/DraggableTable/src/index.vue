@@ -50,7 +50,7 @@ import type {
   VxeTableDefines,
   VxeTablePropTypes,
 } from 'vxe-table'
-import type { ColumnType, types } from '@moluoxixi/components/DraggableTable/src/_types'
+import type { ColumnType, NoNextInputParams, NoSelectValueParams, types } from './_types'
 import { ElMessage } from 'element-plus'
 
 import { cloneDeep, groupBy } from 'lodash'
@@ -74,7 +74,7 @@ import {
   getCustomType,
   handleGetColumn,
   handleGetRequiredFields,
-} from '@moluoxixi/components/DraggableTable/src/_utils'
+} from './_utils'
 
 /**
  * 自定义右键菜单
@@ -84,10 +84,6 @@ import ContextMenu from './components/ContextMenu/index.vue'
 import './renderers'
 import type { slotsType } from '@moluoxixi/components/_types'
 import EnterNextContainer from '@moluoxixi/components/EnterNextContainer'
-import type {
-  NoNextInputParams,
-  NoSelectValueParams,
-} from './_types'
 
 defineOptions({
   name: 'DraggableTable',
