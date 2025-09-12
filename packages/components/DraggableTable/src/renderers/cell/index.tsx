@@ -1,4 +1,4 @@
-import { VxeUI } from 'vxe-table'
+import { VxeUI } from 'vxe-pc-ui'
 import CellRenderer from './CellRenderer.tsx'
 
 // 创建一个默认渲染器

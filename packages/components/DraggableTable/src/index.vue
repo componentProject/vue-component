@@ -1050,6 +1050,7 @@ async function handleSaveColumnsToStorage() {
         }
         return col
       })
+    console.log('columns', columns)
     if (getType(props.setConfig, 'function')) {
       await props.setConfig({
         pageId: props.pageId,

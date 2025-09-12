@@ -52,7 +52,7 @@
     </el-button>
     <!-- 使用DraggableTable组件 -->
     <DraggableTable
-      id="demo_table_12"
+      id="demo_table_123"
       ref="draggableTableRef"
       v-model="tableData"
       page-id="page1"

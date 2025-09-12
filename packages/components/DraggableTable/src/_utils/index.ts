@@ -146,17 +146,17 @@ export function handleGetColumn(Column: ColumnType): ColumnType {
   }
 }
 
-// export function handleGetRequiredFields() {
-//   const noRequiredFields = ['resizeWidth', 'visible', 'options', 'cellProps', 'editProps', 'filterProps']
-//   return Object.keys(handleGetColumn({})).filter(key => !noRequiredFields.includes(key)) as Array<
-//     keyof ColumnType
-//   >
-// }
-export function handleGetRequiredFields(customColumns: ColumnType[] = []) {
-  const requiredFields = []
-  customColumns.forEach((column) => {
-    if (column.field)
-      requiredFields.push(column.field)
-  })
-  return Array.from(new Set(['field', 'title', 'width', ...requiredFields]))
+export function handleGetRequiredFields() {
+  const noRequiredFields = ['resizeWidth', 'visible', 'options', 'cellProps', 'editProps', 'filterProps']
+  return Object.keys(handleGetColumn({})).filter(key => !noRequiredFields.includes(key)) as Array<
+    keyof ColumnType
+  >
 }
+// export function handleGetRequiredFields(customColumns: ColumnType[] = []) {
+//   const requiredFields = []
+//   customColumns.forEach((column) => {
+//     if (column.field)
+//       requiredFields.push(column.field)
+//   })
+//   return Array.from(new Set(['field', 'title', 'width', ...requiredFields]))
+// }
