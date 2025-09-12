@@ -2,7 +2,7 @@ import { getHttpService } from '../../utils/AjaxPackage/netseriver.js'
 import FormData from 'form-data'
 
 const httpApi: any = getHttpService({
-  baseURL: 'http://192.168.209.103:10019/',
+  baseURL: 'http://192.168.209.103:10019/ts-fm',
   timeout: 3000,
   getToken: () => null,
   // 响应字段配置
