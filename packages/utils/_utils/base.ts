@@ -1,6 +1,9 @@
 import type { App, Component } from 'vue'
 import { Fragment } from 'vue'
-
+/** 简单延迟函数，用于缓冲时间 */
+export function sleep(ms: number = 0): Promise<void> {
+  return new Promise(resolve => setTimeout(resolve, ms))
+}
 export function filterEmpty(children = []) {
   const res: any[] = []
   children.forEach((child: any) => {

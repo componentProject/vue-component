@@ -53,5 +53,5 @@ export interface NoSelectValueParams {
   /** 列索引 */
   colIndex: number
 }
-export type ColumnType = VxeTableDefines.ColumnOptions & customColumnProps
+export type ColumnType = VxeTableDefines.ColumnOptions & customColumnProps & { renderWidth?: number }
 export type TableRowData = VxeTablePropTypes.Row

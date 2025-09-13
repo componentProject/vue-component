@@ -60,7 +60,7 @@ import type {
 import type { ColumnType, customConfigType, NoNextInputParams, NoSelectValueParams, types } from './_types'
 import { ElMessage } from 'element-plus'
 
-import { cloneDeep, groupBy } from 'lodash'
+import { groupBy } from 'lodash'
 import { diff, isEmpty } from 'radash'
 import Sortable from 'sortablejs'
 import {
@@ -84,6 +84,7 @@ import {
   getStringObj,
   getType,
   onHotkeys,
+  sleep,
 } from '@moluoxixi/utils/_utils'
 import {
   getCustomType,
@@ -606,7 +607,7 @@ function handleCheckboxChange(params: VxeTableDefines.CheckboxChangeParams) {
  */
 const computedColumns = computed<ColumnType[]>(() => {
   const typeSet = new Set<types | undefined>([])
-  const columns: any[] = cloneDeep(props.columns)
+  const columns: any[] = localColumns.value
     .filter((i: any) => {
       if (i.type && typeSet.has(i.type)) {
         return false
@@ -631,19 +632,13 @@ const computedColumns = computed<ColumnType[]>(() => {
   // 获取slots中未使用的插槽
   const slotsDiff = [...diff(slotNames.value, columnsSlotsNames)]
 
-  return columns.map((i) => {
-    const col = handleGetColumn(i)
-    col.visible = col.visible ?? true
+  return columns.map((col) => {
     const { options, editProps, filterProps, cellProps, ...item } = col
     const customType = getCustomType(item.type)
     if (customType) {
       delete item.type
     }
 
-    item.resizable = item.resizable ?? (props.resizable || props.columnConfig.resizable)
-    item.align = item.align ?? props.align
-    /** 提供默认排序 */
-    item.sortable = item.sortable ?? props.sortable
     if (!item.field)
       return item
     //#region 提供基于field的插槽
@@ -965,7 +960,7 @@ const gridProps = computed<VxeGridProps>(() => {
     },
     ...attrs,
     // 使用计算后的列配置
-    columns: localColumns.value?.map((item: ColumnType) => {
+    columns: computedColumns.value?.map((item: ColumnType) => {
       const { min, max, required, ...column } = item
       return column
     }),
@@ -976,6 +971,7 @@ const gridProps = computed<VxeGridProps>(() => {
 //#region 存储相关
 const container = useTemplateRef<HTMLElement>('container')
 const offEffect = ref()
+const requiredFields = computed<string[]>(() => handleGetRequiredFields(props.customColumns))
 onMounted(() => {
   offEffect.value = onHotkeys(props.saveHotKeys, () => customConfigDialogVisible.value = true, { target: container.value })
 })
@@ -1033,6 +1029,8 @@ async function handleSaveColumnsToServer(key: string, columns: string) {
 /** 保存列配置到本地存储 */
 async function handleSaveColumnsToStorage() {
   try {
+    /** nextTick无效，故只能sleep等待队列清空再执行 */
+    await sleep()
     // 如果没有表格实例，或者启用了本地存储，不保存
     if (!xTable.value || props.customConfig.storage) {
       return
@@ -1040,17 +1038,18 @@ async function handleSaveColumnsToStorage() {
     // 直接从表格实例获取完整列配置
     const { fullColumn } = xTable.value.getTableColumn()
     // 只保存必要的列属性
-    const columns = computedColumns.value
-      .filter((item: ColumnType) => item.title || item.type)
-      .map((i: ColumnType) => {
-        const oldCol = handleGetColumn(i)
-        const col = fullColumn.find((item: ColumnType) => item.field === i.field && item.type === i.type && item.title === i.title)
-        if (col) {
-          col.width = oldCol.width!
-        }
+    const columns = fullColumn
+      .map((i: Record<string, any>) => {
+        const _col: Record<string, any> = handleGetColumn(i)
+        _col.width = _col.width || _col.resizeWidth
+        const col: Record<string, any> = {}
+        requiredFields.value.forEach((field: string) => {
+          col[field] = _col[field]
+        })
+
         return col
       })
-    console.log('columns', columns)
+    console.log('saveColumns', columns)
     if (getType(props.setConfig, 'function')) {
       await props.setConfig({
         pageId: props.pageId,
@@ -1070,35 +1069,27 @@ async function handleSaveColumnsToStorage() {
   }
 }
 
-/** 没有本地存储的列配置，使用props.columns */
-function handleSavePropsColumns() {
-  localColumns.value = cloneDeep(computedColumns.value)
-}
-
 /**
- * 对比计算出来的computedColumns与本地存储的storedColumns是否不一致
- * @param computedColumns
+ * 对比 props.columns 与 存储的storedColumns 是否不一致
+ * @param columns
  * @param storedColumns
  */
 function handleCompareColumns(
-  computedColumns: ColumnType[] = [],
+  columns: ColumnType[] = [],
   storedColumns: ColumnType[] = [],
 ) {
-  if (computedColumns.length !== storedColumns.length) {
+  if (columns.length !== storedColumns.length) {
     return true
   }
-  const requiredFields: Array<keyof ColumnType> = handleGetRequiredFields(props.customColumns)
-  return computedColumns.some((source) => {
-    const target = storedColumns.find(
-      item =>
-        item.field === source.field && item.type === source.type && item.title === source.title,
+
+  const noCompareFields = ['resizeWidth', 'width']
+  return columns.some((source: Record<string, any>) => {
+    const target: Record<string, any> | undefined = storedColumns.find(
+      (item: Record<string, any>) => requiredFields.value
+        .filter((field: string) => !noCompareFields.includes(field))
+        .every((field: string) => getStringObj(item[field]) === getStringObj(source[field])),
     )
-    if (!target) {
-      return true
-    }
-    return requiredFields.some(
-      field => getStringObj(target[field]) !== getStringObj(source[field]),
-    )
+    return !target
   })
 }
 
@@ -1115,29 +1106,31 @@ function handleColumnResizableChange(params: VxeTableDefines.ResizableChangePara
 
 /** 监听props.columns的变化 */
 watch(
-  () => computedColumns.value,
-  async (newColumns: ColumnType[]) => {
+  () => props.columns,
+  async (_newColumns: ColumnType[]) => {
+    const newColumns = _newColumns.filter(Boolean).map((i) => {
+      i.resizable = i.resizable ?? (props.resizable || props.columnConfig.resizable)
+      i.align = i.align ?? props.align
+      /** 提供默认排序 */
+      i.sortable = i.sortable ?? props.sortable
+      return i
+    })
     // 如果启用了本地存储，不保存
     if (props.customConfig.storage) {
-      localColumns.value = cloneDeep(newColumns)
-      return
+      localColumns.value = newColumns
     }
-    // 尝试从本地存储获取列配置
-    const storedColumns = await handleGetStoredColumns()
-    if (!isEmpty(newColumns)) {
-      // 对比本地存储的列配置和props.columns
-      // 检查每列的field, title, fixed, sortable是否变化
-      const shouldUseStored = handleCompareColumns(newColumns, storedColumns)
-      // 使用props.columns并保存到本地
-      if (shouldUseStored) {
+    else {
+      // 尝试从本地存储获取列配置
+      const _storedColumns = await handleGetStoredColumns()
+      const storedColumns = _storedColumns.filter(Boolean)
+
+      console.log('storedColumns', storedColumns)
+      if (handleCompareColumns(newColumns, storedColumns)) {
         console.log('shouldUseStored')
-        handleSavePropsColumns()
+        localColumns.value = newColumns
       }
       else {
-        localColumns.value = storedColumns.map((item: any) => {
-          item.width = item.resizeWidth ? Math.ceil(item.resizeWidth) : item.width
-          return item
-        })
+        localColumns.value = storedColumns
       }
     }
   },
@@ -1146,11 +1139,9 @@ watch(
 
 watch(
   () => localColumns.value,
-  (newVal: ColumnType) => {
-    nextTick(() => {
-      xTable.value?.loadColumn(newVal)
-      handleSaveColumnsToStorage()
-    })
+  (v: ColumnType[]) => {
+    console.log('aaaa', v.length)
+    handleSaveColumnsToStorage()
   },
 )
 //#endregion

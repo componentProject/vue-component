@@ -29,11 +29,12 @@
       </template>
       <template #width="{ row, column }">
         <ElInput
-          v-model="row[column.field]"
+          :model-value="row[column.field]"
           size="small"
           :disabled="!row.resizable"
           :placeholder="getPlaceholder(column.title)"
           style="width: 100%"
+          @update:model-value="handlePositiveNumberInput(row, column.field, $event)"
         />
       </template>
       <template #resizable="{ row, column }">
