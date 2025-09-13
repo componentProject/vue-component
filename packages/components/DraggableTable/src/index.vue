@@ -1,5 +1,5 @@
 <template>
-  <div ref="container" class="h-full w-full flex-1 overflow-hidden">
+  <div ref="container" class="h-full w-full flex-1 overflow-hidden outline-0">
     <VxeGrid
       ref="xTable"
       :header-cell-config="{ height: '30px' }"
