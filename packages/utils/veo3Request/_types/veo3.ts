@@ -1,4 +1,4 @@
-export interface veo3Request {
+export interface veo3VideoGenerateParamsType {
   /** 提示词 */
   prompt?: string
   /** apikey */

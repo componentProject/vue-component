@@ -1,31 +1,34 @@
 import { BaseApi } from '@moluoxixi/utils/AjaxPackage'
 import type { InternalAxiosRequestConfig } from 'axios'
 import { AxiosHeaders } from 'axios'
-import type { Image4oRequest, SunoGenerateRequest } from './_types'
+
 import type {
-  SunoAddAccompanimentRequest,
-  SunoAddInstrumentalRequest,
-  SunoAddVocalRequest,
-  SunoAddVocalsRequest,
-  SunoCoverGenerateByTaskRequest,
-  SunoCreateMusicVideoRequest,
-  SunoExtendMusicRequest,
-  SunoGenerateCoverRequest,
-  SunoGenerateLyricsRequest,
+  gpt4oImageGenerateParamsType,
+  sunoAddAccompanimentParamsType,
+  sunoAddInstrumentalParamsType,
+  sunoAddVocalParamsType,
+  sunoAddVocalsParamsType,
+  sunoCoverGenerateParamsType,
+  sunoCreateMusicVideoParamsType,
+  sunoExtendMusicParamsType,
+  sunoGenerateCoverParamsType,
+  sunoGenerateLyricsParamsType,
+  sunoGenerateParamsType,
   SunoGenerateResponse,
-  SunoGetTimestampedLyricsRequest,
-  SunoImproveStyleRequest,
-  SunoLyricsRequest,
-  SunoStyleGenerateRequest,
-  SunoTimestampLyricsRequest,
-  SunoUploadCoverRequest,
-  SunoUploadExtendRequest,
-  SunoVocalRemovalGenerateRequest,
-  SunoVocalSeparationRequest,
-  SunoWavConvertRequest,
-  SunoWavGenerateRequest,
-} from './_types/suno'
-import type { veo3Request } from './_types/veo3'
+  sunoGetTimestampedLyricsParamsType,
+  sunoImproveStyleParamsType,
+  sunoLyricsGenerateParamsType,
+  sunoMp4GenerateParamsType,
+  sunoStyleGenerateParamsType,
+  sunoTimestampLyricsParamsType,
+  sunoUploadCoverParamsType,
+  sunoUploadExtendParamsType,
+  sunoVocalRemovalGenerateParamsType,
+  sunoVocalSeparationParamsType,
+  sunoWavConvertParamsType,
+  sunoWavGenerateParamsType,
+  veo3VideoGenerateParamsType,
+} from './_types'
 
 // 类型已拆分到 packages/utils/_types/
 
@@ -53,20 +56,21 @@ class RequestApi extends BaseApi {
 
   //#region veo3
   /**
-   * 创建 Veo3 视频生成任务。
-   * @param options - 生成参数
-   * @param options.prompt - 提示词
-   * @param options.imageUrls - 图片地址列表
-   * @param options.watermark - 水印标记
-   * @param options.callBackUrl - 回调地址
-   * @param options.enableFallback - 是否启用兜底模型
-   * @param options.model - 使用的模型名
-   * @param options.aspectRatio - 画面比例，如 16:9
-   * @param options.enableTranslation - 是否启用翻译
-   * @param options.seeds - 随机种子
+   * 创建 Veo 视频 1080p 生成任务（/veo/generate）。
+   * @param options - 生成参数对象（默认 {}）
    * @returns 服务端响应
+   * @description
+   * - prompt: 提示词
+   * - imageUrls: 图片地址列表
+   * - watermark: 水印标记
+   * - callBackUrl: 回调地址
+   * - enableFallback: 是否启用兜底模型
+   * - model: 使用的模型名
+   * - aspectRatio: 画面比例，如 16:9
+   * - enableTranslation: 是否启用翻译
+   * - seeds: 随机种子
    */
-  veo3Video(options: veo3Request = {}): Promise<any> {
+  veo3VideoGenerate(options: Partial<veo3VideoGenerateParamsType> = {}): Promise<any> {
     const {
       prompt = '',
       imageUrls = [],
@@ -76,7 +80,7 @@ class RequestApi extends BaseApi {
       model = 'veo3',
       aspectRatio = '16:9',
       enableTranslation = false,
-      seeds,
+      seeds = undefined,
     } = options
     return this.post('/veo/generate', {
       model,
@@ -92,20 +96,20 @@ class RequestApi extends BaseApi {
   }
 
   /**
-   * 获取 Veo3 1080p 视频。
-   * @param taskId - 任务 ID
+   * 获取 Veo 1080p 视频（/veo/get-1080p-video）。
+   * @param taskId - 任务 ID（默认 ''）
    * @returns 视频信息或下载地址
    */
-  getVeo3Video(taskId = '') {
+  veoGet1080pVideo(taskId: string = '') {
     return this.get('/veo/get-1080p-video', { taskId })
   }
 
   /**
-   * 获取 Veo3 任务状态。
-   * @param taskId - 任务 ID
+   * 获取 Veo 任务状态（/veo/record-info）。
+   * @param taskId - 任务 ID（默认 ''）
    * @returns 任务状态信息
    */
-  getVeo3VideoStatus(taskId = '') {
+  veoRecordInfo(taskId: string = '') {
     return this.get('/veo/record-info', { taskId })
   }
 
@@ -113,17 +117,18 @@ class RequestApi extends BaseApi {
 
   //#region 4o image
   /**
-   * 创建 4o 图片生成任务。
-   * @param options - 生成参数
-   * @param options.size - 生成尺寸比例，如 3:2
-   * @param options.prompt - 提示词
-   * @param options.maskUrl - 蒙版图片地址
-   * @param options.uploadCn - 是否上传到中国区
-   * @param options.enableFallback - 是否启用兜底模型
-   * @param options.fallbackModel - 兜底模型名
+   * gpt-4o 图片生成（/gpt4o-image/generate）。
+   * @param options - 生成参数对象（默认 {}）
    * @returns 服务端响应
+   * @description
+   * - size: 生成尺寸比例，如 3:2
+   * - prompt: 提示词
+   * - maskUrl: 蒙版图片地址
+   * - uploadCn: 是否上传到中国区
+   * - enableFallback: 是否启用兜底模型
+   * - fallbackModel: 兜底模型名
    */
-  Image4o(options: Image4oRequest = {}): Promise<any> {
+  gpt4oImageGenerate(options: Partial<gpt4oImageGenerateParamsType> = {}): Promise<any> {
     const {
       size = '3:2',
       prompt = '',
@@ -146,24 +151,12 @@ class RequestApi extends BaseApi {
 
   //#region Suno
   /**
-   * 生成音乐（Suno）。支持自定义模式或简易模式。
-   * 接收提示词、风格、标题、模型、权重等参数。
-   * @param options - 生成参数
-   * @param options.prompt - 提示词
-   * @param options.style - 音乐风格
-   * @param options.title - 标题
-   * @param options.customMode - 是否启用自定义模式
-   * @param options.instrumental - 是否为纯音乐
-   * @param options.model - 模型
-   * @param options.callBackUrl - 回调地址
-   * @param options.negativeTags - 负面标签
-   * @param options.vocalGender - 人声性别
-   * @param options.styleWeight - 风格权重 0~1
-   * @param options.weirdnessConstraint - 创意度 0~1
-   * @param options.audioWeight - 音频要素权重 0~1
+   * Suno 生成音乐（/generate）。
+   * @param options - 生成参数对象（默认 {}）
    * @returns 成功时返回包含任务 ID 的响应
+   * @description 关键参数：prompt、style、title、customMode、instrumental、model、callBackUrl、negativeTags、vocalGender、styleWeight、weirdnessConstraint、audioWeight
    */
-  suno(options: SunoGenerateRequest = {}): Promise<SunoGenerateResponse> {
+  sunoGenerate(options: Partial<sunoGenerateParamsType> = {}): Promise<SunoGenerateResponse> {
     const {
       prompt = '',
       style = 'Classical',
@@ -177,7 +170,7 @@ class RequestApi extends BaseApi {
       styleWeight = 0.65,
       weirdnessConstraint = 0.65,
       audioWeight = 0.65,
-    } = options
+    } = options || ({} as sunoGenerateParamsType)
     return this.post('/generate', {
       style,
       title,
@@ -195,24 +188,11 @@ class RequestApi extends BaseApi {
   }
 
   /**
-   * 延长音乐。
-   * @param options - 延长参数，如音频 ID、提示词、风格、起始秒等
-   * @param options.audioId - 音频 ID
-   * @param options.defaultParamFlag - 是否使用默认参数
-   * @param options.prompt - 延长段提示词
-   * @param options.style - 延长段风格
-   * @param options.title - 延长后标题
-   * @param options.continueAt - 从第几秒开始延长
-   * @param options.model - 模型
-   * @param options.callBackUrl - 回调地址
-   * @param options.negativeTags - 负面标签
-   * @param options.vocalGender - 人声音色偏好
-   * @param options.styleWeight - 风格权重
-   * @param options.weirdnessConstraint - 创意度
-   * @param options.audioWeight - 音频要素权重
+   * Suno 延长音乐（/generate/extend）。
+   * @param options - 延长参数对象（默认 {}）
    * @returns 服务端响应
    */
-  extendMusic(options: Partial<SunoExtendMusicRequest> = {}) {
+  sunoGenerateExtend(options: Partial<sunoExtendMusicParamsType> = {}) {
     const {
       audioId,
       defaultParamFlag,
@@ -246,23 +226,11 @@ class RequestApi extends BaseApi {
   }
 
   /**
-   * 上传并翻唱音乐。
-   * @param options - 翻唱参数，如音频地址、风格、标题等
-   * @param options.audioUrl - 待翻唱音频地址
-   * @param options.style - 风格
-   * @param options.title - 标题
-   * @param options.vocalGender - 人声音色偏好
-   * @param options.model - 模型
-   * @param options.callBackUrl - 回调地址
-   * @param options.negativeTags - 负面标签
-   * @param options.styleWeight - 风格权重
-   * @param options.weirdnessConstraint - 创意度
-   * @param options.audioWeight - 音频要素权重
-   * @param options.instrumental - 是否纯音乐
-   * @param options.customMode - 是否自定义模式
+   * 上传并翻唱音乐（/generate/upload-cover）。
+   * @param options - 参数对象（默认 {}）
    * @returns 服务端响应
    */
-  uploadAndCover(options: Partial<SunoUploadCoverRequest> = {}) {
+  sunoUploadCoverGenerate(options: Partial<sunoUploadCoverParamsType> = {}) {
     const {
       uploadUrl,
       prompt,
@@ -296,25 +264,11 @@ class RequestApi extends BaseApi {
   }
 
   /**
-   * 上传并扩展音乐。
-   * @param options - 扩展参数，如音频地址、提示词、起始秒等
-   * @param options.audioUrl - 待扩展音频地址
-   * @param options.prompt - 延长段提示词
-   * @param options.style - 延长段风格
-   * @param options.title - 延长后标题
-   * @param options.continueAt - 从第几秒开始延长
-   * @param options.model - 模型
-   * @param options.callBackUrl - 回调地址
-   * @param options.negativeTags - 负面标签
-   * @param options.vocalGender - 人声音色偏好
-   * @param options.styleWeight - 风格权重
-   * @param options.weirdnessConstraint - 创意度
-   * @param options.audioWeight - 音频要素权重
-   * @param options.instrumental - 是否纯音乐
-   * @param options.customMode - 是否自定义模式
+   * 上传并扩展音乐（/generate/upload-extend）。
+   * @param options - 参数对象（默认 {}）
    * @returns 服务端响应
    */
-  uploadAndExtend(options: Partial<SunoUploadExtendRequest> = {}) {
+  sunoUploadExtendGenerate(options: Partial<sunoUploadExtendParamsType> = {}) {
     const {
       uploadUrl,
       defaultParamFlag,
@@ -350,20 +304,11 @@ class RequestApi extends BaseApi {
   }
 
   /**
-   * 添加伴奏生成音乐。
-   * @param options - 参数，如音频地址、风格、标题等
-   * @param options.audioUrl - 原始音频地址
-   * @param options.style - 风格
-   * @param options.title - 标题
-   * @param options.model - 模型
-   * @param options.callBackUrl - 回调地址
-   * @param options.negativeTags - 负面标签
-   * @param options.styleWeight - 风格权重
-   * @param options.weirdnessConstraint - 创意度
-   * @param options.audioWeight - 音频要素权重
+   * 添加伴奏生成音乐（/generate/add-accompaniment）。
+   * @param options - 参数对象（默认 {}）
    * @returns 服务端响应
    */
-  addAccompaniment(options: Partial<SunoAddAccompanimentRequest> = {}) {
+  sunoAddAccompanimentGenerate(options: Partial<sunoAddAccompanimentParamsType> = {}) {
     const {
       audioUrl,
       style,
@@ -389,20 +334,11 @@ class RequestApi extends BaseApi {
   }
 
   /**
-   * 添加纯伴奏（不含人声）。
-   * @param options - 参数，如上传地址、标题、标签、负面标签等
-   * @param options.uploadUrl - 上传接口地址
-   * @param options.title - 标题
-   * @param options.negativeTags - 负面标签
-   * @param options.tags - 标签（逗号分隔）
-   * @param options.callBackUrl - 回调地址
-   * @param options.vocalGender - 人声性别偏好
-   * @param options.styleWeight - 风格权重
-   * @param options.weirdnessConstraint - 创意度
-   * @param options.audioWeight - 音频要素权重
+   * 添加纯伴奏（/generate/add-instrumental）。
+   * @param options - 参数对象（默认 {}）
    * @returns 服务端响应
    */
-  addInstrumental(options: Partial<SunoAddInstrumentalRequest> = {}) {
+  sunoAddInstrumentalGenerate(options: Partial<sunoAddInstrumentalParamsType> = {}) {
     const {
       uploadUrl,
       title,
@@ -428,22 +364,11 @@ class RequestApi extends BaseApi {
   }
 
   /**
-   * 添加人声生成音乐。
-   * @param options - 参数，如伴奏地址、歌词、人声偏好等
-   * @param options.audioUrl - 伴奏音频地址
-   * @param options.lyrics - 歌词或人声提示
-   * @param options.vocalGender - 人声音色偏好
-   * @param options.style - 风格
-   * @param options.title - 标题
-   * @param options.model - 模型
-   * @param options.callBackUrl - 回调地址
-   * @param options.negativeTags - 负面标签
-   * @param options.styleWeight - 风格权重
-   * @param options.weirdnessConstraint - 创意度
-   * @param options.audioWeight - 音频要素权重
+   * 添加人声生成音乐（/generate/add-vocal）。
+   * @param options - 参数对象（默认 {}）
    * @returns 服务端响应
    */
-  addVocal(options: Partial<SunoAddVocalRequest> = {}) {
+  sunoAddVocalGenerate(options: Partial<sunoAddVocalParamsType> = {}) {
     const {
       audioUrl,
       lyrics,
@@ -473,21 +398,11 @@ class RequestApi extends BaseApi {
   }
 
   /**
-   * 添加人声（上传并在人声轨道上生成）。
-   * @param options - 参数，如上传地址、提示词、标题、风格等
-   * @param options.uploadUrl - 上传接口地址
-   * @param options.prompt - 提示词
-   * @param options.title - 标题
-   * @param options.negativeTags - 负面标签
-   * @param options.style - 风格
-   * @param options.vocalGender - 人声性别
-   * @param options.styleWeight - 风格权重
-   * @param options.weirdnessConstraint - 创意度
-   * @param options.audioWeight - 音频要素权重
-   * @param options.callBackUrl - 回调地址
+   * 添加人声（上传并在人声轨道上生成）（/generate/add-vocals）。
+   * @param options - 参数对象（默认 {}）
    * @returns 服务端响应
    */
-  addVocals(options: Partial<SunoAddVocalsRequest> = {}) {
+  sunoAddVocalsGenerate(options: Partial<sunoAddVocalsParamsType> = {}) {
     const {
       uploadUrl,
       prompt,
@@ -515,56 +430,40 @@ class RequestApi extends BaseApi {
   }
 
   /**
-   * 获取音乐任务详情。
-   * @param taskId - 任务 ID
+   * 获取音乐任务详情（/generate/record-info）。
+   * @param taskId - 任务 ID（默认 ''）
    * @returns 任务详情
    */
-  getMusicTaskDetail(taskId = '') {
+  sunoGenerateRecordInfo(taskId: string = '') {
     return this.get('/generate/record-info', { taskId })
   }
 
   /**
-   * 获取带时间戳的歌词。
-   * @param options - 歌词文本及可选语言
-   * @param options.lyrics - 原始歌词文本
-   * @param options.language - 语言
-   * @param options.model - 模型
-   * @param options.callBackUrl - 回调地址
+   * 获取带时间戳的歌词（/generate/timestamp-lyrics）。
+   * @param options - 参数对象（默认 {}）
    * @returns 含时间戳的歌词
    */
-  getTimestampLyrics(options: Partial<SunoTimestampLyricsRequest> = {}) {
-    const { lyrics, language, model, callBackUrl } = options
+  sunoGenerateTimestampLyrics(options: Partial<sunoTimestampLyricsParamsType> = {}) {
+    const { lyrics = '', language = '', model = 'V3_5', callBackUrl = '' } = options
     return this.post('/generate/timestamp-lyrics', { lyrics, language, model, callBackUrl })
   }
 
   /**
-   * 通过任务与音频 ID 获取带时间戳的歌词。
-   * @param taskId - 任务 ID
-   * @param audioId - 音频 ID
+   * 通过任务与音频 ID 获取带时间戳的歌词（/generate/get-timestamped-lyrics）。
+   * @param options - 参数对象（默认 {}）
    * @returns 含时间戳的歌词
    */
-  getTimestampedLyrics(taskId = '', audioId = '') {
-    const params: SunoGetTimestampedLyricsRequest = { taskId, audioId }
-    return this.get('/generate/get-timestamped-lyrics', params)
+  sunoGetTimestampedLyrics(options: Partial<sunoGetTimestampedLyricsParamsType> = {}) {
+    const { taskId = '', audioId = '' } = options
+    return this.get('/generate/get-timestamped-lyrics', { taskId, audioId })
   }
 
   /**
-   * 提升音乐风格。
-   * @param options - 风格相关参数，包含曲目 ID
-   * @param options.musicId - 曲目 ID
-   * @param options.prompt - 提示词
-   * @param options.style - 风格
-   * @param options.title - 标题
-   * @param options.styleWeight - 风格权重
-   * @param options.model - 模型
-   * @param options.callBackUrl - 回调地址
-   * @param options.negativeTags - 负面标签
-   * @param options.vocalGender - 人声音色偏好
-   * @param options.weirdnessConstraint - 创意度
-   * @param options.audioWeight - 音频要素权重
+   * 提升音乐风格（/generate/improve-style）。
+   * @param options - 参数对象（默认 {}）
    * @returns 服务端响应
    */
-  improveMusicStyle(options: Partial<SunoImproveStyleRequest> = {}) {
+  sunoImproveStyleGenerate(options: Partial<sunoImproveStyleParamsType> = {}) {
     const {
       musicId,
       prompt,
@@ -594,236 +493,204 @@ class RequestApi extends BaseApi {
   }
 
   /**
-   * 生成音乐封面。
-   * @param options - 封面提示词、标题、风格等
-   * @param options.prompt - 封面提示词
-   * @param options.title - 标题
-   * @param options.style - 风格
-   * @param options.callBackUrl - 回调地址
-   * @param options.model - 模型
+   * 生成音乐封面（/generate/cover）。
+   * @param options - 参数对象（默认 {}）
    * @returns 服务端响应
    */
-  generateMusicCover(options: Partial<SunoGenerateCoverRequest> = {}) {
-    const { prompt, title, style, callBackUrl, model } = options
+  sunoGenerateCover(options: Partial<sunoGenerateCoverParamsType> = {}) {
+    const { prompt = '', title = '', style = '', callBackUrl = '', model = 'V3_5' } = options
     return this.post('/generate/cover', { prompt, title, style, callBackUrl, model })
   }
 
   /**
-   * 获取音乐封面详情。
-   * @param taskId - 任务 ID
+   * 获取音乐封面详情（/generate/cover/record-info）。
+   * @param taskId - 任务 ID（默认 ''）
    * @returns 任务详情
    */
-  getMusicCoverDetail(taskId = '') {
+  sunoGenerateCoverRecordInfo(taskId: string = '') {
     return this.get('/generate/cover/record-info', { taskId })
   }
 
   /**
-   * 获取 Suno 封面任务详情。
-   * @param taskId - 任务 ID
+   * 获取 Suno 封面任务详情（/suno/cover/record-info）。
+   * @param taskId - 任务 ID（默认 ''）
    * @returns 任务详情
    */
-  getSunoCoverRecordInfo(taskId = '') {
+  sunoCoverRecordInfo(taskId: string = '') {
     return this.get('/suno/cover/record-info', { taskId })
   }
 
   /**
-   * 生成歌词。
-   * @param options - 提示词、风格、标题等
-   * @param options.prompt - 提示词或主题
-   * @param options.style - 风格
-   * @param options.title - 标题
-   * @param options.callBackUrl - 回调地址
-   * @param options.language - 语言
-   * @param options.model - 模型
+   * 生成歌词（/generate/lyrics）。
+   * @param options - 参数对象（默认 {}）
    * @returns 服务端响应
    */
-  generateLyrics(options: Partial<SunoGenerateLyricsRequest> = {}) {
-    const { prompt, style, title, callBackUrl, language, model } = options
+  sunoGenerateLyrics(options: Partial<sunoGenerateLyricsParamsType> = {}) {
+    const { prompt = '', style = '', title = '', callBackUrl = '', language = '', model = 'V3_5' } = options
     return this.post('/generate/lyrics', { prompt, style, title, callBackUrl, language, model })
   }
 
   /**
-   * 直接创建歌词任务。
-   * @param prompt - 提示词
-   * @param callBackUrl - 回调地址
+   * 直接创建歌词任务（/lyrics）。
+   * @param options - 参数对象（默认 {}）
    * @returns 任务创建结果
    */
-  lyrics(prompt = '', callBackUrl = '') {
-    const body: SunoLyricsRequest = { prompt, callBackUrl }
-    return this.post('/lyrics', body)
+  sunoLyricsGenerate(options: Partial<sunoLyricsGenerateParamsType> = {}) {
+    const { prompt = '', callBackUrl = '' } = options
+    return this.post('/lyrics', { prompt, callBackUrl })
   }
 
   /**
-   * 获取歌词任务详情。
-   * @param taskId - 任务 ID
+   * 获取歌词任务详情（/generate/lyrics/record-info）。
+   * @param taskId - 任务 ID（默认 ''）
    * @returns 任务详情
    */
-  getLyricsTaskDetail(taskId = '') {
+  sunoGenerateLyricsRecordInfo(taskId: string = '') {
     return this.get('/generate/lyrics/record-info', { taskId })
   }
 
   /**
    * 获取 Suno 歌词任务详情（/lyrics/record-info）。
-   * @param taskId - 任务 ID
+   * @param taskId - 任务 ID（默认 ''）
    * @returns 任务详情
    */
-  getLyricsRecordInfo(taskId = '') {
+  sunoLyricsRecordInfo(taskId: string = '') {
     return this.get('/lyrics/record-info', { taskId })
   }
 
   /**
-   * 转换为 WAV 格式。
-   * @param options - 音频地址及回调
-   * @param options.audioUrl - 音频地址
-   * @param options.callBackUrl - 回调地址
+   * 转换为 WAV 格式（/generate/wav）。
+   * @param options - 参数对象（默认 {}）
    * @returns 服务端响应
    */
-  convertToWav(options: Partial<SunoWavConvertRequest> = {}) {
-    const { audioUrl, callBackUrl } = options
+  sunoGenerateWav(options: Partial<sunoWavConvertParamsType> = {}) {
+    const { audioUrl = '', callBackUrl = '' } = options
     return this.post('/generate/wav', { audioUrl, callBackUrl })
   }
 
   /**
    * 生成 WAV（/wav/generate）。
-   * @param taskId - 任务 ID
-   * @param audioId - 音频 ID
-   * @param callBackUrl - 回调地址
+   * @param options - 参数对象（默认 {}）
    * @returns 任务创建结果
    */
-  wavGenerate(taskId = '', audioId = '', callBackUrl = '') {
-    const body: SunoWavGenerateRequest = { taskId, audioId, callBackUrl }
-    return this.post('/wav/generate', body)
+  sunoWavGenerate(options: Partial<sunoWavGenerateParamsType> = {}) {
+    const { taskId = '', audioId = '', callBackUrl = '' } = options
+    return this.post('/wav/generate', { taskId, audioId, callBackUrl })
   }
 
   /**
    * 获取 WAV 任务详情（/wav/record-info）。
-   * @param taskId - 任务 ID
+   * @param taskId - 任务 ID（默认 ''）
    * @returns 任务详情
    */
-  getWavRecordInfo(taskId = '') {
+  sunoWavRecordInfo(taskId: string = '') {
     return this.get('/wav/record-info', { taskId })
   }
 
   /**
-   * 获取 WAV 转换详情。
-   * @param taskId - 任务 ID
+   * 获取 WAV 转换详情（/generate/wav/record-info）。
+   * @param taskId - 任务 ID（默认 ''）
    * @returns 任务详情
    */
-  getWavConvertDetail(taskId = '') {
+  sunoGenerateWavRecordInfo(taskId: string = '') {
     return this.get('/generate/wav/record-info', { taskId })
   }
 
   /**
-   * 人声和乐器分离。
-   * @param options - 音频地址及回调
-   * @param options.audioUrl - 音频地址
-   * @param options.callBackUrl - 回调地址
+   * 人声和乐器分离（/generate/separate）。
+   * @param options - 参数对象（默认 {}）
    * @returns 服务端响应
    */
-  separateVocalAndInstrument(options: Partial<SunoVocalSeparationRequest> = {}) {
-    const { audioUrl, callBackUrl } = options
+  sunoGenerateSeparate(options: Partial<sunoVocalSeparationParamsType> = {}) {
+    const { audioUrl = '', callBackUrl = '' } = options
     return this.post('/generate/separate', { audioUrl, callBackUrl })
   }
 
   /**
    * 人声/伴奏分离生成（/vocal-removal/generate）。
-   * @param taskId - 任务 ID
-   * @param audioId - 音频 ID
-   * @param type - 分离类型，例如 'separate_vocal'
-   * @param callBackUrl - 回调地址
+   * @param options - 参数对象（默认 {}）
    * @returns 任务创建结果
    */
-  vocalRemovalGenerate(taskId = '', audioId = '', type = 'separate_vocal', callBackUrl = '') {
-    const body: SunoVocalRemovalGenerateRequest = { taskId, audioId, type, callBackUrl }
-    return this.post('/vocal-removal/generate', body)
+  sunoVocalRemovalGenerate(options: Partial<sunoVocalRemovalGenerateParamsType> = {}) {
+    const { taskId = '', audioId = '', type = 'separate_vocal', callBackUrl = '' } = options
+    return this.post('/vocal-removal/generate', { taskId, audioId, type, callBackUrl })
   }
 
   /**
    * 获取人声/伴奏分离任务详情（/vocal-removal/record-info）。
-   * @param taskId - 任务 ID
+   * @param taskId - 任务 ID（默认 ''）
    * @returns 任务详情
    */
-  getVocalRemovalRecordInfo(taskId = '') {
+  sunoVocalRemovalRecordInfo(taskId: string = '') {
     return this.get('/vocal-removal/record-info', { taskId })
   }
 
   /**
-   * 获取音频分离详情。
-   * @param taskId - 任务 ID
+   * 获取音频分离详情（/generate/separate/record-info）。
+   * @param taskId - 任务 ID（默认 ''）
    * @returns 任务详情
    */
-  getSeparationDetail(taskId = '') {
+  sunoGenerateSeparateRecordInfo(taskId: string = '') {
     return this.get('/generate/separate/record-info', { taskId })
   }
 
   /**
-   * 创建音乐视频。
-   * @param options - 音频地址、提示词、标题等
-   * @param options.audioUrl - 音频地址
-   * @param options.prompt - 提示词或风格
-   * @param options.title - 标题
-   * @param options.callBackUrl - 回调地址
-   * @param options.model - 模型
-   * @param options.style - 风格
+   * 创建音乐视频（/generate/music-video）。
+   * @param options - 参数对象（默认 {}）
    * @returns 服务端响应
    */
-  createMusicVideo(options: Partial<SunoCreateMusicVideoRequest> = {}) {
-    const { audioUrl, prompt, title, callBackUrl, model, style } = options
+  sunoGenerateMusicVideo(options: Partial<sunoCreateMusicVideoParamsType> = {}) {
+    const { audioUrl = '', prompt = '', title = '', callBackUrl = '', model = 'V3_5', style = '' } = options
     return this.post('/generate/music-video', { audioUrl, prompt, title, callBackUrl, model, style })
   }
 
   /**
-   * 获取音乐视频详情。
-   * @param taskId - 任务 ID
+   * 获取音乐视频详情（/generate/music-video/record-info）。
+   * @param taskId - 任务 ID（默认 ''）
    * @returns 任务详情
    */
-  getMusicVideoDetail(taskId = '') {
+  sunoGenerateMusicVideoRecordInfo(taskId: string = '') {
     return this.get('/generate/music-video/record-info', { taskId })
   }
 
   //#endregion
 
   /**
-   * 根据文本内容生成风格。
-   * @param content - 文本内容
+   * 根据文本内容生成风格（/style/generate）。
+   * @param content - 文本内容（默认 ''）
    * @returns 风格生成结果
    */
-  styleGenerate(content = '') {
-    const body: SunoStyleGenerateRequest = { content }
+  sunoStyleGenerate(content: string = '') {
+    const body: sunoStyleGenerateParamsType = { content }
     return this.post('/style/generate', body)
   }
 
   /**
-   * 根据任务生成音乐封面。
-   * @param taskId - 任务 ID
-   * @param callBackUrl - 回调地址
+   * 根据任务生成音乐封面（/suno/cover/generate）。
+   * @param options - 参数对象（默认 {}）
    * @returns 任务创建结果
    */
-  generateCoverByTask(taskId = '', callBackUrl = '') {
-    const body: SunoCoverGenerateByTaskRequest = { taskId, callBackUrl }
-    return this.post('/suno/cover/generate', body)
+  sunoCoverGenerate(options: Partial<sunoCoverGenerateParamsType> = {}) {
+    const { taskId = '', callBackUrl = '' } = options
+    return this.post('/suno/cover/generate', { taskId, callBackUrl })
   }
 
   /**
    * 创建 MP4 视频（/mp4/generate）。
-   * @param taskId - 任务 ID
-   * @param audioId - 音频 ID
-   * @param callBackUrl - 回调地址
-   * @param author - 作者名称
-   * @param domainName - 域名
+   * @param options - 参数对象（默认 {}）
    * @returns 任务创建结果
    */
-  mp4Generate(taskId = '', audioId = '', callBackUrl = '', author = '', domainName = '') {
-    const body = { taskId, audioId, callBackUrl, author, domainName }
-    return this.post('/mp4/generate', body)
+  sunoMp4Generate(options: Partial<sunoMp4GenerateParamsType> = {}) {
+    const { taskId = '', audioId = '', callBackUrl = '', author = '', domainName = '' } = options
+    return this.post('/mp4/generate', { taskId, audioId, callBackUrl, author, domainName })
   }
 
   /**
    * 获取 MP4 任务详情（/mp4/record-info）。
-   * @param taskId - 任务 ID
+   * @param taskId - 任务 ID（默认 ''）
    * @returns 任务详情
    */
-  getMp4RecordInfo(taskId = '') {
+  sunoMp4RecordInfo(taskId: string = '') {
     return this.get('/mp4/record-info', { taskId })
   }
 }

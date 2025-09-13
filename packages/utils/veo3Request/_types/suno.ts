@@ -33,7 +33,7 @@ export interface SunoGenerateCallbackPayload {
   text?: string
 }
 
-export interface SunoGenerateRequest {
+export interface sunoGenerateParamsType {
   /**
    * 文本提示词。
    * - customMode 为 false 时必填（唯一必填项）
@@ -109,7 +109,7 @@ export interface SunoGenerateRequest {
 }
 
 /** 延长音乐 */
-export interface SunoExtendMusicRequest {
+export interface sunoExtendMusicParamsType {
   /** 需要延长的音频 ID */
   audioId: string
   /** 是否使用默认参数（为 true 时，可仅传入必需参数） */
@@ -139,7 +139,7 @@ export interface SunoExtendMusicRequest {
 }
 
 /** 上传并翻唱音乐 */
-export interface SunoUploadCoverRequest {
+export interface sunoUploadCoverParamsType {
   /** 上传接口地址（用于上传并翻唱链路） */
   uploadUrl: string
   /** 翻唱提示词/文本描述 */
@@ -169,7 +169,7 @@ export interface SunoUploadCoverRequest {
 }
 
 /** 上传并扩展音乐 */
-export interface SunoUploadExtendRequest {
+export interface sunoUploadExtendParamsType {
   /** 上传接口地址（用于上传并扩展链路） */
   uploadUrl: string
   /** 是否使用默认参数 */
@@ -201,7 +201,7 @@ export interface SunoUploadExtendRequest {
 }
 
 /** 添加伴奏生成音乐 */
-export interface SunoAddAccompanimentRequest {
+export interface sunoAddAccompanimentParamsType {
   /** 原始音频 URL */
   audioUrl: string
   /** 风格 */
@@ -223,7 +223,7 @@ export interface SunoAddAccompanimentRequest {
 }
 
 /** 添加人声生成音乐 */
-export interface SunoAddVocalRequest {
+export interface sunoAddVocalParamsType {
   /** 伴奏音频 URL */
   audioUrl: string
   /** 歌词或人声提示 */
@@ -249,7 +249,7 @@ export interface SunoAddVocalRequest {
 }
 
 /** 获取带时间戳的歌词 */
-export interface SunoTimestampLyricsRequest {
+export interface sunoTimestampLyricsParamsType {
   /** 原始歌词文本 */
   lyrics: string
   /** 语言（可选） */
@@ -261,7 +261,7 @@ export interface SunoTimestampLyricsRequest {
 }
 
 /** 提升音乐风格 */
-export interface SunoImproveStyleRequest {
+export interface sunoImproveStyleParamsType {
   /** 曲目 ID */
   musicId: string
   /** 提示词或风格引导 */
@@ -287,13 +287,13 @@ export interface SunoImproveStyleRequest {
 }
 
 /** 携带任务 ID 的请求 */
-export interface SunoTaskIdRequest {
+export interface sunoTaskIdParamsType {
   /** 任务 ID */
   taskId: string
 }
 
 /** 生成音乐封面 */
-export interface SunoGenerateCoverRequest {
+export interface sunoGenerateCoverParamsType {
   /** 封面提示词 */
   prompt: string
   /** 标题 */
@@ -307,7 +307,7 @@ export interface SunoGenerateCoverRequest {
 }
 
 /** 生成歌词 */
-export interface SunoGenerateLyricsRequest {
+export interface sunoGenerateLyricsParamsType {
   /** 提示词或主题 */
   prompt: string
   /** 风格 */
@@ -323,7 +323,7 @@ export interface SunoGenerateLyricsRequest {
 }
 
 /** 转换为 WAV 格式 */
-export interface SunoWavConvertRequest {
+export interface sunoWavConvertParamsType {
   /** 音频 URL */
   audioUrl: string
   /** 回调地址 */
@@ -331,7 +331,7 @@ export interface SunoWavConvertRequest {
 }
 
 /** 人声和乐器分离 */
-export interface SunoVocalSeparationRequest {
+export interface sunoVocalSeparationParamsType {
   /** 音频 URL */
   audioUrl: string
   /** 回调地址 */
@@ -339,7 +339,7 @@ export interface SunoVocalSeparationRequest {
 }
 
 /** 创建音乐视频 */
-export interface SunoCreateMusicVideoRequest {
+export interface sunoCreateMusicVideoParamsType {
   /** 音频 URL */
   audioUrl: string
   /** 提示词/风格 */
@@ -355,7 +355,7 @@ export interface SunoCreateMusicVideoRequest {
 }
 
 /** 添加纯伴奏（Add Instrumental） */
-export interface SunoAddInstrumentalRequest {
+export interface sunoAddInstrumentalParamsType {
   /** 上传接口地址 */
   uploadUrl: string
   /** 标题 */
@@ -377,7 +377,7 @@ export interface SunoAddInstrumentalRequest {
 }
 
 /** 添加人声（Add Vocals） */
-export interface SunoAddVocalsRequest {
+export interface sunoAddVocalsParamsType {
   /** 上传接口地址 */
   uploadUrl: string
   /** 提示词 */
@@ -403,7 +403,7 @@ export interface SunoAddVocalsRequest {
 /**
  * 通过任务与音频 ID 获取带时间戳的歌词
  */
-export interface SunoGetTimestampedLyricsRequest {
+export interface sunoGetTimestampedLyricsParamsType {
   /** 任务 ID */
   taskId: string
   /** 音频 ID */
@@ -411,13 +411,13 @@ export interface SunoGetTimestampedLyricsRequest {
 }
 
 /** 根据文本内容生成风格（/style/generate） */
-export interface SunoStyleGenerateRequest {
+export interface sunoStyleGenerateParamsType {
   /** 文本内容 */
   content: string
 }
 
 /** 根据任务生成音乐封面（/suno/cover/generate） */
-export interface SunoCoverGenerateByTaskRequest {
+export interface sunoCoverGenerateParamsType {
   /** 任务 ID */
   taskId: string
   /** 回调地址 */
@@ -425,7 +425,7 @@ export interface SunoCoverGenerateByTaskRequest {
 }
 
 /** 直接创建歌词任务（/lyrics） */
-export interface SunoLyricsRequest {
+export interface sunoLyricsGenerateParamsType {
   /** 提示词 */
   prompt: string
   /** 回调地址 */
@@ -433,7 +433,7 @@ export interface SunoLyricsRequest {
 }
 
 /** 生成 WAV（/wav/generate） */
-export interface SunoWavGenerateRequest {
+export interface sunoWavGenerateParamsType {
   /** 任务 ID */
   taskId: string
   /** 音频 ID */
@@ -443,7 +443,7 @@ export interface SunoWavGenerateRequest {
 }
 
 /** 人声/伴奏分离生成（/vocal-removal/generate） */
-export interface SunoVocalRemovalGenerateRequest {
+export interface sunoVocalRemovalGenerateParamsType {
   /** 任务 ID */
   taskId: string
   /** 音频 ID */
@@ -455,7 +455,7 @@ export interface SunoVocalRemovalGenerateRequest {
 }
 
 /** 创建 MP4 视频（/mp4/generate） */
-export interface SunoMp4GenerateRequest {
+export interface sunoMp4GenerateParamsType {
   /** 任务 ID */
   taskId: string
   /** 音频 ID */

@@ -1,3 +1,3 @@
-export type { veo3Request } from './veo3'
-export type { SunoGenerateRequest } from './suno'
-export type { Image4oRequest } from './image4o'
+export type { veo3VideoGenerateParamsType } from './veo3'
+export type { gpt4oImageGenerateParamsType } from './image4o'
+export * from './suno'

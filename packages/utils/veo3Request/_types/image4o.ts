@@ -1,4 +1,4 @@
-export interface Image4oRequest {
+export interface gpt4oImageGenerateParamsType {
   /** 生成尺寸比例，如 '3:2' */
   size?: string
   /** 提示词 */
