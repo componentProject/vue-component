@@ -1,5 +1,12 @@
 <template>
   <div>
+    <div>
+      veo3文生视频
+      <ElButton @click="veo3Video">
+        发送请求
+      </ElButton>
+      <ElInput v-model="prompt" type="textarea" />
+    </div>
     <div class="title">
       调试与演示
     </div>
@@ -38,9 +45,18 @@ import { onMounted, ref } from 'vue'
 // 允许在 Vue SFC 中使用 .ts 扩展导入
 import { load } from '../../../utils.ts'
 // 虚拟模块由 Vite 插件在运行时提供
-import { setDeleteByPathAndCode } from '../../../../../packages/utils/_api/index.ts'
+import { setDeleteByPathAndCode } from '@moluoxixi/utils/_api'
+import { request } from '@moluoxixi/utils/veo3Request'
 
 defineOptions({ name: '调试与演示' })
+const prompt = ref('With a nervous yet focused expression, wearing a dark form-fitting short garment with a slightly open collar, sweat glistening on the collarbones, short hair tousled by the river wind, holding a simple selfie stick, walking quickly and narrating.\nBurning warships and billowing black smoke sweeping across the lens, the sounds of arrows whizzing through the air mingling with soldiers\' shouts; ambush soldiers lurking in the reeds on the shore, sword glints flashing in the firelight; the flags on the main ship fluttering in the distance, the drums booming like thunder.\nLowering his body to pass through the chaotic beachhead, breathing heavily, the picture shaking, advancing towards the main battlefield.\nThe on-site narrator **Chinese speaking**: "The fire attack has begun. The Eastern Wu fleet is approaching. The Cao army\'s formation is in great disorder. Follow me to report the battle situation quickly!')
+
+function veo3Video() {
+  request.veo3Video({
+    prompt: prompt.value,
+  })
+}
+
 // 使用ref替代data属性
 const componentName = ref('DraggableTable') // 调试与演示组件库的组件，直接修改组件名
 const localComponent = ref<any>(null) // 调试组件
@@ -142,6 +158,7 @@ async function loadComponents(components: string[]) {
     console.error('加载动态组件失败:', error)
   }
 }
+
 async function handleClick() {
   const params = {
     code: 'webfile',
