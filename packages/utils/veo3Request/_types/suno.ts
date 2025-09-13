@@ -107,3 +107,363 @@ export interface SunoGenerateRequest {
    */
   audioWeight?: number
 }
+
+/** 延长音乐 */
+export interface SunoExtendMusicRequest {
+  /** 需要延长的音频 ID */
+  audioId: string
+  /** 是否使用默认参数（为 true 时，可仅传入必需参数） */
+  defaultParamFlag?: boolean
+  /** 延长段提示词 */
+  prompt?: string
+  /** 延长段风格 */
+  style?: string
+  /** 延长后标题 */
+  title?: string
+  /** 从第几秒开始延长（单位：秒） */
+  continueAt?: number
+  /** 模型 */
+  model?: SunoModel
+  /** 回调地址 */
+  callBackUrl?: string
+  /** 负面标签 */
+  negativeTags?: string
+  /** 人声性别偏好 */
+  vocalGender?: SunoVocalGender
+  /** 风格权重 0~1 */
+  styleWeight?: number
+  /** 创意度 0~1 */
+  weirdnessConstraint?: number
+  /** 音频要素权重 0~1 */
+  audioWeight?: number
+}
+
+/** 上传并翻唱音乐 */
+export interface SunoUploadCoverRequest {
+  /** 上传接口地址（用于上传并翻唱链路） */
+  uploadUrl: string
+  /** 翻唱提示词/文本描述 */
+  prompt?: string
+  /** 风格 */
+  style?: string
+  /** 标题 */
+  title?: string
+  /** 人声性别偏好 */
+  vocalGender?: SunoVocalGender
+  /** 模型 */
+  model?: SunoModel
+  /** 回调地址 */
+  callBackUrl?: string
+  /** 负面标签 */
+  negativeTags?: string
+  /** 风格权重 0~1 */
+  styleWeight?: number
+  /** 创意度 0~1 */
+  weirdnessConstraint?: number
+  /** 音频要素权重 0~1 */
+  audioWeight?: number
+  /** 是否为纯音乐 */
+  instrumental?: boolean
+  /** 是否自定义模式 */
+  customMode?: boolean
+}
+
+/** 上传并扩展音乐 */
+export interface SunoUploadExtendRequest {
+  /** 上传接口地址（用于上传并扩展链路） */
+  uploadUrl: string
+  /** 是否使用默认参数 */
+  defaultParamFlag?: boolean
+  /** 是否为纯音乐 */
+  instrumental?: boolean
+  /** 延长段提示词 */
+  prompt?: string
+  /** 延长段风格 */
+  style?: string
+  /** 延长后标题 */
+  title?: string
+  /** 从第几秒开始延长（单位：秒） */
+  continueAt?: number
+  /** 模型 */
+  model?: SunoModel
+  /** 负面标签 */
+  negativeTags?: string
+  /** 回调地址 */
+  callBackUrl?: string
+  /** 人声性别偏好 */
+  vocalGender?: SunoVocalGender
+  /** 风格权重 0~1 */
+  styleWeight?: number
+  /** 创意度 0~1 */
+  weirdnessConstraint?: number
+  /** 音频要素权重 0~1 */
+  audioWeight?: number
+}
+
+/** 添加伴奏生成音乐 */
+export interface SunoAddAccompanimentRequest {
+  /** 原始音频 URL */
+  audioUrl: string
+  /** 风格 */
+  style?: string
+  /** 标题 */
+  title?: string
+  /** 模型 */
+  model?: SunoModel
+  /** 回调地址 */
+  callBackUrl?: string
+  /** 负面标签 */
+  negativeTags?: string
+  /** 风格权重 0~1 */
+  styleWeight?: number
+  /** 创意度 0~1 */
+  weirdnessConstraint?: number
+  /** 音频要素权重 0~1 */
+  audioWeight?: number
+}
+
+/** 添加人声生成音乐 */
+export interface SunoAddVocalRequest {
+  /** 伴奏音频 URL */
+  audioUrl: string
+  /** 歌词或人声提示 */
+  lyrics?: string
+  /** 人声性别偏好 */
+  vocalGender?: SunoVocalGender
+  /** 风格 */
+  style?: string
+  /** 标题 */
+  title?: string
+  /** 模型 */
+  model?: SunoModel
+  /** 回调地址 */
+  callBackUrl?: string
+  /** 负面标签 */
+  negativeTags?: string
+  /** 风格权重 0~1 */
+  styleWeight?: number
+  /** 创意度 0~1 */
+  weirdnessConstraint?: number
+  /** 音频要素权重 0~1 */
+  audioWeight?: number
+}
+
+/** 获取带时间戳的歌词 */
+export interface SunoTimestampLyricsRequest {
+  /** 原始歌词文本 */
+  lyrics: string
+  /** 语言（可选） */
+  language?: string
+  /** 模型 */
+  model?: SunoModel
+  /** 回调地址 */
+  callBackUrl?: string
+}
+
+/** 提升音乐风格 */
+export interface SunoImproveStyleRequest {
+  /** 曲目 ID */
+  musicId: string
+  /** 提示词或风格引导 */
+  prompt?: string
+  /** 风格标签 */
+  style?: string
+  /** 标题 */
+  title?: string
+  /** 风格权重 0~1 */
+  styleWeight?: number
+  /** 模型 */
+  model?: SunoModel
+  /** 回调地址 */
+  callBackUrl?: string
+  /** 负面标签 */
+  negativeTags?: string
+  /** 人声性别偏好 */
+  vocalGender?: SunoVocalGender
+  /** 创意度 0~1 */
+  weirdnessConstraint?: number
+  /** 音频要素权重 0~1 */
+  audioWeight?: number
+}
+
+/** 携带任务 ID 的请求 */
+export interface SunoTaskIdRequest {
+  /** 任务 ID */
+  taskId: string
+}
+
+/** 生成音乐封面 */
+export interface SunoGenerateCoverRequest {
+  /** 封面提示词 */
+  prompt: string
+  /** 标题 */
+  title?: string
+  /** 风格 */
+  style?: string
+  /** 回调地址 */
+  callBackUrl?: string
+  /** 模型 */
+  model?: SunoModel
+}
+
+/** 生成歌词 */
+export interface SunoGenerateLyricsRequest {
+  /** 提示词或主题 */
+  prompt: string
+  /** 风格 */
+  style?: string
+  /** 标题 */
+  title?: string
+  /** 回调地址 */
+  callBackUrl?: string
+  /** 语言 */
+  language?: string
+  /** 模型 */
+  model?: SunoModel
+}
+
+/** 转换为 WAV 格式 */
+export interface SunoWavConvertRequest {
+  /** 音频 URL */
+  audioUrl: string
+  /** 回调地址 */
+  callBackUrl?: string
+}
+
+/** 人声和乐器分离 */
+export interface SunoVocalSeparationRequest {
+  /** 音频 URL */
+  audioUrl: string
+  /** 回调地址 */
+  callBackUrl?: string
+}
+
+/** 创建音乐视频 */
+export interface SunoCreateMusicVideoRequest {
+  /** 音频 URL */
+  audioUrl: string
+  /** 提示词/风格 */
+  prompt?: string
+  /** 标题 */
+  title?: string
+  /** 回调地址 */
+  callBackUrl?: string
+  /** 模型 */
+  model?: SunoModel
+  /** 风格 */
+  style?: string
+}
+
+/** 添加纯伴奏（Add Instrumental） */
+export interface SunoAddInstrumentalRequest {
+  /** 上传接口地址 */
+  uploadUrl: string
+  /** 标题 */
+  title?: string
+  /** 负面标签 */
+  negativeTags?: string
+  /** 标签（逗号分隔） */
+  tags?: string
+  /** 回调地址 */
+  callBackUrl?: string
+  /** 人声性别偏好（用于生成参数平衡） */
+  vocalGender?: SunoVocalGender
+  /** 风格权重 0~1 */
+  styleWeight?: number
+  /** 创意度 0~1 */
+  weirdnessConstraint?: number
+  /** 音频要素权重 0~1 */
+  audioWeight?: number
+}
+
+/** 添加人声（Add Vocals） */
+export interface SunoAddVocalsRequest {
+  /** 上传接口地址 */
+  uploadUrl: string
+  /** 提示词 */
+  prompt?: string
+  /** 标题 */
+  title?: string
+  /** 负面标签 */
+  negativeTags?: string
+  /** 风格 */
+  style?: string
+  /** 人声性别偏好 */
+  vocalGender?: SunoVocalGender
+  /** 风格权重 0~1 */
+  styleWeight?: number
+  /** 创意度 0~1 */
+  weirdnessConstraint?: number
+  /** 音频要素权重 0~1 */
+  audioWeight?: number
+  /** 回调地址 */
+  callBackUrl?: string
+}
+
+/**
+ * 通过任务与音频 ID 获取带时间戳的歌词
+ */
+export interface SunoGetTimestampedLyricsRequest {
+  /** 任务 ID */
+  taskId: string
+  /** 音频 ID */
+  audioId: string
+}
+
+/** 根据文本内容生成风格（/style/generate） */
+export interface SunoStyleGenerateRequest {
+  /** 文本内容 */
+  content: string
+}
+
+/** 根据任务生成音乐封面（/suno/cover/generate） */
+export interface SunoCoverGenerateByTaskRequest {
+  /** 任务 ID */
+  taskId: string
+  /** 回调地址 */
+  callBackUrl?: string
+}
+
+/** 直接创建歌词任务（/lyrics） */
+export interface SunoLyricsRequest {
+  /** 提示词 */
+  prompt: string
+  /** 回调地址 */
+  callBackUrl?: string
+}
+
+/** 生成 WAV（/wav/generate） */
+export interface SunoWavGenerateRequest {
+  /** 任务 ID */
+  taskId: string
+  /** 音频 ID */
+  audioId: string
+  /** 回调地址 */
+  callBackUrl?: string
+}
+
+/** 人声/伴奏分离生成（/vocal-removal/generate） */
+export interface SunoVocalRemovalGenerateRequest {
+  /** 任务 ID */
+  taskId: string
+  /** 音频 ID */
+  audioId: string
+  /** 分离类型，例如 'separate_vocal' */
+  type?: string
+  /** 回调地址 */
+  callBackUrl?: string
+}
+
+/** 创建 MP4 视频（/mp4/generate） */
+export interface SunoMp4GenerateRequest {
+  /** 任务 ID */
+  taskId: string
+  /** 音频 ID */
+  audioId: string
+  /** 回调地址 */
+  callBackUrl?: string
+  /** 作者名称 */
+  author?: string
+  /** 域名 */
+  domainName?: string
+}
