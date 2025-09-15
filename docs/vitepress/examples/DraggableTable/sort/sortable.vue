@@ -1,6 +1,6 @@
 <template>
   <div class="container" style="height: 350px;">
-    <DraggableTable id="dt-sort-sortable" v-model="tableData" save-type="local" :columns="columns" :sortable="true" />
+    <DraggableTable id="dt-sort-sortable" v-model="tableData" :columns="columns" :sortable="true" />
   </div>
 </template>
 

@@ -10,17 +10,18 @@
     <div class="title">
       调试与演示
     </div>
-    <el-button type="primary" @click="handleClick">
+    <!-- <el-button type="primary" @click="handleClick">
       删除组件库组件
-    </el-button>
-    <div class="main" style="height: 300px">
+    </el-button> -->
+    <div class="main">
       <div class="list-title">
         开发调试组件
       </div>
       <component
         :is="localComponent"
         :columns="columns"
-        :data="tableData"
+        v-model="tableData"
+        save-type="local"
         :resizable="true"
       />
     </div>
@@ -63,31 +64,33 @@ const localComponent = ref<any>(null) // 调试组件
 const dynamicComponent = ref<any>(null) // 用于存储动态组件
 
 const columns = [
+  { field: 'age1', title: '测试', sortable: true },
+  { type: 'seq', title: '', width: 60 },
   { field: 'id', title: 'ID', width: 60 },
   { field: 'name', title: '姓名', width: 120 },
-  { field: 'age', title: '年龄' },
+  { field: 'age', title: '年龄', sortable: true },
 ]
 const tableData = [
-  { id: 1, name: '张三', age: 18 },
-  { id: 2, name: '李四', age: 20 },
-  { id: 3, name: '王五', age: 22 },
-  { id: 4, name: '王五', age: 22 },
-  { id: 5, name: '王五', age: 22 },
-  { id: 6, name: '王五', age: 22 },
-  { id: 7, name: '王五', age: 22 },
-  { id: 8, name: '王五', age: 22 },
-  { id: 9, name: '王五', age: 22 },
-  { id: 10, name: '王五', age: 22 },
-  { id: 11, name: '王五', age: 22 },
-  { id: 12, name: '王五', age: 22 },
-  { id: 13, name: '王五', age: 22 },
-  { id: 14, name: '王五', age: 22 },
-  { id: 15, name: '王五', age: 22 },
-  { id: 16, name: '王五', age: 22 },
-  { id: 17, name: '王五', age: 22 },
-  { id: 18, name: '王五', age: 22 },
-  { id: 19, name: '王五', age: 22 },
-  { id: 20, name: '王五', age: 22 },
+  { id: 1, name: '张三', age: '22' },
+  { id: 2, name: '李四', age: '20' },
+  { id: 3, name: '王五', age: '18' },
+  // { id: 4, name: '王五', age: 16 },
+  // { id: 5, name: '王五', age: 22 },
+  // { id: 6, name: '王五', age: 22 },
+  // { id: 7, name: '王五', age: 22 },
+  // { id: 8, name: '王五', age: 22 },
+  // { id: 9, name: '王五', age: 22 },
+  // { id: 10, name: '王五', age: 22 },
+  // { id: 11, name: '王五', age: 22 },
+  // { id: 12, name: '王五', age: 22 },
+  // { id: 13, name: '王五', age: 22 },
+  // { id: 14, name: '王五', age: 22 },
+  // { id: 15, name: '王五', age: 22 },
+  // { id: 16, name: '王五', age: 22 },
+  // { id: 17, name: '王五', age: 22 },
+  // { id: 18, name: '王五', age: 22 },
+  // { id: 19, name: '王五', age: 22 },
+  // { id: 20, name: '王五', age: 22 },
   // { id: 21, name: '王五', age: 22 },
   // { id: 22, name: '王五', age: 22 },
   // { id: 23, name: '王五', age: 22 },
@@ -150,7 +153,7 @@ async function loadLocalComponent(componentName: string) {
  */
 async function loadComponents(components: string[]) {
   try {
-    const loadedComponents = await load(vue, components)
+    const loadedComponents = await load(vue, components, true)
     dynamicComponent.value = loadedComponents[componentName.value]
     console.log('动态组件加载成功:', dynamicComponent)
   }
@@ -189,6 +192,7 @@ onMounted(async () => {
 
 .main {
   margin: 20px;
+  height: 200px;
   text-align: center;
 }
 

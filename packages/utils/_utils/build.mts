@@ -20,7 +20,7 @@ import Components from 'unplugin-vue-components/vite'
 import viteImagemin from 'vite-plugin-imagemin'
 import { obfuscator } from 'rollup-obfuscator'
 import cssInjectedByJsPlugin from 'vite-plugin-css-injected-by-js'
-import { lazyImport, VxeResolver } from 'vite-plugin-lazy-import'
+// import { lazyImport, VxeResolver } from 'vite-plugin-lazy-import'
 import { UploadEvent } from './UploadComponent.ts'
 
 /** 必须排除的文件 */
@@ -111,16 +111,16 @@ function createBaseConfig(ctx: BuildContext, comp: string, internalDeps: string[
         },
       }),
       vueJsx(),
-      lazyImport({
-        resolvers: [
-          VxeResolver({
-            libraryName: 'vxe-pc-ui',
-          }),
-          VxeResolver({
-            libraryName: 'vxe-table',
-          }),
-        ],
-      }),
+      // lazyImport({
+      //   resolvers: [
+      //     VxeResolver({
+      //       libraryName: 'vxe-pc-ui',
+      //     }),
+      //     VxeResolver({
+      //       libraryName: 'vxe-table',
+      //     }),
+      //   ],
+      // }),
       // 自动引入
       AutoImport({
         imports: ['vue'],
