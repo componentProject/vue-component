@@ -9,6 +9,7 @@
       highlight-current
       :props="treeProps"
       v-bind="$attrs"
+      :empty-text="emptyText"
       @node-click="onRowClick"
     >
       <template #default="{ node, data }">
@@ -88,6 +89,7 @@ const props = withDefaults(defineProps<TreeProps>(), {
   indent: 16,
   showLine: false,
   showRowLine: false,
+  emptyText: '暂无数据',
 })
 
 const emit = defineEmits<{

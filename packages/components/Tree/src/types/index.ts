@@ -34,6 +34,7 @@ export interface TreeProps<T = any> {
   indent?: number | string
   height?: number
   props?: TreeOptionProps
+  emptyText?: string
   /**
    * 是否显示左侧连接线
    */

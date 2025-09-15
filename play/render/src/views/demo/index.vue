@@ -21,7 +21,10 @@
         :is="localComponent"
         :columns="columns"
         v-model="tableData"
-        save-type="local"
+        save-type="server"
+        id="123456789"
+        page-id="123456789"
+        user-id="123456789"
         :resizable="true"
       />
     </div>
@@ -33,7 +36,7 @@
         :is="dynamicComponent"
         pop-type="input"
         :columns="columns"
-        :data="tableData"
+        v-model="tableData"
       />
     </div>
   </div>
@@ -64,15 +67,14 @@ const localComponent = ref<any>(null) // 调试组件
 const dynamicComponent = ref<any>(null) // 用于存储动态组件
 
 const columns = [
-  { field: 'age1', title: '测试', sortable: true },
   { type: 'seq', title: '', width: 60 },
   { field: 'id', title: 'ID', width: 60 },
   { field: 'name', title: '姓名', width: 120 },
   { field: 'age', title: '年龄', sortable: true },
 ]
 const tableData = [
-  { id: 1, name: '张三', age: '22' },
-  { id: 2, name: '李四', age: '20' },
+  { id: 1, name: '张三', age: '' },
+  { id: 2, name: '李四', age: '' },
   { id: 3, name: '王五', age: '18' },
   // { id: 4, name: '王五', age: 16 },
   // { id: 5, name: '王五', age: 22 },
@@ -177,7 +179,6 @@ async function handleClick() {
 
 onMounted(async () => {
   await loadLocalComponent(componentName.value)
-  return
   await loadComponents([componentName.value])
 })
 </script>

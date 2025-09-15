@@ -944,8 +944,7 @@ const gridProps = computed<VxeGridProps>(() => {
         const {
           column: { field },
         } = params
-        // const fieldValues = Object.keys(groupBy(tableData.value, field))
-        const fieldValues = tableData.value?.filter((item: { [x: string]: any }) => item[field])
+        const fieldValues = Object.keys(groupBy(tableData.value, field))
         return fieldValues?.length > 1
       },
       ...props.sortConfig,
