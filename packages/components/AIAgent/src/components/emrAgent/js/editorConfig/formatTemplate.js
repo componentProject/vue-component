@@ -56,10 +56,14 @@ function extractInputFields(node, result, setContent = true) {
       //模板不规范，特殊处理
       if (!node.Elements || node.Elements.length <= 0 || node.Elements[0].Type !== 'InputField') {
         if (readOnlyNodeList.includes(deCode)) {
-          result.readOnly.push(item)
+          if (!result.readOnly.find(item => item.deCode === deCode)) {
+            result.readOnly.push(item)
+          }
         }
         else if (!ignoreNodeList.includes(deCode)) {
-          result.normal.push(item)
+          if (deCode.startsWith('DE')) {
+            result.normal.push(item)
+          }
         }
       }
 
