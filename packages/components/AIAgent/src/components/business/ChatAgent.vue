@@ -537,7 +537,8 @@ export default {
           }
         }
         this.sendMessage(this.inputContent)
-      } else {
+      }
+      else {
         for (const item of this.configParams) {
           if (this.commonSysData[item.paramName]) {
             item.paramValue = this.commonSysData[item.paramName]
