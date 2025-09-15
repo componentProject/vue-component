@@ -156,8 +156,7 @@ const tableData = ref([
 
 // 列配置
 const columns = ref([
-  { type: 'seq', width: 70, field: 'sql' },
-
+  { type: 'seq', width: 200 },
   {
     field: 'name',
     title: 'Name',
