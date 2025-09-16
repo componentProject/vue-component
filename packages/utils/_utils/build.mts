@@ -164,9 +164,7 @@ function createBaseConfig(ctx: BuildContext, comp: string, internalDeps: string[
       ...(!ctx.excludeHeavyPlugins
         ? [
             dts({
-              root: ctx.packDir,
-              entryRoot: `.${ctx.entryBaseUrl}${comp}`,
-              tsconfigPath: './tsconfig.base.json',
+              tsconfigPath: resolve(ctx.packDir, `.${ctx.entryBaseUrl}${comp}`, './tsconfig.base.json'),
               declarationOnly: false,
             }),
           ]
@@ -1320,7 +1318,7 @@ export interface BuildOptions {
   useExternal?: boolean
   /** 强制 external 的组件列表（组件名数组） */
   requireExternalPacks?: string[]
-  /** 入口基础路径（默认 '/'，相对 components 包根目录） */
+  /** 组件的入口文件路径,需要以/开头，/结尾，相对于packDir */
   entryBaseUrl?: string
   /** 需要项目预设的依赖（可选，传入则覆盖自动推导） */
   presetGlobals?: Record<string, string>
