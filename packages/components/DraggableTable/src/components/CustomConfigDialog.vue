@@ -157,7 +157,7 @@ function handlePositiveNumberInput(row: any, field: string, value: string) {
 }
 
 function getPlaceholder(title: string) {
-  return `请输入${title}（大于0）,不要输入则为自适应`
+  return `请输入${title}（大于0）,不输入则为自适应`
 }
 
 const tableColumns = computed(() => {
