@@ -1,5 +1,5 @@
 <template>
-  <div ref="container" class="h-full w-full flex-1 overflow-hidden outline-0">
+  <div ref="container" class="h-full w-full flex-1 overflow-hidden outline-0 container">
     <VxeGrid
       ref="xTable"
       :header-cell-config="{ height: '30px' }"
@@ -725,6 +725,7 @@ const computedColumns = computed<ColumnType[]>(() => {
         props: {
           filterLayout: props.filterLayout,
           filterType: props.filterType,
+          filterFormatter: item.filterFormatter,
           ...filterProps,
         },
       }
@@ -1421,4 +1422,10 @@ defineExpose({
 
 <style scoped lang="scss">
 @forward '@moluoxixi/components/_assets/styles/tailwind.scss';
+
+.container {
+  :deep(.vxe-table--filter-template) {
+    display: flex !important;
+  }
+}
 </style>
