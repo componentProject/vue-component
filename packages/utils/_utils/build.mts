@@ -164,8 +164,9 @@ function createBaseConfig(ctx: BuildContext, comp: string, internalDeps: string[
       ...(!ctx.excludeHeavyPlugins
         ? [
             dts({
-              entryRoot: resolve(ctx.packDir, `.${ctx.entryBaseUrl}${comp}`),
-              tsconfigPath: resolve(ctx.packDir, `.${ctx.entryBaseUrl}${comp}`, './tsconfig.base.json'),
+              root: ctx.packDir,
+              entryRoot: `.${ctx.entryBaseUrl}${comp}`,
+              tsconfigPath: './tsconfig.base.json',
               declarationOnly: false,
             }),
           ]

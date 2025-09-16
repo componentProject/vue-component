@@ -35,9 +35,14 @@
       </div>
       <component
         :is="dynamicComponent"
+        id="123456789"
         v-model="tableData"
-        pop-type="input"
         :columns="columns"
+        save-type="server"
+        page-id="123456789"
+        user-id="123456789"
+        :filterable="true"
+        :resizable="true"
       />
     </div>
   </div>
