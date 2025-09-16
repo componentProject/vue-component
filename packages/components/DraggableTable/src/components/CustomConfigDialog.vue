@@ -6,6 +6,7 @@
   >
     <VxeGrid
       id="custom"
+      ref="xTable"
       border
       :header-cell-config="{ height: '30px' }"
       :cell-config="{ height: '30px' }"
@@ -31,6 +32,7 @@
         <ElInput
           :model-value="row[column.field]"
           size="small"
+          maxlength="4"
           :disabled="!row.resizable"
           :placeholder="getPlaceholder(column.title)"
           style="width: 100%"
@@ -116,7 +118,7 @@ const props = defineProps({
 const emit = defineEmits<{
   (e: 'confirm', customColumns: any[]): void
 }>()
-
+const xTable = useTemplateRef('xTable')
 const computedDialogProps = computed(() => {
   return {
     width: '800px',
@@ -155,7 +157,7 @@ function handlePositiveNumberInput(row: any, field: string, value: string) {
 }
 
 function getPlaceholder(title: string) {
-  return `请输入${title}（大于0）`
+  return `请输入${title}（大于0）,不要输入则为自适应`
 }
 
 const tableColumns = computed(() => {
@@ -170,7 +172,7 @@ watch(() => visible.value, (v: boolean) => {
       return {
         ...item,
         visible: item.visible ?? true,
-        width: item.width || Math.ceil(item.resizeWidth) || Math.ceil(item.renderWidth),
+        width: item.width || (item.resizeWidth ? Math.ceil(item.resizeWidth) : ''),
       }
     })
   }
@@ -191,7 +193,7 @@ function handleEvent(type: 'confirm' | 'reset' | 'cancel') {
       break
     case 'confirm':
       emit('confirm', {
-        customColumns: tableData.value,
+        customColumns: xTable.value?.getTableData()?.tableData,
         isCommon: isCommon.value,
       })
       visible.value = false

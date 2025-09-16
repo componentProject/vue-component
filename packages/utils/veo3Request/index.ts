@@ -1,3 +1,5 @@
+// noinspection JSUnusedGlobalSymbols
+
 import { BaseApi } from '@moluoxixi/utils/AjaxPackage'
 import type { InternalAxiosRequestConfig } from 'axios'
 import { AxiosHeaders } from 'axios'
@@ -33,7 +35,7 @@ import type {
 // 类型已拆分到 packages/utils/_types/
 
 class RequestApi extends BaseApi {
-  private apiKey: string
+  private readonly apiKey: string
 
   constructor({ url, apiKey }: Record<string, string>) {
     super(url)
@@ -533,7 +535,7 @@ class RequestApi extends BaseApi {
    * 获取音乐任务详情（/generate/record-info）。
    *
    * @param taskId 任务 ID
-   * @returns {Promise<any>} 任务详情
+   * @returns 任务详情
    */
   sunoGenerateRecordInfo(taskId: string = '') {
     return this.get('/generate/record-info', { taskId })
@@ -821,8 +823,6 @@ class RequestApi extends BaseApi {
     return this.get('/generate/music-video/record-info', { taskId })
   }
 
-  //#endregion
-
   /**
    * 根据文本内容生成风格（/style/generate）。
    *
@@ -872,6 +872,7 @@ class RequestApi extends BaseApi {
   sunoMp4RecordInfo(taskId: string = '') {
     return this.get('/mp4/record-info', { taskId })
   }
+  //#endregion
 }
 
 function getKieModelRequest(apiKey: string) {

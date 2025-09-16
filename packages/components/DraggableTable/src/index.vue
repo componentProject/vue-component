@@ -60,7 +60,7 @@ import type {
 import type { ColumnType, customConfigType, NoNextInputParams, NoSelectValueParams, types } from './_types'
 import { ElMessage } from 'element-plus'
 
-import { groupBy } from 'lodash'
+import { cloneDeep, groupBy } from 'lodash'
 import { diff, isEmpty } from 'radash'
 import Sortable from 'sortablejs'
 import {
@@ -81,14 +81,12 @@ import {
   debounce,
   dispatchEvents,
   getClass,
-  getStringObj,
   getType,
   onHotkeys,
   sleep,
 } from '@moluoxixi/utils/_utils'
 import {
   getCustomType,
-  handleGetColumn,
   handleGetRequiredFields,
 } from './_utils'
 
@@ -370,9 +368,9 @@ const props = defineProps({
       { type: 'checkbox', width: 40 },
       { field: 'field', title: '字段' },
       { field: 'title', title: '列名称', slots: { default: 'title' } },
-      { field: 'width', width: 100, title: '宽度', slots: { default: 'width' } },
-      { field: 'resizable', title: '可调整', slots: { default: 'resizable' } },
-      { field: 'align', title: '对齐方式', slots: { default: 'align' } },
+      { field: 'width', minWidth: 200, title: '宽度', slots: { default: 'width' } },
+      { field: 'resizable', width: 80, title: '可调整', slots: { default: 'resizable' } },
+      { field: 'align', width: 100, title: '对齐方式', slots: { default: 'align' } },
     ],
   },
   // 表格唯一ID，用于本地存储识别
@@ -979,7 +977,7 @@ onMounted(() => {
 onBeforeUnmount(() => offEffect?.())
 // 本地保存的列配置
 const localColumns = ref<ColumnType[]>([])
-const customRestConfig = ref([])
+const customRestConfig = ref({})
 
 function handleCustomConfigSave({ customColumns, ...rest }: { customColumns: ColumnType[], rest: any[] }) {
   localColumns.value = customColumns
@@ -1022,7 +1020,7 @@ async function handleGetStoredColumns(): Promise<ColumnType[]> {
 }
 
 async function handleSaveColumnsToServer(key: string, columns: string) {
-  const [isCommon] = customRestConfig.value || []
+  const { isCommon } = customRestConfig.value || {}
   await setMemoryUpload({
     pageId: props.pageId,
     widgetId: key,
@@ -1043,9 +1041,8 @@ async function handleSaveColumnsToStorage() {
     const { fullColumn } = xTable.value.getTableColumn()
     // 只保存必要的列属性
     const columns = fullColumn
-      .map((i: Record<string, any>) => {
-        const _col: Record<string, any> = handleGetColumn(i)
-        _col.width = _col.width || _col.resizeWidth
+      .map((_col: Record<string, any>) => {
+        _col.width = Math.ceil(_col.resizeWidth || _col.width)
         const col: Record<string, any> = {}
         requiredFields.value.forEach((field: string) => {
           col[field] = _col[field]
@@ -1053,7 +1050,7 @@ async function handleSaveColumnsToStorage() {
 
         return col
       })
-    console.log('saveColumns', columns)
+    console.log('saveColumns', cloneDeep(columns))
     if (getType(props.setConfig, 'function')) {
       await props.setConfig({
         pageId: props.pageId,
@@ -1073,29 +1070,7 @@ async function handleSaveColumnsToStorage() {
   }
 }
 
-/**
- * 对比 props.columns 与 存储的storedColumns 是否不一致
- * @param columns
- * @param storedColumns
- */
-function handleCompareColumns(
-  columns: ColumnType[] = [],
-  storedColumns: ColumnType[] = [],
-) {
-  if (columns.length !== storedColumns.length) {
-    return true
-  }
-
-  const noCompareFields = ['resizeWidth', 'width']
-  return columns.some((source: Record<string, any>) => {
-    const target: Record<string, any> | undefined = storedColumns.find(
-      (item: Record<string, any>) => requiredFields.value
-        .filter((field: string) => !noCompareFields.includes(field))
-        .every((field: string) => getStringObj(item[field]) === getStringObj(source[field])),
-    )
-    return !target
-  })
-}
+/** 已移除旧的列对比函数，逻辑合并已在 watch 中实现 */
 
 /**
  * 监听列宽变化
@@ -1126,115 +1101,65 @@ watch(
     else {
       // 尝试从本地存储获取列配置
       const _storedColumns = await handleGetStoredColumns()
-      // const storedColumns = _storedColumns.filter(Boolean)
+      const storedColumns = _storedColumns.filter(Boolean)
 
-      // 获取props.columns中所有列的field值（如果有）和type值（如果有）
-      const propsColumnsKeys = props.columns.flatMap((col: { field?: any, type?: any }) => {
-        const keys = []
-        if (col.field) {
-          keys.push({ type: 'field', value: col.field })
-        }
-        if (col.type) {
-          keys.push({ type: 'type', value: col.type })
-        }
-        return keys
-      })
+      // props.columns 基于field,type等唯一key，值为col，map为columnsMap
+      // storedColumns 基于field,type等唯一key，值为col，map为storedColumnsMap
+      // columnsMap的key与storedColumnsMap的key做对比，以columnsMap为准，要求如下：
+      // 1.columnsMap中存在，storedColumnsMap中不存在，则在storedColumnsMap中添加对应的key
+      // 2.columnsMap中存在，storedColumnsMap中也存在，则在storedColumnsMap中合并属性
+      // 3.columnsMap中不存在，storedColumnsMap中存在，则移除storedColumnsMap中对应的key
+      // 4.以处理完毕后的storedColumnsMap的value作为新的columns,赋值给localColumns.value
 
-      //按照_storedColumns的原始顺序，只保留那些在props.columns中存在的列配置
-      const storedColumnsInOrder = _storedColumns.filter((storedCol) => {
-        // 如果存储的列有field属性，则检查是否在props.columns的field集合中
-        if (storedCol.field) {
-          return propsColumnsKeys.some((key: { type: string, value: string | undefined }) =>
-            key.type === 'field' && key.value === storedCol.field,
-          )
-        }
-        // 如果存储的列没有field属性但有type属性，则检查是否在props.columns的type集合中
-        else if (storedCol.type) {
-          return propsColumnsKeys.some((key: { type: string, value: string | undefined }) =>
-            key.type === 'type' && key.value === storedCol.type,
-          )
-        }
-        // 如果既没有field也没有type，则不保留
-        return false
-      }).filter(Boolean)
-
-      // 创建一个Map来快速查找props.columns中的原始列配置
-      const propsColumnsMap = new Map()
-      props.columns.forEach((propCol: ColumnType) => {
-        if (propCol.field) {
-          propsColumnsMap.set(`field:${propCol.field}`, propCol)
-        }
-        if (propCol.type) {
-          propsColumnsMap.set(`type:${propCol.type}`, propCol)
-        }
-      })
-
-      // 创建一个Set来记录已经在storedColumnsInOrder中的列
-      const includedColumns = new Set()
-
-      // 处理存储的列，并合并props.columns中的新属性
-      const processedStoredColumns = storedColumnsInOrder.map((storedCol) => {
-        // 记录此列已包含
-        if (storedCol.field) {
-          includedColumns.add(`field:${storedCol.field}`)
-        }
-        if (storedCol.type) {
-          includedColumns.add(`type:${storedCol.type}`)
-        }
-
-        // 查找对应的props列配置
-        let propCol = null
-        if (storedCol.field) {
-          propCol = propsColumnsMap.get(`field:${storedCol.field}`)
-        }
-        if (!propCol && storedCol.type) {
-          propCol = propsColumnsMap.get(`type:${storedCol.type}`)
-        }
-
-        // 合并props.columns中的新属性到存储的列配置中
-        // 优先使用存储的配置值，但保留props.columns中的新属性
-        if (propCol) {
-          return {
-            ...propCol, // 先放props列配置，确保新属性被包含
-            ...storedCol, // 然后放存储的列配置，确保用户的自定义设置优先
-            sortable: storedCol.sortable ?? propCol.sortable ?? props.sortable, // 特殊处理sortable属性
-          }
-        }
-
-        return storedCol
-      })
-
-      // 添加props.columns中存在但_storedColumns中不存在的列到末尾
-      const storedColumns = [...processedStoredColumns]
-      props.columns.forEach((propCol: ColumnType) => {
-        let isIncluded = false
-
-        // 检查该列是否已经在processedStoredColumns中
-        if (propCol.field) {
-          isIncluded = includedColumns.has(`field:${propCol.field}`)
-        }
-
-        if (!isIncluded && propCol.type) {
-          isIncluded = includedColumns.has(`type:${propCol.type}`)
-        }
-
-        // 如果不在，则添加到末尾
-        if (!isIncluded) {
-          storedColumns.push({
-            ...propCol,
-            sortable: propCol.sortable ?? props.sortable,
-          })
-        }
-      })
-
-      console.log('storedColumns', storedColumns)
-      //这里的判断逻辑不全
-      if (handleCompareColumns(newColumns, storedColumns)) {
-        localColumns.value = newColumns
+      // 基于 field 优先、其次 type 作为唯一键
+      const getColumnKey = (col: Record<string, any>) => {
+        if (col?.field)
+          return `field:${col.field}`
+        if (col?.type)
+          return `type:${col.type}`
+        return ''
       }
-      else {
-        localColumns.value = storedColumns
-      }
+
+      // 以 newColumns 为基准构建 propsColumnsMap（只收集有唯一键的列）
+      const propsColumnsMap = new Map<string, Record<string, any>>()
+      newColumns.forEach((col: any) => {
+        const key = getColumnKey(col)
+        if (key)
+          propsColumnsMap.set(key, col)
+      })
+
+      // 合并逻辑：
+      // - 先按 storedColumns 原有顺序输出（删除 props 中已不存在的会被跳过）
+      // - 对于两边都存在的 key，合并：以 props 的结构为底，保存用户自定义（stored）为主覆盖
+      // - 再将 props 中新增但存储里没有的列追加到末尾
+      const merged: any[] = []
+
+      // 先遍历存储顺序，保留顺序优先
+      storedColumns.forEach((storedCol: any) => {
+        const key = getColumnKey(storedCol)
+        if (!key)
+          return
+        const propCol = propsColumnsMap.get(key)
+        if (!propCol) {
+          // 3) props 中已不存在时，从结果中剔除（即不 push）
+          return
+        }
+        // 2) 合并属性：以 props 为基础，存储覆盖
+        const mergedCol: any = {
+          ...propCol,
+          ...storedCol,
+        }
+        merged.push(mergedCol)
+        // 该 key 已处理，避免后续重复添加
+        propsColumnsMap.delete(key)
+      })
+
+      // 1) 追加 props 中新增而存储中不存在的列
+      propsColumnsMap.forEach(item => merged.push(item))
+
+      console.log('merged', storedColumns, merged)
+      // 4) 结果赋值
+      localColumns.value = merged
     }
   },
   { deep: true, immediate: true },
@@ -1242,8 +1167,7 @@ watch(
 
 watch(
   () => localColumns.value,
-  (v: ColumnType[]) => {
-    console.log('aaaa', v.length)
+  () => {
     handleSaveColumnsToStorage()
   },
 )

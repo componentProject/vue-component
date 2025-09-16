@@ -19,10 +19,10 @@
       </div>
       <component
         :is="localComponent"
-        :columns="columns"
-        v-model="tableData"
-        save-type="server"
         id="123456789"
+        v-model="tableData"
+        :columns="columns"
+        save-type="server"
         page-id="123456789"
         user-id="123456789"
         :resizable="true"
@@ -34,9 +34,13 @@
       </div>
       <component
         :is="dynamicComponent"
+        id="1234567891"
+        v-model="tableData"
+        save-type="server"
+        page-id="1234567891"
+        user-id="1234567891"
         pop-type="input"
         :columns="columns"
-        v-model="tableData"
       />
     </div>
   </div>
@@ -68,9 +72,10 @@ const dynamicComponent = ref<any>(null) // 用于存储动态组件
 
 const columns = [
   { type: 'seq', title: '', width: 60 },
-  { field: 'id', title: 'ID', width: 60 },
+  { field: 'id', title: 'ID', width: 60, sortable: true },
   { field: 'name', title: '姓名', width: 120 },
   { field: 'age', title: '年龄', sortable: true },
+  { field: 'age1', title: '年龄1', sortable: true },
 ]
 const tableData = [
   { id: 1, name: '张三', age: '' },
