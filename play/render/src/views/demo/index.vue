@@ -19,12 +19,13 @@
       </div>
       <component
         :is="localComponent"
-        :columns="columns"
-        v-model="tableData"
-        save-type="server"
         id="123456789"
+        v-model="tableData"
+        :columns="columns"
+        save-type="server"
         page-id="123456789"
         user-id="123456789"
+        :filterable="true"
         :resizable="true"
       />
     </div>
@@ -34,9 +35,9 @@
       </div>
       <component
         :is="dynamicComponent"
+        v-model="tableData"
         pop-type="input"
         :columns="columns"
-        v-model="tableData"
       />
     </div>
   </div>
@@ -66,9 +67,19 @@ const componentName = ref('DraggableTable') // 调试与演示组件库的组件
 const localComponent = ref<any>(null) // 调试组件
 const dynamicComponent = ref<any>(null) // 用于存储动态组件
 
+const statusMap = {
+      1: '一',
+      2: '二',
+      3: '三',
+    }
+
 const columns = [
   { type: 'seq', title: '', width: 60 },
-  { field: 'id', title: 'ID', width: 60 },
+  { field: 'id', title: 'ID', width: 60, formatter: ({ row }) => {
+    return statusMap[row.id] || row
+  }, filterFormatter: ({ value, columns }) => {
+    return statusMap[value] || value
+  } },
   { field: 'name', title: '姓名', width: 120 },
   { field: 'age', title: '年龄', sortable: true },
 ]

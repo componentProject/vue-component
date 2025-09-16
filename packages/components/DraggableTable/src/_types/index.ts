@@ -32,6 +32,8 @@ interface customColumnProps {
   editProps?: objType
   filterProps?: objType
   cellProps?: objType
+  /** 过滤值格式化函数 */
+  filterFormat?: (value: any) => string
 }
 
 /** 当没有下一个输入元素时触发的事件参数 */
