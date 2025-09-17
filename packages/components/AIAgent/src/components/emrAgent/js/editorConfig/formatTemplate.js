@@ -41,7 +41,7 @@ function extractInputFields(node, result, setContent = true) {
       if (setContent) {
         content = dict.find(item => item.Value === node.InnerValue)?.Text || node.InnerValue || ''
 
-        if (!content && node.Elements && node.Elements.length === 1 && node.Elements[0].Type !== 'InputField') {
+        if (!content && node.Elements && node.Elements[0].Type !== 'InputField') {
           content = node.Elements[0].Text
         }
       }
