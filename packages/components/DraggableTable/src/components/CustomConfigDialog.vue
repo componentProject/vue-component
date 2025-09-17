@@ -1,7 +1,6 @@
 <template>
-  <ElDialog
-    v-model="visible"
-    destroy-on-close
+  <DragModalDialog
+    v-model:visible="visible"
     v-bind="computedDialogProps"
   >
     <VxeGrid
@@ -83,15 +82,16 @@
         </ElButton>
       </div>
     </template>
-  </ElDialog>
+  </DragModalDialog>
 </template>
 
 <script lang="ts" setup>
 import { computed, ref } from 'vue'
 import { VxeGrid } from 'vxe-table'
-import { ElButton, ElCheckbox, ElDialog, ElInput, ElOption, ElSelect, ElSwitch } from 'element-plus'
+import { ElButton, ElCheckbox, ElInput, ElOption, ElSelect, ElSwitch } from 'element-plus'
 import { getTypeName } from '@moluoxixi/components/DraggableTable/src/_utils'
 import { cloneDeep } from 'lodash'
+import DragModalDialog from '@moluoxixi/components/DragModalDialog'
 import type { ColumnType } from '@moluoxixi/components/DraggableTable/src/_types'
 
 const props = defineProps({
@@ -121,8 +121,9 @@ const emit = defineEmits<{
 const xTable = useTemplateRef('xTable')
 const computedDialogProps = computed(() => {
   return {
-    width: '800px',
     title: '个性化列配置',
+    width: '800px',
+    height: '60%',
     ...props.dialogProps,
   }
 })
