@@ -531,7 +531,7 @@ async function replaceImportsAndExports(componentCode: string, componentName: st
 export async function load($_Vue: any, originComponentNames: string[], isLongRange?: boolean) {
   const listRes = await getList({
     productCode: 'webFile_his',
-    vue: ['Vue3', 'vue3Test'],
+    vue: ['vue3Test'],
   })
   const allComponentList = listRes.vue3Test
   const componentNames = originComponentNames?.length > 0 ? originComponentNames : allComponentList.map(i => i.componentCode)
