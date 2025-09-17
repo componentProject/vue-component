@@ -875,9 +875,6 @@ class RequestApi extends BaseApi {
   //#endregion
 }
 
-function getKieModelRequest(apiKey: string) {
+export default function getKieModelRequest(apiKey: string) {
   return new RequestApi({ url: 'https://api.kie.ai/api/v1', apiKey })
 }
-
-const request = getKieModelRequest('783fbe9ef74f10434e8adc3176c19c56')
-export { request }

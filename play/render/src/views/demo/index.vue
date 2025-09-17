@@ -1,12 +1,5 @@
 <template>
   <div>
-    <div>
-      veo3文生视频
-      <ElButton @click="veo3Video">
-        发送请求
-      </ElButton>
-      <ElInput v-model="prompt" type="textarea" />
-    </div>
     <div class="title">
       调试与演示
     </div>
@@ -19,15 +12,18 @@
       </div>
       <component
         :is="localComponent"
-        id="123456789"
+        id="123456789321"
         v-model="tableData"
         :columns="columns"
-        save-type="server"
-        page-id="123456789"
-        user-id="123456789"
+        page-id="123456789321"
+        user-id="123456789321"
         :filterable="true"
         :resizable="true"
-      />
+      >
+        <template #action>
+          <div>按钮</div>
+        </template>
+      </component>
     </div>
     <div class="main">
       <div class="list-title">
@@ -43,7 +39,11 @@
         user-id="123456789"
         :filterable="true"
         :resizable="true"
-      />
+      >
+        <template #action>
+          <div>按钮</div>
+        </template>
+      </component>
     </div>
   </div>
 </template>
@@ -56,16 +56,8 @@ import { onMounted, ref } from 'vue'
 import { load } from '../../../utils.ts'
 // 虚拟模块由 Vite 插件在运行时提供
 import { setDeleteByPathAndCode } from '@moluoxixi/utils/_api'
-import { request } from '@moluoxixi/utils/veo3Request'
 
 defineOptions({ name: '调试与演示' })
-const prompt = ref('With a nervous yet focused expression, wearing a dark form-fitting short garment with a slightly open collar, sweat glistening on the collarbones, short hair tousled by the river wind, holding a simple selfie stick, walking quickly and narrating.\nBurning warships and billowing black smoke sweeping across the lens, the sounds of arrows whizzing through the air mingling with soldiers\' shouts; ambush soldiers lurking in the reeds on the shore, sword glints flashing in the firelight; the flags on the main ship fluttering in the distance, the drums booming like thunder.\nLowering his body to pass through the chaotic beachhead, breathing heavily, the picture shaking, advancing towards the main battlefield.\nThe on-site narrator **Chinese speaking**: "The fire attack has begun. The Eastern Wu fleet is approaching. The Cao army\'s formation is in great disorder. Follow me to report the battle situation quickly!')
-
-function veo3Video() {
-  request.veo3Video({
-    prompt: prompt.value,
-  })
-}
 
 // 使用ref替代data属性
 const componentName = ref('DraggableTable') // 调试与演示组件库的组件，直接修改组件名
@@ -73,10 +65,10 @@ const localComponent = ref<any>(null) // 调试组件
 const dynamicComponent = ref<any>(null) // 用于存储动态组件
 
 const statusMap = {
-      1: '一',
-      2: '二',
-      3: '三',
-    }
+  1: '一',
+  2: '二',
+  3: '三',
+}
 
 const columns = [
   { type: 'seq', title: '', width: 60 },
@@ -87,6 +79,30 @@ const columns = [
   } },
   { field: 'name', title: '姓名', width: 120 },
   { field: 'age', title: '年龄', sortable: true },
+  { field: 'age1', title: '测试', sortable: true },
+  { field: 'age3', title: '测试3' },
+  { field: 'age4', title: '测试4' },
+  { field: 'age5', title: '测试5' },
+  { field: 'age6', title: '测试6' },
+  { field: 'age7', title: '测试7' },
+  { field: 'age8', title: '测试8' },
+  { field: 'age9', title: '测试9' },
+  { field: 'age10', title: '测试10' },
+  { field: 'age11', title: '测试11' },
+  { field: 'age12', title: '测试12' },
+  { field: 'age13', title: '测试13' },
+  { field: 'age14', title: '测试14' },
+  { field: 'age15', title: '测试15' },
+  { field: 'age16', title: '测试16' },
+  {
+    field: 'action',
+    align: 'center',
+    title: '操作',
+    width: 110,
+    slots: {
+      default: 'action',
+    },
+  },
 ]
 const tableData = [
   { id: 1, name: '张三', age: '' },
@@ -172,6 +188,7 @@ async function loadLocalComponent(componentName: string) {
 async function loadComponents(components: string[]) {
   try {
     const loadedComponents = await load(vue, components, true)
+    console.log('00000000000', loadedComponents[componentName.value])
     dynamicComponent.value = loadedComponents[componentName.value]
     console.log('动态组件加载成功:', dynamicComponent)
   }

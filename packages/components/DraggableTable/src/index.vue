@@ -973,7 +973,9 @@ const container = useTemplateRef<HTMLElement>('container')
 const offEffect = ref()
 const requiredFields = computed<string[]>(() => handleGetRequiredFields(props.customColumns))
 onMounted(() => {
-  offEffect.value = onHotkeys(props.saveHotKeys, () => customConfigDialogVisible.value = true, { target: container.value })
+  if (props.saveType !== 'default') {
+    offEffect.value = onHotkeys(props.saveHotKeys, () => customConfigDialogVisible.value = true, { target: container.value })
+  }
 })
 onBeforeUnmount(() => offEffect?.())
 // 本地保存的列配置
@@ -1096,7 +1098,7 @@ watch(
       return i
     })
     // 如果启用了本地存储，不保存
-    if (props.customConfig.storage) {
+    if (props.customConfig.storage || props.saveType === 'default') {
       localColumns.value = newColumns
     }
     else {
@@ -1118,6 +1120,7 @@ watch(
           return `field:${col.field}`
         if (col?.type)
           return `type:${col.type}`
+        ElMessage.error('columns对象field或type属性，必须存在一个')
         return ''
       }
 
