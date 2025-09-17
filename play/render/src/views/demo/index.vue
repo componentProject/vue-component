@@ -188,7 +188,6 @@ async function loadLocalComponent(componentName: string) {
 async function loadComponents(components: string[]) {
   try {
     const loadedComponents = await load(vue, components, true)
-    console.log('00000000000', loadedComponents[componentName.value])
     dynamicComponent.value = loadedComponents[componentName.value]
     console.log('动态组件加载成功:', dynamicComponent)
   }
