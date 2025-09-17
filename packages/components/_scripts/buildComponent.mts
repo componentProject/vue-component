@@ -53,7 +53,6 @@ async function main() {
         alias,
         rootDir,
         packDir,
-        uploadType: 'vue3Test',
       })
       return result ? 0 : 1
     }
