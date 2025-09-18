@@ -1,5 +1,5 @@
 <template>
-  <div ref="container" class="h-full w-full flex-1 overflow-hidden outline-0 container">
+  <div ref="container" class="h-full flex-1 overflow-hidden outline-0 container">
     <VxeGrid
       ref="xTable"
       :header-cell-config="{ height: '30px' }"
@@ -21,26 +21,29 @@
         <slot :name="name" v-bind="slotParams" />
       </template>
     </VxeGrid>
-    <ContextMenu
-      v-model="contextMenuVisible"
-      :columns="fullColumns"
-      :virtual-ref="virtualRef"
-      @menu-confirm="handleMenuConfirm"
-      @header-context-menu="handleHeaderContextMenu"
-    />
+    <!--    表头右键菜单，有bug，暂时关闭 -->
+    <!--    <ContextMenu -->
+    <!--      v-model="contextMenuVisible" -->
+    <!--      :columns="collectColumn" -->
+    <!--      :virtual-ref="virtualRef" -->
+    <!--      @menu-confirm="handleMenuConfirm" -->
+    <!--      @header-context-menu="handleHeaderContextMenu" -->
+    <!--    /> -->
 
-    <EnterNextContainer
-      v-for="(virtual, index) in tableVirtualRefs"
-      :key="`row-${index}`"
-      :virtual-ref="virtual"
-      :allow-select-next-in-empty="props.allowSelectNextInEmpty"
-      @no-next-input="handleNoNextInput"
-      @no-select-value="handleNoSelectValue"
-    />
+    <template v-if="needCollect">
+      <EnterNextContainer
+        v-for="(virtual, index) in tableVirtualRefs"
+        :key="`row-${index}`"
+        :virtual-ref="virtual"
+        :allow-select-next-in-empty="props.allowSelectNextInEmpty"
+        @no-next-input="handleNoNextInput"
+        @no-select-value="handleNoSelectValue"
+      />
+    </template>
     <CustomConfigDialog
       v-model="customConfigDialogVisible"
       :columns="props.columns"
-      :computed-columns="fullColumns"
+      :collect-columns="collectColumn"
       :custom-columns="props.customColumns"
       @confirm="handleCustomConfigSave"
     />
@@ -49,20 +52,6 @@
 
 <script lang="ts" setup>
 import type { PropType } from 'vue'
-import type {
-  VxeGridInstance,
-  VxeGridProps,
-  VxeGridPropTypes,
-  VxeTableConstructor,
-  VxeTableDefines,
-  VxeTablePropTypes,
-} from 'vxe-table'
-import type { ColumnType, customConfigType, NoNextInputParams, NoSelectValueParams, types } from './_types'
-import { ElMessage } from 'element-plus'
-
-import { cloneDeep, groupBy } from 'lodash'
-import { diff, isEmpty } from 'radash'
-import Sortable from 'sortablejs'
 import {
   computed,
   nextTick,
@@ -73,7 +62,21 @@ import {
   useTemplateRef,
   watch,
 } from 'vue'
+import type {
+  VxeGridInstance,
+  VxeGridProps,
+  VxeGridPropTypes,
+  VxeTableConstructor,
+  VxeTableDefines,
+  VxeTablePropTypes,
+} from 'vxe-table'
 import { VxeGrid } from 'vxe-table'
+import type { ColumnType, customConfigType, NoNextInputParams, NoSelectValueParams } from './_types'
+import { ElMessage } from 'element-plus'
+
+import { cloneDeep, groupBy } from 'lodash'
+import { diff, isEmpty } from 'radash'
+import Sortable from 'sortablejs'
 import { VxePager, VxeTooltip, VxeUI } from 'vxe-pc-ui'
 import 'vxe-table/lib/style.css'
 import 'vxe-pc-ui/lib/style.css'
@@ -85,13 +88,10 @@ import {
   onHotkeys,
   sleep,
 } from '@moluoxixi/utils/_utils'
-import {
-  getCustomType,
-  handleGetRequiredFields,
-} from './_utils'
+import { getCustomType, handleGetRequiredFields } from './_utils'
 
 /** 自定义右键菜单 */
-import ContextMenu from './components/ContextMenu/index.vue'
+// import ContextMenu from './components/ContextMenu/index.vue'
 // 导入自定义渲染器
 import './renderers'
 import type { slotsType } from '@moluoxixi/components/_types'
@@ -327,7 +327,18 @@ const props = defineProps({
       pageSize: 10,
       total: 100,
       pageSizes: [10, 20, 30, 50, 100],
-      layouts: ['Home', 'PrevJump', 'PrevPage', 'Number', 'NextPage', 'NextJump', 'End', 'Sizes', 'FullJump', 'Total'],
+      layouts: [
+        'Home',
+        'PrevJump',
+        'PrevPage',
+        'Number',
+        'NextPage',
+        'NextJump',
+        'End',
+        'Sizes',
+        'FullJump',
+        'Total',
+      ],
     }),
   },
   // 是否展示分页
@@ -365,8 +376,8 @@ const props = defineProps({
   customColumns: {
     type: Array as PropType<ColumnType[]>,
     default: () => [
-      { type: 'checkbox', width: 40 },
-      { field: 'field', title: '字段' },
+      { type: 'checkbox', width: 60 },
+      { field: 'field', title: '字段', width: 160, treeNode: true, dragSort: true },
       { field: 'title', title: '列名称', slots: { default: 'title' } },
       { field: 'width', minWidth: 200, title: '宽度', slots: { default: 'width' } },
       { field: 'resizable', width: 80, title: '可调整', slots: { default: 'resizable' } },
@@ -426,11 +437,12 @@ const xTable = useTemplateRef<VxeGridInstance>('xTable')
 
 //#region 回车下一个功能
 const tableVirtualRefs = ref<HTMLElement[]>([])
-
+/** 是否符合收集回车元素的条件 */
+const needCollect = computed(() => ['row', 'table'].includes(props.containerType))
 // 获取表格中所有的行元素
 function collectTableVirtualRefs() {
   try {
-    if (!xTable.value) {
+    if (!xTable.value || !needCollect.value) {
       return
     }
 
@@ -526,13 +538,25 @@ function handleTableRendered(params: VxeTableDefines.ToggleRowExpandEventParams)
 //#endregion
 
 //#region 表头配置弹窗功能
-const contextMenuVisible = ref(false)
-const fullColumns = computed<ColumnType[]>(() => {
+const collectColumn = computed<ColumnType[]>(() => {
   if (!xTable.value)
     return []
-  const { fullColumn } = xTable.value.getTableColumn()
-  return fullColumn as any[]
+  const { collectColumn } = xTable.value.getTableColumn()
+  return collectColumn as any[]
 })
+// /**
+//  * 表头右键菜单确定事件
+//  * @param columns
+//  */
+// function handleMenuConfirm(columns: ColumnType[]) {
+//   localColumns.value = columns
+// }
+//
+// /** 表头右键菜单显示事件 */
+// function handleHeaderContextMenu(params: HTMLElement) {
+//   emit('headerContextMenu', params)
+// }
+const contextMenuVisible = ref(false)
 const virtualRef = ref<HTMLElement>()
 /**
  * 表头右键事件
@@ -550,19 +574,6 @@ function handleHeaderCellMenu(
     virtualRef.value = params.cell
     contextMenuVisible.value = true
   }
-}
-
-/**
- * 表头右键菜单确定事件
- * @param columns
- */
-function handleMenuConfirm(columns: ColumnType[]) {
-  localColumns.value = columns
-}
-
-/** 表头右键菜单显示事件 */
-function handleHeaderContextMenu(params: HTMLElement) {
-  emit('headerContextMenu', params)
 }
 //#endregion
 
@@ -604,43 +615,53 @@ function handleCheckboxChange(params: VxeTableDefines.CheckboxChangeParams) {
  * 4. 添加基于field的自定义默认渲染器，额外提供以下type功能：'input' | 'select' | 'date' | 'datetime' | 'switch' | 'progress' | 'tag'
  */
 const computedColumns = computed<ColumnType[]>(() => {
-  const typeSet = new Set<types | undefined>([])
   const columns: any[] = localColumns.value
-    .filter((i: any) => {
-      if (i.type && typeSet.has(i.type)) {
-        return false
-      }
-      typeSet.add(i.type)
-      return true
-    })
-  /** 相同type的列只保留一个 */
   if (!getType(columns, 'array'))
     return []
-  //#region 获取所有插槽的名称
+
+  //#region 获取所有插槽的名称（递归收集）
   const columnsSlotsNames: string[] = []
-  columns.forEach((item) => {
-    if (item?.slots) {
+  const collectSlots = (col: any) => {
+    if (col?.slots) {
       columnsSlotsNames.push(
-        ...(Object.values(item.slots).filter(i => getType(i, 'string')) as string[]),
+        ...(Object.values(col.slots).filter(i => getType(i, 'string')) as string[]),
       )
     }
-  })
+    if (Array.isArray(col?.children)) {
+      col.children.forEach(collectSlots)
+    }
+  }
+  columns.forEach(collectSlots)
   //#endregion
 
   // 获取slots中未使用的插槽
   const slotsDiff = [...diff(slotNames.value, columnsSlotsNames)]
 
-  return columns.map((col) => {
-    const { options, editProps, filterProps, cellProps, ...item } = col
+  const transformColumn = (col: any): any => {
+    const { options, editProps, filterProps, cellProps, children, ...rest } = col || {}
+    const hasChildren = Array.isArray(children) && children.length > 0
+
+    if (hasChildren) {
+      const nextChildren = children.map((child: any) => transformColumn(child)).filter(Boolean)
+      if (!nextChildren.length)
+        return undefined
+      const { min, max, required, ...cleanRest } = rest as any
+      return {
+        ...cleanRest,
+        children: nextChildren,
+      }
+    }
+
+    const item: any = { ...rest }
+
     const customType = getCustomType(item.type)
     if (customType) {
       delete item.type
     }
 
-    if (!item.field)
-      return item
-    //#region 提供基于field的插槽
-    /*
+    if (item.field) {
+      //#region 提供基于field的插槽
+      /*
      * 提供基于field的插槽，规则如下：
      * 如果slotsDiff中存在"${field}"，则作为defaultSlots.default，
      * 如果slotsDiff中存在"header-${field}"，则作为defaultSlots.header，
@@ -653,122 +674,123 @@ const computedColumns = computed<ColumnType[]>(() => {
      * 如果slotsDiff中存在"edit-${field}"，且存在column.editRender，则作为defaultSlots.edit，
      * 如果slotsDiff中存在"valid-${field}"，且存在column.editRules,column.editRender，则作为defaultSlots.valid
      */
-    const defaultField = item.field
-    const defaultSlots: ColumnType['slots'] = {}
-    const slotsMap = {
-      default: defaultField,
-      header: `header-${defaultField}`,
-      footer: `footer-${defaultField}`,
-      title: `title-${defaultField}`,
-      checkbox: `checkbox-${defaultField}`,
-      radio: `radio-${defaultField}`,
-      content: `content-${defaultField}`,
-      filter: `filter-${defaultField}`,
-      edit: `edit-${defaultField}`,
-      valid: `valid-${defaultField}`,
-    }
-    type keyType = keyof typeof slotsMap;
-    (Object.keys(slotsMap) as keyType[]).forEach((key) => {
-      const slotName = slotsMap[key]
-      if (slotsDiff.includes(slotName)) {
-        if (key === 'title' && item.type === 'checkbox') {
-          defaultSlots.title = slotName
+      const defaultField = item.field
+      const defaultSlots: ColumnType['slots'] = {}
+      const slotsMap = {
+        default: defaultField,
+        header: `header-${defaultField}`,
+        footer: `footer-${defaultField}`,
+        title: `title-${defaultField}`,
+        checkbox: `checkbox-${defaultField}`,
+        radio: `radio-${defaultField}`,
+        content: `content-${defaultField}`,
+        filter: `filter-${defaultField}`,
+        edit: `edit-${defaultField}`,
+        valid: `valid-${defaultField}`,
+      }
+      type keyType = keyof typeof slotsMap;
+      (Object.keys(slotsMap) as keyType[]).forEach((key) => {
+        const slotName = (slotsMap as any)[key]
+        if (slotsDiff.includes(slotName)) {
+          if (key === 'title' && item.type === 'checkbox') {
+            defaultSlots.title = slotName
+          }
+          else if (key === 'checkbox' && item.type === 'checkbox') {
+            defaultSlots.checkbox = slotName
+          }
+          else if (key === 'radio' && item.type === 'radio') {
+            defaultSlots.radio = slotName
+          }
+          else if (key === 'content' && item.type === 'expand') {
+            defaultSlots.content = slotName
+          }
+          else if (
+            key === 'filter'
+            && getType(item.filterRender, 'object')
+            && !getType(item.filters, 'array')
+          ) {
+            defaultSlots.filter = slotName
+          }
+          else if (key === 'edit' && getType(item.editRender, 'object')) {
+            defaultSlots.edit = slotName
+          }
+          else if (
+            key === 'valid'
+            && !isEmpty(props.editRules)
+            && getType(item.editRender, 'object')
+          ) {
+            defaultSlots.valid = slotName
+          }
+          else {
+            (defaultSlots as any)[key] = slotName
+          }
         }
-        else if (key === 'checkbox' && item.type === 'checkbox') {
-          defaultSlots.checkbox = slotName
-        }
-        else if (key === 'radio' && item.type === 'radio') {
-          defaultSlots.radio = slotName
-        }
-        else if (key === 'content' && item.type === 'expand') {
-          defaultSlots.content = slotName
-        }
-        else if (
-          key === 'filter'
-          && getType(item.filterRender, 'object')
-          && !getType(item.filters, 'array')
-        ) {
-          defaultSlots.filter = slotName
-        }
-        else if (key === 'edit' && getType(item.editRender, 'object')) {
-          defaultSlots.edit = slotName
-        }
-        else if (
-          key === 'valid'
-          && !isEmpty(props.editRules)
-          && getType(item.editRender, 'object')
-        ) {
-          defaultSlots.valid = slotName
-        }
-        else {
-          defaultSlots[key] = slotName
+      })
+      item.slots = {
+        ...defaultSlots,
+        ...item.slots,
+      }
+      //#endregion
+
+      //#region 添加基于field的自定义筛选器渲染器,该渲染器基于当前列显示的内容进行筛选，支持input搜索，checkbox多选，可通过filterLayout配置
+      if (props.filterable && !item.filters && !item.slots?.edit && isEmpty(item.filterRender)) {
+        item.filters = [
+          {
+            data: { vals: [], sVal: '' },
+            checked: false,
+          },
+        ]
+        item.filterRender = {
+          name: 'filterRenderer',
+          props: {
+            filterLayout: props.filterLayout,
+            filterType: props.filterType,
+            filterFormatter: item.filterFormatter,
+            ...filterProps,
+          },
         }
       }
-    })
-    item.slots = {
-      ...defaultSlots,
-      ...item.slots,
-    }
-    //#endregion
+      //#endregion
 
-    //#region 添加基于field的自定义筛选器渲染器,该渲染器基于当前列显示的内容进行筛选，支持input搜索，checkbox多选，可通过filterLayout配置
-    if (props.filterable && !item.filters && !item.slots.edit && isEmpty(item.filterRender)) {
-      item.filters = [
-        {
-          data: { vals: [], sVal: '' },
-          checked: false,
-        },
-      ]
-      // 使用自定义筛选器渲染器
-      item.filterRender = {
-        name: 'filterRenderer',
-        props: {
-          filterLayout: props.filterLayout,
-          filterType: props.filterType,
-          filterFormatter: item.filterFormatter,
-          ...filterProps,
-        },
+      //#region 添加基于field的自定义编辑渲染器，当前列满足正常年月日顺序的任意字符串时间格式/Date时，显示单日期时间选择器，列传递options，显示select,否则显示input
+      if (props.editable && isEmpty(item.editRender) && !item.formatter && !item.slots?.edit) {
+        item.editRender = {
+          name: 'editRenderer',
+          autoFocus: props.editAutoFocus,
+          props: {
+            options,
+            ...editProps,
+          },
+        }
       }
-    }
-    //#endregion
+      //#endregion
 
-    //#region 添加基于field的自定义编辑渲染器，当前列满足正常年月日顺序的任意字符串时间格式/Date时，显示单日期时间选择器，列传递options，显示select,否则显示input
-    if (props.editable && isEmpty(item.editRender) && !item.formatter && !item.slots?.edit) {
-      // 使用自定义编辑渲染器
-      item.editRender = {
-        name: 'editRenderer',
-        autoFocus: props.editAutoFocus,
-        props: {
-          options,
-          ...editProps,
-        },
+      //#region 添加基于field的自定义默认渲染器，额外提供以下type功能：'input' | 'select' | 'date' | 'datetime' | 'switch' | 'progress' | 'tag'
+      if (
+        isEmpty(item.cellRender)
+        && isEmpty(item.contentRender)
+        && isEmpty(item.editRender)
+        && !item.slots?.default
+        && !item.formatter
+        && customType
+      ) {
+        item.cellRender = {
+          name: 'cellRenderer',
+          props: {
+            options,
+            type: customType,
+            ...cellProps,
+          },
+        }
       }
+      //#endregion
     }
-    //#endregion
 
-    //#region 添加基于field的自定义默认渲染器，额外提供以下type功能：'input' | 'select' | 'date' | 'datetime' | 'switch' | 'progress' | 'tag'
+    const { min, max, required, ...cleanItem } = item
+    return cleanItem
+  }
 
-    if (
-      isEmpty(item.cellRender)
-      && isEmpty(item.contentRender)
-      // 与editRender互斥
-      && isEmpty(item.editRender)
-      && !item.slots?.default
-      && !item.formatter
-      && customType
-    ) {
-      item.cellRender = {
-        name: 'cellRenderer',
-        props: {
-          options,
-          type: customType,
-          ...cellProps,
-        },
-      }
-    }
-    //#endregion
-    return item
-  })
+  return columns.map(transformColumn).filter(Boolean) as ColumnType[]
 })
 //#endregion
 
@@ -784,7 +806,10 @@ const gridProps = computed<VxeGridProps>(() => {
   if (isEditEnabled && localColumns.value.length > 0) {
     localColumns.value.forEach((column: ColumnType) => {
       // 检查列是否有 field 且有验证规则
-      if (column.field && (column.required === true || column.min !== undefined || column.max !== undefined)) {
+      if (
+        column.field
+        && (column.required === true || column.min !== undefined || column.max !== undefined)
+      ) {
         const rules: any[] = []
 
         // 添加必填验证
@@ -959,11 +984,8 @@ const gridProps = computed<VxeGridProps>(() => {
       ...props.filterConfig,
     },
     ...attrs,
-    // 使用计算后的列配置
-    columns: computedColumns.value?.map((item: ColumnType) => {
-      const { min, max, required, ...column } = item
-      return column
-    }),
+    // 使用计算后的列配置（递归移除内部校验相关属性，保持渲染结构）
+    columns: computedColumns.value,
   } as VxeGridProps
 })
 //#endregion
@@ -977,18 +999,43 @@ onMounted(() => {
     offEffect.value = onHotkeys(props.saveHotKeys, () => customConfigDialogVisible.value = true, { target: container.value })
   }
 })
-onBeforeUnmount(() => offEffect?.())
+onBeforeUnmount(() => offEffect.value?.())
 // 本地保存的列配置
 const localColumns = ref<ColumnType[]>([])
 const customRestConfig = ref({})
 
-function handleCustomConfigSave({ customColumns, ...rest }: { customColumns: ColumnType[], rest: any[] }) {
+/**
+ * 生成列的唯一键：优先使用 field，其次使用 type。
+ * - 用于“存储合并/顺序恢复/宽度映射”等场景，确保不同来源的列能稳定对齐。
+ * @param col 列配置对象
+ * @returns 唯一键（如 "field:xxx" | "type:checkbox"），若无法生成则返回空字符串
+ */
+function getColumnUniqueKey(col: Record<string, any>): string {
+  if (col?.field)
+    return `field:${col.field}`
+  if (col?.type)
+    return `type:${col.type}`
+  console.error('field或type字段必须存在其一，缺失会导致问题')
+  return ''
+}
+
+function handleCustomConfigSave({
+  customColumns,
+  ...rest
+}: {
+  customColumns: ColumnType[]
+  rest: any[]
+}) {
   localColumns.value = customColumns
   customRestConfig.value = rest
 }
 
 // 本地存储键名
 const getStorageKey = () => (props.id ? `table_columns_${props.id}` : ``)
+/** 是否不使用内部存储实现 */
+const isNoSave = computed(
+  () => props.customConfig.storage || !['server', 'local'].includes(props.saveType),
+)
 
 /** 获取本地存储的列配置 */
 async function handleGetStoredColumns(): Promise<ColumnType[]> {
@@ -1021,7 +1068,7 @@ async function handleGetStoredColumns(): Promise<ColumnType[]> {
     return [] as ColumnType[]
   }
 }
-
+/** 存到服务器端 */
 async function handleSaveColumnsToServer(key: string, columns: string) {
   const { isCommon } = customRestConfig.value || {}
   await setMemoryUpload({
@@ -1031,35 +1078,97 @@ async function handleSaveColumnsToServer(key: string, columns: string) {
     data: columns,
   })
 }
+/** 递归映射列，仅保留必要字段并保留 children */
+function mapColumnsTree(nodes: any[], requiredFieldsList: string[]): any[] {
+  return (nodes || [])
+    .filter(Boolean)
+    .map((_col: Record<string, any>) => {
+      _col.width = Math.ceil(_col.resizeWidth || _col.width)
+      const col: Record<string, any> = {}
+      requiredFieldsList.forEach((field: string) => {
+        col[field] = _col[field]
+      })
+      if (Array.isArray((_col as any).children) && (_col as any).children.length) {
+        const children = mapColumnsTree((_col as any).children, requiredFieldsList)
+        if (children.length) {
+          (col as any).children = children
+        }
+      }
+      return col
+    })
+}
+/**
+ * 递归合并两套列配置（同级顺序按 stored 优先，props 为底，stored 覆盖）。
+ * - children 同样递归处理。
+ */
+function mergeColumnsLevel(storedLevel: any[] = [], propsLevel: any[] = []): any[] {
+  const result: any[] = []
+  const matchedKeys = new Set<string>()
+
+  // 同级 props 映射（仅收集有唯一键的项）
+  const propsMap = new Map<string, any>()
+  propsLevel.forEach((col: any) => {
+    const k = getColumnUniqueKey(col)
+    if (k)
+      propsMap.set(k, col)
+  })
+
+  // 先按 stored 同级顺序输出并合并
+  storedLevel.forEach((storedCol: any) => {
+    const k = getColumnUniqueKey(storedCol)
+    if (!k)
+      return
+    const propCol = propsMap.get(k)
+    if (!propCol)
+      return
+    const mergedCol: any = { ...propCol, ...storedCol }
+
+    const propChildren = Array.isArray(propCol?.children) ? propCol.children : []
+    const storedChildren = Array.isArray(storedCol?.children) ? storedCol.children : []
+    if (propChildren.length || storedChildren.length) {
+      const nextChildren = mergeColumnsLevel(storedChildren, propChildren)
+      if (nextChildren.length)
+        mergedCol.children = nextChildren
+      else
+        delete mergedCol.children
+    }
+
+    result.push(mergedCol)
+    matchedKeys.add(k)
+  })
+
+  // 末尾追加 props 中新增（同级）
+  propsLevel.forEach((propCol: any) => {
+    const k = getColumnUniqueKey(propCol)
+    if (!k || !matchedKeys.has(k))
+      result.push(propCol)
+  })
+
+  return result
+}
 /** 保存列配置到本地存储 */
 async function handleSaveColumnsToStorage() {
   try {
     /** nextTick无效，故只能sleep等待队列清空再执行 */
     await sleep()
     // 如果没有表格实例，或者启用了本地存储，不保存
-    if (!xTable.value || props.customConfig.storage) {
+    if (!xTable.value || isNoSave.value) {
       return
     }
     // 直接从表格实例获取完整列配置
-    const { fullColumn } = xTable.value.getTableColumn()
-    // 只保存必要的列属性
-    const columns = fullColumn
-      .map((_col: Record<string, any>) => {
-        _col.width = Math.ceil(_col.resizeWidth || _col.width)
-        const col: Record<string, any> = {}
-        requiredFields.value.forEach((field: string) => {
-          col[field] = _col[field]
-        })
-
-        return col
-      })
+    const { collectColumn } = xTable.value.getTableColumn()
+    // 只保存必要的列属性（递归处理 tree 结构）
+    const columns = mapColumnsTree(collectColumn as any[], requiredFields.value)
     console.log('saveColumns', cloneDeep(columns))
     if (getType(props.setConfig, 'function')) {
-      await props.setConfig({
-        pageId: props.pageId,
-        widgetId: getStorageKey(),
-        userId: props.userId,
-      }, JSON.stringify(columns))
+      await props.setConfig(
+        {
+          pageId: props.pageId,
+          widgetId: getStorageKey(),
+          userId: props.userId,
+        },
+        JSON.stringify(columns),
+      )
     }
     else if (props.saveType === 'server') {
       await handleSaveColumnsToServer(getStorageKey(), JSON.stringify(columns))
@@ -1085,20 +1194,25 @@ function handleColumnResizableChange(params: VxeTableDefines.ResizableChangePara
   dispatchEvents(document, ['mousedown', 'mouseup', 'click'])
   emit('resizableChange', params)
 }
-
+/** 给columns添加默认值 */
+function processColumns(columns: any[]) {
+  return columns.filter(Boolean).map((i) => {
+    i.resizable = i.resizable ?? (props.resizable || props.columnConfig.resizable)
+    i.align = i.align ?? props.align
+    /** 提供默认排序 */
+    i.sortable = i.sortable ?? props.sortable
+    if (i.children?.length) {
+      i.children = processColumns(i.children)
+    }
+    return i
+  })
+}
 /** 监听props.columns的变化 */
 watch(
   () => props.columns,
   async (_newColumns: ColumnType[]) => {
-    const newColumns = _newColumns.filter(Boolean).map((i) => {
-      i.resizable = i.resizable ?? (props.resizable || props.columnConfig.resizable)
-      i.align = i.align ?? props.align
-      /** 提供默认排序 */
-      i.sortable = i.sortable ?? props.sortable
-      return i
-    })
-    // 如果启用了本地存储，不保存
-    if (props.customConfig.storage || props.saveType === 'default') {
+    const newColumns = processColumns(cloneDeep(_newColumns))
+    if (isNoSave.value) {
       localColumns.value = newColumns
     }
     else {
@@ -1114,55 +1228,12 @@ watch(
       // 3.columnsMap中不存在，storedColumnsMap中存在，则移除storedColumnsMap中对应的key
       // 4.以处理完毕后的storedColumnsMap的value作为新的columns,赋值给localColumns.value
 
-      // 基于 field 优先、其次 type 作为唯一键
-      const getColumnKey = (col: Record<string, any>) => {
-        if (col?.field)
-          return `field:${col.field}`
-        if (col?.type)
-          return `type:${col.type}`
-        ElMessage.error('columns对象field或type属性，必须存在一个')
-        return ''
-      }
-
-      // 以 newColumns 为基准构建 propsColumnsMap（只收集有唯一键的列）
-      const propsColumnsMap = new Map<string, Record<string, any>>()
-      newColumns.forEach((col: any) => {
-        const key = getColumnKey(col)
-        if (key)
-          propsColumnsMap.set(key, col)
-      })
-
-      // 合并逻辑：
-      // - 先按 storedColumns 原有顺序输出（删除 props 中已不存在的会被跳过）
-      // - 对于两边都存在的 key，合并：以 props 的结构为底，保存用户自定义（stored）为主覆盖
-      // - 再将 props 中新增但存储里没有的列追加到末尾
-      const merged: any[] = []
-
-      // 先遍历存储顺序，保留顺序优先
-      storedColumns.forEach((storedCol: any) => {
-        const key = getColumnKey(storedCol)
-        if (!key)
-          return
-        const propCol = propsColumnsMap.get(key)
-        if (!propCol) {
-          // 3) props 中已不存在时，从结果中剔除（即不 push）
-          return
-        }
-        // 2) 合并属性：以 props 为基础，存储覆盖
-        const mergedCol: any = {
-          ...propCol,
-          ...storedCol,
-        }
-        merged.push(mergedCol)
-        // 该 key 已处理，避免后续重复添加
-        propsColumnsMap.delete(key)
-      })
-
-      // 1) 追加 props 中新增而存储中不存在的列
-      propsColumnsMap.forEach(item => merged.push(item))
-
+      // 基于 newColumns 递归构建同级映射，按 storedColumns 递归对比同级：
+      // - 先按 stored 同级顺序输出（props 中已不存在的跳过）
+      // - 两边都存在时：以 props 为底，stored 覆盖；children 递归处理
+      // - 同级末尾追加 props 中新增但存储里没有的项
+      const merged = mergeColumnsLevel(storedColumns, newColumns)
       console.log('merged', storedColumns, merged)
-      // 4) 结果赋值
       localColumns.value = merged
     }
   },

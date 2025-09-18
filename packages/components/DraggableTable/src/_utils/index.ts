@@ -160,5 +160,5 @@ export function handleGetRequiredFields(customColumns: ColumnType[] = []): strin
     if (column.field)
       requiredFields.push(column.field)
   })
-  return Array.from(new Set(['field', 'title', 'width', 'type', ...requiredFields]))
+  return Array.from(new Set(['field', 'title', 'width', 'type', 'children', ...requiredFields]))
 }

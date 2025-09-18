@@ -1,28 +1,12 @@
 <template>
   <DragModalDialog
     v-model:visible="visible"
-    v-bind="computedDialogProps"
+    v-bind="props.dialogProps"
   >
     <VxeGrid
       id="custom"
       ref="xTable"
-      border
-      :header-cell-config="{ height: '30px' }"
-      :cell-config="{ height: '30px' }"
-      min-height="200px"
-      :columns="tableColumns"
-      :data="tableData"
-      :checkbox-config="checkboxConfig"
-      :row-config="{
-        useKey: true,
-        resizable: true,
-        drag: true,
-      }"
-      :row-drag-config="{
-        showGuidesStatus: true,
-        showIcon: false,
-        trigger: 'row',
-      }"
+      v-bind="gridProps"
     >
       <template #title="{ row }">
         <div>{{ getTypeName(row.type) || row.title }}</div>
@@ -90,16 +74,16 @@ import { computed, ref } from 'vue'
 import { VxeGrid } from 'vxe-table'
 import { ElButton, ElCheckbox, ElInput, ElOption, ElSelect, ElSwitch } from 'element-plus'
 import { getTypeName } from '@moluoxixi/components/DraggableTable/src/_utils'
-import { cloneDeep } from 'lodash'
 import DragModalDialog from '@moluoxixi/components/DragModalDialog'
 import type { ColumnType } from '@moluoxixi/components/DraggableTable/src/_types'
+import { flattenTree } from '@moluoxixi/utils/_utils'
 
 const props = defineProps({
   columns: {
     type: Array as PropType<ColumnType[]>,
     default: () => [],
   },
-  computedColumns: {
+  collectColumns: {
     type: Array as PropType<ColumnType[]>,
     default: () => [],
   },
@@ -110,7 +94,11 @@ const props = defineProps({
   dialogProps: {
     type: Object,
     default: () => {
-      return {}
+      return {
+        title: '个性化列配置',
+        width: '800px',
+        height: '60%',
+      }
     },
   },
 })
@@ -119,14 +107,6 @@ const emit = defineEmits<{
   (e: 'confirm', customColumns: any[]): void
 }>()
 const xTable = useTemplateRef('xTable')
-const computedDialogProps = computed(() => {
-  return {
-    title: '个性化列配置',
-    width: '800px',
-    height: '60%',
-    ...props.dialogProps,
-  }
-})
 
 const visible = defineModel<boolean>({ default: false })
 
@@ -145,8 +125,6 @@ const options = [
   },
 ]
 
-const checkboxConfig = { checkField: 'visible' }
-
 // 处理正整数输入
 function handlePositiveNumberInput(row: any, field: string, value: string) {
   let filtered = String(value || '').replace(/\D/g, '')
@@ -161,26 +139,54 @@ function getPlaceholder(title: string) {
   return `请输入${title}（大于0）,不输入则为自适应`
 }
 
-const tableColumns = computed(() => {
-  return props.customColumns || []
-})
-
 const tableData = ref([])
-
+function processData(data: any[] = []): any[] {
+  return data.map((item: any) => {
+    const { visible, width, resizeWidth, children, ...rest } = item
+    return {
+      ...rest,
+      children: processData(children),
+      visible: item.visible ?? true,
+      width: item.width || (item.resizeWidth ? Math.ceil(item.resizeWidth) : ''),
+    }
+  })
+}
 watch(() => visible.value, (v: boolean) => {
   if (v) {
-    tableData.value = cloneDeep(props.computedColumns).map((item: any) => {
-      return {
-        ...item,
-        visible: item.visible ?? true,
-        width: item.width || (item.resizeWidth ? Math.ceil(item.resizeWidth) : ''),
-      }
-    })
+    tableData.value = processData(flattenTree(props.collectColumns))
   }
 }, {
   immediate: true,
 })
-
+const gridProps = computed(() => {
+  return {
+    border: true,
+    headerCellConfig: { height: '30px' },
+    cellConfig: { height: '30px' },
+    // height: '100%',
+    height: '400px',
+    columns: props.customColumns,
+    checkboxConfig: { checkField: 'visible' },
+    rowConfig: {
+      // useKey: true,
+      // resizable: true,
+      drag: true,
+    },
+    rowDragConfig: {
+      isPeerDrag: true,
+      showGuidesStatus: true,
+      showIcon: false,
+      trigger: 'row',
+    },
+    treeConfig: {
+      expandAll: true,
+      transform: true,
+      rowField: 'id',
+      parentField: 'parentId',
+    },
+    data: tableData.value,
+  }
+})
 const isCommon = ref(false)
 
 function handleEvent(type: 'confirm' | 'reset' | 'cancel') {
@@ -194,7 +200,7 @@ function handleEvent(type: 'confirm' | 'reset' | 'cancel') {
       break
     case 'confirm':
       emit('confirm', {
-        customColumns: xTable.value?.getTableData()?.tableData,
+        customColumns: xTable.value?.getTableData()?.fullData,
         isCommon: isCommon.value,
       })
       visible.value = false

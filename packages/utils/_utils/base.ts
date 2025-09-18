@@ -121,6 +121,72 @@ export function getClass(className: string, hasPrefix?: boolean) {
   }
 }
 
+export function buildTree(list: any[], rowKey: string = 'id', parentKey: string = 'parentId', childrenKey: string = 'children') {
+  const idToNodeMap = new Map<any, any>()
+  const roots: any[] = []
+  // 克隆并初始化 children
+  for (const item of list) {
+    const clone = { ...item }
+    clone[childrenKey] = []
+    idToNodeMap.set(clone[rowKey], clone)
+  }
+  for (const item of list) {
+    const id = item[rowKey]
+    const parentId = item[parentKey]
+    const node = idToNodeMap.get(id)
+    if (!parentId || !idToNodeMap.has(parentId)) {
+      roots.push(node)
+    }
+    else {
+      idToNodeMap.get(parentId)[childrenKey].push(node)
+    }
+  }
+  return roots
+}
+
+/**
+ * 将树形结构展平成一维数组。
+ * - 会去除每项的 children 字段
+ * - 为每个子节点补充 parentKey（父节点的 rowKey 值）
+ * - 输出顺序为先序遍历，可与 buildTree 配合还原结构
+ */
+export function flattenTree(tree: any[] | any, rowKey: string = 'id', parentKey: string = 'parentId', childrenKey: string = 'children'): any[] {
+  const result: any[] = []
+  const nodes: any[] = Array.isArray(tree) ? tree : [tree]
+
+  const walk = (node: any, parentId?: any) => {
+    if (!node || typeof node !== 'object') {
+      return
+    }
+    const children = node[childrenKey]
+    const current: any = { ...node }
+    // 去除 children，避免残留树结构
+    if (childrenKey in current) {
+      delete current[childrenKey]
+    }
+    // 设置父标识
+    if (parentId === undefined || parentId === null) {
+      // 根节点：确保 parentKey 为 undefined，便于 buildTree 识别为根
+      if (parentKey in current) {
+        current[parentKey] = undefined
+      }
+    }
+    else {
+      current[parentKey] = parentId
+    }
+    result.push(current)
+    if (Array.isArray(children) && children.length > 0) {
+      const nextParentId = current[rowKey]
+      for (const child of children) {
+        walk(child, nextParentId)
+      }
+    }
+  }
+
+  for (const n of nodes) walk(n)
+  return result
+}
+
 /**
  * 为传入的组件注入 install 方法，按组件的 name 自动完成全局注册。
  *
