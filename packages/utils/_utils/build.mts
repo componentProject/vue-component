@@ -1350,7 +1350,7 @@ export async function buildComponentsWithOptions(options: BuildOptions): Promise
     requireExternalPacks: reqExternal = [],
     entryBaseUrl: ebu = '/',
     presetGlobals: presetGlobalsArg,
-    uploadType = 'Vue3',
+    uploadType = 'vue3Test',
   } = options || ({} as BuildOptions)
 
   // 必填参数校验
