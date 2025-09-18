@@ -52,6 +52,7 @@
     <template #footer>
       <div class="flex justify-end items-center">
         <ElCheckbox
+          v-if="isConfiguration"
           v-model="isCommon" style="margin-right: 40px;" label="作为统一配置"
           size="large"
         />
@@ -91,6 +92,10 @@ const props = defineProps({
   customColumns: {
     type: Array as PropType<ColumnType[]>,
     default: () => [],
+  },
+  isConfiguration: {
+    type: Boolean,
+    default: false,
   },
   dialogProps: {
     type: Object,
@@ -207,4 +212,7 @@ function handleEvent(type: 'confirm' | 'reset' | 'cancel') {
   }
   visible.value = false
 }
+defineExpose({
+  isCommon,
+})
 </script>
