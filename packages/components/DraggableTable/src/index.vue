@@ -1,5 +1,5 @@
 <template>
-  <div ref="container" class="h-full flex-1 overflow-hidden outline-0 container">
+  <div ref="container" class="h-full w-full flex-1 overflow-hidden outline-0 table-box">
     <VxeGrid
       ref="xTable"
       :header-cell-config="{ height: '30px' }"
@@ -101,7 +101,6 @@ import type { slotsType } from '@moluoxixi/components/_types'
 import EnterNextContainer from '@moluoxixi/components/EnterNextContainer'
 import CustomConfigDialog from './components/CustomConfigDialog.vue'
 import { getMemoryQuery, setMemoryUpload } from '@moluoxixi/utils/_api'
-import option from 'vxe-pc-ui/packages/select/src/option'
 
 defineOptions({
   name: 'DraggableTable',
@@ -1522,7 +1521,7 @@ defineExpose({
 
 <style scoped lang="scss">
 @forward '@moluoxixi/components/_assets/styles/tailwind.scss';
-.container {
+.table-box {
   :deep(.vxe-table--filter-template) {
     display: flex !important;
   }
