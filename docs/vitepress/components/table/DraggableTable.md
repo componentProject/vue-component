@@ -214,9 +214,10 @@ DraggableTable/expose/getTable
 | containerType | 回车容器类型（'row'|'table'） | String | 'row' | 否 |
 | saveType | 列配置存储类型（'local'|'server'） | String | 'server' | 否 |
 | saveHotKeys | 打开个性化列配置弹窗的按键组合 | String[] | `['shift','alt','ctrl','f12']` | 否 |
-| getConfig | 服务端获取列配置方法 | ^[Function]`(config: customConfigType) => Promise<ColumnType[]>` | - | 否 |
-| setConfig | 服务端保存列配置方法 | ^[Function]`(config: customConfigType, columns: ColumnType[]) => Promise<any>` | - | 否 |
-| customColumns | 自定义个性化弹窗的列集合 | `Array<ColumnType>` | 见源代码默认值 | 否 |
+| getConfig | 自定义获取列配置方法 | ^[Function]`(config: customConfigType) => Promise<ColumnType[]>` | - | 否 |
+| setConfig | 自定义保存列配置方法 | ^[Function]`(config: customConfigType, columns: ColumnType[]) => Promise<any>` | - | 否 |
+| customColumns | 自定义个性化列配置弹窗的列集合 | `Array<ColumnType>` | 见源代码默认值 | 否 |
+| isConfiguration | 自定义个性化列配置弹窗是否显示统一配置 | Boolean | false | 否 |
 | ...attrs | 其他属性透传给[vxe-grid](https://vxetable.cn/#/grid/api) | - | - |
 
 ### columns 配置

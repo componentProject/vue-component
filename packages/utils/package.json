@@ -27,6 +27,7 @@
     "build": "tsx _scripts/buildComponent.mts build"
   },
   "dependencies": {
+    "@google/genai": "^1.20.0",
     "axios": "catalog:build",
     "dayjs": "catalog:build",
     "element-plus": "catalog:build",

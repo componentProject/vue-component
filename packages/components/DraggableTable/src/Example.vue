@@ -52,7 +52,7 @@
     </el-button>
     <!-- 使用DraggableTable组件 -->
     <DraggableTable
-      id="demo_table_123"
+      id="demo_table_12355666"
       ref="draggableTableRef"
       v-model="tableData"
       page-id="page1"
@@ -60,6 +60,7 @@
       :columns="columns"
       :loading="loading"
       :height="500"
+      save-type="server"
       :rowdragable="rowdragable"
       :columndragable="columndragable"
       :editable="editable"
@@ -160,6 +161,7 @@ const columns = ref([
   {
     field: 'name',
     title: 'Name',
+    fixed: 'left',
     min: 3,
     max: 10,
     required: true,
@@ -167,7 +169,7 @@ const columns = ref([
   { field: 'createTime', title: '日期', width: 150 },
   {
     field: 'sex',
-    title: 'Sex',
+    title: 'Sex1',
     options: [
       {
         label: '男',
@@ -180,9 +182,16 @@ const columns = ref([
     ],
   },
   {
-    field: 'age',
-    title: 'Age',
-    min: 1,
+    field: 'age1',
+    title: 'Age1',
+    children: [
+      { field: 'bbb', title: 'bbb', width: 140 },
+      { field: 'baaa', title: 'baaa', width: 120, children: [
+        { field: 'dddd', title: 'dddd', width: 120 },
+        { field: 'gggg', title: 'gggg', width: 220 },
+      ] },
+
+    ],
   },
   { field: 'aaa', title: '操作' },
 ])
