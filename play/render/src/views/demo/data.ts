@@ -45,12 +45,14 @@ export default {
       { id: 3, name: '王五', age: '18' },
     ],
     id: '123456789321',
-    pageId: '123456789321',
+    pageId: '123456789321321',
     userId: '123456789321',
     filterable: true,
     resizable: true,
     saveType: 'server',
-    isConfiguration: false,
+    saveHotKeys: ['a', 's'],
+    isConfiguration: true,
+    columndragable: true,
     // 数据绑定配置
     bindingType: 'v-model', // 可选值: 'v-model' 或 'data'
     bindingProp: 'tableData', // 绑定的数据属性名

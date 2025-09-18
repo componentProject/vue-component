@@ -1,5 +1,6 @@
 <template>
   <DragModalDialog
+    resizable
     v-model:visible="visible"
     v-bind="props.dialogProps"
   >
@@ -11,7 +12,7 @@
       <template #title="{ row }">
         <div>{{ getTypeName(row.type) || row.title }}</div>
       </template>
-      <template #width="{ row, column }">
+      <template #input="{ row, column }">
         <ElInput
           :model-value="row[column.field]"
           size="small"
@@ -22,14 +23,15 @@
           @update:model-value="handlePositiveNumberInput(row, column.field, $event)"
         />
       </template>
-      <template #resizable="{ row, column }">
+      <template #switch="{ row, column }">
         <ElSwitch
           v-model="row[column.field]"
           size="small"
         />
       </template>
-      <template #align="{ row, column }">
+      <template #select="{ row, column }">
         <ElSelect
+          v-if="column.field !== 'fixed' || !row.parentId"
           v-model="row[column.field]"
           class="m-2"
           placeholder="Select"
@@ -38,7 +40,7 @@
           style="width: 100%"
         >
           <ElOption
-            v-for="item in options"
+            v-for="item in column.params.options"
             :key="item.value"
             :label="item.label"
             :value="item.value"
@@ -116,20 +118,6 @@ const xTable = useTemplateRef('xTable')
 
 const visible = defineModel<boolean>({ default: false })
 
-const options = [
-  {
-    label: '左对齐',
-    value: 'left',
-  },
-  {
-    label: '右对齐',
-    value: 'right',
-  },
-  {
-    label: '居中对齐',
-    value: 'center',
-  },
-]
 
 // 处理正整数输入
 function handlePositiveNumberInput(row: any, field: string, value: string) {
@@ -153,6 +141,7 @@ function processData(data: any[] = []): any[] {
       ...rest,
       children: processData(children),
       visible: item.visible ?? true,
+      fixed: item.fixed ?? '',
       width: item.width || (item.resizeWidth ? Math.ceil(item.resizeWidth) : ''),
     }
   })
@@ -164,13 +153,13 @@ watch(() => visible.value, (v: boolean) => {
 }, {
   immediate: true,
 })
+console.log('00000000', props.customColumns)
 const gridProps = computed(() => {
   return {
     border: true,
     headerCellConfig: { height: '30px' },
     cellConfig: { height: '30px' },
-    // height: '100%',
-    height: '400px',
+    height: '100%',
     columns: props.customColumns,
     checkboxConfig: { checkField: 'visible' },
     rowConfig: {

@@ -141,6 +141,7 @@ async function handleClick() {
 
 onMounted(async () => {
   await loadLocalComponent(componentName.value)
+  return
   await loadComponents([componentName.value])
 })
 </script>

@@ -101,6 +101,7 @@ import type { slotsType } from '@moluoxixi/components/_types'
 import EnterNextContainer from '@moluoxixi/components/EnterNextContainer'
 import CustomConfigDialog from './components/CustomConfigDialog.vue'
 import { getMemoryQuery, setMemoryUpload } from '@moluoxixi/utils/_api'
+import option from 'vxe-pc-ui/packages/select/src/option'
 
 defineOptions({
   name: 'DraggableTable',
@@ -379,12 +380,43 @@ const props = defineProps({
   customColumns: {
     type: Array as PropType<ColumnType[]>,
     default: () => [
-      { type: 'checkbox', width: 60 },
-      { field: 'field', title: '字段', width: 160, treeNode: true, dragSort: true },
-      { field: 'title', title: '列名称', slots: { default: 'title' } },
-      { field: 'width', minWidth: 200, title: '宽度', editable: true, slots: { default: 'width' } },
-      { field: 'resizable', width: 80, title: '可调整', editable: true, slots: { default: 'resizable' } },
-      { field: 'align', width: 100, title: '对齐方式', editable: true, slots: { default: 'align' } },
+      { type: 'checkbox', width: 40 },
+      { field: 'field', minWidth: 160, title: '字段', treeNode: true, dragSort: true },
+      { field: 'title', minWidth: 160, title: '列名称', slots: { default: 'title' } },
+      { field: 'width', width: 70, title: '宽度', editable: true, slots: { default: 'input' } },
+      { field: 'fixed', width: 100, title: '固定位置', editable: true, params: {
+        options: [
+          {
+            label: '左',
+            value: 'left',
+          },
+          {
+            label: '右',
+            value: 'right',
+          },
+          {
+            label: '默认',
+            value: '',
+          },
+        ],
+      }, slots: { default: 'select' } },
+      { field: 'align', width: 100, title: '对齐方式', editable: true, params: {
+        options: [
+          {
+            label: '左对齐',
+            value: 'left',
+          },
+          {
+            label: '右对齐',
+            value: 'right',
+          },
+          {
+            label: '居中对齐',
+            value: 'center',
+          },
+        ],
+      }, slots: { default: 'select' } },
+      { field: 'resizable', width: 70, title: '可调整', align: 'center', editable: true, slots: { default: 'switch' } },
     ],
   },
   // 表格唯一ID，用于本地存储识别
@@ -1062,7 +1094,7 @@ async function handleGetStoredColumns(): Promise<ColumnType[]> {
         widgetId: getStorageKey(),
         userId: props.userId,
       })
-      if (props.isConfiguration && customConfigDialogRef.value) {
+      if (res.data && props.isConfiguration && customConfigDialogRef.value) {
         customConfigDialogRef.value.isCommon = res?.isExist !== 1
       }
       return (JSON.parse(res.data) || []) as ColumnType[]
