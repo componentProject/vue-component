@@ -44,7 +44,7 @@
       ref="customConfigDialogRef"
       v-model="customConfigDialogVisible"
       :columns="props.columns"
-      :isConfiguration="props.isConfiguration"
+      :is-configuration="props.isConfiguration"
       :collect-columns="collectColumn"
       :custom-columns="props.customColumns"
       @confirm="handleCustomConfigSave"
@@ -57,6 +57,7 @@ import type { PropType } from 'vue'
 import {
   computed,
   nextTick,
+  onBeforeMount,
   onBeforeUnmount,
   onMounted,
   ref,
@@ -381,9 +382,9 @@ const props = defineProps({
       { type: 'checkbox', width: 60 },
       { field: 'field', title: '字段', width: 160, treeNode: true, dragSort: true },
       { field: 'title', title: '列名称', slots: { default: 'title' } },
-      { field: 'width', minWidth: 200, title: '宽度', slots: { default: 'width' } },
-      { field: 'resizable', width: 80, title: '可调整', slots: { default: 'resizable' } },
-      { field: 'align', width: 100, title: '对齐方式', slots: { default: 'align' } },
+      { field: 'width', minWidth: 200, title: '宽度', editable: true, slots: { default: 'width' } },
+      { field: 'resizable', width: 80, title: '可调整', editable: true, slots: { default: 'resizable' } },
+      { field: 'align', width: 100, title: '对齐方式', editable: true, slots: { default: 'align' } },
     ],
   },
   // 表格唯一ID，用于本地存储识别
@@ -557,7 +558,7 @@ const collectColumn = computed<ColumnType[]>(() => {
 //  * @param columns
 //  */
 // function handleMenuConfirm(columns: ColumnType[]) {
-//   localColumns.value = columns
+//   saveColumns(columns)
 // }
 //
 // /** 表头右键菜单显示事件 */
@@ -655,7 +656,6 @@ const computedColumns = computed<ColumnType[]>(() => {
 
     //#region 默认值处理
     item.resizable = item.resizable ?? (props.resizable || props.columnConfig.resizable)
-    console.log('item.resizable', item.resizable)
     item.align = item.align ?? props.align
     /** 提供默认排序 */
     item.sortable = item.sortable ?? props.sortable
@@ -837,7 +837,6 @@ const computedColumns = computed<ColumnType[]>(() => {
     }
   }
 
-  console.log('columns', cloneDeep(columns))
   return columns.map(transformColumn).filter(Boolean) as ColumnType[]
 })
 //#endregion
@@ -1004,7 +1003,7 @@ const gridProps = computed<VxeGridProps>(() => {
 //#region 存储相关
 const container = useTemplateRef<HTMLElement>('container')
 const offEffect = ref()
-const requiredFields = computed<string[]>(() => handleGetRequiredFields(props.customColumns))
+const requiredFields = computed<string[]>(() => handleGetRequiredFields(props.customColumns.filter((i: any) => i.editable)))
 onMounted(() => {
   if (props.saveType !== 'default') {
     offEffect.value = onHotkeys(props.saveHotKeys, () => customConfigDialogVisible.value = true, { target: container.value })
@@ -1038,7 +1037,7 @@ function handleCustomConfigSave({
   rest: any[]
 }) {
   customRestConfig.value = rest
-  localColumns.value = customColumns
+  saveColumns(customColumns)
 }
 
 // 本地存储键名
@@ -1136,7 +1135,6 @@ function mergeColumnsLevel(storedLevel: any[] = [], propsLevel: any[] = []): any
       return
     const mergedCol: any = { ...propCol, ...storedCol }
 
-    console.log('mergedCol', mergedCol)
     const propChildren = Array.isArray(propCol?.children) ? propCol.children : []
     const storedChildren = Array.isArray(storedCol?.children) ? storedCol.children : []
     if (propChildren.length || storedChildren.length) {
@@ -1160,7 +1158,12 @@ function mergeColumnsLevel(storedLevel: any[] = [], propsLevel: any[] = []): any
 
   return result
 }
-/** 保存列配置到本地存储 */
+
+function saveColumns(columns: any[]) {
+  localColumns.value = columns
+  handleSaveColumnsToStorage()
+}
+/** 保存列配置到存储 */
 async function handleSaveColumnsToStorage() {
   try {
     /** nextTick无效，故只能sleep等待队列清空再执行 */
@@ -1173,7 +1176,6 @@ async function handleSaveColumnsToStorage() {
     const { collectColumn } = xTable.value.getTableColumn()
     // 只保存必要的列属性（递归处理 tree 结构）
     const columns = mapColumnsTree(collectColumn as any[], requiredFields.value)
-    console.log('saveColumns', cloneDeep(columns))
     if (getType(props.setConfig, 'function')) {
       await props.setConfig(
         {
@@ -1209,44 +1211,34 @@ function handleColumnResizableChange(params: VxeTableDefines.ResizableChangePara
   emit('resizableChange', params)
 }
 /** 监听props.columns的变化 */
-watch(
-  () => props.columns,
-  async (_newColumns: ColumnType[]) => {
-    const newColumns = cloneDeep(_newColumns)
-    if (isNoSave.value) {
-      localColumns.value = newColumns
-    }
-    else {
-      // 尝试从本地存储获取列配置
-      const _storedColumns = await handleGetStoredColumns()
-      const storedColumns = _storedColumns.filter(Boolean)
+onBeforeMount(async () => {
+  const newColumns = cloneDeep(props.columns)
+  if (isNoSave.value) {
+    localColumns.value = newColumns
+    return
+  }
+  // 尝试从本地存储获取列配置
+  const _storedColumns = await handleGetStoredColumns()
+  const storedColumns = _storedColumns.filter(Boolean)
+  if (!storedColumns?.length) {
+    localColumns.value = newColumns
+    return
+  }
 
-      // props.columns 基于field,type等唯一key，值为col，map为columnsMap
-      // storedColumns 基于field,type等唯一key，值为col，map为storedColumnsMap
-      // columnsMap的key与storedColumnsMap的key做对比，以columnsMap为准，要求如下：
-      // 1.columnsMap中存在，storedColumnsMap中不存在，则在storedColumnsMap中添加对应的key
-      // 2.columnsMap中存在，storedColumnsMap中也存在，则在storedColumnsMap中合并属性
-      // 3.columnsMap中不存在，storedColumnsMap中存在，则移除storedColumnsMap中对应的key
-      // 4.以处理完毕后的storedColumnsMap的value作为新的columns,赋值给localColumns.value
+  // props.columns 基于field,type等唯一key，值为col，map为columnsMap
+  // storedColumns 基于field,type等唯一key，值为col，map为storedColumnsMap
+  // columnsMap的key与storedColumnsMap的key做对比，以columnsMap为准，要求如下：
+  // 1.columnsMap中存在，storedColumnsMap中不存在，则在storedColumnsMap中添加对应的key
+  // 2.columnsMap中存在，storedColumnsMap中也存在，则在storedColumnsMap中合并属性
+  // 3.columnsMap中不存在，storedColumnsMap中存在，则移除storedColumnsMap中对应的key
+  // 4.以处理完毕后的storedColumnsMap的value作为新的columns,赋值给localColumns.value
 
-      // 基于 newColumns 递归构建同级映射，按 storedColumns 递归对比同级：
-      // - 先按 stored 同级顺序输出（props 中已不存在的跳过）
-      // - 两边都存在时：以 props 为底，stored 覆盖；children 递归处理
-      // - 同级末尾追加 props 中新增但存储里没有的项
-      const merged = mergeColumnsLevel(storedColumns, newColumns)
-      console.log('merged', storedColumns, merged)
-      localColumns.value = merged
-    }
-  },
-  { deep: true, immediate: true },
-)
-
-watch(
-  () => localColumns.value,
-  () => {
-    handleSaveColumnsToStorage()
-  },
-)
+  // 基于 newColumns 递归构建同级映射，按 storedColumns 递归对比同级：
+  // - 先按 stored 同级顺序输出（props 中已不存在的跳过）
+  // - 两边都存在时：以 props 为底，stored 覆盖；children 递归处理
+  // - 同级末尾追加 props 中新增但存储里没有的项
+  localColumns.value = mergeColumnsLevel(storedColumns, newColumns)
+})
 //#endregion
 
 //#region draggable模式逻辑
@@ -1390,7 +1382,7 @@ function initColumnDraggable() {
       fullColumn.splice(newColumnIndex, 0, currRow)
 
       // 将修改后的列配置保存到本地
-      localColumns.value = fullColumn as any[]
+      saveColumns(fullColumn)
 
       // 构造vxe格式的事件参数
       const dragColumn = tableColumn[oldIndex]
@@ -1441,6 +1433,7 @@ watch(
     }
     else {
       destroyRowSortable()
+      destroyColumnSortable()
     }
   },
   {
@@ -1460,7 +1453,6 @@ watch(
     }
     else {
       destroyRowSortable()
-      destroyColumnSortable()
     }
   },
   {

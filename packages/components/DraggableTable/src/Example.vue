@@ -60,7 +60,7 @@
       :columns="columns"
       :loading="loading"
       :height="500"
-      save-type="local"
+      save-type="server"
       :rowdragable="rowdragable"
       :columndragable="columndragable"
       :editable="editable"
@@ -168,7 +168,7 @@ const columns = ref([
   { field: 'createTime', title: '日期', width: 150 },
   {
     field: 'sex',
-    title: 'Sex',
+    title: 'Sex1',
     options: [
       {
         label: '男',
