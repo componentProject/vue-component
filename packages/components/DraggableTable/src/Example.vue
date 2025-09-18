@@ -60,7 +60,7 @@
       :columns="columns"
       :loading="loading"
       :height="500"
-      save-type="server"
+      save-type="local"
       :rowdragable="rowdragable"
       :columndragable="columndragable"
       :editable="editable"

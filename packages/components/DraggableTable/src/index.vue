@@ -653,6 +653,10 @@ const computedColumns = computed<ColumnType[]>(() => {
     }
 
     const item: any = { ...rest }
+    item.resizable = item.resizable ?? (props.resizable || props.columnConfig.resizable)
+    item.align = item.align ?? props.align
+    /** 提供默认排序 */
+    item.sortable = item.sortable ?? props.sortable
 
     const customType = getCustomType(item.type)
     if (customType) {
@@ -1123,6 +1127,7 @@ function mergeColumnsLevel(storedLevel: any[] = [], propsLevel: any[] = []): any
       return
     const mergedCol: any = { ...propCol, ...storedCol }
 
+    console.log('mergedCol', mergedCol)
     const propChildren = Array.isArray(propCol?.children) ? propCol.children : []
     const storedChildren = Array.isArray(storedCol?.children) ? storedCol.children : []
     if (propChildren.length || storedChildren.length) {
@@ -1197,10 +1202,6 @@ function handleColumnResizableChange(params: VxeTableDefines.ResizableChangePara
 /** 给columns添加默认值 */
 function processColumns(columns: any[]) {
   return columns.filter(Boolean).map((i) => {
-    i.resizable = i.resizable ?? (props.resizable || props.columnConfig.resizable)
-    i.align = i.align ?? props.align
-    /** 提供默认排序 */
-    i.sortable = i.sortable ?? props.sortable
     if (i.children?.length) {
       i.children = processColumns(i.children)
     }
