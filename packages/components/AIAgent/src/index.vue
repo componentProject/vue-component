@@ -3,7 +3,7 @@
     v-if="configOption.token"
     class="ai-agent"
     :class="{ 'ai-agent-dragging': isDragging, 'drag-disabled': !drag }"
-    data-v="1.6.7"
+    data-v="1.7.0"
   >
     <!-- 浮动按钮 -->
     <FloatingButton

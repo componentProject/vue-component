@@ -16,6 +16,7 @@
                 :key="index"
                 :role="item.role"
                 :content="item.markedContent"
+                :is-finished="item.finished"
                 :text-loading="index === 0 && loading"
               >
                 <template v-if="!isStreamLoad" #actions>
@@ -296,6 +297,7 @@ export default {
         content: '',
         markedContent: '',
         role: 'assistant',
+        finished: false,
         userFeedback: '',
       }
       this.chatList.unshift(params2)
@@ -394,7 +396,7 @@ export default {
               this.lastConversationId = res.task_id
               lastItem.content += res.data?.text
               lastItem.conversationId = res.task_id
-              lastItem.message_id = res.task_id
+              lastItem.message_id = res.workflow_run_id
             }
             if (res.choices && res.choices.length > 0) {
               lastItem.content += res.choices[0]?.delta?.content || ''
@@ -420,6 +422,7 @@ export default {
       }
     },
     onComplete(isOk = true, msg = '请求失败', lastItem) {
+      lastItem.finished = true
       if (!isOk) {
         lastItem.role = 'error'
         lastItem.markedContent = msg

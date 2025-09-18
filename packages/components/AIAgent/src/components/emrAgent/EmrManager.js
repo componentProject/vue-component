@@ -86,7 +86,6 @@ export class EmrManager {
       console.error('jsonData或agentId为空')
       return
     }
-
     this.state.emr_data = formatTemplate(jsonData)
     await this.context.$nextTick()
 
@@ -219,9 +218,9 @@ export class EmrManager {
           return
 
         const isValidResponse
-          = currentItemNow
-            && currentItemNow.ID === requestContext.itemId
-            && currentItemNow.deCode === requestContext.deCode
+                    = currentItemNow
+                      && currentItemNow.ID === requestContext.itemId
+                      && currentItemNow.deCode === requestContext.deCode
 
         if (
           isValidResponse
