@@ -597,6 +597,8 @@ function handleCheckboxChange(params: VxeTableDefines.CheckboxChangeParams) {
 //#endregion
 
 //#region 动态计算columns
+// 编辑验证规则
+const defaultEditRules = ref<VxeTablePropTypes.EditRules>({})
 /**
  * 计算后的columns，用于提供额外功能，目前功能如下：
  * 1. 提供基于field的插槽，规则如下：
@@ -619,7 +621,10 @@ const computedColumns = computed<ColumnType[]>(() => {
   if (!getType(columns, 'array'))
     return []
 
-  //#region 获取所有插槽的名称（递归收集）
+  // 清空验证规则
+  // eslint-disable-next-line vue/no-side-effects-in-computed-properties
+  defaultEditRules.value = {}
+  //#region 获取所有插槽的名称（递归收集）,并设置编辑规则
   const columnsSlotsNames: string[] = []
   const collectSlots = (col: any) => {
     if (col?.slots) {
@@ -638,30 +643,15 @@ const computedColumns = computed<ColumnType[]>(() => {
   const slotsDiff = [...diff(slotNames.value, columnsSlotsNames)]
 
   const transformColumn = (col: any): any => {
-    const { options, editProps, filterProps, cellProps, children, ...rest } = col || {}
-    const hasChildren = Array.isArray(children) && children.length > 0
+    const { options, editProps, filterProps, cellProps, children, min, max, required, ...item } = col || {}
 
-    if (hasChildren) {
-      const nextChildren = children.map((child: any) => transformColumn(child)).filter(Boolean)
-      if (!nextChildren.length)
-        return undefined
-      const { min, max, required, ...cleanRest } = rest as any
-      return {
-        ...cleanRest,
-        children: nextChildren,
-      }
-    }
-
-    const item: any = { ...rest }
+    //#region 默认值处理
     item.resizable = item.resizable ?? (props.resizable || props.columnConfig.resizable)
+    console.log('item.resizable', item.resizable)
     item.align = item.align ?? props.align
     /** 提供默认排序 */
     item.sortable = item.sortable ?? props.sortable
-
-    const customType = getCustomType(item.type)
-    if (customType) {
-      delete item.type
-    }
+    //#endregion
 
     if (item.field) {
       //#region 提供基于field的插槽
@@ -736,6 +726,35 @@ const computedColumns = computed<ColumnType[]>(() => {
       }
       //#endregion
 
+      //#region 提供 field 的编辑验证规则，支持required,min,max
+      const isEditEnabled = props.editable || props.editConfig?.enabled
+      if (
+        isEditEnabled
+        && (getType(required, 'boolean') || getType(min, 'number') || getType(max, 'number'))
+      ) {
+        const rules: any[] = []
+
+        // 添加必填验证
+        if (required) {
+          rules.push({ required: true, message: `${item.title || ''}必须填写` })
+        }
+
+        // 添加最小值验证
+        if (min) {
+          rules.push({ min, message: `${item.title || ''}不能小于${min}` })
+        }
+
+        // 添加最大值验证
+        if (max) {
+          rules.push({ max, message: `${item.title || ''}不能大于${max}` })
+        }
+
+        if (rules.length > 0) {
+          defaultEditRules.value[item.field] = rules
+        }
+      }
+      //#endregion
+
       //#region 添加基于field的自定义筛选器渲染器,该渲染器基于当前列显示的内容进行筛选，支持input搜索，checkbox多选，可通过filterLayout配置
       if (props.filterable && !item.filters && !item.slots?.edit && isEmpty(item.filterRender)) {
         item.filters = [
@@ -770,6 +789,10 @@ const computedColumns = computed<ColumnType[]>(() => {
       //#endregion
 
       //#region 添加基于field的自定义默认渲染器，额外提供以下type功能：'input' | 'select' | 'date' | 'datetime' | 'switch' | 'progress' | 'tag'
+      const customType = getCustomType(item.type)
+      if (customType) {
+        delete item.type
+      }
       if (
         isEmpty(item.cellRender)
         && isEmpty(item.contentRender)
@@ -790,10 +813,23 @@ const computedColumns = computed<ColumnType[]>(() => {
       //#endregion
     }
 
-    const { min, max, required, ...cleanItem } = item
-    return cleanItem
+    const hasChildren = Array.isArray(children) && children.length > 0
+
+    if (hasChildren) {
+      const nextChildren = children.map((child: any) => transformColumn(child)).filter(Boolean)
+      if (!nextChildren.length)
+        return undefined
+      return {
+        ...item,
+        children: nextChildren,
+      }
+    }
+    else {
+      return item
+    }
   }
 
+  console.log('columns', cloneDeep(columns))
   return columns.map(transformColumn).filter(Boolean) as ColumnType[]
 })
 //#endregion
@@ -801,43 +837,6 @@ const computedColumns = computed<ColumnType[]>(() => {
 //#region 动态计算gridProps
 // 计算表格配置属性
 const gridProps = computed<VxeGridProps>(() => {
-  // 生成默认的编辑验证规则
-  const defaultEditRules: VxeTablePropTypes.EditRules = {}
-
-  // 只有在启用编辑功能时才生成验证规则
-  const isEditEnabled = props.editable || props.editConfig?.enabled
-
-  if (isEditEnabled && localColumns.value.length > 0) {
-    localColumns.value.forEach((column: ColumnType) => {
-      // 检查列是否有 field 且有验证规则
-      if (
-        column.field
-        && (column.required === true || column.min !== undefined || column.max !== undefined)
-      ) {
-        const rules: any[] = []
-
-        // 添加必填验证
-        if (column.required === true) {
-          rules.push({ required: true, message: `${column.title || ''}必须填写` })
-        }
-
-        // 添加最小值验证
-        if (column.min !== undefined) {
-          rules.push({ min: column.min, message: `${column.title || ''}不能小于${column.min}` })
-        }
-
-        // 添加最大值验证
-        if (column.max !== undefined) {
-          rules.push({ max: column.max, message: `${column.title || ''}不能大于${column.max}` })
-        }
-
-        if (rules.length > 0) {
-          defaultEditRules[column.field] = rules
-        }
-      }
-    })
-  }
-
   return {
     // 基本配置
     id: props.id,
@@ -871,7 +870,7 @@ const gridProps = computed<VxeGridProps>(() => {
     },
     // 合并默认验证规则和用户传入的验证规则
     editRules: {
-      ...defaultEditRules,
+      ...defaultEditRules.value,
       ...props.editRules,
     },
     rowConfig: {
@@ -1030,8 +1029,8 @@ function handleCustomConfigSave({
   customColumns: ColumnType[]
   rest: any[]
 }) {
-  localColumns.value = customColumns
   customRestConfig.value = rest
+  localColumns.value = customColumns
 }
 
 // 本地存储键名
@@ -1199,20 +1198,11 @@ function handleColumnResizableChange(params: VxeTableDefines.ResizableChangePara
   dispatchEvents(document, ['mousedown', 'mouseup', 'click'])
   emit('resizableChange', params)
 }
-/** 给columns添加默认值 */
-function processColumns(columns: any[]) {
-  return columns.filter(Boolean).map((i) => {
-    if (i.children?.length) {
-      i.children = processColumns(i.children)
-    }
-    return i
-  })
-}
 /** 监听props.columns的变化 */
 watch(
   () => props.columns,
   async (_newColumns: ColumnType[]) => {
-    const newColumns = processColumns(cloneDeep(_newColumns))
+    const newColumns = cloneDeep(_newColumns)
     if (isNoSave.value) {
       localColumns.value = newColumns
     }
