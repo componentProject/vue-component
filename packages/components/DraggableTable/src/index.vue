@@ -41,8 +41,10 @@
       />
     </template>
     <CustomConfigDialog
+      ref="customConfigDialogRef"
       v-model="customConfigDialogVisible"
       :columns="props.columns"
+      :isConfiguration="props.isConfiguration"
       :collect-columns="collectColumn"
       :custom-columns="props.customColumns"
       @confirm="handleCustomConfigSave"
@@ -394,6 +396,11 @@ const props = defineProps({
   userId: {
     type: String,
   },
+  //是否有权限统一配置（个性话化列配置）
+  isConfiguration: {
+    type: Boolean,
+    default: false,
+  },
   //#endregion
 })
 // 组件事件
@@ -422,6 +429,7 @@ VxeUI.component(VxePager)
 VxeUI.component(VxeTooltip)
 
 const customConfigDialogVisible = ref(false)
+const customConfigDialogRef = useTemplateRef<HTMLElement>('customConfigDialogRef')
 
 const attrs = useAttrs()
 
@@ -1040,7 +1048,6 @@ const getStorageKey = () => (props.id ? `table_columns_${props.id}` : ``)
 const isNoSave = computed(
   () => props.customConfig.storage || !['server', 'local'].includes(props.saveType),
 )
-
 /** 获取本地存储的列配置 */
 async function handleGetStoredColumns(): Promise<ColumnType[]> {
   try {
@@ -1057,6 +1064,9 @@ async function handleGetStoredColumns(): Promise<ColumnType[]> {
         widgetId: getStorageKey(),
         userId: props.userId,
       })
+      if (props.isConfiguration && customConfigDialogRef.value) {
+        customConfigDialogRef.value.isCommon = res?.isExist !== 1
+      }
       return (JSON.parse(res.data) || []) as ColumnType[]
     }
     else if (props.saveType === 'local') {
@@ -1497,7 +1507,6 @@ defineExpose({
 
 <style scoped lang="scss">
 @forward '@moluoxixi/components/_assets/styles/tailwind.scss';
-
 .container {
   :deep(.vxe-table--filter-template) {
     display: flex !important;
