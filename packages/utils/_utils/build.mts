@@ -1188,12 +1188,12 @@ async function buildComponent(
       })
 
       try {
-        // console.log(`开始发布 ${pkgJson.name}@${pkgJson.version}...`)
-        //
-        // // 发布组件
-        // const packageDir = comp ? `${ctx.LIB_NAMESPACE}/packages/${comp}` : ctx.LIB_NAMESPACE
-        // execSync(`cd ${packageDir} && npm publish --tag latest`, { stdio: 'inherit' })
-        // console.log(`${pkgJson.name}@${pkgJson.version} 发布成功！`)
+        console.log(`开始发布 ${pkgJson.name}@${pkgJson.version}...`)
+
+        // 发布组件
+        const packageDir = comp ? `${ctx.LIB_NAMESPACE}/packages/${comp}` : ctx.LIB_NAMESPACE
+        execSync(`cd ${packageDir} && npm publish --tag latest`, { stdio: 'inherit' })
+        console.log(`${pkgJson.name}@${pkgJson.version} 发布成功！`)
       }
       catch (error) {
         console.error('发布失败:', error)
