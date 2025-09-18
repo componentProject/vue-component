@@ -153,6 +153,10 @@ export function buildTree(list: any[], rowKey: string = 'id', parentKey: string 
 export function flattenTree(tree: any[] | any, rowKey: string = 'id', parentKey: string = 'parentId', childrenKey: string = 'children'): any[] {
   const result: any[] = []
   const nodes: any[] = Array.isArray(tree) ? tree : [tree]
+  // 简单的唯一ID生成器（作用域内唯一）
+  const base = Date.now().toString(36)
+  let autoIdCounter = 0
+  const generateAutoId = () => `auto_${base}_${autoIdCounter++}`
 
   const walk = (node: any, parentId?: any) => {
     if (!node || typeof node !== 'object') {
@@ -160,6 +164,10 @@ export function flattenTree(tree: any[] | any, rowKey: string = 'id', parentKey:
     }
     const children = node[childrenKey]
     const current: any = { ...node }
+    // 若缺少 rowKey，则自动补一个唯一ID
+    if (current[rowKey] === undefined || current[rowKey] === null || current[rowKey] === '') {
+      current[rowKey] = generateAutoId()
+    }
     // 去除 children，避免残留树结构
     if (childrenKey in current) {
       delete current[childrenKey]

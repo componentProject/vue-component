@@ -78,6 +78,7 @@ import { getTypeName } from '@moluoxixi/components/DraggableTable/src/_utils'
 import DragModalDialog from '@moluoxixi/components/DragModalDialog'
 import type { ColumnType } from '@moluoxixi/components/DraggableTable/src/_types'
 import { flattenTree } from '@moluoxixi/utils/_utils'
+import { cloneDeep } from 'lodash'
 
 const props = defineProps({
   columns: {
@@ -197,9 +198,8 @@ const isCommon = ref(false)
 function handleEvent(type: 'confirm' | 'reset' | 'cancel') {
   switch (type) {
     case 'reset':
-      tableData.value = props.columns
       emit('confirm', {
-        customColumns: tableData.value,
+        customColumns: cloneDeep(props.columns),
         isCommon: isCommon.value,
       })
       break
@@ -208,11 +208,9 @@ function handleEvent(type: 'confirm' | 'reset' | 'cancel') {
         customColumns: xTable.value?.getTableData()?.fullData,
         isCommon: isCommon.value,
       })
-      visible.value = false
       break
-    case 'cancel':
-      visible.value = false
   }
+  visible.value = false
 }
 defineExpose({
   isCommon,
