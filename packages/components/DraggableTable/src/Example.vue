@@ -161,6 +161,7 @@ const columns = ref([
   {
     field: 'name',
     title: 'Name',
+    fixed: 'left',
     min: 3,
     max: 10,
     required: true,

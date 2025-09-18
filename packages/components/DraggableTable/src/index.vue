@@ -893,6 +893,7 @@ const gridProps = computed<VxeGridProps>(() => {
       showGuidesStatus: true,
       showIcon: false,
       trigger: 'row',
+      isPeerDrag: true,
       dragEndMethod: (params: any) => {
         const isDrag = props.rowDragEndMethod ? props.rowDragEndMethod(params) : true
         if (isDrag) {
@@ -929,10 +930,10 @@ const gridProps = computed<VxeGridProps>(() => {
       ...props.columnConfig,
     },
     columnDragConfig: {
-      isCrossDrag: true,
       showGuidesStatus: true,
       showIcon: false,
       trigger: 'cell',
+      isPeerDrag: true,
       dragEndMethod: (params: any) => {
         const isDrag = props.columnDragEndMethod ? props.columnDragEndMethod(params) : true
         // Vxe自带逻辑，无须添加
