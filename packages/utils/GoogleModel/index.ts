@@ -1,60 +1,29 @@
 // noinspection JSUnusedGlobalSymbols
-import { GoogleGenAI } from '@google/genai'
+type Constructor<T = any> = new (...args: any[]) => T
 
-export interface CreateVideoClientOptions {
-  apiKey?: string
-  defaultModel?: 'veo-3.0-generate-001' | 'veo-3.0-fast-generate-001' | 'veo-2.0-generate-001' | string
-}
-
-export interface GenerateVeoVideoOptions {
-  prompt: string
-  model?: CreateVideoClientOptions['defaultModel']
-  pollIntervalMs?: number
-  timeoutMs?: number
-}
-
-export class GoogleVideoClient {
-  private readonly ai: any
-  private readonly defaultModel: NonNullable<CreateVideoClientOptions['defaultModel']>
-
-  constructor(options: CreateVideoClientOptions = {}) {
-    this.ai = new GoogleGenAI({ apiKey: options.apiKey })
-    this.defaultModel = options.defaultModel || 'veo-3.0-generate-001'
-  }
-
-  generateVeoVideo(options: GenerateVeoVideoOptions) {
-    const { prompt, model, pollIntervalMs = 10000, timeoutMs = 6 * 60 * 1000 } = options
-    return new Promise<any>(async (resolve, reject) => {
-      try {
-        let operation: any = await this.ai.models.generateVideos({
-          model: model || this.defaultModel,
-          prompt,
-        })
-        const start = Date.now()
-        while (!operation.done) {
-          if (Date.now() - start > timeoutMs) {
-            return reject(new Error('Veo video generation timed out'))
-          }
-          await new Promise(r => setTimeout(r, pollIntervalMs))
-          operation = await this.ai.operations.getVideosOperation({ operation })
-        }
-        resolve(operation)
+function _mixinClass<TBase extends Constructor>(...bases: TBase[]) {
+  class Mixed {
+    constructor(...args: any[]) {
+      for (const Base of bases) {
+        const instance = new (Base as any)(...args)
+        Object.assign(this, instance)
       }
-      catch (err) {
-        reject(err)
+    }
+  }
+  for (const Base of bases) {
+    for (const name of Object.getOwnPropertyNames((Base as any).prototype)) {
+      if (name === 'constructor') {
+        continue
       }
-    })
+      Object.defineProperty(
+        Mixed.prototype,
+        name,
+        Object.getOwnPropertyDescriptor((Base as any).prototype, name) as PropertyDescriptor,
+      )
+    }
   }
-
-  async downloadGeneratedVideo(operation: any, downloadPath: string) {
-    const video = operation.response.generatedVideos[0]
-    await this.ai.files.download({ file: video.video, downloadPath })
-    return downloadPath
-  }
+  return Mixed as unknown as TBase
 }
 
-export default function createGoogleVideoClient(options?: CreateVideoClientOptions) {
-  return new GoogleVideoClient(options)
-}
-
-
+export * from './_types'
+export * from './veo'
