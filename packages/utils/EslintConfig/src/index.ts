@@ -35,6 +35,10 @@ export default function createEslintConfig(config: optionsType, ...userConfigs: 
         'jsonc/sort-keys': 'off',
         // 不能使用console
         'no-console': 'off',
+        // 未使用的变量
+        'unused-imports/no-unused-vars': 'off',
+        // 全局process
+        'node/prefer-global/process': 'off',
         ...rules,
       },
       ...otherOptions,

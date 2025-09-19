@@ -11,9 +11,9 @@ const LIB_NAMESPACE = 'moluoxixi'
 const aliasComponentPath = '@moluoxixi/utils'
 
 /**
- * 必须要排除依赖的工具包
+ * 必须要排除依赖的工具包(部分node包需要依赖本地运行，不排除依赖会出错）
  */
-const requireExternalPacks = ['ViteConfig']
+const requireExternalPacks = ['ViteConfig', 'EslintConfig']
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)

@@ -1,6 +1,6 @@
 {
   "ViteConfig": "0.0.19",
-  "EslintConfig": "0.0.5",
+  "EslintConfig": "0.0.6",
   "AjaxPackage": "0.0.6",
   "ClassNames": "0.0.2",
   "GoogleModel": "0.0.4"
