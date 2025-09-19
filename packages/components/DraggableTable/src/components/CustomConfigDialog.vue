@@ -141,7 +141,7 @@ function processData(data: any[] = []): any[] {
       ...rest,
       children: processData(children),
       visible: item.visible ?? true,
-      fixed: item.fixed ?? '',
+      fixed: item.fixed ?? 'default',
       width: item.width || (item.resizeWidth ? Math.ceil(item.resizeWidth) : ''),
     }
   })

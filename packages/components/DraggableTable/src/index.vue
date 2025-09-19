@@ -395,7 +395,7 @@ const props = defineProps({
           },
           {
             label: '默认',
-            value: '',
+            value: 'default',
           },
         ],
       }, slots: { default: 'select' } },
