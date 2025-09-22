@@ -156,7 +156,7 @@ async function handleClick() {
     code: 'webfile',
     paraMeters: {
       productCode: 'webFile_his',
-      Vue: 'vue3Test',
+      Vue: 'Vue3',
       componentCode: 'EnterNextDragTable',
     },
   }
