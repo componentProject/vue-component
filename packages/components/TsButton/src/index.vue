@@ -1,7 +1,7 @@
 <template>
   <ElPopover
     :content="props.content"
-    v-bind="props.popoverProps"
+    v-bind="computedPopoverProps"
     :disabled="!computedShowPopover"
   >
     <template #reference>
@@ -40,16 +40,6 @@ const props = withDefaults(defineProps<{
 }>(), {
   showType: 'content',
   content: '',
-  popoverProps: () => ({
-    placement: 'top',
-    trigger: 'hover',
-    width: 'auto',
-    popperStyle: {
-      maxWidth: '400px',
-      whiteSpace: 'pre-wrap',
-    },
-  }),
-
   debounce: 0,
   throttle: 300,
   disabled: false,
@@ -73,7 +63,18 @@ const computedShowPopover = computed(() => {
   // disabled 模式：当按钮被禁用时展示 popover
   return props.showType === 'disabled' && props.disabled
 })
-
+const computedPopoverProps = computed(() => {
+  return {
+    ...props.popoverProps,
+    placement: 'top',
+    trigger: 'hover',
+    width: 'auto',
+    popperStyle: {
+      maxWidth: '400px',
+      whiteSpace: 'pre-wrap',
+    },
+  }
+})
 const computedOptions = computed<ThrottleOrDebounceOptions>(() => {
   const o = props.options || {}
   if (o.promise) {
