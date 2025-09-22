@@ -1,5 +1,6 @@
 import type { QiankunProps } from 'vite-plugin-qiankun/dist/helper'
 import { createApp } from 'vue'
+import * as Vue from 'vue'
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 import {
   browserTracingIntegration,
@@ -93,6 +94,10 @@ async function render(props: QiankunProps) {
   proxy(container as HTMLElement)
   app = createApp(App)
   window.$remoteLoad = load
+  const res = await load(Vue)
+  Object.keys(res).forEach((name) => {
+    app.component(name, res[name])
+  })
   // 注册指令
   directives(app)
 

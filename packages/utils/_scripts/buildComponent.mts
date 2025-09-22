@@ -53,6 +53,7 @@ async function main() {
         aliasComponentPath,
         rootDir,
         packDir,
+        uploadType: 'UtilityClass',
       })
       return buildPublishResult ? 0 : 1
     }
