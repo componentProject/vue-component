@@ -55,4 +55,9 @@ export default {
     // 数据绑定配置
     bindings: ['v-model=tableData'],
   },
+  TsButton: {
+    showType: 'disabled',
+    content: '莫',
+    disabled: true,
+  },
 }

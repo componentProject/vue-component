@@ -53,6 +53,7 @@ async function main() {
         alias,
         rootDir,
         packDir,
+        uploadType: 'Vue3',
       })
       return result ? 0 : 1
     }

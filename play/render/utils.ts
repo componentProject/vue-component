@@ -528,12 +528,12 @@ async function replaceImportsAndExports(componentCode: string, componentName: st
  * @param isLongRange 本地调试的使用，默认false（加载本地打包后的组件）、true加载线上组件
  * @returns 清理后的代码
  */
-export async function load($_Vue: any, originComponentNames: string[], isLongRange?: boolean) {
+export async function load($_Vue: any, originComponentNames?: string[], isLongRange?: boolean) {
   const listRes = await getList({
     productCode: 'webFile_his',
-    vue: ['vue3Test'],
+    vue: ['Vue3'],
   })
-  const allComponentList = listRes.vue3Test
+  const allComponentList = listRes.Vue3
   const componentNames = originComponentNames?.length > 0 ? originComponentNames : allComponentList.map(i => i.componentCode)
   // 预先为所有组件添加依赖映射
   allComponentList.forEach((item) => {
@@ -568,7 +568,8 @@ export async function fetchFileContent(componentName: string): Promise<string> {
     const module = await modules[moduleKey]()
     console.log(`成功加载组件 ${componentName} 的文件内容`)
     return module.default || module
-  } catch (error) {
+  }
+  catch (error) {
     console.error(`获取组件 ${componentName} 文件内容失败:`, error)
     throw error
   }

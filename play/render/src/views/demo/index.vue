@@ -3,9 +3,9 @@
     <div class="title">
       调试与演示
     </div>
-    <!-- <el-button type="primary" @click="handleClick">
+    <el-button type="primary" @click="handleClick">
       删除组件库组件
-    </el-button> -->
+    </el-button>
     <div class="main">
       <div class="list-title">
         开发调试组件
@@ -37,16 +37,16 @@
 
 <script setup lang="ts">
 import * as vue from 'vue'
-import { onMounted, ref } from 'vue'
+import { getCurrentInstance, onMounted, ref } from 'vue'
 import { load } from '../../../utils.ts'
 // 虚拟模块由 Vite 插件在运行时提供
 import { setDeleteByPathAndCode } from '@moluoxixi/utils/_api'
 import componentData from './data.ts'
 
 defineOptions({ name: '调试与演示' })
-
+console.log('aaaaaaaaaaaaa', getCurrentInstance())
 // 使用ref替代data属性
-const componentName = ref('DraggableTable') // 调试与演示组件库的组件，直接修改组件名
+const componentName = ref('TsButton') // 调试与演示组件库的组件，直接修改组件名
 const localComponent = ref<any>(null) // 调试组件
 const dynamicComponent = ref<any>(null) // 用于存储动态组件
 
@@ -142,7 +142,7 @@ async function loadLocalComponent(componentName: string) {
  */
 async function loadComponents(components: string[]) {
   try {
-    const loadedComponents = await load(vue, components, true)
+    const loadedComponents = await load(vue, components, false)
     dynamicComponent.value = loadedComponents[componentName.value]
     console.log('动态组件加载成功:', dynamicComponent)
   }
@@ -157,7 +157,7 @@ async function handleClick() {
     paraMeters: {
       productCode: 'webFile_his',
       Vue: 'Vue3',
-      componentCode: 'ConfigTable',
+      componentCode: 'EnterNextDragTable',
     },
   }
   //ConfigTable、
