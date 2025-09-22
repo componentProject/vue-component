@@ -2,27 +2,27 @@
   <div class="draggable-table-demo">
     <h2>可拖拽表格演示</h2>
     <div class="demo-actions">
-      <el-button @click="addRow">
+      <ElButton @click="addRow">
         添加行
-      </el-button>
-      <el-button @click="rowdragable = !rowdragable">
+      </ElButton>
+      <ElButton @click="rowdragable = !rowdragable">
         {{ rowdragable ? '禁用行拖拽' : '启用行拖拽' }}
-      </el-button>
-      <el-button @click="columndragable = !columndragable">
+      </ElButton>
+      <ElButton @click="columndragable = !columndragable">
         {{ columndragable ? '禁用列拖拽' : '启用列拖拽' }}
-      </el-button>
+      </ElButton>
 
-      <el-button @click="editable = !editable">
+      <ElButton @click="editable = !editable">
         {{ editable ? '禁用编辑' : '启用编辑(与cellRender互斥)' }}
-      </el-button>
+      </ElButton>
 
-      <el-button @click="filterable = !filterable">
+      <ElButton @click="filterable = !filterable">
         {{ filterable ? '禁用过滤' : '启用过滤' }}
-      </el-button>
+      </ElButton>
 
-      <el-button @click="sortable = !sortable">
+      <ElButton @click="sortable = !sortable">
         {{ sortable ? '禁用排序' : '启用排序' }}
-      </el-button>
+      </ElButton>
 
       <div class="flex items-center">
         <span class="mr-8!">扩展type选择：</span>
@@ -44,12 +44,12 @@
         </el-select>
       </div>
     </div>
-    <el-button @click="loading = !loading">
+    <ElButton @click="loading = !loading">
       转变loading
-    </el-button>
-    <el-button @click="handleValidate">
+    </ElButton>
+    <ElButton @click="handleValidate">
       校验表格
-    </el-button>
+    </ElButton>
     <!-- 使用DraggableTable组件 -->
     <DraggableTable
       id="demo_table_12355666"
@@ -79,14 +79,12 @@
 </template>
 
 <script lang="ts" setup>
-import { ElMessage } from 'element-plus'
-import { getCurrentInstance, onMounted, ref, useTemplateRef } from 'vue'
+import { ElButton, ElMessage } from 'element-plus'
+import { onMounted, ref, useTemplateRef } from 'vue'
 // import DraggableTable from './index.vue'
 // import TsButton from '@moluoxixi/components/TsButton'
 // 表格加载状态
 const loading = ref(false)
-
-console.log('aaaaaaaaaaaaa', getCurrentInstance())
 // 拖拽开关状态
 const rowdragable = ref(false)
 const columndragable = ref(false)

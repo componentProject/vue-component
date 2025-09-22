@@ -69,7 +69,7 @@
     "vite-plugin-compression": "catalog:dev",
     "vite-plugin-css-injected-by-js": "^3.5.1",
     "vite-plugin-dts": "^4.5.4",
-    "vite-plugin-html": "^3.2.2",
+    "vite-plugin-html": "catalog:dev",
     "vite-plugin-imagemin": "catalog:dev",
     "vite-plugin-lazy-import": "^1.0.7",
     "vite-plugin-qiankun": "catalog:dev",
