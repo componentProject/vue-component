@@ -80,13 +80,13 @@
 
 <script lang="ts" setup>
 import { ElMessage } from 'element-plus'
-import { onMounted, ref, useTemplateRef } from 'vue'
-import DraggableTable from './index.vue'
-import TsButton from '@moluoxixi/components/TsButton'
-
+import { getCurrentInstance, onMounted, ref, useTemplateRef } from 'vue'
+// import DraggableTable from './index.vue'
+// import TsButton from '@moluoxixi/components/TsButton'
 // 表格加载状态
 const loading = ref(false)
 
+console.log('aaaaaaaaaaaaa', getCurrentInstance())
 // 拖拽开关状态
 const rowdragable = ref(false)
 const columndragable = ref(false)

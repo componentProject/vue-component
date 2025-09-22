@@ -528,7 +528,7 @@ async function replaceImportsAndExports(componentCode: string, componentName: st
  * @param isLongRange 本地调试的使用，默认false（加载本地打包后的组件）、true加载线上组件
  * @returns 清理后的代码
  */
-export async function load($_Vue: any, originComponentNames: string[], isLongRange?: boolean) {
+export async function load($_Vue: any, originComponentNames?: string[], isLongRange?: boolean) {
   const listRes = await getList({
     productCode: 'webFile_his',
     vue: ['Vue3'],

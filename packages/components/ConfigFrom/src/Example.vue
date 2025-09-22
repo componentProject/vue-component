@@ -6,7 +6,7 @@
 </template>
 
 <script setup lang="ts">
-import ConfigFrom from './index.vue'
+// import ConfigFrom from './index.vue'
 
 const model: Record<string, any> = {
   r1c3_checkbox: true,
