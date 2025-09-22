@@ -153,7 +153,6 @@ watch(() => visible.value, (v: boolean) => {
 }, {
   immediate: true,
 })
-console.log('00000000', props.customColumns)
 const gridProps = computed(() => {
   return {
     border: true,

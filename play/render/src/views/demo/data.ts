@@ -50,11 +50,9 @@ export default {
     filterable: true,
     resizable: true,
     saveType: 'server',
-    saveHotKeys: ['a', 's'],
     isConfiguration: true,
     columndragable: true,
     // 数据绑定配置
-    bindingType: 'v-model', // 可选值: 'v-model' 或 'data'
-    bindingProp: 'tableData', // 绑定的数据属性名
+    bindings: ['v-model=tableData'],
   },
 }

@@ -51,15 +51,9 @@ const localComponent = ref<any>(null) // 调试组件
 const dynamicComponent = ref<any>(null) // 用于存储动态组件
 
 // 从data.ts获取当前组件的配置
-const componentConfig = computed(() => componentData[componentName.value] || {})
-
-// 获取组件数据绑定配置
-const bindingConfig = computed(() => {
-  const config = componentConfig.value
-  return {
-    type: config.bindingType || 'data', // 默认使用data绑定
-    prop: config.bindingProp || '',
-  }
+const componentConfig = computed(() => {
+  const name = componentName.value as keyof typeof componentData
+  return componentData[name] || {}
 })
 
 // 构建完整的组件属性，支持不同的数据绑定方式
@@ -68,22 +62,53 @@ const componentProps = computed(() => {
   // 创建新对象，避免直接修改原始数据
   const props = { ...config }
 
-  const { type, prop } = bindingConfig.value
-
   // 根据绑定类型处理数据绑定
-  if (prop && config[prop]) {
-    if (type === 'v-model') {
-      // 处理v-model绑定
-      props.modelValue = config[prop]
-      props['onUpdate:modelValue'] = (value: any) => {
-        console.log(`${prop} updated:`, value)
+  if (props.bindings && props.bindings.length) {
+    props.bindings.forEach((binding: string) => {
+      // 容错处理：分割绑定字符串，处理可能的空格
+      const parts = binding.split(/\s*=\s*/)
+      if (parts.length !== 2) {
+        console.warn('Invalid binding format:', binding)
+        return
       }
-    }
+      const type = parts[0].trim()
+      const prop = parts[1].trim()
+      // 处理可能的v-model拼写变体
+      let isModelBinding = false
+      let modelKey = ''
+      // 检测v-model及其可能的拼写变体
+      if (type.toLowerCase().startsWith('v-model')) {
+        isModelBinding = true
+        // 标准化处理，移除可能的拼写错误（如v-modee）
+        const normalizedType = type.replace(/^v-\s*mode[^:]*(:|$)/i, 'v-model$1')
+        if (normalizedType === 'v-model') {
+          modelKey = 'modelValue'
+        }
+        else {
+          // 提取v-model:后的参数部分
+          modelKey = normalizedType.substring(8) // 'v-model:'.length is 8
+        }
+      }
+      // 处理v-model绑定（包括变体）
+      if (isModelBinding) {
+        props[modelKey] = config[prop]
+        props[`onUpdate:${modelKey}`] = (value: any) => {
+          console.log(`${prop} updated:`, value)
+          // 实际更新配置值
+          if (componentData[componentName.value]) {
+            componentData[componentName.value][prop] = value
+          }
+        }
+      }
+      else {
+        // 普通属性绑定
+        props[type] = config[prop]
+      }
+    })
   }
 
   // 删除不需要传递给组件的配置属性
-  delete props.bindingType
-  delete props.bindingProp
+  delete props.bindings
 
   return props
 })
@@ -141,7 +166,6 @@ async function handleClick() {
 
 onMounted(async () => {
   await loadLocalComponent(componentName.value)
-  return
   await loadComponents([componentName.value])
 })
 </script>
