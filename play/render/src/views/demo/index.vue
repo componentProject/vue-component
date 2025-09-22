@@ -46,7 +46,7 @@ import componentData from './data.ts'
 defineOptions({ name: '调试与演示' })
 
 // 使用ref替代data属性
-const componentName = ref('DraggableTable') // 调试与演示组件库的组件，直接修改组件名
+const componentName = ref('TsButton') // 调试与演示组件库的组件，直接修改组件名
 const localComponent = ref<any>(null) // 调试组件
 const dynamicComponent = ref<any>(null) // 用于存储动态组件
 
@@ -117,7 +117,7 @@ async function loadLocalComponent(componentName: string) {
  */
 async function loadComponents(components: string[]) {
   try {
-    const loadedComponents = await load(vue, components, true)
+    const loadedComponents = await load(vue, components, false)
     dynamicComponent.value = loadedComponents[componentName.value]
     console.log('动态组件加载成功:', dynamicComponent)
   }
@@ -141,7 +141,6 @@ async function handleClick() {
 
 onMounted(async () => {
   await loadLocalComponent(componentName.value)
-  return
   await loadComponents([componentName.value])
 })
 </script>

@@ -57,4 +57,9 @@ export default {
     bindingType: 'v-model', // 可选值: 'v-model' 或 'data'
     bindingProp: 'tableData', // 绑定的数据属性名
   },
+  TsButton: {
+    showType: 'disabled',
+    content: '莫',
+    disabled: true,
+  },
 }

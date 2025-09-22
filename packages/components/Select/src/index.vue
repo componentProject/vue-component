@@ -1,8 +1,8 @@
 <template>
   <div>
     <el-select
-      v-model="data"
       :id="selectId"
+      v-model="data"
       append-to="#app"
       :clearable="props.clearable"
       :filterable="props.filterable"
@@ -40,7 +40,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onUnmounted, ref, watch, nextTick } from 'vue'
+import { computed, nextTick, onUnmounted, ref, watch } from 'vue'
 import getServerOptions from '@moluoxixi/components/Select/src/uitls'
 import type { objType } from '@moluoxixi/components/_types'
 import { getType, getTypeDefault } from '@moluoxixi/utils/_utils'
@@ -124,9 +124,9 @@ const props = defineProps({
   },
 })
 
-const selectId = `select-${Math.random().toString(36).substr(2, 9)}`
-
 const emits = defineEmits(['change', 'load-more'])
+
+const selectId = `select-${Math.random().toString(36).substr(2, 9)}`
 
 const data = defineModel<any>()
 const keyword = ref('')
@@ -239,7 +239,7 @@ function setupIntersectionObserver() {
     const allDropdowns = document.querySelectorAll('.el-select-dropdown')
 
     // 通过可见性判断当前激活的下拉框
-    const activeDropdowns = Array.from(allDropdowns).filter(d => {
+    const activeDropdowns = Array.from(allDropdowns).filter((d) => {
       const style = window.getComputedStyle(d)
       return style.display !== 'none' && style.visibility !== 'hidden'
     })
@@ -265,12 +265,11 @@ function setupIntersectionObserver() {
       const entry = entries[0]
 
       if (entry.isIntersecting
-        && entry.intersectionRatio >= 0.1  // 降低阈值
+        && entry.intersectionRatio >= 0.1 // 降低阈值
         && props.enableLoadMore
         && props.hasMore
         && !props.loading
         && !hasTriggeredLoadMore.value) {
-
         hasTriggeredLoadMore.value = true
         emits('load-more')
 
