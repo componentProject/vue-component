@@ -37,14 +37,13 @@
 
 <script setup lang="ts">
 import * as vue from 'vue'
-import { getCurrentInstance, onMounted, ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import { load } from '../../../utils.ts'
 // 虚拟模块由 Vite 插件在运行时提供
 import { setDeleteByPathAndCode } from '@moluoxixi/utils/_api'
 import componentData from './data.ts'
 
 defineOptions({ name: '调试与演示' })
-console.log('aaaaaaaaaaaaa', getCurrentInstance())
 // 使用ref替代data属性
 const componentName = ref('TsButton') // 调试与演示组件库的组件，直接修改组件名
 const localComponent = ref<any>(null) // 调试组件
@@ -157,7 +156,7 @@ async function handleClick() {
     paraMeters: {
       productCode: 'webFile_his',
       Vue: 'vue3Test',
-      componentCode: 'EnterNextDragTable',
+      componentCode: 'EslintConfig',
     },
   }
   //ConfigTable、

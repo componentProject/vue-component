@@ -75,18 +75,47 @@
         </TsButton>
       </template>
     </DraggableTable>
+
+    <ElButton @click="drawerVisible = !drawerVisible">
+      显示/隐藏Drawer
+    </ElButton>
+    <ElDrawer v-model="drawerVisible" destroy-on-close size="90%" title="退费申请">
+      <DraggableTable
+        id="demo_table_12355666"
+        ref="draggableTableRef"
+        v-model="tableData"
+        page-id="page1"
+        user-id="shabi"
+        :columns="columns"
+        :loading="loading"
+        :height="500"
+        save-type="server"
+        :rowdragable="rowdragable"
+        :columndragable="columndragable"
+        :editable="editable"
+        :filterable="filterable"
+        :sortable="sortable"
+        show-pagination
+      >
+        <!-- 自定义操作列插槽 -->
+        <template #aaa>
+          <TsButton show-type="disabled" content="你好" disabled type="danger" size="small">
+            aaa自定义插槽按钮
+          </TsButton>
+        </template>
+      </DraggableTable>
+    </ElDrawer>
   </div>
 </template>
 
 <script lang="ts" setup>
 import { ElMessage } from 'element-plus'
-import { getCurrentInstance, onMounted, ref, useTemplateRef } from 'vue'
+import { onMounted, ref, useTemplateRef } from 'vue'
 // import DraggableTable from './index.vue'
 // import TsButton from '@moluoxixi/components/TsButton'
 // 表格加载状态
 const loading = ref(false)
-
-console.log('aaaaaaaaaaaaa', getCurrentInstance())
+const drawerVisible = ref(false)
 // 拖拽开关状态
 const rowdragable = ref(false)
 const columndragable = ref(false)
