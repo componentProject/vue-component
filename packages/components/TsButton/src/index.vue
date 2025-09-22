@@ -36,6 +36,7 @@ const props = withDefaults(defineProps<{
   // 交互增强：参考 PopoverTableSelect；二者若同时传入，优先防抖
   debounce?: number
   throttle?: number
+  zIndex?: number
   options?: ThrottleOrDebounceOptions
 }>(), {
   showType: 'content',
@@ -43,6 +44,7 @@ const props = withDefaults(defineProps<{
   debounce: 0,
   throttle: 300,
   disabled: false,
+  zIndex: 9999,
   options: () => ({}),
 })
 
@@ -64,15 +66,18 @@ const computedShowPopover = computed(() => {
   return props.showType === 'disabled' && props.disabled
 })
 const computedPopoverProps = computed(() => {
+  const { popperStyle = {}, ...rest } = props.popoverProps || {}
   return {
-    ...props.popoverProps,
     placement: 'top',
     trigger: 'hover',
     width: 'auto',
     popperStyle: {
       maxWidth: '400px',
       whiteSpace: 'pre-wrap',
+      zIndex: props.zIndex,
+      ...popperStyle,
     },
+    ...rest,
   }
 })
 const computedOptions = computed<ThrottleOrDebounceOptions>(() => {
