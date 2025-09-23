@@ -22,6 +22,7 @@ import { obfuscator } from 'rollup-obfuscator'
 import cssInjectedByJsPlugin from 'vite-plugin-css-injected-by-js'
 // import { lazyImport, VxeResolver } from 'vite-plugin-lazy-import'
 import { UploadEvent } from './UploadComponent.ts'
+import { COMPONENT_SETTING_TYPE } from '@moluoxixi/constant'
 
 //#region CLI 辅助函数
 /**
@@ -122,7 +123,7 @@ export async function runBuildCli(params: RunBuildCliParams, cli?: RunBuildCliOp
 
   if (!uploadType) {
     console.error('错误: 缺少必填参数 uploadType')
-    printUsage({ exampleUploadType: cli?.exampleUploadType || 'vue3Test', defaultCommand: cli?.defaultCommand || 'build-publish' })
+    printUsage({ exampleUploadType: cli?.exampleUploadType || COMPONENT_SETTING_TYPE, defaultCommand: cli?.defaultCommand || 'build-publish' })
     return 1
   }
 
@@ -371,8 +372,12 @@ async function getCurrentVersions(ctx: BuildContext): Promise<Record<string, str
  * @returns 下一个版本号
  */
 function getNextVersion(currentVersion: string, type: 'major' | 'minor' | 'patch' = 'patch'): string {
-  // 解析当前版本号
-  const [major, minor, patch] = currentVersion.split('.').map(Number)
+  // 解析当前版本号，处理可能存在的预发布版本号
+  const versionParts = currentVersion.split('-')
+  const mainVersion = versionParts[0]
+
+  // 解析主版本号
+  const [major, minor, patch] = mainVersion.split('.').map(Number)
 
   // 根据类型计算新版本号
   let newMajor = major
@@ -393,9 +398,18 @@ function getNextVersion(currentVersion: string, type: 'major' | 'minor' | 'patch
       newPatch++
       break
   }
-
-  // 生成新版本号
-  return `${newMajor}.${newMinor}.${newPatch}`
+  // 生成新版本号并添加 beta 后缀
+  // 如果当前版本已经是 beta 版本，则递增 beta 版本号
+  if (versionParts.length > 1 && versionParts[1].startsWith('beta.')) {
+    // 提取 beta 版本号
+    const betaVersionMatch = versionParts[1].match(/^beta\.(\d+)$/)
+    const betaVersion = betaVersionMatch ? Number.parseInt(betaVersionMatch[1], 10) + 1 : 0
+    return `${newMajor}.${newMinor}.${newPatch}-beta.${betaVersion}`
+  }
+  else {
+    // 如果是新的 beta 版本，从 0 开始
+    return `${newMajor}.${newMinor}.${newPatch}-beta.0`
+  }
 }
 
 /**
@@ -1292,7 +1306,6 @@ async function buildComponent(
       ...internal,
       ...deps.external,
     }
-    console.log('dependencies--------------', pkgJson.dependencies)
     // 检查是否有样式文件
     const stylePath = resolve(esOutputDir, 'style/index.css')
     if (fs.existsSync(stylePath)) {
@@ -1322,7 +1335,7 @@ async function buildComponent(
 
         // 发布组件
         const packageDir = comp ? `${ctx.LIB_NAMESPACE}/packages/${comp}` : ctx.LIB_NAMESPACE
-        execSync(`cd ${packageDir} && npm publish --tag latest`, { stdio: 'inherit' })
+        execSync(`cd ${packageDir} && npm publish --tag beta`, { stdio: 'inherit' })
         console.log(`${pkgJson.name}@${pkgJson.version} 发布成功！`)
       }
       catch (error) {
@@ -1480,7 +1493,7 @@ export async function buildComponentsWithOptions(options: BuildOptions): Promise
     requireExternalPacks: reqExternal = [],
     entryBaseUrl: ebu = '/',
     presetGlobals: presetGlobalsArg,
-    uploadType = 'vue3Test',
+    uploadType = COMPONENT_SETTING_TYPE,
   } = options || ({} as BuildOptions)
 
   // 必填参数校验

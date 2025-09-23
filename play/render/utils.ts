@@ -2,6 +2,7 @@
 // import fs from 'node:fs/promises'
 // import path from 'node:path'
 import { getDownLoadByIds, getList } from './src/api/index.ts'
+import { COMPONENT_SETTING_TYPE } from '@moluoxixi/constant'
 
 const modules = import.meta.glob('../../packages/components/moluoxixi/packages/*/es/index.mjs', {
   query: '?raw',
@@ -531,9 +532,9 @@ async function replaceImportsAndExports(componentCode: string, componentName: st
 export async function load($_Vue: any, originComponentNames?: string[], isLongRange?: boolean) {
   const listRes = await getList({
     productCode: 'webFile_his',
-    vue: ['vue3Test'],
+    vue: [COMPONENT_SETTING_TYPE],
   })
-  const allComponentList = listRes.vue3Test
+  const allComponentList = listRes[COMPONENT_SETTING_TYPE]
   const componentNames = originComponentNames?.length > 0 ? originComponentNames : allComponentList.map(i => i.componentCode)
   // 预先为所有组件添加依赖映射
   allComponentList.forEach((item) => {

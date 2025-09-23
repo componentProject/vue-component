@@ -34,7 +34,8 @@
     "vue": "catalog:build",
     "vue-i18n": "catalog:build",
     "vue-router": "catalog:build",
-    "vxe-table": "catalog:build"
+    "vxe-table": "catalog:build",
+    "@moluoxixi/constant": "workspace:*"
   },
   "devDependencies": {
     "@moluoxixi/components": "workspace:*",
