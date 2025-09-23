@@ -22,6 +22,133 @@ import { obfuscator } from 'rollup-obfuscator'
 import cssInjectedByJsPlugin from 'vite-plugin-css-injected-by-js'
 // import { lazyImport, VxeResolver } from 'vite-plugin-lazy-import'
 import { UploadEvent } from './UploadComponent.ts'
+import { COMPONENT_SETTING_TYPE } from '@moluoxixi/constant'
+
+//#region CLI 辅助函数
+/**
+ * 将字符串形式的布尔开关解析为布尔值。
+ *
+ * @param input 旗标值，例如 'true'|'false'|'1'|'0'；未传则返回默认值
+ * @param [defaultValue] 当未传入 input 时返回的默认布尔值，函数内默认为 false
+ * @returns {boolean} 解析后的布尔值
+ */
+export function parseBoolean(input: string | undefined, defaultValue = false): boolean {
+  if (typeof input === 'undefined')
+    return defaultValue
+  const v = String(input).toLowerCase()
+  return v === 'true' || v === '1'
+}
+
+/**
+ * 从命令行参数中读取形如 `--name=value` 的旗标值。
+ *
+ * @param args process.argv.slice(2) 后的参数数组
+ * @param name 旗标名称（不含前缀 --），如 'mode'
+ * @param [defaultValue] 当未提供该旗标时返回的默认字符串
+ * @returns 旗标字符串值；未提供且无默认值时返回 undefined
+ */
+export function getFlagValue(args: string[], name: string, defaultValue?: string): string | undefined {
+  const prefix = `--${name}=`
+  const item = args.find(a => a.startsWith(prefix))
+  return (item?.slice(prefix.length)) ?? defaultValue
+}
+
+export interface CliUsageOptions {
+  exampleUploadType: string
+  defaultCommand?: 'build' | 'build-publish'
+}
+/**
+ * 打印统一的 CLI 使用说明。
+ *
+ * @param options 配置
+ * @param options.exampleUploadType 示例中的 uploadType 值
+ * @param [options.defaultCommand] 示例中标注的默认命令，函数内默认为 'build'
+ */
+export function printUsage(options: CliUsageOptions): void {
+  const { exampleUploadType, defaultCommand = 'build' } = options
+  const buildLine = `  build         - 仅构建组件${defaultCommand === 'build' ? '（默认）' : ''}`
+  const publishLine = `  build-publish - 构建并发布组件${defaultCommand === 'build-publish' ? '（默认）' : ''}`
+  console.log(`
+使用方法:
+  tsx [引用runBuildCliAndExit方法的文件路径] [command] --mode=[mode] --excludeHeavyPlugins=[excludeHeavyPlugins] --uploadType=${exampleUploadType}
+
+命令(可选):
+${buildLine}
+${publishLine}
+
+模式(可选):
+  all           - 处理所有单个组件和整个组件库（默认）
+  library       - 只处理整个组件库
+  <组件名>      - 只处理指定的单个组件
+
+可选参数:
+  [excludeHeavyPlugins]  是否排除重型插件，true/false（默认 false）
+
+必填参数:
+  --uploadType=${exampleUploadType}  上传类型
+
+示例:
+  tsx _scripts/buildComponent.mts build --uploadType=${exampleUploadType}
+  tsx _scripts/buildComponent.mts build-publish --mode=library --uploadType=${exampleUploadType}
+  tsx _scripts/buildComponent.mts --uploadType=${exampleUploadType}
+  `)
+}
+//#endregion
+
+//#region CLI 运行器
+export type RunBuildCliParams = Omit<BuildOptions, 'mode' | 'shouldPublish' | 'excludeHeavyPlugins' | 'uploadType'>
+export interface RunBuildCliOptions {
+  exampleUploadType?: string
+  defaultCommand?: 'build' | 'build-publish'
+}
+
+/**
+ * 解析命令行参数并执行构建。
+ * - 从 CLI 解析出 command/mode/excludeHeavyPlugins/uploadType
+ * - 其它固定入参与 BuildOptions 对齐，通过 params 传入
+ *
+ * @param params 与 BuildOptions 对齐的固定入参（不含 CLI 四个字段）
+ * @param [cli] CLI 展示与默认值配置
+ * @returns 进程退出码：0 成功，非 0 失败
+ */
+export async function runBuildCli(params: RunBuildCliParams, cli?: RunBuildCliOptions): Promise<number> {
+  const args = process.argv.slice(2)
+  const firstArg = args[0]
+  const command = (firstArg === 'build' || firstArg === 'build-publish')
+    ? firstArg
+    : (cli?.defaultCommand || 'build-publish')
+  const mode = getFlagValue(args, 'mode', 'all')
+  const excludeHeavyPlugins = parseBoolean(getFlagValue(args, 'excludeHeavyPlugins', 'false'), false)
+  const uploadType = getFlagValue(args, 'uploadType')
+
+  if (!uploadType) {
+    console.error('错误: 缺少必填参数 uploadType')
+    printUsage({ exampleUploadType: cli?.exampleUploadType || COMPONENT_SETTING_TYPE, defaultCommand: cli?.defaultCommand || 'build-publish' })
+    return 1
+  }
+
+  const result = await buildComponentsWithOptions({
+    ...params,
+    mode,
+    shouldPublish: command === 'build-publish',
+    excludeHeavyPlugins,
+    uploadType,
+  })
+  return result ? 0 : 1
+}
+
+/**
+ * 执行 runBuildCli 并在完成后以返回码退出当前进程。
+ *
+ * @param params 与 BuildOptions 对齐的固定入参
+ * @param [cli] CLI 展示与默认值配置
+ */
+export function runBuildCliAndExit(params: RunBuildCliParams, cli?: RunBuildCliOptions): void {
+  runBuildCli(params, cli).then((exitCode) => {
+    process.exit(exitCode)
+  })
+}
+//#endregion
 
 /** 必须排除的文件 */
 const mustExcludeDirs = ['moluoxixi', 'node_modules', 'typings', '_typings']
@@ -46,8 +173,8 @@ export interface BuildContext {
   presetGlobals: Record<string, string>
   /** Peer 依赖列表（可选） */
   peerDepList: string[]
-  /** 项目根目录，用于获取依赖版本信息 */
-  rootDir: string
+  /** 项目根目录，用于获取依赖版本信息（可选，仅用于扫描依赖） */
+  rootDir?: string
   /** 组件仓库所在路径 */
   packDir: string
   /** 组件的入口文件路径,需要以/开头，/结尾，相对于packDir */
@@ -245,8 +372,12 @@ async function getCurrentVersions(ctx: BuildContext): Promise<Record<string, str
  * @returns 下一个版本号
  */
 function getNextVersion(currentVersion: string, type: 'major' | 'minor' | 'patch' = 'patch'): string {
-  // 解析当前版本号
-  const [major, minor, patch] = currentVersion.split('.').map(Number)
+  // 解析当前版本号，处理可能存在的预发布版本号
+  const versionParts = currentVersion.split('-')
+  const mainVersion = versionParts[0]
+
+  // 解析主版本号
+  const [major, minor, patch] = mainVersion.split('.').map(Number)
 
   // 根据类型计算新版本号
   let newMajor = major
@@ -267,9 +398,24 @@ function getNextVersion(currentVersion: string, type: 'major' | 'minor' | 'patch
       newPatch++
       break
   }
-
-  // 生成新版本号
-  return `${newMajor}.${newMinor}.${newPatch}`
+  if (COMPONENT_SETTING_TYPE.includes('Test')) {
+    // 生成新版本号并添加 beta 后缀
+    // 如果当前版本已经是 beta 版本，则递增 beta 版本号
+    if (versionParts.length > 1 && versionParts[1].startsWith('beta.')) {
+      // 提取 beta 版本号
+      const betaVersionMatch = versionParts[1].match(/^beta\.(\d+)$/)
+      const betaVersion = betaVersionMatch ? Number.parseInt(betaVersionMatch[1], 10) + 1 : 0
+      return `${newMajor}.${newMinor}.${newPatch}-beta.${betaVersion}`
+    }
+    else {
+      // 如果是新的 beta 版本，从 0 开始
+      return `${newMajor}.${newMinor}.${newPatch}-beta.0`
+    }
+  }
+  else {
+    // 如果是新的 beta 版本，从 0 开始
+    return `${newMajor}.${newMinor}.${newPatch}`
+  }
 }
 
 /**
@@ -434,7 +580,11 @@ async function analyzeComponentDeps(ctx: BuildContext, comp: string) {
     const peerDeps = new Map<string, string>()
 
     // 读取项目package.json获取版本信息
-    const projectPkg = await getPackageJson(ctx, [ctx.rootDir, ctx.packDir]) as any
+    const dirCandidates = [] as string[]
+    if (ctx.rootDir)
+      dirCandidates.push(ctx.rootDir)
+    dirCandidates.push(ctx.packDir)
+    const projectPkg = await getPackageJson(ctx, dirCandidates) as any
     const allProjectDeps = {
       ...(projectPkg?.dependencies || {}),
       ...(projectPkg?.devDependencies || {}),
@@ -1162,7 +1312,6 @@ async function buildComponent(
       ...internal,
       ...deps.external,
     }
-    console.log('dependencies--------------', pkgJson.dependencies)
     // 检查是否有样式文件
     const stylePath = resolve(esOutputDir, 'style/index.css')
     if (fs.existsSync(stylePath)) {
@@ -1192,7 +1341,7 @@ async function buildComponent(
 
         // 发布组件
         const packageDir = comp ? `${ctx.LIB_NAMESPACE}/packages/${comp}` : ctx.LIB_NAMESPACE
-        execSync(`cd ${packageDir} && npm publish --tag latest`, { stdio: 'inherit' })
+        execSync(`cd ${packageDir} && npm publish --tag beta`, { stdio: 'inherit' })
         console.log(`${pkgJson.name}@${pkgJson.version} 发布成功！`)
       }
       catch (error) {
@@ -1306,8 +1455,8 @@ export interface BuildOptions {
   aliasComponentPath: string
   /** Vite resolve.alias 配置（可选）。不传则使用默认 alias 映射 */
   alias?: Record<string, string>
-  /** 项目根目录（必填） */
-  rootDir: string
+  /** 项目根目录（可选，仅用于扫描依赖） */
+  rootDir?: string
   /** 组件仓库所在路径（必填） */
   packDir: string
   /** 是否按文件分块输出 */
@@ -1350,7 +1499,7 @@ export async function buildComponentsWithOptions(options: BuildOptions): Promise
     requireExternalPacks: reqExternal = [],
     entryBaseUrl: ebu = '/',
     presetGlobals: presetGlobalsArg,
-    uploadType = 'Vue3',
+    uploadType = COMPONENT_SETTING_TYPE,
   } = options || ({} as BuildOptions)
 
   // 必填参数校验
@@ -1358,8 +1507,7 @@ export async function buildComponentsWithOptions(options: BuildOptions): Promise
     throw new Error('缺少必填参数：libNamespace')
   if (!aliasPath)
     throw new Error('缺少必填参数：aliasComponentPath')
-  if (!rootDir)
-    throw new Error('缺少必填参数：rootDir')
+  // rootDir 可选，仅用于扫描依赖
   if (!packDir)
     throw new Error('缺少必填参数：packDir')
 

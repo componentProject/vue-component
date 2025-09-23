@@ -8,9 +8,9 @@
     "registry": "https://registry.npmjs.org/"
   },
   "scripts": {
-    "publish": "tsx _scripts/buildComponent.mts build-publish",
-    "build": "tsx _scripts/buildComponent.mts build",
-    "publish:allComponent": "tsx _scripts/buildComponent.mts build-publish allComponent true"
+    "publish": "tsx _scripts/buildComponent.mts build-publish --uploadType=Vue3",
+    "build": "tsx _scripts/buildComponent.mts build --uploadType=Vue3",
+    "publish:allComponent": "tsx _scripts/buildComponent.mts build-publish --mode=allComponent --excludeHeavyPlugins=true --uploadType=Vue3"
   },
   "dependencies": {
     "@codemirror/view": "^6.36.5",
@@ -67,6 +67,7 @@
     "xe-utils": "3",
     "@designable/core": "catalog:build",
     "@moluoxixi/components": "workspace:*",
+    "@moluoxixi/constant": "workspace:*",
     "@moluoxixi/element": "1.0.4",
     "xlsx": "^0.18.5"
   },

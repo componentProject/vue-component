@@ -16,15 +16,15 @@
     }
   },
   "files": [
-    "dist",
-    "AjaxPackage"
+    "AjaxPackage",
+    "dist"
   ],
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
   },
   "scripts": {
-    "publish": "tsx _scripts/buildComponent.mts build-publish",
-    "build": "tsx _scripts/buildComponent.mts build"
+    "publish": "tsx _scripts/buildComponent.mts build-publish --uploadType=UtilityClass",
+    "build": "tsx _scripts/buildComponent.mts build --uploadType=UtilityClass"
   },
   "dependencies": {
     "@google/genai": "^1.20.0",
@@ -40,6 +40,7 @@
   "devDependencies": {
     "@antfu/eslint-config": "^4.16.1",
     "@moluoxixi/utils": "workspace:*",
+    "@moluoxixi/constant": "workspace:*",
     "@tailwindcss/postcss": "catalog:dev",
     "@types/lodash": "catalog:type",
     "@types/node": "catalog:type",
