@@ -14,11 +14,7 @@
           </div>
         </div>
         <div v-else class="bubble-content">
-          <div
-            v-if="role === 'assistant'"
-            class="bubble-content-text markdown-body"
-            v-html="processedContent"
-          />
+          <div v-if="role === 'assistant'" class="bubble-content-text markdown-body" v-html="processedContent" />
           <div v-else-if="role === 'error'" class="bubble-content-text error">
             {{ content }}
           </div>

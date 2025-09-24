@@ -3,14 +3,10 @@
     v-if="configOption.token"
     class="ai-agent"
     :class="{ 'ai-agent-dragging': isDragging, 'drag-disabled': !drag }"
-    data-v="1.7.0"
+    data-v="1.7.2"
   >
     <!-- 浮动按钮 -->
-    <FloatingButton
-      @button-click="handleFloatingButtonClick"
-      @drag-start="handleDragStart"
-      @drag-end="handleDragEnd"
-    />
+    <FloatingButton @button-click="handleFloatingButtonClick" @drag-start="handleDragStart" @drag-end="handleDragEnd" />
     <!-- 浮动面板 -->
     <FloatingPanel
       ref="floatingPanel"
@@ -47,12 +43,7 @@
         </div>
         <!-- 阻止mousedown冒泡导致不可输入 -->
         <div v-if="currentView == 'findAgent'" class="floating-panel-header-search" @mousedown.stop>
-          <input
-            id="tsAiAgent-find-agent-search"
-            v-model="searchValue"
-            type="text"
-            placeholder="搜索智能体"
-          >
+          <input id="tsAiAgent-find-agent-search" v-model="searchValue" type="text" placeholder="搜索智能体">
         </div>
         <TipsPopover
           v-if="currentView == 'findAgent'"
@@ -71,11 +62,7 @@
       <!-- 浮动面板内容 -->
       <template v-if="isUserKnowNotice" #content>
         <template v-if="currentView == 'findAgent'">
-          <CategoryTabs
-            :tab-list="categoryList"
-            :current-tab="currentTab"
-            @update:current-tab="currentTab = $event"
-          />
+          <CategoryTabs :tab-list="categoryList" :current-tab="currentTab" @update:current-tab="currentTab = $event" />
           <div class="agent-list-container">
             <!-- 智能体列表 -->
             <div id="tsAiAgent-find-agent-list" class="agent-list">
