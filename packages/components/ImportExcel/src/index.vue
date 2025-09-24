@@ -15,7 +15,7 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ElButton, ElMessage } from 'element-plus'
 import { computed, nextTick } from 'vue'
 import * as XLSX from 'xlsx'

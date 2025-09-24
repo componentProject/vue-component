@@ -12,6 +12,7 @@ import Tabs from '@moluoxixi/components/Tabs'
 import TsButton from '@moluoxixi/components/TsButton'
 import Tree from '@moluoxixi/components/Tree'
 import DragModalDialog from '@moluoxixi/components/DragModalDialog'
+import Footer from '@moluoxixi/components/Footer'
 
 export {
   ConfigFrom,
@@ -22,6 +23,7 @@ export {
   ExportExcel,
   ImportExcel,
   PopoverTableSelect,
+  Footer,
   Select,
   Tabs,
   Tree,

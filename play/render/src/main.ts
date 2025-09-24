@@ -93,7 +93,7 @@ async function render(props: QiankunProps) {
   const { container } = props
   proxy(container as HTMLElement)
   app = createApp(App)
-  window.$remoteLoad = load
+  // window.$remoteLoad = load
   const res = await load(Vue)
   Object.keys(res).forEach((name) => {
     app.component(name, res[name])
@@ -102,7 +102,7 @@ async function render(props: QiankunProps) {
   directives(app)
 
   // 修改Element的appendToBody默认行为
-  modifyComponents(app, [ElDrawer, ElDialog], (attrs) => {
+  modifyComponents(app, [ElDrawer, ElDialog], (attrs: Record<string, any>) => {
     const appendToBody = (attrs['append-to-body'] ?? false) !== false
     return {
       ...attrs,
