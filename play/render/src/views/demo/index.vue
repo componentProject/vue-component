@@ -128,7 +128,6 @@ const secondComponentProps = computed(() => {
 async function loadLocalComponent(componentName: string) {
   try {
     const buttonModule = await import(`../../../../../packages/components/${componentName}/index.ts`)
-    console.log('000000000000000', buttonModule)
     localComponent.value = buttonModule.default
   }
   catch (error) {

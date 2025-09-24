@@ -1,3 +1,5 @@
+import { ElInput } from 'element-plus'// 导入自定义组件
+
 const statusMap = {
   1: '一',
   2: '二',
@@ -76,7 +78,7 @@ export default {
         label: 'Name',
         field: 'name',
         defaultValue: '',
-        comp: 'el-input',
+        component: ElInput,
         // labelSlot: "name-label", 默认字段标签名插槽命名规则 [field]-label，也可以自定义
         tooltip: '这是tooltip',
         props: {
@@ -87,7 +89,7 @@ export default {
       {
         label: 'Age',
         field: 'age',
-        comp: 'el-input',
+        component: 'el-input',
         props: {
           type: 'number',
           min: 1,
@@ -101,7 +103,7 @@ export default {
       {
         label: 'Remark',
         field: 'remark',
-        comp: 'el-textarea',
+        component: 'el-textarea',
         props: {
           rows: 4,
         },
@@ -109,7 +111,7 @@ export default {
       {
         label: 'Birthday',
         field: 'birthday',
-        comp: 'el-date-picker',
+        component: 'el-date-picker',
         tooltip: '这是tooltip',
         props: {
           type: 'date',
@@ -120,7 +122,7 @@ export default {
       {
         label: 'Subject',
         field: 'subject',
-        comp: 'el-select',
+        component: 'el-select',
         tooltip: '这是tooltip',
         tips: '这是显眼的tips',
         options: [
@@ -145,7 +147,7 @@ export default {
       {
         label: 'Hobby',
         field: 'hobby',
-        comp: 'el-checkbox-group',
+        component: 'el-checkbox-group',
         labelKey: 'name',
         valueKey: 'id',
         options: [
@@ -170,7 +172,7 @@ export default {
       {
         label: 'Marry',
         field: 'marry',
-        comp: 'el-radio-group',
+        component: 'el-radio-group',
         options: [
           {
             label: 'married',
