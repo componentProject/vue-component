@@ -3,9 +3,9 @@
     <div class="title">
       调试与演示
     </div>
-    <el-button type="primary" @click="handleClick">
+    <!-- <el-button type="primary" @click="handleClick">
       删除组件库组件
-    </el-button>
+    </el-button> -->
     <div class="main">
       <div class="list-title">
         开发调试组件
@@ -45,7 +45,7 @@ import componentData from './data.ts'
 
 defineOptions({ name: '调试与演示' })
 // 使用ref替代data属性
-const componentName = ref('TsButton') // 调试与演示组件库的组件，直接修改组件名
+const componentName = ref('ReForm') // 调试与演示组件库的组件，直接修改组件名
 const localComponent = ref<any>(null) // 调试组件
 const dynamicComponent = ref<any>(null) // 用于存储动态组件
 
@@ -128,6 +128,7 @@ const secondComponentProps = computed(() => {
 async function loadLocalComponent(componentName: string) {
   try {
     const buttonModule = await import(`../../../../../packages/components/${componentName}/index.ts`)
+    console.log('000000000000000', buttonModule)
     localComponent.value = buttonModule.default
   }
   catch (error) {
@@ -156,7 +157,7 @@ async function handleClick() {
     paraMeters: {
       productCode: 'webFile_his',
       Vue: 'Vue3',
-      componentCode: 'EnterNextDragTable',
+      componentCode: '',
     },
   }
   //ConfigTable、
@@ -165,6 +166,7 @@ async function handleClick() {
 
 onMounted(async () => {
   await loadLocalComponent(componentName.value)
+  return
   await loadComponents([componentName.value])
 })
 </script>
