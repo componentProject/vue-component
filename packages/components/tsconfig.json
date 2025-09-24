@@ -7,6 +7,20 @@
       "ESNext"
     ],
     "baseUrl": ".",
+    "paths": {
+      "@moluoxixi/components": [
+        "./"
+      ],
+      "@moluoxixi/components/*": [
+        "./*"
+      ],
+      "@moluoxixi/utils": [
+        "../utils"
+      ],
+      "@moluoxixi/utils/*": [
+        "../utils/*"
+      ]
+    },
     "module": "ESNext",
     "moduleResolution": "Bundler",
     "resolveJsonModule": true,
@@ -36,5 +50,5 @@
     "dist",
     "node_modules",
     "vite.config.ts"
-  ],
+  ]
 }
