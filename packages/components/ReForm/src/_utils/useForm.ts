@@ -8,6 +8,7 @@ import {
   triggerRef,
   unref,
   watch,
+  nextTick
 } from 'vue'
 import type { MaybeRef, Ref, ShallowRef } from 'vue'
 import {
@@ -87,6 +88,9 @@ export default function useForm(
   }
 }
 
+// 添加一个缓存来存储组件配置对象
+const itemConfigCache = new Map<string, ReFormItem>()
+
 export function useWatchForm(
   formItems: ShallowRef<ReFormItem[]>,
   formData: ShallowRef<ReFormModelValue>,
@@ -98,13 +102,35 @@ export function useWatchForm(
   const renderFormItems = computed(() => {
     const travel = (originItems: ReFormItem[]): ReFormItem[] => {
       return originItems.map((formItem: ReFormItem) => {
+        // 生成缓存key，基于field和component名称
+        const cacheKey = formItem.field
+          ? `${formItem.field}_${typeof formItem.component === 'string' ? formItem.component : 'component'}`
+          : JSON.stringify({type: formItem.type, component: typeof formItem.component === 'string' ? formItem.component : 'component'})
+
+        // 尝试从缓存获取配置
+        if (itemConfigCache.has(cacheKey)) {
+          const cachedItem = itemConfigCache.get(cacheKey)!
+          // 只更新必要的属性，不重建整个对象
+          if (cachedItem.props && cachedItem.field) {
+            // 避免整个props对象被替换，只更新modelValue
+            cachedItem.props[cachedItem.modelProp] = unref(formData)[cachedItem.field]
+          }
+          return cachedItem
+        }
+
         const item: ReFormItem = cloneDeep(formItem)
         if (item.type !== 'group') {
           const field = item.field
           const updateEvent = (value: any) => {
-            formData.value[field] = value
-            emits('change', field, value, unref(formData))
-            triggerRef(formData)
+            // 使用nextTick确保更新的稳定性
+            nextTick(() => {
+              if (formData.value[field] !== value) {
+                formData.value[field] = value
+                emits('change', field, value, unref(formData))
+                // 只在必要时触发更新
+                triggerRef(formData)
+              }
+            })
           }
 
           const wrapperEvent = (...rest: Function[]) => {
@@ -145,6 +171,9 @@ export function useWatchForm(
         else {
           item.children = travel(item.children)
         }
+
+        // 存入缓存
+        itemConfigCache.set(cacheKey, item)
         return item
       })
     }
@@ -194,3 +223,11 @@ export function useWatchForm(
     unwatchFormData,
   }
 }
+
+// 添加清理缓存的函数，避免内存泄漏
+function clearItemConfigCache() {
+  itemConfigCache.clear()
+}
+
+// 导出清理函数以便在组件卸载时调用
+export { clearItemConfigCache }

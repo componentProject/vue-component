@@ -12,7 +12,7 @@ export const DEFAULT_FORM_ITEM_CFG = {
 export const DEFAULT_COLLAPSED_TEXT = ['展开', '收起']
 export const DEFAULT_TEXTAREA_ROWS = 3
 export const HAS_CHILD_COMPONENT_MAP = {
-  'el-select': 'el-option',
-  'el-radio-group': 'el-radio',
-  'el-checkbox-group': 'el-checkbox',
+  ElSelect: 'el-option',
+  ElRadioGroup: 'el-radio',
+  ElCheckboxGroup: 'el-checkbox',
 }

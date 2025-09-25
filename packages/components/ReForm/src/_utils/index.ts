@@ -18,6 +18,15 @@ import {
 } from './constants'
 import { normalizeGridResponsive } from './useGridResponsive'
 
+// 获取组件名称，确保组件类型比较的一致性
+export function getComponentName(component: any): string {
+  if (typeof component === 'string') {
+    return component
+  }
+  // 对于组件对象，尝试获取其名称标识
+  return component.__vccOpts?.name || component.name || component.displayName || 'unknown-component'
+}
+
 export function unwrapperShadowRef(data: MaybeRef<ReFormModelValue>) {
   const model = unref(data)
   const keys = Object.keys(model)
@@ -106,9 +115,10 @@ export function normalizeFormItems(
       }
 
       if (formItem.type === 'component') {
-        if (!isUndefined(HAS_CHILD_COMPONENT_MAP[formItem.component])) {
+        const componentName = getComponentName(formItem.component)
+        if (!isUndefined(HAS_CHILD_COMPONENT_MAP[componentName])) {
           if (isUndefined(formItem.childComp)) {
-            formItem.childComp = HAS_CHILD_COMPONENT_MAP[formItem.component]
+            formItem.childComp = HAS_CHILD_COMPONENT_MAP[componentName]
           }
         }
         if (formItem.component === 'el-textarea' || formItem.component === 'textarea') {

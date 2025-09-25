@@ -13,6 +13,7 @@
       <component
         :is="localComponent"
         v-bind="componentProps"
+        @submit="handleSubmit"
       >
         <template #action>
           <div>按钮</div>
@@ -168,6 +169,10 @@ onMounted(async () => {
   return
   await loadComponents([componentName.value])
 })
+
+const handleSubmit = (obj) => {
+  console.log('提交数据:', obj)
+}
 </script>
 
 <style scoped lang="scss">

@@ -1,4 +1,5 @@
-import { ElInput } from 'element-plus'// 导入自定义组件
+import { ElCheckboxGroup, ElDatePicker, ElInput, ElInputNumber, ElRadioGroup, ElSelect } from 'element-plus'// 导入自定义组件
+import { ElOption, ElRadio, ElCheckbox } from 'element-plus'
 
 const statusMap = {
   1: '一',
@@ -77,7 +78,7 @@ export default {
       {
         label: 'Name',
         field: 'name',
-        defaultValue: '',
+        defaultValue: '测试数据',
         component: ElInput,
         // labelSlot: "name-label", 默认字段标签名插槽命名规则 [field]-label，也可以自定义
         tooltip: '这是tooltip',
@@ -89,9 +90,8 @@ export default {
       {
         label: 'Age',
         field: 'age',
-        component: 'el-input',
+        component: ElInputNumber,
         props: {
-          type: 'number',
           min: 1,
           max: 9999,
         },
@@ -111,20 +111,22 @@ export default {
       {
         label: 'Birthday',
         field: 'birthday',
-        component: 'el-date-picker',
+        component: ElDatePicker,
         tooltip: '这是tooltip',
         props: {
           type: 'date',
-          format: 'YYYY/MM/DD',
+          format: 'YYYY-MM-DD',
           class: 'w-full',
         },
       },
       {
         label: 'Subject',
         field: 'subject',
-        component: 'el-select',
+        component: ElSelect,
+        childComp: ElOption,
         tooltip: '这是tooltip',
-        tips: '这是显眼的tips',
+        tips: '这是说明或者提示',
+        rules: [{ required: true, message: '不能为空' }],
         options: [
           {
             label: 'Subject1',
@@ -139,7 +141,6 @@ export default {
             value: '3',
           },
         ],
-        rules: [{ required: true, message: '不能为空' }],
         props: {
           clearable: true,
         },
@@ -147,9 +148,11 @@ export default {
       {
         label: 'Hobby',
         field: 'hobby',
-        component: 'el-checkbox-group',
+        component: ElCheckboxGroup,
+        childComp: ElCheckbox,
         labelKey: 'name',
         valueKey: 'id',
+        defaultValue: ['1'],
         options: [
           {
             name: 'hobby1',
@@ -164,7 +167,6 @@ export default {
             id: '3',
           },
         ],
-        defaultValue: ['1'],
         props: {
           clearable: true,
         },
@@ -172,7 +174,8 @@ export default {
       {
         label: 'Marry',
         field: 'marry',
-        component: 'el-radio-group',
+        component: ElRadioGroup,
+        childComp: ElRadio,
         options: [
           {
             label: 'married',
@@ -186,6 +189,7 @@ export default {
         defaultValue: '2',
         props: {
           clearable: true,
+          disabled: true,
         },
       },
     ],
