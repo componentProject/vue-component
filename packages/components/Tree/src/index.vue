@@ -331,7 +331,7 @@ function toggleLevelSelect(data: TreeNodeData) {
 //#region 跨级选择
 function getNodeKeys(data: TreeNodeData) {
   if (!data) {
-    return new Set<any>(treeData.value.reduce((p, item) => p.concat(getDescendantIds(item[props.rowField])), []))
+    return new Set<any>(treeData.value.reduce((p, item) => p.concat([item[props.rowField], ...getDescendantIds(item[props.rowField])]), []))
   }
   else {
     return new Set<any>([data[props.rowField], ...getDescendantIds(data[props.rowField])])
@@ -339,7 +339,14 @@ function getNodeKeys(data: TreeNodeData) {
 }
 function toggleExpand(data: TreeNodeData, node: TreeNode) {
   const nodeKeys = getNodeKeys(data)
-  if (!node || !node.expanded) {
+  let expanded
+  if (!node) {
+    expanded = treeData.value.some(item => treeRef.value?.getNode(item[props.rowField]).expanded)
+  }
+  else {
+    expanded = node.expanded
+  }
+  if (!expanded) {
     treeRef.value?.setExpandedKeys(nodeKeys)
   }
   else {
