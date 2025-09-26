@@ -62,8 +62,6 @@ export default function useForm(
     return normalizeVisible(formItems, unref(formData))
   })
 
-  // formItems => shallwoRef
-  // formRuels => shallwoRef
   const unwatchForm = watch(
     () => unref(items),
     () => {

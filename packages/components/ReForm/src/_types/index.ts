@@ -2,7 +2,7 @@ import type { Arrayable } from '@vueuse/core'
 import type { ButtonProps, ElForm, ElTooltipProps, FormItemRule } from 'element-plus'
 import type { MaybeRef } from 'vue'
 
-import type { ReGridResponsive } from './_utils/useGridResponsive/types'
+import type { ReGridResponsive } from '../_utils/useGridResponsive/types'
 
 export { ReGridResponsive }
 export interface ReFormProps {

@@ -1,5 +1,5 @@
 import { ElCheckboxGroup, ElDatePicker, ElInput, ElInputNumber, ElRadioGroup, ElSelect } from 'element-plus'// 导入自定义组件
-import { ElOption, ElRadio, ElCheckbox } from 'element-plus'
+import { ElCheckbox, ElOption, ElRadio } from 'element-plus'
 
 const statusMap = {
   1: '一',
@@ -67,20 +67,31 @@ export default {
     size: 'default',
     labelWidth: 100,
     labelPosition: 'right',
+    Change: (formData: any) => {
+      console.log('表单值发生变化', formData)
+    },
+    // editable: false, // 表单是否可编辑 可以用作详情使用
+    // disabled: true, // 表单是否禁止编辑
     items: [
       {
         label: 'ID',
         field: 'id',
         defaultValue: 'just text content',
         type: 'text',
-        customClass: 'is-required', // 通过样式类展示必填ico，不直接绑定required属性，会有校验问题
+      },
+      {
+        label: 'slot',
+        field: 'slot',
+        defaultValue: 'slot text',
+        labelSlot: 'slot-label',
+        slot: 'slotControl',
+        component: '',
       },
       {
         label: 'Name',
         field: 'name',
         defaultValue: '测试数据',
         component: ElInput,
-        // labelSlot: "name-label", 默认字段标签名插槽命名规则 [field]-label，也可以自定义
         tooltip: '这是tooltip',
         props: {
           clearable: true,
@@ -91,14 +102,11 @@ export default {
         label: 'Age',
         field: 'age',
         component: ElInputNumber,
+        defaultValue: 1,
         props: {
           min: 1,
           max: 9999,
         },
-        // events: {
-        //   focus: handleNumberFocus,
-        //   blur: handleNumberBlur,
-        // },
       },
       {
         label: 'Remark',
@@ -172,6 +180,33 @@ export default {
         },
       },
       {
+        label: 'Hobby2',
+        field: 'hobby2',
+        component: ElCheckboxGroup,
+        childComp: ElCheckbox,
+        labelKey: 'name',
+        valueKey: 'id',
+        defaultValue: ['1'],
+        options: [
+          {
+            name: 'hobby1',
+            id: '1',
+          },
+          {
+            name: 'hobby2',
+            id: '2',
+          },
+          {
+            name: 'hobby3',
+            id: '3',
+          },
+        ],
+        props: {
+          clearable: true,
+          disabled: true,
+        },
+      },
+      {
         label: 'Marry',
         field: 'marry',
         component: ElRadioGroup,
@@ -189,7 +224,21 @@ export default {
         defaultValue: '2',
         props: {
           clearable: true,
-          disabled: true,
+        },
+        visible: {
+          type: '|',
+          conditions: [
+            {
+              field: 'age',
+              value: 2,
+              type: '=',
+            },
+            {
+              field: 'age',
+              value: 3,
+              type: '=',
+            },
+          ],
         },
       },
     ],
