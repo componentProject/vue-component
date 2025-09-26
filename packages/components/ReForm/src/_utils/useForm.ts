@@ -8,7 +8,7 @@ import {
   triggerRef,
   unref,
   watch,
-  nextTick
+  nextTick,
 } from 'vue'
 import type { MaybeRef, Ref, ShallowRef } from 'vue'
 import {
@@ -33,6 +33,7 @@ export default function useForm(
   items: MaybeRef<ReFormItem[]>,
   defaultValue?: MaybeRef<ReFormModelValue>,
   span?: MaybeRef<number | ReGridResponsive>,
+  layout?: string, // 添加 layout 参数
 ) {
   const submiting = ref(false)
   const reFormRef = ref<InstanceType<typeof ElForm> | null>(null)
@@ -41,7 +42,7 @@ export default function useForm(
   }
 
   const formItems: ShallowRef<ReFormItem[]> = shallowRef(
-    normalizeFormItems(unref(items), unref(span)),
+    normalizeFormItems(unref(items), unref(span), layout), // 传递 layout 参数
   )
 
   // 合并逻辑 - 利用相同递归
@@ -65,7 +66,7 @@ export default function useForm(
   const unwatchForm = watch(
     () => unref(items),
     () => {
-      formItems.value = normalizeFormItems(unref(items), unref(span))
+      formItems.value = normalizeFormItems(unref(items), unref(span), layout) // 传递 layout 参数
       formRules.value = normalizeFormRules(formItems.value)
       triggerRef(formItems)
       triggerRef(formRules)

@@ -30,6 +30,8 @@ export interface ReFormProps {
   btnSpan?: number | ReGridResponsive
   /**表单按钮组内联样式 */
   btnSpanStyle?: string
+  /**表单布局类型：grid或flex */
+  layout?: 'grid' | 'flex'
   /**表单按钮组-提交按钮文字 */
   submitBtnText?: string
   /**表单按钮组-取消按钮文字 */

@@ -65,19 +65,17 @@ export default {
   },
   ReForm: {
     size: 'default',
-    labelWidth: 100,
     labelPosition: 'right',
-    Change: (formData: any) => {
-      console.log('表单值发生变化', formData)
-    },
-    // editable: false, // 表单是否可编辑 可以用作详情使用
-    // disabled: true, // 表单是否禁止编辑
+    layout: 'grid', // grid、flex
+    //editable: false, // 表单是否可编辑 可以用作详情使用
+    //disabled: true, // 表单是否禁止编辑
     items: [
       {
         label: 'ID',
         field: 'id',
         defaultValue: 'just text content',
         type: 'text',
+        span: 12,
       },
       {
         label: 'slot',
@@ -86,6 +84,7 @@ export default {
         labelSlot: 'slot-label',
         slot: 'slotControl',
         component: '',
+        span: 12,
       },
       {
         label: 'Name',

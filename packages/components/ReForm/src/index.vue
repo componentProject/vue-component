@@ -11,7 +11,8 @@
       :size="size"
       :scroll-to-error="scrollToError"
     >
-      <div class="ap-form-grid" :style="gridTemplateStyle">
+      <!-- 使用动态class绑定，根据layout的值直接选择不同的布局类 -->
+      <div :class="layout === 'flex' ? 'ap-form-flex' : 'ap-form-grid'" :style="gridTemplateStyle">
         <ReFormRenderItems :items="renderFormItems">
           <template v-for="slotName in slotsNames[0]" #[slotName]="slotScoped">
             <slot :name="slotName" v-bind="slotScoped" />
@@ -51,10 +52,10 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, provide, unref, useAttrs, nextTick } from 'vue'
+import { computed, nextTick, onMounted, provide, unref, useAttrs } from 'vue'
 import type { ReFormEmits, ReFormProps } from './_types'
 import useForm, { useWatchForm } from './_utils/useForm'
-import { cloneDeep } from 'lodash'
+import { cloneDeep, isUndefined } from 'lodash'
 import { getSlotsNames, unwrapperShadowRef } from './_utils'
 import useGridCols from './_utils/useGridCols'
 import type { CSSProperties, Ref } from 'vue'
@@ -79,11 +80,23 @@ const props = withDefaults(defineProps<ReFormProps>(), {
   autoCollapseInValidate: true,
   submitBtnText: '确定',
   cancelBtnText: '取消',
+  layout: 'grid', // 默认使用grid布局
 })
 
 const emits = defineEmits<ReFormEmits>()
 
 const localItems = computed(() => props.items)
+
+// 根据layout属性设置不同的cols默认值
+const effectiveCols = computed(() => {
+  // 无论哪种布局，未指定cols时都使用相同的默认值
+  if (isUndefined(props.cols)) {
+    return { lg: 24, sm: 24, xl: 24, md: 24 }
+  }
+  else {
+    return { lg: props.cols, sm: props.cols, xl: props.cols, md: props.cols }
+  }
+})
 
 const {
   submiting,
@@ -94,7 +107,7 @@ const {
   formVisible,
   formCollapsed,
   formGroupDependency,
-} = useForm(localItems, props.modelValue, props.cols)
+} = useForm(localItems, props.modelValue, effectiveCols, props.layout)
 
 const { renderFormItems, formDataProxy } = useWatchForm(
   formItems,
@@ -110,7 +123,7 @@ const slotsNames = computed<[string[], string[]]>(() =>
 )
 
 const { gridResponsive, responsiveWidth, localBtnSpan } = useGridCols(
-  props.cols,
+  effectiveCols,
   props.btnSpan,
 )
 
@@ -123,10 +136,30 @@ const labelPosition = computed(
 
 const gridTemplateStyle = computed(() => {
   const style: CSSProperties = {}
-  style['column-gap'] = `${props.colGap}px`
-  style['row-gap'] = 0
-  style['grid-template-columns'] = `repeat(${gridResponsive.value}, 1fr)`
+
+  if (props.layout === 'grid') {
+    style['column-gap'] = `${props.colGap}px`
+    style['row-gap'] = 0
+    // 关键修复：确保grid容器的列数至少为24
+    const effectiveColumns = Math.max(gridResponsive.value, 24)
+    style['grid-template-columns'] = `repeat(${effectiveColumns}, 1fr)`
+  }
+  else {
+    style.marginBottom = `${props.colGap}px`
+  }
+
   return style
+})
+
+const localBtnSpanStyle = computed<string>(() => {
+  if (props.layout === 'grid') {
+    return props.btnSpanStyle || `grid-column-start: span ${localBtnSpan.value}`
+  }
+  else {
+    // flex布局下的按钮组样式
+    const width = (100 / gridResponsive.value) * localBtnSpan.value
+    return props.btnSpanStyle || `width: calc(${width}% - ${(props.colGap * (localBtnSpan.value - 1)) / gridResponsive.value}px)`
+  }
 })
 
 const tooltipProps: Ref<ReFormProps['tooltipProps']> = computed(() => {
@@ -136,10 +169,6 @@ const tooltipProps: Ref<ReFormProps['tooltipProps']> = computed(() => {
     ...(props.tooltipProps || {}),
   } as ReFormProps['tooltipProps']
 })
-
-const localBtnSpanStyle = computed<string>(
-  () => props.btnSpanStyle || `grid-column-start: span ${localBtnSpan.value}`,
-)
 
 const readonly = computed<boolean>(() => !props.editable)
 const emptyText = computed<string>(() => props.emptyText ?? '')
@@ -255,6 +284,7 @@ function handleSwitchCollapsed(field: string) {
   formCollapsed.value[field] = !formCollapsed.value[field]
 }
 
+// 在provide中确保layout属性正确注入
 provide(Symbol.for('ap-re-form'), {
   gridTemplateStyle,
   gridResponsive,
@@ -269,6 +299,7 @@ provide(Symbol.for('ap-re-form'), {
   labelWidth,
   labelPosition,
   handleSwitchCollapsed,
+  layout: computed(() => props.layout),
 })
 
 onMounted(() => {
@@ -307,11 +338,18 @@ defineExpose({
 }
 </style>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .ap-form {
   --ap-form-readonly-height-small: 20px;
   --ap-form-readonly-height-default: 24px;
   --ap-form-readonly-height-large: 28px;
+
+  :deep(.el-input) {
+    width: 100%;
+  }
+  :deep(.el-input-number) {
+    width: 100%;
+  }
 
   // 移除未定义的 m mixin 使用，直接使用类选择器
   .el-form-item--small {
@@ -346,5 +384,30 @@ defineExpose({
       line-height: var(--ap-form-readonly-height-large);
     }
   }
+}
+.ap-form-wrapper {
+  @apply relative;
+
+  .ap-form-grid {
+    @apply grid;
+    transition: all 0.2s ease; /* 过渡效果 */
+  }
+
+  /* 独立的flex布局容器样式 */
+  .ap-form-flex {
+    @apply flex flex-wrap;
+  }
+}
+
+/* 优化表单元素在两种布局下的样式 */
+.ap-form-grid-item {
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+  /* 确保宽度计算正确应用 */
+}
+
+/* 确保按钮组在两种布局下都能正确显示 */
+.ap-form-grid-item.btn-group {
+  box-sizing: border-box;
 }
 </style>

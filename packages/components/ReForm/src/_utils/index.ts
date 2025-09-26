@@ -68,11 +68,14 @@ export function getSlotsNames(items: ReFormItem[]): [string[], string[]] {
 /**
  * 规范化表单配置
  * @param items 表单配置
+ * @param span 表单字段栅格占比
+ * @param layout 布局类型
  * @returns 表单配置
  */
 export function normalizeFormItems(
   items: ReFormItem[],
   span?: number | ReGridResponsive,
+  layout?: string,
 ): ReFormItem[] {
   // defaultKeys: type labelKey valueKey modelProp modelEvent events{[modelEvent]}
   const travel = (nodes: ReFormItem[]) => {
@@ -82,12 +85,24 @@ export function normalizeFormItems(
         ...item,
       }) as ReFormItem
 
-      if (!isUndefined(span) && isUndefined(item.span)) {
-        formItem.span = span
+      // 根据不同布局类型设置不同的默认span值
+      if (isUndefined(item.span)) {
+        if (layout === 'flex') {
+          formItem.span = 6
+        }
+        else if (layout === 'grid') {
+          formItem.span = 24
+        }
+        else if (!isUndefined(span)) {
+          formItem.span = span
+        }
       }
 
-      // 格式化响应栅格
-      formItem.span = normalizeGridResponsive(formItem.span)
+      // 格式化响应栅格 - 但在flex布局下跳过此处理，保持span为数字类型
+      // 格式化响应栅格 - 在flex和grid布局下都保持span为数字类型
+      if (layout !== 'flex' && layout !== 'grid') {
+        formItem.span = normalizeGridResponsive(formItem.span)
+      }
 
       if (formItem.type === 'group') {
         formItem.collapsedTriggerProps = {

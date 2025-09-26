@@ -15,8 +15,17 @@
         v-bind="componentProps"
         @submit="handleSubmit"
       >
-        <template #action>
-          <div>按钮</div>
+        <template #slot-label>
+          <span>slot-label</span>
+        </template>
+        <template #slotControl>
+          <div class="ml-2">slot-control</div>
+        </template>
+        <template #btns>
+          <el-button @click="handleSubmit">去提交</el-button>
+          <el-button @click="handleCancel">返回</el-button>
+          <el-button @click="handleReset">重置</el-button>
+          <el-button>其他操作</el-button>
         </template>
       </component>
     </div>
