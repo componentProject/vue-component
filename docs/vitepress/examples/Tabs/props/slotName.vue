@@ -14,10 +14,10 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-const active = ref('panel1')
+const active = ref()
 const tabList = [
-  { id: 'panel1', label: '默认', slot: 'panel1' },
-  { id: 'panel2', label: '默认' },
+  { label: '默认', slot: 'panel1' },
+  { label: '默认' },
 ]
 </script>
 

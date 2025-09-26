@@ -14,10 +14,10 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-const active = ref('A')
+const active = ref()
 const tabList = [
-  { id: 'A', label: 'A' },
-  { id: 'B', label: 'B', lazy: true },
+  { label: 'A' },
+  { label: 'B', lazy: true },
 ]
 </script>
 

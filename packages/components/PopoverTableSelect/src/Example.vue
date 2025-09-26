@@ -61,6 +61,7 @@
           :options="{ promise: true }"
           @select="handleInputSelect"
           @input="handleInput"
+          @enter="handleEnter"
         />
       </div>
     </div>
@@ -148,6 +149,7 @@ const inputRef = ref()
 function handleSelect(row: any) {
   inputValue.value = row.name
 }
+
 //#endregion
 
 //#region 带select插槽示例
@@ -160,7 +162,11 @@ const inputValue2Select = ref(1)
 const inputValue1 = ref('')
 
 function handleInputSelect(row: any) {
+  console.log('select', row)
   inputValue1.value = row.name
+}
+function handleEnter(row: any) {
+  console.log('enter', row)
 }
 function handleInput(val: string) {
   return new Promise((resolve) => {
