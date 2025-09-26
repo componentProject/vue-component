@@ -119,23 +119,6 @@ const collapsedTriggerMargin = computed(() => {
   }
   return 0
 })
-
-function normalizeSpan(span: MaybeRef<ReGridResponsive | number | undefined>): number {
-  const spanValue = unref(span);
-
-  // 简化逻辑，直接返回有效的span值
-  if (spanValue === undefined) {
-    return 24; // 默认值为24
-  }
-
-  if (typeof spanValue === 'number') {
-    return Math.max(spanValue, 1); // 确保至少为1
-  }
-
-  // 对于响应式配置，保持原有逻辑
-  const matchedSpan = matchResponsive(unref(responsiveWidth), spanValue);
-  return Math.max(matchedSpan, 1);
-}
 </script>
 
 <style lang="scss" scoped>
