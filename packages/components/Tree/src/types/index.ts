@@ -8,9 +8,7 @@ interface TreeOptionProps {
   label?: string
   value?: string
   disabled?: string
-  class?: (data: TreeNodeData, node: TreeNode) => string | {
-    [key: string]: boolean
-  }
+  class?: (data?: TreeNodeData, node?: TreeNode) => string | Record<string, boolean>
 }
 export interface ButtonsItem {
   btnType?: ButtonType
@@ -31,7 +29,7 @@ export interface TreeProps<T = any> {
   icon?: (nodeData: T) => Component | string
   showType?: 'hover' | 'click' | 'default'
   buttons?: (nodeData: T) => ButtonsItem[]
-  indent?: number | string
+  indent?: number
   height?: number
   props?: TreeOptionProps
   emptyText?: string
@@ -47,4 +45,12 @@ export interface TreeProps<T = any> {
    * 层级选择：点击某节点时高亮该节点及其所有子孙节点
    */
   levelSelect?: boolean
+  /**
+   * 点击节点时是否同时展开/收起该节点及其子孙
+   */
+  expandAllOnClickNode?: boolean
+  /**
+   * 是否默认展开所有
+   */
+  defaultExpandAll?: boolean
 }

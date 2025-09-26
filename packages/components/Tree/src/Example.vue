@@ -50,6 +50,21 @@
       </div>
       <pre style="margin-top: 8px">{{ selectedRows }}</pre>
     </div>
+
+    <h3>expandAllOnClickNode：点击节点自动展开/收起整支</h3>
+    <div class="block">
+      <Tree
+        ref="expandOnClickTree"
+        default-expand-all
+        expand-all-on-click-node
+        :data="treeList"
+        children-field="children"
+        label-field="name"
+      />
+      <ElButton style="margin-top: 8px" size="small" @click="onToggleTreeExpand">
+        切换整棵树展开状态
+      </ElButton>
+    </div>
   </div>
 </template>
 
@@ -133,15 +148,15 @@ function iconByType(row: any) {
 function renderButtons(): ButtonsItem[] {
   return [
     {
-      type: 'add',
+      btnType: 'add',
       tooltip: '新增子节点',
     },
     {
-      type: 'edit',
+      btnType: 'edit',
       tooltip: '编辑',
     },
     {
-      type: 'delete',
+      btnType: 'delete',
       tooltip: '删除',
     },
   ]
@@ -169,6 +184,11 @@ function onCascadeChange(rows: any[]) {
     const { children, ...i } = item
     return i
   })
+}
+
+const expandOnClickTree = ref<InstanceType<typeof Tree> | null>(null)
+function onToggleTreeExpand() {
+  expandOnClickTree.value?.toggleExpand()
 }
 </script>
 

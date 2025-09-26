@@ -37,6 +37,7 @@ const treeData = ref([
 | showLine | 显示父子连线 | boolean | false |
 | showRowLine | 显示行内延伸线 | boolean | false |
 | levelSelect | 级联高亮并触发 `change` | boolean | false |
+| expandAllOnClickNode | 点击节点是否自动切换自身及子孙的展开状态 | boolean | false |
 
 ### Events
 
@@ -58,3 +59,4 @@ const treeData = ref([
 | 名称 | 说明 |
 | --- | --- |
 | `getTree` | 获取内部 ElTreeV2 实例 |
+| `toggleExpand(node?: TreeNode)` | 切换整树或指定节点（含子孙）的展开状态 |
