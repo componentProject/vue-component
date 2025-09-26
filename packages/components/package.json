@@ -69,7 +69,8 @@
     "@moluoxixi/components": "workspace:*",
     "@moluoxixi/constant": "workspace:*",
     "@moluoxixi/element": "1.0.4",
-    "xlsx": "^0.18.5"
+    "xlsx": "^0.18.5",
+    "@vueuse/core": "^11.0.0"
   },
   "devDependencies": {
     "@types/file-saver": "catalog:type",

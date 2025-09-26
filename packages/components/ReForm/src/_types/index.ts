@@ -2,7 +2,7 @@ import type { Arrayable } from '@vueuse/core'
 import type { ButtonProps, ElForm, ElTooltipProps, FormItemRule } from 'element-plus'
 import type { MaybeRef } from 'vue'
 
-import type { ReGridResponsive } from './_utils/useGridResponsive/types'
+import type { ReGridResponsive } from '../_utils/useGridResponsive/types'
 
 export { ReGridResponsive }
 export interface ReFormProps {
@@ -30,6 +30,8 @@ export interface ReFormProps {
   btnSpan?: number | ReGridResponsive
   /**表单按钮组内联样式 */
   btnSpanStyle?: string
+  /**表单布局类型：grid或flex */
+  layout?: 'grid' | 'flex'
   /**表单按钮组-提交按钮文字 */
   submitBtnText?: string
   /**表单按钮组-取消按钮文字 */
@@ -64,7 +66,7 @@ export interface ReFormEmits {
 }
 
 export interface ReFormItem extends ReFormGroupItem {
-  type?: 'text' | 'comp' | 'group' // 字段类型 text-纯文本字段; comp-表单控件字段; group-表单字段组合，默认 comp
+  type?: 'text' | 'component' | 'group' // 字段类型 text-纯文本字段; component-表单控件字段; group-表单字段组合，默认 component
   label?: string // 表单字段标签名
   field: string // 表单字段名
   labelWidth?: number // 表单字段标签名宽度，默认继承el-form配置
@@ -76,8 +78,8 @@ export interface ReFormItem extends ReFormGroupItem {
   tooltip?: string // 问号提示语
   tips?: string // 表单控件下方提示
   tipsClass?: string // 表单控件下方提示样式类 - 颜色
-  comp?: string // type = "comp" 生效，表单字段控件名（必须是全局组件，非全局组件请使用插槽渲染）
-  childComp?: string // type = "comp" 生效，表单字段控件需要选项组，子组件所使用组件
+  component?: string // type = "component" 生效，表单字段控件名（必须是全局组件，非全局组件请使用插槽渲染）
+  childComp?: string // type = "component" 生效，表单字段控件需要选项组，子组件所使用组件
   options?: ReFormItemOption[] // 表单字段控件需要选项组，如 select -》 option，checkbox-group -》 checkbox 等需要指定
   labelKey?: string // 选项组选项标签名字段
   valueKey?: string // 选项组选项主键字段

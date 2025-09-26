@@ -3,7 +3,7 @@
     <div
       v-if="formVisible[item.field]"
       class="ap-form-grid-item"
-      :style="`grid-column-start: span ${normalizeSpan(item.span as ReGridResponsive)}`"
+      :style="getItemStyle(item)"
     >
       <template v-if="item.type === 'group'">
         <div class="ap-form-group">
@@ -83,7 +83,35 @@ const {
   labelWidth,
   labelPosition,
   handleSwitchCollapsed,
+  layout,
+  colGap = computed(() => 16), // 新增colGap注入，默认16px
 } = inject(Symbol.for('ap-re-form')) as any
+
+// 提取为单独的方法，提高可读性和可维护性
+function getItemStyle(item: ReFormItem): string {
+  // 直接使用item.span属性，如果未定义则默认为24
+  const span = typeof item.span === 'number' ? item.span : 24
+  if (layout.value === 'grid') {
+    // 关键修复：使用更可靠的grid布局语法
+    if (span === 24) {
+      // 当span为24时，使用grid-column: 1 / -1确保横跨整个容器
+      return 'grid-column: 1 / -1'
+    } else {
+      // 对于其他span值，使用标准的grid-column-start
+      return `grid-column-start: span ${span}`
+    }
+  }
+  else {
+    // flex布局保持原有的计算逻辑
+    const safeGridResponsive = Math.max(unref(gridResponsive) || 1, 1)
+    const safeColGap = Math.max(unref(colGap) || 0, 0)
+
+    const width = (100 / safeGridResponsive) * span
+    const gapCompensation = (safeColGap * (span - 1)) / safeGridResponsive
+
+    return `width: calc(${width}% - ${gapCompensation}px); flex-shrink: 0;`
+  }
+}
 
 const collapsedTriggerMargin = computed(() => {
   if (unref(labelPosition) === 'left' || unref(labelPosition) === 'right') {
@@ -92,11 +120,21 @@ const collapsedTriggerMargin = computed(() => {
   return 0
 })
 
-function normalizeSpan(span: MaybeRef<ReGridResponsive>): number {
-  return Math.min(
-    matchResponsive(unref(responsiveWidth), unref(span)),
-    unref(gridResponsive),
-  )
+function normalizeSpan(span: MaybeRef<ReGridResponsive | number | undefined>): number {
+  const spanValue = unref(span);
+
+  // 简化逻辑，直接返回有效的span值
+  if (spanValue === undefined) {
+    return 24; // 默认值为24
+  }
+
+  if (typeof spanValue === 'number') {
+    return Math.max(spanValue, 1); // 确保至少为1
+  }
+
+  // 对于响应式配置，保持原有逻辑
+  const matchedSpan = matchResponsive(unref(responsiveWidth), spanValue);
+  return Math.max(matchedSpan, 1);
 }
 </script>
 

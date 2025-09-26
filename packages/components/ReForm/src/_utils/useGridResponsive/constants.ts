@@ -1,4 +1,5 @@
-export const DEFAULT_FORM_GRID_RESPONSIVE = 1
+// 修改为与grid布局默认span值一致
+export const DEFAULT_FORM_GRID_RESPONSIVE = 24
 export const DEFAULT_FORM_GRID_RESPONSIVE_ITEMS = {
   xs: '<768px',
   sm: '>=768px',

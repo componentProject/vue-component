@@ -35,10 +35,11 @@
           </template>
           <template v-else>
             <!-- 带子组件 -->
-            <template v-if="childComps.includes(item.comp!)">
+            <template v-if="childComps.includes(getComponentName(item.component))">
               <component
-                :is="item.comp"
+                :is="item.component"
                 v-if="!readonly"
+                :key="getComponentKey(item.component, item.field)"
                 :class="[item.controlClass || '']"
                 v-bind="item.props"
                 v-on="item.events"
@@ -61,7 +62,7 @@
             <!-- 多行文本框 -->
             <template
               v-else-if="
-                item.comp === 'el-textarea' || item.comp === 'textarea'
+                item.component === 'el-textarea' || item.component === 'textarea'
               "
             >
               <el-input
@@ -78,8 +79,9 @@
             <!-- 一般表单控件/全局控件 -->
             <template v-else>
               <component
-                :is="item.comp"
+                :is="item.component"
                 v-if="!readonly"
+                :key="getComponentKey(item.component, item.field)"
                 :class="[item.controlClass || '']"
                 v-bind="item.props"
                 v-on="item.events"
@@ -107,6 +109,8 @@ import { inject, ref } from 'vue'
 import { isArray, isUndefined } from 'lodash'
 import { HAS_CHILD_COMPONENT_MAP } from '../_utils/constants'
 import type { ReFormItem } from '../_types'
+import { ElCheckbox, ElOption, ElRadio } from 'element-plus'
+import { getComponentName } from '../_utils'
 
 defineOptions({
   name: 'ReFormRenderItem',
@@ -116,6 +120,16 @@ const props = defineProps<{
   item: ReFormItem
 }>()
 
+// 生成稳定的组件key，确保组件实例复用
+function getComponentKey(component: any, field?: string): string {
+  // 基础key基于组件名称
+  const baseKey = getComponentName(component)
+
+  // 如果有字段名，将字段名也加入key中，确保不同表单项的组件实例独立
+  return field ? `${baseKey}_${field}` : baseKey
+}
+
+// 覆盖childComps的使用，确保使用组件名称进行比较
 const childComps = ref(Object.keys(HAS_CHILD_COMPONENT_MAP))
 
 const { formData, tooltipProps, readonly, emptyText } = inject(
