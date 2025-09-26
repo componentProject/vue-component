@@ -52,9 +52,9 @@
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, onMounted, provide, unref, useAttrs } from 'vue'
+import { computed, nextTick, onMounted, provide, unref, useAttrs, onUnmounted } from 'vue'
 import type { ReFormEmits, ReFormProps } from './_types'
-import useForm, { useWatchForm } from './_utils/useForm'
+import useForm, { clearItemConfigCache, useWatchForm } from './_utils/useForm'
 import { cloneDeep, isUndefined } from 'lodash'
 import { getSlotsNames, unwrapperShadowRef } from './_utils'
 import useGridCols from './_utils/useGridCols'
@@ -69,7 +69,6 @@ defineOptions({
 })
 
 const props = withDefaults(defineProps<ReFormProps>(), {
-  // cols: 1,
   colGap: 16,
   size: 'default',
   disabled: false,
@@ -165,7 +164,7 @@ const localBtnSpanStyle = computed<string>(() => {
 const tooltipProps: Ref<ReFormProps['tooltipProps']> = computed(() => {
   return {
     effect: 'light',
-    placement: 'right',
+    placement: 'top',
     ...(props.tooltipProps || {}),
   } as ReFormProps['tooltipProps']
 })
@@ -308,6 +307,11 @@ onMounted(() => {
   }
   reFormRef.value && reFormRef.value.clearValidate() // 默认清空校验 - 避免初始化就飘红色
 })
+onUnmounted(() => {
+  if (props.formRef) {
+    clearItemConfigCache()
+  }
+})
 
 defineExpose({
   submiting,
@@ -325,18 +329,6 @@ defineExpose({
   autoCollapseByErrors,
 })
 </script>
-
-<style lang="scss" scoped>
-.ap-form-wrapper {
-  @apply relative;
-
-  .ap-form-grid {
-    @apply grid;
-
-    transition: grid-template-columns 0.2s ease; /* 过渡效果 */
-  }
-}
-</style>
 
 <style lang="scss" scoped>
 .ap-form {
