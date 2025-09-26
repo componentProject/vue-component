@@ -109,7 +109,6 @@ import { inject, ref } from 'vue'
 import { isArray, isUndefined } from 'lodash'
 import { HAS_CHILD_COMPONENT_MAP } from '../_utils/constants'
 import type { ReFormItem } from '../_types'
-import { ElCheckbox, ElOption, ElRadio } from 'element-plus'
 import { getComponentName } from '../_utils'
 
 defineOptions({
@@ -130,7 +129,7 @@ function getComponentKey(component: any, field?: string): string {
 }
 
 // 覆盖childComps的使用，确保使用组件名称进行比较
-const childComps = ref(Object.keys(HAS_CHILD_COMPONENT_MAP))
+const childComps = Object.keys(HAS_CHILD_COMPONENT_MAP)
 
 const { formData, tooltipProps, readonly, emptyText } = inject(
   Symbol.for('ap-re-form'),
