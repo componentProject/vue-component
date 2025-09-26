@@ -1,0 +1,141 @@
+import type { VxeGridPropTypes, VxeTablePropTypes } from 'vxe-table'
+import type { ColumnType, customConfigType } from './index'
+
+/**
+ * DraggableTable 组件的 Props 类型定义
+ */
+export interface DraggableTableProps {
+  //#region 其他原始配置加默认值
+  /** 是否显示表格边框 */
+  border: boolean
+  /** 表格列对齐方式 */
+  align: VxeTablePropTypes.Align
+  /** 表格内容溢出隐藏并显示tooltip */
+  showOverflow: VxeTablePropTypes.ShowOverflow
+  /** 头部溢出隐藏并显示tooltip */
+  showHeaderOverflow: VxeTablePropTypes.ShowOverflow
+  /** 底部溢出隐藏并显示tooltip */
+  showFooterOverflow: VxeTablePropTypes.ShowOverflow
+  resizable: boolean
+  /** 是否自动调整列宽 */
+  autoResize: boolean
+  /** 是否允许列宽拖拽 */
+  /** 列宽拖拽配置 */
+  resizableConfig: VxeTablePropTypes.ResizableConfig
+  //#endregion
+
+  //#region 编辑相关
+  /** 是否允许编辑 */
+  editable: boolean
+  /** 触发编辑后是否自动聚焦 */
+  editAutoFocus: boolean
+  /** 编辑规则 */
+  editRules: VxeTablePropTypes.EditRules | null
+  /** 编辑配置 */
+  editConfig: VxeTablePropTypes.EditConfig
+  //#endregion
+
+  //#region 过滤相关
+  filterable: boolean
+  /** 筛选器类型,full 为匹配所有全量表格数据，filter 为匹配当前表格数据 */
+  filterType: 'full' | 'filter'
+  /** 筛选器布局配置，支持 input, checkbox, select */
+  filterLayout: Array<'input' | 'checkbox' | 'select'>
+  filterConfig: VxeTablePropTypes.FilterConfig
+  //#endregion
+
+  //#region 行列拖拽
+  dragable: boolean
+  /** 是否启用行拖拽 */
+  rowdragable: boolean
+  /** 是否启用列拖拽 */
+  columndragable: boolean
+  /**
+   * 拖拽模式
+   * vxe模式下，表格数据发生变化时整个表格会刷新key重新渲染，而draggable模式下不会重新渲染
+   */
+  dragType: string
+  /** 需要禁用拖拽的行class */
+  rowDisabledClass: string
+  /** 行拖拽禁用方法 */
+  rowDragDisabledMethod?: (...args: any[]) => any
+  /** 行拖拽结束回调方法 */
+  rowDragEndMethod?: (...args: any[]) => any
+  /** 行拖拽配置对象 */
+  rowDragConfig: VxeTablePropTypes.RowDragConfig
+  /** 列拖拽禁用方法 */
+  columnDragDisabledMethod?: (...args: any[]) => any
+  /** 列拖拽结束回调方法 */
+  columnDragEndMethod?: (...args: any[]) => any
+  /** 列拖拽配置对象 */
+  columnDragConfig: VxeTablePropTypes.ColumnDragConfig
+  //#endregion
+
+  //#region 行相关配置
+  /** 行的唯一标识字段 */
+  rowId: VxeTablePropTypes.RowConfig['keyField']
+  /** 行配置对象 */
+  rowConfig: VxeTablePropTypes.RowConfig
+  //#endregion
+
+  //#region 列相关配置
+  /** 列配置数组 */
+  columns: ColumnType[]
+  /** 列配置对象 */
+  columnConfig: VxeTablePropTypes.ColumnConfig
+  //#endregion
+
+  //#region 虚拟列表配置
+  /** 列虚拟滚动配置 */
+  virtualXConfig: VxeTablePropTypes.VirtualXConfig
+  /** 行虚拟滚动配置 */
+  virtualYConfig: VxeTablePropTypes.VirtualYConfig
+  //#endregion
+
+  //#region 右键菜单配置
+  /** 头部右键菜单是否允许配置列隐藏显示 */
+  menuConfigColumn: boolean
+  menuConfig: VxeTablePropTypes.MenuConfig
+  //#endregion
+
+  //#region 排序相关配置
+  sortable: boolean
+  sortConfig: VxeTablePropTypes.SortConfig
+  //#endregion
+
+  //#region 自定义相关配置
+  customConfig: VxeTablePropTypes.CustomConfig
+  //#endregion
+
+  //#region 鼠标相关配置
+  mouseConfig: VxeTablePropTypes.MouseConfig
+  //#endregion
+
+  //#region 分页配置
+  pagerConfig: VxeGridPropTypes.PagerConfig
+  // 是否展示分页
+  showPagination: boolean
+  //#endregion
+
+  //#region 回车容器相关
+  allowSelectNextInEmpty: boolean
+  containerType: 'row' | 'table'
+  //#endregion
+
+  //#region 存储相关
+  saveType: 'local' | 'server' | 'default'
+  saveHotKeys: string[]
+  getConfig?: (config: customConfigType) => Promise<ColumnType[]>
+  setConfig?: (config: customConfigType, columns: ColumnType[]) => Promise<any>
+  /** 自定义自定义存储弹窗的columns */
+  customColumns: ColumnType[]
+  // 表格唯一ID，用于本地存储识别
+  id?: string
+  pageId?: string
+  userId?: string
+  //是否有权限统一配置（个性话化列配置）
+  isConfiguration: boolean
+  //#endregion
+}
+
+

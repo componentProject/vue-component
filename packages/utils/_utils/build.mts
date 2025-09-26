@@ -293,7 +293,7 @@ function createBaseConfig(ctx: BuildContext, comp: string, internalDeps: string[
             dts({
               root: ctx.packDir,
               entryRoot: `.${ctx.entryBaseUrl}${comp}`,
-              tsconfigPath: './tsconfig.base.json',
+              tsconfigPath: './tsconfig.build.json',
               declarationOnly: false,
             }),
           ]

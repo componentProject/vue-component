@@ -4,7 +4,6 @@ packages:
   - packages/*
   - play/*
   - docs/*
-  - constant
 
 # 该分类仅包含多pack共用依赖
 catalogs:

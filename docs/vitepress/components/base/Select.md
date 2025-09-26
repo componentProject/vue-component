@@ -64,37 +64,36 @@ Select/props/loadMore
 
 ### Props
 
-| 参数 | 说明 | 类型 | 默认值 |
-| --- | --- | --- | --- |
-| `tagType` | Tag 类型 | `'success'` \| `'info'` \| `'warning'` \| `'danger'` | `'primary'` |
-| `teleported` | 是否 Teleport 到 body | Boolean | `true` |
-| `clearable` | 是否可清空 | Boolean | `true` |
-| `filterable` | 是否可筛选 | Boolean | `true` |
-| `filterMethod` | 自定义筛选方法 | ^[Function]`(keyword: string) => void` | - |
-| `collapseTagsTooltip` | 折叠时是否显示 Tooltip | Boolean | `true` |
-| `collapseTags` | 多选时是否折叠 Tag | Boolean | `true` |
-| `label` | 选项显示字段名 | String | `'label'` |
-| `value` | 选项值字段名 | String | `'value'` |
-| `disabledValues` | 禁用的值列表 | Array | `[]` |
-| `disabledLabels` | 禁用的标签列表 | Array | `[]` |
-| `disabledHandler` | 自定义禁用回调 | ^[Function]`({ label: string, value: any, data?: any }) => boolean` | - |
-| `options` | 本地选项数据 | Array | `[]` |
-| `filterFields` | 参与本地筛选的字段名集合 | Array | `[]` |
-| `serverProps` | 远程数据配置 | ^[Object]`objType` | - |
-| `enableLoadMore` | 开启加载更多 | Boolean | `false` |
-| `hasMore` | 是否还有更多数据 | Boolean | `false` |
-| `loading` | 加载中状态 | Boolean | `false` |
+| 参数                    | 说明                 | 类型                                                                  | 默认值       |
+|-----------------------|--------------------|---------------------------------------------------------------------|-----------|
+| `tagType`             | Tag 类型             | ^[String]`success \| info \| warning \| danger`                      | `primary`  |
+| `teleported`          | 是否 Teleport 到 body | Boolean                                                             | `true`    |
+| `clearable`           | 是否可清空              | Boolean                                                             | `true`    |
+| `filterable`          | 是否可筛选              | Boolean                                                             | `true`    |
+| `filterMethod`        | 自定义筛选方法            | ^[Function]`(keyword: string) => void`                              | -         |
+| `collapseTagsTooltip` | 折叠时是否显示 Tooltip    | Boolean                                                             | `true`    |
+| `collapseTags`        | 多选时是否折叠 Tag        | Boolean                                                             | `true`    |
+| `label`               | 选项显示字段名            | String                                                              | `'label'` |
+| `value`               | 选项值字段名             | String                                                              | `'value'` |
+| `disabledValues`      | 禁用的值列表             | Array                                                               | `[]`      |
+| `disabledLabels`      | 禁用的标签列表            | Array                                                               | `[]`      |
+| `disabledHandler`     | 自定义禁用回调            | ^[Function]`({ label: string, value: any, data?: any }) => boolean` | -         |
+| `options`             | 本地选项数据             | Array                                                               | `[]`      |
+| `filterFields`        | 参与本地筛选的字段名集合       | Array                                                               | `[]`      |
+| `enableLoadMore`      | 开启加载更多             | Boolean                                                             | `false`   |
+| `hasMore`             | 是否还有更多数据           | Boolean                                                             | `false`   |
+| `loading`             | 加载中状态              | Boolean                                                             | `false`   |
 
 ### v-model
 
-| 名称 | 说明 | 类型 |
-| --- | --- | --- |
+| 名称           | 说明  | 类型  |
+|--------------|-----|-----|
 | `modelValue` | 选中值 | any |
 
 ### Events
 
-| 事件名 | 说明 | 回调参数 |
-| --- | --- | --- |
+| 事件名      | 说明   | 回调参数                              |
+|----------|------|-----------------------------------|
 | `change` | 选项变化 | ^[Function]`(value: any) => void` |
 
 ### Slots

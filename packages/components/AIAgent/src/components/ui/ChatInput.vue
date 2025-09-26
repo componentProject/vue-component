@@ -68,9 +68,9 @@ export default {
     submitDisabled() {
       const requiredParams = this.params.filter(param => param.isRequired == 1)
       const allParamsDone
-                = requiredParams.length > 0
-                  ? requiredParams.every(param => param.paramValue)
-                  : this.params.some(param => param.paramValue)
+        = requiredParams.length > 0
+          ? requiredParams.every(param => param.paramValue)
+          : this.params.some(param => param.paramValue)
       let allDone = false
       if (requiredParams.length > 0) {
         allDone = allParamsDone
@@ -101,6 +101,9 @@ export default {
         return
       }
       this.$emit('send', this.inputValue)
+      this.$nextTick(() => {
+        this.adjustHeight()
+      })
     },
     stop() {
       this.$emit('stop')
@@ -110,7 +113,7 @@ export default {
       this.$emit('newMessage')
       // 新对话时清空输入框
     },
-    adjustHeight(e) {
+    adjustHeight() {
       const target = this.$refs.promptTextarea
       if (!target)
         return
@@ -145,7 +148,7 @@ export default {
           this.$nextTick(() => {
             textarea.selectionStart = textarea.selectionEnd = start + 1
             // 触发高度调整
-            this.adjustHeight(e)
+            this.adjustHeight()
           })
         }
       }

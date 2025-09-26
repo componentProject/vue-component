@@ -18,17 +18,17 @@
 import { computed, ref } from 'vue'
 import { ElButton } from 'element-plus'
 
-const active = ref('A')
+const active = ref()
 const visible = ref(false)
 const tabList = computed(() => [
-  { id: 'A', label: 'A' },
-  { id: 'B', label: 'B', show: () => visible.value },
+  { label: 'A' },
+  { label: 'B', show: () => visible.value },
 ])
 
 function toggle() {
   visible.value = !visible.value
-  if (!visible.value && active.value === 'B')
-    active.value = 'A'
+  if (!visible.value && active.value === '1')
+    active.value = '0'
 }
 </script>
 

@@ -6,22 +6,11 @@
     "node": ">=16.0.0"
   },
   "description": "项目通用常量定义包",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
-  "files": [
-    "dist"
-  ],
-  "scripts": {
-    "build": "tsc"
-  },
   "keywords": [
     "constants",
     "typescript",
     "vue3"
   ],
   "author": "1983531544@qq.com",
-  "license": "MIT",
-  "devDependencies": {
-    "typescript": "^5.0.0"
-  }
+  "license": "MIT"
 }

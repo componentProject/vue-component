@@ -53,34 +53,21 @@
 </template>
 
 <script lang="ts" setup>
-import type { PropType } from 'vue'
-import {
-  computed,
-  nextTick,
-  onBeforeMount,
-  onBeforeUnmount,
-  onMounted,
-  ref,
-  useAttrs,
-  useTemplateRef,
-  watch,
-} from 'vue'
 import type {
   VxeGridInstance,
   VxeGridProps,
-  VxeGridPropTypes,
   VxeTableConstructor,
   VxeTableDefines,
   VxeTablePropTypes,
 } from 'vxe-table'
 import { VxeGrid } from 'vxe-table'
-import type { ColumnType, customConfigType, NoNextInputParams, NoSelectValueParams } from './_types'
+import type { ColumnType, DraggableTableEmits, DraggableTableProps } from './_types'
 import { ElMessage } from 'element-plus'
 
 import { cloneDeep, groupBy } from 'lodash'
 import { diff, isEmpty } from 'radash'
 import Sortable from 'sortablejs'
-import { VxePager, VxeTooltip, VxeUI } from 'vxe-pc-ui'
+import VxeUI, { VxePager, VxeTooltip } from 'vxe-pc-ui'
 import 'vxe-table/lib/style.css'
 import 'vxe-pc-ui/lib/style.css'
 import {
@@ -106,359 +93,180 @@ defineOptions({
   name: 'DraggableTable',
 })
 // 定义组件属性
-const props = defineProps({
+const props = withDefaults(defineProps<DraggableTableProps>(), {
   //#region 其他原始配置加默认值
   /** 是否显示表格边框 */
-  border: {
-    type: Boolean,
-    default: true,
-  },
+  border: true,
   /** 表格列对齐方式 */
-  align: {
-    type: String as PropType<VxeTablePropTypes.Align>,
-    default: 'left',
-  },
+  align: 'left',
   /** 表格内容溢出隐藏并显示tooltip */
-  showOverflow: {
-    type: [Boolean, String] as PropType<VxeTablePropTypes.ShowOverflow>,
-    default: true,
-  },
+  showOverflow: true,
   /** 头部溢出隐藏并显示tooltip */
-  showHeaderOverflow: {
-    type: [Boolean, String] as PropType<VxeTablePropTypes.ShowOverflow>,
-    default: true,
-  },
+  showHeaderOverflow: true,
   /** 底部溢出隐藏并显示tooltip */
-  showFooterOverflow: {
-    type: [Boolean, String] as PropType<VxeTablePropTypes.ShowOverflow>,
-    default: true,
-  },
-  resizable: {
-    type: Boolean,
-    default: true,
-  },
+  showFooterOverflow: true,
+  resizable: true,
   /** 是否自动调整列宽 */
-  autoResize: {
-    type: Boolean,
-    default: true,
-  },
+  autoResize: true,
   /** 是否允许列宽拖拽 */
   /** 列宽拖拽配置 */
-  resizableConfig: {
-    type: Object as PropType<VxeTablePropTypes.ResizableConfig>,
-    default: () => ({}),
-  },
+  resizableConfig: () => ({}),
   //#endregion
   //#region 编辑相关
   /** 是否允许编辑 */
-  editable: {
-    type: Boolean,
-    default: () => false,
-  },
+  editable: false,
   /** 触发编辑后是否自动聚焦 */
-  editAutoFocus: {
-    type: Boolean,
-    default: () => true,
-  },
+  editAutoFocus: true,
   /** 编辑规则 */
-  editRules: {
-    type: Object as PropType<VxeTablePropTypes.EditRules>,
-    default: null,
-  },
+  editRules: null,
   /** 编辑配置 */
-  editConfig: {
-    type: Object as PropType<VxeTablePropTypes.EditConfig>,
-    default: () => ({}),
-  },
+  editConfig: () => ({}),
   //#endregion
   //#region 过滤相关
-  filterable: {
-    type: Boolean,
-    default: () => false,
-  },
+  filterable: false,
   /** 筛选器类型,full 为匹配所有全量表格数据，filter 为匹配当前表格数据 */
-  filterType: {
-    type: String as PropType<'full' | 'filter'>,
-    default: () => 'filter',
-  },
+  filterType: 'filter',
   /** 筛选器布局配置，支持 input, checkbox, select */
-  filterLayout: {
-    type: Array as PropType<('input' | 'checkbox' | 'select')[]>,
-    default: () => ['input', 'checkbox'],
-  },
-  filterConfig: {
-    type: Object as PropType<VxeTablePropTypes.FilterConfig>,
-    default: () => ({}),
-  },
+  filterLayout: () => ['input', 'checkbox'],
+  filterConfig: () => ({}),
   //#endregion
   //#region 行列拖拽
-  dragable: {
-    type: Boolean,
-    default: false,
-  },
+  dragable: false,
   /** 是否启用行拖拽 */
-  rowdragable: {
-    type: Boolean,
-    default: false,
-  },
+  rowdragable: false,
   /** 是否启用列拖拽 */
-  columndragable: {
-    type: Boolean,
-    default: false,
-  },
+  columndragable: false,
   /**
    * 拖拽模式
    * vxe模式下，表格数据发生变化时整个表格会刷新key重新渲染，而draggable模式下不会重新渲染
    */
-  dragType: {
-    type: String,
-    default: () => 'vxe',
-    // default: () => 'draggable',
-  },
+  dragType: 'vxe',
   /** 需要禁用拖拽的行class */
-  rowDisabledClass: {
-    type: String,
-    default: () => '',
-  },
-  /** 行拖拽禁用方法 */
-  rowDragDisabledMethod: {
-    type: Function,
-  },
-  /** 行拖拽结束回调方法 */
-  rowDragEndMethod: {
-    type: Function,
-  },
+  rowDisabledClass: '',
   /** 行拖拽配置对象 */
-  rowDragConfig: {
-    type: Object as PropType<VxeTablePropTypes.RowDragConfig>,
-    default: () => ({}),
-  },
-
-  /** 列拖拽禁用方法 */
-  columnDragDisabledMethod: {
-    type: Function,
-  },
-  /** 列拖拽结束回调方法 */
-  columnDragEndMethod: {
-    type: Function,
-  },
+  rowDragConfig: () => ({}),
   /** 列拖拽配置对象 */
-  columnDragConfig: {
-    type: Object as PropType<VxeTablePropTypes.ColumnDragConfig>,
-    default: () => ({}),
-  },
-
+  columnDragConfig: () => ({}),
   //#endregion
   //#region 行相关配置
   /** 行的唯一标识字段 */
-  rowId: {
-    type: String as PropType<VxeTablePropTypes.RowConfig['keyField']>,
-    default: () => '_X_ROW_KEY',
-  },
+  rowId: '_X_ROW_KEY',
   /** 行配置对象 */
-  rowConfig: {
-    type: Object as PropType<VxeTablePropTypes.RowConfig>,
-    default: () => ({}),
-  },
+  rowConfig: () => ({}),
   //#endregion
   //#region 列相关配置
   /** 列配置数组 */
-  columns: {
-    type: Array as PropType<ColumnType[]>,
-    default: () => [],
-  },
+  columns: () => [],
   /** 列配置对象 */
-  columnConfig: {
-    type: Object as PropType<VxeTablePropTypes.ColumnConfig>,
-    default: () => ({}),
-  },
+  columnConfig: () => ({}),
   //#endregion
   //#region 虚拟列表配置
   /** 列虚拟滚动配置 */
-  virtualXConfig: {
-    type: Object as PropType<VxeTablePropTypes.VirtualXConfig>,
-    default: () => ({}),
-  },
+  virtualXConfig: () => ({}),
   /** 行虚拟滚动配置 */
-  virtualYConfig: {
-    type: Object as PropType<VxeTablePropTypes.VirtualYConfig>,
-    default: () => ({}),
-  },
+  virtualYConfig: () => ({}),
   //#endregion
   //#region 右键菜单配置
   /** 头部右键菜单是否允许配置列隐藏显示 */
-  menuConfigColumn: {
-    type: Boolean,
-    default: true,
-  },
-  menuConfig: {
-    type: Object as PropType<VxeTablePropTypes.MenuConfig>,
-    default: () => ({}),
-  },
+  menuConfigColumn: true,
+  menuConfig: () => ({}),
   //#endregion
   //#region 排序相关配置
-  sortable: {
-    type: Boolean,
-    default: false,
-  },
-  sortConfig: {
-    type: Object as PropType<VxeTablePropTypes.SortConfig>,
-    default: () => ({}),
-  },
+  sortable: false,
+  sortConfig: () => ({}),
   //#endregion
   //#region 自定义相关配置
-  customConfig: {
-    type: Object as PropType<VxeTablePropTypes.CustomConfig>,
-    default: () => ({}),
-  },
+  customConfig: () => ({}),
   //#endregion
   //#region 鼠标相关配置
-  mouseConfig: {
-    type: Object as PropType<VxeTablePropTypes.MouseConfig>,
-    default: () => ({}),
-  },
+  mouseConfig: () => ({}),
   //#endregion
   //#region 分页配置
-  pagerConfig: {
-    type: Object as PropType<VxeGridPropTypes.PagerConfig>,
-    /**
-     * layouts 可选值：Home, PrevJump, PrevPage, Number, JumpNumber, NextPage, NextJump, End, Sizes, Jump, FullJump, PageCount, Total
-     * @see https://vxetable.cn/#/grid/api?q=pager-config
-     */
-    default: () => ({
-      currentPage: 1,
-      pageSize: 10,
-      total: 100,
-      pageSizes: [10, 20, 30, 50, 100],
-      layouts: [
-        'Home',
-        'PrevJump',
-        'PrevPage',
-        'Number',
-        'NextPage',
-        'NextJump',
-        'End',
-        'Sizes',
-        'FullJump',
-        'Total',
-      ],
-    }),
-  },
+  /**
+   * layouts 可选值：Home, PrevJump, PrevPage, Number, JumpNumber, NextPage, NextJump, End, Sizes, Jump, FullJump, PageCount, Total
+   * @see https://vxetable.cn/#/grid/api?q=pager-config
+   */
+  pagerConfig: () => ({
+    currentPage: 1,
+    pageSize: 10,
+    total: 100,
+    pageSizes: [10, 20, 30, 50, 100],
+    layouts: [
+      'Home',
+      'PrevJump',
+      'PrevPage',
+      'Number',
+      'NextPage',
+      'NextJump',
+      'End',
+      'Sizes',
+      'FullJump',
+      'Total',
+    ],
+  }),
   // 是否展示分页
-  showPagination: {
-    type: Boolean,
-    default: false,
-  },
+  showPagination: false,
   //#endregion
   //#region 回车容器相关
-  allowSelectNextInEmpty: {
-    type: Boolean,
-    default: false,
-  },
-  containerType: {
-    type: String as PropType<'row' | 'table'>,
-    default: 'row',
-  },
+  allowSelectNextInEmpty: false,
+  containerType: 'row',
   //#endregion
   //#region 存储相关
-  saveType: {
-    type: String as PropType<'local' | 'server' | 'default'>,
-    default: 'default',
-  },
-  saveHotKeys: {
-    type: Array as PropType<string[]>,
-    default: () => ['shift', 'alt', 'ctrl', 'f12'],
-  },
-  getConfig: {
-    type: Function as PropType<(config: customConfigType) => Promise<ColumnType[]>>,
-  },
-  setConfig: {
-    type: Function as PropType<(config: customConfigType, columns: ColumnType[]) => Promise<any>>,
-  },
+  saveType: 'default',
+  saveHotKeys: () => ['shift', 'alt', 'ctrl', 'f12'],
   /** 自定义自定义存储弹窗的columns */
-  customColumns: {
-    type: Array as PropType<ColumnType[]>,
-    default: () => [
-      { type: 'checkbox', width: 40 },
-      { field: 'field', minWidth: 160, title: '字段', treeNode: true, dragSort: true },
-      { field: 'title', minWidth: 160, title: '列名称', slots: { default: 'title' } },
-      { field: 'width', width: 70, title: '宽度', editable: true, slots: { default: 'input' } },
-      { field: 'fixed', width: 100, title: '固定位置', editable: true, params: {
-        options: [
-          {
-            label: '左',
-            value: 'left',
-          },
-          {
-            label: '右',
-            value: 'right',
-          },
-          {
-            label: '默认',
-            value: 'default',
-          },
-        ],
-      }, slots: { default: 'select' } },
-      { field: 'align', width: 100, title: '对齐方式', editable: true, params: {
-        options: [
-          {
-            label: '左对齐',
-            value: 'left',
-          },
-          {
-            label: '右对齐',
-            value: 'right',
-          },
-          {
-            label: '居中对齐',
-            value: 'center',
-          },
-        ],
-      }, slots: { default: 'select' } },
-      { field: 'resizable', width: 70, title: '可调整', align: 'center', editable: true, slots: { default: 'switch' } },
-    ],
-  },
-  // 表格唯一ID，用于本地存储识别
-  id: {
-    type: String,
-  },
-  pageId: {
-    type: String,
-  },
-  userId: {
-    type: String,
-  },
+  customColumns: () => [
+    { type: 'checkbox', width: 40 },
+    { field: 'field', minWidth: 160, title: '字段', treeNode: true, dragSort: true },
+    { field: 'title', minWidth: 160, title: '列名称', slots: { default: 'title' } },
+    { field: 'width', width: 70, title: '宽度', editable: true, slots: { default: 'input' } },
+    { field: 'fixed', width: 100, title: '固定位置', editable: true, params: {
+      options: [
+        {
+          label: '左',
+          value: 'left',
+        },
+        {
+          label: '右',
+          value: 'right',
+        },
+        {
+          label: '默认',
+          value: 'default',
+        },
+      ],
+    }, slots: { default: 'select' } },
+    { field: 'align', width: 100, title: '对齐方式', editable: true, params: {
+      options: [
+        {
+          label: '左对齐',
+          value: 'left',
+        },
+        {
+          label: '右对齐',
+          value: 'right',
+        },
+        {
+          label: '居中对齐',
+          value: 'center',
+        },
+      ],
+    }, slots: { default: 'select' } },
+    { field: 'resizable', width: 70, title: '可调整', align: 'center', editable: true, slots: { default: 'switch' } },
+  ],
   //是否有权限统一配置（个性话化列配置）
-  isConfiguration: {
-    type: Boolean,
-    default: false,
-  },
+  isConfiguration: false,
   //#endregion
 })
 // 组件事件
-const emit = defineEmits<{
-  (e: 'currentChange', params: number): void
-  (e: 'update:pagination', params: number): void
-  (e: 'sizeChange', params: number): void
-  (e: 'pageChange', params: number): void
-  (e: 'headerContextMenu', params: HTMLElement): void
-  (e: 'headerCellMenu', params: VxeTableDefines.HeaderCellMenuParams & { cell?: HTMLElement }): void
-  (e: 'checkboxAll', params: VxeTableDefines.CheckboxAllParams): void
-  (e: 'checkboxChange', params: VxeTableDefines.CheckboxAllParams): void
-  (e: 'resizableChange', params: VxeTableDefines.ResizableChangeParams): void
-  (e: 'rowDragend', params: any): void
-  (e: 'columnDragend', params: any): void
-  (e: 'update:tableData', params: any[]): void
-  // 当在表格中最后一个输入元素按下Enter键时触发
-  (e: 'noNextInput', params: NoNextInputParams): void
-  // 当在表格中select下拉为空时触发
-  (e: 'noSelectValue', params: NoSelectValueParams): void
-  (e: 'toggleTreeExpand', params: VxeTableDefines.ToggleRowExpandEventParams): void
-}>()
+// 当在表格中最后一个输入元素按下Enter键时触发
+// 当在表格中select下拉为空时触发
+const emit = defineEmits<DraggableTableEmits>()
 // 获取插槽
 const slots = defineSlots<slotsType>()
-VxeUI.component(VxePager)
-VxeUI.component(VxeTooltip)
+// 注册 VxeUI 组件
+;(VxeUI as any).component(VxePager)
+;(VxeUI as any).component(VxeTooltip)
 
 const customConfigDialogVisible = ref(false)
 const customConfigDialogRef = useTemplateRef<HTMLElement>('customConfigDialogRef')
@@ -1275,8 +1083,8 @@ onBeforeMount(async () => {
 
 //#region draggable模式逻辑
 // 保存拖拽实例的引用
-const rowSortableInstance = ref<Sortable | null>()
-const columnSortableInstance = ref<Sortable | null>()
+const rowSortableInstance = ref<InstanceType<typeof Sortable> | null>()
+const columnSortableInstance = ref<InstanceType<typeof Sortable> | null>()
 
 // 销毁行拖拽实例
 function destroyRowSortable() {

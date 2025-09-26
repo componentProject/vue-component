@@ -1,6 +1,8 @@
 import type { VxeColumnPropTypes, VxeTableDefines, VxeTablePropTypes } from 'vxe-table'
 import type { objType } from '@moluoxixi/components/_types'
 
+export * from './emit'
+export * from './props'
 export interface customConfigType {
   pageId: string
   widgetId: string
