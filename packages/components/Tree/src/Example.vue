@@ -50,12 +50,32 @@
       </div>
       <pre style="margin-top: 8px">{{ selectedRows }}</pre>
     </div>
+
+    <h3>expandAllOnClickNode：点击节点自动展开/收起整支</h3>
+    <div class="block h-[200px]! flex flex-col">
+      <div class="flex-1-hidden">
+        <Tree
+          ref="expandOnClickTree"
+          default-expand-all
+          expand-all-on-click-node
+          :data="flatList"
+          row-field="id"
+          parent-field="pid"
+          label-field="name"
+          :buttons="renderButtons"
+          :icon="iconByType"
+        />
+      </div>
+      <ElButton style="margin-top: 8px" size="small" @click="onToggleTreeExpand">
+        切换整棵树展开状态
+      </ElButton>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import Tree from './index.vue'
-import { computed, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { Document, Folder } from '@element-plus/icons-vue'
 import { ElButton } from 'element-plus'
 import type { ButtonsItem } from './types/index.ts'
@@ -63,61 +83,65 @@ import type { ButtonsItem } from './types/index.ts'
 const ChildIcon = Document
 const ParentIcon = Folder
 
-const treeList = [
-  {
-    id: 1,
-    name: '根 1',
-    children: [
+const treeList = ref([])
+onMounted(() => {
+  setTimeout(() => {
+    treeList.value = [
       {
-        id: 11,
-        name: '子 1-1',
+        id: 1,
+        name: '根 1',
         children: [
           {
-            id: 111,
-            name: '子 1-1-1',
-          },
-          {
-            id: 112,
-            name: '子 1-1-2',
+            id: 11,
+            name: '子 1-1',
             children: [
               {
-                id: 1111,
-                name: '子 1-1-1-1',
-                children: [
-                  { id: 11111, name: '子 1-1-1-1-1' },
-                  { id: 11112, name: '子 1-1-1-1-2' },
-                ],
+                id: 111,
+                name: '子 1-1-1',
               },
               {
-                id: 1112,
-                name: '子 1-1-1-2',
+                id: 112,
+                name: '子 1-1-2',
                 children: [
-                  { id: 11111, name: '子 1-1-1-1-1' },
-                  { id: 11112, name: '子 1-1-1-1-2' },
+                  {
+                    id: 1111,
+                    name: '子 1-1-1-1',
+                    children: [
+                      { id: 11111, name: '子 1-1-1-1-1' },
+                      { id: 11112, name: '子 1-1-1-1-2' },
+                    ],
+                  },
+                  {
+                    id: 1112,
+                    name: '子 1-1-1-2',
+                    children: [
+                      { id: 11111, name: '子 1-1-1-1-1' },
+                      { id: 11112, name: '子 1-1-1-1-2' },
+                    ],
+                  },
                 ],
+              },
+              // {
+              //   id: 113,
+              //   name: '子 1-1-3',
+              // },
+            ],
+          },
+          {
+            id: 12,
+            name: '子 1-2',
+            children: [
+              {
+                id: 121,
+                name: '子 1-2-1',
               },
             ],
           },
-          // {
-          //   id: 113,
-          //   name: '子 1-1-3',
-          // },
         ],
       },
-      {
-        id: 12,
-        name: '子 1-2',
-        children: [
-          {
-            id: 121,
-            name: '子 1-2-1',
-          },
-        ],
-      },
-    ],
-  },
-]
-
+    ]
+  }, 2000)
+})
 const flatList = [
   { id: 1, pid: null, name: '根 1', type: 'dir' },
   { id: 11, pid: 1, name: '子 1-1', type: 'file' },
@@ -133,15 +157,15 @@ function iconByType(row: any) {
 function renderButtons(): ButtonsItem[] {
   return [
     {
-      type: 'add',
+      btnType: 'add',
       tooltip: '新增子节点',
     },
     {
-      type: 'edit',
+      btnType: 'edit',
       tooltip: '编辑',
     },
     {
-      type: 'delete',
+      btnType: 'delete',
       tooltip: '删除',
     },
   ]
@@ -169,6 +193,11 @@ function onCascadeChange(rows: any[]) {
     const { children, ...i } = item
     return i
   })
+}
+
+const expandOnClickTree = ref<InstanceType<typeof Tree> | null>(null)
+function onToggleTreeExpand() {
+  expandOnClickTree.value?.toggleExpand()
 }
 </script>
 

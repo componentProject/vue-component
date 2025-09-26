@@ -7,6 +7,7 @@
       :height="height"
       :expand-on-click-node="false"
       highlight-current
+      :node-key="props.rowField"
       :props="treeProps"
       v-bind="$attrs"
       :empty-text="emptyText"
@@ -46,7 +47,7 @@
               </ElIcon>
 
               <span class="ml-4" style="margin-left: 4px">
-                <slot name="label" :node="node" :data="data">{{ (data as any)[props.labelField] ?? '' }}</slot>
+                <slot name="label" :node="node" :data="data">{{ data[props.labelField] ?? '' }}</slot>
               </span>
             </div>
             <div v-if="props.showRowLine" class="flex-1-hidden wl-right_line" />
@@ -68,7 +69,7 @@
 
 <script setup lang="ts">
 import type { Component as VueComponent } from 'vue'
-import { computed, onMounted, ref, useTemplateRef } from 'vue'
+import { computed, onMounted, onUnmounted, ref, useTemplateRef } from 'vue'
 import type { TreeNode, TreeNodeData } from 'element-plus'
 import { ElIcon, ElTreeV2 } from 'element-plus'
 import type { ButtonsItem, TreeProps } from './types'
@@ -90,6 +91,7 @@ const props = withDefaults(defineProps<TreeProps>(), {
   showLine: false,
   showRowLine: false,
   emptyText: '暂无数据',
+  expandAllOnClickNode: false,
 })
 
 const emit = defineEmits<{
@@ -104,7 +106,7 @@ const treeProps = computed(() => {
     class: (data: TreeNodeData) => {
       return {
         ...treeClass(data),
-        ...classNames(data),
+        ...(classNames(data) || {}),
       }
     },
     label: props.labelField,
@@ -114,10 +116,12 @@ const treeProps = computed(() => {
   }
 })
 
+//#region 动态高度计算
 const height = ref()
 const treeContainer = useTemplateRef('treeContainer')
 function resizeChange() {
   height.value = Math.ceil(treeContainer.value?.getBoundingClientRect().height)
+  console.log('height.value ', height.value)
 }
 onMounted(() => {
   height.value = Math.ceil(treeContainer.value?.getBoundingClientRect().height)
@@ -126,6 +130,7 @@ onMounted(() => {
 onUnmounted(() => {
   window.removeEventListener('resize', resizeChange)
 })
+//#endregion
 
 function isLeaf(nodeData: Record<string, any>) {
   const list = nodeData?.[props.childrenField] as any[] | undefined
@@ -146,9 +151,6 @@ function getButtons(nodeData: Record<string, any>): ButtonsItem[] {
 const indent = props.indent
 const activeNode = ref<any | null>(null)
 const treeRef = useTemplateRef('treeRef')
-
-// 级联高亮相关
-const highlightedKeySet = ref<Set<any>>(new Set())
 
 const idMaps = computed(() => {
   const idToNodeMap = new Map<any, any>()
@@ -176,54 +178,6 @@ function leftLineShow(item: number, node: TreeNode & { parent: any }) {
   else {
     return leftLineShow(item - 1, node.parent)
   }
-}
-function isHighlighted(row: any) {
-  const idKey = props.rowField
-  return highlightedKeySet.value.has((row as any)?.[idKey])
-}
-
-function getDescendantIds(id: any): any[] {
-  const result: any[] = []
-  const { idToNodeMap } = idMaps.value
-  const childrenKey = props.childrenField
-  const stack: any[] = []
-  const start = idToNodeMap.get(id)
-  if (!start)
-    return result
-  stack.push(start)
-  while (stack.length) {
-    const node = stack.pop()
-    const nid = node?.[props.rowField]
-    if (nid !== id)
-      result.push(nid)
-    const children = node?.[childrenKey] as any[] | undefined
-    if (children && children.length) {
-      for (let i = children.length - 1; i >= 0; i--) stack.push(children[i])
-    }
-  }
-  return result
-}
-
-function hasAncestorHighlighted(id: any): boolean {
-  const { idToParentIdMap } = idMaps.value
-  let pid = idToParentIdMap.get(id)
-  while (pid !== undefined && pid !== null) {
-    if (highlightedKeySet.value.has(pid))
-      return true
-    pid = idToParentIdMap.get(pid)
-  }
-  return false
-}
-
-function emitChange() {
-  const { idToNodeMap } = idMaps.value
-  const rows: any[] = []
-  highlightedKeySet.value.forEach((k) => {
-    const n = idToNodeMap.get(k)
-    if (n)
-      rows.push(n)
-  })
-  emit('change', rows)
 }
 
 function clearTreeCurrent() {
@@ -274,6 +228,7 @@ function resolveButtonIcon(btn: ButtonsItem): VueComponent | string | undefined 
     return btn.icon
   switch (btn.btnType) {
     case 'add':
+      console.log('add', Plus)
       return Plus
     case 'edit':
       return Edit
@@ -287,38 +242,132 @@ function resolveButtonIcon(btn: ButtonsItem): VueComponent | string | undefined 
 function onRowClick(data: TreeNodeData, node: TreeNode, e: MouseEvent) {
   // 级联选择逻辑
   if (props.levelSelect) {
-    const id = (data as any)?.[props.rowField]
-    const already = highlightedKeySet.value.has(id)
-    const ancestorHighlighted = hasAncestorHighlighted(id)
-    if (!already) {
-      // 新点击：高亮自身与所有子孙
-      highlightedKeySet.value = new Set<any>([id, ...getDescendantIds(id)])
-    }
-    else {
-      if (ancestorHighlighted) {
-        // 祖先已高亮：只保留当前节点及其子孙
-        highlightedKeySet.value = new Set<any>([id, ...getDescendantIds(id)])
-      }
-      else {
-        // 否则取消所有高亮并取消树选中
-        highlightedKeySet.value = new Set<any>()
-        clearTreeCurrent()
-      }
-    }
-    emitChange()
+    toggleLevelSelect(data)
   }
 
   // 按钮显示交互：仅在 showType=click 下处理
   if (props.showType === 'click') {
     activeNode.value = activeNode.value === data ? null : data
   }
+
+  if (props.expandAllOnClickNode)
+    toggleExpand(data, node)
+
   emit('nodeClick', data, node, e)
 }
+
+function getDescendantIds(id: any): any[] {
+  const result: any[] = []
+  const { idToNodeMap } = idMaps.value
+  const childrenKey = props.childrenField
+  const stack: any[] = []
+  const start = idToNodeMap.get(id)
+  if (!start)
+    return result
+  stack.push(start)
+  while (stack.length) {
+    const node = stack.pop()
+    const nid = node?.[props.rowField]
+    if (nid !== id)
+      result.push(nid)
+    const children = node?.[childrenKey] as any[] | undefined
+    if (children && children.length) {
+      for (let i = children.length - 1; i >= 0; i--) stack.push(children[i])
+    }
+  }
+  return result
+}
+//#region 级联高亮
+const highlightedKeySet = ref<Set<any>>(new Set())
+function isHighlighted(row: any) {
+  const idKey = props.rowField
+  return highlightedKeySet.value.has((row as any)?.[idKey])
+}
+
+function hasAncestorHighlighted(id: any): boolean {
+  const { idToParentIdMap } = idMaps.value
+  let pid = idToParentIdMap.get(id)
+  while (pid !== undefined && pid !== null) {
+    if (highlightedKeySet.value.has(pid))
+      return true
+    pid = idToParentIdMap.get(pid)
+  }
+  return false
+}
+
+function emitChange() {
+  const { idToNodeMap } = idMaps.value
+  const rows: any[] = []
+  highlightedKeySet.value.forEach((k) => {
+    const n = idToNodeMap.get(k)
+    if (n)
+      rows.push(n)
+  })
+  emit('change', rows)
+}
+function toggleLevelSelect(data: TreeNodeData) {
+  const id = (data as any)?.[props.rowField]
+  const already = highlightedKeySet.value.has(id)
+  const ancestorHighlighted = hasAncestorHighlighted(id)
+  if (!already) {
+    // 新点击：高亮自身与所有子孙
+    highlightedKeySet.value = new Set<any>([id, ...getDescendantIds(id)])
+  }
+  else {
+    if (ancestorHighlighted) {
+      // 祖先已高亮：只保留当前节点及其子孙
+      highlightedKeySet.value = new Set<any>([id, ...getDescendantIds(id)])
+    }
+    else {
+      // 否则取消所有高亮并取消树选中
+      highlightedKeySet.value = new Set<any>()
+      clearTreeCurrent()
+    }
+  }
+  emitChange()
+}
+//#endregion
+
+//#region 跨级选择
+function getNodeKeys(data: TreeNodeData) {
+  if (!data) {
+    return new Set<any>(treeData.value.reduce((p, item) => p.concat([item[props.rowField], ...getDescendantIds(item[props.rowField])]), []))
+  }
+  else {
+    return new Set<any>([data[props.rowField], ...getDescendantIds(data[props.rowField])])
+  }
+}
+function toggleExpand(data: TreeNodeData, node: TreeNode) {
+  const nodeKeys = getNodeKeys(data)
+  let expanded
+  if (!node) {
+    expanded = treeData.value.some(item => treeRef.value?.getNode(item[props.rowField]).expanded)
+  }
+  else {
+    expanded = node.expanded
+  }
+  if (!expanded) {
+    treeRef.value?.setExpandedKeys(nodeKeys)
+  }
+  else {
+    nodeKeys.forEach((nodeKey) => {
+      treeRef.value?.collapseNode(treeRef.value?.getNode(nodeKey))
+    })
+  }
+}
+onMounted(() => {
+  if (props.defaultExpandAll) {
+    toggleExpand()
+  }
+})
+//#endregion
 
 defineExpose({
   getTree() {
     return treeRef.value
   },
+  toggleExpand,
+
 })
 </script>
 
