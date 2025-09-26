@@ -134,34 +134,34 @@ PopoverTableSelect/popoverProps/width
 
 #### 透传给内部 Popover 与 DraggableTable 的关键 Props
 
-| 参数 | 说明 | 类型 | 默认值 |
-| --- | --- | --- | --- |
-| placement | Popover 弹出位置 | String | 'bottom' |
-| trigger | 触发方式 | `'click'` \| `'focus'` \| `'hover'` \| `'contextmenu'` | 'hover' |
-| title | 弹出标题 | String | '' |
-| effect | 主题 | `'dark'` \| `'light'` | 'light' |
-| content | 主体内容（可被插槽覆盖） | String | '' |
-| disabled | 是否禁用 | Boolean | false |
-| offset | 偏移量 | Number | 12 |
-| transition | 动画 | String | 'el-fade-in-linear' |
-| showArrow | 是否显示箭头 | Boolean | true |
-| popperOptions | Popper.js 配置 | Object | ^[Object]`{ modifiers: [{ name: 'computeStyles', options: { gpuAcceleration: false } }] }` |
-| popperClass | 自定义 class | String | '' |
-| popperStyle | 自定义样式 | String\|Object | '' |
-| showAfter | 显示延迟 | Number | 0 |
-| hideAfter | 隐藏延迟 | Number | 200 |
-| autoClose | 自动关闭延时 | Number | 0 |
-| tabindex | tabindex | Number | undefined |
-| teleported | Teleport 到 body | Boolean | true |
-| persistent | 是否持久化 | Boolean | true |
-| width | 弹窗宽度 | String\|Number | 400 |
-| height | 表格高度 | String\|Number | 300 |
-| id | 传给 DraggableTable 的唯一标识 | String | 'popoverTableSelect' |
-| columns | vxe-grid 列配置 | ^[Array]`ColumnType[]` | [] |
-| data | 表格数据 | Array | [] |
-| enableLoadMore | 开启加载更多 | Boolean | `false` |
-| hasMore | 是否还有更多数据 | Boolean | `false` |
-| loading | 加载中状态 | Boolean | `false` |
+| 参数 | 说明 | 类型                               | 默认值 |
+| --- | --- |----------------------------------| --- |
+| placement | Popover 弹出位置 | String                           | 'bottom' |
+| trigger | 触发方式 | ^[String]`click \| focus \| hover \| contextmenu`                            | 'hover' |
+| title | 弹出标题 | String                           | '' |
+| effect | 主题 | `'dark'` \| `'light'`            | 'light' |
+| content | 主体内容（可被插槽覆盖） | String                           | '' |
+| disabled | 是否禁用 | Boolean                          | false |
+| offset | 偏移量 | Number                           | 12 |
+| transition | 动画 | String                           | 'el-fade-in-linear' |
+| showArrow | 是否显示箭头 | Boolean                          | true |
+| popperOptions | Popper.js 配置 | Object                           | ^[Object]`{ modifiers: [{ name: 'computeStyles', options: { gpuAcceleration: false } }] }` |
+| popperClass | 自定义 class | String                           | '' |
+| popperStyle | 自定义样式 | String\|Object                   | '' |
+| showAfter | 显示延迟 | Number                           | 0 |
+| hideAfter | 隐藏延迟 | Number                           | 200 |
+| autoClose | 自动关闭延时 | Number                           | 0 |
+| tabindex | tabindex | Number                           | undefined |
+| teleported | Teleport 到 body | Boolean                          | true |
+| persistent | 是否持久化 | Boolean                          | true |
+| width | 弹窗宽度 | String\|Number                   | 400 |
+| height | 表格高度 | String\|Number                   | 300 |
+| id | 传给 DraggableTable 的唯一标识 | String                           | 'popoverTableSelect' |
+| columns | vxe-grid 列配置 | ^[Array]`ColumnType[]`           | [] |
+| data | 表格数据 | Array                            | [] |
+| enableLoadMore | 开启加载更多 | Boolean                          | `false` |
+| hasMore | 是否还有更多数据 | Boolean                          | `false` |
+| loading | 加载中状态 | Boolean                          | `false` |
 | virtualYConfig | 滚动配置 | ^[Object]`{ threshold: number }` | `{ threshold: 30（表格距离头部、底部还有多少px触发） }` |
 
 

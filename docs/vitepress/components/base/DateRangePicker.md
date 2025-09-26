@@ -5,8 +5,8 @@
 日期范围选择器组件，支持选择日期/日期范围，统一格式化与默认值处理，提供快捷选项与禁用规则。
 
 ### 类型（type）
-date：单日期；change 返回单个字符串，v-model 始终为字符串数组
 
+date：单日期；change 返回单个字符串，v-model 始终为字符串数组
 
 :::demo
 DateRangePicker/type/type-date
@@ -209,33 +209,33 @@ DateRangePicker/expose/focus
 
 ### Props
 
-| 参数 | 说明 | 类型 | 默认值 |
-| --- | --- | --- | --- |
-| modelValue | 绑定值 | Array | [] |
-| type | 日期选择类型 | String | 'date' |
-| format | 显示在输入框中的格式 | String | null |
-| valueFormat | 绑定值的格式（对显示无效） | String | 'YYYY-MM-DD HH:mm:ss' |
-| outputFormat | 控制内部格式化的起止时间格式 | String \| String[] | 根据 type 自动推断 |
-| placeholder | 非范围选择时的占位内容 | String | '请选择日期' |
-| startPlaceholder | 范围选择时开始日期的占位内容 | String | '开始日期' |
-| endPlaceholder | 范围选择时结束日期的占位内容 | String | '结束日期' |
-| rangeSeparator | 范围分隔符 | String | '至' |
-| defaultToday | 当无选定值时是否默认返回今天的日期范围 | Boolean | true |
-| dateRange | 日期范围配置，数字或 [n,m] | Number \| Number[] \| null | null |
-| dateRangeType | 日期范围类型 | Moment.unitOfTime.DurationConstructor | 'day' |
-| dateRangeBaseDate | 日期范围的基准日期 | String \| Object | 当前日期 |
-| minDate | 最小可选日期 | String \| Object | null |
-| maxDate | 最大可选日期 | String \| Object | null |
-| disabledDateRange | 禁用日期范围配置。支持三种形式：<br/>1) `[minDate, maxDate]`：限制在区间内；<br/>2) `minDate`：仅最小值；<br/>3) `maxDate`：仅最大值。优先级高于 `minDate`/`maxDate` 单独配置。| Array | null |
-| datetimeDisableTypes | datetime 的时分秒禁用规则 | Array<'hours' \| 'minutes' \| 'seconds'> | ['hours','minutes','seconds'] |
-| shortcuts | 是否显示快速选择，或自定义快捷项 | Boolean \| Array | false |
+| 参数                   | 说明                                                                                                                                | 类型                                             | 默认值                           |
+|----------------------|-----------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------|-------------------------------|
+| modelValue           | 绑定值                                                                                                                               | Array                                          | []                            |
+| type                 | 日期选择类型                                                                                                                            | String                                         | 'date'                        |
+| format               | 显示在输入框中的格式                                                                                                                        | String                                         | null                          |
+| valueFormat          | 绑定值的格式（对显示无效）                                                                                                                     | String                                         | 'YYYY-MM-DD HH:mm:ss'         |
+| outputFormat         | 控制内部格式化的起止时间格式                                                                                                                    | String \| String[]                             | 根据 type 自动推断                  |
+| placeholder          | 非范围选择时的占位内容                                                                                                                       | String                                         | '请选择日期'                       |
+| startPlaceholder     | 范围选择时开始日期的占位内容                                                                                                                    | String                                         | '开始日期'                        |
+| endPlaceholder       | 范围选择时结束日期的占位内容                                                                                                                    | String                                         | '结束日期'                        |
+| rangeSeparator       | 范围分隔符                                                                                                                             | String                                         | '至'                           |
+| defaultToday         | 当无选定值时是否默认返回今天的日期范围                                                                                                               | Boolean                                        | true                          |
+| dateRange            | 日期范围配置，数字或 [n,m]                                                                                                                  | Number \| Number[] \| null                     | null                          |
+| dateRangeType        | 日期范围类型                                                                                                                            | ^[String]`Moment.unitOfTime.DurationConstructor` | 'day'                         |
+| dateRangeBaseDate    | 日期范围的基准日期，日期字符串或moment对象                                                                                                          | String \| Object                               | 当前日期                          |
+| minDate              | 最小可选日期                                                                                                                            | String \| Object                               | null                          |
+| maxDate              | 最大可选日期                                                                                                                            | String \| Object                               | null                          |
+| disabledDateRange    | 禁用日期范围配置。支持三种形式：<br/>1) `[minDate, maxDate]`：限制在区间内；<br/>2) `minDate`：仅最小值；<br/>3) `maxDate`：仅最大值。优先级高于 `minDate`/`maxDate` 单独配置。 | Array                                          | null                          |
+| datetimeDisableTypes | datetime 的时分秒禁用规则                                                                                                                 | ^[Array]`hours \| minutes \| seconds`                                     | ['hours','minutes','seconds'] |
+| shortcuts            | 是否显示快速选择，或自定义快捷项                                                                                                                  | Boolean \| Array                               | false                         |
 
 ### Events
 
-| 事件名 | 说明 | 回调参数                                                                 |
-| --- | --- |----------------------------------------------------------------------|
-| update:modelValue | 绑定值更新 | ^[Function]`(value: string[] \| string) => void`|
-| change | 用户确认选定的值时触发 | ^[Function]`(value: string[]\| string) => void` |
+| 事件名               | 说明          | 回调参数                                             |
+|-------------------|-------------|--------------------------------------------------|
+| update:modelValue | 绑定值更新       | ^[Function]`(value: string[] \| string) => void` |
+| change            | 用户确认选定的值时触发 | ^[Function]`(value: string[]\| string) => void`  |
 
 ### Slots
 
@@ -243,8 +243,8 @@ DateRangePicker/expose/focus
 
 ### Expose
 
-| 名称 | 说明 | 类型 |
-| --- | --- | --- |
+| 名称    | 说明           | 类型                      |
+|-------|--------------|-------------------------|
 | focus | 使 input 获取焦点 | ^[Function]`() => void` |
-| blur | 使 input 失去焦点 | ^[Function]`() => void` |
+| blur  | 使 input 失去焦点 | ^[Function]`() => void` |
 
