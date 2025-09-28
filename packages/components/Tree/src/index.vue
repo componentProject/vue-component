@@ -69,7 +69,7 @@
 
 <script setup lang="ts">
 import type { Component as VueComponent } from 'vue'
-import { computed, onMounted, onUnmounted, ref, useTemplateRef } from 'vue'
+import { computed, nextTick, onMounted, onUnmounted, ref, useTemplateRef } from 'vue'
 import type { TreeNode, TreeNodeData } from 'element-plus'
 import { ElIcon, ElTreeV2 } from 'element-plus'
 import type { ButtonsItem, TreeProps } from './types'
@@ -120,11 +120,14 @@ const treeProps = computed(() => {
 const height = ref()
 const treeContainer = useTemplateRef('treeContainer')
 function resizeChange() {
-  height.value = Math.ceil(treeContainer.value?.getBoundingClientRect().height)
-  console.log('height.value ', height.value)
+  nextTick(() => {
+    height.value = Math.ceil(treeContainer.value?.getBoundingClientRect().height)
+  })
 }
 onMounted(() => {
-  height.value = Math.ceil(treeContainer.value?.getBoundingClientRect().height)
+  nextTick(() => {
+    height.value = Math.ceil(treeContainer.value?.getBoundingClientRect().height)
+  })
   window.addEventListener('resize', resizeChange)
 })
 onUnmounted(() => {
@@ -367,7 +370,7 @@ defineExpose({
     return treeRef.value
   },
   toggleExpand,
-
+  reload: resizeChange,
 })
 </script>
 
