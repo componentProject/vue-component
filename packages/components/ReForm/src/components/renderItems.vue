@@ -11,6 +11,7 @@
             <slot :name="item.slot" :collpased="formCollapsed[item.field]">
               <ReCollapsedBtn
                 v-bind="item.collapsedTriggerProps"
+                :collapsed-text="item.collapsedText"
                 :style="{
                   marginLeft: item.collapsedTriggerIndex
                     ? `${collapsedTriggerMargin}px`
@@ -61,10 +62,8 @@
 <script setup lang="ts">
 import ReCollapsedBtn from './ReCollapsedBtn.vue'
 import { computed, inject, unref } from 'vue'
-import type { MaybeRef } from 'vue'
-import type { ReFormItem, ReGridResponsive } from '../_types'
+import type { ReFormItem } from '../_types'
 import ReFormRenderItem from './renderItem.vue'
-import { matchResponsive } from '../_utils/useGridResponsive'
 
 defineOptions({
   name: 'ReFormRenderItems',
@@ -74,10 +73,16 @@ const props = defineProps<{
   items: ReFormItem[]
 }>()
 
+// 使用inject时传入默认值避免报错
+const formContext = inject(Symbol.for('ap-re-form'), {
+  layout: computed(() => 'grid'),
+  gridResponsive: computed(() => 24),
+  // 其他必要的默认值
+})
+
 const {
   gridTemplateStyle,
   gridResponsive,
-  responsiveWidth,
   formCollapsed,
   formVisible,
   labelWidth,
@@ -96,7 +101,8 @@ function getItemStyle(item: ReFormItem): string {
     if (span === 24) {
       // 当span为24时，使用grid-column: 1 / -1确保横跨整个容器
       return 'grid-column: 1 / -1'
-    } else {
+    }
+    else {
       // 对于其他span值，使用标准的grid-column-start
       return `grid-column-start: span ${span}`
     }

@@ -37,9 +37,15 @@
         :is="dynamicComponent"
         v-bind="secondComponentProps"
       >
-        <template #action>
-          <div>按钮</div>
+        <template #slot-label>
+          <span>slot-label</span>
         </template>
+        <template #slotControl>
+          <div class="ml-2">slot-control</div>
+        </template>
+        <!-- <template #action>
+          <div>按钮</div>
+        </template> -->
       </component>
     </div>
   </div>
@@ -151,7 +157,7 @@ async function loadLocalComponent(componentName: string) {
  */
 async function loadComponents(components: string[]) {
   try {
-    const loadedComponents = await load(vue, components, false)
+    const loadedComponents = await load(vue, components, true)
     dynamicComponent.value = loadedComponents[componentName.value]
     console.log('动态组件加载成功:', dynamicComponent)
   }
@@ -175,7 +181,6 @@ async function handleClick() {
 
 onMounted(async () => {
   await loadLocalComponent(componentName.value)
-  return
   await loadComponents([componentName.value])
 })
 
@@ -193,6 +198,8 @@ const handleSubmit = (obj) => {
 }
 
 .main {
+  display: inline-block;
+  width: 50%;
   margin: 20px;
   height: 200px;
   text-align: center;
