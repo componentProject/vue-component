@@ -175,8 +175,6 @@ const localBtnSpanStyle = computed<string>(() => {
   else {
     // flex布局下的按钮组样式
     const width = (100 / gridResponsive.value) * localBtnSpan.value
-    console.log('111111111111', width, gridResponsive.value, localBtnSpan.value)
-    console.log('222222222222', props.btnSpanStyle || `width: calc(${width}% - ${(props.colGap * (localBtnSpan.value - 1)) / gridResponsive.value}px)`)
     return props.btnSpanStyle || `width: calc(${width}% - ${(props.colGap * (localBtnSpan.value - 1)) / gridResponsive.value}px)`
   }
 })
