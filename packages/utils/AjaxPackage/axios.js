@@ -36,7 +36,7 @@ export function createAxiosInstance(baseURL, timeout = 5000, options = {}) {
       // 添加token到请求头
       const token = getToken()
       if (token) {
-        config.headers.Authorization = `Bearer ${token}`
+        config.headers.Token = `${token}`
       }
       return config
     },
@@ -121,6 +121,7 @@ export function createAxiosInstance(baseURL, timeout = 5000, options = {}) {
     async (error) => {
       // 处理响应错误
       if (error.response?.status === 401) {
+        return
         // token过期，触发回调
         onLoginRequired()
         ElMessage.error({

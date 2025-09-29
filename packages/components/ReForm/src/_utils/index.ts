@@ -98,8 +98,6 @@ export function normalizeFormItems(
         }
       }
 
-      // 格式化响应栅格 - 但在flex布局下跳过此处理，保持span为数字类型
-      // 格式化响应栅格 - 在flex和grid布局下都保持span为数字类型
       if (layout !== 'flex' && layout !== 'grid') {
         formItem.span = normalizeGridResponsive(formItem.span)
       }
