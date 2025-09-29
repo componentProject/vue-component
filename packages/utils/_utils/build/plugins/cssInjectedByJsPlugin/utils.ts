@@ -1,5 +1,6 @@
 import type { Plugin } from 'vite'
 import { build } from 'vite'
+import { v4 } from 'uuid'
 import type { OutputAsset, OutputBundle, OutputChunk } from 'rollup'
 import type { BuildCSSInjectionConfiguration, CSSInjectionConfiguration, PluginConfiguration } from './interface'
 
@@ -14,29 +15,12 @@ export type InjectCode = (cssCode: string, options: InjectCodeOptions) => string
 export type InjectCodeFunction = (cssCode: string, options: InjectCodeOptions) => void
 
 const cssInjectedByJsId = '\0vite/all-css'
-const generatedStyleIdPrefix = 'vite-plugin-css-injected-by-js-style-'
-let generatedStyleIdCounter = 0
-
-function generateStyleId(prefix: string = generatedStyleIdPrefix): string {
-  generatedStyleIdCounter += 1
-  return `${prefix}${generatedStyleIdCounter}`
-}
-
-function ensureStyleId(styleIdCandidate: InjectCodeOptions['styleId'] = undefined): string {
-  if (typeof styleIdCandidate == 'function') {
-    return ensureStyleId(styleIdCandidate())
-  }
-  if (typeof styleIdCandidate == 'string' && styleIdCandidate.length > 0) {
-    return styleIdCandidate
-  }
-  return generateStyleId()
-}
 
 function createStyle(cssCode: string, normalizedStyleId, injections: string[] = []) {
   const postCreationInjection = injections.filter(Boolean).join('')
   return `try{
     if(typeof document != 'undefined'){
-      if(document.getElementById(${normalizedStyleId})){
+      if(!document.getElementById(${normalizedStyleId})){
         var elementStyle = document.createElement('style');
         ${postCreationInjection}
         elementStyle.appendChild(document.createTextNode(${cssCode}));
@@ -50,9 +34,7 @@ function createStyle(cssCode: string, normalizedStyleId, injections: string[] = 
 }
 
 const defaultInjectCode: InjectCode = (cssCode, { styleId, useStrictCSP, attributes }) => {
-  const ensuredStyleId = ensureStyleId(styleId)
-  const normalizedStyleId = JSON.stringify(ensuredStyleId)
-  const styleIdInjection = `elementStyle.id = ${normalizedStyleId};`
+  const styleIdInjection = `elementStyle.id = ${styleId};`
 
   let attributesInjection = ''
   if (attributes) {
@@ -65,7 +47,7 @@ const defaultInjectCode: InjectCode = (cssCode, { styleId, useStrictCSP, attribu
 
   const cspInjection = useStrictCSP ? `elementStyle.nonce = document.head.querySelector('meta[property=csp-nonce]')?.content;` : ''
 
-  return createStyle(cssCode, normalizedStyleId, [styleIdInjection, cspInjection, attributesInjection])
+  return createStyle(cssCode, styleId, [styleIdInjection, cspInjection, attributesInjection])
 }
 
 export async function buildCSSInjectionCode({
@@ -79,8 +61,6 @@ export async function buildCSSInjectionCode({
 }: BuildCSSInjectionConfiguration): Promise<OutputChunk | null> {
   const { minify, target } = buildOptions
 
-  const ensuredStyleId = ensureStyleId(styleId)
-
   const res = await build({
     root: '',
     configFile: false,
@@ -88,7 +68,7 @@ export async function buildCSSInjectionCode({
     plugins: [
       injectionCSSCodePlugin({
         cssToInject,
-        styleId: ensuredStyleId,
+        styleId,
         injectCode,
         injectCodeFunction,
         useStrictCSP,
@@ -123,8 +103,7 @@ export function resolveInjectionCode(
   injectCodeFunction: ((cssCode: string, options: InjectCodeOptions) => void) | undefined,
   { styleId, useStrictCSP, attributes }: InjectCodeOptions,
 ) {
-  const ensuredStyleId = ensureStyleId(styleId)
-  const injectionOptions = { styleId: ensuredStyleId, useStrictCSP, attributes }
+  const injectionOptions = { styleId, useStrictCSP, attributes }
   if (injectCodeFunction) {
     return `(${injectCodeFunction})(${cssCode}, ${JSON.stringify(injectionOptions)})`
   }
@@ -139,6 +118,7 @@ function injectionCSSCodePlugin({
   styleId,
   useStrictCSP,
 }: CSSInjectionConfiguration): Plugin {
+  const ensuredStyleId = `"${styleId || v4()}"`
   return {
     name: 'vite:injection-css-code-plugin',
     resolveId(id: string) {
@@ -149,7 +129,6 @@ function injectionCSSCodePlugin({
     load(id: string) {
       if (id == cssInjectedByJsId) {
         const cssCode = JSON.stringify(cssToInject.trim())
-        const ensuredStyleId = ensureStyleId(styleId)
         return resolveInjectionCode(cssCode, injectCode, injectCodeFunction, { styleId: ensuredStyleId, useStrictCSP })
       }
     },

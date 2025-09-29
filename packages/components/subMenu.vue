@@ -1,20 +1,22 @@
 <template>
   <template v-for="(route, index) in routes" :key="index">
-    <el-menu-item v-if="!route.children?.length" :index="route.path">
+    <ElMenuItem v-if="!route.children?.length" :index="route.path">
       {{ route.meta?.title || route.name }}
-    </el-menu-item>
+    </ElMenuItem>
     <template v-else>
-      <el-sub-menu :index="route.path">
+      <ElSubMenu :index="route.path">
         <template #title>
           {{ route.meta?.title || route.name }}
         </template>
         <sub-menu :routes="route.children" />
-      </el-sub-menu>
+      </ElSubMenu>
     </template>
   </template>
 </template>
 
 <script setup lang="ts">
+import { ElMenuItem, ElSubMenu } from 'element-plus'
+
 defineProps({
   routes: {
     type: Array,
@@ -23,4 +25,6 @@ defineProps({
 })
 </script>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+@use 'element-plus/theme-chalk/el-menu-item.css';
+</style>
