@@ -26,5 +26,5 @@ defineProps({
 </script>
 
 <style scoped lang="scss">
-@use 'element-plus/theme-chalk/el-menu-item.css';
+@forward 'element-plus/theme-chalk/el-menu-item.css';
 </style>

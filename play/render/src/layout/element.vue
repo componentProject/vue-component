@@ -9,10 +9,10 @@
  * Copyright (c) 2025 by ${git_name_email}, All Rights Reserved.
 -->
 <template>
-  <ElConfigProvider :locale="zhCn" :namespace="systemCode" :empty-values="[undefined]">
+  <ElConfigProvider :namespace="systemCode" :empty-values="[undefined]">
     <div
       class="h-full"
-      :class="{ 'h-screen': !qiankunWindow.__POWERED_BY_QIANKUN__ }"
+      :class="{ 'h-screen!': !qiankunWindow.__POWERED_BY_QIANKUN__ }"
       :style="`--el-color-primary: ${themeColor || '#3A77FF'};`"
     >
       <ElContainer class="w-full h-full">
@@ -48,7 +48,6 @@
 </template>
 
 <script lang="ts" setup>
-import zhCn from 'element-plus/dist/locale/zh-cn.mjs'
 import { ElConfigProvider, ElContainer, ElHeader, ElMain, ElMenu } from 'element-plus'
 import { qiankunWindow } from 'vite-plugin-qiankun/dist/helper'
 import { computed, reactive } from 'vue'
@@ -67,10 +66,11 @@ const defaultTab = computed(() => router.currentRoute.value.path)
 </script>
 
 <style lang="scss" scoped>
-@use 'element-plus/theme-chalk/el-header.css';
-@use 'element-plus/theme-chalk/el-menu.css';
-@use 'element-plus/theme-chalk/el-main.css';
-@use 'element-plus/theme-chalk/el-container.css';
+@forward '../assets/styles/tailwind.scss';
+@forward 'element-plus/theme-chalk/el-header.css';
+@forward 'element-plus/theme-chalk/el-menu.css';
+@forward 'element-plus/theme-chalk/el-main.css';
+@forward 'element-plus/theme-chalk/el-container.css';
 .bg-primary {
   background-color: var(--el-color-primary);
 }

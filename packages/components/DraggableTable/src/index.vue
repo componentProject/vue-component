@@ -1327,8 +1327,7 @@ defineExpose({
 </script>
 
 <style scoped lang="scss">
-@forward '@moluoxixi/components/_assets/styles/tailwind.scss';
-@use 'vxe-table/lib/style.css';
+@forward '@moluoxixi/components/_assets/styles/main.scss';
 .table-box {
   :deep(.vxe-table--filter-template) {
     display: flex !important;

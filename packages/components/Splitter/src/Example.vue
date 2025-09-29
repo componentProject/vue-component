@@ -127,6 +127,5 @@ import Splitter from './index.vue'
   align-items: center;
   justify-content: center;
   font-size: 18px;
-  padding: 20px;
 }
 </style>

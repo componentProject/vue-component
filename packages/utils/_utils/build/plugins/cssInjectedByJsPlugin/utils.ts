@@ -16,7 +16,7 @@ export type InjectCodeFunction = (cssCode: string, options: InjectCodeOptions) =
 
 const cssInjectedByJsId = '\0vite/all-css'
 
-function createStyle(cssCode: string, normalizedStyleId, injections: string[] = []) {
+function createStyle(cssCode: string, normalizedStyleId: string, injections: string[] = []) {
   const postCreationInjection = injections.filter(Boolean).join('')
   return `try{
     if(typeof document != 'undefined'){

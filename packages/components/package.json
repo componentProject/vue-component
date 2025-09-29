@@ -1,6 +1,6 @@
 {
   "name": "@moluoxixi/components",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "all components are settled here",
   "main": "index.ts",
   "module": "index.ts",
