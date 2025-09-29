@@ -1,5 +1,5 @@
 <template>
-  <el-button
+  <ElButton
     :disabled="disabled"
     v-bind="$attrs"
     link
@@ -7,18 +7,20 @@
     class="ap-collapsed-btn"
     @click="handleSwitchCollapsed"
   >
+    <!-- 移除错误的代码行 -->
     <span v-if="!hiddenText" class="ap-collapsed-btn__text">{{
       modelValue ? localCollapsedText[0] : localCollapsedText[1]
     }}</span>
     <el-icon :class="{ 'is-expanded': !modelValue }">
       <ArrowDown />
     </el-icon>
-  </el-button>
+  </ElButton>
 </template>
 
 <script setup lang="ts">
 import { ArrowDown } from '@element-plus/icons-vue'
 import { computed } from 'vue'
+import { ElButton } from 'element-plus'
 import { normalizeCollapsedText } from '../_utils'
 
 defineOptions({
@@ -56,12 +58,6 @@ function handleSwitchCollapsed() {
 
 <style lang="scss" scoped>
 .ap-collapsed-btn {
-  @apply relative;
-
-  &__text {
-    @apply mr-1;
-  }
-
   :deep(.el-icon) {
     transition: all 0.2s linear;
     transform: rotate(0);

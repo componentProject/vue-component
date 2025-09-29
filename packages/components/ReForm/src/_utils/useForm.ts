@@ -41,6 +41,13 @@ export default function useForm(
     reFormRef.value = unref(form)
   }
 
+  // 每个组件实例创建独立的缓存
+  const itemConfigCache = new Map<string, ReFormItem>()
+  // 添加清理缓存的方法
+  const clearItemConfigCache = () => {
+    itemConfigCache.clear()
+  }
+
   const formItems: ShallowRef<ReFormItem[]> = shallowRef(
     normalizeFormItems(unref(items), unref(span), layout), // 传递 layout 参数
   )
@@ -84,17 +91,17 @@ export default function useForm(
     formCollapsed,
     formGroupDependency,
     unwatchForm,
+    clearItemConfigCache, // 导出清理方法
+    itemConfigCache, // 导出缓存对象，供useWatchForm使用
   }
 }
-
-// 添加一个缓存来存储组件配置对象
-const itemConfigCache = new Map<string, ReFormItem>()
 
 export function useWatchForm(
   formItems: ShallowRef<ReFormItem[]>,
   formData: ShallowRef<ReFormModelValue>,
   props: ReFormProps,
   emits: ReFormEmits,
+  itemConfigCache: Map<string, ReFormItem> // 接收实例缓存
 ) {
   const renderFormItemsCache = computed(() => unref(formItems))
 
@@ -223,10 +230,10 @@ export function useWatchForm(
   }
 }
 
-// 添加清理缓存的函数，避免内存泄漏
-function clearItemConfigCache() {
-  itemConfigCache.clear()
-}
+// 移除全局清理函数
+// function clearItemConfigCache() {
+//   itemConfigCache.clear()
+// }
 
 // 导出清理函数以便在组件卸载时调用
-export { clearItemConfigCache }
+// export { clearItemConfigCache }

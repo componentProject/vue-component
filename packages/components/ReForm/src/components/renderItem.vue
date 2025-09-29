@@ -1,6 +1,6 @@
 <template>
   <div class="ap-form-item ap-form-control">
-    <el-form-item
+    <ElFormItem
       :class="[item.customClass || '']"
       :prop="item.field"
       :label="item.label"
@@ -12,13 +12,13 @@
         <slot :name="item.labelSlot">
           <span class="inline-flex items-center">
             <span>{{ item.label }}</span>
-            <el-tooltip
+            <ElTooltip
               v-if="item.tooltip"
               v-bind="tooltipProps"
               :content="item.tooltip"
             >
-              <el-icon class="ml-1"><QuestionFilled /></el-icon>
-            </el-tooltip>
+              <ElIcon class="ml-1"><QuestionFilled /></ElIcon>
+            </ElTooltip>
           </span>
         </slot>
       </template>
@@ -65,7 +65,7 @@
                 item.component === 'el-textarea' || item.component === 'textarea'
               "
             >
-              <el-input
+              <ElInput
                 v-if="!readonly"
                 type="textarea"
                 :class="[item.controlClass || '']"
@@ -99,17 +99,18 @@
           {{ item.tips || "" }}
         </div>
       </template>
-    </el-form-item>
+    </ElFormItem>
   </div>
 </template>
 
 <script setup lang="ts">
 import { QuestionFilled } from '@element-plus/icons-vue'
-import { inject, ref } from 'vue'
+import { inject } from 'vue'
 import { isArray, isUndefined } from 'lodash'
 import { HAS_CHILD_COMPONENT_MAP } from '../_utils/constants'
 import type { ReFormItem } from '../_types'
 import { getComponentName } from '../_utils'
+import { ElFormItem, ElIcon, ElInput, ElTooltip } from 'element-plus'
 
 defineOptions({
   name: 'ReFormRenderItem',

@@ -95,21 +95,23 @@ const focusNameInput = () => {
   }
 }
 
-const getFormRef = () => {
+function getFormRef() {
   const elFormRef = formRef.value.getRef('form')
   if (elFormRef) {
-    refInfo.value = '成功获取到 el-form 引用，类型：' + elFormRef.$el?.tagName
-  } else {
+    refInfo.value = `成功获取到 el-form 引用，类型：${  elFormRef.$el?.tagName}`
+  }
+  else {
     refInfo.value = '无法获取表单引用'
   }
 }
 
-const clearValidation = () => {
+function clearValidation() {
   const elFormRef = formRef.value.getRef('form')
   if (elFormRef && elFormRef.clearValidate) {
     elFormRef.clearValidate()
     refInfo.value = '已清除表单验证状态'
-  } else {
+  }
+  else {
     refInfo.value = '无法清除验证状态'
   }
 }

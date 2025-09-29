@@ -12,22 +12,7 @@
       </div>
       <component
         :is="localComponent"
-        v-bind="componentProps"
-        @submit="handleSubmit"
-      >
-        <template #slot-label>
-          <span>slot-label</span>
-        </template>
-        <template #slotControl>
-          <div class="ml-2">slot-control</div>
-        </template>
-        <template #btns>
-          <el-button @click="handleSubmit">去提交</el-button>
-          <el-button @click="handleCancel">返回</el-button>
-          <el-button @click="handleReset">重置</el-button>
-          <el-button>其他操作</el-button>
-        </template>
-      </component>
+      />
     </div>
     <div class="main">
       <div class="list-title">
@@ -37,9 +22,15 @@
         :is="dynamicComponent"
         v-bind="secondComponentProps"
       >
-        <template #action>
-          <div>按钮</div>
+        <template #slot-label>
+          <span>slot-label</span>
         </template>
+        <template #slotControl>
+          <div class="ml-2">slot-control</div>
+        </template>
+        <!-- <template #action>
+          <div>按钮</div>
+        </template> -->
       </component>
     </div>
   </div>
@@ -55,7 +46,7 @@ import componentData from './data.ts'
 
 defineOptions({ name: '调试与演示' })
 // 使用ref替代data属性
-const componentName = ref('ReForm') // 调试与演示组件库的组件，直接修改组件名
+const componentName = ref('HisFooter') // 调试与演示组件库的组件，直接修改组件名
 const localComponent = ref<any>(null) // 调试组件
 const dynamicComponent = ref<any>(null) // 用于存储动态组件
 
@@ -151,7 +142,7 @@ async function loadLocalComponent(componentName: string) {
  */
 async function loadComponents(components: string[]) {
   try {
-    const loadedComponents = await load(vue, components, false)
+    const loadedComponents = await load(vue, components, true)
     dynamicComponent.value = loadedComponents[componentName.value]
     console.log('动态组件加载成功:', dynamicComponent)
   }
@@ -179,9 +170,6 @@ onMounted(async () => {
   await loadComponents([componentName.value])
 })
 
-const handleSubmit = (obj) => {
-  console.log('提交数据:', obj)
-}
 </script>
 
 <style scoped lang="scss">
