@@ -81,8 +81,8 @@
 <script lang="ts" setup>
 import { ElButton, ElMessage } from 'element-plus'
 import { onMounted, ref, useTemplateRef } from 'vue'
-// import DraggableTable from './index.vue'
-// import TsButton from '@moluoxixi/components/TsButton'
+import DraggableTable from './index.vue'
+import TsButton from '@moluoxixi/components/TsButton'
 // 表格加载状态
 const loading = ref(false)
 // 拖拽开关状态
@@ -157,14 +157,14 @@ const tableData = ref([
 // 列配置
 const columns = ref([
   { type: 'seq', width: 70 },
-  {
-    field: 'name',
-    title: 'Name',
-    fixed: 'left',
-    min: 3,
-    max: 10,
-    required: true,
-  },
+  // {
+  //   field: 'name',
+  //   title: 'Name',
+  //   fixed: 'left',
+  //   min: 3,
+  //   max: 10,
+  //   required: true,
+  // },
   { field: 'createTime', title: '日期', width: 150 },
   {
     field: 'sex',

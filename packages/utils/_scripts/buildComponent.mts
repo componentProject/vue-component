@@ -1,6 +1,6 @@
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { runBuildCliAndExit } from '../_utils/build.mts'
+import { runBuildCliAndExit } from '../_utils/build/index.mts'
 
 // === 组件库命名空间配置 ===
 const LIB_NAMESPACE = 'moluoxixi'

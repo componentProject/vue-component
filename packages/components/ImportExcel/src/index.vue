@@ -19,7 +19,7 @@
 import { ElButton, ElMessage } from 'element-plus'
 import { computed, nextTick } from 'vue'
 import * as XLSX from 'xlsx'
-import { getTypeDefault } from '@moluoxixi/utils/_utils/index.ts'
+import { getTypeDefault } from '@moluoxixi/utils/_utils'
 
 defineOptions({
   name: 'ImportExcel',

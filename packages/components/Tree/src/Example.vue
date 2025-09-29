@@ -1,78 +1,61 @@
 <template>
-  <div class="example-container h-full">
-    <!--    <h3>基本用法（default：按钮常显）</h3> -->
-    <!--    <div class="block" style="height: 100px !important;"> -->
-    <!--      <Tree :data="treeList" children-field="children" label-field="name" :child-icon="ChildIcon" :parent-icon="ParentIcon" :buttons="renderButtons" /> -->
-    <!--    </div> -->
+  <div class="example-container">
+    <h3>基本用法（default：按钮常显）</h3>
+    <div class="block" style="height: 100px !important;">
+      <Tree :data="treeList" children-field="children" label-field="name" :child-icon="ChildIcon" :parent-icon="ParentIcon" :buttons="renderButtons" />
+    </div>
 
-    <!--    <h3>hover：悬浮显示按钮</h3> -->
-    <!--    <div class="block"> -->
-    <!--      <Tree :data="treeList" children-field="children" label-field="name" :buttons="renderButtons" show-type="hover" /> -->
-    <!--    </div> -->
+    <h3>hover：悬浮显示按钮</h3>
+    <div class="block">
+      <Tree :data="treeList" children-field="children" label-field="name" :buttons="renderButtons" show-type="hover" />
+    </div>
 
-    <!--    <h3>click：点击行显示按钮（再点收起）</h3> -->
-    <!--    <div class="block"> -->
-    <!--      <Tree :data="treeList" children-field="children" label-field="name" :buttons="renderButtons" show-type="click" /> -->
-    <!--    </div> -->
+    <h3>click：点击行显示按钮（再点收起）</h3>
+    <div class="block">
+      <Tree :data="treeList" children-field="children" label-field="name" :buttons="renderButtons" show-type="click" />
+    </div>
 
-    <!--    <h3>显示虚线</h3> -->
-    <!--    <div class="block"> -->
-    <!--      <Tree show-line show-row-line :data="treeList" children-field="children" label-field="name" :buttons="renderButtons" /> -->
-    <!--    </div> -->
+    <h3>显示虚线</h3>
+    <div class="block">
+      <Tree show-line show-row-line :data="treeList" children-field="children" label-field="name" :buttons="renderButtons" />
+    </div>
 
-    <!--    <h3>扁平数据（rowField + parentField 覆盖 childrenField）+ 函数 icon</h3> -->
-    <!--    <div class="block"> -->
-    <!--      <Tree :data="flatList" row-field="id" parent-field="pid" label-field="name" :buttons="renderButtons" :icon="iconByType" /> -->
-    <!--    </div> -->
+    <h3>扁平数据（rowField + parentField 覆盖 childrenField）+ 函数 icon</h3>
+    <div class="block">
+      <Tree :data="flatList" row-field="id" parent-field="pid" label-field="name" :buttons="renderButtons" :icon="iconByType" />
+    </div>
 
-    <!--    <h3>自定义按钮：slot 名称和函数渲染</h3> -->
-    <!--    <div class="block"> -->
-    <!--      <Tree :data="treeList" children-field="children" label-field="name" :buttons="renderCustomButtons"> -->
-    <!--        <template #customSlot="{ data }"> -->
-    <!--          <ElButton link size="small" @click.stop="() => onAlert(`slot: ${data.name}`)"> -->
-    <!--            自定义 -->
-    <!--          </ElButton> -->
-    <!--        </template> -->
-    <!--      </Tree> -->
-    <!--    </div> -->
+    <h3>自定义按钮：slot 名称和函数渲染</h3>
+    <div class="block">
+      <Tree :data="treeList" children-field="children" label-field="name" :buttons="renderCustomButtons">
+        <template #customSlot="{ data }">
+          <ElButton link size="small" @click.stop="() => onAlert(`slot: ${data.name}`)">
+            自定义
+          </ElButton>
+        </template>
+      </Tree>
+    </div>
 
-    <!--    <h3>级联选择（levelSelect）：点击节点高亮其及其子孙，通过 change 抛出高亮数组</h3> -->
-    <!--    <div class="block"> -->
-    <!--      <Tree -->
-    <!--        :data="treeList" -->
-    <!--        children-field="children" -->
-    <!--        label-field="name" -->
-    <!--        level-select -->
-    <!--        @change="onCascadeChange" -->
-    <!--      /> -->
-    <!--      <div style="margin-top: 8px"> -->
-    <!--        已选节点（name）: {{ selectedNames }} -->
-    <!--      </div> -->
-    <!--      <pre style="margin-top: 8px">{{ selectedRows }}</pre> -->
-    <!--    </div> -->
-
-    <h3>expandAllOnClickNode：点击节点自动展开/收起整支</h3>
-    <div class="block h-full flex flex-col">
-      <div class="flex-1-hidden">
-        <Tree
-          ref="expandOnClickTree"
-          default-expand-all
-          expand-all-on-click-node
-          :data="treeList"
-          children-field="children"
-          label-field="name"
-        />
+    <h3>级联选择（levelSelect）：点击节点高亮其及其子孙，通过 change 抛出高亮数组</h3>
+    <div class="block">
+      <Tree
+        :data="treeList"
+        children-field="children"
+        label-field="name"
+        level-select
+        @change="onCascadeChange"
+      />
+      <div style="margin-top: 8px">
+        已选节点（name）: {{ selectedNames }}
       </div>
-      <ElButton style="margin-top: 8px" size="small" @click="onToggleTreeExpand">
-        切换整棵树展开状态
-      </ElButton>
+      <pre style="margin-top: 8px">{{ selectedRows }}</pre>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import Tree from './index.vue'
-import { computed, onMounted, ref } from 'vue'
+import { computed, ref } from 'vue'
 import { Document, Folder } from '@element-plus/icons-vue'
 import { ElButton } from 'element-plus'
 import type { ButtonsItem } from './types/index.ts'
@@ -80,65 +63,61 @@ import type { ButtonsItem } from './types/index.ts'
 const ChildIcon = Document
 const ParentIcon = Folder
 
-const treeList = ref([])
-onMounted(() => {
-  setTimeout(() => {
-    treeList.value = [
+const treeList = [
+  {
+    id: 1,
+    name: '根 1',
+    children: [
       {
-        id: 1,
-        name: '根 1',
+        id: 11,
+        name: '子 1-1',
         children: [
           {
-            id: 11,
-            name: '子 1-1',
-            children: [
-              {
-                id: 111,
-                name: '子 1-1-1',
-              },
-              {
-                id: 112,
-                name: '子 1-1-2',
-                children: [
-                  {
-                    id: 1111,
-                    name: '子 1-1-1-1',
-                    children: [
-                      { id: 11111, name: '子 1-1-1-1-1' },
-                      { id: 11112, name: '子 1-1-1-1-2' },
-                    ],
-                  },
-                  {
-                    id: 1112,
-                    name: '子 1-1-1-2',
-                    children: [
-                      { id: 11111, name: '子 1-1-1-1-1' },
-                      { id: 11112, name: '子 1-1-1-1-2' },
-                    ],
-                  },
-                ],
-              },
-              // {
-              //   id: 113,
-              //   name: '子 1-1-3',
-              // },
-            ],
+            id: 111,
+            name: '子 1-1-1',
           },
           {
-            id: 12,
-            name: '子 1-2',
+            id: 112,
+            name: '子 1-1-2',
             children: [
               {
-                id: 121,
-                name: '子 1-2-1',
+                id: 1111,
+                name: '子 1-1-1-1',
+                children: [
+                  { id: 11111, name: '子 1-1-1-1-1' },
+                  { id: 11112, name: '子 1-1-1-1-2' },
+                ],
+              },
+              {
+                id: 1112,
+                name: '子 1-1-1-2',
+                children: [
+                  { id: 11111, name: '子 1-1-1-1-1' },
+                  { id: 11112, name: '子 1-1-1-1-2' },
+                ],
               },
             ],
+          },
+          // {
+          //   id: 113,
+          //   name: '子 1-1-3',
+          // },
+        ],
+      },
+      {
+        id: 12,
+        name: '子 1-2',
+        children: [
+          {
+            id: 121,
+            name: '子 1-2-1',
           },
         ],
       },
-    ]
-  }, 2000)
-})
+    ],
+  },
+]
+
 const flatList = [
   { id: 1, pid: null, name: '根 1', type: 'dir' },
   { id: 11, pid: 1, name: '子 1-1', type: 'file' },
@@ -190,11 +169,6 @@ function onCascadeChange(rows: any[]) {
     const { children, ...i } = item
     return i
   })
-}
-
-const expandOnClickTree = ref<InstanceType<typeof Tree> | null>(null)
-function onToggleTreeExpand() {
-  expandOnClickTree.value?.toggleExpand()
 }
 </script>
 

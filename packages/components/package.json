@@ -68,6 +68,7 @@
     "@designable/core": "catalog:build",
     "@moluoxixi/components": "workspace:*",
     "@moluoxixi/constant": "workspace:*",
+    "@moluoxixi/utils": "workspace:*",
     "@moluoxixi/element": "1.0.4",
     "xlsx": "^0.18.5",
     "@vueuse/core": "^11.0.0"

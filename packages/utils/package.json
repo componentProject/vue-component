@@ -1,24 +1,8 @@
 {
   "name": "@moluoxixi/utils",
   "version": "0.0.5",
-  "description": "all components are settled here",
-  "main": "dist/index.js",
-  "module": "dist/index.es.js",
-  "types": "dist/index.d.ts",
-  "exports": {
-    ".": {
-      "require": "./dist/index.js",
-      "import": "./dist/index.es.js"
-    },
-    "./AjaxPackage": {
-      "require": "./dist/AjaxPackage/index.js",
-      "import": "./dist/AjaxPackage/index.es.js"
-    }
-  },
-  "files": [
-    "AjaxPackage",
-    "dist"
-  ],
+  "main": "index.ts",
+  "module": "index.ts",
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
   },
