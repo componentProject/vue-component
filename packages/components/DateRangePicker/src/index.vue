@@ -1,30 +1,33 @@
 <template>
-  <div class="w-full inline-block flex-1 overflow-hidden date-range-picker">
-    <ElDatePicker
-      ref="datePicker"
-      v-bind="$attrs"
-      v-model="localDateValue"
-      style="width: 100%"
-      :format="computedFormat"
-      :default-time="defaultTime"
-      :placeholder="placeholder"
-      :start-placeholder="startPlaceholder"
-      :end-placeholder="endPlaceholder"
-      :range-separator="rangeSeparator"
-      :type="props.type"
-      :disabled-date="disabledDateFn"
-      :disabled-hours="disabledHoursFn"
-      :disabled-minutes="disabledMinutesFn"
-      :disabled-seconds="disabledSecondsFn"
-      :shortcuts="computedShortcuts"
-      @change="handleDateChange"
-    />
+  <div class="w-full inline-block flex-1-hidden date-range-picker">
+    <ElConfigProvider :locale="zhCn">
+      <ElDatePicker
+        ref="datePicker"
+        v-bind="$attrs"
+        v-model="localDateValue"
+        style="width: 100%"
+        :format="computedFormat"
+        :default-time="defaultTime"
+        :placeholder="placeholder"
+        :start-placeholder="startPlaceholder"
+        :end-placeholder="endPlaceholder"
+        :range-separator="rangeSeparator"
+        :type="props.type"
+        :disabled-date="disabledDateFn"
+        :disabled-hours="disabledHoursFn"
+        :disabled-minutes="disabledMinutesFn"
+        :disabled-seconds="disabledSecondsFn"
+        :shortcuts="computedShortcuts"
+        @change="handleDateChange"
+      />
+    </ElConfigProvider>
   </div>
 </template>
 
 <script lang="ts" setup>
 import type { DatePickerProps } from 'element-plus'
-import { ElDatePicker } from 'element-plus'
+import zhCn from 'element-plus/dist/locale/zh-cn.mjs'
+import { ElConfigProvider, ElDatePicker } from 'element-plus'
 import type { Moment, unitOfTime } from 'moment'
 import type { PropType } from 'vue'
 import moment from 'moment'
@@ -536,5 +539,6 @@ watch(
 </script>
 
 <style lang="scss" scoped>
-@forward '@moluoxixi/components/_assets/styles/tailwind.scss';
+@forward '@moluoxixi/components/_assets/styles/main.scss';
+@forward 'element-plus/theme-chalk/el-date-picker.css';
 </style>

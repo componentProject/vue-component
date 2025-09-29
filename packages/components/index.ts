@@ -13,6 +13,7 @@ import TsButton from '@moluoxixi/components/TsButton'
 import Tree from '@moluoxixi/components/Tree'
 import DragModalDialog from '@moluoxixi/components/DragModalDialog'
 import TsFooter from '@moluoxixi/components/TsFooter'
+import ReForm from '@moluoxixi/components/ReForm'
 
 export {
   ConfigFrom,
@@ -23,6 +24,7 @@ export {
   ExportExcel,
   ImportExcel,
   PopoverTableSelect,
+  ReForm,
   Select,
   Tabs,
   Tree,
@@ -30,7 +32,7 @@ export {
   TsFooter,
 }
 
-const components: Component[] = [TsFooter, DragModalDialog, ConfigFrom, DateRangePicker, DraggableTable, EnterNextContainer, ExportExcel, ImportExcel, TsButton, PopoverTableSelect, Select, Tabs, Tree]
+const components: Component[] = [TsFooter, DragModalDialog, ConfigFrom, DateRangePicker, DraggableTable, EnterNextContainer, ExportExcel, ImportExcel, TsButton, PopoverTableSelect, Select, Tabs, Tree, ReForm]
 
 export default {
   install(app: App) {

@@ -1,7 +1,6 @@
 import type { QiankunProps } from 'vite-plugin-qiankun/dist/helper'
 import { createApp } from 'vue'
 import * as Vue from 'vue'
-import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 import {
   browserTracingIntegration,
   init,
@@ -109,11 +108,6 @@ async function render(props: QiankunProps) {
       appendTo: appendToBody ? container || '#app' : 'body',
     }
   })
-
-  // 注册图标组件
-  for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
-    app.component(key, component)
-  }
 
   const router = getRouter(props)
 

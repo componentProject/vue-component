@@ -35,7 +35,7 @@
             v-model="inputValue2Select"
             :teleported="false"
             placeholder="请选择"
-            style="width: 240px"
+            style="width: 100%"
           >
             <el-option
               label="1"

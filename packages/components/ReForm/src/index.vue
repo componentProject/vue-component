@@ -1,6 +1,6 @@
 <template>
   <div class="ap-form-wrapper">
-    <el-form
+    <ElForm
       ref="reFormRef"
       class="ap-form"
       :class="{ 'ap-form--readonly': readonly }"
@@ -26,41 +26,42 @@
           class="ap-form-grid-item"
           :style="localBtnSpanStyle"
         >
-          <el-form-item :label="btnLabelText" :label-width="btnLabelWidth">
+          <ElFormItem :label="btnLabelText" :label-width="btnLabelWidth">
             <template v-if="btnLabelText" #label>
               <div style="display: inline-block; width: 1px">
                 {{ btnLabelText }}
               </div>
             </template>
             <slot name="btns">
-              <el-button
+              <ElButton
                 type="primary"
                 :disabled="disabled"
                 @click="handleSubmit"
               >
                 {{ submitBtnText }}
-              </el-button>
-              <el-button @click="handleCancel">
+              </ElButton>
+              <ElButton @click="handleCancel">
                 {{ cancelBtnText }}
-              </el-button>
+              </ElButton>
             </slot>
-          </el-form-item>
+          </ElFormItem>
         </div>
       </div>
-    </el-form>
+    </ElForm>
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed, nextTick, onMounted, provide, unref, useAttrs, onUnmounted } from 'vue'
 import type { ReFormEmits, ReFormProps } from './_types'
-import useForm, { clearItemConfigCache, useWatchForm } from './_utils/useForm'
+import useForm, { useWatchForm } from './_utils/useForm'
 import { cloneDeep, isUndefined } from 'lodash'
 import { getSlotsNames, unwrapperShadowRef } from './_utils'
 import useGridCols from './_utils/useGridCols'
 import type { CSSProperties, Ref } from 'vue'
 import type { Arrayable } from '@vueuse/core'
 import type { FormValidateCallback } from 'element-plus'
+import { ElButton, ElForm, ElFormItem } from 'element-plus'
 import ReFormRenderItems from './components/renderItems.vue'
 
 defineOptions({
@@ -97,6 +98,9 @@ const effectiveCols = computed(() => {
   }
 })
 
+// 为每个组件实例创建唯一标识符
+const formInstanceId = Symbol('ap-re-form-instance')
+
 const {
   submiting,
   reFormRef,
@@ -106,24 +110,38 @@ const {
   formVisible,
   formCollapsed,
   formGroupDependency,
+  clearItemConfigCache, // 解构获取清理方法
+  itemConfigCache, // 解构获取缓存对象
 } = useForm(localItems, props.modelValue, effectiveCols, props.layout)
 
-const { renderFormItems, formDataProxy } = useWatchForm(
+const {
+  renderFormItems,
+  formDataProxy,
+} = useWatchForm(
   formItems,
   formData,
   props,
   emits,
+  itemConfigCache, // 传递实例缓存
 )
 
 const $attrs = useAttrs()
+
+const layout = computed(() => props.layout || 'grid')
 
 const slotsNames = computed<[string[], string[]]>(() =>
   getSlotsNames(unref(renderFormItems)),
 )
 
+const btnSpanWithDefault = computed(() => {
+  if (!isUndefined(props.btnSpan))
+    return props.btnSpan
+  return layout.value === 'flex' ? 6 : 24
+})
+
 const { gridResponsive, responsiveWidth, localBtnSpan } = useGridCols(
   effectiveCols,
-  props.btnSpan,
+  btnSpanWithDefault,
 )
 
 const labelWidth = computed(() =>
@@ -151,7 +169,7 @@ const gridTemplateStyle = computed(() => {
 })
 
 const localBtnSpanStyle = computed<string>(() => {
-  if (props.layout === 'grid') {
+  if (layout.value === 'grid') {
     return props.btnSpanStyle || `grid-column-start: span ${localBtnSpan.value}`
   }
   else {
@@ -272,7 +290,10 @@ function validateField(
 }
 
 function clearValidate() {
-  reFormRef.value && reFormRef.value.clearValidate()
+  // 增强健壮性，先检查reFormRef.value是否存在，再检查clearValidate方法是否存在
+  if (reFormRef.value && typeof reFormRef.value.clearValidate === 'function') {
+    reFormRef.value.clearValidate()
+  }
 }
 
 function validate(callback: FormValidateCallback) {
@@ -299,6 +320,7 @@ provide(Symbol.for('ap-re-form'), {
   labelPosition,
   handleSwitchCollapsed,
   layout: computed(() => props.layout),
+  formInstanceId, // 传递实例ID
 })
 
 onMounted(() => {
@@ -309,7 +331,7 @@ onMounted(() => {
 })
 onUnmounted(() => {
   if (props.formRef) {
-    clearItemConfigCache()
+    clearItemConfigCache() // 调用实例的清理方法
   }
 })
 
@@ -327,6 +349,7 @@ defineExpose({
   resetFields,
   handleSwitchCollapsed,
   autoCollapseByErrors,
+  getRef: () => reFormRef.value,
 })
 </script>
 

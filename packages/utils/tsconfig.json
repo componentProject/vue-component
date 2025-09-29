@@ -20,6 +20,9 @@
         "../components/*"
       ]
     },
+    "types": [
+      "vite/client"
+    ],
     "module": "ESNext",
     "moduleResolution": "nodenext",
     "resolveJsonModule": true,

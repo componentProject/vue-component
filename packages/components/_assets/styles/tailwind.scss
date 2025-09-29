@@ -8,10 +8,14 @@
 
 @layer base {
   html {
+    font-size: 4px;
     @apply whitespace-nowrap;
   }
   canvas {
     display: inline;
+  }
+  body {
+    font-size: 16px;
   }
 }
 @layer utilities {

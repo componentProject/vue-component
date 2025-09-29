@@ -68,8 +68,7 @@ import { cloneDeep, groupBy } from 'lodash'
 import { diff, isEmpty } from 'radash'
 import Sortable from 'sortablejs'
 import VxeUI, { VxePager, VxeTooltip } from 'vxe-pc-ui'
-import 'vxe-table/lib/style.css'
-import 'vxe-pc-ui/lib/style.css'
+
 import {
   debounce,
   dispatchEvents,
@@ -1328,7 +1327,7 @@ defineExpose({
 </script>
 
 <style scoped lang="scss">
-@forward '@moluoxixi/components/_assets/styles/tailwind.scss';
+@forward '@moluoxixi/components/_assets/styles/main.scss';
 .table-box {
   :deep(.vxe-table--filter-template) {
     display: flex !important;
