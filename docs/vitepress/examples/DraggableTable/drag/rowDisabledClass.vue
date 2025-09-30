@@ -33,9 +33,6 @@ function rowClassName({ row }: any) {
 </script>
 
 <style scoped>
-.container {
-  padding: 8px;
-}
 .no-drag {
   background-color: #fafafa;
 }

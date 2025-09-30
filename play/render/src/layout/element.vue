@@ -66,11 +66,15 @@ const defaultTab = computed(() => router.currentRoute.value.path)
 </script>
 
 <style lang="scss" scoped>
-@forward '../assets/styles/tailwind.scss';
+@forward '@/assets/styles/tailwind.scss';
 @forward 'element-plus/theme-chalk/el-header.css';
 @forward 'element-plus/theme-chalk/el-menu.css';
 @forward 'element-plus/theme-chalk/el-main.css';
 @forward 'element-plus/theme-chalk/el-container.css';
+
+:deep(.el-main) {
+  --el-main-padding: 12px !important;
+}
 .bg-primary {
   background-color: var(--el-color-primary);
 }
@@ -127,10 +131,6 @@ const defaultTab = computed(() => router.currentRoute.value.path)
         }
       }
     }
-  }
-
-  :deep(.el-main) {
-    --el-main-padding: 12px;
   }
 }
 </style>

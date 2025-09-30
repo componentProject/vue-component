@@ -21,7 +21,6 @@ import getRouter from './router'
 import { useSystemStore } from './stores/modules/system.ts'
 
 import '@/assets/styles/main.css'
-import 'vxe-table/lib/style.css'
 
 import 'moment/dist/locale/zh-cn' // 中文化
 import { load } from '../utils.ts'

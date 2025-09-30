@@ -1,11 +1,1 @@
-/*@import 'tailwind.scss';*/
-/*@import 'base.css';*/
-/*@import "element/index.scss";*/
-/*@import "../fonts/index.css";*/
-
-
-*,
-*::before,
-*::after {
-  margin: 0;
-}
+@import 'base.css';

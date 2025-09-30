@@ -63,7 +63,7 @@ import type {
 import { VxeGrid } from 'vxe-table'
 import type { ColumnType, DraggableTableEmits, DraggableTableProps } from './_types'
 import { ElMessage } from 'element-plus'
-
+import '@moluoxixi/components/_assets/styles/vxeVariable.scss'
 import { cloneDeep, groupBy } from 'lodash'
 import { diff, isEmpty } from 'radash'
 import Sortable from 'sortablejs'
@@ -1327,7 +1327,9 @@ defineExpose({
 </script>
 
 <style scoped lang="scss">
-@forward '@moluoxixi/components/_assets/styles/main.scss';
+:deep(*) {
+  @import '@moluoxixi/components/_assets/styles/vxeStyle.scss';
+}
 .table-box {
   :deep(.vxe-table--filter-template) {
     display: flex !important;

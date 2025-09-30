@@ -91,6 +91,8 @@ const viteConfig = {
     preprocessorOptions: {
       scss: {
         silenceDeprecations: ['legacy-js-api'],
+        api: 'modern-compiler',
+        additionalData: `@forward '@moluoxixi/components/_assets/styles/main.scss';`,
       },
     },
     postcss: {

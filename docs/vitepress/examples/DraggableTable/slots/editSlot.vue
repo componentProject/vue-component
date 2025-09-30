@@ -23,9 +23,6 @@ const columns = ref([
 </script>
 
 <style scoped>
-.container {
-  padding: 8px;
-}
 input {
   width: 100%;
   box-sizing: border-box;
