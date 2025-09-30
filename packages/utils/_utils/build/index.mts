@@ -1214,8 +1214,8 @@ async function buildAllComponents(ctx: BuildContext, shouldPublish = false) {
         if (success)
           successCount++
 
-        // 每个组件打包完成后，主动等待 15 秒
-        await sleep(15000)
+        // 每个组件打包完成后，主动等待 3 秒,等待内存释放
+        await sleep(3000)
       }
       catch (error) {
         console.error(`组件 ${comp} ${shouldPublish ? '打包发布' : '打包'}失败:`, error)
