@@ -35,5 +35,5 @@ runBuildCliAndExit(
     packDir,
     requireExternalPacks,
   },
-  { exampleUploadType: EXAMPLE_UPLOAD_TYPE, defaultCommand: 'build-publish' },
+  { command: 'build-publish' },
 )
