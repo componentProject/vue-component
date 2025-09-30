@@ -21,8 +21,8 @@ const props = defineProps({
   paramsObj: {
     type: Object,
     default: () => ({
-      medicalInsuranceCode: '员工医保编码',
-      paltOrgCode: '机构医保编码',
+      medicalInsuranceCode: '国家医疗机构个人编码',
+      paltOrgCode: '国家定点医疗机构编码',
     }),
   },
 })

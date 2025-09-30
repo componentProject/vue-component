@@ -21,6 +21,7 @@
     "allowImportingTsExtensions": true
   },
   "include": [
-    ".vitepress/config/**/*"
+    ".vitepress/config/**/*",
+    ".vitepress/config/*"
   ]
 }

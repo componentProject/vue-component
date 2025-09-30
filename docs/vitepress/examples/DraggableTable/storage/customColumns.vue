@@ -39,9 +39,6 @@ const customCols = ref([
 </script>
 
 <style scoped>
-.container {
-  padding: 8px;
-}
 .tip {
   margin: 0 0 8px;
   color: #555;

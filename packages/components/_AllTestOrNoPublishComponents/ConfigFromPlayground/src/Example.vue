@@ -27,7 +27,7 @@ function handleExport() {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 pre {
   white-space: pre-wrap;
 }

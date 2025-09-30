@@ -12,6 +12,7 @@
       </div>
       <component
         :is="localComponent"
+        v-bind="componentProps"
       />
     </div>
     <div class="main">
@@ -21,17 +22,7 @@
       <component
         :is="dynamicComponent"
         v-bind="secondComponentProps"
-      >
-        <template #slot-label>
-          <span>slot-label</span>
-        </template>
-        <template #slotControl>
-          <div class="ml-2">slot-control</div>
-        </template>
-        <!-- <template #action>
-          <div>按钮</div>
-        </template> -->
-      </component>
+      />
     </div>
   </div>
 </template>
@@ -46,7 +37,7 @@ import componentData from './data.ts'
 
 defineOptions({ name: '调试与演示' })
 // 使用ref替代data属性
-const componentName = ref('HisFooter') // 调试与演示组件库的组件，直接修改组件名
+const componentName = ref('ReForm') // 调试与演示组件库的组件，直接修改组件名
 const localComponent = ref<any>(null) // 调试组件
 const dynamicComponent = ref<any>(null) // 用于存储动态组件
 
