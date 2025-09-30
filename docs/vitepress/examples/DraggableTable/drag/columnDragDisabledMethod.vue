@@ -32,7 +32,5 @@ function columnDragDisabledMethod({ column }: any) {
 </script>
 
 <style scoped>
-.container {
-  padding: 8px;
-}
+
 </style>

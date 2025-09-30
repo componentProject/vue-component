@@ -27,9 +27,6 @@ function logTable() {
 </script>
 
 <style scoped>
-.container {
-  padding: 8px;
-}
 .btn {
   padding: 6px 10px;
   margin-bottom: 8px;

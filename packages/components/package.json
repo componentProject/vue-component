@@ -8,9 +8,9 @@
     "registry": "https://registry.npmjs.org/"
   },
   "scripts": {
-    "publish": "tsx _scripts/buildComponent.mts build-publish --uploadType=Vue3",
-    "build": "tsx _scripts/buildComponent.mts build --uploadType=Vue3",
-    "publish:allComponent": "tsx _scripts/buildComponent.mts build-publish --mode=allComponent --excludeHeavyPlugins=true --uploadType=Vue3"
+    "publish": "tsx _scripts/buildComponent.mts build-publish --uploadType=vue3Test",
+    "build": "tsx _scripts/buildComponent.mts build --uploadType=vue3Test",
+    "publish:allComponent": "tsx _scripts/buildComponent.mts build-publish --mode=allComponent --excludeHeavyPlugins=true --uploadType=vue3Test"
   },
   "dependencies": {
     "@codemirror/view": "^6.36.5",

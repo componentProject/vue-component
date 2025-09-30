@@ -115,7 +115,7 @@ const props = defineProps({
   },
 })
 
-const emits = defineEmits(['focus', 'blur', 'enter', 'clear', 'load-more'])
+const emits = defineEmits(['focus', 'blur', 'enter', 'clear', 'loadMore'])
 
 // 获取插槽
 const slots = defineSlots<slotsType>()
@@ -207,8 +207,8 @@ const computedInput = computed(() => {
 })
 
 function handleScrollBoundary(obj) {
-  if(props.enableLoadMore && props.hasMore && obj.direction === 'bottom'){
-    emits('load-more')
+  if (props.enableLoadMore && props.hasMore && obj.direction === 'bottom') {
+    emits('loadMore')
   }
 }
 </script>

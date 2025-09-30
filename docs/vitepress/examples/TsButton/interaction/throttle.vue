@@ -20,9 +20,6 @@ function onClick() {
 </script>
 
 <style scoped>
-.container {
-  padding: 8px;
-}
 .tip {
   margin-top: 8px;
   font-size: 12px;

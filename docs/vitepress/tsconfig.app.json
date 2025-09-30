@@ -36,6 +36,7 @@
     ".vitepress/**/*"
   ],
   "exclude": [
-    ".vitepress/config/**/*"
+    ".vitepress/config/**/*",
+    ".vitepress/config/*"
   ]
 }

@@ -21,9 +21,6 @@ const form = ref({ a: '', b: '', c: '', sel: '' })
 </script>
 
 <style scoped>
-.container {
-  padding: 8px;
-}
 .box {
   padding: 8px;
   border: 1px solid #e5e7eb;

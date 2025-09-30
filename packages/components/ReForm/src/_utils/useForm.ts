@@ -106,80 +106,82 @@ export function useWatchForm(
   const renderFormItemsCache = computed(() => unref(formItems))
 
   const renderFormItems = computed(() => {
-    const travel = (originItems: ReFormItem[]): ReFormItem[] => {
+    // 恢复parentPath参数，确保分组层次结构被正确处理
+    const travel = (originItems: ReFormItem[], parentPath = ''): ReFormItem[] => {
       return originItems.map((formItem: ReFormItem) => {
-        // 生成缓存key，基于field和component名称
+        // 生成缓存key，考虑分组层次结构
+        const path = parentPath ? `${parentPath}.${formItem.field}` : formItem.field
         const cacheKey = formItem.field
-          ? `${formItem.field}_${typeof formItem.component === 'string' ? formItem.component : 'component'}`
-          : JSON.stringify({type: formItem.type, component: typeof formItem.component === 'string' ? formItem.component : 'component'})
-
-        // 尝试从缓存获取配置
-        if (itemConfigCache.has(cacheKey)) {
+          ? `${path}_${typeof formItem.component === 'string' ? formItem.component : 'component'}`
+          : JSON.stringify({type: formItem.type, component: typeof formItem.component === 'string' ? formItem.component : 'component', path})
+    
+        // 尝试从缓存获取配置，但只在非分组项上使用缓存
+        if (formItem.type !== 'group' && itemConfigCache.has(cacheKey)) {
           const cachedItem = itemConfigCache.get(cacheKey)!
           // 只更新必要的属性，不重建整个对象
           if (cachedItem.props && cachedItem.field) {
-            // 避免整个props对象被替换，只更新modelValue
             cachedItem.props[cachedItem.modelProp] = unref(formData)[cachedItem.field]
           }
           return cachedItem
         }
-
+    
+        // 为每个表单项创建一个新的副本，确保不影响原始配置
         const item: ReFormItem = cloneDeep(formItem)
+        
+        // 处理非分组表单项
         if (item.type !== 'group') {
           const field = item.field
-          const updateEvent = (value: any) => {
-            // 使用nextTick确保更新的稳定性
-            nextTick(() => {
-              if (formData.value[field] !== value) {
-                formData.value[field] = value
-                emits('change', field, value, unref(formData))
-                // 只在必要时触发更新
-                triggerRef(formData)
+          if (field) {
+            // 创建更新事件处理函数
+            const updateEvent = (value: any) => {
+              // 使用nextTick确保更新的稳定性
+              nextTick(() => {
+                if (formData.value[field] !== value) {
+                  formData.value[field] = value
+                  emits('change', field, value, unref(formData))
+                  // 只在必要时触发更新
+                  triggerRef(formData)
+                }
+              })
+            }
+    
+            // 修复wrapperEvent函数，正确调用事件处理函数
+            const wrapperEvent = (originalEvent: Function | undefined, updateEvent: Function) => {
+              return (value: any) => {
+                // 先执行用户自定义事件
+                if (typeof originalEvent === 'function') {
+                  originalEvent(value)
+                }
+                // 然后执行表单更新事件
+                updateEvent(value)
               }
-            })
-          }
-
-          const wrapperEvent = (...rest: Function[]) => {
-            const events = [...rest]
-            return (value: any) => {
-              for (const event of events) {
-                event.apply(value)
-              }
             }
-          }
-
-          if (isUndefined(item.props)) {
-            item.props = {
-              [item.modelProp]: unref(formData)[item.field],
+    
+            // 确保props对象存在并设置modelValue
+            if (isUndefined(item.props)) {
+              item.props = {}
             }
-          }
-          else {
-            item.props[item.modelProp] = unref(formData)[item.field]
-          }
-
-          if (isUndefined(item.events)) {
-            item.events = {
-              [item.modelEvent]: updateEvent,
+            item.props[item.modelProp] = unref(formData)[field]
+    
+            // 确保events对象存在并设置事件处理函数
+            if (isUndefined(item.events)) {
+              item.events = {}
             }
+            const originalEvent = item.events[item.modelEvent]
+            item.events[item.modelEvent] = wrapperEvent(originalEvent, updateEvent)
           }
-          else {
-            if (isUndefined(item.events[item.modelEvent])) {
-              item.events[item.modelEvent] = updateEvent
-            }
-            else {
-              item.events[item.modelEvent] = wrapperEvent(
-                updateEvent,
-                item.events[item.modelEvent],
-              )
-            }
-          }
+    
+          // 存入缓存，确保组件实例的稳定性
+          itemConfigCache.set(cacheKey, item)
         }
         else {
-          item.children = travel(item.children)
+          // 检查item.children是否存在，避免处理空数组
+          if (item.children && item.children.length) {
+            // 传递分组路径，确保子项能够正确绑定到表单数据
+            item.children = travel(item.children, formItem.field || parentPath)
+          }
         }
-
-        // 存入缓存
-        itemConfigCache.set(cacheKey, item)
+    
         return item
       })
     }

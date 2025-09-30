@@ -80,6 +80,14 @@ export default viteConfig(
             },
           },
         },
+        css: {
+          preprocessorOptions: {
+            scss: {
+              api: 'modern-compiler',
+              additionalData: `@forward '@moluoxixi/components/_assets/styles/main.scss';`,
+            },
+          },
+        },
       },
       autoRoutes: {
         routeConfig: {

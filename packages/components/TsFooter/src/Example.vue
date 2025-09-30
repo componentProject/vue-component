@@ -34,5 +34,4 @@ const right = ref([{ text: 'GitHub', link: 'https://github.com' }])
 </script>
 
 <style scoped lang="scss">
-@forward '@moluoxixi/components/_assets/styles/main.scss';
 </style>
