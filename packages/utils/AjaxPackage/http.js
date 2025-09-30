@@ -30,10 +30,30 @@ class HttpRequest {
    * @param {object} [params] - 请求参数
    * @param {object} [config] - axios配置
    * @returns {Promise} 请求结果
+   * @returns {Promise} 请求结果
    */
-  async post(url, params = {}, config = {}) {
+  async post(url, params = {}, config = {}, addSign) {
     try {
-      const response = await this.axiosInstance.post(url, params, config)
+    // 创建一个新的配置对象，避免修改原始配置
+      let requestConfig = { ...config }
+      // 如果提供了addSign参数，在请求前应用签名
+      if (typeof addSign === 'function') {
+        try {
+        // 确保headers存在
+          if (!requestConfig.headers) {
+            requestConfig.headers = {}
+          }
+          // 应用签名函数
+          addSign(requestConfig)
+          console.log('addSign已应用到请求:', requestConfig)
+        }
+        catch (error) {
+          console.error('执行addSign时出错:', error)
+        // 即使addSign执行失败也继续请求，避免阻断业务流程
+        }
+      }
+
+      const response = await this.axiosInstance.post(url, params, requestConfig)
       return response.data
     }
     catch (error) {

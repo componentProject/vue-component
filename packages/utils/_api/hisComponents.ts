@@ -1,7 +1,7 @@
 import { getHttpService } from '../../utils/AjaxPackage/netseriver.js'
 
 const httpApi: any = getHttpService({
-  baseURL: '/ts-bs-his-base',
+  baseURL: '/ts-bs-his',
   timeout: 3000,
   getToken: () => null,
   // 响应字段配置
@@ -13,6 +13,6 @@ const httpApi: any = getHttpService({
 })
 
 //HIS6.0 获取HisFooter（医保信息）
-export function getQueryMedicaIInsuranceInfoApi(headers: any) {
-  return httpApi.post('/ts-pfs-bas/queryMedicalInsuranceInfo', {}, headers)
+export function getQueryMedicaIInsuranceInfoApi(headers: any, addSign) {
+  return httpApi.post('/ts-pfs-bas/queryMedicalInsuranceInfo', {}, headers, addSign)
 }
