@@ -33,5 +33,5 @@ runBuildCliAndExit(
     rootDir,
     packDir,
   },
-  { exampleUploadType: COMPONENT_SETTING_TYPE, defaultCommand: 'build-publish' },
+  { uploadType: COMPONENT_SETTING_TYPE, command: 'build-publish' },
 )

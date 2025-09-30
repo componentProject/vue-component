@@ -22,7 +22,6 @@ import transformAliasPlugin from './plugins/transformAliasPlugin/index.mts'
 import cssInjectedByJsPlugin from './plugins/cssInjectedByJsPlugin/index.mts'
 // import { lazyImport, VxeResolver } from 'vite-plugin-lazy-import'
 import { UploadEvent } from './utils/UploadComponent.ts'
-import { COMPONENT_SETTING_TYPE } from '@moluoxixi/constant'
 
 //#region CLI 辅助函数
 /**
@@ -53,24 +52,20 @@ export function getFlagValue(args: string[], name: string, defaultValue?: string
   return (item?.slice(prefix.length)) ?? defaultValue
 }
 
-export interface CliUsageOptions {
-  exampleUploadType: string
-  defaultCommand?: 'build' | 'build-publish'
-}
 /**
  * 打印统一的 CLI 使用说明。
  *
  * @param options 配置
- * @param options.exampleUploadType 示例中的 uploadType 值
- * @param [options.defaultCommand] 示例中标注的默认命令，函数内默认为 'build'
+ * @param options.uploadType 示例中的 uploadType 值
+ * @param [options.command] 示例中标注的默认命令，函数内默认为 'build'
  */
-export function printUsage(options: CliUsageOptions): void {
-  const { exampleUploadType, defaultCommand = 'build' } = options
-  const buildLine = `  build         - 仅构建组件${defaultCommand === 'build' ? '（默认）' : ''}`
-  const publishLine = `  build-publish - 构建并发布组件${defaultCommand === 'build-publish' ? '（默认）' : ''}`
+export function printUsage(options: RunBuildCliOptions): void {
+  const { uploadType, command = 'build-publish' } = options
+  const buildLine = `  build         - 仅构建组件${command === 'build' ? '（默认）' : ''}`
+  const publishLine = `  build-publish - 构建并发布组件${command === 'build-publish' ? '（默认）' : ''}`
   console.log(`
 使用方法:
-  tsx [引用runBuildCliAndExit方法的文件路径] [command] --mode=[mode] --excludeHeavyPlugins=[excludeHeavyPlugins] --uploadType=${exampleUploadType}
+  tsx [引用runBuildCliAndExit方法的文件路径] [command] --mode=[mode] --excludeHeavyPlugins=[excludeHeavyPlugins] --uploadType=${uploadType}
 
 命令(可选):
 ${buildLine}
@@ -85,12 +80,12 @@ ${publishLine}
   [excludeHeavyPlugins]  是否排除重型插件，true/false（默认 false）
 
 必填参数:
-  --uploadType=${exampleUploadType}  上传类型
+  --uploadType=${uploadType}  上传类型
 
 示例:
-  tsx _scripts/buildComponent.mts build --uploadType=${exampleUploadType}
-  tsx _scripts/buildComponent.mts build-publish --mode=library --uploadType=${exampleUploadType}
-  tsx _scripts/buildComponent.mts --uploadType=${exampleUploadType}
+  tsx _scripts/buildComponent.mts build --uploadType=${uploadType}
+  tsx _scripts/buildComponent.mts build-publish --mode=library --uploadType=${uploadType}
+  tsx _scripts/buildComponent.mts --uploadType=${uploadType}
   `)
 }
 //#endregion
@@ -98,8 +93,8 @@ ${publishLine}
 //#region CLI 运行器
 export type RunBuildCliParams = Omit<BuildOptions, 'mode' | 'shouldPublish' | 'excludeHeavyPlugins' | 'uploadType'>
 export interface RunBuildCliOptions {
-  exampleUploadType?: string
-  defaultCommand?: 'build' | 'build-publish'
+  uploadType?: string
+  command?: 'build' | 'build-publish'
 }
 
 /**
@@ -116,14 +111,14 @@ export async function runBuildCli(params: RunBuildCliParams, cli?: RunBuildCliOp
   const firstArg = args[0]
   const command = (firstArg === 'build' || firstArg === 'build-publish')
     ? firstArg
-    : (cli?.defaultCommand || 'build-publish')
+    : (cli?.command || 'build-publish')
   const mode = getFlagValue(args, 'mode', 'all')
   const excludeHeavyPlugins = parseBoolean(getFlagValue(args, 'excludeHeavyPlugins', 'false'), false)
-  const uploadType = getFlagValue(args, 'uploadType')
+  const uploadType = getFlagValue(args, 'uploadType', cli?.uploadType)
 
   if (!uploadType) {
     console.error('错误: 缺少必填参数 uploadType')
-    printUsage({ exampleUploadType: cli?.exampleUploadType || COMPONENT_SETTING_TYPE, defaultCommand: cli?.defaultCommand || 'build-publish' })
+    printUsage(cli)
     return 1
   }
 
@@ -369,9 +364,10 @@ async function getCurrentVersions(ctx: BuildContext): Promise<Record<string, str
  * 获取下一个版本号
  * @param currentVersion 当前版本号
  * @param type 版本类型：major, minor, patch
+ * @param uploadType
  * @returns 下一个版本号
  */
-function getNextVersion(currentVersion: string, type: 'major' | 'minor' | 'patch' = 'patch'): string {
+function getNextVersion(currentVersion: string, type: 'major' | 'minor' | 'patch' = 'patch', uploadType?: string): string {
   // 解析当前版本号，处理可能存在的预发布版本号
   const versionParts = currentVersion.split('-')
   const mainVersion = versionParts[0]
@@ -398,7 +394,7 @@ function getNextVersion(currentVersion: string, type: 'major' | 'minor' | 'patch
       newPatch++
       break
   }
-  if (COMPONENT_SETTING_TYPE.includes('Test')) {
+  if (uploadType?.includes('Test')) {
     // 生成新版本号并添加 beta 后缀
     // 如果当前版本已经是 beta 版本，则递增 beta 版本号
     if (versionParts.length > 1 && versionParts[1].startsWith('beta.')) {
@@ -1143,7 +1139,7 @@ async function buildComponent(
       pkgJson.exports['./style.css'] = './es/style/index.css'
     }
     // 生成新版本号
-    const newVersion = getNextVersion(currentVersion, 'patch')
+    const newVersion = getNextVersion(currentVersion, 'patch', ctx.uploadType)
     pkgJson.version = newVersion
 
     // 写入package.json
@@ -1323,7 +1319,7 @@ export async function buildComponentsWithOptions(options: BuildOptions): Promise
     requireExternalPacks: reqExternal = [],
     entryBaseUrl: ebu = '/',
     presetGlobals: presetGlobalsArg,
-    uploadType = COMPONENT_SETTING_TYPE,
+    uploadType,
   } = options || ({} as BuildOptions)
 
   // 必填参数校验
