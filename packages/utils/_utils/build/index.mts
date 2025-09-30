@@ -1148,25 +1148,28 @@ async function buildComponent(
     console.log(`==========  ${buildName} 打包完成 ==========`)
     // 如果需要发布，执行发布
     if (shouldPublish) {
-      const res = await UploadEvent(fileUrl, buildName, ctx.uploadType || 'Vue3')
-      console.log('res', res)
-      console.log(`准备发布 ${buildName}，版本：${currentVersion} -> ${newVersion}`)
-
-      await writeComponentVersions(ctx, {
-        [componentKey]: newVersion,
-      })
-
-      try {
-        console.log(`开始发布 ${pkgJson.name}@${pkgJson.version}...`)
-
-        // 发布组件
-        const packageDir = comp ? `${ctx.LIB_NAMESPACE}/packages/${comp}` : ctx.LIB_NAMESPACE
-        execSync(`cd ${packageDir} && npm publish --tag beta`, { stdio: 'inherit' })
-        console.log(`${pkgJson.name}@${pkgJson.version} 发布成功！`)
+      if (ctx.uploadType) {
+        const res = await UploadEvent(fileUrl, buildName, ctx.uploadType)
+        console.log('res', res)
       }
-      catch (error) {
-        console.error('发布失败:', error)
-        return false
+      else {
+        console.log(`准备发布 ${buildName}，版本：${currentVersion} -> ${newVersion}`)
+        await writeComponentVersions(ctx, {
+          [componentKey]: newVersion,
+        })
+
+        try {
+          console.log(`开始发布 ${pkgJson.name}@${pkgJson.version}...`)
+
+          // 发布组件
+          const packageDir = comp ? `${ctx.LIB_NAMESPACE}/packages/${comp}` : ctx.LIB_NAMESPACE
+          execSync(`cd ${packageDir} && npm publish --tag beta`, { stdio: 'inherit' })
+          console.log(`${pkgJson.name}@${pkgJson.version} 发布成功！`)
+        }
+        catch (error) {
+          console.error('发布失败:', error)
+          return false
+        }
       }
     }
 
