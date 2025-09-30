@@ -7,8 +7,8 @@
     "registry": "https://registry.npmjs.org/"
   },
   "scripts": {
-    "publish": "tsx _scripts/buildComponent.mts build-publish --uploadType=UtilityClass",
-    "build": "tsx _scripts/buildComponent.mts build --uploadType=UtilityClass"
+    "publish": "tsx _scripts/buildComponent.mts build-publish",
+    "build": "tsx _scripts/buildComponent.mts build"
   },
   "dependencies": {
     "@google/genai": "^1.20.0",
