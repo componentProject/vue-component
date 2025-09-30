@@ -2,8 +2,6 @@ import viteConfig, { wrapperEnv } from '../../packages/utils/ViteConfig/index.ts
 import path from 'node:path'
 import process from 'node:process'
 import { loadEnv } from 'vite'
-// sentry
-import { sentryVitePlugin } from '@sentry/vite-plugin'
 
 export default viteConfig(
   ({ mode }) => {
@@ -38,19 +36,10 @@ export default viteConfig(
           extensions: ['.js', '.jsx', '.ts', '.tsx', '.vue'],
           alias: {
             '@moluoxixi/components': path.resolve(rootPath, '../../packages/components'),
-            '@moluoxixi/components/*': path.resolve(rootPath, '../../packages/components/*'),
             '@moluoxixi/utils': path.resolve(rootPath, '../../packages/utils'),
-            '@moluoxixi/utils/*': path.resolve(rootPath, '../../packages/utils/*'),
           },
         },
-        plugins: [
-          viteEnv.VITE_SENTRY
-          && sentryVitePlugin({
-            authToken: process.env.SENTRY_AUTH_TOKEN,
-            org: 'f1f562b9b82f',
-            project: 'javascript-vue',
-          }),
-        ],
+        plugins: [],
         server: {
           proxy: {
             // '/ts-bs-his-base': {

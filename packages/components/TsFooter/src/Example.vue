@@ -32,3 +32,7 @@ const base = ref([
 const left = ref(['沪ICP备00000000号-1'])
 const right = ref([{ text: 'GitHub', link: 'https://github.com' }])
 </script>
+
+<style scoped lang="scss">
+@forward '@moluoxixi/components/_assets/styles/main.scss';
+</style>
