@@ -46,4 +46,6 @@ onMounted(() => {
 })
 </script>
 
-<style scoped></style>
+<style lang="scss" scoped>
+@forward '@moluoxixi/components/_assets/styles/main.scss';
+</style>

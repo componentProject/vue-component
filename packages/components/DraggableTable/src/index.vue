@@ -1328,6 +1328,10 @@ defineExpose({
 
 <style scoped lang="scss">
 @forward '@moluoxixi/components/_assets/styles/main.scss';
+:deep(*) {
+  @import 'vxe-pc-ui/es/style.css';
+  @import 'vxe-table/es/style.css';
+}
 .table-box {
   :deep(.vxe-table--filter-template) {
     display: flex !important;
