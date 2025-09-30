@@ -1,7 +1,7 @@
 <template>
   <DragModalDialog
-    resizable
     v-model:visible="visible"
+    resizable
     v-bind="props.dialogProps"
   >
     <VxeGrid
@@ -118,7 +118,6 @@ const xTable = useTemplateRef('xTable')
 
 const visible = defineModel<boolean>({ default: false })
 
-
 // 处理正整数输入
 function handlePositiveNumberInput(row: any, field: string, value: string) {
   let filtered = String(value || '').replace(/\D/g, '')
@@ -204,3 +203,9 @@ defineExpose({
   isCommon,
 })
 </script>
+
+<style scoped lang="scss">
+:deep(*) {
+  @import '@moluoxixi/components/_assets/styles/vxeStyle.scss';
+}
+</style>

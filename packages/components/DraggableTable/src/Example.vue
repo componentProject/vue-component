@@ -157,14 +157,6 @@ const tableData = ref([
 // 列配置
 const columns = ref([
   { type: 'seq', width: 70 },
-  // {
-  //   field: 'name',
-  //   title: 'Name',
-  //   fixed: 'left',
-  //   min: 3,
-  //   max: 10,
-  //   required: true,
-  // },
   { field: 'createTime', title: '日期', width: 150 },
   {
     field: 'sex',
@@ -179,6 +171,22 @@ const columns = ref([
         value: '2',
       },
     ],
+  },
+  {
+    field: 'name',
+    title: 'Name',
+    fixed: 'left',
+    min: 3,
+    max: 10,
+    required: true,
+  },
+  {
+    field: 'name1',
+    title: 'Name',
+    fixed: 'left',
+    min: 3,
+    max: 10,
+    required: true,
   },
   {
     field: 'age1',
