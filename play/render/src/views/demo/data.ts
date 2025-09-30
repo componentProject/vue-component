@@ -86,6 +86,47 @@ export default {
         field: 'age',
         defaultValue: 3,
         component: ElInput,
+        props: {
+          onInput: (val: string) => {
+            console.log('onInput111111111', val)
+          },
+        },
+      },
+      {
+        label: 'Birthday1',
+        field: 'birthday1',
+        component: ElDatePicker,
+        tooltip: '这是tooltip',
+        props: {
+          type: 'date',
+          format: 'YYYY/MM/DD',
+        },
+      },
+      {
+        label: 'Subject1',
+        field: 'subject1',
+        component: ElSelect,
+        childComp: ElOption,
+        tooltip: '这是tooltip',
+        tips: '这是显眼的tips',
+        options: [
+          {
+            label: 'Subject1',
+            value: '1',
+          },
+          {
+            label: 'Subject2',
+            value: '2',
+          },
+          {
+            label: 'Subject3',
+            value: '3',
+          },
+        ],
+        rules: [{ required: true, message: '不能为空' }],
+        props: {
+          clearable: true,
+        },
       },
       {
         type: 'group',
@@ -101,6 +142,11 @@ export default {
             field: 'age3',
             defaultValue: 3,
             component: ElInput,
+            props: {
+              change: (val: string) => {
+                console.log('change22222222', val)
+              },
+            },
           },
           {
             label: 'Remark',
@@ -108,6 +154,9 @@ export default {
             component: 'el-textarea',
             props: {
               rows: 4,
+              change: (val: string) => {
+                console.log('change111111111', val)
+              },
             },
           },
           {
@@ -124,6 +173,7 @@ export default {
             label: 'Subject',
             field: 'subject',
             component: ElSelect,
+            childComp: ElOption,
             tooltip: '这是tooltip',
             tips: '这是显眼的tips',
             options: [
