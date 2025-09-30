@@ -53,7 +53,11 @@ function createHttpService(options = {}) {
       return httpInstance.get(url, params, config)
     },
 
-    post(url, data, config) {
+    post(url, data, config, addSign) {
+      // 保持现有的优先级逻辑，但移除默认值
+      if (typeof addSign === 'function') {
+        return httpInstance.post(url, data, config, addSign)
+      }
       return httpInstance.post(url, data, config)
     },
 

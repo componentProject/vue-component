@@ -1,5 +1,5 @@
 <template>
-  <TsFooter :items="items" />
+  <TsFooter v-if="items.length" class="his-footer" :items="items" />
 </template>
 
 <script setup lang="ts">
@@ -13,6 +13,10 @@ const props = defineProps({
   token: {
     type: String,
     default: null,
+  },
+  addSign: {
+    type: Function,
+    default: () => {},
   },
   paramsObj: {
     type: Object,
@@ -30,20 +34,29 @@ async function getQueryMedicaIInsuranceInfo() {
     headers: {
       Token: props.token,
     },
-  })
+  }, props.addSign)
   if (res) {
     items.value = []
     for (const key in props.paramsObj) {
       if (res[key]) {
-        items.value.push({ text: `${props.paramsObj[key]}:${res[key]}` })
+        items.value.push({ text: `${props.paramsObj[key]}: ${res[key]}` })
       }
     }
   }
 }
-
 onMounted(() => {
   if (props.token) {
     getQueryMedicaIInsuranceInfo()
   }
 })
+
+defineExpose({
+  items,
+})
 </script>
+
+<style scoped lang="scss">
+.his-footer {
+  margin-top: 10px;
+}
+</style>

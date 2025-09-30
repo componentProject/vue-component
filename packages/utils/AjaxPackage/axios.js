@@ -30,7 +30,7 @@ export function createAxiosInstance(baseURL, timeout = 5000, options = {}) {
     timeout,
   })
 
-  // 请求拦截器 - 添加token
+  // 请求拦截器 - 添加token和签名
   instance.interceptors.request.use(
     (config) => {
       // 添加token到请求头
@@ -121,7 +121,6 @@ export function createAxiosInstance(baseURL, timeout = 5000, options = {}) {
     async (error) => {
       // 处理响应错误
       if (error.response?.status === 401) {
-        return
         // token过期，触发回调
         onLoginRequired()
         ElMessage.error({
