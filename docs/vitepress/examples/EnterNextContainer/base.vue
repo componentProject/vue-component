@@ -28,9 +28,6 @@ function handleNoNextInput() {
 </script>
 
 <style scoped>
-.container {
-  padding: 8px;
-}
 .ipt {
   display: block;
   margin-bottom: 8px;

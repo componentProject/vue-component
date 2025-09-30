@@ -41,7 +41,5 @@ function handlePageChange(params: any) {
 </script>
 
 <style scoped>
-.container {
-  padding: 8px;
-}
+
 </style>

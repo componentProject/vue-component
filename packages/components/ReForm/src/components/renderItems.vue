@@ -128,7 +128,6 @@ const collapsedTriggerMargin = computed(() => {
 </script>
 
 <style lang="scss" scoped>
-@forward '@moluoxixi/components/_assets/styles/main.scss';
 .ap-form-group {
   @apply relative w-full;
 

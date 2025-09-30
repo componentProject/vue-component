@@ -28,7 +28,6 @@ function handleExport() {
 </script>
 
 <style lang="scss" scoped>
-@forward '@moluoxixi/components/_assets/styles/main.scss';
 pre {
   white-space: pre-wrap;
 }

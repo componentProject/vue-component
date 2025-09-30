@@ -65,7 +65,6 @@ function getPanelProp<T>(slotName: string | number | undefined, prop: keyof Pane
 </script>
 
 <style scoped lang="scss">
-@forward '@moluoxixi/components/_assets/styles/main.scss';
 /* 自定义分割条样式 */
 :deep(.el-splitter-bar) {
   .el-splitter-bar__dragger-horizontal {

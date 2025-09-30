@@ -34,9 +34,6 @@ function onChange(e: any) {
 </script>
 
 <style scoped>
-.container {
-  padding: 8px;
-}
 .value {
   margin-top: 8px;
   font-size: 12px;

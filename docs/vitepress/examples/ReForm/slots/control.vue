@@ -3,7 +3,9 @@
     <ReForm v-bind="formData">
       <template #name-control="{ item }">
         <el-input v-bind="item.props" v-on="item.events" />
-        <div class="ml-2">custom name control</div>
+        <div class="ml-2">
+          custom name control
+        </div>
       </template>
     </ReForm>
   </div>
