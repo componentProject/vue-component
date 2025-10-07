@@ -29,24 +29,36 @@ const props = defineProps({
 
 const items = ref<any[]>([])
 
-async function getQueryMedicaIInsuranceInfo() {
-  const res = await getQueryMedicaIInsuranceInfoApi({
-    headers: {
-      Token: props.token,
-    },
-  }, props.addSign)
-  if (res) {
+async function getMedicalInsuranceInfo() {
+  try {
+    // 获取医保信息数据
+    const res = await getQueryMedicaIInsuranceInfoApi({
+      headers: {
+        Token: props.token,
+      },
+    }, props.addSign)
+    // 清空现有数据
     items.value = []
-    for (const key in props.paramsObj) {
-      if (res[key]) {
-        items.value.push({ text: `${props.paramsObj[key]}: ${res[key]}` })
-      }
+    // 检查响应和参数字典是否有效
+    if (!res || typeof res !== 'object' || !props.paramsObj || typeof props.paramsObj !== 'object') {
+      return
     }
+    items.value = Object.keys(props.paramsObj)
+      .filter(key => Reflect.has(res, key))
+      .map((key) => {
+        // 格式化显示文本，处理空值情况
+        const value = res[key] ?? '未维护'
+        return { text: `${props.paramsObj[key]}: ${value}` }
+      })
+  }
+  catch (error) {
+    console.error('获取医保信息失败:', error)
+    // 可以根据需要添加错误提示逻辑
   }
 }
 onMounted(() => {
   if (props.token) {
-    getQueryMedicaIInsuranceInfo()
+    getMedicalInsuranceInfo()
   }
 })
 
