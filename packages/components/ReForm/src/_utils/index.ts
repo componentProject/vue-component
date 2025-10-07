@@ -88,7 +88,8 @@ export function normalizeFormItems(
       // 根据不同布局类型设置不同的默认span值
       if (isUndefined(item.span)) {
         if (layout === 'flex') {
-          formItem.span = 6
+          // 对于分组项，默认span为24；非分组项保持默认为6
+          formItem.span = item.type === 'group' ? 24 : 6
         }
         else if (layout === 'grid') {
           formItem.span = 24

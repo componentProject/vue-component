@@ -28,6 +28,7 @@
             <div
               v-show="!formCollapsed[item.field]"
               class="ap-form-group__content"
+              :class="layout === 'flex' ? 'ap-form-flex' : 'ap-form-grid'"
               :style="gridTemplateStyle"
             >
               <ReFormRenderItems :items="item.children">
@@ -89,6 +90,7 @@ const {
   labelPosition,
   handleSwitchCollapsed,
   layout,
+  itemWidth = computed(() => undefined),
   colGap = computed(() => 16), // 新增colGap注入，默认16px
 } = inject(Symbol.for('ap-re-form')) as any
 
@@ -108,7 +110,18 @@ function getItemStyle(item: ReFormItem): string {
     }
   }
   else {
-    // flex布局保持原有的计算逻辑
+    // flex布局下优先检查表单项的itemWidth，其次是全局的itemWidth
+    const finalItemWidth = item.itemWidth !== undefined ? item.itemWidth : unref(itemWidth)
+
+    if (finalItemWidth !== undefined) {
+      // 如果设置了itemWidth，使用固定宽度
+      const width = typeof finalItemWidth === 'number'
+        ? `${finalItemWidth}px`
+        : finalItemWidth
+      return `width: ${width}; flex-shrink: 0;`
+    }
+
+    // 没有设置itemWidth时保持原有逻辑
     const safeGridResponsive = Math.max(unref(gridResponsive) || 1, 1)
     const safeColGap = Math.max(unref(colGap) || 0, 0)
 
@@ -139,6 +152,9 @@ const collapsedTriggerMargin = computed(() => {
     @apply grid;
 
     transition: grid-template-columns 0.2s ease; /* 过渡效果 */
+  }
+  .ap-form-flex {
+    @apply flex flex-wrap;
   }
 }
 </style>
