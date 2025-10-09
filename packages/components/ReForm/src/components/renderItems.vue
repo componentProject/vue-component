@@ -74,13 +74,6 @@ const props = defineProps<{
   items: ReFormItem[]
 }>()
 
-// 使用inject时传入默认值避免报错
-const formContext = inject(Symbol.for('ap-re-form'), {
-  layout: computed(() => 'grid'),
-  gridResponsive: computed(() => 24),
-  // 其他必要的默认值
-})
-
 const {
   gridTemplateStyle,
   gridResponsive,
