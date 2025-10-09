@@ -9,5 +9,8 @@ import { ElOption } from 'element-plus'
 </script>
 
 <style scoped>
-@forward 'element-plus/theme-chalk/src/option.scss';
+@import 'element-plus/theme-chalk/el-option.css';
+:deep(*) {
+  @import 'element-plus/theme-chalk/el-option.css';
+}
 </style>

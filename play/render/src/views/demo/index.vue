@@ -160,8 +160,8 @@ async function handleClick() {
 }
 
 onMounted(async () => {
-  await loadLocalComponent(componentName.value)
-  await loadComponents([componentName.value])
+  // await loadLocalComponent(componentName.value)
+  // await loadComponents([componentName.value])
 })
 </script>
 

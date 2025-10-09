@@ -10,15 +10,14 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { ElInput } from 'element-plus'
-import '@moluoxixi/components/_assets/styles/elementPlusVariable.css'
 // 获取插槽
 const slots = defineSlots<slotsType>()
 const slotNames = computed<string[]>(() => Object.keys(slots) as string[])
 </script>
 
 <style scoped>
+@import 'element-plus/theme-chalk/el-input.css';
 :deep(*) {
-  @import '@moluoxixi/components/_assets/styles/elementPlusBase.css';
   @import 'element-plus/theme-chalk/el-input.css';
 }
 </style>

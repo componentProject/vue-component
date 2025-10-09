@@ -9,5 +9,8 @@ import { ElSwitch } from 'element-plus'
 </script>
 
 <style scoped>
-@forward 'element-plus/theme-chalk/src/switch.scss';
+@import 'element-plus/theme-chalk/el-switch.css';
+:deep(*) {
+  @import 'element-plus/theme-chalk/el-switch.css';
+}
 </style>

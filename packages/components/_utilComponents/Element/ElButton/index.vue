@@ -8,6 +8,6 @@
 import { ElButton } from 'element-plus'
 </script>
 
-<style scoped lang="scss">
-@forward 'element-plus/theme-chalk/src/button.scss';
+<style scoped>
+@import 'element-plus/theme-chalk/el-button.css';
 </style>

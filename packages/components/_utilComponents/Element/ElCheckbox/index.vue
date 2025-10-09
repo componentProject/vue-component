@@ -9,5 +9,8 @@ import { ElCheckbox } from 'element-plus'
 </script>
 
 <style scoped>
-@forward 'element-plus/theme-chalk/src/checkbox.scss';
+@import 'element-plus/theme-chalk/el-checkbox.css';
+:deep(*) {
+  @import 'element-plus/theme-chalk/el-checkbox.css';
+}
 </style>
