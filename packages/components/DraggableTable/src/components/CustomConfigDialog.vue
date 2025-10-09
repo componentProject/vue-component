@@ -55,7 +55,8 @@
       <div class="flex justify-end items-center">
         <ElCheckbox
           v-if="isConfiguration"
-          v-model="isCommon" style="margin-right: 40px;" label="作为统一配置"
+          v-model="isCommon" style="margin-right: 40px;"
+          label="作为统一配置"
           size="large"
         />
         <ElButton @click="handleEvent('reset')">
