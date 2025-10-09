@@ -61,6 +61,7 @@ import type {
   VxeTablePropTypes,
 } from 'vxe-table'
 import { VxeGrid } from 'vxe-table'
+import { computed, nextTick, onBeforeMount, onBeforeUnmount, onMounted, ref, useAttrs, useTemplateRef, watch } from 'vue'
 import type { ColumnType, DraggableTableEmits, DraggableTableProps } from './_types'
 import { ElMessage } from 'element-plus'
 import '@moluoxixi/components/_assets/styles/vxeVariable.scss'
@@ -261,17 +262,16 @@ const props = withDefaults(defineProps<DraggableTableProps>(), {
 // 当在表格中最后一个输入元素按下Enter键时触发
 // 当在表格中select下拉为空时触发
 const emit = defineEmits<DraggableTableEmits>()
-// 获取插槽
-const slots = defineSlots<slotsType>()
 // 注册 VxeUI 组件
-;(VxeUI as any).component(VxePager)
+// 获取插槽
+// eslint-disable-next-line style/max-statements-per-line
+const slots = defineSlots<slotsType>(); (VxeUI as any).component(VxePager)
 ;(VxeUI as any).component(VxeTooltip)
 
 const customConfigDialogVisible = ref(false)
 const customConfigDialogRef = useTemplateRef<HTMLElement>('customConfigDialogRef')
 
 const attrs = useAttrs()
-
 const slotNames = computed<string[]>(() => Object.keys(slots) as string[])
 
 const tableData = defineModel({

@@ -195,7 +195,8 @@ export default defineComponent({
     return () =>
       currOption.value && (
         <div
-          class="p-8 select-none flex-1-hidden flex flex-col">
+          class="p-8 select-none flex-1-hidden flex flex-col"
+        >
           <div class="flex flex-col flex-1-hidden">
             {filterLayoutRender.value}
           </div>

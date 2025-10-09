@@ -89,7 +89,7 @@ function themeManager(props: QiankunProps) {
 
 async function render(props: QiankunProps) {
   const { container } = props
-  proxy(container as HTMLElement)
+  // proxy(container as HTMLElement)
   app = createApp(App)
   // window.$remoteLoad = load
   const res = await load(Vue)
