@@ -9,7 +9,7 @@
 
 <script setup lang="ts">
 import { computed, useTemplateRef } from 'vue'
-import '@moluoxixi/components/VxeUI/VxeGrid/variable.scss'
+import './variable.scss'
 import { VxeGrid } from 'vxe-table'
 // 获取插槽
 const slots = defineSlots<slotsType>()

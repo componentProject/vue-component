@@ -75,7 +75,7 @@
 <script lang="ts" setup>
 import { computed, ref, useTemplateRef } from 'vue'
 import { VxeGrid } from '@moluoxixi/components/VxeUI'
-import { ElButton, ElCheckbox, ElInput, ElOption, ElSelect, ElSwitch } from '@moluoxixi/components/Element'
+import { ElButton, ElCheckbox, ElInput, ElOption, ElSelect, ElSwitch } from '@moluoxixi/components/ElementUI'
 import { getTypeName } from '@moluoxixi/components/DraggableTable/src/_utils'
 import DragModalDialog from '@moluoxixi/components/DragModalDialog'
 import type { ColumnType } from '@moluoxixi/components/DraggableTable/src/_types'
