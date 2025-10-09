@@ -15,21 +15,21 @@
         v-bind="componentProps"
       />
     </div>
-    <div class="main">
-      <div class="list-title">
-        引用组件库解析的组件
-      </div>
-      <component
-        :is="dynamicComponent"
-        v-bind="secondComponentProps"
-      />
-    </div>
+    <!--    <div class="main"> -->
+    <!--      <div class="list-title"> -->
+    <!--        引用组件库解析的组件 -->
+    <!--      </div> -->
+    <!--      <component -->
+    <!--        :is="dynamicComponent" -->
+    <!--        v-bind="secondComponentProps" -->
+    <!--      /> -->
+    <!--    </div> -->
   </div>
 </template>
 
 <script setup lang="ts">
 import * as vue from 'vue'
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { load } from '../../../utils.ts'
 // 虚拟模块由 Vite 插件在运行时提供
 import { setDeleteByPathAndCode } from '@moluoxixi/utils/_api'
@@ -37,9 +37,13 @@ import componentData from './data.ts'
 
 defineOptions({ name: '调试与演示' })
 // 使用ref替代data属性
-const componentName = ref('ReForm') // 调试与演示组件库的组件，直接修改组件名
-const localComponent = ref<any>(null) // 调试组件
-const dynamicComponent = ref<any>(null) // 用于存储动态组件
+// 调试与演示组件库的组件，直接修改组件名
+// const componentName = ref('ReForm')
+const componentName = ref('DraggableTable')
+// 调试组件
+const localComponent = ref<any>(null)
+// 用于存储动态组件
+const dynamicComponent = ref<any>(null)
 
 // 从data.ts获取当前组件的配置
 const componentConfig = computed(() => {
@@ -157,10 +161,8 @@ async function handleClick() {
 
 onMounted(async () => {
   await loadLocalComponent(componentName.value)
-  return
   await loadComponents([componentName.value])
 })
-
 </script>
 
 <style scoped lang="scss">

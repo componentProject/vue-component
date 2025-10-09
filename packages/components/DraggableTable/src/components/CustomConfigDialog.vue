@@ -75,7 +75,9 @@
 <script lang="ts" setup>
 import { computed, ref } from 'vue'
 import { VxeGrid } from 'vxe-table'
+// import { ElButton, ElCheckbox, ElInput, ElOption, ElSelect, ElSwitch } from '@moluoxixi/components/_utilComponents/Element'
 import { ElButton, ElCheckbox, ElInput, ElOption, ElSelect, ElSwitch } from 'element-plus'
+import '@moluoxixi/components/_assets/styles/elementPlusVariable.css'
 import { getTypeName } from '@moluoxixi/components/DraggableTable/src/_utils'
 import DragModalDialog from '@moluoxixi/components/DragModalDialog'
 import type { ColumnType } from '@moluoxixi/components/DraggableTable/src/_types'
@@ -207,5 +209,8 @@ defineExpose({
 <style scoped lang="scss">
 :deep(*) {
   @import '@moluoxixi/components/_assets/styles/vxeStyle.scss';
+  @import 'element-plus/theme-chalk/index.css';
 }
+@import 'element-plus/theme-chalk/el-button.css';
+@import 'element-plus/theme-chalk/el-checkbox.css';
 </style>

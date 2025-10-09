@@ -1,4 +1,4 @@
-import { ElCheckboxGroup, ElDatePicker, ElInput, ElInputNumber, ElRadioGroup, ElSelect } from 'element-plus'// 导入自定义组件
+import { ElCheckboxGroup, ElDatePicker, ElInput, ElRadioGroup, ElSelect } from 'element-plus'// 导入自定义组件
 import { ElCheckbox, ElOption, ElRadio } from 'element-plus'
 
 const statusMap = {
@@ -54,7 +54,7 @@ export default {
     resizable: true,
     saveType: 'server',
     isConfiguration: true,
-    columndragable: true,
+    // columndragable: true,
     // 数据绑定配置
     bindings: ['v-model=tableData'],
   },
