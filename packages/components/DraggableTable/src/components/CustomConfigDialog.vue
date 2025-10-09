@@ -73,14 +73,15 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, ref } from 'vue'
-import { VxeGrid } from 'vxe-table'
-import { ElButton, ElCheckbox, ElInput, ElOption, ElSelect, ElSwitch } from '@moluoxixi/components/_utilComponents/Element'
+import { computed, ref, useTemplateRef } from 'vue'
+import { VxeGrid } from '@moluoxixi/components/VxeUI'
+import { ElButton, ElCheckbox, ElInput, ElOption, ElSelect, ElSwitch } from '@moluoxixi/components/Element'
 import { getTypeName } from '@moluoxixi/components/DraggableTable/src/_utils'
 import DragModalDialog from '@moluoxixi/components/DragModalDialog'
 import type { ColumnType } from '@moluoxixi/components/DraggableTable/src/_types'
 import { flattenTree } from '@moluoxixi/utils/_utils'
 import { cloneDeep } from 'lodash'
+import type { VxeGridInstance } from 'vxe-table'
 
 const props = defineProps({
   columns: {
@@ -114,7 +115,8 @@ const props = defineProps({
 const emit = defineEmits<{
   (e: 'confirm', customColumns: any[]): void
 }>()
-const xTable = useTemplateRef('xTable')
+const tableRef = useTemplateRef<VxeGridInstance>('xTable')
+const xTable = computed(() => tableRef.value?.tableRef)
 
 const visible = defineModel<boolean>({ default: false })
 
@@ -203,9 +205,3 @@ defineExpose({
   isCommon,
 })
 </script>
-
-<style scoped lang="scss">
-:deep(*) {
-  @import '@moluoxixi/components/_assets/styles/vxeStyle.scss';
-}
-</style>

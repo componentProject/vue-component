@@ -60,11 +60,10 @@ import type {
   VxeTableDefines,
   VxeTablePropTypes,
 } from 'vxe-table'
-import { VxeGrid } from 'vxe-table'
+import { VxeGrid } from '@moluoxixi/components/VxeUI'
 import { computed, nextTick, onBeforeMount, onBeforeUnmount, onMounted, ref, useAttrs, useTemplateRef, watch } from 'vue'
 import type { ColumnType, DraggableTableEmits, DraggableTableProps } from './_types'
 import { ElMessage } from 'element-plus'
-import '@moluoxixi/components/_assets/styles/vxeVariable.scss'
 import { cloneDeep, groupBy } from 'lodash'
 import { diff, isEmpty } from 'radash'
 import Sortable from 'sortablejs'
@@ -280,7 +279,8 @@ const tableData = defineModel({
 })
 
 // 表格引用
-const xTable = useTemplateRef<VxeGridInstance>('xTable')
+const tableRef = useTemplateRef<VxeGridInstance>('xTable')
+const xTable = computed(() => tableRef.value?.tableRef)
 
 //#region 回车下一个功能
 const tableVirtualRefs = ref<HTMLElement[]>([])
@@ -1327,9 +1327,6 @@ defineExpose({
 </script>
 
 <style scoped lang="scss">
-:deep(*) {
-  @import '@moluoxixi/components/_assets/styles/vxeStyle.scss';
-}
 .table-box {
   :deep(.vxe-table--filter-template) {
     display: flex !important;
