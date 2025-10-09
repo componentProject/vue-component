@@ -32,6 +32,8 @@ export interface ReFormProps {
   btnSpanStyle?: string
   /**表单布局类型：grid或flex */
   layout?: 'grid' | 'flex'
+  /**全局表单项宽度（在flex布局下生效） */
+  itemWidth?: number | string
   /**表单按钮组-提交按钮文字 */
   submitBtnText?: string
   /**表单按钮组-取消按钮文字 */
@@ -74,6 +76,7 @@ export interface ReFormItem extends ReFormGroupItem {
   customClass?: string // form-item样式类
   controlClass?: string // 控件样式
   span?: number | ReGridResponsive // 表单字段栅格占比
+  itemWidth?: number | string //表单项目宽度，在flex布局下生效
   defaultValue?: any // 表单字段默认值
   tooltip?: string // 问号提示语
   tips?: string // 表单控件下方提示

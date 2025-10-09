@@ -7,7 +7,6 @@
     class="ap-collapsed-btn"
     @click="handleSwitchCollapsed"
   >
-    <!-- 移除错误的代码行 -->
     <span v-if="!hiddenText" class="ap-collapsed-btn__text">{{
       modelValue ? localCollapsedText[0] : localCollapsedText[1]
     }}</span>

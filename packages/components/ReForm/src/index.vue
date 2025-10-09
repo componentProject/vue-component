@@ -52,7 +52,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, onMounted, provide, unref, useAttrs, onUnmounted } from 'vue'
+import { computed, nextTick, onMounted, onUnmounted, provide, unref, useAttrs } from 'vue'
 import type { ReFormEmits, ReFormProps } from './_types'
 import useForm, { useWatchForm } from './_utils/useForm'
 import { cloneDeep, isUndefined } from 'lodash'
@@ -156,7 +156,7 @@ const gridTemplateStyle = computed(() => {
 
   if (props.layout === 'grid') {
     style['column-gap'] = `${props.colGap}px`
-    style['row-gap'] = 0
+    style['row-gap'] = `${props.colGap}px`
     // 关键修复：确保grid容器的列数至少为24
     const effectiveColumns = Math.max(gridResponsive.value, 24)
     style['grid-template-columns'] = `repeat(${effectiveColumns}, 1fr)`
@@ -320,6 +320,7 @@ provide(Symbol.for('ap-re-form'), {
   labelPosition,
   handleSwitchCollapsed,
   layout: computed(() => props.layout),
+  itemWidth: computed(() => props.itemWidth),
   formInstanceId, // 传递实例ID
 })
 

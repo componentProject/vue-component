@@ -104,6 +104,8 @@ ReForm/events/index
 | tooltipProps | 表单默认提示语自定义样式 | `Partial<TooltipProps>` | - |
 | hideBtns | 隐藏表单按钮组 | boolean | false |
 | emptyText | 只读情况下空内容展示占位符 | string | "-" |
+| itemWidth | 全局表单项宽度（在flex布局下生效） | "number" ｜ "string" | - |
+| colGap | 全局表单项间距 | number | 16 |
 
 ### Events
 

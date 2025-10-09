@@ -114,7 +114,7 @@ export function useWatchForm(
         const cacheKey = formItem.field
           ? `${path}_${typeof formItem.component === 'string' ? formItem.component : 'component'}`
           : JSON.stringify({type: formItem.type, component: typeof formItem.component === 'string' ? formItem.component : 'component', path})
-    
+
         // 尝试从缓存获取配置，但只在非分组项上使用缓存
         if (formItem.type !== 'group' && itemConfigCache.has(cacheKey)) {
           const cachedItem = itemConfigCache.get(cacheKey)!
@@ -124,10 +124,10 @@ export function useWatchForm(
           }
           return cachedItem
         }
-    
+
         // 为每个表单项创建一个新的副本，确保不影响原始配置
         const item: ReFormItem = cloneDeep(formItem)
-        
+
         // 处理非分组表单项
         if (item.type !== 'group') {
           const field = item.field
@@ -144,7 +144,7 @@ export function useWatchForm(
                 }
               })
             }
-    
+
             // 修复wrapperEvent函数，正确调用事件处理函数
             const wrapperEvent = (originalEvent: Function | undefined, updateEvent: Function) => {
               return (value: any) => {
@@ -156,13 +156,13 @@ export function useWatchForm(
                 updateEvent(value)
               }
             }
-    
+
             // 确保props对象存在并设置modelValue
             if (isUndefined(item.props)) {
               item.props = {}
             }
             item.props[item.modelProp] = unref(formData)[field]
-    
+
             // 确保events对象存在并设置事件处理函数
             if (isUndefined(item.events)) {
               item.events = {}
@@ -170,7 +170,7 @@ export function useWatchForm(
             const originalEvent = item.events[item.modelEvent]
             item.events[item.modelEvent] = wrapperEvent(originalEvent, updateEvent)
           }
-    
+
           // 存入缓存，确保组件实例的稳定性
           itemConfigCache.set(cacheKey, item)
         }
@@ -181,7 +181,7 @@ export function useWatchForm(
             item.children = travel(item.children, formItem.field || parentPath)
           }
         }
-    
+
         return item
       })
     }
@@ -220,6 +220,7 @@ export function useWatchForm(
     },
     {
       deep: true,
+      immediate: false,
     },
   )
 
