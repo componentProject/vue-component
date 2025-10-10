@@ -92,10 +92,10 @@ async function render(props: QiankunProps) {
   // proxy(container as HTMLElement)
   app = createApp(App)
   // window.$remoteLoad = load
-  const res = await load(Vue)
-  Object.keys(res).forEach((name) => {
-    app.component(name, res[name])
-  })
+  // const res = await load(Vue)
+  // Object.keys(res).forEach((name) => {
+  //   app.component(name, res[name])
+  // })
   // 注册指令
   directives(app)
 

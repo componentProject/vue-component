@@ -54,6 +54,10 @@ export default {
     resizable: true,
     saveType: 'server',
     isConfiguration: true,
+    dialogProps: {
+      title: '个性化列配置1111',
+      zIndex: 10000,
+    },
     // columndragable: true,
     // 数据绑定配置
     bindings: ['v-model=tableData'],

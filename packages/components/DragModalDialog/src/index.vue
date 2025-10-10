@@ -258,7 +258,7 @@ interface Props {
   /** 是否允许遮罩层穿透，开启后点击事件可传递到下方元素 */
   penetrate?: boolean
   /** 指定弹窗挂载的目标元素，可以是 CSS 选择器字符串或 DOM 元素，默认挂载到 body */
-  teleportTo?: string
+  teleportTo?: string | HTMLElement | null | undefined
   /** 关闭时是否销毁对话框内容 */
   destroyOnClose?: boolean
 }

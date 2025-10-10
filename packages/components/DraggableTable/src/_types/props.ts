@@ -135,7 +135,7 @@ export interface DraggableTableProps {
   userId?: string
   //是否有权限统一配置（个性话化列配置）
   isConfiguration: boolean
+  /** 自定义弹窗配置 */
+  dialogProps?: any
   //#endregion
 }
-
-

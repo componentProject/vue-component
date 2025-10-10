@@ -1,5 +1,5 @@
 <template>
-  <div ref="container" class="h-full w-full flex-1 overflow-hidden outline-0 table-box">
+  <div ref="container" class="h-full w-full flex-1 overflow-hidden outline-0 table-box containerMain">
     <VxeGrid
       ref="xTable"
       :header-cell-config="{ height: '30px' }"
@@ -47,6 +47,7 @@
       :is-configuration="props.isConfiguration"
       :collect-columns="collectColumn"
       :custom-columns="props.customColumns"
+      :dialog-props="props.dialogProps"
       @confirm="handleCustomConfigSave"
     />
   </div>
@@ -255,6 +256,7 @@ const props = withDefaults(defineProps<DraggableTableProps>(), {
   ],
   //是否有权限统一配置（个性话化列配置）
   isConfiguration: false,
+  dialogProps: {},
   //#endregion
 })
 // 组件事件

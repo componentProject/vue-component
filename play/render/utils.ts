@@ -562,7 +562,6 @@ export async function fetchFileContent(componentName: string): Promise<string> {
       key.includes(`/packages/components/moluoxixi/packages/${componentName}/es/index.mjs`),
     )
     if (!moduleKey) {
-      console.log('11111111111', moduleKey)
       throw new Error(`找不到组件 ${componentName} 的模块文件`)
     }
 
