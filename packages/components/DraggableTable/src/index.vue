@@ -60,7 +60,7 @@ import type {
   VxeTableDefines,
   VxeTablePropTypes,
 } from 'vxe-table'
-import { VxeGrid } from '@moluoxixi/components/VxeUI'
+import { VxeGrid } from 'vxe-table'
 import { computed, nextTick, onBeforeMount, onBeforeUnmount, onMounted, ref, useAttrs, useTemplateRef, watch } from 'vue'
 import type { ColumnType, DraggableTableEmits, DraggableTableProps } from './_types'
 import { ElMessage } from 'element-plus'
@@ -87,6 +87,7 @@ import type { slotsType } from '@moluoxixi/components/_types'
 import EnterNextContainer from '@moluoxixi/components/EnterNextContainer'
 import CustomConfigDialog from './components/CustomConfigDialog.vue'
 import { getMemoryQuery, setMemoryUpload } from '@moluoxixi/utils/_api'
+import './variable.scss'
 
 defineOptions({
   name: 'DraggableTable',
@@ -279,8 +280,7 @@ const tableData = defineModel({
 })
 
 // 表格引用
-const tableRef = useTemplateRef<VxeGridInstance>('xTable')
-const xTable = computed(() => tableRef.value?.tableRef)
+const xTable = useTemplateRef<VxeGridInstance>('xTable')
 
 //#region 回车下一个功能
 const tableVirtualRefs = ref<HTMLElement[]>([])
@@ -1327,6 +1327,9 @@ defineExpose({
 </script>
 
 <style scoped lang="scss">
+:deep(*) {
+  @import '@moluoxixi/components/VxeUI/VxeGrid/style.scss';
+}
 .table-box {
   :deep(.vxe-table--filter-template) {
     display: flex !important;

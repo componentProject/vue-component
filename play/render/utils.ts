@@ -34,6 +34,7 @@ const dependencyMapping: DependencyMap = {
  * @param componentName - 组件名
  */
 export function addToDependencyMapping(packageName: string, componentName: string) {
+  console.log('componentMapping', componentMapping)
   if (!dependencyMapping[packageName]) {
     dependencyMapping[packageName] = componentName
     console.log(`已添加组件映射: ${packageName} -> ${componentName}`)
@@ -60,11 +61,11 @@ function cleanImports(code: string): string {
 
   // 移除所有类型的import语句
   // 1. import Name from 'module'
-  cleanCode = cleanCode.replace(/import\s+\w+\s+from\s+["'][^"']+["']\s*;/g, '')
+  cleanCode = cleanCode.replace(/import\s+\S+\s+from\s+["'][^"']+["']\s*;/g, '')
   // 2. import { name1, name2 } from 'module'
   cleanCode = cleanCode.replace(/import\s+\{[^}]*\}\s+from\s+["'][^"']+["']\s*;/g, '')
   // 3. import * as name from 'module'
-  cleanCode = cleanCode.replace(/import\s+\*\s+as\s+\w+\s+from\s+["'][^"']+["']\s*;/g, '')
+  cleanCode = cleanCode.replace(/import\s+\*\s+as\s+\S+\s+from\s+["'][^"']+["']\s*;/g, '')
   // 4. import 'module'
   cleanCode = cleanCode.replace(/import\s+["'][^"']+["']\s*;/g, '')
 
@@ -115,12 +116,13 @@ function analyzeImports(code: string): analyzeImportsResult {
   let match: RegExpExecArray | null
 
   // 1. 单一默认导入 import Name from 'module'
-  const singleImportRegex = /import\s+(\w+)\s+from\s+["']([^"']+)["']/g
+  const singleImportRegex = /import\s+(\S+)\s+from\s+["']([^"']+)["']/g
   // eslint-disable-next-line no-cond-assign
   while ((match = singleImportRegex.exec(code)) !== null) {
     const importVar = match[1]
     const importPath = match[2]
 
+    console.log('importVar', importVar, importPath)
     allImports.push({
       type: 'default',
       defaultImport: importVar,
@@ -146,7 +148,7 @@ function analyzeImports(code: string): analyzeImportsResult {
   }
 
   // 3. 命名空间导入 import * as name from 'module'
-  const namespaceImportRegex = /import\s+\*\s+as\s+(\w+)\s+from\s+["']([^"']+)["']/g
+  const namespaceImportRegex = /import\s+\*\s+as\s+(\S+)\s+from\s+["']([^"']+)["']/g
   // eslint-disable-next-line no-cond-assign
   while ((match = namespaceImportRegex.exec(code)) !== null) {
     const namespaceAlias = match[1]
@@ -179,7 +181,7 @@ function processImports(code: string): string {
     // 处理默认导入 import XX from '@package'
     const defaultImportRegex = new RegExp(`import\\s+(\\w+)\\s+from\\s+["\']${escapedPackageName}["\']`, 'g')
     processedCode = processedCode.replace(defaultImportRegex, (match, importVar) => {
-      return `const ${importVar} = componentMapping['${componentName}']`
+      return `const ${importVar} = componentMapping['${componentName}'].default`
     })
 
     // 处理命名导入 import { XX, YY as ZZ } from '@package'
@@ -253,8 +255,7 @@ function analyzeExports(code: string): analyzeExportsResult {
     }
 
     // 匹配 export const/let/var/function/class 模式
-    // eslint-disable-next-line regexp/optimal-quantifier-concatenation
-    const declarationExportRegex = /export\s+(const|let|var|function|class)\s+(\w+)[^;]*;?/g
+    const declarationExportRegex = /export\s+(const|let|var|function|class)\s+(\S+)[^;]*;?/g
     // eslint-disable-next-line no-cond-assign
     while ((match = declarationExportRegex.exec(code)) !== null) {
       const exportName = match[2]
@@ -556,13 +557,13 @@ export async function load($_Vue: any, originComponentNames?: string[], isLongRa
  * @returns 文件内容字符串
  */
 export async function fetchFileContent(componentName: string): Promise<string> {
+  console.log(`xxxxxxxxxxxxxx${componentName}bbbbbbbbbbbbb`)
   try {
     // 从glob中找到对应的模块
     const moduleKey = Object.keys(modules).find(key =>
       key.includes(`/packages/components/moluoxixi/packages/${componentName}/es/index.mjs`),
     )
     if (!moduleKey) {
-      console.log('11111111111', moduleKey)
       throw new Error(`找不到组件 ${componentName} 的模块文件`)
     }
 
@@ -613,6 +614,7 @@ export async function loadRemoteComponents($_Vue: any, allComponentList: allComp
     const orginComponentCode = componentRes.content
     const componentName = componentRes.name
     const componentsCode = await replaceImportsAndExports(orginComponentCode, componentName, allComponentList, isLongRange)
+    console.log('componentsCode', componentsCode)
     // 组件结果对象，这将作为函数的返回值
     for (const [name, code] of Object.entries(componentsCode)) {
       if (!code)
@@ -638,7 +640,7 @@ export async function loadRemoteComponents($_Vue: any, allComponentList: allComp
 
         // 更新组件映射对象
         if (name) {
-          componentMapping[name] = component
+          componentMapping[name] = componentsCodeResult
         }
       }
       catch (error: any) {

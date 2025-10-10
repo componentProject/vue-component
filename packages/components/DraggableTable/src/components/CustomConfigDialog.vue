@@ -74,8 +74,8 @@
 
 <script lang="ts" setup>
 import { computed, ref, useTemplateRef } from 'vue'
-import { VxeGrid } from '@moluoxixi/components/VxeUI'
-import { ElButton, ElCheckbox, ElInput, ElOption, ElSelect, ElSwitch } from '@moluoxixi/components/Element'
+import { VxeGrid } from 'vxe-table'
+import { ElButton, ElCheckbox, ElInput, ElOption, ElSelect, ElSwitch } from 'element-plus'
 import { getTypeName } from '@moluoxixi/components/DraggableTable/src/_utils'
 import DragModalDialog from '@moluoxixi/components/DragModalDialog'
 import type { ColumnType } from '@moluoxixi/components/DraggableTable/src/_types'
@@ -115,8 +115,7 @@ const props = defineProps({
 const emit = defineEmits<{
   (e: 'confirm', customColumns: any[]): void
 }>()
-const tableRef = useTemplateRef<VxeGridInstance>('xTable')
-const xTable = computed(() => tableRef.value?.tableRef)
+const xTable = useTemplateRef<VxeGridInstance>('xTable')
 
 const visible = defineModel<boolean>({ default: false })
 
@@ -205,3 +204,9 @@ defineExpose({
   isCommon,
 })
 </script>
+
+<style scoped lang="scss">
+:deep(*) {
+  @import '@moluoxixi/components/VxeUI/VxeGrid/style.scss';
+}
+</style>
