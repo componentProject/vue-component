@@ -1,11 +1,15 @@
 <template>
-  <ElCheckbox v-bind="$attrs">
-    <slot name="default" />
+  <ElCheckbox :label="props.label" v-bind="$attrs">
+    <slot v-if="!props.label" name="default" />
   </ElCheckbox>
 </template>
 
 <script setup lang="ts">
 import { ElCheckbox } from 'element-plus'
+
+const props = defineProps({
+  label: String,
+})
 </script>
 
 <style scoped>
