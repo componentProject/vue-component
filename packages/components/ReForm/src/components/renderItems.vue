@@ -120,7 +120,6 @@ function getItemStyle(item: ReFormItem): string {
 
     const width = (100 / safeGridResponsive) * span
     const gapCompensation = (safeColGap * (span - 1)) / safeGridResponsive
-
     return `width: calc(${width}% - ${gapCompensation}px); flex-shrink: 0;`
   }
 }

@@ -69,6 +69,7 @@ defineOptions({
   inheritAttrs: false,
 })
 
+//组件输入/输出 - props和emits定义
 const props = withDefaults(defineProps<ReFormProps>(), {
   colGap: 16,
   size: 'default',
@@ -85,11 +86,14 @@ const props = withDefaults(defineProps<ReFormProps>(), {
 
 const emits = defineEmits<ReFormEmits>()
 
+//组件实例标识和核心服务初始化
+const formInstanceId = Symbol('ap-re-form-instance')
 const localItems = computed(() => props.items)
 
-// 根据layout属性设置不同的cols默认值
+//布局相关计算属性
+const $attrs = useAttrs()
+const layout = computed(() => props.layout || 'grid')
 const effectiveCols = computed(() => {
-  // 无论哪种布局，未指定cols时都使用相同的默认值
   if (isUndefined(props.cols)) {
     return { lg: 24, sm: 24, xl: 24, md: 24 }
   }
@@ -97,42 +101,6 @@ const effectiveCols = computed(() => {
     return { lg: props.cols, sm: props.cols, xl: props.cols, md: props.cols }
   }
 })
-
-// 为每个组件实例创建唯一标识符
-const formInstanceId = Symbol('ap-re-form-instance')
-
-const {
-  submiting,
-  reFormRef,
-  formData,
-  formRules,
-  formItems,
-  formVisible,
-  formCollapsed,
-  formGroupDependency,
-  clearItemConfigCache, // 解构获取清理方法
-  itemConfigCache, // 解构获取缓存对象
-} = useForm(localItems, props.modelValue, effectiveCols, props.layout)
-
-const {
-  renderFormItems,
-  formDataProxy,
-} = useWatchForm(
-  formItems,
-  formData,
-  props,
-  emits,
-  itemConfigCache, // 传递实例缓存
-)
-
-const $attrs = useAttrs()
-
-const layout = computed(() => props.layout || 'grid')
-
-const slotsNames = computed<[string[], string[]]>(() =>
-  getSlotsNames(unref(renderFormItems)),
-)
-
 const btnSpanWithDefault = computed(() => {
   if (!isUndefined(props.btnSpan))
     return props.btnSpan
@@ -144,25 +112,43 @@ const { gridResponsive, responsiveWidth, localBtnSpan } = useGridCols(
   btnSpanWithDefault,
 )
 
-const labelWidth = computed(() =>
-  Number.parseInt(`${$attrs['label-width'] || $attrs.labelWidth}`),
-)
-const labelPosition = computed(
-  () => $attrs['label-position'] || $attrs.labelPosition,
+//表单核心状态 - 从useForm获取的核心状态
+const {
+  submiting,
+  reFormRef,
+  formData,
+  formRules,
+  formItems,
+  formVisible,
+  formCollapsed,
+  formGroupDependency,
+  clearItemConfigCache,
+  itemConfigCache,
+} = useForm(localItems, props.modelValue, effectiveCols, props.layout)
+
+const {
+  renderFormItems,
+  formDataProxy,
+} = useWatchForm(
+  formItems,
+  formData,
+  props,
+  emits,
+  itemConfigCache,
 )
 
+//样式相关计算属性
 const gridTemplateStyle = computed(() => {
   const style: CSSProperties = {}
 
   if (props.layout === 'grid') {
     style['column-gap'] = `${props.colGap}px`
     style['row-gap'] = `${props.colGap}px`
-    // 关键修复：确保grid容器的列数至少为24
     const effectiveColumns = Math.max(gridResponsive.value, 24)
     style['grid-template-columns'] = `repeat(${effectiveColumns}, 1fr)`
   }
   else {
-    style.marginBottom = `${props.colGap}px`
+    style['gap'] = `${props.colGap}px`
   }
 
   return style
@@ -173,11 +159,19 @@ const localBtnSpanStyle = computed<string>(() => {
     return props.btnSpanStyle || `grid-column-start: span ${localBtnSpan.value}`
   }
   else {
-    // flex布局下的按钮组样式
     const width = (100 / gridResponsive.value) * localBtnSpan.value
     return props.btnSpanStyle || `width: calc(${width}% - ${(props.colGap * (localBtnSpan.value - 1)) / gridResponsive.value}px)`
   }
 })
+
+//标签和按钮相关计算属性
+const labelWidth = computed(() =>
+  Number.parseInt(`${$attrs['label-width'] || $attrs.labelWidth}`),
+)
+
+const labelPosition = computed(
+  () => $attrs['label-position'] || $attrs.labelPosition,
+)
 
 const tooltipProps: Ref<ReFormProps['tooltipProps']> = computed(() => {
   return {
@@ -192,6 +186,7 @@ const emptyText = computed<string>(() => props.emptyText ?? '')
 const btnLabelWidth = computed<number | undefined>(() =>
   props.ignoreBtnLabel ? 0 : undefined,
 )
+
 const btnLabelText = computed<string>(() => {
   if (props.ignoreBtnLabel)
     return ''
@@ -204,7 +199,11 @@ const btnLabelText = computed<string>(() => {
   return ''
 })
 
-// 根据分组依赖自动展开分组-获取校验失败定位
+const slotsNames = computed<[string[], string[]]>(() =>
+  getSlotsNames(unref(renderFormItems)),
+)
+
+// 表单功能方法
 function autoCollapseByErrors(errors?: Record<string, any>) {
   if (!props.autoCollapseInValidate || !errors)
     return
@@ -237,6 +236,7 @@ function autoCollapseByErrors(errors?: Record<string, any>) {
   }
 }
 
+//表单交互方法
 function handleSubmit() {
   reFormRef.value
   && reFormRef.value.validate((valid: boolean, errors: Record<string, any>) => {
@@ -304,7 +304,7 @@ function handleSwitchCollapsed(field: string) {
   formCollapsed.value[field] = !formCollapsed.value[field]
 }
 
-// 在provide中确保layout属性正确注入
+//依赖注入
 provide(Symbol.for('ap-re-form'), {
   gridTemplateStyle,
   gridResponsive,
@@ -324,6 +324,7 @@ provide(Symbol.for('ap-re-form'), {
   formInstanceId, // 传递实例ID
 })
 
+//生命周期钩子
 onMounted(() => {
   if (props.formRef) {
     props.formRef(unref(reFormRef))

@@ -232,11 +232,3 @@ export function useWatchForm(
     unwatchFormData,
   }
 }
-
-// 移除全局清理函数
-// function clearItemConfigCache() {
-//   itemConfigCache.clear()
-// }
-
-// 导出清理函数以便在组件卸载时调用
-// export { clearItemConfigCache }
