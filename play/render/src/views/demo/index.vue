@@ -15,7 +15,7 @@
         v-bind="componentProps"
       />
     </div>
-    <!-- <div class="main">
+    <div class="main">
       <div class="list-title">
         引用组件库解析的组件
       </div>
@@ -23,7 +23,7 @@
         :is="dynamicComponent"
         v-bind="secondComponentProps"
       />
-    </div> -->
+    </div>
   </div>
 </template>
 
@@ -161,7 +161,6 @@ async function handleClick() {
 
 onMounted(async () => {
   await loadLocalComponent(componentName.value)
-  return
   await loadComponents([componentName.value])
 })
 </script>

@@ -1,82 +1,80 @@
 <template>
-  <div v-if="visible">
-    <DragModalDialog
-      v-model:visible="visible"
-      resizable
-      v-bind="computedDialogProps"
+  <DragModalDialog
+    v-model:visible="visible"
+    resizable
+    v-bind="props.dialogProps"
+  >
+    <VxeGrid
+      id="custom"
+      ref="xTable"
+      v-bind="gridProps"
     >
-      <VxeGrid
-        id="custom"
-        ref="xTable"
-        v-bind="gridProps"
-      >
-        <template #title="{ row }">
-          <div>{{ getTypeName(row.type) || row.title }}</div>
-        </template>
-        <template #input="{ row, column }">
-          <ElInput
-            :model-value="row[column.field]"
-            size="small"
-            maxlength="4"
-            :disabled="!row.resizable"
-            :placeholder="getPlaceholder(column.title)"
-            style="width: 100%"
-            @update:model-value="handlePositiveNumberInput(row, column.field, $event)"
-          />
-        </template>
-        <template #switch="{ row, column }">
-          <ElSwitch
-            v-model="row[column.field]"
-            size="small"
-          />
-        </template>
-        <template #select="{ row, column }">
-          <ElSelect
-            v-if="column.field !== 'fixed' || !row.parentId"
-            v-model="row[column.field]"
-            class="m-2"
-            placeholder="Select"
-            size="small"
-            :disabled="!row.resizable"
-            style="width: 100%"
-          >
-            <ElOption
-              v-for="item in column.params.options"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
-              @click.stop
-              @mousedown.stop
-            />
-          </ElSelect>
-        </template>
-      </VxeGrid>
-
-      <template #footer>
-        <div class="flex justify-end items-center">
-          <ElCheckbox
-            v-if="isConfiguration"
-            v-model="isCommon" style="margin-right: 40px;" label="作为统一配置"
-            size="large"
-          />
-          <ElButton @click="handleEvent('reset')">
-            恢复默认
-          </ElButton>
-          <ElButton type="primary" @click="handleEvent('confirm')">
-            确认
-          </ElButton>
-          <ElButton type="info" @click="handleEvent('cancel')">
-            取消
-          </ElButton>
-        </div>
+      <template #title="{ row }">
+        <div>{{ getTypeName(row.type) || row.title }}</div>
       </template>
-    </DragModalDialog>
-  </div>
+      <template #input="{ row, column }">
+        <ElInput
+          :model-value="row[column.field]"
+          size="small"
+          maxlength="4"
+          :disabled="!row.resizable"
+          :placeholder="getPlaceholder(column.title)"
+          style="width: 100%"
+          @update:model-value="handlePositiveNumberInput(row, column.field, $event)"
+        />
+      </template>
+      <template #switch="{ row, column }">
+        <ElSwitch
+          v-model="row[column.field]"
+          size="small"
+        />
+      </template>
+      <template #select="{ row, column }">
+        <ElSelect
+          v-if="column.field !== 'fixed' || !row.parentId"
+          v-model="row[column.field]"
+          class="m-2"
+          placeholder="Select"
+          size="small"
+          :disabled="!row.resizable"
+          style="width: 100%"
+        >
+          <ElOption
+            v-for="item in column.params.options"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
+            @click.stop
+            @mousedown.stop
+          />
+        </ElSelect>
+      </template>
+    </VxeGrid>
+
+    <template #footer>
+      <div class="flex justify-end items-center">
+        <ElCheckbox
+          v-if="isConfiguration"
+          v-model="isCommon" style="margin-right: 40px;" label="作为统一配置"
+          size="large"
+        />
+        <ElButton @click="handleEvent('reset')">
+          恢复默认
+        </ElButton>
+        <ElButton type="primary" @click="handleEvent('confirm')">
+          确认
+        </ElButton>
+        <ElButton type="info" @click="handleEvent('cancel')">
+          取消
+        </ElButton>
+      </div>
+    </template>
+  </DragModalDialog>
 </template>
 
 <script lang="ts" setup>
 import { computed, ref, useTemplateRef } from 'vue'
-import { VxeGrid } from '@moluoxixi/components/VxeUI'
+import { VxeGrid } from 'vxe-table'
 import { ElButton, ElCheckbox, ElInput, ElOption, ElSelect, ElSwitch } from 'element-plus'
 import { getTypeName } from '@moluoxixi/components/DraggableTable/src/_utils'
 import DragModalDialog from '@moluoxixi/components/DragModalDialog'
@@ -102,30 +100,22 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
-  customTitle: {
-    type: String,
-    default: '',
-  },
   dialogProps: {
     type: Object,
-    default: () => {},
+    default: () => {
+      return {
+        title: '个性化列配置',
+        width: '800px',
+        height: '60%',
+      }
+    },
   },
 })
 
 const emit = defineEmits<{
   (e: 'confirm', customColumns: any[]): void
 }>()
-const tableRef = useTemplateRef<VxeGridInstance>('xTable')
-const xTable = computed(() => tableRef.value?.tableRef)
-const computedDialogProps = computed(() => {
-  return {
-    title: '个性化列配置',
-    width: '800px',
-    height: '60%',
-    teleportTo: '.containerMain',
-    ...props.dialogProps,
-  }
-})
+const xTable = useTemplateRef<VxeGridInstance>('xTable')
 
 const visible = defineModel<boolean>({ default: false })
 
@@ -214,3 +204,9 @@ defineExpose({
   isCommon,
 })
 </script>
+
+<style scoped lang="scss">
+:deep(*) {
+  @import '@moluoxixi/components/VxeUI/VxeGrid/style.scss';
+}
+</style>
