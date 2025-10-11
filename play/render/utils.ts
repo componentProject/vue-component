@@ -34,10 +34,8 @@ const dependencyMapping: DependencyMap = {
  * @param componentName - 组件名
  */
 export function addToDependencyMapping(packageName: string, componentName: string) {
-  console.log('componentMapping', componentMapping)
   if (!dependencyMapping[packageName]) {
     dependencyMapping[packageName] = componentName
-    console.log(`已添加组件映射: ${packageName} -> ${componentName}`)
   }
 }
 
@@ -122,7 +120,6 @@ function analyzeImports(code: string): analyzeImportsResult {
     const importVar = match[1]
     const importPath = match[2]
 
-    console.log('importVar', importVar, importPath)
     allImports.push({
       type: 'default',
       defaultImport: importVar,
@@ -542,6 +539,8 @@ export async function load($_Vue: any, originComponentNames?: string[], isLongRa
     const packageName = getPackageNameFromComponentName(item.componentCode)
     addToDependencyMapping(packageName, item.componentCode)
   })
+  console.log('所有依赖的映射', dependencyMapping)
+  console.log('文件解析后的对象', componentMapping)
   componentMapping.$_Vue = $_Vue
   return await loadRemoteComponents($_Vue, allComponentList, componentNames, isLongRange)
 }
@@ -557,7 +556,6 @@ export async function load($_Vue: any, originComponentNames?: string[], isLongRa
  * @returns 文件内容字符串
  */
 export async function fetchFileContent(componentName: string): Promise<string> {
-  console.log(`xxxxxxxxxxxxxx${componentName}bbbbbbbbbbbbb`)
   try {
     // 从glob中找到对应的模块
     const moduleKey = Object.keys(modules).find(key =>
@@ -569,8 +567,9 @@ export async function fetchFileContent(componentName: string): Promise<string> {
 
     // 动态导入模块
     const module = await modules[moduleKey]()
-    console.log(`成功加载组件 ${componentName} 的文件内容`)
-    return module.default || module
+    const content = module.default || module
+    console.log(`成功加载组件 ${componentName} 的文件内容,大小为${(content?.length / 1024 / 1024).toFixed(2)}M`)
+    return content
   }
   catch (error) {
     console.error(`获取组件 ${componentName} 文件内容失败:`, error)
@@ -596,7 +595,6 @@ export async function loadRemoteComponents($_Vue: any, allComponentList: allComp
         const component = allComponentList.find(i => i.componentCode === item)
         if (component) {
           const content = await fetchFileContent(item)
-          console.log('成功获取文件内容', content.length)
           return {
             ...component,
             name: component.componentCode,
@@ -614,7 +612,6 @@ export async function loadRemoteComponents($_Vue: any, allComponentList: allComp
     const orginComponentCode = componentRes.content
     const componentName = componentRes.name
     const componentsCode = await replaceImportsAndExports(orginComponentCode, componentName, allComponentList, isLongRange)
-    console.log('componentsCode', componentsCode)
     // 组件结果对象，这将作为函数的返回值
     for (const [name, code] of Object.entries(componentsCode)) {
       if (!code)
