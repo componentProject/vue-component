@@ -23,7 +23,7 @@
         </ReFormRenderItems>
         <div
           v-if="!hideBtns"
-          class="ap-form-grid-item"
+          class="ap-form-grid-item ap-form-grid-item--btns"
           :style="localBtnSpanStyle"
         >
           <ElFormItem :label="btnLabelText" :label-width="btnLabelWidth">
@@ -403,7 +403,7 @@ defineExpose({
   }
 }
 .ap-form-wrapper {
-  @apply relative;
+  // @apply relative;
 
   .ap-form-grid {
     @apply grid;

@@ -15,7 +15,7 @@
         v-bind="componentProps"
       />
     </div>
-    <div class="main">
+    <!-- <div class="main">
       <div class="list-title">
         引用组件库解析的组件
       </div>
@@ -23,7 +23,7 @@
         :is="dynamicComponent"
         v-bind="secondComponentProps"
       />
-    </div>
+    </div> -->
   </div>
 </template>
 
@@ -39,7 +39,7 @@ defineOptions({ name: '调试与演示' })
 // 使用ref替代data属性
 // 调试与演示组件库的组件，直接修改组件名
 // const componentName = ref('ReForm')
-const componentName = ref('ReForm')
+const componentName = ref('DesignForm')
 // 调试组件
 const localComponent = ref<any>(null)
 // 用于存储动态组件
@@ -176,7 +176,7 @@ onMounted(async () => {
 
 .main {
   margin: 20px;
-  height: 200px;
+  height: 500px;
   text-align: center;
 }
 

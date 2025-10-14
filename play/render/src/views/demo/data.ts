@@ -8,6 +8,9 @@ const statusMap = {
 }
 
 export default {
+  DesignForm: {
+
+  },
   DraggableTable: {
     // 基础数据
     columns: [
@@ -70,7 +73,7 @@ export default {
   ReForm: {
     size: 'default',
     labelPosition: 'right',
-    layout: 'flex', // grid、flex
+    layout: 'grid', // grid、flex
     // editable: false, // 表单是否可编辑 可以用作详情使用
     //disabled: true, // 表单是否禁止编辑
     itemWidth: 400,
