@@ -89,7 +89,6 @@ const {
 
 // 提取为单独的方法，提高可读性和可维护性
 function getItemStyle(item: ReFormItem): string {
-  // 直接使用item.span属性，如果未定义则默认为24
   const span = typeof item.span === 'number' ? item.span : 24
   if (layout.value === 'grid') {
     // 关键修复：使用更可靠的grid布局语法
@@ -104,13 +103,23 @@ function getItemStyle(item: ReFormItem): string {
   }
   else {
     // flex布局下优先检查表单项的itemWidth，其次是全局的itemWidth
-    const finalItemWidth = item.itemWidth !== undefined ? item.itemWidth : unref(itemWidth)
+    const finalItemWidth = item.itemWidth !== undefined ? item.itemWidth : unref(itemWidth.value)
 
-    if (finalItemWidth !== undefined) {
+    if (finalItemWidth !== undefined && finalItemWidth !== null) {
       // 如果设置了itemWidth，使用固定宽度
-      const width = typeof finalItemWidth === 'number'
-        ? `${finalItemWidth}px`
-        : finalItemWidth
+      let width = finalItemWidth
+      // 检查是否需要添加px单位
+      if (typeof finalItemWidth === 'number') {
+        // 数字类型直接添加px单位
+        width = `${finalItemWidth}px`
+      }
+      else if (typeof finalItemWidth === 'string') {
+        // 字符串类型检查是否是纯数字字符串，如果是则添加px单位
+        // 排除已经包含单位的情况（如'100px', '20rem', '50%'等）
+        if (/^\d+(?:\.\d+)?$/.test(finalItemWidth)) {
+          width = `${finalItemWidth}px`
+        }
+      }
       return `width: ${width}; flex-shrink: 0;`
     }
 

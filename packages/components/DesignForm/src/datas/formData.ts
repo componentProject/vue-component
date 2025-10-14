@@ -1,7 +1,7 @@
 import { ElCheckbox, ElCheckboxGroup, ElInput, ElRadio, ElRadioGroup, ElSelect } from 'element-plus'
 
-// 表单配置
-export const formConfig = {
+// 默认的表单配置
+export const defaultFormConfig = {
   size: 'default',
   labelPosition: 'top',
   hideBtns: true,
@@ -53,30 +53,29 @@ export const formConfig = {
         ],
       },
     },
-    {
-      label: '表单项固定宽度(number|string单位px)',
-      field: 'itemWidth',
-      defaultValue: '',
-      tooltip: '表单水平布局下，设置该属性后，每个表单项的宽度将固定为该值',
-      component: ElInput,
-      props: {
-        clearable: true,
-        maxheight: 20,
-      },
-      visible: {
-        conditions: [
-          {
-            field: 'layout',
-            value: 'flex',
-            type: '=',
-          },
-        ],
-      },
-    },
+    // {
+    //   label: '表单项固定宽度(number|string单位px)',
+    //   field: 'itemWidth',
+    //   tooltip: '表单水平布局下，设置该属性后，每个表单项的宽度将固定为该值',
+    //   component: ElInput,
+    //   props: {
+    //     clearable: true,
+    //     maxheight: 20,
+    //   },
+    //   visible: {
+    //     conditions: [
+    //       {
+    //         field: 'layout',
+    //         value: 'flex',
+    //         type: '=',
+    //       },
+    //     ],
+    //   },
+    // },
     {
       label: '全局表单项间距',
       field: 'colGap',
-      defaultValue: '16px',
+      defaultValue: 16,
       component: ElInput,
       props: {
         clearable: true,
@@ -107,6 +106,23 @@ export const formConfig = {
       },
     },
     {
+      label: '隐藏表单按钮组',
+      field: 'hideBtns',
+      defaultValue: true,
+      component: ElRadioGroup,
+      childComp: ElRadio,
+      options: [
+        {
+          label: '是',
+          value: true,
+        },
+        {
+          label: '否',
+          value: false,
+        },
+      ],
+    },
+    {
       label: '提交按钮显示文字',
       field: 'submitBtnText',
       defaultValue: '确定',
@@ -114,6 +130,15 @@ export const formConfig = {
       props: {
         clearable: true,
         maxheight: 20,
+      },
+      visible: {
+        conditions: [
+          {
+            field: 'hideBtns',
+            value: false,
+            type: '=',
+          },
+        ],
       },
     },
     {
@@ -125,6 +150,15 @@ export const formConfig = {
         clearable: true,
         maxheight: 20,
       },
+      visible: {
+        conditions: [
+          {
+            field: 'hideBtns',
+            value: false,
+            type: '=',
+          },
+        ],
+      },
     },
   ],
 }
@@ -133,6 +167,7 @@ export const formConfig = {
 export const formItemConfig = {
   size: 'default',
   labelPosition: 'top',
+  hideBtns: true,
   items: [
     {
       label: '组件类型',
