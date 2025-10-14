@@ -1,5 +1,5 @@
 <template>
-  <footer class="w-full bg-white mt-4! mb-4! flex flex-wrap" :style="computedStyle">
+  <footer class="w-full bg-white flex flex-wrap" :style="computedStyle">
     <template v-for="(item, index) in normalizedItems" :key="index">
       <a
         v-if="item.link"
@@ -28,6 +28,7 @@ defineOptions({ name: 'TsFooter' })
 const props = withDefaults(defineProps<tsFooterParamsType>(), {
   items: () => [],
   align: 'center',
+  mt: 8,
   xGap: 24,
   yGap: 6,
   size: 12,
@@ -53,7 +54,10 @@ const justifyMap = {
   right: 'flex-end',
 }
 const computedStyle = computed<CSSStyleDeclaration>(() => {
+  console.log('props.my', props.my)
   return {
+    'margin-top': `${props.mt || props.my}px`,
+    'margin-bottom': `${props.mb || props.my}px`,
     'column-gap': `${props.xGap}px`,
     'row-gap': `${props.yGap}px`,
     'padding-top': `${props.yGap}px`,

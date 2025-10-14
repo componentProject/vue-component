@@ -13,6 +13,9 @@ export interface tsFooterParamsType {
   textStyle?: (item: { text: string, link?: string }) => CSSStyleDeclaration
   xGap?: number
   yGap?: number
+  my?: number
+  mt?: number
+  mb?: number
   /** 字体大小 & 行高 */
   size?: number
 }
