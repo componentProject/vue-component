@@ -1,5 +1,4 @@
-import { ElCheckboxGroup, ElDatePicker, ElInput, ElRadioGroup, ElSelect } from 'element-plus'// 导入自定义组件
-import { ElCheckbox, ElOption, ElRadio } from 'element-plus'
+import { ElCheckbox, ElCheckboxGroup, ElDatePicker, ElInput, ElOption, ElRadio, ElRadioGroup, ElSelect } from 'element-plus'// 导入自定义组件
 
 const statusMap = {
   1: '一',

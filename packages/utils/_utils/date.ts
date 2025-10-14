@@ -1,10 +1,9 @@
 import type { functionType } from '@moluoxixi/components/_types'
 import { getType } from './base.ts'
+import type { DateType, StartOf } from '_types/date'
 import moment from 'moment'
 
 //#region 日期相关
-export type DateType = string | Date | moment.Moment
-
 /**
  * 匹配 以年月日 时分秒 顺序排列的任意时间格式字符串,匹配不到默认返回 YYYY-MM-DD HH:mm:ss
  * @param str
@@ -109,7 +108,7 @@ export function getFormatDateByType(
   dateStr: DateType,
   valueFormat: string = 'YYYY-MM-DD HH:mm:ss',
   type: DateOperationType = 'startOf',
-  dateType: moment.unitOfTime.StartOf = 'day',
+  dateType: StartOf = 'day',
 ) {
   const momentDate = getMomentIsValid(dateStr, valueFormat)
   if (!momentDate)
@@ -126,7 +125,7 @@ export function getFormatDateByType(
 export function formatDateRangeByType(
   date: DateType | DateType[],
   valueFormat: string = 'YYYY-MM-DD HH:mm:ss',
-  dateType: moment.unitOfTime.StartOf = 'day',
+  dateType: StartOf = 'day',
 ) {
   if (!date)
     return []

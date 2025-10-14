@@ -15,7 +15,7 @@
         v-bind="componentProps"
       />
     </div>
-    <div v-if="dynamicComponent" class="main">
+    <div class="main">
       <div class="list-title">
         引用组件库解析的组件
       </div>
@@ -39,7 +39,9 @@ defineOptions({ name: '调试与演示' })
 // 使用ref替代data属性
 // 调试与演示组件库的组件，直接修改组件名
 // const componentName = ref('ReForm')
-const componentName = ref('DraggableTable')
+// const componentName = ref('DraggableTable')
+// const componentName = ref('HisFooter')
+const componentName = ref('HisFooter')
 // 调试组件
 const localComponent = ref<any>(null)
 // 用于存储动态组件
@@ -138,8 +140,9 @@ async function loadLocalComponent(componentName: string) {
 async function loadComponents(components: string[]) {
   try {
     const loadedComponents = await load(vue, components, true)
+    console.log('loadedComponents', loadedComponents)
     dynamicComponent.value = loadedComponents[componentName.value]
-    console.log('动态组件加载成功:', dynamicComponent)
+    console.log('动态组件加载成功:', dynamicComponent, componentName.value, loadedComponents[componentName.value])
   }
   catch (error) {
     console.error('加载动态组件失败:', error)
