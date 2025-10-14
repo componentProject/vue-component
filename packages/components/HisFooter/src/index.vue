@@ -69,6 +69,6 @@ defineExpose({
 
 <style scoped lang="scss">
 .his-footer {
-  margin-top: 10px;
+  margin-top: 8px;
 }
 </style>

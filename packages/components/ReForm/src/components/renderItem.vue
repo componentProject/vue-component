@@ -170,7 +170,8 @@ function getOptionLabel(
   }
 
   .ap-form-control--tip {
-    @apply mt-1;
+    //TODO: 有报错
+    //@apply mt-1;
 
     line-height: 1.2;
     color: var(--el-text-color-placeholder);

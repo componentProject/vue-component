@@ -113,12 +113,13 @@ export async function runBuildCli(params: RunBuildCliParams, cli?: RunBuildCliOp
     ? firstArg
     : (cli?.command || 'build-publish')
   const mode = getFlagValue(args, 'mode', 'all')
-  const excludeHeavyPlugins = parseBoolean(getFlagValue(args, 'excludeHeavyPlugins', 'false'), false)
+  // const excludeHeavyPlugins = parseBoolean(getFlagValue(args, 'excludeHeavyPlugins', 'false'), false)
+  const excludeHeavyPlugins = parseBoolean(getFlagValue(args, 'excludeHeavyPlugins', 'true'), false)
   const uploadType = getFlagValue(args, 'uploadType', cli?.uploadType)
 
   if (!uploadType) {
     console.error('错误: 缺少必填参数 uploadType')
-    printUsage(cli)
+    printUsage(cli || {})
     return 1
   }
 
@@ -182,7 +183,7 @@ export interface BuildContext {
   uploadType?: string
 }
 
-export type ModuleFormat = 'es' | 'cjs'
+export type ModuleFormat = 'es' | 'cjs' | 'umd'
 
 export interface ComponentDependencies {
   internal: string[]
@@ -201,6 +202,7 @@ export interface BundleComponentModuleOptions {
   entryFileNames: string
   chunkFileNames: string
   exportsType?: string
+  skipManualChunks?: boolean
 }
 
 //#region 通用配置
@@ -831,13 +833,14 @@ async function analyzeComponentDeps(ctx: BuildContext, comp: string) {
  * @param {string} options.comp - 组件名
  * @param {string} options.entry - 入口文件
  * @param {string} options.outDir - 输出目录
- * @param {'es'|'cjs'} options.format - 模块格式：'es' 或 'cjs'
+ * @param {'es'|'cjs'|'umd'} options.format - 模块格式：'es'、'cjs' 或 'umd'
  * @param {Record<string, string>} options.dependencies - 组件依赖
  * @param {Record<string, string>} options.globals - 全局变量配置
  * @param {any} options.baseConfig - 基础配置
  * @param {string} options.entryFileNames - 入口文件名格式
  * @param {string} options.chunkFileNames - 分块文件名格式
  * @param {string} [options.exportsType] - 导出类型（仅CJS需要）
+ * @param {boolean} [options.skipManualChunks] - 是否跳过手动分块（UMD格式需要）
  */
 async function bundleComponentModule(ctx: BuildContext, {
   comp,
@@ -850,6 +853,7 @@ async function bundleComponentModule(ctx: BuildContext, {
   entryFileNames,
   chunkFileNames,
   exportsType,
+  skipManualChunks,
 }: BundleComponentModuleOptions) {
   const currentComponent = comp
   await build({
@@ -908,7 +912,7 @@ async function bundleComponentModule(ctx: BuildContext, {
           globals,
           ...(exportsType ? { exports: exportsType } : {}),
           // 禁用手动分块，避免文件拆分
-          manualChunks: (id: string) => {
+          manualChunks: !skipManualChunks && ((id: string) => {
             if (!ctx.isChunck) {
               return 'index'
             }
@@ -923,7 +927,7 @@ async function bundleComponentModule(ctx: BuildContext, {
                 return undefined
               }
             }
-          },
+          }),
         },
       },
     },
@@ -980,7 +984,12 @@ async function getComponentConfig(ctx: BuildContext, comp: string): Promise<Comp
 
   return { entry, outputDir, dependencies }
 }
-
+/** 清空目录 */
+async function clearDir(DirPath: string) {
+  // 清空目录
+  await fsp.rm(DirPath, { recursive: true, force: true }).catch(() => {})
+  await fsp.mkdir(DirPath, { recursive: true })
+}
 /**
  * 专业的单组件打包函数 - 参考Element Plus和Ant Design
  * @param ctx
@@ -1015,15 +1024,11 @@ async function buildComponent(
   console.log(`\n========== 开始打包: ${buildName}，版本：${currentVersion} ==========`)
   const esOutputDir = resolve(outputDir, 'es')
   const libOutputDir = resolve(outputDir, 'lib')
+  const umdOutputDir = resolve(outputDir, 'umd')
   try {
-    // 清空目录
-    await fsp.rm(esOutputDir, { recursive: true, force: true }).catch(() => {
-    })
-    await fsp.mkdir(esOutputDir, { recursive: true })
-    await fsp.rm(libOutputDir, { recursive: true, force: true }).catch(() => {
-    })
-    await fsp.mkdir(libOutputDir, { recursive: true })
-
+    await clearDir(esOutputDir)
+    await clearDir(libOutputDir)
+    await clearDir(umdOutputDir)
     // 使用传入的依赖分析结果
     const deps = dependencies
 
@@ -1039,6 +1044,20 @@ async function buildComponent(
     console.log('--------------------------->globals', globals)
     // 创建基础配置
     const baseConfig = createBaseConfig(ctx, comp, deps.internal)
+
+    // 打包UMD模块
+    await bundleComponentModule(ctx, {
+      comp,
+      entry,
+      outDir: umdOutputDir,
+      format: 'umd',
+      dependencies,
+      globals,
+      baseConfig,
+      entryFileNames: `[name].js`,
+      chunkFileNames: `[name].js`,
+      skipManualChunks: true,
+    })
 
     // 打包ES模块
     await bundleComponentModule(ctx, {
