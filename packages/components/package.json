@@ -13,13 +13,20 @@
     "publish:allComponent": "tsx _scripts/buildComponent.mts build-publish --mode=allComponent --excludeHeavyPlugins=true"
   },
   "dependencies": {
+    "@antv/g2": "^5.4.1",
     "@codemirror/view": "^6.36.5",
+    "@designable/core": "catalog:build",
     "@element-plus/icons-vue": "catalog:build",
     "@form-create/designer": "^3.1.0",
     "@form-create/element-ui": "^3.1.0",
     "@formily/core": "catalog:build",
     "@formily/json-schema": "catalog:build",
     "@formily/vue": "catalog:build",
+    "@moluoxixi/components": "workspace:*",
+    "@moluoxixi/constant": "workspace:*",
+    "@moluoxixi/element": "1.0.4",
+    "@moluoxixi/utils": "workspace:*",
+    "@vueuse/core": "^11.0.0",
     "axios": "catalog:build",
     "clipboard": "^2.0.11",
     "constrained-editor-plugin": "^1.4.0",
@@ -65,13 +72,7 @@
     "vxe-pc-ui": "^4.9.17",
     "vxe-table": "catalog:build",
     "xe-utils": "3",
-    "@designable/core": "catalog:build",
-    "@moluoxixi/components": "workspace:*",
-    "@moluoxixi/constant": "workspace:*",
-    "@moluoxixi/utils": "workspace:*",
-    "@moluoxixi/element": "1.0.4",
-    "xlsx": "^0.18.5",
-    "@vueuse/core": "^11.0.0"
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@types/file-saver": "catalog:type",
