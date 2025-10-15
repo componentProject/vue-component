@@ -1,131 +1,79 @@
 <template>
-  <div>
-    <el-select
-      :id="selectId"
-      v-model="data"
-      append-to="#app"
-      :clearable="props.clearable"
-      :filterable="props.filterable"
-      :filter-method="computedFilterMethod"
-      :collapse-tags="props.collapseTags"
-      :tag-type="props.tagType"
-      :teleported="props.teleported"
-      :collapse-tags-tooltip="props.collapseTagsTooltip"
-      v-bind="$attrs"
-      @change="handleSelectChange"
-      @visible-change="handleVisibleChange"
+  <ElSelect
+    :id="selectId"
+    v-model="data"
+    :clearable="props.clearable"
+    :filterable="props.filterable"
+    :filter-method="computedFilterMethod"
+    :collapse-tags="props.collapseTags"
+    :tag-type="props.tagType"
+    :teleported="props.teleported"
+    :collapse-tags-tooltip="props.collapseTagsTooltip"
+    v-bind="$attrs"
+    @change="handleSelectChange"
+    @visible-change="handleVisibleChange"
+  >
+    <ElOption
+      v-for="(item) in computedOptions"
+      :key="item[props.value]"
+      :label="item[props.label]"
+      :value="item[props.value]"
+      :disabled="
+        computedDisabledHandler({
+          label: item[props.label],
+          value: item[props.value],
+          data: item,
+        })
+      "
+      v-bind="props.optionProps"
+    />
+    <div
+      v-if="props.enableLoadMore && props.hasMore"
+      ref="loadMoreTrigger"
+      class="load-more-trigger"
     >
-      <el-option
-        v-for="(item) in computedOptions"
-        :key="item[props.value]"
-        :label="item[props.label]"
-        :value="item[props.value]"
-        :disabled="
-          computedDisabledHandler({
-            label: item[props.label],
-            value: item[props.value],
-            data: item,
-          })
-        "
-      />
-      <div
-        v-if="props.enableLoadMore && props.hasMore"
-        ref="loadMoreTrigger"
-        class="load-more-trigger"
-      >
-        <span v-if="props.loading">加载中...</span>
-      </div>
-    </el-select>
-  </div>
+      <span v-if="props.loading || isLoading">加载中...</span>
+    </div>
+  </ElSelect>
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, onUnmounted, ref, watch } from 'vue'
-import getServerOptions from '@moluoxixi/components/Select/src/uitls'
-import type { objType } from '@moluoxixi/components/_types'
+import { computed, nextTick, onUnmounted, ref, withDefaults } from 'vue'
+import { ElOption, ElSelect } from 'element-plus'
 import { getType, getTypeDefault } from '@moluoxixi/utils/_utils'
+import { useOptions } from '../../_hooks'
+import type { TsSelectEmits, TsSelectProps } from './_types'
 
 defineOptions({
-  name: 'WlSelect',
+  name: 'TsSelect',
 })
 
-const props = defineProps({
-  tagType: {
-    type: String as () => 'success' | 'info' | 'warning' | 'danger',
-    default: 'primary',
-  },
-  teleported: {
-    type: Boolean,
-    default: true,
-  },
-  clearable: {
-    type: Boolean,
-    default: true,
-  },
-  filterable: {
-    type: Boolean,
-    default: true,
-  },
-  filterMethod: {
-    type: Function,
-  },
-  collapseTagsTooltip: {
-    type: Boolean,
-    default: true,
-  },
-  collapseTags: {
-    type: Boolean,
-    default: true,
-  },
-  label: {
-    type: String,
-    default: 'label',
-  },
-  value: {
-    type: String,
-    default: 'value',
-  },
-  disabledValues: {
-    type: Array,
-    default: () => [],
-  },
-  disabledLabels: {
-    type: Array,
-    default: () => [],
-  },
-  disabledHandler: {
-    type: Function,
-  },
-  options: {
-    type: Array,
-    default: () => [],
-  },
-  filterFields: {
-    type: Array,
-    default: () => [],
-  },
-  serverProps: {
-    type: Object as PropType<objType | null>,
-  },
-  // 开启加载更多
-  enableLoadMore: {
-    type: Boolean,
-    default: false,
-  },
-  // 是否还有更多数据
-  hasMore: {
-    type: Boolean,
-    default: false,
-  },
-  // 加载中
-  loading: {
-    type: Boolean,
-    default: false,
-  },
+const props = withDefaults(defineProps<TsSelectProps>(), {
+  tagType: 'primary',
+  teleported: true,
+  clearable: true,
+  filterable: true,
+  collapseTagsTooltip: true,
+  collapseTags: true,
+  label: 'label',
+  value: 'value',
+  disabledValues: () => [],
+  disabledLabels: () => [],
+  options: () => [],
+  filterFields: () => [],
+  enableLoadMore: false,
+  hasMore: false,
+  loading: false,
+  requestMethod: 'POST',
+  requestUrl: '',
+  requestParams: () => ({}),
+  requestParamsType: 'body',
+  requestHeaders: () => ({}),
+  responseDataPath: '',
+  optionProps: () => ({}),
 })
 
-const emits = defineEmits(['change', 'load-more'])
-
+const emits = defineEmits<TsSelectEmits>()
 const selectId = `select-${Math.random().toString(36).substr(2, 9)}`
 
 const data = defineModel<any>()
@@ -152,26 +100,16 @@ const allFilterFields = computed(() => {
   )
 })
 
-const valueType = ref<string>()
-const serverOrLocalOptions = ref<any[]>([])
-
-watch(
-  () => [props.serverProps, props.options],
-  async ([newVal, newOptions]) => {
-    if (newVal) {
-      const { serverType = 'base', optionsParams = {} } = newVal as objType
-      serverOrLocalOptions.value = await getServerOptions(serverType, optionsParams)
-    }
-    else {
-      serverOrLocalOptions.value = newOptions as any[]
-    }
-    valueType.value = getType(serverOrLocalOptions.value[0]?.[props.value]) as string
-  },
-  {
-    immediate: true,
-    deep: true,
-  },
-)
+// 使用 useOptions hook 来处理 options 获取逻辑
+const { options: serverOrLocalOptions, isLoading } = useOptions({
+  options: props.options,
+  requestUrl: props.requestUrl,
+  requestParams: props.requestParams,
+  requestMethod: props.requestMethod,
+  requestParamsType: props.requestParamsType,
+  requestHeaders: props.requestHeaders,
+  responseDataPath: props.responseDataPath,
+})
 
 const computedOptions = computed(() => {
   return getType(props.filterMethod, 'function')
@@ -194,9 +132,7 @@ function defaultDisabledHandler({ label, value }: { [label: string]: any }) {
 }
 
 function handleSelectChange(value: any) {
-  if (getType(value, valueType.value)) {
-    emits('change', value)
-  }
+  emits('change', value)
 }
 
 function handleVisibleChange(visible: boolean) {
@@ -251,8 +187,7 @@ function setupIntersectionObserver() {
 
     // 确保找到下拉框的滚动容器
     if (dropdown) {
-      const wrap = dropdown.querySelector('.el-select-dropdown__wrap') || dropdown
-      dropdown = wrap
+      dropdown = dropdown.querySelector('.el-select-dropdown__wrap') || dropdown
     }
 
     if (!dropdown) {
@@ -271,7 +206,7 @@ function setupIntersectionObserver() {
         && !props.loading
         && !hasTriggeredLoadMore.value) {
         hasTriggeredLoadMore.value = true
-        emits('load-more')
+        emits('loadMore')
 
         // 3秒后重置状态
         setTimeout(() => {

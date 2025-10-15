@@ -1,101 +1,110 @@
-# Vue Template Components
+# Vue 组件库
 
-这是一个基于 Vue 3 + TypeScript 的组件库，封装了多个实用的组件，方便在 Vue 项目中使用。
-
-## 安装
-
-```bash
-npm install vue-template-components
-# 或
-yarn add vue-template-components
-# 或
-pnpm add vue-template-components
-```
-
-## 使用
-
-### 全局注册
-
-```js
-import { createApp } from 'vue'
-import App from './App.vue'
-import VueTemplateComponents from 'vue-template-components'
-import 'vue-template-components/dist/style.css'
-
-const app = createApp(App)
-app.use(VueTemplateComponents)
-app.mount('#app')
-```
-
-### 按需引入
-
-```vue
-<template>
-  <Calendar />
-  <DraggableTable :data="tableData" :columns="columns" />
-</template>
-
-<script setup>
-import { Calendar, DraggableTable } from 'vue-template-components'
-import 'vue-template-components/dist/style.css'
-</script>
-```
+这是一个基于 Vue 3 和 Element Plus 的组件库，提供了丰富的业务组件和工具函数。
 
 ## 组件列表
 
-组件库包含以下组件：
+### 表单组件
+- **TsSelect** - 选择器组件，支持静态数据和动态请求
+- **TsCheckbox** - 多选框组件，支持静态数据和动态请求
+- **TsRadio** - 单选框组件，支持静态数据和动态请求
+- **ReForm** - 动态表单组件
+- **ConfigFrom** - 配置表单组件
 
-- Calendar - 日历组件
-- ConfigForm - 配置化表单（基于 Formily + Element Plus）
-- ConfigProvider - 配置提供者
-- DateRangePicker - 日期范围选择器
-- DraggableTable - 可拖拽表格
-- EnterNextContainer - 可按 Enter 切换下一个输入框的容器
-- EnterNextTable - 可按 Enter 切换下一个输入框的表格
-- EnterNextDragTable - 可拖拽且可按 Enter 切换下一个输入框的表格
-- ExportExcel - Excel 导出工具
-- Icon - 图标组件
-- IntersectObserver - 交叉观察器
-- KeepAllAlive - 保持所有组件存活
-- MarkdownEditor - Markdown 编辑器
-- PopoverTableSelect - 弹出表格选择器
-- Select - 选择器
-- Tabs - 标签页
-- Watermark - 水印组件
+### 数据展示组件
+- **DraggableTable** - 可拖拽表格组件
+- **PopoverTableSelect** - 弹出表格选择器
+- **Tree** - 树形组件
+- **Tabs** - 标签页组件
 
-### 新增
-- ConfigFrom - 配置化表单（基于 form-create + Element UI）
-- ConfigFromPlayground - 配置化表单可视化设计器（基于 form-create designer）
+### 业务组件
+- **DateRangePicker** - 日期范围选择器
+- **ExportExcel** - Excel 导出组件
+- **ImportExcel** - Excel 导入组件
+- **DragModalDialog** - 可拖拽模态框
+- **EnterNextContainer** - 回车下一步容器
+- **TsButton** - 按钮组件
+- **TsFooter** - 页脚组件
 
-依赖（若未安装）：
+### 工具组件
+- **KeepAllAlive** - 保持所有组件活跃状态
+- **Splitter** - 分割器组件
+- **Title** - 标题组件
+
+## 安装使用
 
 ```bash
-pnpm -C packages/components add @form-create/element-ui @form-create/designer -w
+npm install @moluoxixi/components
 ```
 
-## 开发与贡献
+```typescript
+import { createApp } from 'vue'
+import App from './App.vue'
+import Components from '@moluoxixi/components'
 
-1. 克隆仓库
-   ```bash
-   git clone https://github.com/yourusername/vue-template-components.git
-   cd vue-template-components
-   ```
+const app = createApp(App)
+app.use(Components)
+```
 
-2. 安装依赖
-   ```bash
-   pnpm install
-   ```
+## 按需引入
 
-3. 启动开发服务器
-   ```bash
-   pnpm dev
-   ```
+```typescript
+import { TsSelect, TsCheckbox, TsRadio } from '@moluoxixi/components'
 
-4. 构建组件库
-   ```bash
-   pnpm build:component
-   ```
+// 在组件中使用
+export default {
+  components: {
+    TsSelect,
+    TsCheckbox,
+    TsRadio
+  }
+}
+```
 
-## License
+## Hooks
 
-MIT 
+组件库还提供了一些可复用的 hooks：
+
+- **useOptions** - 用于处理 options 获取逻辑的 hook，支持静态数据和动态请求
+
+```typescript
+import { useOptions } from '@moluoxixi/components'
+
+const { options, isLoading, error } = useOptions({
+  options: props.options,
+  requestUrl: props.requestUrl,
+  requestParams: props.requestParams
+})
+```
+
+## 开发指南
+
+### 组件开发规范
+
+1. 所有组件都应该支持 TypeScript
+2. 使用 Vue 3 Composition API
+3. 遵循 Element Plus 的设计规范
+4. 提供完整的 API 文档和示例
+5. 支持静态数据和动态请求两种数据源
+
+### 目录结构
+
+```
+packages/components/
+├── _hooks/           # 可复用的 hooks
+├── TsSelect/         # 选择器组件
+├── TsCheckbox/       # 多选框组件
+├── TsRadio/          # 单选框组件
+├── ...               # 其他组件
+└── index.ts          # 主入口文件
+```
+
+## 更新日志
+
+### v1.0.0
+- 新增 TsSelect 选择器组件
+- 新增 TsCheckbox 多选框组件
+- 新增 TsRadio 单选框组件
+- 新增 useOptions hook
+- 支持静态数据和动态请求
+- 完整的 TypeScript 类型支持

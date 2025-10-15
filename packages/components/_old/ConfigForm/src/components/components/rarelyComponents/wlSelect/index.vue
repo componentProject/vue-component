@@ -3,7 +3,7 @@
  * @Date: 2025-04-07 17:48:27
  * @LastEditors: moluoxixi 1983531544@qq.com
  * @LastEditTime: 2025-04-09 10:27:37
- * @FilePath: \vue-component\src\components\ConfigForm\components\components\rarelyComponents\wlSelect\index.vue
+ * @FilePath: \vue-component\src\components\ConfigForm\components\components\rarelyComponents\TsSelect\index.vue
  * @Description:
  *
  * Copyright (c) 2025 by ${git_name_email}, All Rights Reserved.
@@ -11,22 +11,22 @@
 <template>
   <el-select v-if="show" v-model="computedModel" v-bind="Options" v-on="Event">
     <!-- default Option 组件列表 -->
-    <el-option v-for="(option, index) in options" v-bind="option" :key="index"/>
+    <el-option v-for="(option, index) in options" v-bind="option" :key="index" />
     <!-- prefix Select 组件头部内容 -->
     <template v-if="slots.prefix" #prefix="scope">
-      <slot name="prefix" v-bind="scope"/>
+      <slot name="prefix" v-bind="scope" />
     </template>
     <!-- empty 无选项时的列表 -->
     <template v-if="slots.empty" #empty="scope">
-      <slot name="empty" v-bind="scope"/>
+      <slot name="empty" v-bind="scope" />
     </template>
   </el-select>
 </template>
 
 <script setup lang="ts">
-import type {configType, FormModelProps} from '@moluoxixi/components/ConfigForm/src/types'
-import {computed, ref, watch} from 'vue'
-import {isType} from '@moluoxixi/utils/_utils'
+import type { configType, FormModelProps } from '@moluoxixi/components/ConfigForm/src/types'
+import { computed, ref, watch } from 'vue'
+import { isType } from '@moluoxixi/utils/_utils'
 
 const props = withDefaults(
   defineProps<{
@@ -59,7 +59,7 @@ const computedModel = computed({
 watch(
   () => props.config,
   (v) => {
-    const {show: showVal, event, options: SelectOptions = [], ...rest} = v
+    const { show: showVal, event, options: SelectOptions = [], ...rest } = v
     if (isType(showVal, 'boolean')) {
       show.value = !!showVal
     }
@@ -67,7 +67,7 @@ watch(
     options.value = SelectOptions
     Event.value = event || {}
   },
-  {immediate: true, deep: true},
+  { immediate: true, deep: true },
 )
 </script>
 

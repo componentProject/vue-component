@@ -55,6 +55,10 @@ export default viteConfig(
             //     })
             //   },
             // },
+            '/ompBase': {
+              changeOrigin: true,
+              target: 'http://192.168.209.103:9099',
+            },
             '/ts-bs-his-base': {
               changeOrigin: true,
               target: 'http://192.168.208.26:9099',

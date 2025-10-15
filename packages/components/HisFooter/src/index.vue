@@ -1,5 +1,5 @@
 <template>
-  <TsFooter v-if="items.length" class="his-footer" :items="items" />
+  <TsFooter v-if="items.length" :items="items" />
 </template>
 
 <script setup lang="ts">
@@ -67,8 +67,4 @@ defineExpose({
 })
 </script>
 
-<style scoped lang="scss">
-.his-footer {
-  margin-top: 10px;
-}
-</style>
+<style scoped lang="scss"></style>

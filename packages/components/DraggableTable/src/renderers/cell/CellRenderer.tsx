@@ -6,7 +6,7 @@ import { ElInput, ElProgress, ElSwitch, ElTag } from 'element-plus'
 import { computed, defineComponent, onMounted, ref, watch } from 'vue'
 import { detectDateFormatByReplace } from '@moluoxixi/utils/_utils'
 import DateRangePicker from '@moluoxixi/components/DateRangePicker'
-import Select from '@moluoxixi/components/Select'
+import Select from '@moluoxixi/components/TsSelect'
 
 export default defineComponent({
   name: 'CellRenderer',
