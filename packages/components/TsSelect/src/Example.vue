@@ -2,7 +2,14 @@
   <div class="example-container">
     <h3>本地数据源</h3>
     <div class="select-container">
-      <Select v-model="localValue" :options="localData" label="name" value="age" @change="onLocalChange" />
+      <TsSelect
+        v-model="localValue"
+        :options="localData"
+        label="name"
+        value="age"
+        :option-props="{ size: 'large', disabled: false }"
+        @change="onLocalChange"
+      />
       <div class="value-display">
         当前选中值: {{ localValue }}
       </div>
@@ -10,7 +17,7 @@
 
     <h3>远程数据源</h3>
     <div class="select-container">
-      <Select
+      <TsSelect
         v-model="remoteValue"
         request-url="/ompBase/upgServices"
         :request-params="requestParams"
@@ -32,7 +39,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import Select from '@moluoxixi/components/Select/index.ts'
+import TsSelect from '@moluoxixi/components/TsSelect'
 
 const requestParams = ref({
   applicationId: '2',

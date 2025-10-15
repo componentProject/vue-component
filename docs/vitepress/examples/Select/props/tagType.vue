@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <WlSelect
+    <TsSelect
       v-model="vals"
       :options="options"
       :filterable="true"

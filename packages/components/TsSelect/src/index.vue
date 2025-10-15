@@ -1,163 +1,79 @@
 <template>
-  <div>
-    <ElSelect
-      :id="selectId"
-      v-model="data"
-      append-to="#app"
-      :clearable="props.clearable"
-      :filterable="props.filterable"
-      :filter-method="computedFilterMethod"
-      :collapse-tags="props.collapseTags"
-      :tag-type="props.tagType"
-      :teleported="props.teleported"
-      :collapse-tags-tooltip="props.collapseTagsTooltip"
-      v-bind="$attrs"
-      @change="handleSelectChange"
-      @visible-change="handleVisibleChange"
+  <ElSelect
+    :id="selectId"
+    v-model="data"
+    :clearable="props.clearable"
+    :filterable="props.filterable"
+    :filter-method="computedFilterMethod"
+    :collapse-tags="props.collapseTags"
+    :tag-type="props.tagType"
+    :teleported="props.teleported"
+    :collapse-tags-tooltip="props.collapseTagsTooltip"
+    v-bind="$attrs"
+    @change="handleSelectChange"
+    @visible-change="handleVisibleChange"
+  >
+    <ElOption
+      v-for="(item) in computedOptions"
+      :key="item[props.value]"
+      :label="item[props.label]"
+      :value="item[props.value]"
+      :disabled="
+        computedDisabledHandler({
+          label: item[props.label],
+          value: item[props.value],
+          data: item,
+        })
+      "
+      v-bind="props.optionProps"
+    />
+    <div
+      v-if="props.enableLoadMore && props.hasMore"
+      ref="loadMoreTrigger"
+      class="load-more-trigger"
     >
-      <ElOption
-        v-for="(item) in computedOptions"
-        :key="item[props.value]"
-        :label="item[props.label]"
-        :value="item[props.value]"
-        :disabled="
-          computedDisabledHandler({
-            label: item[props.label],
-            value: item[props.value],
-            data: item,
-          })
-        "
-      />
-      <div
-        v-if="props.enableLoadMore && props.hasMore"
-        ref="loadMoreTrigger"
-        class="load-more-trigger"
-      >
-        <span v-if="props.loading || isLoading">加载中...</span>
-      </div>
-    </ElSelect>
-  </div>
+      <span v-if="props.loading || isLoading">加载中...</span>
+    </div>
+  </ElSelect>
 </template>
 
 <script setup lang="ts">
-import type { PropType } from 'vue'
-import { computed, nextTick, onUnmounted, ref } from 'vue'
+import { computed, nextTick, onUnmounted, ref, withDefaults } from 'vue'
 import { ElOption, ElSelect } from 'element-plus'
 import { getType, getTypeDefault } from '@moluoxixi/utils/_utils'
 import { useOptions } from '../../_hooks'
-
-// 定义请求类型
-type RequestMethod = 'GET' | 'POST' | 'PUT' | 'DELETE'
-type RequestParamsType = 'query' | 'body' | 'form'
+import type { TsSelectEmits, TsSelectProps } from './_types'
 
 defineOptions({
-  name: 'WlSelect',
+  name: 'TsSelect',
 })
 
-const props = defineProps({
-  tagType: {
-    type: String as () => 'success' | 'info' | 'warning' | 'danger',
-    default: 'primary',
-  },
-  teleported: {
-    type: Boolean,
-    default: true,
-  },
-  clearable: {
-    type: Boolean,
-    default: true,
-  },
-  filterable: {
-    type: Boolean,
-    default: true,
-  },
-  filterMethod: {
-    type: Function as PropType<(query: string) => void>,
-  },
-  collapseTagsTooltip: {
-    type: Boolean,
-    default: true,
-  },
-  collapseTags: {
-    type: Boolean,
-    default: true,
-  },
-  label: {
-    type: String,
-    default: 'label',
-  },
-  value: {
-    type: String,
-    default: 'value',
-  },
-  disabledValues: {
-    type: Array,
-    default: () => [],
-  },
-  disabledLabels: {
-    type: Array,
-    default: () => [],
-  },
-  disabledHandler: {
-    type: Function,
-  },
-  options: {
-    type: Array,
-    default: () => [],
-  },
-  filterFields: {
-    type: Array,
-    default: () => [],
-  },
-  // 开启加载更多
-  enableLoadMore: {
-    type: Boolean,
-    default: false,
-  },
-  // 是否还有更多数据
-  hasMore: {
-    type: Boolean,
-    default: false,
-  },
-  // 加载中
-  loading: {
-    type: Boolean,
-    default: false,
-  },
-  // 请求类型
-  requestMethod: {
-    type: String as () => RequestMethod,
-    default: 'POST',
-  },
-  // 请求地址
-  requestUrl: {
-    type: String,
-    default: '',
-  },
-  // 请求入参
-  requestParams: {
-    type: Object,
-    default: () => ({}),
-  },
-  // 入参类型
-  requestParamsType: {
-    type: String as () => RequestParamsType,
-    default: 'body',
-  },
-  // 请求头
-  requestHeaders: {
-    type: Object,
-    default: () => ({}),
-  },
-  // 返回值路径，例如 'list.data' 则获取 response.data.list.data
-  responseDataPath: {
-    type: String,
-    default: '',
-  },
+const props = withDefaults(defineProps<TsSelectProps>(), {
+  tagType: 'primary',
+  teleported: true,
+  clearable: true,
+  filterable: true,
+  collapseTagsTooltip: true,
+  collapseTags: true,
+  label: 'label',
+  value: 'value',
+  disabledValues: () => [],
+  disabledLabels: () => [],
+  options: () => [],
+  filterFields: () => [],
+  enableLoadMore: false,
+  hasMore: false,
+  loading: false,
+  requestMethod: 'POST',
+  requestUrl: '',
+  requestParams: () => ({}),
+  requestParamsType: 'body',
+  requestHeaders: () => ({}),
+  responseDataPath: '',
+  optionProps: () => ({}),
 })
 
-const emits = defineEmits(['change', 'loadMore'])
-
+const emits = defineEmits<TsSelectEmits>()
 const selectId = `select-${Math.random().toString(36).substr(2, 9)}`
 
 const data = defineModel<any>()

@@ -1,4 +1,4 @@
-import { computed, ref, watch } from 'vue'
+import { computed, ref, watch, type ComputedRef } from 'vue'
 import BaseApi from '@moluoxixi/utils/AjaxPackage/class'
 
 // 定义请求类型
@@ -16,9 +16,9 @@ export interface UseOptionsProps {
 }
 
 export interface UseOptionsReturn {
-  options: any[]
-  isLoading: boolean
-  error: string | null
+  options: ComputedRef<any[]>
+  isLoading: ComputedRef<boolean>
+  error: ComputedRef<string | null>
 }
 
 /**
