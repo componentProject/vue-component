@@ -3,12 +3,7 @@
     <div class="chat-agent-container">
       <div class="chat-agent-content">
         <div class="chat-list-container">
-          <div
-            id="tsAiAgent-chat-list-content"
-            ref="chatList"
-            class="chat-list-content"
-            @scroll="handleScroll"
-          >
+          <div id="tsAiAgent-chat-list-content" ref="chatList" class="chat-list-content" @scroll="handleScroll">
             <div class="chat-list">
               <!-- <t-chat-item role="assistant" content="提示词" v-if="chatList.length === 0"> </t-chat-item> -->
               <Bubble
@@ -20,10 +15,7 @@
                 :text-loading="index === 0 && loading"
               >
                 <template v-if="!isStreamLoad" #actions>
-                  <BubbleAction
-                    :data="item"
-                    @operation="(e, type, item) => handleOperation(e, type, item, index)"
-                  />
+                  <BubbleAction :data="item" @operation="(e, type, item) => handleOperation(e, type, item, index)" />
                 </template>
               </Bubble>
             </div>
@@ -566,7 +558,17 @@ export default {
 
     // 添加一个方法来获取当前状态（供父组件调用）
     getCurrentState() {
-      return JSON.parse(JSON.stringify(this.$data))
+      const state = JSON.parse(JSON.stringify(this.$data))
+      // 移除 mixin 相关属性，避免序列化问题和恢复时的冲突
+      delete state.md
+      delete state.urlSet
+      delete state.viewer
+      delete state.showViewer
+      delete state.index
+      delete state.urlList
+      delete state.showModal
+      delete state.iframeContent
+      return state
     },
 
     // 添加一个方法来设置状态（供父组件调用）
@@ -574,7 +576,23 @@ export default {
       if (!state)
         return
       setTimeout(() => {
+        // 保存 mixin 初始化的属性，避免被覆盖
+        const mixinProps = {
+          md: this.md,
+          urlSet: this.urlSet,
+          viewer: this.viewer,
+          showViewer: this.showViewer,
+          index: this.index,
+          urlList: this.urlList,
+          showModal: this.showModal,
+          iframeContent: this.iframeContent,
+        }
+
+        // 应用状态
         Object.assign(this, state)
+
+        // 恢复 mixin 属性
+        Object.assign(this, mixinProps)
       }, 100)
     },
   },
