@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-select
+    <ElSelect
       :id="selectId"
       v-model="data"
       append-to="#app"
@@ -15,7 +15,7 @@
       @change="handleSelectChange"
       @visible-change="handleVisibleChange"
     >
-      <el-option
+      <ElOption
         v-for="(item) in computedOptions"
         :key="item[props.value]"
         :label="item[props.label]"
@@ -33,17 +33,22 @@
         ref="loadMoreTrigger"
         class="load-more-trigger"
       >
-        <span v-if="props.loading">加载中...</span>
+        <span v-if="props.loading || isLoading">加载中...</span>
       </div>
-    </el-select>
+    </ElSelect>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, onUnmounted, ref, watch } from 'vue'
-import getServerOptions from '@moluoxixi/components/Select/src/uitls'
-import type { objType } from '@moluoxixi/components/_types'
+import type { PropType } from 'vue'
+import { computed, nextTick, onUnmounted, ref } from 'vue'
+import { ElOption, ElSelect } from 'element-plus'
 import { getType, getTypeDefault } from '@moluoxixi/utils/_utils'
+import { useOptions } from '../../_hooks'
+
+// 定义请求类型
+type RequestMethod = 'GET' | 'POST' | 'PUT' | 'DELETE'
+type RequestParamsType = 'query' | 'body' | 'form'
 
 defineOptions({
   name: 'WlSelect',
@@ -67,7 +72,7 @@ const props = defineProps({
     default: true,
   },
   filterMethod: {
-    type: Function,
+    type: Function as PropType<(query: string) => void>,
   },
   collapseTagsTooltip: {
     type: Boolean,
@@ -104,9 +109,6 @@ const props = defineProps({
     type: Array,
     default: () => [],
   },
-  serverProps: {
-    type: Object as PropType<objType | null>,
-  },
   // 开启加载更多
   enableLoadMore: {
     type: Boolean,
@@ -122,9 +124,39 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  // 请求类型
+  requestMethod: {
+    type: String as () => RequestMethod,
+    default: 'POST',
+  },
+  // 请求地址
+  requestUrl: {
+    type: String,
+    default: '',
+  },
+  // 请求入参
+  requestParams: {
+    type: Object,
+    default: () => ({}),
+  },
+  // 入参类型
+  requestParamsType: {
+    type: String as () => RequestParamsType,
+    default: 'body',
+  },
+  // 请求头
+  requestHeaders: {
+    type: Object,
+    default: () => ({}),
+  },
+  // 返回值路径，例如 'list.data' 则获取 response.data.list.data
+  responseDataPath: {
+    type: String,
+    default: '',
+  },
 })
 
-const emits = defineEmits(['change', 'load-more'])
+const emits = defineEmits(['change', 'loadMore'])
 
 const selectId = `select-${Math.random().toString(36).substr(2, 9)}`
 
@@ -152,26 +184,16 @@ const allFilterFields = computed(() => {
   )
 })
 
-const valueType = ref<string>()
-const serverOrLocalOptions = ref<any[]>([])
-
-watch(
-  () => [props.serverProps, props.options],
-  async ([newVal, newOptions]) => {
-    if (newVal) {
-      const { serverType = 'base', optionsParams = {} } = newVal as objType
-      serverOrLocalOptions.value = await getServerOptions(serverType, optionsParams)
-    }
-    else {
-      serverOrLocalOptions.value = newOptions as any[]
-    }
-    valueType.value = getType(serverOrLocalOptions.value[0]?.[props.value]) as string
-  },
-  {
-    immediate: true,
-    deep: true,
-  },
-)
+// 使用 useOptions hook 来处理 options 获取逻辑
+const { options: serverOrLocalOptions, isLoading } = useOptions({
+  options: props.options,
+  requestUrl: props.requestUrl,
+  requestParams: props.requestParams,
+  requestMethod: props.requestMethod,
+  requestParamsType: props.requestParamsType,
+  requestHeaders: props.requestHeaders,
+  responseDataPath: props.responseDataPath,
+})
 
 const computedOptions = computed(() => {
   return getType(props.filterMethod, 'function')
@@ -194,9 +216,7 @@ function defaultDisabledHandler({ label, value }: { [label: string]: any }) {
 }
 
 function handleSelectChange(value: any) {
-  if (getType(value, valueType.value)) {
-    emits('change', value)
-  }
+  emits('change', value)
 }
 
 function handleVisibleChange(visible: boolean) {
@@ -251,8 +271,7 @@ function setupIntersectionObserver() {
 
     // 确保找到下拉框的滚动容器
     if (dropdown) {
-      const wrap = dropdown.querySelector('.el-select-dropdown__wrap') || dropdown
-      dropdown = wrap
+      dropdown = dropdown.querySelector('.el-select-dropdown__wrap') || dropdown
     }
 
     if (!dropdown) {
@@ -271,7 +290,7 @@ function setupIntersectionObserver() {
         && !props.loading
         && !hasTriggeredLoadMore.value) {
         hasTriggeredLoadMore.value = true
-        emits('load-more')
+        emits('loadMore')
 
         // 3秒后重置状态
         setTimeout(() => {

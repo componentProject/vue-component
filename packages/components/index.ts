@@ -15,6 +15,9 @@ import DragModalDialog from '@moluoxixi/components/DragModalDialog'
 import TsFooter from '@moluoxixi/components/TsFooter'
 import ReForm from '@moluoxixi/components/ReForm'
 
+// 导出 hooks
+export * from './_hooks'
+
 export {
   ConfigFrom,
   DateRangePicker,
