@@ -176,7 +176,7 @@ onMounted(async () => {
 
 .main {
   margin: 20px;
-  height: 500px;
+  height: 600px;
   text-align: center;
 }
 

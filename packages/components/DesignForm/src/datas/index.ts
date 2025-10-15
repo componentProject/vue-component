@@ -1,42 +1,44 @@
 import { ElCheckbox, ElCheckboxGroup, ElInput, ElInputNumber, ElRadio, ElRadioGroup, ElSelect } from 'element-plus'
 
-let fieldCounter = 0
-
-function createComponentConfig(baseConfig: any) {
-  return {
-    ...baseConfig,
-    field: `field_${++fieldCounter}`, // 生成唯一的 field
-  }
+export const componentMap = {
+  elinput: ElInput,
+  eltextarea: ElInput,
+  elinputnumber: ElInputNumber,
+  elselect: ElSelect,
 }
 
 export const formItemObj = {
-  elInput: createComponentConfig({
+  elInput: {
     label: '输入框',
     component: ElInput,
-  }),
-  eltextarea: createComponentConfig({
+    props: {
+      clearable: true,
+      disabled: false,
+    },
+  },
+  eltextarea: {
     label: '多行输入框',
     component: ElInput,
     props: {
       type: 'textarea',
     },
-  }),
-  elinputnumber: createComponentConfig({
+  },
+  elinputnumber: {
     label: '数字输入框',
     component: ElInputNumber,
-  }),
-  elselect: createComponentConfig({
+  },
+  elselect: {
     label: '下拉框',
     component: ElSelect,
-  }),
-  elcheckboxgroup: createComponentConfig({
-    label: '多选框组',
+  },
+  elcheckboxgroup: {
+    label: '多选',
     component: ElCheckboxGroup,
     childComp: ElCheckbox,
-  }),
-  elradiogroup: createComponentConfig({
-    label: '单选框组',
+  },
+  elradiogroup: {
+    label: '单选',
     component: ElRadioGroup,
     childComp: ElRadio,
-  }),
+  },
 }

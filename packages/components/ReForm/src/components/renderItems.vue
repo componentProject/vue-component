@@ -105,7 +105,7 @@ function getItemStyle(item: ReFormItem): string {
     // flex布局下优先检查表单项的itemWidth，其次是全局的itemWidth
     const finalItemWidth = item.itemWidth !== undefined ? item.itemWidth : unref(itemWidth.value)
 
-    if (finalItemWidth !== undefined && finalItemWidth !== null) {
+    if (finalItemWidth) {
       // 如果设置了itemWidth，使用固定宽度
       let width = finalItemWidth
       // 检查是否需要添加px单位
@@ -126,9 +126,8 @@ function getItemStyle(item: ReFormItem): string {
     // 没有设置itemWidth时保持原有逻辑
     const safeGridResponsive = Math.max(unref(gridResponsive) || 1, 1)
     const safeColGap = Math.max(unref(colGap) || 0, 0)
-
     const width = (100 / safeGridResponsive) * span
-    const gapCompensation = (safeColGap * (span - 1)) / safeGridResponsive
+    const gapCompensation = (((100 / width) - 1) * safeColGap) / (100 / width)
     return `width: calc(${width}% - ${gapCompensation}px); flex-shrink: 0;`
   }
 }

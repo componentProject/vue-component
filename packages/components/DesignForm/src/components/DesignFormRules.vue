@@ -4,7 +4,9 @@
       <template #组件配置>
         <div v-if="selectedItem" class="config-section">
           <ReForm
+            ref="formItemConfigRef"
             v-bind="formItemConfig"
+            v-model="formData"
             @change="handleItemConfigChange"
           />
           <!-- 添加表单项操作按钮 -->
@@ -36,6 +38,7 @@ import { watch } from 'vue'
 import Tabs from '@moluoxixi/components/Tabs'
 import ReForm from '@moluoxixi/components/ReForm'
 import { formItemConfig as defaultFormItemConfig } from '../datas/formData'
+import { deepClone } from '../utils/formSerializer'
 
 const props = defineProps<{
   formConfig?: any
@@ -56,12 +59,15 @@ const tabList = [
   { label: '表单配置', name: 'form' },
 ]
 
+const formData = ref<any>({})
+
+const formItemConfigRef = ref<any>(null)
 const formConfigRef = ref<any>(null)
 
 // 表单配置数据（深拷贝避免修改原始数据）
 const formConfigData = ref<any>(null)
 // 表单项配置（深拷贝）
-const formItemConfig = ref<any>(JSON.parse(JSON.stringify(defaultFormItemConfig)))
+const formItemConfig = ref<any>(deepClone(defaultFormItemConfig))
 
 // 监听外部表单配置变化
 watch(
@@ -79,14 +85,37 @@ watch(
   () => props.selectedItem,
   (newItem) => {
     if (newItem) {
+      setFormItemConfig(newItem)
       activeTab.value = 'component'
     }
   },
 )
 
+// 根据添加的组件设置表单项配置
+function setFormItemConfig(item: any) {
+  const itemObj = {}
+  // 简单循环item对象的所有属性
+  if (item && typeof item === 'object') {
+    Object.keys(item).forEach((key) => {
+      if (key === 'component') {
+        itemObj[key] = item[key].name
+      }
+      else if (key === 'props') {
+        Object.keys(item[key]).forEach((propKey) => {
+          itemObj[propKey] = item[key][propKey]
+        })
+      }
+      else {
+        itemObj[key] = item[key]
+      }
+      formData.value = itemObj
+    })
+  }
+}
+
 // 表单项配置实时变化
-function handleItemConfigChange(values: any) {
-  // 可以在这里实现实时预览功能
+function handleItemConfigChange() {
+  emits('update:selectedItem', formItemConfigRef.value.formData)
 }
 
 // 表单配置实时变化

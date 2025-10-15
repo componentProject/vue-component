@@ -124,7 +124,7 @@ const {
   formGroupDependency,
   clearItemConfigCache,
   itemConfigCache,
-} = useForm(localItems, props.modelValue, effectiveCols, props.layout)
+} = useForm(localItems, props.modelValue, effectiveCols, layout)
 
 const {
   renderFormItems,
@@ -148,7 +148,7 @@ const gridTemplateStyle = computed(() => {
     style['grid-template-columns'] = `repeat(${effectiveColumns}, 1fr)`
   }
   else {
-    style['gap'] = `${props.colGap}px`
+    style.gap = `${props.colGap}px`
   }
 
   return style
@@ -321,6 +321,7 @@ provide(Symbol.for('ap-re-form'), {
   handleSwitchCollapsed,
   layout: computed(() => props.layout),
   itemWidth: computed(() => props.itemWidth),
+  colGap: computed(() => props.colGap),
   formInstanceId, // 传递实例ID
 })
 

@@ -53,25 +53,25 @@ export const defaultFormConfig = {
         ],
       },
     },
-    // {
-    //   label: '表单项固定宽度(number|string单位px)',
-    //   field: 'itemWidth',
-    //   tooltip: '表单水平布局下，设置该属性后，每个表单项的宽度将固定为该值',
-    //   component: ElInput,
-    //   props: {
-    //     clearable: true,
-    //     maxheight: 20,
-    //   },
-    //   visible: {
-    //     conditions: [
-    //       {
-    //         field: 'layout',
-    //         value: 'flex',
-    //         type: '=',
-    //       },
-    //     ],
-    //   },
-    // },
+    {
+      label: '表单项固定宽度(number|string单位px)',
+      field: 'itemWidth',
+      tooltip: '表单水平布局下，设置该属性后，每个表单项的宽度将固定为该值',
+      component: ElInput,
+      props: {
+        clearable: true,
+        maxheight: 20,
+      },
+      visible: {
+        conditions: [
+          {
+            field: 'layout',
+            value: 'flex',
+            type: '=',
+          },
+        ],
+      },
+    },
     {
       label: '全局表单项间距',
       field: 'colGap',
@@ -95,6 +95,23 @@ export const defaultFormConfig = {
           { label: '靠右', value: 'right' },
         ],
       },
+    },
+    {
+      label: '提交时是否滚动到第一个错误位置',
+      field: 'scrollToError',
+      defaultValue: true,
+      component: ElRadioGroup,
+      childComp: ElRadio,
+      options: [
+        {
+          label: '是',
+          value: true,
+        },
+        {
+          label: '否',
+          value: false,
+        },
+      ],
     },
     {
       label: '标签宽度',
@@ -163,7 +180,7 @@ export const defaultFormConfig = {
   ],
 }
 
-// 表单item组件配置
+//表单item组件配置
 export const formItemConfig = {
   size: 'default',
   labelPosition: 'top',
@@ -180,6 +197,7 @@ export const formItemConfig = {
         options: [
           { label: '输入框', value: 'ElInput' },
           { label: '多文本框', value: 'ElTextarea' },
+          { label: '数字输入框', value: 'ElInputNumber' },
           { label: '下拉框', value: 'ElSelect' },
           { label: '多选', value: 'ElCheckboxGroup' },
           { label: '单选', value: 'ElRadioGroup' },
@@ -208,6 +226,25 @@ export const formItemConfig = {
       rules: [{ required: true, message: '字段编码不能为空' }],
     },
     {
+      label: '标签的宽度',
+      field: 'labelWidth',
+      component: ElInput,
+      props: {
+        clearable: true,
+        maxheight: 40,
+      },
+    },
+    {
+      label: '提示信息',
+      field: 'tips',
+      defaultValue: '',
+      component: ElInput,
+      props: {
+        clearable: true,
+        maxheight: 100,
+      },
+    },
+    {
       label: '默认值',
       field: 'defaultValue',
       component: ElInput,
@@ -217,19 +254,39 @@ export const formItemConfig = {
       },
     },
     {
+      label: '是否禁用',
+      field: 'disabled',
+      component: ElRadioGroup,
+      childComp: ElRadio,
+      props: {
+        clearable: true,
+        maxheight: 40,
+      },
+      options: [
+        {
+          label: '是',
+          value: true,
+        },
+        {
+          label: '否',
+          value: false,
+        },
+      ],
+    },
+    {
       label: '是否必填',
       field: 'required',
-      defaultValue: '2',
+      defaultValue: false,
       component: ElRadioGroup,
       childComp: ElRadio,
       options: [
         {
           label: '是',
-          value: '1',
+          value: true,
         },
         {
           label: '否',
-          value: '2',
+          value: false,
         },
       ],
       props: {
@@ -256,10 +313,19 @@ export const formItemConfig = {
       props: {
         clearable: true,
       },
+      visible: {
+        conditions: [
+          {
+            field: 'required',
+            value: true,
+            type: '=',
+          },
+        ],
+      },
     },
     {
-      label: '提示信息',
-      field: 'tips',
+      label: '错误信息',
+      field: 'errorTips',
       defaultValue: '',
       component: ElInput,
       props: {
@@ -277,35 +343,25 @@ export const formItemConfig = {
         maxheight: 100,
       },
     },
-    {
-      label: '最小值',
-      field: 'min',
-      defaultValue: '',
-      component: ElInput,
-      props: {
-        clearable: true,
-        maxheight: 20,
-      },
-    },
-    {
-      label: '最大值',
-      field: 'max',
-      defaultValue: '',
-      component: ElInput,
-      props: {
-        clearable: true,
-        maxheight: 20,
-      },
-    },
-    {
-      label: '错误信息',
-      field: 'errorTips',
-      defaultValue: '',
-      component: ElInput,
-      props: {
-        clearable: true,
-        maxheight: 100,
-      },
-    },
+    // {
+    //   label: '最小值',
+    //   field: 'min',
+    //   defaultValue: '',
+    //   component: ElInput,
+    //   props: {
+    //     clearable: true,
+    //     maxheight: 20,
+    //   },
+    // },
+    // {
+    //   label: '最大值',
+    //   field: 'max',
+    //   defaultValue: '',
+    //   component: ElInput,
+    //   props: {
+    //     clearable: true,
+    //     maxheight: 20,
+    //   },
+    // },
   ],
 }

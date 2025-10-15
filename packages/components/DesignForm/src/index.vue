@@ -7,7 +7,7 @@
       <div v-if="!formConfig" class="empty-form">
         <p>请从左侧添加表单项</p>
       </div>
-      <ReForm v-else v-bind="formConfig" @submit="handleFormSubmit" />
+      <ReForm v-else v-bind="formConfig" @submit="handleFormSubmit" @click="handleReFormClick" />
     </div>
     <div class="design-form-right">
       <DesignFormRules
@@ -27,7 +27,7 @@ import { ref, watch } from 'vue'
 import ReForm from '@moluoxixi/components/ReForm'
 import DesignFormRules from './components/DesignFormRules.vue'
 import DesignFormList from './components/DesignFormList.vue'
-import { formItemObj } from './datas/index'
+import { componentMap, formItemObj } from './datas/index'
 import { defaultFormConfig } from './datas/formData'
 import { deepClone } from './utils/formSerializer'
 
@@ -54,6 +54,9 @@ function handleAddFormItem(componentKey: string) {
   if (componentConfig) {
     // 深拷贝组件配置
     const newItem = deepClone(componentConfig)
+    const timestamp = Date.now()
+    const random = Math.floor(Math.random() * 1000)
+    newItem.field = `${componentKey}_${timestamp}_${random}`
     const newItemConfig = {
       ...formConfig.value,
       items: [...formConfig.value.items, newItem],
@@ -61,6 +64,12 @@ function handleAddFormItem(componentKey: string) {
     // 选中新添加的表单项
     selectedItemIndex.value = newItemConfig.items.length - 1
     selectedItem.value = newItem
+
+    // 为所有表单项添加或移除选中样式
+    newItemConfig.items = newItemConfig.items.map((item, index) => ({
+      ...item,
+      customClass: index === selectedItemIndex.value ? 'selected-form-item' : '',
+    }))
     formConfig.value = { ...newItemConfig }
   }
 }
@@ -78,11 +87,38 @@ function handleFormConfigUpdate(newConfig: any) {
 // 更新选中的表单项
 function handleSelectedItemUpdate(updatedItem: any) {
   if (selectedItemIndex.value !== null && formConfig.value) {
-    formConfig.value.items[selectedItemIndex.value] = { ...updatedItem }
-    selectedItem.value = updatedItem
-    // 触发响应式更新
-    formConfig.value = { ...formConfig.value }
+    const itemObj: any = {}
+    Object.keys(updatedItem).forEach((key) => {
+      if (key === 'component') {
+        itemObj[key] = componentMap[updatedItem[key].toLowerCase()]
+      }
+      else if (key === 'required') {
+        // 确保props对象存在
+        if (!itemObj.rules) {
+          itemObj.rules = []
+        }
+        itemObj.rules = [{ required: updatedItem[key], message: '不能为空' }]
+      }
+      else {
+        itemObj[key] = updatedItem[key]
+      }
+    })
+
+    const newItems = [...formConfig.value.items]
+    newItems.splice(selectedItemIndex.value, 1, { ...itemObj })
+
+    // 创建全新的formConfig对象，确保响应式更新
+    formConfig.value = {
+      ...formConfig.value,
+      items: newItems,
+    }
+
+    selectedItem.value = itemObj
   }
+}
+
+function handleReFormClick(index: number) {
+  console.log('0000000', index)
 }
 
 // 表单提交处理
@@ -136,6 +172,13 @@ watch(selectedItemIndex, (newIndex) => {
   .design-form-main {
     flex: 1;
     height: 100%;
+
+    :global(.selected-form-item) {
+      padding: 2px;
+      border: 1px solid #409eff;
+      background-color: rgba(64, 158, 255, 0.05);
+      transition: all 0.3s ease;
+    }
   }
 
   .design-form-right {
