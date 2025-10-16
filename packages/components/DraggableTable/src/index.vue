@@ -85,7 +85,6 @@ import { getCustomType, handleGetRequiredFields } from './_utils'
 // 导入自定义渲染器
 import './renderers'
 import type { slotsType } from '@moluoxixi/components/_types'
-import EnterNextContainer from '@moluoxixi/components/EnterNextContainer'
 import CustomConfigDialog from './components/CustomConfigDialog.vue'
 import { getMemoryQuery, setMemoryUpload } from '@moluoxixi/utils/_api'
 import './variable.scss'
