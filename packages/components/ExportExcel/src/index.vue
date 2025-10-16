@@ -10,10 +10,10 @@
 </template>
 
 <script setup>
-import { ElButton, ElMessage } from 'element-plus'
+import { ElButton } from 'element-plus'
 import fileSaver from 'file-saver'
 import { computed } from 'vue'
-import * as XLSX from 'xlsx'
+import { utils, write } from 'xlsx'
 import { getTypeDefault } from '@moluoxixi/utils/_utils/index.ts'
 
 // 设置组件不继承属性到根元素，而是手动通过$attrs绑定
@@ -75,7 +75,13 @@ const props = defineProps({
     default: '暂无数据可导出',
   },
 })
-
+const emits = defineEmits([
+  // 导入成功，抛出解析后的数组数据
+  'success',
+  // 导入失败或中断，抛出错误信息
+  'error',
+  'warning',
+])
 // 计算按钮是否禁用
 const isDisabled = computed(() => {
   return !props.allowEmptyExport && (!props.tableData || props.tableData.length === 0)
@@ -119,7 +125,10 @@ function handleExport() {
   if (!props.tableData || props.tableData.length === 0) {
     if (props.allowEmptyExport) {
       // 允许空数据导出，但给出提示
-      ElMessage.warning('当前数据为空，将导出表头信息')
+      emits('warning', {
+        message: '当前数据为空，将导出表头信息',
+        data: [],
+      })
       // 创建仅包含表头的数据
       const emptyData = [{}] // 创建一个空对象，以便生成工作表
       const header = computedHeader.value
@@ -130,7 +139,10 @@ function handleExport() {
     }
     else {
       // 不允许空数据导出
-      ElMessage.warning(props.emptyMessage)
+      emits('error', {
+        message: 'props.emptyMessage',
+        data: [],
+      })
     }
   }
   else {
@@ -189,7 +201,7 @@ function formatData(dataSource, keys) {
  */
 function exportExcel(data, header, fileName, keys = null) {
   // 创建工作簿
-  const wb = XLSX.utils.book_new()
+  const wb = utils.book_new()
 
   // 处理数据
   let worksheet
@@ -201,20 +213,20 @@ function exportExcel(data, header, fileName, keys = null) {
     keys.forEach((key) => {
       emptyObj[key] = ''
     })
-    worksheet = XLSX.utils.json_to_sheet([emptyObj], { header: keys })
+    worksheet = utils.json_to_sheet([emptyObj], { header: keys })
   }
   else {
     // 正常数据导出
-    worksheet = XLSX.utils.json_to_sheet(data, { header: keys })
+    worksheet = utils.json_to_sheet(data, { header: keys })
   }
 
   // 添加表头
-  XLSX.utils.sheet_add_aoa(worksheet, [header], { origin: 'A1' })
+  utils.sheet_add_aoa(worksheet, [header], { origin: 'A1' })
 
   // 设置表头样式（加粗）
-  const range = XLSX.utils.decode_range(worksheet['!ref'])
+  const range = utils.decode_range(worksheet['!ref'])
   for (let col = range.s.c; col <= range.e.c; ++col) {
-    const cellRef = XLSX.utils.encode_cell({ r: 0, c: col })
+    const cellRef = utils.encode_cell({ r: 0, c: col })
     if (!worksheet[cellRef])
       continue
     worksheet[cellRef].s = {
@@ -259,14 +271,14 @@ function exportExcel(data, header, fileName, keys = null) {
   }
 
   // 添加到工作簿
-  XLSX.utils.book_append_sheet(wb, worksheet, 'Sheet1')
+  utils.book_append_sheet(wb, worksheet, 'Sheet1')
 
   // 导出文件
   const fileType = props.exportType === 'xlsx' ? 'xlsx' : 'csv'
   const bookType = props.exportType === 'xlsx' ? 'xlsx' : 'csv'
 
   // 生成文件并下载
-  const wbout = XLSX.write(wb, { bookType, type: 'array' })
+  const wbout = write(wb, { bookType, type: 'array' })
   const blob = new Blob([wbout], { type: 'application/octet-stream' })
 
   // 添加时间戳
@@ -276,7 +288,10 @@ function exportExcel(data, header, fileName, keys = null) {
   fileSaver.saveAs(blob, fullFileName)
 
   // 导出成功提示
-  ElMessage.success('导出成功')
+  emits('success', {
+    message: '导出成功',
+    data: [],
+  })
 }
 
 /**

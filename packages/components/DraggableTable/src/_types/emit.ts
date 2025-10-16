@@ -5,10 +5,6 @@ import type { NoNextInputParams, NoSelectValueParams } from './index'
  * DraggableTable 组件的 Emits 类型定义
  */
 export interface DraggableTableEmits {
-  (e: 'currentChange', params: number): void
-  (e: 'update:pagination', params: number): void
-  (e: 'sizeChange', params: number): void
-  (e: 'pageChange', params: number): void
   (e: 'headerContextMenu', params: HTMLElement): void
   (e: 'headerCellMenu', params: VxeTableDefines.HeaderCellMenuParams & { cell?: HTMLElement }): void
   (e: 'checkboxAll', params: VxeTableDefines.CheckboxAllParams): void

@@ -2,7 +2,14 @@
   <div class="example-container">
     <h3>本地数据源</h3>
     <div class="select-container">
-      <Select v-model="localValue" :options="localData" label="name" value="age" @change="onLocalChange" />
+      <TsSelect
+        v-model="localValue"
+        :options="localData"
+        label="name"
+        value="age"
+        :option-props="{ size: 'large', disabled: false }"
+        @change="onLocalChange"
+      />
       <div class="value-display">
         当前选中值: {{ localValue }}
       </div>
@@ -10,47 +17,35 @@
 
     <h3>远程数据源</h3>
     <div class="select-container">
-      <Select
+      <TsSelect
         v-model="remoteValue"
-        :server-props="{ serverType: 'base', optionsParams: { dictType: 'COMMON_YES_NO' } }"
+        request-url="/ompBase/upgServices"
+        :request-params="requestParams"
+        request-method="GET"
+        :request-headers="{
+          token: '84677795-e391-4a79-a313-4fc89598a73d',
+        }"
+        response-data-path="rows"
+        label="name"
+        value="id"
         @change="onRemoteChange"
       />
       <div class="value-display">
         当前选中值: {{ remoteValue }}
       </div>
     </div>
-
-    <div class="config-info">
-      <h3>全局配置示例</h3>
-      <pre>
-// 在应用入口配置
-import { configureServerOptions } from '@moluoxixi/components/Select/src/uitls'
-
-configureServerOptions({
-  serverMap: {
-    base: '/api/common/dict',
-    users: '/api/users',
-    departments: '/api/departments'
-  },
-  requestHandler: async (url, params) => {
-    // 自定义请求处理逻辑
-    const response = await fetch(url, {
-      method: 'POST',
-      body: JSON.stringify(params)
-    })
-    const data = await response.json()
-    return data.list || []
-  }
-})
-      </pre>
-    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import Select from '@moluoxixi/components/Select/index.ts'
+import TsSelect from '@moluoxixi/components/TsSelect'
 
+const requestParams = ref({
+  applicationId: '2',
+  pageNo: 1,
+  pageSize: 999,
+})
 // 本地数据
 const localData = [
   { name: '测试1', age: '12' },
