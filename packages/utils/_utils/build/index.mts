@@ -15,7 +15,6 @@ import type { ICruiseOptions, ICruiseResult } from 'dependency-cruiser'
 import { cruise } from 'dependency-cruiser'
 import AutoImport from 'unplugin-auto-import/vite'
 import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
-import Components from 'unplugin-vue-components/vite'
 import viteImagemin from 'vite-plugin-imagemin'
 import { obfuscator } from 'rollup-obfuscator'
 import transformAliasPlugin from './plugins/transformAliasPlugin/index.mts'
@@ -252,24 +251,24 @@ function createBaseConfig(ctx: BuildContext, comp: string, internalDeps: string[
         dts: resolve(ctx.packDir, './_typings/auto-imports.d.ts'),
       } as any),
       // 与自定义element组件冲突
-      Components({
-        resolvers: [
-          ElementPlusResolver({
-            exclude: new RegExp(
-              ([]).map(item => `^${item}$`).join('|'),
-            ),
-          }),
-        ],
-        globs: [
-          `.${ctx.entryBaseUrl}**/index.vue`,
-          `.${ctx.entryBaseUrl}**/index.ts`,
-          `!.${ctx.entryBaseUrl}**/base/**/*`,
-          `!.${ctx.entryBaseUrl}**/components/**/*`,
-          `!.${ctx.entryBaseUrl}**/src/**/*`,
-          `!.${ctx.entryBaseUrl}**/_*/**/*`,
-        ],
-        dts: resolve(ctx.packDir, './_typings/components.d.ts'),
-      }),
+      // Components({
+      //   resolvers: [
+      //     ElementPlusResolver({
+      //       exclude: new RegExp(
+      //         ([]).map(item => `^${item}$`).join('|'),
+      //       ),
+      //     }),
+      //   ],
+      //   globs: [
+      //     `.${ctx.entryBaseUrl}**/index.vue`,
+      //     `.${ctx.entryBaseUrl}**/index.ts`,
+      //     `!.${ctx.entryBaseUrl}**/base/**/*`,
+      //     `!.${ctx.entryBaseUrl}**/components/**/*`,
+      //     `!.${ctx.entryBaseUrl}**/src/**/*`,
+      //     `!.${ctx.entryBaseUrl}**/_*/**/*`,
+      //   ],
+      //   dts: resolve(ctx.packDir, './_typings/components.d.ts'),
+      // }),
       // 按需启用图片压缩（重型插件）
       ...(!ctx.excludeHeavyPlugins
         ? [
@@ -861,11 +860,12 @@ async function bundleComponentModule(ctx: BuildContext, {
     build: {
       outDir,
       emptyOutDir: true,
-      minify: 'esbuild',
+      minify: false,
+      // minify: 'esbuild',
       cssCodeSplit: false, // 关闭CSS代码分割，避免文件拆分
       lib: {
         entry,
-        name: `/${comp || ''}`,
+        name: `${comp || ''}`,
         formats: [format],
       },
       rollupOptions: {
@@ -889,13 +889,17 @@ async function bundleComponentModule(ctx: BuildContext, {
               return !(componentMatch && componentMatch[1] === currentComponent.toLowerCase())
             }
           }
-          // 检查Vue相关依赖
-          const isVueDep = ['vue', '@vue/runtime-core', '@vue/runtime-dom'].includes(id)
-          // Node.js核心模块，标记为外部依赖
-          const isNodeBuiltin = id.startsWith('node:')
-            || ['path', 'module', 'fs', 'os', 'events', 'stream', 'buffer', 'crypto', 'zlib', 'http', 'https', 'url', 'querystring', 'child_process'].includes(id)
+          // 全部交给presetGlobals
+          // // 检查Vue相关依赖
+          // const isVueDep = ['@vue/runtime-core', '@vue/runtime-dom'].includes(id)
+          // // Node.js核心模块，标记为外部依赖
+          // const isNodeBuiltin = id.startsWith('node:')
+          //   || ['path', 'module', 'fs', 'os', 'events', 'stream', 'buffer', 'crypto', 'zlib', 'http', 'https', 'url', 'querystring', 'child_process'].includes(id)
 
-          if (isVueDep || isNodeBuiltin || ctx.peerDepList.includes(id)) {
+          // if (isVueDep || isNodeBuiltin || ctx.peerDepList.includes(id)) {
+          //   return true
+          // }
+          if (ctx.peerDepList.includes(id)) {
             return true
           }
           const isExternal = ctx.useExternal || ctx.requireExternalPacks.includes(comp)
@@ -1025,6 +1029,7 @@ async function buildComponent(
   const esOutputDir = resolve(outputDir, 'es')
   const libOutputDir = resolve(outputDir, 'lib')
   const umdOutputDir = resolve(outputDir, 'umd')
+  const iifeOutputDir = resolve(outputDir, 'iife')
   try {
     await clearDir(esOutputDir)
     await clearDir(libOutputDir)
@@ -1037,13 +1042,28 @@ async function buildComponent(
     for (const compName of deps.internal) {
       // 当打包的是组件时，排除当前组件的自引用
       if (compName !== comp) {
-        globals[`${ctx.aliasComponentPath}/${compName}`] = `@${ctx.LIB_NAMESPACE}/${compName.toLowerCase()}`
+        // globals[`${ctx.aliasComponentPath}/${compName}`] = `@${ctx.LIB_NAMESPACE}/${compName.toLowerCase()}`
+        globals[`@${ctx.LIB_NAMESPACE}/${compName.toLowerCase()}`] = compName
       }
     }
 
     console.log('--------------------------->globals', globals)
     // 创建基础配置
     const baseConfig = createBaseConfig(ctx, comp, deps.internal)
+
+    // 打包UMD模块
+    await bundleComponentModule(ctx, {
+      comp,
+      entry,
+      outDir: iifeOutputDir,
+      format: 'iife',
+      dependencies,
+      globals,
+      baseConfig,
+      entryFileNames: `[name].js`,
+      chunkFileNames: `[name].js`,
+      skipManualChunks: true,
+    })
 
     // 打包UMD模块
     await bundleComponentModule(ctx, {
@@ -1340,7 +1360,7 @@ export async function buildComponentsWithOptions(options: BuildOptions): Promise
     useExternal = false,
     requireExternalPacks: reqExternal = [],
     entryBaseUrl: ebu = '/',
-    presetGlobals: presetGlobalsArg,
+    presetGlobals,
     uploadType,
   } = options || ({} as BuildOptions)
 
@@ -1353,19 +1373,6 @@ export async function buildComponentsWithOptions(options: BuildOptions): Promise
   if (!packDir)
     throw new Error('缺少必填参数：packDir')
 
-  const presetGlobals = useExternal
-    ? {
-        'vxe-table': 'VXETable',
-        'element-plus': 'ElementPlus',
-        'vite': 'Vite',
-        'vue': 'Vue',
-        ...presetGlobalsArg,
-      }
-    : {
-        vue: 'Vue',
-        vite: 'Vite',
-        ...presetGlobalsArg,
-      }
   const peerDepList = Object.keys(presetGlobals)
   // 生成上下文
   const ctx: BuildContext = {

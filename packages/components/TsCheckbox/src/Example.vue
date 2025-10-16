@@ -57,7 +57,15 @@ const localData = [
   { name: '测试7', age: '18' },
   { name: '测试8', age: '19' },
 ]
-
+const codeString = `(function (this){
+  this.a=1
+})(this)`
+const componentMapping = {}
+const newCodeString = codeString.replaceAll('this', '_this')
+console.log('newCodeString', newCodeString)
+// eslint-disable-next-line no-new-func
+const componentsCodeResult = new Function('_this', codeString.replaceAll('this', '_this'))(componentMapping)
+console.log('componentsCodeResult', componentsCodeResult, componentMapping)
 const localValues = ref<string[]>([])
 const remoteValues = ref<string[]>([])
 

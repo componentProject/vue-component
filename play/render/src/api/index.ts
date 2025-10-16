@@ -1,4 +1,5 @@
 import { getHttpService } from '../../../../packages/utils/AjaxPackage/index.ts'
+import { COMPONENT_SETTING_TYPE } from '@moluoxixi/constant'
 
 //import { getHttpService } from '@moluoxixi/AjaxPackage'
 
@@ -14,8 +15,13 @@ export const httpApi: any = getHttpService({
   },
 })
 
-export function getList(data: any) {
-  return httpApi.post('/ts-fm/file/getList', data)
+export async function getList(data: any = {}) {
+  const res = await httpApi.post('/ts-fm/file/getList', {
+    productCode: 'webFile_his',
+    vue: [COMPONENT_SETTING_TYPE],
+    ...data,
+  })
+  return res[COMPONENT_SETTING_TYPE]
 }
 
 const httpApi2: any = getHttpService({
