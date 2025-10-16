@@ -150,16 +150,7 @@ async function loadComponents(components: string[]) {
 }
 
 async function handleClick() {
-  const params = {
-    code: 'webfile',
-    paraMeters: {
-      productCode: 'webFile_his',
-      Vue: 'Vue3',
-      componentCode: '',
-    },
-  }
-  //ConfigTable、
-  await setDeleteByPathAndCode(params)
+  await setDeleteByPathAndCode('ConfigTable')
 }
 
 onMounted(async () => {

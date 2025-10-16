@@ -93,6 +93,7 @@ async function render(props: QiankunProps) {
   // proxy(container as HTMLElement)
   app = createApp(App)
   await registerAllComponent(app, Vue, vueShared)
+  console.log('app', app._context.components, app._context.components.TsFooter)
   // window.$remoteLoad = load
   // const res = await load(Vue)
   // Object.keys(res).forEach((name) => {

@@ -3,9 +3,14 @@
     <div class="title">
       调试与演示
     </div>
-    <!-- <el-button type="primary" @click="handleClick">
-      删除组件库组件
-    </el-button> -->
+    <div class="flex">
+      <div class="w-[200px]">
+        <TsSelect v-model="componentCode" placeholder="请选择要删除的组件" label="componentCode" value="id" :options="componentOptions" />
+      </div>
+      <ElButton type="primary" @click="handleClick">
+        删除组件库组件
+      </ElButton>
+    </div>
     <div v-if="localComponent" class="main">
       <div class="list-title">
         开发调试组件
@@ -30,21 +35,20 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 // 虚拟模块由 Vite 插件在运行时提供
-import { setDeleteByPathAndCode } from '@moluoxixi/utils/_api'
+import { getList, setDeleteByPathAndCode } from '@moluoxixi/utils/_api'
 import componentData from './data.ts'
+import { ElButton, ElMessage } from 'element-plus'
 
-defineOptions({ name: '调试与演示iife' })
+defineOptions({ name: '调试与演示iife和umd' })
 // 使用ref替代data属性
 // 调试与演示组件库的组件，直接修改组件名
 // const componentName = ref('ReForm')
-// const componentName = ref('DraggableTable')
+const componentName = ref('DraggableTable')
 // const componentName = ref('HisFooter')
-const componentName = ref('TsFooter')
+// const componentName = ref('TsFooter')
 // const componentName = ref('TestFooter')
 // 调试组件
 const localComponent = ref<any>(null)
-// 用于存储动态组件
-const dynamicComponent = ref<any>(null)
 
 // 从data.ts获取当前组件的配置
 const componentConfig = computed(() => {
@@ -133,20 +137,21 @@ async function loadLocalComponent(componentName: string) {
   }
 }
 
+const componentOptions = ref([])
+async function getComponentOptions() {
+  componentOptions.value = await getList()
+}
+const componentCode = ref('')
 async function handleClick() {
-  const params = {
-    code: 'webfile',
-    paraMeters: {
-      productCode: 'webFile_his',
-      Vue: 'Vue3',
-      componentCode: '',
-    },
+  if (!componentCode.value) {
+    ElMessage.error('请选择要删除的组件')
+    return
   }
-  //ConfigTable、
-  await setDeleteByPathAndCode(params)
+  await setDeleteByPathAndCode(componentCode.value)
 }
 
 onMounted(async () => {
+  getComponentOptions()
   // await loadLocalComponent(componentName.value)
 })
 </script>
