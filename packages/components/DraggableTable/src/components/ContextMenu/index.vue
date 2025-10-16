@@ -20,12 +20,12 @@
           </ElCheckbox>
         </div>
         <div class="flex justify-center">
-          <el-button size="small" @click="popoverVisible = false">
+          <ElButton size="small" @click="popoverVisible = false">
             取消
-          </el-button>
-          <el-button size="small" type="primary" @click="handleConfirm">
+          </ElButton>
+          <ElButton size="small" type="primary" @click="handleConfirm">
             确定
-          </el-button>
+          </ElButton>
         </div>
       </div>
     </ElPopover>
@@ -35,7 +35,7 @@
 <script setup lang="ts">
 import type { ComponentPublicInstance, PropType } from 'vue'
 import type { ColumnType, types } from '../../_types'
-import { ElCheckbox, ElMessage, ElPopover } from 'element-plus'
+import { ElButton, ElCheckbox, ElMessage, ElPopover } from 'element-plus'
 import { cloneDeep } from 'lodash'
 import { nextTick, onUnmounted, ref, useTemplateRef, watch } from 'vue'
 import { getTypeName } from '../../_utils'
