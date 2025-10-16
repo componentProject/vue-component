@@ -77,6 +77,7 @@ import { flattenTree } from '@moluoxixi/utils/_utils'
 import { cloneDeep } from 'lodash'
 import type { VxeGridInstance } from 'vxe-table'
 import TsSelect from '@moluoxixi/components/TsSelect'
+import DragModalDialog from '@moluoxixi/components/DragModalDialog'
 
 const props = defineProps({
   columns: {

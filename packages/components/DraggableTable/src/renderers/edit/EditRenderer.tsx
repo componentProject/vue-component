@@ -4,6 +4,8 @@ import type { objType } from '@moluoxixi/components/_types'
 import { ElInput } from 'element-plus'
 import { computed, defineComponent, ref, watch } from 'vue'
 import { detectDateFormatByReplace, getMomentIsValidIsNoNum } from '@moluoxixi/utils/_utils'
+import TsSelect from '@moluoxixi/components/TsSelect'
+import DateRangePicker from '@moluoxixi/components/DateRangePicker'
 
 export default defineComponent({
   name: 'EditRenderer',
