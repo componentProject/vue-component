@@ -860,8 +860,9 @@ async function bundleComponentModule(ctx: BuildContext, {
     build: {
       outDir,
       emptyOutDir: true,
-      minify: false,
-      // minify: 'esbuild',
+      // 是否压缩
+      // minify: false,
+      minify: 'esbuild',
       cssCodeSplit: false, // 关闭CSS代码分割，避免文件拆分
       lib: {
         entry,
