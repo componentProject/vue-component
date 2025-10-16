@@ -33,8 +33,9 @@ runBuildCliAndExit(
     rootDir,
     packDir,
     presetGlobals: {
-      'vue': 'Vue',
-      '@vue/shared': 'vueShared',
+      vue: 'Vue',
+      // 老版本不支持，需要更新壳子后再放出来
+      // '@vue/shared': 'vueShared',
     },
   },
   { uploadType: COMPONENT_SETTING_TYPE, command: 'build-publish' },

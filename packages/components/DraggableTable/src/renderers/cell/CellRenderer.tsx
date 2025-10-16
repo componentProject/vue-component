@@ -5,8 +5,6 @@ import type { customCustomTypes } from '../../_types'
 import { ElInput, ElProgress, ElSwitch, ElTag } from 'element-plus'
 import { computed, defineComponent, onMounted, ref, watch } from 'vue'
 import { detectDateFormatByReplace } from '@moluoxixi/utils/_utils'
-import DateRangePicker from '@moluoxixi/components/DateRangePicker'
-import TsSelect from '@moluoxixi/components/TsSelect'
 
 export default defineComponent({
   name: 'CellRenderer',

@@ -51,7 +51,7 @@
       校验表格
     </ElButton>
     <!-- 使用DraggableTable组件 -->
-    <TdDraggableTable
+    <DraggableTable
       id="demo_table_12355666"
       ref="draggableTableRef"
       v-model="tableData"
@@ -75,15 +75,14 @@
           aaa自定义插槽按钮
         </TsButton>
       </template>
-    </TdDraggableTable>
+    </DraggableTable>
   </div>
 </template>
 
 <script lang="ts" setup>
 import { ElButton, ElMessage } from 'element-plus'
 import { onMounted, ref, useTemplateRef } from 'vue'
-import TdDraggableTable from './index.vue'
-import TsButton from '@moluoxixi/components/TsButton'
+import DraggableTable from './index.vue'
 // 表格加载状态
 const loading = ref(false)
 // 拖拽开关状态
