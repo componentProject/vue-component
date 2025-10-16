@@ -51,7 +51,7 @@
       校验表格
     </ElButton>
     <!-- 使用DraggableTable组件 -->
-    <DraggableTable
+    <TdDraggableTable
       id="demo_table_12355666"
       ref="draggableTableRef"
       v-model="tableData"
@@ -67,6 +67,7 @@
       :filterable="filterable"
       :sortable="sortable"
       show-pagination
+      @page-change="pageChangeHandler"
     >
       <!-- 自定义操作列插槽 -->
       <template #aaa>
@@ -74,14 +75,14 @@
           aaa自定义插槽按钮
         </TsButton>
       </template>
-    </DraggableTable>
+    </TdDraggableTable>
   </div>
 </template>
 
 <script lang="ts" setup>
 import { ElButton, ElMessage } from 'element-plus'
 import { onMounted, ref, useTemplateRef } from 'vue'
-import DraggableTable from './index.vue'
+import TdDraggableTable from './index.vue'
 import TsButton from '@moluoxixi/components/TsButton'
 // 表格加载状态
 const loading = ref(false)
@@ -268,7 +269,9 @@ const cellTypeList = ref([
     },
   },
 ])
-
+function pageChangeHandler(params) {
+  console.log('params', params)
+}
 function changeCellType(type: string) {
   const item = columns.value.at(-2)
   columns.value[columns.value.length - 2] = {
