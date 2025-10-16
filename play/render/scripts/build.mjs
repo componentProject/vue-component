@@ -17,8 +17,8 @@ const renameDir = buildoutputDir
 uploadWeb().then(r => console.log(r))
 
 async function uploadWeb() {
-  const renamePath = path.join(__dirname, `../${renameDir}.zip`)
-  const form = path.join(__dirname, `../${buildoutputDir}`)
+  const renamePath = path.resolve(__dirname, `../${renameDir}.zip`)
+  const form = path.resolve(__dirname, `../${buildoutputDir}`)
   try {
     // let ip = '192.168.208.18';
     // 服务器前端静态资源存储路径
