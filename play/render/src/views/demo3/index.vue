@@ -37,9 +37,10 @@ defineOptions({ name: '调试与演示iife' })
 // 使用ref替代data属性
 // 调试与演示组件库的组件，直接修改组件名
 // const componentName = ref('ReForm')
-const componentName = ref('DraggableTable')
+// const componentName = ref('DraggableTable')
 // const componentName = ref('HisFooter')
-// const componentName = ref('TsFooter')
+const componentName = ref('TsFooter')
+// const componentName = ref('TestFooter')
 // 调试组件
 const localComponent = ref<any>(null)
 // 用于存储动态组件
