@@ -35,7 +35,6 @@
             v-if="column.field !== 'fixed' || !row.parentId"
             v-model="row[column.field]"
             :options="column.params.options"
-            :teleported="false"
             class="m-2"
             placeholder="Select"
             size="small"
