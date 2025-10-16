@@ -61,7 +61,7 @@ import type {
 } from 'vxe-table'
 import { VxeGrid } from 'vxe-table'
 import '@moluoxixi/components/VxeUI/VxeGrid/variable.scss'
-import { computed, nextTick, onBeforeMount, onBeforeUnmount, onMounted, ref, useAttrs, useTemplateRef, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, useAttrs, useTemplateRef, watch } from 'vue'
 import type { ColumnType, DraggableTableEmits, DraggableTableProps } from './_types'
 import { ElMessage } from 'element-plus'
 import { cloneDeep, groupBy } from 'lodash'
@@ -1051,8 +1051,7 @@ function handleColumnResizableChange(params: VxeTableDefines.ResizableChangePara
   dispatchEvents(document, ['mousedown', 'mouseup', 'click'])
   emit('resizableChange', params)
 }
-/** 监听props.columns的变化 */
-onBeforeMount(async () => {
+async function loadColumns() {
   const newColumns = cloneDeep(props.columns)
   if (isNoSave.value) {
     localColumns.value = newColumns
@@ -1079,6 +1078,11 @@ onBeforeMount(async () => {
   // - 两边都存在时：以 props 为底，stored 覆盖；children 递归处理
   // - 同级末尾追加 props 中新增但存储里没有的项
   localColumns.value = mergeColumnsLevel(storedColumns, newColumns)
+}
+/** 监听props.columns的变化 */
+watch(() => props.columns, loadColumns, {
+  deep: true,
+  immediate: true,
 })
 //#endregion
 
@@ -1325,6 +1329,7 @@ watch(
 defineExpose({
   // 暴露表格实例
   getTable: () => xTable.value,
+  loadColumns,
 })
 </script>
 

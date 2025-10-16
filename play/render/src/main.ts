@@ -1,7 +1,7 @@
 import type { QiankunProps } from 'vite-plugin-qiankun/dist/helper'
 import { createApp } from 'vue'
 import * as Vue from 'vue'
-import * as vueShared from '@vue/shared'
+import { idbStorage } from '@moluoxixi/utils/_utils/indexdb.ts'
 import {
   browserTracingIntegration,
   init,
@@ -24,7 +24,8 @@ import { useSystemStore } from './stores/modules/system.ts'
 import '@/assets/styles/main.css'
 
 import 'moment/dist/locale/zh-cn' // 中文化
-import { registerAllComponent } from '../_utils.ts'
+import { registerAllComponent } from '@moluoxixi/utils/_utils/loadComponent.ts'
+import { getList } from '@moluoxixi/utils/_api'
 
 moment.locale('zh-cn')
 
@@ -92,7 +93,9 @@ async function render(props: QiankunProps) {
   const { container } = props
   // proxy(container as HTMLElement)
   app = createApp(App)
-  await registerAllComponent(app, Vue, vueShared)
+  const allComponentList = await getList()
+  await idbStorage.setItem('Vue3', JSON.stringify(allComponentList))
+  await registerAllComponent(Vue, app)
   console.log('app', app._context.components, app._context.components.TsFooter)
   // window.$remoteLoad = load
   // const res = await load(Vue)

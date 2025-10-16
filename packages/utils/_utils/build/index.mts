@@ -1185,6 +1185,7 @@ async function buildComponent(
     // 写入package.json
     await fsp.writeFile(resolve(outputDir, 'package.json'), JSON.stringify(pkgJson, null, 2), 'utf-8')
     const fileUrl = resolve(`${outputDir}/es/index.mjs`)
+    // const fileUrl = resolve(`${outputDir}/umd/index.js`)
     console.log(`==========  ${buildName} 打包完成 ==========`)
     // 如果需要发布，执行发布
     if (shouldPublish) {
