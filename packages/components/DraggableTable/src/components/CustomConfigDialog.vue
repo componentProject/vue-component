@@ -31,24 +31,16 @@
           />
         </template>
         <template #select="{ row, column }">
-          <ElSelect
+          <TsSelect
             v-if="column.field !== 'fixed' || !row.parentId"
             v-model="row[column.field]"
+            :options="column.params.options"
+            :teleported="false"
             class="m-2"
             placeholder="Select"
             size="small"
             :disabled="!row.resizable"
-            style="width: 100%"
-          >
-            <ElOption
-              v-for="item in column.params.options"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
-              @click.stop
-              @mousedown.stop
-            />
-          </ElSelect>
+          />
         </template>
       </VxeGrid>
 
@@ -77,12 +69,14 @@
 <script lang="ts" setup>
 import { computed, ref, useTemplateRef } from 'vue'
 import { VxeGrid } from 'vxe-table'
-import { ElButton, ElCheckbox, ElInput, ElOption, ElSelect, ElSwitch } from 'element-plus'
+import '@moluoxixi/components/VxeUI/VxeGrid/variable.scss'
+import { ElButton, ElCheckbox, ElInput, ElSwitch } from 'element-plus'
 import { getTypeName } from '@moluoxixi/components/DraggableTable/src/_utils'
 import type { ColumnType } from '@moluoxixi/components/DraggableTable/src/_types'
 import { flattenTree } from '@moluoxixi/utils/_utils'
 import { cloneDeep } from 'lodash'
 import type { VxeGridInstance } from 'vxe-table'
+import TsSelect from '@moluoxixi/components/TsSelect'
 
 const props = defineProps({
   columns: {
@@ -146,7 +140,7 @@ function processData(data: any[] = []): any[] {
       ...rest,
       children: processData(children),
       visible: item.visible ?? true,
-      fixed: item.fixed ?? 'default',
+      fixed: item.fixed ?? '',
       width: item.width || (item.resizeWidth ? Math.ceil(item.resizeWidth) : ''),
     }
   })
@@ -161,8 +155,8 @@ watch(() => visible.value, (v: boolean) => {
 const gridProps = computed(() => {
   return {
     border: true,
-    headerCellConfig: { height: '30px' },
-    cellConfig: { height: '30px' },
+    headerCellConfig: { height: 30 },
+    cellConfig: { height: 30 },
     height: '100%',
     columns: props.customColumns,
     checkboxConfig: { checkField: 'visible' },

@@ -2,8 +2,6 @@
   <div ref="container" class="h-full w-full flex-1 overflow-hidden outline-0 table-box containerMain">
     <VxeGrid
       ref="xTable"
-      :header-cell-config="{ height: '30px' }"
-      :cell-config="{ height: '30px' }"
       v-bind="gridProps"
       @checkbox-all="handleCheckboxAll"
       @checkbox-change="handleCheckboxChange"
@@ -62,6 +60,7 @@ import type {
   VxeTablePropTypes,
 } from 'vxe-table'
 import { VxeGrid } from 'vxe-table'
+import '@moluoxixi/components/VxeUI/VxeGrid/variable.scss'
 import { computed, nextTick, onBeforeMount, onBeforeUnmount, onMounted, ref, useAttrs, useTemplateRef, watch } from 'vue'
 import type { ColumnType, DraggableTableEmits, DraggableTableProps } from './_types'
 import { ElMessage } from 'element-plus'
@@ -232,7 +231,7 @@ const props = withDefaults(defineProps<DraggableTableProps>(), {
         },
         {
           label: '默认',
-          value: 'default',
+          value: '',
         },
       ],
     }, slots: { default: 'select' } },
@@ -684,6 +683,8 @@ const computedColumns = computed<ColumnType[]>(() => {
 // 计算表格配置属性
 const gridProps = computed<VxeGridProps>(() => {
   return {
+    headerCellConfig: { height: 30 },
+    cellConfig: { height: 30 },
     // 基本配置
     id: props.id,
     border: props.border,

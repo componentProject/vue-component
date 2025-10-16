@@ -83,15 +83,14 @@ function getiifeComponent(Vue: any, vueShared: any, componentCode: string, compo
   )(Vue, vueShared)()
 }
 
-function getumdComponent(Vue: any, vueShared: any, _componentCode: string, componentName: string, componentMapping: Record<string, any> = {}) {
-  const componentCode = _componentCode.replace('this', '_this')
+function getumdComponent(Vue: any, vueShared: any, componentCode: string, componentName: string, componentMapping: Record<string, any> = {}) {
   componentMapping.Vue = Vue
   componentMapping.vueShared = vueShared
   // eslint-disable-next-line no-new-func
   new Function(
     '_this',
     'globalThis',
-    componentCode,
+    componentCode.replace('this', '_this'),
   )(componentMapping)
   return componentMapping[componentName]
 }
