@@ -33,7 +33,7 @@ export default function useForm(
   items: MaybeRef<ReFormItem[]>,
   defaultValue?: MaybeRef<ReFormModelValue>,
   span?: MaybeRef<number | ReGridResponsive>,
-  layout?: string, // 添加 layout 参数
+  layout?: MaybeRef<string>,
 ) {
   const submiting = ref(false)
   const reFormRef = ref<InstanceType<typeof ElForm> | null>(null)
@@ -49,7 +49,7 @@ export default function useForm(
   }
 
   const formItems: ShallowRef<ReFormItem[]> = shallowRef(
-    normalizeFormItems(unref(items), unref(span), layout), // 传递 layout 参数
+    normalizeFormItems(unref(items), unref(span), unref(layout)), // 传递 layout 参数
   )
 
   // 合并逻辑 - 利用相同递归
@@ -71,9 +71,12 @@ export default function useForm(
   })
 
   const unwatchForm = watch(
-    () => unref(items),
+    [() => unref(items), () => unref(layout)], // 同时监听items和layout
     () => {
-      formItems.value = normalizeFormItems(unref(items), unref(span), layout) // 传递 layout 参数
+      // 清除缓存，确保重新计算所有表单项的span
+      clearItemConfigCache()
+      // 重新计算表单配置，使用新的layout
+      formItems.value = normalizeFormItems(unref(items), unref(span), unref(layout))
       formRules.value = normalizeFormRules(formItems.value)
       triggerRef(formItems)
       triggerRef(formRules)
