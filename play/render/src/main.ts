@@ -1,6 +1,7 @@
 import type { QiankunProps } from 'vite-plugin-qiankun/dist/helper'
 import { createApp } from 'vue'
 import * as Vue from 'vue'
+import * as vueShared from '@vue/shared'
 import {
   browserTracingIntegration,
   init,
@@ -23,7 +24,7 @@ import { useSystemStore } from './stores/modules/system.ts'
 import '@/assets/styles/main.css'
 
 import 'moment/dist/locale/zh-cn' // 中文化
-import { load } from '../utils.ts'
+import { registerAllComponent } from '../_utils.ts'
 
 moment.locale('zh-cn')
 
@@ -91,6 +92,7 @@ async function render(props: QiankunProps) {
   const { container } = props
   // proxy(container as HTMLElement)
   app = createApp(App)
+  await registerAllComponent(app, Vue, vueShared)
   // window.$remoteLoad = load
   // const res = await load(Vue)
   // Object.keys(res).forEach((name) => {

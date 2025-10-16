@@ -32,6 +32,10 @@ runBuildCliAndExit(
     alias,
     rootDir,
     packDir,
+    presetGlobals: {
+      'vue': 'Vue',
+      '@vue/shared': 'vueShared',
+    },
   },
   { uploadType: COMPONENT_SETTING_TYPE, command: 'build-publish' },
 )

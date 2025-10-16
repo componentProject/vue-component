@@ -34,6 +34,9 @@ runBuildCliAndExit(
     rootDir,
     packDir,
     requireExternalPacks,
+    presetGlobals: {
+      vite: 'Vite',
+    },
   },
   { command: 'build-publish' },
 )
