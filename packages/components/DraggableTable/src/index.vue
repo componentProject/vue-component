@@ -59,8 +59,6 @@ import type {
   VxeTableDefines,
   VxeTablePropTypes,
 } from 'vxe-table'
-import { VxeGrid } from 'vxe-table'
-import '@moluoxixi/components/VxeUI/VxeGrid/variable.scss'
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, useAttrs, useTemplateRef, watch } from 'vue'
 import type { ColumnType, DraggableTableEmits, DraggableTableProps } from './_types'
 import { ElMessage } from 'element-plus'
@@ -85,7 +83,7 @@ import { getCustomType, handleGetRequiredFields } from './_utils'
 import './renderers'
 import type { slotsType } from '@moluoxixi/components/_types'
 import CustomConfigDialog from './components/CustomConfigDialog.vue'
-import { getMemoryQuery, setMemoryUpload } from '@moluoxixi/utils/_api'
+import { getMemoryQuery, setMemoryUpload } from '@moluoxixi/utils/_api/cache'
 import './variable.scss'
 
 defineOptions({
@@ -255,7 +253,7 @@ const props = withDefaults(defineProps<DraggableTableProps>(), {
   ],
   //是否有权限统一配置（个性话化列配置）
   isConfiguration: false,
-  dialogProps: {},
+  dialogProps: () => ({ zIndex: 1000 }),
   //#endregion
 })
 // 组件事件
@@ -280,7 +278,8 @@ const tableData = defineModel({
 })
 
 // 表格引用
-const xTable = useTemplateRef<VxeGridInstance>('xTable')
+const xTableRef = useTemplateRef<VxeGridInstance>('xTable')
+const xTable = computed(() => xTableRef.value?.tableRef)
 
 //#region 回车下一个功能
 const tableVirtualRefs = ref<HTMLElement[]>([])
@@ -1334,9 +1333,6 @@ defineExpose({
 </script>
 
 <style scoped lang="scss">
-:deep(*) {
-  @import '@moluoxixi/components/VxeUI/VxeGrid/style.scss';
-}
 .table-box {
   :deep(.vxe-table--filter-template) {
     display: flex !important;

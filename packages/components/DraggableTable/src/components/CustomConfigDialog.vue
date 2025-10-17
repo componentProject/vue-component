@@ -68,8 +68,6 @@
 
 <script lang="ts" setup>
 import { computed, ref, useTemplateRef } from 'vue'
-import { VxeGrid } from 'vxe-table'
-import '@moluoxixi/components/VxeUI/VxeGrid/variable.scss'
 import { ElButton, ElCheckbox, ElInput, ElSwitch } from 'element-plus'
 import { getTypeName } from '@moluoxixi/components/DraggableTable/src/_utils'
 import type { CustomConfigDialogEmits, CustomConfigDialogProps } from '@moluoxixi/components/DraggableTable/src/_types'
@@ -82,11 +80,11 @@ const props = withDefaults(defineProps<CustomConfigDialogProps>(), {
   collectColumns: () => [],
   customColumns: () => [],
   isConfiguration: false,
-  dialogProps: () => ({ zIndex: 1000 }),
 })
 
 const emit = defineEmits<CustomConfigDialogEmits>()
-const xTable = useTemplateRef<VxeGridInstance>('xTable')
+const xTableRef = useTemplateRef<VxeGridInstance>('xTable')
+const xTable = computed(() => xTableRef.value?.tableRef)
 
 const computedDialogProps = computed(() => {
   return {
@@ -105,7 +103,9 @@ const computedPopperStyle = computed(() => {
     }
   }
   else {
-    return {}
+    return {
+      'z-index': 1001,
+    }
   }
 })
 
@@ -198,7 +198,4 @@ defineExpose({
 </script>
 
 <style scoped lang="scss">
-:deep(*) {
-  @import '@moluoxixi/components/VxeUI/VxeGrid/style.scss';
-}
 </style>
