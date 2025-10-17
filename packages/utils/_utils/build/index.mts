@@ -250,25 +250,6 @@ function createBaseConfig(ctx: BuildContext, comp: string, internalDeps: string[
         resolvers: [ElementPlusResolver()],
         dts: resolve(ctx.packDir, './_typings/auto-imports.d.ts'),
       } as any),
-      // 与自定义element组件冲突
-      // Components({
-      //   resolvers: [
-      //     ElementPlusResolver({
-      //       exclude: new RegExp(
-      //         ([]).map(item => `^${item}$`).join('|'),
-      //       ),
-      //     }),
-      //   ],
-      //   globs: [
-      //     `.${ctx.entryBaseUrl}**/index.vue`,
-      //     `.${ctx.entryBaseUrl}**/index.ts`,
-      //     `!.${ctx.entryBaseUrl}**/base/**/*`,
-      //     `!.${ctx.entryBaseUrl}**/components/**/*`,
-      //     `!.${ctx.entryBaseUrl}**/src/**/*`,
-      //     `!.${ctx.entryBaseUrl}**/_*/**/*`,
-      //   ],
-      //   dts: resolve(ctx.packDir, './_typings/components.d.ts'),
-      // }),
       // 按需启用图片压缩（重型插件）
       ...(!ctx.excludeHeavyPlugins
         ? [
@@ -1029,6 +1010,7 @@ async function buildComponent(
     await clearDir(esOutputDir)
     await clearDir(libOutputDir)
     await clearDir(umdOutputDir)
+    await clearDir(iifeOutputDir)
     // 使用传入的依赖分析结果
     const deps = dependencies
 
@@ -1046,22 +1028,23 @@ async function buildComponent(
     // 创建基础配置
     const baseConfig = createBaseConfig(ctx, comp, deps.internal)
 
-    // 打包UMD模块
-    await bundleComponentModule(ctx, {
-      comp,
-      entry,
-      outDir: iifeOutputDir,
-      format: 'iife',
-      dependencies,
-      globals,
-      baseConfig,
-      entryFileNames: `[name].js`,
-      chunkFileNames: `[name].js`,
-      skipManualChunks: true,
-    })
+    const callbacks = []
+    // // 打包iife模块
+    // callbacks.push(bundleComponentModule(ctx, {
+    //   comp,
+    //   entry,
+    //   outDir: iifeOutputDir,
+    //   format: 'iife',
+    //   dependencies,
+    //   globals,
+    //   baseConfig,
+    //   entryFileNames: `[name].js`,
+    //   chunkFileNames: `[name].js`,
+    //   skipManualChunks: true,
+    // }))
 
     // 打包UMD模块
-    await bundleComponentModule(ctx, {
+    callbacks.push(bundleComponentModule(ctx, {
       comp,
       entry,
       outDir: umdOutputDir,
@@ -1072,10 +1055,10 @@ async function buildComponent(
       entryFileNames: `[name].js`,
       chunkFileNames: `[name].js`,
       skipManualChunks: true,
-    })
+    }))
 
     // 打包ES模块
-    await bundleComponentModule(ctx, {
+    callbacks.push(bundleComponentModule(ctx, {
       comp,
       entry,
       outDir: esOutputDir,
@@ -1085,10 +1068,10 @@ async function buildComponent(
       baseConfig,
       entryFileNames: `[name].mjs`,
       chunkFileNames: `[name].mjs`,
-    })
+    }))
 
     // 打包CJS模块
-    await bundleComponentModule(ctx, {
+    callbacks.push(bundleComponentModule(ctx, {
       comp,
       entry,
       outDir: libOutputDir,
@@ -1099,7 +1082,9 @@ async function buildComponent(
       entryFileNames: `[name].cjs`,
       chunkFileNames: `[name].cjs`,
       exportsType: 'named',
-    })
+    }))
+
+    await Promise.all(callbacks)
 
     // 复制README.md
     const componentName = `\\${comp}`
@@ -1178,13 +1163,11 @@ async function buildComponent(
 
     // 写入package.json
     await fsp.writeFile(resolve(outputDir, 'package.json'), JSON.stringify(pkgJson, null, 2), 'utf-8')
-    // const fileUrl = resolve(`${outputDir}/es/index.mjs`)
-    const fileUrl = resolve(`${outputDir}/umd/index.js`)
     console.log(`==========  ${buildName} 打包完成 ==========`)
     // 如果需要发布，执行发布
     if (shouldPublish) {
       if (ctx.uploadType) {
-        const res = await UploadEvent(fileUrl, buildName, ctx.uploadType)
+        const res = await UploadEvent(outputDir, buildName, ctx.uploadType)
         console.log('res', res)
       }
       else {
