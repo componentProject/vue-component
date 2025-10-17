@@ -1002,15 +1002,15 @@ async function buildComponent(
   const currentVersion = versions[componentKey] || '0.0.1'
 
   console.log(`\n========== 开始打包: ${buildName}，版本：${currentVersion} ==========`)
-  const esOutputDir = resolve(outputDir, 'es')
-  const libOutputDir = resolve(outputDir, 'lib')
   const umdOutputDir = resolve(outputDir, 'umd')
-  const iifeOutputDir = resolve(outputDir, 'iife')
+  // const esOutputDir = resolve(outputDir, 'es')
+  // const libOutputDir = resolve(outputDir, 'lib')
+  // const iifeOutputDir = resolve(outputDir, 'iife')
   try {
-    await clearDir(esOutputDir)
-    await clearDir(libOutputDir)
     await clearDir(umdOutputDir)
-    await clearDir(iifeOutputDir)
+    // await clearDir(esOutputDir)
+    // await clearDir(libOutputDir)
+    // await clearDir(iifeOutputDir)
     // 使用传入的依赖分析结果
     const deps = dependencies
 
@@ -1028,19 +1028,19 @@ async function buildComponent(
     // 创建基础配置
     const baseConfig = createBaseConfig(ctx, comp, deps.internal)
 
-    // 打包UMD模块
-    await bundleComponentModule(ctx, {
-      comp,
-      entry,
-      outDir: iifeOutputDir,
-      format: 'iife',
-      dependencies,
-      globals,
-      baseConfig,
-      entryFileNames: `[name].js`,
-      chunkFileNames: `[name].js`,
-      skipManualChunks: true,
-    })
+    // // 打包iife模块
+    // await bundleComponentModule(ctx, {
+    //   comp,
+    //   entry,
+    //   outDir: iifeOutputDir,
+    //   format: 'iife',
+    //   dependencies,
+    //   globals,
+    //   baseConfig,
+    //   entryFileNames: `[name].js`,
+    //   chunkFileNames: `[name].js`,
+    //   skipManualChunks: true,
+    // })
 
     // 打包UMD模块
     await bundleComponentModule(ctx, {
@@ -1055,33 +1055,33 @@ async function buildComponent(
       chunkFileNames: `[name].js`,
       skipManualChunks: true,
     })
-
-    // 打包ES模块
-    await bundleComponentModule(ctx, {
-      comp,
-      entry,
-      outDir: esOutputDir,
-      format: 'es',
-      dependencies,
-      globals,
-      baseConfig,
-      entryFileNames: `[name].mjs`,
-      chunkFileNames: `[name].mjs`,
-    })
-
-    // 打包CJS模块
-    await bundleComponentModule(ctx, {
-      comp,
-      entry,
-      outDir: libOutputDir,
-      format: 'cjs',
-      dependencies,
-      globals,
-      baseConfig,
-      entryFileNames: `[name].cjs`,
-      chunkFileNames: `[name].cjs`,
-      exportsType: 'named',
-    })
+    //
+    // // 打包ES模块
+    // await bundleComponentModule(ctx, {
+    //   comp,
+    //   entry,
+    //   outDir: esOutputDir,
+    //   format: 'es',
+    //   dependencies,
+    //   globals,
+    //   baseConfig,
+    //   entryFileNames: `[name].mjs`,
+    //   chunkFileNames: `[name].mjs`,
+    // })
+    //
+    // // 打包CJS模块
+    // await bundleComponentModule(ctx, {
+    //   comp,
+    //   entry,
+    //   outDir: libOutputDir,
+    //   format: 'cjs',
+    //   dependencies,
+    //   globals,
+    //   baseConfig,
+    //   entryFileNames: `[name].cjs`,
+    //   chunkFileNames: `[name].cjs`,
+    //   exportsType: 'named',
+    // })
 
     // 复制README.md
     const componentName = `\\${comp}`
@@ -1097,30 +1097,18 @@ async function buildComponent(
       name: `@${ctx.LIB_NAMESPACE}${(comp ? `/${comp}` : '/components').toLowerCase()}`,
       version: currentVersion,
       description: `${comp} 组件`,
-      main: 'lib/index.cjs',
-      module: 'es/index.mjs',
-      types: 'es/index.d.ts',
+      main: 'umd/index.js',
+      module: 'umd/index.js',
+      types: 'umd/index.d.ts',
       exports: {
         '.': {
           import: {
-            types: './es/index.d.ts',
-            default: './es/index.mjs',
+            types: './umd/index.d.ts',
+            default: './umd/index.js',
           },
           require: {
-            types: './lib/index.d.ts',
-            default: './lib/index.cjs',
-          },
-        },
-        './es': {
-          import: {
-            types: './es/index.d.ts',
-            default: './es/index.mjs',
-          },
-        },
-        './lib': {
-          require: {
-            types: './lib/index.d.ts',
-            default: './lib/index.cjs',
+            types: './umd/index.d.ts',
+            default: './umd/index.js',
           },
         },
       },
@@ -1149,10 +1137,10 @@ async function buildComponent(
       ...deps.external,
     }
     // 检查是否有样式文件
-    const stylePath = resolve(esOutputDir, 'style/index.css')
+    const stylePath = resolve(umdOutputDir, 'style/index.css')
     if (fs.existsSync(stylePath)) {
-      pkgJson.exports['./style'] = './es/style/index.css'
-      pkgJson.exports['./style.css'] = './es/style/index.css'
+      pkgJson.exports['./style'] = './umd/style/index.css'
+      pkgJson.exports['./style.css'] = './umd/style/index.css'
     }
     // 生成新版本号
     const newVersion = getNextVersion(currentVersion, 'patch', ctx.uploadType)
@@ -1160,7 +1148,6 @@ async function buildComponent(
 
     // 写入package.json
     await fsp.writeFile(resolve(outputDir, 'package.json'), JSON.stringify(pkgJson, null, 2), 'utf-8')
-    // const fileUrl = resolve(`${outputDir}/es/index.mjs`)
     const fileUrl = resolve(`${outputDir}/umd/index.js`)
     console.log(`==========  ${buildName} 打包完成 ==========`)
     // 如果需要发布，执行发布
@@ -1232,7 +1219,7 @@ async function buildAllComponents(ctx: BuildContext, shouldPublish = false) {
           successCount++
 
         // 每个组件打包完成后，主动等待 3 秒,等待内存释放
-        await sleep(3000)
+        await sleep(1000)
       }
       catch (error) {
         console.error(`组件 ${comp} ${shouldPublish ? '打包发布' : '打包'}失败:`, error)
