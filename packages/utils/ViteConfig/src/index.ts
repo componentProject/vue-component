@@ -233,18 +233,6 @@ export default function createViteConfig(Config: ViteConfigType) {
           plugins: [tailwindcss() as Plugin, autoprefixer() as Plugin],
         },
         devSourcemap: isDev,
-        preprocessorOptions: {
-          scss: {
-            api: 'modern-compiler',
-            additionalData(content: string, filename: string) {
-              if (filename.includes('element')) {
-                const addStr = `$namespace: ${envSystemCode};`
-                return `${addStr}\n${content}`
-              }
-              return content
-            },
-          },
-        },
       },
       resolve: {
         extensions: ['.js', '.jsx', '.ts', '.tsx', '.vue'],

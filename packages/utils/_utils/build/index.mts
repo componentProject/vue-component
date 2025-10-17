@@ -311,13 +311,7 @@ function createBaseConfig(ctx: BuildContext, comp: string, internalDeps: string[
         scss: {
           // 使用legacy避免initAsyncCompiler错误
           api: 'legacy',
-          additionalData(content: string, filename: string) {
-            if (filename.includes('element')) {
-              const addStr = `$namespace: el;`
-              return `${addStr}\n${content}`
-            }
-            return content
-          },
+          additionalData: `@forward '@moluoxixi/components/_assets/styles/main.scss';`,
         },
       },
     },

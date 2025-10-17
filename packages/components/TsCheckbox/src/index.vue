@@ -2,16 +2,13 @@
   <ElCheckboxGroup
     :id="checkboxId"
     v-model="data"
-    class="flex flex-wrap"
+    :style="computedStyle"
     v-bind="$attrs"
     @change="handleCheckboxChange"
   >
     <ElCheckbox
       v-for="(item) in serverOrLocalOptions"
       :key="item[props.value]"
-      :style="{
-        'margin-right': '16px',
-      }"
       :label="item[props.value]"
       :disabled="
         computedDisabledHandler({
@@ -39,6 +36,9 @@ defineOptions({
 })
 
 const props = withDefaults(defineProps<TsCheckboxProps>(), {
+  layout: 'flex',
+  xGap: 16,
+  gridColumns: 4,
   label: 'label',
   value: 'value',
   disabledValues: () => [],
@@ -54,9 +54,27 @@ const props = withDefaults(defineProps<TsCheckboxProps>(), {
 })
 
 const emits = defineEmits<TsCheckboxEmits>()
+const computedStyle = computed(() => {
+  const baseStyle = {
+    'column-gap': `${props.xGap}px`,
+  }
+  if (props.layout === 'grid') {
+    return {
+      ...baseStyle,
+      'display': 'grid',
+      'grid-template-columns': `repeat(${props.gridColumns}, minmax(max-content, 1fr))`,
+    }
+  }
+  else {
+    return {
+      ...baseStyle,
+      'display': 'flex',
+      'flex-wrap': 'wrap',
+    }
+  }
+})
 
 const checkboxId = `checkbox-${Math.random().toString(36).substr(2, 9)}`
-
 const data = defineModel<any[]>()
 
 // 使用 useOptions hook 来处理 options 获取逻辑
@@ -84,3 +102,6 @@ const computedDisabledHandler = computed(() => {
   return getTypeDefault(props.disabledHandler, 'function') || defaultDisabledHandler
 })
 </script>
+
+<style lang="scss" scoped>
+</style>
