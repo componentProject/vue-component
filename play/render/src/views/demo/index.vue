@@ -30,18 +30,19 @@
 <script setup lang="ts">
 import * as vue from 'vue'
 import { computed, onMounted, ref } from 'vue'
-import { load } from '../../../utils.ts'
+import { load } from '@moluoxixi/utils/_utils/loadComponent'
 // 虚拟模块由 Vite 插件在运行时提供
 import { setDeleteByPathAndCode } from '@moluoxixi/utils/_api'
 import componentData from './data.ts'
+import { COMPONENT_SETTING_TYPE } from '@moluoxixi/constant'
 
 defineOptions({ name: '调试与演示' })
 // 使用ref替代data属性
 // 调试与演示组件库的组件，直接修改组件名
 // const componentName = ref('ReForm')
-const componentName = ref('DraggableTable')
+// const componentName = ref('DraggableTable')
 // const componentName = ref('HisFooter')
-// const componentName = ref('TsFooter')
+const componentName = ref('TsFooter')
 // 调试组件
 const localComponent = ref<any>(null)
 // 用于存储动态组件
@@ -139,8 +140,7 @@ async function loadLocalComponent(componentName: string) {
  */
 async function loadComponents(components: string[]) {
   try {
-    const loadedComponents = await load(vue, components, true)
-    console.log('loadedComponents', loadedComponents)
+    const loadedComponents = await load(vue, components, COMPONENT_SETTING_TYPE, 'es', true)
     dynamicComponent.value = loadedComponents[componentName.value]
     console.log('动态组件加载成功:', dynamicComponent, componentName.value, loadedComponents[componentName.value])
   }
