@@ -1,0 +1,40 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "jsx": "preserve",
+    "lib": [
+      "ESNext"
+    ],
+    "baseUrl": ".",
+    "paths": {
+      "@moluoxixi/utils": [
+        "./"
+      ],
+      "@moluoxixi/utils/*": [
+        "./*"
+      ],
+      "@moluoxixi/components": [
+        "../components"
+      ],
+      "@moluoxixi/components/*": [
+        "../components/*"
+      ]
+    },
+    "types": [
+      "vite/client"
+    ],
+    "module": "ESNext",
+    "moduleResolution": "nodenext",
+    "resolveJsonModule": true,
+    "allowJs": true,
+    "strict": true,
+    "strictNullChecks": true,
+    "noUnusedLocals": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "isolatedModules": true,
+    "skipLibCheck": true,
+    "allowImportingTsExtensions": true
+  }
+}

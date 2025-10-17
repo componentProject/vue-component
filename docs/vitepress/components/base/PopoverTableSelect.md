@@ -7,113 +7,113 @@
 ### 外观与触发（popType）
 
 示例：外部输入框作为触发器（`popType='default'`，`virtualRef` 指向输入框）
-::::demo
+:::demo
 PopoverTableSelect/props/popType-default
-::::
+:::
 
 示例：内置输入框作为触发器（`popType='input'`）
-::::demo
+:::demo
 PopoverTableSelect/props/popType-input
-::::
+:::
 
 ### 关闭弹窗的方式（selectTrigger）
 
 示例：单击选中关闭（`selectTrigger='click'`）
-::::demo
+:::demo
 PopoverTableSelect/props/trigger-select-click
-::::
+:::
 
 示例：双击选中关闭（`selectTrigger='dblclick'`）
-::::demo
+:::demo
 PopoverTableSelect/props/trigger-select-dblclick
-::::
+:::
 
 ### 连续展示（successiveShowType）
 
 示例：按回车后继续展示（`successiveShowType='enter'`）
-::::demo
+:::demo
 PopoverTableSelect/props/successiveShowType-enter
-::::
+:::
 
 示例：输入时实时展示（`successiveShowType='input'`）
-::::demo
+:::demo
 PopoverTableSelect/props/successiveShowType-input
-::::
+:::
 
 ### 输入体验（debounce / throttle / options）
 
 示例：防抖 400ms（`debounce=400`）
-::::demo
+:::demo
 PopoverTableSelect/props/debounce
-::::
+:::
 
 示例：节流 500ms（`throttle=500`）
-::::demo
+:::demo
 PopoverTableSelect/props/throttle
-::::
+:::
 
 示例：Promise 模式（`options={ promise: true }`）
-::::demo
+:::demo
 PopoverTableSelect/props/options-promise
-::::
+:::
 
 ### 输入框配置（inputProps / placeholder）
 
 示例：自定义占位符（`placeholder='请输入姓名关键字'`）
-::::demo
+:::demo
 PopoverTableSelect/props/placeholder
-::::
+:::
 
 示例：透传输入框属性（`inputProps`）
-::::demo
+:::demo
 PopoverTableSelect/props/inputProps
-::::
+:::
 
 ### 插槽（slots）
 
 示例：默认插槽在表格上方自定义区域
-::::demo
+:::demo
 PopoverTableSelect/slots/default
-::::
+:::
 
 ### 事件（emits）
 
 示例：选中行触发 `select`
-::::demo
+:::demo
 PopoverTableSelect/events/select
-::::
+:::
 
 示例：输入触发 `input`
-::::demo
+:::demo
 PopoverTableSelect/events/input
-::::
+:::
 
 示例：回车触发 `enter`
-::::demo
+:::demo
 PopoverTableSelect/events/enter
-::::
+:::
 
 示例：焦点与清空（`focus`/`blur`/`clear`）
-::::demo
+:::demo
 PopoverTableSelect/events/focus-blur-clear
-::::
+:::
 
 示例：下拉加载更多（enableLoadMore、hasMore、loading、virtualYConfig）
-::::demo
+:::demo
 PopoverTableSelect/events/loadMore
-::::
+:::
 
 ### Popover 透传属性（popoverProps）
 
 示例：弹出位置 `placement`
-::::demo
+:::demo
 PopoverTableSelect/popoverProps/placement
-::::
+:::
 
 示例：弹窗宽度 `width`
-::::demo
+:::demo
 PopoverTableSelect/popoverProps/width
-::::
+:::
 
 ## API
 
@@ -134,34 +134,34 @@ PopoverTableSelect/popoverProps/width
 
 #### 透传给内部 Popover 与 DraggableTable 的关键 Props
 
-| 参数 | 说明 | 类型 | 默认值 |
-| --- | --- | --- | --- |
-| placement | Popover 弹出位置 | String | 'bottom' |
-| trigger | 触发方式 | `'click'` \| `'focus'` \| `'hover'` \| `'contextmenu'` | 'hover' |
-| title | 弹出标题 | String | '' |
-| effect | 主题 | `'dark'` \| `'light'` | 'light' |
-| content | 主体内容（可被插槽覆盖） | String | '' |
-| disabled | 是否禁用 | Boolean | false |
-| offset | 偏移量 | Number | 12 |
-| transition | 动画 | String | 'el-fade-in-linear' |
-| showArrow | 是否显示箭头 | Boolean | true |
-| popperOptions | Popper.js 配置 | Object | ^[Object]`{ modifiers: [{ name: 'computeStyles', options: { gpuAcceleration: false } }] }` |
-| popperClass | 自定义 class | String | '' |
-| popperStyle | 自定义样式 | String\|Object | '' |
-| showAfter | 显示延迟 | Number | 0 |
-| hideAfter | 隐藏延迟 | Number | 200 |
-| autoClose | 自动关闭延时 | Number | 0 |
-| tabindex | tabindex | Number | undefined |
-| teleported | Teleport 到 body | Boolean | true |
-| persistent | 是否持久化 | Boolean | true |
-| width | 弹窗宽度 | String\|Number | 400 |
-| height | 表格高度 | String\|Number | 300 |
-| id | 传给 DraggableTable 的唯一标识 | String | 'popoverTableSelect' |
-| columns | vxe-grid 列配置 | ^[Array]`ColumnType[]` | [] |
-| data | 表格数据 | Array | [] |
-| enableLoadMore | 开启加载更多 | Boolean | `false` |
-| hasMore | 是否还有更多数据 | Boolean | `false` |
-| loading | 加载中状态 | Boolean | `false` |
+| 参数 | 说明 | 类型                               | 默认值 |
+| --- | --- |----------------------------------| --- |
+| placement | Popover 弹出位置 | String                           | 'bottom' |
+| trigger | 触发方式 | ^[String]`click \| focus \| hover \| contextmenu`                            | 'hover' |
+| title | 弹出标题 | String                           | '' |
+| effect | 主题 | `'dark'` \| `'light'`            | 'light' |
+| content | 主体内容（可被插槽覆盖） | String                           | '' |
+| disabled | 是否禁用 | Boolean                          | false |
+| offset | 偏移量 | Number                           | 12 |
+| transition | 动画 | String                           | 'el-fade-in-linear' |
+| showArrow | 是否显示箭头 | Boolean                          | true |
+| popperOptions | Popper.js 配置 | Object                           | ^[Object]`{ modifiers: [{ name: 'computeStyles', options: { gpuAcceleration: false } }] }` |
+| popperClass | 自定义 class | String                           | '' |
+| popperStyle | 自定义样式 | String\|Object                   | '' |
+| showAfter | 显示延迟 | Number                           | 0 |
+| hideAfter | 隐藏延迟 | Number                           | 200 |
+| autoClose | 自动关闭延时 | Number                           | 0 |
+| tabindex | tabindex | Number                           | undefined |
+| teleported | Teleport 到 body | Boolean                          | true |
+| persistent | 是否持久化 | Boolean                          | true |
+| width | 弹窗宽度 | String\|Number                   | 400 |
+| height | 表格高度 | String\|Number                   | 300 |
+| id | 传给 DraggableTable 的唯一标识 | String                           | 'popoverTableSelect' |
+| columns | vxe-grid 列配置 | ^[Array]`ColumnType[]`           | [] |
+| data | 表格数据 | Array                            | [] |
+| enableLoadMore | 开启加载更多 | Boolean                          | `false` |
+| hasMore | 是否还有更多数据 | Boolean                          | `false` |
+| loading | 加载中状态 | Boolean                          | `false` |
 | virtualYConfig | 滚动配置 | ^[Object]`{ threshold: number }` | `{ threshold: 30（表格距离头部、底部还有多少px触发） }` |
 
 

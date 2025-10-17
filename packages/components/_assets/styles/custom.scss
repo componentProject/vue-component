@@ -1,0 +1,21 @@
+:root {
+  --el-border-radius-base: 8px;
+  --el-table-border-color: #dcdfe6;
+}
+
+.bg-primary{
+  background-color: var(--el-color-primary);
+}
+
+:deep(*){
+  box-sizing: border-box;
+  margin: 0;
+  font-weight: normal;
+  .el-card {
+    --el-card-padding: 16px;
+  }
+
+  .el-button {
+    font-family: SourceHanSans-Regular, serif;
+  }
+}

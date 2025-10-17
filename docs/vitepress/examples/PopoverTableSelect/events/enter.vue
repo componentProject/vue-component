@@ -43,9 +43,6 @@ function onEnter(row: any) {
 </script>
 
 <style scoped>
-.container {
-  padding: 8px;
-}
 .ipt {
   width: 220px;
 }

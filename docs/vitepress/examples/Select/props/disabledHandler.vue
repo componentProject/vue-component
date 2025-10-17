@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <WlSelect
+    <TsSelect
       v-model="val"
       :options="options"
       :disabled-handler="disabledHandler"
@@ -29,9 +29,6 @@ function disabledHandler({ label }: { label: string }) {
 </script>
 
 <style scoped>
-.container {
-  padding: 8px;
-}
 .tip {
   margin-top: 8px;
   font-size: 12px;

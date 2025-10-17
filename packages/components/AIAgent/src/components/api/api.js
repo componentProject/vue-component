@@ -67,7 +67,9 @@ export async function generateEmr(content, agentId, abortSignal) {
     })
     return
   }
-  return data.object.result
+  const outputs = data.object.outputs || {}
+  const key = Object.keys(outputs)[0]
+  return outputs[key]
 }
 
 export async function completeLine(content, agentId, abortSignal) {
@@ -93,7 +95,9 @@ export async function completeLine(content, agentId, abortSignal) {
   }
 
   const data = await res.json()
-  return data.object.result
+  const outputs = data.object.outputs || {}
+  const key = Object.keys(outputs)[0]
+  return outputs[key]
 }
 
 export function qcEmr() {

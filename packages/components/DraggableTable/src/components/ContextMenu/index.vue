@@ -20,12 +20,12 @@
           </ElCheckbox>
         </div>
         <div class="flex justify-center">
-          <el-button size="small" @click="popoverVisible = false">
+          <ElButton size="small" @click="popoverVisible = false">
             取消
-          </el-button>
-          <el-button size="small" type="primary" @click="handleConfirm">
+          </ElButton>
+          <ElButton size="small" type="primary" @click="handleConfirm">
             确定
-          </el-button>
+          </ElButton>
         </div>
       </div>
     </ElPopover>
@@ -34,11 +34,11 @@
 
 <script setup lang="ts">
 import type { ComponentPublicInstance, PropType } from 'vue'
-import type { ColumnType, types } from '@moluoxixi/components/DraggableTable/src/_types'
-import { ElCheckbox, ElMessage, ElPopover } from 'element-plus'
+import type { ColumnType, types } from '../../_types'
+import { ElButton, ElCheckbox, ElMessage, ElPopover } from 'element-plus'
 import { cloneDeep } from 'lodash'
 import { nextTick, onUnmounted, ref, useTemplateRef, watch } from 'vue'
-import { getTypeName } from '@moluoxixi/components/DraggableTable/src/_utils'
+import { getTypeName } from '../../_utils'
 
 const props = defineProps({
   virtualRef: {
@@ -121,9 +121,7 @@ watch(
   },
 )
 
-/**
- * 设置事件监听器
- */
+/** 设置事件监听器 */
 function setupEventListeners() {
   virtualElement = (props.virtualRef as ComponentPublicInstance)?.$el || props.virtualRef
   if (virtualElement) {
@@ -131,9 +129,7 @@ function setupEventListeners() {
   }
 }
 
-/**
- * 清理事件监听器
- */
+/** 清理事件监听器 */
 function cleanupEventListeners() {
   if (virtualElement) {
     // 移除事件
@@ -143,9 +139,7 @@ function cleanupEventListeners() {
   document.removeEventListener('mousedown', handleOutsideClick)
 }
 
-/**
- * 处理点击外部区域，关闭popover
- */
+/** 处理点击外部区域，关闭popover */
 function handleOutsideClick(e: MouseEvent) {
   if (!popoverVisible.value)
     return

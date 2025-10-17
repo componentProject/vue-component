@@ -23,11 +23,11 @@ EnterNextContainer/virtualRef
 
 ### Props
 
-| 参数 | 说明                                            | 类型 | 默认值 |
-| --- |-----------------------------------------------| --- | --- |
-| virtualRef | 外部元素引用，当提供时，将监控该元素而不是容器内部                     | ComponentPublicInstance \| ComponentInternalInstance \| HTMLElement \| null | null |
+| 参数 | 说明                                            | 类型                  | 默认值 |
+| --- |-----------------------------------------------|---------------------| --- |
+| virtualRef | 外部元素引用，当提供时，将监控该元素而不是容器内部                     | ^[HTMLElement\|Component]`ComponentPublicInstance \| ComponentInternalInstance \| HTMLElement \| null`           | null |
 | focusNum | 默认聚焦第几个元素                                     | Number \| undefined | - |
-| autoNext | 与`focusNum`配合使用，同时开启，`focusNum`将变为聚焦第几个未禁用的元素 | Boolean | - |
+| autoNext | 与`focusNum`配合使用，同时开启，`focusNum`将变为聚焦第几个未禁用的元素 | Boolean             | - |
 
 ### Events
 

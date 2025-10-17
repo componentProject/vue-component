@@ -1,6 +1,13 @@
 <template>
   <div class="container" style="height: 350px;">
-    <DraggableTable v-model="tableData" :columns="columns" :editable="true" :edit-auto-focus="false" />
+    <DraggableTable
+      id="demo8"
+      v-model="tableData"
+      save-type="local"
+      :columns="columns"
+      editable
+      :edit-auto-focus="false"
+    />
   </div>
 </template>
 
@@ -20,7 +27,5 @@ const columns = ref([
 </script>
 
 <style scoped>
-.container {
-  padding: 8px;
-}
+
 </style>

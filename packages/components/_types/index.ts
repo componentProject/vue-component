@@ -5,6 +5,8 @@ export interface objType {
 export interface slotsType {
   [key: string]: (props: objType) => any
 }
+
+export type functionType = (...args: any) => any
 /**
  * 将 readonly 类型转换为非 readonly 类型
  */

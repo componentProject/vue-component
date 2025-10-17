@@ -1,12 +1,10 @@
 import type { PropType } from 'vue'
 import type { VxeGlobalRendererHandles, VxeTableDefines } from 'vxe-table'
 import type { objType } from '@moluoxixi/components/_types'
-import type { customCustomTypes } from '@moluoxixi/components/DraggableTable/src/_types'
+import type { customCustomTypes } from '../../_types'
 import { ElInput, ElProgress, ElSwitch, ElTag } from 'element-plus'
 import { computed, defineComponent, onMounted, ref, watch } from 'vue'
 import { detectDateFormatByReplace } from '@moluoxixi/utils/_utils'
-import DateRangePicker from '@moluoxixi/components/DateRangePicker/index.ts'
-import Select from '@moluoxixi/components/Select/index.ts'
 
 export default defineComponent({
   name: 'CellRenderer',
@@ -70,7 +68,7 @@ export default defineComponent({
       return (
         renderOptsPropsType.value === 'select'
         && propsOptions.value && (
-          <Select
+          <TsSelect
             class="w-full!"
             filterable
             automatic-dropdown

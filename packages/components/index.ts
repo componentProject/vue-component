@@ -7,14 +7,20 @@ import ExportExcel from '@moluoxixi/components/ExportExcel'
 import ImportExcel from '@moluoxixi/components/ImportExcel'
 import PopoverTableSelect from '@moluoxixi/components/PopoverTableSelect'
 import ConfigFrom from '@moluoxixi/components/ConfigFrom'
-import Select from '@moluoxixi/components/Select'
+import TsSelect from '@moluoxixi/components/TsSelect'
 import Tabs from '@moluoxixi/components/Tabs'
-import Button from '@moluoxixi/components/Button'
+import TsButton from '@moluoxixi/components/TsButton'
 import Tree from '@moluoxixi/components/Tree'
 import DragModalDialog from '@moluoxixi/components/DragModalDialog'
+import TsFooter from '@moluoxixi/components/TsFooter'
+import ReForm from '@moluoxixi/components/ReForm'
+import TsCheckbox from '@moluoxixi/components/TsCheckbox'
+import TsRadio from '@moluoxixi/components/TsRadio'
+
+// 导出 hooks
+export * from './_hooks'
 
 export {
-  Button,
   ConfigFrom,
   DateRangePicker,
   DraggableTable,
@@ -23,12 +29,17 @@ export {
   ExportExcel,
   ImportExcel,
   PopoverTableSelect,
-  Select,
+  ReForm,
   Tabs,
   Tree,
+  TsButton,
+  TsCheckbox,
+  TsFooter,
+  TsRadio,
+  TsSelect,
 }
 
-const components: Component[] = [DragModalDialog, ConfigFrom, DateRangePicker, DraggableTable, EnterNextContainer, ExportExcel, ImportExcel, Button, PopoverTableSelect, Select, Tabs, Tree]
+const components: Component[] = [TsFooter, DragModalDialog, ConfigFrom, DateRangePicker, DraggableTable, EnterNextContainer, ExportExcel, ImportExcel, TsButton, TsCheckbox, TsRadio, PopoverTableSelect, TsSelect, Tabs, Tree, ReForm]
 
 export default {
   install(app: App) {

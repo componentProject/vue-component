@@ -23,20 +23,22 @@ export function createAxiosInstance(baseURL, timeout = 5000, options = {}) {
     },
     // 新增自定义响应处理器
     responseHandler = null,
+    ...rest
   } = options
 
   const instance = axios.create({
     baseURL,
     timeout,
+    ...rest,
   })
 
-  // 请求拦截器 - 添加token
+  // 请求拦截器 - 添加token和签名
   instance.interceptors.request.use(
     (config) => {
       // 添加token到请求头
       const token = getToken()
       if (token) {
-        config.headers.Authorization = `Bearer ${token}`
+        config.headers.Token = `${token}`
       }
       return config
     },
@@ -54,10 +56,28 @@ export function createAxiosInstance(baseURL, timeout = 5000, options = {}) {
       }
 
       const data = res.data
-      // 使用配置的字段名获取值
-      const code = data[responseFields.code] || data.statusCode
-      const message = data[responseFields.message] || ''
-      const responseData = data[responseFields.data] || {}
+
+      // 支持路径解析的辅助函数
+      function getValueByPath(obj, path) {
+        if (!path)
+          return obj
+        const keys = path.split('.')
+        let result = obj
+        for (const key of keys) {
+          if (result && typeof result === 'object' && key in result) {
+            result = result[key]
+          }
+          else {
+            return undefined
+          }
+        }
+        return result
+      }
+
+      // 使用配置的字段名获取值，支持路径解析
+      const code = getValueByPath(data, responseFields.code) || data.statusCode
+      const message = getValueByPath(data, responseFields.message) || ''
+      const responseData = getValueByPath(data, responseFields.data) || {}
 
       // 如果有自定义响应处理器，优先使用
       if (responseHandler && typeof responseHandler === 'function') {

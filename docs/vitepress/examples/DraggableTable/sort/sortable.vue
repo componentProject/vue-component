@@ -1,6 +1,6 @@
 <template>
   <div class="container" style="height: 350px;">
-    <DraggableTable v-model="tableData" :columns="columns" :sortable="true" />
+    <DraggableTable id="dt-sort-sortable" v-model="tableData" :columns="columns" :sortable="true" />
   </div>
 </template>
 
@@ -20,7 +20,5 @@ const columns = ref([
 </script>
 
 <style scoped>
-.container {
-  padding: 8px;
-}
+
 </style>

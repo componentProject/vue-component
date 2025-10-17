@@ -1,46 +1,6 @@
-:root {
-  --primary-color: #3a77ff; /* 主色调 */
-  --primary-color-1: #3a81ff; /* 辅助色1 */
-  --primary-color-2: #518fff; /* 辅助色2 */
-  --primary-color-3: #53a0fd; /* 辅助色3 */
-  --primary-color-4: #f7faff; /* 辅助色4 */
-  --success-color: #0eb67f; /* 辅助色5 */
-  --success-color-1: #f6fffc; /* 辅助色6 */
-  --warning-color: #f5ab01; /* 提醒色 */
-  --danger-color: #ef6b53; /* 警告色 */
-
-  /* 文字颜色 */
-  --text-color: #2a3651;
-  --text-color-1: #29354f;
-  --text-color-disable: #a9aeb9;
-  --text-color-choose: #3a77ff;
-  --text-color-white: white;
-
-  /* 边框色 */
-  --border-color-1: #dcdfe6;
-  --border-color-2: #b1b6bd;
-  --border-color-3: #e3e6e9;
-  --border-color-4: #e0e4e8;
-  --border-color-5: #0317c4bf;
-  --border-color-6: #7ba4ff;
-
-  /* 背景色 */
-  --bg-color-1: #f1f2f4;
-  --bg-color-2: #fafbfc;
-  --bg-color-3: #29354f;
-  --bg-color-4: #f5f7fa;
-  --bg-color-5: #f6f9ff;
-  --bg-color-6: #ebf2ff;
-}
-
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
+html, body {
   margin: 0;
-  font-weight: normal;
 }
-
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -49,38 +9,4 @@
 ::-webkit-scrollbar-thumb {
   background-color: #dddee0; /* 设置滑块的颜色 */
   border-radius: 5px; /* 设置滑块的圆角 */
-}
-
-body {
-  color: var(--text-color);
-  transition:
-    color 0.5s,
-    background-color 0.5s;
-  font-size: 14px;
-  font-family: SourceHanSans-Regular, serif;
-}
-
-#app {
-  margin: 0;
-  padding: 0;
-  font-weight: normal;
-  background: #f1f2f4;
-  height: 100%;
-  overflow-y: auto;
-}
-
-.text-bold {
-  font-family: SourceHanSans-Semibold, serif;
-}
-
-.text-medium {
-  font-family: SourceHanSans-Medium, serif;
-}
-
-.text-regular {
-  font-family: SourceHanSans-Regular, serif;
-}
-
-.text-light {
-  font-family: SourceHanSans-Light,serif;
 }

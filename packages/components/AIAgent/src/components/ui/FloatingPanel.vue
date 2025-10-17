@@ -90,7 +90,7 @@ export default {
     },
     minHeight: {
       type: Number,
-      default: 380,
+      default: 480,
     },
     drag: {
       type: Boolean,
@@ -405,7 +405,7 @@ export default {
 <style lang="scss">
 .floating-panel {
   position: fixed;
-  z-index: 1000;
+  z-index: 202508;
   display: flex;
   flex-direction: column;
   overflow: hidden;

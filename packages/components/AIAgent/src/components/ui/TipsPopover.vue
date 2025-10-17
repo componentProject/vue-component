@@ -1,11 +1,7 @@
 <template>
   <div class="tips-popover">
     <div class="tips-popover-container">
-      <i
-        class="ai-iconfont icon-wenhaofill"
-        @mouseenter="handleIconMouseEnter"
-        @mouseleave="handleIconMouseLeave"
-      />
+      <i class="ai-iconfont icon-wenhaofill" @mouseenter="handleIconMouseEnter" @mouseleave="handleIconMouseLeave" />
       <!-- 版本号浮窗 -->
       <div
         v-show="showVersionPopover"
@@ -94,6 +90,7 @@ export default {
     // 用户引导点击
     handleShepherdClick() {
       this.$emit('shepherd-click')
+      this.showVersionPopover = false
     },
   },
 }

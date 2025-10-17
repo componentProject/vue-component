@@ -133,15 +133,15 @@ function iconByType(row: any) {
 function renderButtons(): ButtonsItem[] {
   return [
     {
-      type: 'add',
+      btnType: 'add',
       tooltip: '新增子节点',
     },
     {
-      type: 'edit',
+      btnType: 'edit',
       tooltip: '编辑',
     },
     {
-      type: 'delete',
+      btnType: 'delete',
       tooltip: '删除',
     },
   ]

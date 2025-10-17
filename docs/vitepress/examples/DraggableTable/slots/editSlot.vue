@@ -1,6 +1,6 @@
 <template>
   <div class="container" style="height: 350px;">
-    <DraggableTable v-model="tableData" :columns="columns" :editable="true">
+    <DraggableTable id="dt-slots-editSlot" v-model="tableData" save-type="local" :columns="columns" :editable="true">
       <template #edit-name="{ row }">
         <input v-model="row.name">
       </template>
@@ -23,9 +23,6 @@ const columns = ref([
 </script>
 
 <style scoped>
-.container {
-  padding: 8px;
-}
 input {
   width: 100%;
   box-sizing: border-box;

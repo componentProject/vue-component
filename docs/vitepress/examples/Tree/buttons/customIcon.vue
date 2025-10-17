@@ -4,7 +4,6 @@
 
 <script setup lang="ts">
 import { Document } from '@element-plus/icons-vue'
-import type { ButtonsItem } from '@moluoxixi/components/Tree/src/types/index.ts'
 
 const tree = [
   { id: 1, name: '根 1', children: [
@@ -12,7 +11,7 @@ const tree = [
   ] },
 ]
 
-function buttons(row: any): ButtonsItem[] {
+function buttons(row: any): any[] {
   return [
     { icon: Document, tooltip: '文档', event: () => console.log(`doc ${row.name}`) },
   ]

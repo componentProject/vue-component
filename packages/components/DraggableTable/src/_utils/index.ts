@@ -1,8 +1,6 @@
 import type { ColumnType, types } from '@moluoxixi/components/DraggableTable/src/_types'
 
-/**
- * 自定义的列模板
- */
+/** 自定义的列模板 */
 const customTypeMap = {
   input: '',
   select: '',
@@ -36,6 +34,7 @@ export function handleGetColumn(Column: ColumnType): ColumnType {
     title,
     width,
     resizeWidth,
+    renderWidth,
     minWidth,
     resizable,
     visible,
@@ -92,9 +91,9 @@ export function handleGetColumn(Column: ColumnType): ColumnType {
     title,
     width,
     resizeWidth: resizeWidth && Math.ceil(resizeWidth),
+    renderWidth: renderWidth && Math.ceil(renderWidth),
     minWidth,
     resizable,
-    visible,
     fixed,
     align,
     headerAlign,
@@ -144,13 +143,22 @@ export function handleGetColumn(Column: ColumnType): ColumnType {
     cellProps,
     editProps,
     filterProps,
+    visible: visible ?? true,
     //#endregion
   }
 }
 
-export function handleGetRequiredFields() {
-  const noRequiredFields = ['resizeWidth', 'visible', 'options', 'cellProps', 'editProps', 'filterProps']
-  return Object.keys(handleGetColumn({})).filter(key => !noRequiredFields.includes(key)) as Array<
-    keyof ColumnType
-  >
+// export function handleGetRequiredFields() {
+//   const noRequiredFields = ['resizeWidth', 'visible', 'options', 'cellProps', 'editProps', 'filterProps']
+//   return Object.keys(handleGetColumn({})).filter(key => !noRequiredFields.includes(key)) as Array<
+//     keyof ColumnType
+//   >
+// }
+export function handleGetRequiredFields(customColumns: ColumnType[] = []): string[] {
+  const requiredFields: string[] = []
+  customColumns.forEach((column) => {
+    if (column.field)
+      requiredFields.push(column.field)
+  })
+  return Array.from(new Set(['field', 'type', 'children', ...requiredFields]))
 }

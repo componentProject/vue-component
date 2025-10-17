@@ -3,29 +3,30 @@ import { HttpRequest } from './http.js'
 
 /**
  * 创建 HTTP 服务实例
- * @param {Object} options - 配置选项
+ * @param {object} options - 配置选项
  * @param {string} options.baseURL - 基础URL
  * @param {number} options.timeout - 超时时间
  * @param {Function} options.getToken - 获取token的函数
  * @param {Function} options.onLoginRequired - 登录失效回调
- * @param {Object} options.responseFields - 响应字段映射
+ * @param {object} options.responseFields - 响应字段映射
  * @param {Function} options.responseHandler - 响应处理器
- * @returns {Object} HTTP服务实例
+ * @returns {object} HTTP服务实例
  */
 function createHttpService(options = {}) {
+  const { baseURL = '', timeout = 5000, getToken, onLoginRequired, responseFields, ...rest } = options
   const defaultConfig = {
-    baseURL: options.baseURL || '',
-    timeout: 5000,
-    getToken: () => localStorage.getItem('token') || '',
-    onLoginRequired: () => {
+    baseURL,
+    timeout,
+    getToken: getToken || (() => localStorage.getItem('token') || ''),
+    onLoginRequired: onLoginRequired || (() => {
       window.location.href = `/login?redirect=${encodeURIComponent(window.location.href)}`
-    },
+    }),
     responseFields: {
       code: 'code',
       message: 'msg',
       data: 'data',
+      ...responseFields,
     },
-    ...options,
   }
 
   // 创建axios实例
@@ -37,6 +38,7 @@ function createHttpService(options = {}) {
       onLoginRequired: defaultConfig.onLoginRequired,
       responseFields: defaultConfig.responseFields,
       responseHandler: defaultConfig.responseHandler,
+      ...rest,
     },
   )
 
@@ -53,7 +55,11 @@ function createHttpService(options = {}) {
       return httpInstance.get(url, params, config)
     },
 
-    post(url, data, config) {
+    post(url, data, config, addSign) {
+      // 保持现有的优先级逻辑，但移除默认值
+      if (typeof addSign === 'function') {
+        return httpInstance.post(url, data, config, addSign)
+      }
       return httpInstance.post(url, data, config)
     },
 

@@ -9,11 +9,9 @@
       <template v-for="item in props.tabList">
         <ElTabPane
           v-if="item.show ? item.show(item) : true"
-          :key="item.id"
+          :key="item.label"
           style="height: 100%"
-          :label="item.label"
-          :name="item.id"
-          :lazy="item.lazy"
+          v-bind="item"
         >
           <slot :name="item.slot || item.label" />
         </ElTabPane>
@@ -33,8 +31,8 @@ defineOptions({
 const props = defineProps({
   tabList: {
     type: Array<{
-      id: string
       label: string
+      name: string | number
       slot?: string
       lazy?: boolean
       show?: (item: any) => boolean
@@ -47,7 +45,7 @@ const props = defineProps({
   },
 })
 const emits = defineEmits(['tabChange'])
-const activeName = defineModel({ default: '1', type: String })
+const activeName = defineModel({ default: '0', type: String })
 
 function handleTabChange(val: any) {
   emits('tabChange', val)

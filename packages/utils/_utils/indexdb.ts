@@ -41,9 +41,7 @@ function promisifyRequest<T>(request: IDBRequest<T>): Promise<T> {
   })
 }
 
-/**
- * 内存 Map 的简易 KV 存储，用作最终回退（非持久化）
- */
+/** 内存 Map 的简易 KV 存储，用作最终回退（非持久化） */
 class MemoryStorage {
   private map = new Map<string, string>()
 
@@ -220,9 +218,7 @@ export class IDBStorage {
     }
   }
 
-  /**
-   * 清空所有键值
-   */
+  /** 清空所有键值 */
   async clear(): Promise<void> {
     try {
       if (this.fallback === 'indexedDB') {
@@ -271,9 +267,7 @@ export class IDBStorage {
     }
   }
 
-  /**
-   * 返回键数量
-   */
+  /** 返回键数量 */
   async length(): Promise<number> {
     try {
       if (this.fallback === 'indexedDB') {
@@ -291,9 +285,7 @@ export class IDBStorage {
     }
   }
 
-  /**
-   * 返回所有键名（扩展方法，非 localStorage 标准 API）
-   */
+  /** 返回所有键名（扩展方法，非 localStorage 标准 API） */
   async keys(): Promise<string[]> {
     try {
       if (this.fallback === 'indexedDB') {

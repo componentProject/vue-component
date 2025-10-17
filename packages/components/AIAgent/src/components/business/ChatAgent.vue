@@ -3,12 +3,7 @@
     <div class="chat-agent-container">
       <div class="chat-agent-content">
         <div class="chat-list-container">
-          <div
-            id="tsAiAgent-chat-list-content"
-            ref="chatList"
-            class="chat-list-content"
-            @scroll="handleScroll"
-          >
+          <div id="tsAiAgent-chat-list-content" ref="chatList" class="chat-list-content" @scroll="handleScroll">
             <div class="chat-list">
               <!-- <t-chat-item role="assistant" content="提示词" v-if="chatList.length === 0"> </t-chat-item> -->
               <Bubble
@@ -16,13 +11,11 @@
                 :key="index"
                 :role="item.role"
                 :content="item.markedContent"
+                :is-finished="item.finished"
                 :text-loading="index === 0 && loading"
               >
                 <template v-if="!isStreamLoad" #actions>
-                  <BubbleAction
-                    :data="item"
-                    @operation="(e, type, item) => handleOperation(e, type, item, index)"
-                  />
+                  <BubbleAction :data="item" @operation="(e, type, item) => handleOperation(e, type, item, index)" />
                 </template>
               </Bubble>
             </div>
@@ -296,6 +289,7 @@ export default {
         content: '',
         markedContent: '',
         role: 'assistant',
+        finished: false,
         userFeedback: '',
       }
       this.chatList.unshift(params2)
@@ -358,7 +352,6 @@ export default {
         // 1. 检查Content-Type是否是事件流
         const contentType = stream.headers.get('content-type') || ''
         const isStream = contentType.includes('text/event-stream')
-
         // 2. 如果是普通JSON响应则直接处理
         if (!isStream) {
           try {
@@ -367,8 +360,9 @@ export default {
               this.onComplete(false, res.message || '请求失败', lastItem)
             }
             else {
-              const key = Object.keys(res.object)[0]
-              lastItem.content = res.object[key]
+              const outputs = res.object.outputs || {}
+              const key = Object.keys(outputs)[0]
+              lastItem.content = outputs[key]
               lastItem.markedContent = this.md.render(lastItem.content)
               this.onComplete(true, res.object, lastItem)
             }
@@ -394,7 +388,14 @@ export default {
               this.lastConversationId = res.task_id
               lastItem.content += res.data?.text
               lastItem.conversationId = res.task_id
-              lastItem.message_id = res.task_id
+              lastItem.message_id = res.workflow_run_id
+            }
+            if (res.choices && res.choices.length > 0) {
+              lastItem.content += res.choices[0]?.delta?.content || ''
+            }
+            if (res.event == 'error') {
+              this.onComplete(false, res.message || '请求失败', lastItem)
+              return
             }
             lastItem.markedContent = this.md.render(lastItem.content)
             this.initPlugin()
@@ -413,6 +414,7 @@ export default {
       }
     },
     onComplete(isOk = true, msg = '请求失败', lastItem) {
+      lastItem.finished = true
       if (!isOk) {
         lastItem.role = 'error'
         lastItem.markedContent = msg
@@ -494,9 +496,7 @@ export default {
       if (configParams.filter(item => item.paramType == 2).length > 0) {
         this.hasCustomParams = true
         this.configParams = JSON.parse(JSON.stringify(configParams))
-        if (res.agentConfig.callbackUrl) {
-          this.setConfigParams(res.agentConfig.callbackUrl)
-        }
+        this.setConfigParams(res.agentConfig.callbackUrl)
       }
     },
     async getCueWordDetail() {
@@ -521,16 +521,25 @@ export default {
     },
 
     async setConfigParams(url) {
-      const res = await getCommonSysDetailsData(url, this.commonSysData)
-      if (JSON.stringify(res) == '{}') {
-        return
+      if (url) {
+        const res = await getCommonSysDetailsData(url, this.commonSysData)
+        if (JSON.stringify(res) == '{}') {
+          return
+        }
+        for (const item of this.configParams) {
+          if (res[item.paramName]) {
+            item.paramValue = res[item.paramName]
+          }
+        }
+        this.sendMessage(this.inputContent)
       }
-      for (const item of this.configParams) {
-        if (res[item.paramName]) {
-          item.paramValue = res[item.paramName]
+      else {
+        for (const item of this.configParams) {
+          if (this.commonSysData[item.paramName]) {
+            item.paramValue = this.commonSysData[item.paramName]
+          }
         }
       }
-      this.sendMessage(this.inputContent)
     },
 
     resetChat() {
@@ -549,7 +558,17 @@ export default {
 
     // 添加一个方法来获取当前状态（供父组件调用）
     getCurrentState() {
-      return JSON.parse(JSON.stringify(this.$data))
+      const state = JSON.parse(JSON.stringify(this.$data))
+      // 移除 mixin 相关属性，避免序列化问题和恢复时的冲突
+      delete state.md
+      delete state.urlSet
+      delete state.viewer
+      delete state.showViewer
+      delete state.index
+      delete state.urlList
+      delete state.showModal
+      delete state.iframeContent
+      return state
     },
 
     // 添加一个方法来设置状态（供父组件调用）
@@ -557,7 +576,23 @@ export default {
       if (!state)
         return
       setTimeout(() => {
+        // 保存 mixin 初始化的属性，避免被覆盖
+        const mixinProps = {
+          md: this.md,
+          urlSet: this.urlSet,
+          viewer: this.viewer,
+          showViewer: this.showViewer,
+          index: this.index,
+          urlList: this.urlList,
+          showModal: this.showModal,
+          iframeContent: this.iframeContent,
+        }
+
+        // 应用状态
         Object.assign(this, state)
+
+        // 恢复 mixin 属性
+        Object.assign(this, mixinProps)
       }, 100)
     },
   },

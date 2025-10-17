@@ -113,21 +113,24 @@
           <!-- 底部操作区 -->
           <div v-if="$slots.footer || showFooter" class="modal-footer">
             <slot name="footer">
-              <button
-                v-if="showCancel"
-                class="modal-btn modal-btn-secondary"
-                @click="handleCancel"
-              >
-                {{ cancelText }}
-              </button>
-              <button
-                v-if="showConfirm"
-                class="modal-btn modal-btn-primary"
-                :disabled="confirmDisabled"
-                @click="handleConfirm"
-              >
-                {{ confirmText }}
-              </button>
+              <Buttons v-if="props.buttons" :buttons="props.buttons" />
+              <template v-else>
+                <button
+                  v-if="showCancel"
+                  class="modal-btn modal-btn-secondary"
+                  @click="handleCancel"
+                >
+                  {{ cancelText }}
+                </button>
+                <button
+                  v-if="showConfirm"
+                  class="modal-btn modal-btn-primary"
+                  :disabled="confirmDisabled"
+                  @click="handleConfirm"
+                >
+                  {{ confirmText }}
+                </button>
+              </template>
             </slot>
           </div>
 
@@ -153,6 +156,7 @@
 
 <script setup lang="ts">
 import { computed, nextTick, onMounted, ref, watch } from 'vue'
+import { Buttons } from '@moluoxixi/components/_utilComponents'
 
 defineOptions({
   name: 'DragModalDialog',
@@ -187,7 +191,16 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<Emits>()
 
+type ButtonType = 'confirm' | 'cancel'
+interface ButtonsItem {
+  type?: ButtonType
+  slot?: string | ((...args: any[]) => any)
+  icon?: Component | string
+  event?: (data?: any, node?: any) => void
+  tooltip?: string
+}
 interface Props {
+  buttons: ButtonsItem[]
   /** 控制对话框显示/隐藏 */
   visible?: boolean
   /** 对话框标题 */
@@ -245,7 +258,7 @@ interface Props {
   /** 是否允许遮罩层穿透，开启后点击事件可传递到下方元素 */
   penetrate?: boolean
   /** 指定弹窗挂载的目标元素，可以是 CSS 选择器字符串或 DOM 元素，默认挂载到 body */
-  teleportTo?: string
+  teleportTo?: string | HTMLElement | null | undefined
   /** 关闭时是否销毁对话框内容 */
   destroyOnClose?: boolean
 }

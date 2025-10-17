@@ -1,6 +1,6 @@
 <template>
   <div class="container" style="height: 350px;">
-    <DraggableTable v-model="tableData" :columns="columns">
+    <DraggableTable id="dt-slots-filterSlot" v-model="tableData" save-type="local" :columns="columns">
       <template #filter-name>
         <input v-model="keyword" placeholder="输入关键字" @input="onFilter">
       </template>
@@ -31,9 +31,6 @@ function onFilter() {
 </script>
 
 <style scoped>
-.container {
-  padding: 8px;
-}
 input {
   width: 100%;
   box-sizing: border-box;

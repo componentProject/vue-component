@@ -66,7 +66,5 @@ async function handleLoadMore() {
 </script>
 
 <style scoped>
-.container {
-  padding: 8px;
-}
+
 </style>

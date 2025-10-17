@@ -2,27 +2,27 @@
   <div class="draggable-table-demo">
     <h2>可拖拽表格演示</h2>
     <div class="demo-actions">
-      <el-button @click="addRow">
+      <ElButton @click="addRow">
         添加行
-      </el-button>
-      <el-button @click="rowdragable = !rowdragable">
+      </ElButton>
+      <ElButton @click="rowdragable = !rowdragable">
         {{ rowdragable ? '禁用行拖拽' : '启用行拖拽' }}
-      </el-button>
-      <el-button @click="columndragable = !columndragable">
+      </ElButton>
+      <ElButton @click="columndragable = !columndragable">
         {{ columndragable ? '禁用列拖拽' : '启用列拖拽' }}
-      </el-button>
+      </ElButton>
 
-      <el-button @click="editable = !editable">
+      <ElButton @click="editable = !editable">
         {{ editable ? '禁用编辑' : '启用编辑(与cellRender互斥)' }}
-      </el-button>
+      </ElButton>
 
-      <el-button @click="filterable = !filterable">
+      <ElButton @click="filterable = !filterable">
         {{ filterable ? '禁用过滤' : '启用过滤' }}
-      </el-button>
+      </ElButton>
 
-      <el-button @click="sortable = !sortable">
+      <ElButton @click="sortable = !sortable">
         {{ sortable ? '禁用排序' : '启用排序' }}
-      </el-button>
+      </ElButton>
 
       <div class="flex items-center">
         <span class="mr-8!">扩展type选择：</span>
@@ -44,45 +44,47 @@
         </el-select>
       </div>
     </div>
-    <el-button @click="loading = !loading">
+    <ElButton @click="loading = !loading">
       转变loading
-    </el-button>
-    <el-button @click="handleValidate">
+    </ElButton>
+    <ElButton @click="handleValidate">
       校验表格
-    </el-button>
+    </ElButton>
     <!-- 使用DraggableTable组件 -->
     <DraggableTable
-      id="demo_table"
+      id="demo_table_12355666"
       ref="draggableTableRef"
       v-model="tableData"
+      page-id="page1"
+      user-id="shabi"
       :columns="columns"
       :loading="loading"
       :height="500"
+      save-type="server"
       :rowdragable="rowdragable"
       :columndragable="columndragable"
       :editable="editable"
       :filterable="filterable"
       :sortable="sortable"
       show-pagination
+      @page-change="pageChangeHandler"
     >
       <!-- 自定义操作列插槽 -->
       <template #aaa>
-        <el-button type="danger" size="small">
+        <TsButton show-type="disabled" content="你好" disabled type="danger" size="small">
           aaa自定义插槽按钮
-        </el-button>
+        </TsButton>
       </template>
     </DraggableTable>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { ElMessage } from 'element-plus'
+import { ElButton, ElMessage } from 'element-plus'
 import { onMounted, ref, useTemplateRef } from 'vue'
 import DraggableTable from './index.vue'
-
 // 表格加载状态
 const loading = ref(false)
-
 // 拖拽开关状态
 const rowdragable = ref(false)
 const columndragable = ref(false)
@@ -155,18 +157,10 @@ const tableData = ref([
 // 列配置
 const columns = ref([
   { type: 'seq', width: 70 },
-
-  {
-    field: 'name',
-    title: 'Name',
-    min: 3,
-    max: 10,
-    required: true,
-  },
   { field: 'createTime', title: '日期', width: 150 },
   {
     field: 'sex',
-    title: 'Sex',
+    title: 'Sex1',
     options: [
       {
         label: '男',
@@ -179,9 +173,32 @@ const columns = ref([
     ],
   },
   {
-    field: 'age',
-    title: 'Age',
-    min: 1,
+    field: 'name',
+    title: 'Name',
+    fixed: 'left',
+    min: 3,
+    max: 10,
+    required: true,
+  },
+  {
+    field: 'name1',
+    title: 'Name',
+    fixed: 'left',
+    min: 3,
+    max: 10,
+    required: true,
+  },
+  {
+    field: 'age1',
+    title: 'Age1',
+    children: [
+      { field: 'bbb', title: 'bbb', width: 140 },
+      { field: 'baaa', title: 'baaa', width: 120, children: [
+        { field: 'dddd', title: 'dddd', width: 120 },
+        { field: 'gggg', title: 'gggg', width: 220 },
+      ] },
+
+    ],
   },
   { field: 'aaa', title: '操作' },
 ])
@@ -251,7 +268,9 @@ const cellTypeList = ref([
     },
   },
 ])
-
+function pageChangeHandler(params) {
+  console.log('params', params)
+}
 function changeCellType(type: string) {
   const item = columns.value.at(-2)
   columns.value[columns.value.length - 2] = {

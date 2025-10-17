@@ -5,19 +5,19 @@
     <slot />
   </ElTable>
   <!-- 分页区域 -->
-    <div v-if="showPagination" class="flex justify-end mt-8!">
-      <ElConfigProvider :locale="ZhCn">
-        <ElPagination
-          :current-page="pagination.pageIndex"
-          :page-size="pagination.pageSize"
-          :page-sizes="pageSizes"
-          :layout="paginationLayout"
-          :total="pagination.total"
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
-        />
-      </ElConfigProvider>
-    </div>
+  <div v-if="showPagination" class="flex justify-end mt-8!">
+    <ElConfigProvider :locale="ZhCn">
+      <ElPagination
+        :current-page="pagination.pageIndex"
+        :page-size="pagination.pageSize"
+        :page-sizes="pageSizes"
+        :layout="paginationLayout"
+        :total="pagination.total"
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+      />
+    </ElConfigProvider>
+  </div>
 
   <!-- 为表格中的每一行创建EnterNextContainer -->
   <EnterNextContainer
@@ -33,7 +33,6 @@
 <script setup lang="ts">
 import { ElTable } from 'element-plus'
 import { nextTick, ref, watch } from 'vue'
-import EnterNextContainer from '@moluoxixi/components/EnterNextContainer/index.ts'
 import ZhCn from 'element-plus/dist/locale/zh-cn.mjs'
 import type {
   noNextInputParams,

@@ -1,6 +1,7 @@
 import type { QiankunProps } from 'vite-plugin-qiankun/dist/helper'
 import { createApp } from 'vue'
-import * as ElementPlusIconsVue from '@element-plus/icons-vue'
+import * as Vue from 'vue'
+import { idbStorage } from '@moluoxixi/utils/_utils/indexdb.ts'
 import {
   browserTracingIntegration,
   init,
@@ -21,10 +22,11 @@ import getRouter from './router'
 import { useSystemStore } from './stores/modules/system.ts'
 
 import '@/assets/styles/main.css'
-import 'vxe-table/lib/style.css'
 
 import 'moment/dist/locale/zh-cn' // 中文化
-import { load } from '../utils.ts'
+import { registerAllComponent } from '@moluoxixi/utils/_utils/loadComponent'
+import { getList } from '@moluoxixi/utils/_api'
+import { COMPONENT_SETTING_TYPE } from '@moluoxixi/constant'
 
 moment.locale('zh-cn')
 
@@ -90,25 +92,29 @@ function themeManager(props: QiankunProps) {
 
 async function render(props: QiankunProps) {
   const { container } = props
-  proxy(container as HTMLElement)
+  // proxy(container as HTMLElement)
   app = createApp(App)
-  window.$remoteLoad = load
+  const allComponentList = await getList()
+  await idbStorage.setItem(COMPONENT_SETTING_TYPE, JSON.stringify(allComponentList))
+  const isLongRange = false
+  await registerAllComponent(Vue, app, COMPONENT_SETTING_TYPE, isLongRange)
+  console.log('app', app._context.components, app._context.components.TsFooter)
+  // window.$remoteLoad = load
+  // const res = await load(Vue)
+  // Object.keys(res).forEach((name) => {
+  //   app.component(name, res[name])
+  // })
   // 注册指令
   directives(app)
 
   // 修改Element的appendToBody默认行为
-  modifyComponents(app, [ElDrawer, ElDialog], (attrs) => {
+  modifyComponents(app, [ElDrawer, ElDialog], (attrs: Record<string, any>) => {
     const appendToBody = (attrs['append-to-body'] ?? false) !== false
     return {
       ...attrs,
       appendTo: appendToBody ? container || '#app' : 'body',
     }
   })
-
-  // 注册图标组件
-  for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
-    app.component(key, component)
-  }
 
   const router = getRouter(props)
 

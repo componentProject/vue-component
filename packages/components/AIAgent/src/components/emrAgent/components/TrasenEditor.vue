@@ -21,7 +21,10 @@
     <div class="monaco-editor-container">
       <div ref="editorContainer" class="monaco-editor" />
     </div>
-    <Loading :visible="isGeneratingEmr" />
+    <div class="bottom-tip">
+      内容由AI生成，仅供参考。
+    </div>
+    <AILoading :visible="isGeneratingEmr" />
   </div>
 </template>
 
@@ -33,7 +36,7 @@ import 'monaco-editor/esm/vs/editor/contrib/inlineCompletions/ghostTextControlle
 // import 'monaco-editor/esm/vs/editor/contrib/suggest/browser/suggestController.js'; // 代码联想提示
 // import 'monaco-editor/esm/vs/editor/contrib/tokenization/browser/tokenization.js'; // 代码联想提示
 
-import Loading from '../../ui/Loading.vue'
+import AILoading from '../../ui/Loading.vue'
 import {
   getModelField,
   updateEmrContentByLineNumber,
@@ -47,7 +50,7 @@ let editorInstance = null
 export default {
   name: 'TrasenEditor',
   components: {
-    Loading,
+    AILoading,
   },
   props: {
     emr_data: {
@@ -212,10 +215,7 @@ export default {
       editorInstance.onDidChangeCursorSelection((e) => {
         const selection = e.selection
         // 判断是否有选中内容
-        if (
-          selection.startLineNumber !== selection.endLineNumber
-          || selection.startColumn !== selection.endColumn
-        ) {
+        if (selection.startLineNumber !== selection.endLineNumber || selection.startColumn !== selection.endColumn) {
           this.selectedLineNum = []
           for (let i = selection.startLineNumber; i <= selection.endLineNumber; i++) {
             this.selectedLineNum.push(i)
@@ -428,7 +428,7 @@ export default {
   .monaco-editor-container {
     flex: 1;
     overflow: hidden;
-    padding: 8px;
+    padding: 8px 8px 0 8px;
     background-color: #fafbfc;
     .monaco-editor {
       width: 100%;
@@ -465,14 +465,25 @@ export default {
   .regenerate-btn-container {
     padding: 4px 8px 0 0;
     background-color: #fafbfc;
-    text-align: right;
-    color: #5086ff;
+    display: flex;
+    justify-content: space-between;
+    justify-content: flex-end;
+    align-items: center;
+    color: #e6a23c;
+
     .regenerate-btn-item {
+      color: #5086ff;
       cursor: pointer;
       i {
         margin-right: 4px;
       }
     }
+  }
+  .bottom-tip {
+    font-size: 12px;
+    color: #999;
+    text-align: center;
+    padding: 4px 0;
   }
 }
 </style>

@@ -14,7 +14,6 @@ import tailwindcss from '@tailwindcss/postcss'
 import { visualizer } from 'rollup-plugin-visualizer'
 import AutoImport from 'unplugin-auto-import/vite'
 import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
-import Components from 'unplugin-vue-components/vite'
 import importToCDN from 'vite-plugin-cdn-import'
 import viteCompression from 'vite-plugin-compression'
 import viteImagemin from 'vite-plugin-imagemin'
@@ -26,7 +25,6 @@ import scopedCssPrefixPlugin from './plugins/addScopedAndReplacePrefix.ts'
 
 // 自动路由
 import autoRoutesPlugin from './plugins/autoRoutes/index.ts'
-import importComponentsOrUtils from './plugins/importComponents.ts'
 
 import type { PluginMap, PluginType, ViteConfigType } from './_types/index.ts'
 
@@ -68,25 +66,25 @@ export default function createViteConfig(Config: ViteConfigType) {
         ...config.unpluginAutoImportOptions,
       }),
       // 与自定义element组件冲突
-      Components({
-        resolvers: [
-          ElementPlusResolver({
-            exclude: !useDoc && config.unpluginVueComponentsOptions?.elementExcludes
-              ? new RegExp(config.unpluginVueComponentsOptions?.elementExcludes.map((item: string) => `^${item}$`).join('|'))
-              : undefined,
-          }),
-        ],
-        globs: [
-          'src/components/**/index.vue',
-          'src/components/**/index.ts',
-          '!src/components/**/base/**/*',
-          '!src/components/**/components/**/*',
-          '!src/components/**/src/**/*',
-          '!src/components/**/_*/**/*',
-        ],
-        dts: path.resolve(rootPath, './src/typings/components.d.ts'),
-        ...config.unpluginVueComponentsOptions,
-      }),
+      // Components({
+      //   resolvers: [
+      //     ElementPlusResolver({
+      //       exclude: !useDoc && config.unpluginVueComponentsOptions?.elementExcludes
+      //         ? new RegExp(config.unpluginVueComponentsOptions?.elementExcludes.map((item: string) => `^${item}$`).join('|'))
+      //         : undefined,
+      //     }),
+      //   ],
+      //   globs: [
+      //     'src/components/**/index.vue',
+      //     'src/components/**/index.ts',
+      //     '!src/components/**/base/**/*',
+      //     '!src/components/**/components/**/*',
+      //     '!src/components/**/src/**/*',
+      //     '!src/components/**/_*/**/*',
+      //   ],
+      //   dts: path.resolve(rootPath, './src/typings/components.d.ts'),
+      //   ...config.unpluginVueComponentsOptions,
+      // }),
     ].filter(i => !!i)
 
     const performancePlugins = [
@@ -176,9 +174,6 @@ export default function createViteConfig(Config: ViteConfigType) {
         ...performancePlugins,
         ...monitorPlugins,
         ...qianKunPlugins,
-        importComponentsOrUtils({
-          dts: path.resolve(rootPath, './src/typings/virtual-remote.d.ts'),
-        }),
         viteEnv.VITE_AUTO_ROUTES && autoRoutesPlugin({
           root: rootPath,
           routeConfig: {

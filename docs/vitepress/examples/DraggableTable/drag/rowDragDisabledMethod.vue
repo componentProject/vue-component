@@ -1,10 +1,11 @@
 <template>
   <div class="container" style="height: 350px;">
     <DraggableTable
+      id="dt-drag-rowDragDisabledMethod"
       v-model="tableData"
       :columns="columns"
-      drag-type="vxe"
-      :dragable="true"
+      dragable
+      save-type="local"
       :row-drag-disabled-method="rowDragDisabledMethod"
     />
   </div>
@@ -31,7 +32,5 @@ function rowDragDisabledMethod({ row }: any) {
 </script>
 
 <style scoped>
-.container {
-  padding: 8px;
-}
+
 </style>

@@ -15,11 +15,11 @@
   </div>
 </template>
 
-<script setup>
-import { ElButton, ElMessage } from 'element-plus'
-import { computed, nextTick } from 'vue'
-import * as XLSX from 'xlsx'
-import { getTypeDefault } from '@moluoxixi/utils/_utils/index.ts'
+<script setup lang="ts">
+import { ElButton } from 'element-plus'
+import { computed } from 'vue'
+import { read, utils } from 'xlsx'
+import { getTypeDefault } from '@moluoxixi/utils/_utils'
 
 defineOptions({
   name: 'ImportExcel',
@@ -52,6 +52,7 @@ const emits = defineEmits([
   'success',
   // 导入失败或中断，抛出错误信息
   'error',
+  'warning',
 ])
 
 const fileInputRef = useTemplateRef('fileInputRef')
@@ -131,15 +132,17 @@ function handleFileChange(e) {
   reader.onload = (evt) => {
     try {
       const data = new Uint8Array(evt.target.result)
-      const wb = XLSX.read(data, { type: 'array' })
+      const wb = read(data, { type: 'array' })
       const firstSheetName = wb.SheetNames[0]
       const ws = wb.Sheets[firstSheetName]
 
       // 将sheet转为json，包含第一行表头
-      const sheetJson = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' })
+      const sheetJson = utils.sheet_to_json(ws, { header: 1, defval: '' })
       if (!sheetJson.length) {
-        ElMessage.warning('文件为空')
-        emits('success', [])
+        emits('warning', {
+          message: '文件为空',
+          data: [],
+        })
         return
       }
 
@@ -164,20 +167,24 @@ function handleFileChange(e) {
         return obj
       })
 
-      emits('success', result)
-      nextTick(() => {
-        ElMessage.success('导入成功')
+      emits('success', {
+        message: '导入成功',
+        data: result,
       })
     }
     catch (err) {
       console.error(err)
-      ElMessage.error('解析失败，请检查文件格式')
-      emits('error', err)
+      emits('error', {
+        message: '解析失败，请检查文件格式',
+        error: err,
+      })
     }
   }
   reader.onerror = (err) => {
-    ElMessage.error('文件读取失败')
-    emits('error', err)
+    emits('error', {
+      message: '文件读取失败',
+      error: err,
+    })
   }
   reader.readAsArrayBuffer(file)
 }

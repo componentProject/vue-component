@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <WlSelect
+    <TsSelect
       v-model="vals"
       :options="options"
       :filterable="true"
@@ -25,7 +25,5 @@ const options = ref([
 </script>
 
 <style scoped>
-.container {
-  padding: 8px;
-}
+
 </style>

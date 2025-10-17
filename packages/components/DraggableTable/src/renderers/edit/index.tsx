@@ -1,4 +1,4 @@
-import { VxeUI } from 'vxe-table'
+import { VxeUI } from 'vxe-pc-ui'
 import EditRenderer from './EditRenderer.tsx'
 
 // 创建一个编辑渲染器

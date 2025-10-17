@@ -1,7 +1,9 @@
 <template>
   <div class="container">
     <DraggableTable
+      id="dt-events-noNextInput"
       v-model="tableData"
+      save-type="local"
       :columns="columns"
       container-type="row"
       height="300"
@@ -51,9 +53,6 @@ const columns = ref([
 </script>
 
 <style scoped>
-.container {
-  padding: 8px;
-}
 .value {
   margin-top: 8px;
   font-size: 12px;

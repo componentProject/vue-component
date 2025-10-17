@@ -4,8 +4,6 @@ import type { objType } from '@moluoxixi/components/_types'
 import { ElInput } from 'element-plus'
 import { computed, defineComponent, ref, watch } from 'vue'
 import { detectDateFormatByReplace, getMomentIsValidIsNoNum } from '@moluoxixi/utils/_utils'
-import DateRangePicker from '@moluoxixi/components/DateRangePicker/index.ts'
-import Select from '@moluoxixi/components/Select/index.ts'
 
 export default defineComponent({
   name: 'EditRenderer',
@@ -32,7 +30,6 @@ export default defineComponent({
     }
 
     function validateHandle() {
-      console.log('props.renderParams', props.renderParams)
       const xTable = props.renderParams?.$grid
       if (xTable) {
         xTable.validateField(currRow.value, currColumn.value.field).then()
@@ -58,6 +55,7 @@ export default defineComponent({
           <DateRangePicker
             format={valueFormat.value}
             value-format={valueFormat.value}
+            size="small"
             type="date"
             {...renderOptsProps.value}
             modelValue={currRow.value[currColumn.value.field]}
@@ -73,8 +71,9 @@ export default defineComponent({
     const SelectRender = computed(() => {
       return (
         propsOptions.value && (
-          <Select
+          <TsSelect
             class="w-full!"
+            size="small"
             options={propsOptions.value}
             {...renderOptsProps.value}
             teleported={false}
@@ -95,6 +94,7 @@ export default defineComponent({
         <>
           <ElInput
             onInput={validateHandle}
+            size="small"
             {...renderOptsProps.value}
             modelValue={currRow.value[currColumn.value.field]}
             onUpdate:modelValue={(val: any) => {

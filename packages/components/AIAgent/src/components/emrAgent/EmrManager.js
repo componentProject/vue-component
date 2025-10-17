@@ -82,9 +82,10 @@ export class EmrManager {
    */
   async createEmr(jsonData, agentId, showChat) {
     this.state.currentAgentId = agentId
-    if (!jsonData || !agentId || !this.state.emr_data.normal)
+    if (!jsonData || !agentId) {
+      console.error('jsonData或agentId为空')
       return
-
+    }
     this.state.emr_data = formatTemplate(jsonData)
     await this.context.$nextTick()
 
@@ -178,7 +179,7 @@ export class EmrManager {
       }
 
       const linAiData = buildAIData(this.state.emr_data)
-      for (let line of linAiData) {
+      for (const line of linAiData) {
         if (line.deCode == currentItem.deCode) {
           line.generate = 1
           line.beforeContent = lineContent
@@ -217,9 +218,9 @@ export class EmrManager {
           return
 
         const isValidResponse
-          = currentItemNow
-          && currentItemNow.ID === requestContext.itemId
-          && currentItemNow.deCode === requestContext.deCode
+                    = currentItemNow
+                      && currentItemNow.ID === requestContext.itemId
+                      && currentItemNow.deCode === requestContext.deCode
 
         if (
           isValidResponse

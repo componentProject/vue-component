@@ -3,19 +3,17 @@
 </template>
 
 <script setup lang="ts">
-import type { ButtonsItem } from '@moluoxixi/components/Tree/src/types/index.ts'
-
 const tree = [
   { id: 1, name: '根 1', children: [
     { id: 11, name: '子 1-1' },
   ] },
 ]
 
-function buttons(row: any): ButtonsItem[] {
+function buttons(row: any): any[] {
   return [
-    { type: 'add', tooltip: '新增', event: () => console.log(`add ${row.name}`) },
-    { type: 'edit', tooltip: '编辑', event: () => console.log(`edit ${row.name}`) },
-    { type: 'delete', tooltip: '删除', event: () => console.log(`delete ${row.name}`) },
+    { btnType: 'add', tooltip: '新增', event: () => console.log(`add ${row.name}`) },
+    { btnType: 'edit', tooltip: '编辑', event: () => console.log(`edit ${row.name}`) },
+    { btnType: 'delete', tooltip: '删除', event: () => console.log(`delete ${row.name}`) },
   ]
 }
 </script>

@@ -23,10 +23,10 @@ const dateRange = ref<string[]>([])
 | type              | String          | 'date'                | 'date' / 'datetime' / 'daterange' / 'datetimerange'                                                   |
 | format            | String          | 'YYYY-MM-DD'          | 显示在输入框中的格式                                                                                  |
 | valueFormat       | String          | 'YYYY-MM-DD HH:mm:ss' | 绑定值的格式（对显示无效）                                                                            |
+| outputFormat      | String \| String[] | 根据 type 自动推断   | 控制内部格式化的起止时间格式（与显示无关）。当 `type` 不是 `datetime/datetimerange` 时，默认补齐为 `['YYYY-MM-DD 00:00:00','YYYY-MM-DD 23:59:59']`；当 `type` 为 `datetime/datetimerange` 时，默认 `['YYYY-MM-DD HH:mm:ss','YYYY-MM-DD HH:mm:ss']`。若需要返回带时分秒的字符串，请传 `"YYYY-MM-DD HH:mm:ss"`。 |
 | placeholder       | String          | '请选择日期'          | 非范围选择时的占位内容                                                                                |
 | startPlaceholder  | String          | '开始日期'            | 范围选择时开始日期的占位内容                                                                          |
 | endPlaceholder    | String          | '结束日期'            | 范围选择时结束日期的占位内容                                                                          |
-| defaultDatetimeRange | Boolean      | null                  | 单值类型是否默认补齐 00:00:00/23:59:59                                                                |
 | defaultToday      | Boolean         | true                  | 无选定值时默认返回今天的范围                                                                          |
 | dateRange         | Number \| Number[] \| null | null       | 数字/区间：正数=今天到未来n；负数=过去n到今天；数组[-n,m]                                            |
 | dateRangeType     | String          | 'day'                 | 偏移单位：day/week/month/year 等                                                                      |

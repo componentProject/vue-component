@@ -1,6 +1,6 @@
 <template>
   <div class="container" style="height: 350px;">
-    <DraggableTable v-model="tableData" :columns="columns" @resizable-change="last = $event" />
+    <DraggableTable id="dt-events-resizableChange" v-model="tableData" save-type="local" :columns="columns" @resizable-change="last = $event" />
     <div class="value">
       resizableChange: {{ last }}
     </div>
@@ -20,9 +20,6 @@ const columns = ref([
 </script>
 
 <style scoped>
-.container {
-  padding: 8px;
-}
 .value {
   margin-top: 8px;
   font-size: 12px;

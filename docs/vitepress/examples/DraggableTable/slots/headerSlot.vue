@@ -1,6 +1,6 @@
 <template>
   <div class="container" style="height: 350px;">
-    <DraggableTable v-model="tableData" :columns="columns">
+    <DraggableTable id="dt-slots-headerSlot" v-model="tableData" :columns="columns" save-type="local">
       <template #header-name>
         <em>姓名（自定义表头）</em>
       </template>
@@ -23,7 +23,5 @@ const columns = ref([
 </script>
 
 <style scoped>
-.container {
-  padding: 8px;
-}
+
 </style>

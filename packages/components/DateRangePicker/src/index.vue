@@ -1,36 +1,47 @@
 <template>
-  <div class="w-full inline-block flex-1 overflow-hidden date-range-picker">
-    <ElDatePicker
-      ref="datePicker"
-      v-bind="$attrs"
-      v-model="localDateValue"
-      style="width: 100%"
-      :format="computedFormat"
-      :default-time="defaultTime"
-      :placeholder="placeholder"
-      :start-placeholder="startPlaceholder"
-      :end-placeholder="endPlaceholder"
-      :range-separator="rangeSeparator"
-      :type="props.type"
-      :disabled-date="disabledDateFn"
-      :disabled-hours="disabledHoursFn"
-      :disabled-minutes="disabledMinutesFn"
-      :disabled-seconds="disabledSecondsFn"
-      :shortcuts="computedShortcuts"
-      @change="handleDateChange"
-    />
+  <div class="w-full inline-block flex-1-hidden date-range-picker">
+    <ElConfigProvider :locale="zhCn">
+      <ElDatePicker
+        ref="datePicker"
+        v-bind="$attrs"
+        v-model="localDateValue"
+        style="width: 100%"
+        :format="computedFormat"
+        :default-time="defaultTime"
+        :placeholder="placeholder"
+        :start-placeholder="startPlaceholder"
+        :end-placeholder="endPlaceholder"
+        :range-separator="rangeSeparator"
+        :type="props.type"
+        :disabled-date="disabledDateFn"
+        :disabled-hours="disabledHoursFn"
+        :disabled-minutes="disabledMinutesFn"
+        :disabled-seconds="disabledSecondsFn"
+        :shortcuts="computedShortcuts"
+        @change="handleDateChange"
+      />
+    </ElConfigProvider>
   </div>
 </template>
 
 <script lang="ts" setup>
 import type { DatePickerProps } from 'element-plus'
-import { ElDatePicker } from 'element-plus'
+import zhCn from 'element-plus/dist/locale/zh-cn.mjs'
+import { ElConfigProvider, ElDatePicker } from 'element-plus'
 import type { Moment, unitOfTime } from 'moment'
 import type { PropType } from 'vue'
 import moment from 'moment'
 import { isEmpty } from 'radash'
 import { computed, ref, useTemplateRef, watch } from 'vue'
-import { dateIsBefore, formatDateRange, getTypeDefault, validateDate } from '@moluoxixi/utils/_utils'
+import type {
+  DateType,
+} from '@moluoxixi/utils/_utils'
+import {
+  dateIsBefore,
+  formatDateRange,
+  getTypeDefault,
+  validateDate,
+} from '@moluoxixi/utils/_utils'
 
 defineOptions({
   name: 'DateRangePicker',
@@ -81,10 +92,8 @@ const props = defineProps({
     type: Array,
     default: () => [],
   },
-  // date类型是否默认返回 [YYYY-MM-DD 00:00:00，YYYY-MM-DD 23:59:59] 格式，没有则取当前时间
-  defaultDatetimeRange: {
-    type: Boolean,
-    default: null,
+  outputFormat: {
+    type: [String, Array] as PropType<string, string[]>,
   },
   // 当无选定值时，是否默认返回今天的日期范围
   defaultToday: {
@@ -155,8 +164,13 @@ const emit = defineEmits(['update:modelValue', 'change'])
 // 本地日期值，用于与el-date-picker交互
 const localDateValue = ref([])
 
-const computedDefaultDatetimeRange = computed(() => {
-  return props.defaultDatetimeRange ?? props.type !== 'datetime'
+const computedOutputFormat = computed(() => {
+  if (props.type !== 'datetime') {
+    return props.outputFormat || ['YYYY-MM-DD 00:00:00', 'YYYY-MM-DD 23:59:59']
+  }
+  else {
+    return props.outputFormat || ['YYYY-MM-DD HH:mm:ss', 'YYYY-MM-DD HH:mm:ss']
+  }
 })
 const dateTimeTypes = ['datetime', 'datetimerange']
 const defaultTime = computed<[Date, Date] | undefined>(() => {
@@ -407,10 +421,9 @@ function generateDateRangeByConfig() {
     if (startDate && endDate) {
       const range = formatDateRange(
         [startDate, endDate],
+        computedOutputFormat.value,
         props.valueFormat,
-        'day',
-        !computedDefaultDatetimeRange.value,
-      )
+      ) as DateType[]
       emit('update:modelValue', range)
       return range
     }
@@ -458,16 +471,15 @@ const singleDateTypes: string[] = ['date', 'datetime']
 // 处理日期变化事件
 function handleDateChange(val: any) {
   const formattedDates = formatDateRange(
-    val,
+    Array.isArray(val) ? val : [val, val],
+    computedOutputFormat.value,
     props.valueFormat,
-    'day',
-    !computedDefaultDatetimeRange.value,
-  )
+  ) as DateType[]
   emit('update:modelValue', formattedDates)
   emit('change', singleDateTypes.includes(props.type) ? formattedDates[0] : formattedDates)
 }
 
-function getLocalDateValue(date: any[] | any) {
+function getLocalDateValue(date: DateType | DateType[]) {
   return singleDateTypes.includes(props.type) ? (Array.isArray(date) ? date[0] : date) : date
 }
 
@@ -485,17 +497,16 @@ watch(
       // 如果没有传入modelValue:
       // 1.设置了dateRange，则使用dateRange配置生成初始值
       const initialRange = generateDateRangeByConfig()
-      if (initialRange && initialRange.length) {
+      if (initialRange?.length) {
         localDateValue.value = getLocalDateValue(initialRange)
       }
       // 2.设置了defaultToday，则使用当前日期生成初始值
       else if (props.defaultToday) {
         const today = formatDateRange(
           [moment(), moment()],
+          computedOutputFormat.value,
           props.valueFormat,
-          'day',
-          !computedDefaultDatetimeRange.value,
-        )
+        ) as DateType[]
         localDateValue.value = getLocalDateValue(today)
         emit('update:modelValue', today)
       }
@@ -514,11 +525,10 @@ watch(
       // 如果不满足日期格式，则格式化日期
       else {
         const formattedDates = formatDateRange(
-          newVal,
+          Array.isArray(newVal) ? newVal : [newVal, newVal],
+          computedOutputFormat.value,
           props.valueFormat,
-          'day',
-          !computedDefaultDatetimeRange.value,
-        )
+        ) as DateType[]
         localDateValue.value = getLocalDateValue(formattedDates)
         emit('update:modelValue', formattedDates)
       }
@@ -529,5 +539,5 @@ watch(
 </script>
 
 <style lang="scss" scoped>
-@forward '@moluoxixi/components/_assets/styles/tailwind.scss';
+@forward 'element-plus/theme-chalk/el-date-picker.css';
 </style>

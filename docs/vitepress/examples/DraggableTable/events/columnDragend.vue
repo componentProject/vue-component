@@ -1,7 +1,9 @@
 <template>
   <div class="container" style="height: 350px;">
     <DraggableTable
+      id="dt-events-columnDragend"
       v-model="tableData"
+      save-type="local"
       :columns="columns"
       drag-type="vxe"
       :columndragable="true"
@@ -26,9 +28,6 @@ const columns = ref([
 </script>
 
 <style scoped>
-.container {
-  padding: 8px;
-}
 .value {
   margin-top: 8px;
   font-size: 12px;

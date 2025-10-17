@@ -2,7 +2,8 @@
 
 ## 组件示例
 
-导出 Excel/CSV 的通用按钮组件。通过 `columns` 与 `tableData` 组织导出数据，支持自定义列头键名与字段键名优先级（`titles`/`fields`），并可配置导出类型、自动列宽、空数据导出策略等。
+导出 Excel/CSV 的通用按钮组件。通过 `columns` 与 `tableData` 组织导出数据，支持自定义列头键名与字段键名优先级（`titles`/
+`fields`），并可配置导出类型、自动列宽、空数据导出策略等。
 
 ### 基本用法（columns/tableData）
 
@@ -111,17 +112,17 @@ ExportExcel/formatter/formatter
 
 ### Props
 
-| 参数 | 说明 | 类型 | 默认值 |
-| --- | --- | --- | --- |
-| tableData | 表格数据源 | `Array<object>` | — |
-| columns | 列配置数组，支持 `prop/label`、`field/title` 或自定义键 | `Array<object>` | — |
-| titles | 从 `columns` 中提取列头文本的键名优先级 | string[] | `['title','label']` |
-| fields | 从 `columns` 中提取字段键名的优先级 | string[] | `['field','prop']` |
-| fileName | 导出文件名前缀（自动追加时间戳） | string | `导出数据` |
-| buttonText | 按钮文本（未使用插槽时生效） | string | `导出` |
-| exportType | 导出类型 | `xlsx` \| `csv` | `xlsx` |
-| allowEmptyExport | 是否允许空数据导出 | boolean | true |
-| emptyMessage | 禁止空导出时的提示文案 | string | '暂无数据可导出' |
+| 参数               | 说明                                        | 类型              | 默认值                 |
+|------------------|-------------------------------------------|-----------------|---------------------|
+| tableData        | 表格数据源                                     | `Array<object>` | —                   |
+| columns          | 列配置数组，根据`fields`, `titles`匹配`columns`中的字段 | `Array<object>` | —                   |
+| titles           | 从 `columns` 中提取列头文本的键名优先级                 | string[]        | `['title','label']` |
+| fields           | 从 `columns` 中提取字段键名的优先级                   | string[]        | `['field','prop']`  |
+| fileName         | 导出文件名前缀（自动追加时间戳）                          | string          | `导出数据`              |
+| buttonText       | 按钮文本（未使用插槽时生效）                            | string          | `导出`                |
+| exportType       | 导出类型                                      | `xlsx` \| `csv` | `xlsx`              |
+| allowEmptyExport | 是否允许空数据导出                                 | boolean         | true                |
+| emptyMessage     | 禁止空导出时的提示文案                               | string          | '暂无数据可导出'           |
 
 ### Events
 
@@ -129,8 +130,8 @@ ExportExcel/formatter/formatter
 
 ### Slots
 
-| 名称 | 说明 |
-| --- | --- |
+| 名称      | 说明      |
+|---------|---------|
 | default | 自定义按钮内容 |
 
 ### Expose

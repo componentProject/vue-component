@@ -1,7 +1,6 @@
 {
   "workspaces": [
     "packages/*",
-    "packages/formily/*",
     "play/*",
     "docs/*"
   ],
@@ -22,7 +21,6 @@
     "storybook:build": "pnpm run -C docs/storybook build",
     "components:build": "pnpm run -C packages/components build",
     "components:publish": "pnpm run -C packages/components publish",
-    "allComponents:publish": "pnpm run -C packages/components publish:allComponent",
     "utils:build": "pnpm run -C packages/utils build",
     "utils:publish": "pnpm run -C packages/utils publish",
     "type-check": "vue-tsc --build",
@@ -50,6 +48,20 @@
   },
   "license": "MIT",
   "author": "1983531544@qq.com",
+  "pnpm": {
+    "packageExtensions": {
+      "@moluoxixi/element-setters@*": {
+        "dependencies": {
+          "@moluoxixi/element-prototypes": "1.0.4"
+        }
+      }
+    },
+    "overrides": {
+      "@moluoxixi/element-prototypes": "1.0.4",
+      "@moluoxixi/element-renderer": "1.0.4",
+      "@moluoxixi/element-settings-form": "1.0.4"
+    }
+  },
   "repository": {
     "type": "git",
     "url": "git+http://192.168.18.106/middle-tec/front-web/vue-component.git"
@@ -74,7 +86,6 @@
     "template"
   ],
   "devDependencies": {
-    "vite": "catalog:dev",
     "@antfu/eslint-config": "catalog:dev",
     "@commitlint/cli": "^19.8.0",
     "@commitlint/config-conventional": "^19.8.0",
@@ -93,6 +104,7 @@
     "stylelint-config-standard-scss": "^14.0.0",
     "stylelint-config-standard-vue": "^1.0.0",
     "tsx": "^4.20.5",
-    "typescript": "catalog:dev"
+    "typescript": "catalog:dev",
+    "vite": "catalog:dev"
   }
 }

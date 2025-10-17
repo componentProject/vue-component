@@ -8,12 +8,10 @@ interface TreeOptionProps {
   label?: string
   value?: string
   disabled?: string
-  class?: (data: TreeNodeData, node: TreeNode) => string | {
-    [key: string]: boolean
-  }
+  class?: (data?: TreeNodeData, node?: TreeNode) => string | Record<string, boolean>
 }
 export interface ButtonsItem {
-  type?: ButtonType
+  btnType?: ButtonType
   slot?: string | ((...args: any[]) => any)
   icon?: Component | string
   event?: (data?: any, node?: any) => void
@@ -31,9 +29,10 @@ export interface TreeProps<T = any> {
   icon?: (nodeData: T) => Component | string
   showType?: 'hover' | 'click' | 'default'
   buttons?: (nodeData: T) => ButtonsItem[]
-  indent?: number | string
+  indent?: number
   height?: number
   props?: TreeOptionProps
+  emptyText?: string
   /**
    * 是否显示左侧连接线
    */

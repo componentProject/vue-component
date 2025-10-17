@@ -73,3 +73,5 @@ declare interface ViteEnv {
 declare const __SYSTEM_CODE__ = string
 
 declare global {}
+
+declare module 'sortablejs'

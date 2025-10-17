@@ -1,11 +1,12 @@
 <template>
   <div class="container" style="height: 350px;">
     <DraggableTable
+      id="dt-drag-dragType-vxe"
       v-model="tableData"
       :columns="columns"
-      drag-type="vxe"
-      :rowdragable="true"
-      :columndragable="true"
+      rowdragable
+      columndragable
+      save-type="local"
     />
   </div>
 </template>
@@ -27,7 +28,5 @@ const columns = ref([
 </script>
 
 <style scoped>
-.container {
-  padding: 8px;
-}
+
 </style>

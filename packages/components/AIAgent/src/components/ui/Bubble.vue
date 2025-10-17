@@ -14,18 +14,14 @@
           </div>
         </div>
         <div v-else class="bubble-content">
-          <div
-            v-if="role === 'assistant'"
-            class="bubble-content-text markdown-body"
-            v-html="processedContent"
-          />
+          <div v-if="role === 'assistant'" class="bubble-content-text markdown-body" v-html="processedContent" />
           <div v-else-if="role === 'error'" class="bubble-content-text error">
             {{ content }}
           </div>
           <div v-else class="bubble-content-text user">
             {{ content }}
           </div>
-          <div v-if="role === 'assistant'" class="bubble-tip">
+          <div v-if="role === 'assistant' && isFinished" class="bubble-tip">
             本回答由AI生成，内容仅供参考，请仔细甄别。
           </div>
         </div>
@@ -50,6 +46,10 @@ export default {
       default: '',
     },
     textLoading: {
+      type: Boolean,
+      default: false,
+    },
+    isFinished: {
       type: Boolean,
       default: false,
     },
@@ -98,18 +98,18 @@ export default {
       const detailsRegex = /<details[^>]*>([\s\S]*?)<\/details>/g
 
       return processedContent.replace(detailsRegex, (match, innerContent) => {
-        // 检查是否包含Thinking...，如果是则添加自动折叠逻辑
-        if (innerContent.includes('Thinking...')) {
-          // 替换Thinking...为初始状态
-          const processedMatch = match.replace(
-            /<summary[^>]*>([^<]*Thinking[^<]*)<\/summary>/,
-            '<summary>思考中...</summary>',
-          )
+        // 检查是否是思考相关的details标签
+        if (match.includes('class="thinking-details')) {
+          // 已经在convertThinkToDetails中处理过了，直接返回
+          return match
+        }
 
+        // 检查是否包含原生的Thinking...（为了兼容旧格式）
+        if (innerContent.includes('Thinking...') && !match.includes('class="thinking-details')) {
           // 添加自定义样式类
-          const styledMatch = processedMatch.replace(
+          const styledMatch = match.replace(
             /<details([^>]*)>/,
-            '<details$1 class="thinking-details" data-auto-collapse="true">',
+            '<details$1 class="thinking-details legacy" data-auto-collapse="true">',
           )
 
           // 在下一个tick中处理自动折叠
@@ -125,15 +125,32 @@ export default {
     },
 
     convertThinkToDetails(content) {
-      // 使用正则表达式查找think标签
-      const thinkRegex = /<think>([\s\S]*?)<\/think>/g
-      return content.replace(thinkRegex, (match, thinkContent) => {
-        // 将think标签内容转换为details标签格式
-        return `<details style="color:gray;background-color: #f8f8f8;padding: 8px;border-radius: 4px;" open>
-                            <summary> Thinking... </summary>
+      // 处理完整的think标签（已闭合）
+      const completeThinkRegex = /<think>([\s\S]*?)<\/think>/g
+      let processedContent = content.replace(completeThinkRegex, (match, thinkContent) => {
+        // 将完整的think标签转换为details标签格式，显示"已深度思考..."
+        return `<details class="thinking-details completed" style="color:gray;background-color: #f8f8f8;padding: 8px;border-radius: 4px;">
+                            <summary>已深度思考...</summary>
                             ${thinkContent.trim()}
                         </details>`
       })
+
+      // 处理未闭合的think标签（流式渲染中）
+      const incompleteThinkRegex = /<think>([\s\S]*)(?!<\/think>)$/
+      const incompleteMatch = processedContent.match(incompleteThinkRegex)
+
+      if (incompleteMatch) {
+        const thinkContent = incompleteMatch[1]
+        processedContent = processedContent.replace(
+          incompleteThinkRegex,
+          `<details class="thinking-details streaming" style="color:gray;background-color: #f8f8f8;padding: 8px;border-radius: 4px;" open>
+                        <summary>思考中...</summary>
+                        ${thinkContent}
+                    </details>`,
+        )
+      }
+
+      return processedContent
     },
 
     addDownloadButtonsToTables(content) {

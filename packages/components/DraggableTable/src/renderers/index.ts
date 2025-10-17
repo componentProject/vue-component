@@ -1,3 +1,3 @@
-import './filter'
-import './edit'
-import './cell'
+import './filter/index.tsx'
+import './edit/index.tsx'
+import './cell/index.tsx'

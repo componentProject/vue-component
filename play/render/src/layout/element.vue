@@ -9,28 +9,28 @@
  * Copyright (c) 2025 by ${git_name_email}, All Rights Reserved.
 -->
 <template>
-  <el-config-provider :locale="zhCn" :namespace="systemCode" :empty-values="[undefined]">
+  <ElConfigProvider :namespace="systemCode" :empty-values="[undefined]">
     <div
       class="h-full"
-      :class="{ 'h-screen': !qiankunWindow.__POWERED_BY_QIANKUN__ }"
+      :class="{ 'h-screen!': !qiankunWindow.__POWERED_BY_QIANKUN__ }"
       :style="`--el-color-primary: ${themeColor || '#3A77FF'};`"
     >
-      <el-container class="w-full h-full">
-        <el-header
+      <ElContainer class="w-full h-full">
+        <ElHeader
           v-if="!qiankunWindow.__POWERED_BY_QIANKUN__"
           class="headerbox"
           style="padding: 0"
           height="30"
         >
           <div class="w-full h-full bg-primary flex justify-center">
-            <el-menu :default-active="defaultTab" :ellipsis="false" mode="horizontal" router>
+            <ElMenu :default-active="defaultTab" :ellipsis="false" mode="horizontal" router>
               <subMenu :routes="routes" />
-            </el-menu>
+            </ElMenu>
           </div>
-        </el-header>
-        <el-main>
-          <el-container class="h-full w-full">
-            <el-main style="background-color: #fff">
+        </ElHeader>
+        <ElMain>
+          <ElContainer class="h-full w-full">
+            <ElMain style="background-color: #fff">
               <transition name="fade">
                 <RouterView v-slot="{ Component, route }">
                   <keep-alive>
@@ -39,16 +39,16 @@
                   <component :is="Component" v-if="!route.meta.keep" :key="route.path" />
                 </RouterView>
               </transition>
-            </el-main>
-          </el-container>
-        </el-main>
-      </el-container>
+            </ElMain>
+          </ElContainer>
+        </ElMain>
+      </ElContainer>
     </div>
-  </el-config-provider>
+  </ElConfigProvider>
 </template>
 
 <script lang="ts" setup>
-import zhCn from 'element-plus/dist/locale/zh-cn.mjs'
+import { ElConfigProvider, ElContainer, ElHeader, ElMain, ElMenu } from 'element-plus'
 import { qiankunWindow } from 'vite-plugin-qiankun/dist/helper'
 import { computed, reactive } from 'vue'
 import { RouterView, useRouter } from 'vue-router'
@@ -66,6 +66,18 @@ const defaultTab = computed(() => router.currentRoute.value.path)
 </script>
 
 <style lang="scss" scoped>
+//@forward '@/assets/styles/tailwind.scss';
+//@forward 'element-plus/theme-chalk/el-header.css';
+//@forward 'element-plus/theme-chalk/el-menu.css';
+//@forward 'element-plus/theme-chalk/el-main.css';
+//@forward 'element-plus/theme-chalk/el-container.css';
+
+:deep(.el-main) {
+  --el-main-padding: 12px !important;
+}
+.bg-primary {
+  background-color: var(--el-color-primary);
+}
 .headerbox {
   :deep(.el-menu) {
     background-color: var(--el-color-primary);
@@ -119,10 +131,6 @@ const defaultTab = computed(() => router.currentRoute.value.path)
         }
       }
     }
-  }
-
-  :deep(.el-main) {
-    --el-main-padding: 12px;
   }
 }
 </style>

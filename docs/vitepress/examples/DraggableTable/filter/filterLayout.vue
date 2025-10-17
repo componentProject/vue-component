@@ -1,7 +1,9 @@
 <template>
   <div class="container" style="height: 350px;">
     <DraggableTable
+      id="dt-filter-filterLayout"
       v-model="tableData"
+      save-type="local"
       :columns="columns"
       :filterable="true"
       :filter-layout="['input', 'checkbox', 'select']"
@@ -26,7 +28,5 @@ const columns = ref([
 </script>
 
 <style scoped>
-.container {
-  padding: 8px;
-}
+
 </style>

@@ -2,8 +2,6 @@ import viteConfig, { wrapperEnv } from '../../packages/utils/ViteConfig/index.ts
 import path from 'node:path'
 import process from 'node:process'
 import { loadEnv } from 'vite'
-// sentry
-import { sentryVitePlugin } from '@sentry/vite-plugin'
 
 export default viteConfig(
   ({ mode }) => {
@@ -20,7 +18,7 @@ export default viteConfig(
           VITE_DEVTOOLS: false,
           VITE_PURE_CONSOLE_AND_DEBUGGER: false,
           VITE_PORT: 3300,
-          VITE_OPEN: true,
+          VITE_OPEN: false,
           VITE_USE_QIANKUN: true,
           VITE_QIANKUN_DEV: false,
           VITE_COMPRESS: true,
@@ -38,34 +36,40 @@ export default viteConfig(
           extensions: ['.js', '.jsx', '.ts', '.tsx', '.vue'],
           alias: {
             '@moluoxixi/components': path.resolve(rootPath, '../../packages/components'),
-            '@moluoxixi/components/*': path.resolve(rootPath, '../../packages/components/*'),
             '@moluoxixi/utils': path.resolve(rootPath, '../../packages/utils'),
-            '@moluoxixi/utils/*': path.resolve(rootPath, '../../packages/utils/*'),
-            '@/*': path.resolve(rootPath, './src/*'),
           },
         },
-        plugins: [
-          viteEnv.VITE_SENTRY
-          && sentryVitePlugin({
-            authToken: process.env.SENTRY_AUTH_TOKEN,
-            org: 'f1f562b9b82f',
-            project: 'javascript-vue',
-          }),
-        ],
+        plugins: [],
         server: {
           proxy: {
-            '/ts-bs-his-base': {
-              target: `${viteEnv.VITE_PROXY_URL}`,
-              secure: false,
+            // '/ts-bs-his-base': {
+            //   target: `${viteEnv.VITE_PROXY_URL}`,
+            //   secure: false,
+            //   changeOrigin: true,
+            //   configure: (proxy: any) => {
+            //     const encryptedList = ['appId', 'randomStr', 'timestamp', 'version', 'sign']
+            //     proxy.on('proxyReq', (proxyReq: any, req: any) => {
+            //       encryptedList.forEach((item) => {
+            //         proxyReq.setHeader(item, req.headers[item.toLocaleLowerCase()] || req.headers[item])
+            //       })
+            //     })
+            //   },
+            // },
+            '/ompBase': {
               changeOrigin: true,
-              configure: (proxy: any) => {
-                const encryptedList = ['appId', 'randomStr', 'timestamp', 'version', 'sign']
-                proxy.on('proxyReq', (proxyReq: any, req: any) => {
-                  encryptedList.forEach((item) => {
-                    proxyReq.setHeader(item, req.headers[item.toLocaleLowerCase()] || req.headers[item])
-                  })
-                })
-              },
+              target: 'http://192.168.209.103:9099',
+            },
+            '/ts-bs-his-base': {
+              changeOrigin: true,
+              target: 'http://192.168.208.26:9099',
+            },
+            '/ts-cache': {
+              changeOrigin: true,
+              target: 'http://192.168.209.103:9099',
+            },
+            '/ts-fm': {
+              changeOrigin: true,
+              target: 'http://192.168.209.103:9099',
             },
             '/ai-application': {
               // target: 'http://192.168.31.46:19061',
@@ -77,6 +81,14 @@ export default viteConfig(
               // target: 'http://192.168.211.135:8080',
               target: 'http://192.168.209.103:9099',
               changeOrigin: true,
+            },
+          },
+        },
+        css: {
+          preprocessorOptions: {
+            scss: {
+              api: 'modern-compiler',
+              additionalData: `@forward '@moluoxixi/components/_assets/styles/main.scss';`,
             },
           },
         },

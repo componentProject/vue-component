@@ -45,4 +45,14 @@ onMounted(() => {
 })
 </script>
 
-<style scoped></style>
+<style scoped>
+:deep(.el-form) {
+  .el-form-item__label {
+    width: 100%;
+    display: inline-block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+</style>

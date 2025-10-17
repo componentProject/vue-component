@@ -1,7 +1,9 @@
 <template>
   <div class="container" style="height: 350px;">
     <DraggableTable
+      id="dt-events-checkbox"
       v-model="tableData"
+      save-type="local"
       :columns="columns"
       @checkbox-change="onChange"
     />
@@ -32,9 +34,6 @@ function onChange(e: any) {
 </script>
 
 <style scoped>
-.container {
-  padding: 8px;
-}
 .value {
   margin-top: 8px;
   font-size: 12px;

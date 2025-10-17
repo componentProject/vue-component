@@ -17,18 +17,15 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-const active = ref('A')
+const active = ref()
 const last = ref(null)
 const tabList = [
-  { id: 'A', label: 'A' },
-  { id: 'B', label: 'B' },
+  { label: 'A' },
+  { label: 'B' },
 ]
 </script>
 
 <style scoped>
-.container {
-  padding: 8px;
-}
 .value {
   margin-top: 8px;
   font-size: 12px;

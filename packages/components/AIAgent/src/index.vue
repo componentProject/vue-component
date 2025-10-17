@@ -3,17 +3,12 @@
     v-if="configOption.token"
     class="ai-agent"
     :class="{ 'ai-agent-dragging': isDragging, 'drag-disabled': !drag }"
-    data-v="1.6.4"
+    data-v="1.7.3"
   >
     <!-- 浮动按钮 -->
-    <FloatingButton
-      @button-click="handleFloatingButtonClick"
-      @drag-start="handleDragStart"
-      @drag-end="handleDragEnd"
-    />
+    <FloatingButton @button-click="handleFloatingButtonClick" @drag-start="handleDragStart" @drag-end="handleDragEnd" />
     <!-- 浮动面板 -->
     <FloatingPanel
-      ref="floatingPanel"
       :visible="isChatVisible"
       :drag="drag"
       @drag-start="handleDragStart"
@@ -34,7 +29,7 @@
               @back="handleBack"
               @star="handleStar"
               @about-click="$refs.aboutMe.show(currentAgent, 'agent')"
-              @notice-click="isUserKnowNotice = false"
+              @notice-click="handleNoticeClick"
               @shepherd-click="handleShepherdClick"
             />
           </div>
@@ -47,16 +42,10 @@
         </div>
         <!-- 阻止mousedown冒泡导致不可输入 -->
         <div v-if="currentView == 'findAgent'" class="floating-panel-header-search" @mousedown.stop>
-          <input
-            id="tsAiAgent-find-agent-search"
-            v-model="searchValue"
-            type="text"
-            placeholder="搜索智能体"
-          >
+          <input id="tsAiAgent-find-agent-search" v-model="searchValue" type="text" placeholder="搜索智能体">
         </div>
         <TipsPopover
           v-if="currentView == 'findAgent'"
-          ref="tipsPopover"
           @about-click="$refs.aboutMe.show(currentAgent, 'list')"
           @notice-click="isUserKnowNotice = false"
           @shepherd-click="handleShepherdClick"
@@ -71,11 +60,7 @@
       <!-- 浮动面板内容 -->
       <template v-if="isUserKnowNotice" #content>
         <template v-if="currentView == 'findAgent'">
-          <CategoryTabs
-            :tab-list="categoryList"
-            :current-tab="currentTab"
-            @update:current-tab="currentTab = $event"
-          />
+          <CategoryTabs :tab-list="categoryList" :current-tab="currentTab" @update:current-tab="currentTab = $event" />
           <div class="agent-list-container">
             <!-- 智能体列表 -->
             <div id="tsAiAgent-find-agent-list" class="agent-list">
@@ -285,6 +270,10 @@ export default {
     // 用户已知提示
     handleUserNoticeConfirm() {
       this.isUserKnowNotice = true
+      this.currentView = 'chatAgent'
+      this.$nextTick(() => {
+        this.restoreAgentState(this.currentAgent.agentInfo.id)
+      })
     },
     // 获取智能体分类列表
     async getApplicationCategoryList() {
@@ -457,9 +446,25 @@ export default {
     clearAgentStateCache() {
       this.agentStateCache.clear()
     },
+    handleNoticeClick() {
+      this.isUserKnowNotice = false
+      // 如果当前在 chatAgent 视图，保存当前智能体状态
+      const needRestore = this.currentView === 'chatAgent' && this.currentAgent.agentInfo?.id
+      if (needRestore) {
+        this.saveAgentState(this.currentAgent.agentInfo.id)
+      }
+    },
     handleShepherdClick() {
       localStorage.setItem('isShepherd', false)
-      this.shepherdGuide.init()
+
+      // 如果当前在 chatAgent 视图，保存当前智能体状态
+      const needRestore = this.currentView === 'chatAgent' && this.currentAgent.agentInfo?.id
+      if (needRestore) {
+        this.saveAgentState(this.currentAgent.agentInfo.id)
+      }
+
+      // 启动引导，并传递恢复信息
+      this.shepherdGuide.init(needRestore ? this.currentAgent.agentInfo.id : null)
     },
   },
 }
@@ -491,7 +496,7 @@ html {
     width: 100vw;
     height: 100vh;
     background: transparent;
-    z-index: 9;
+    z-index: 202508;
 
     // 只有拖拽的元素可以交互
     .floating-button,

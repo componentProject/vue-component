@@ -23,9 +23,9 @@ import { ref } from 'vue'
 
 const activeTab = ref('user')
 const tabList = [
-  { label: '用户管理', value: 'user', id: 'user' },
-  { label: '配置管理', value: 'config', id: 'config' },
-  { label: '角色管理', value: 'role', id: 'role' },
-  { label: '任务调度', value: 'task', id: 'task' },
+  { label: '用户管理', name: 'user' },
+  { label: '配置管理', name: 'config' },
+  { label: '角色管理', name: 'role' },
+  { label: '任务调度', name: 'task' },
 ]
 </script>
