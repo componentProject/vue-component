@@ -1,14 +1,11 @@
 import {
   computed,
-
+  nextTick,
   ref,
-
   shallowRef,
-
   triggerRef,
   unref,
   watch,
-  nextTick,
 } from 'vue'
 import type { MaybeRef, Ref, ShallowRef } from 'vue'
 import {
@@ -25,7 +22,7 @@ import type {
   ReFormProps,
   ReFormRules,
   ReGridResponsive,
-} from './index.ts'
+} from '../_types'
 import type { ElForm } from 'element-plus'
 import { cloneDeep, isUndefined } from 'lodash'
 
@@ -78,9 +75,30 @@ export default function useForm(
       // 重新计算表单配置，使用新的layout
       formItems.value = normalizeFormItems(unref(items), unref(span), unref(layout))
       formRules.value = normalizeFormRules(formItems.value)
+
+      // 添加以下代码：重新计算表单数据，支持defaultValue动态更新
+      const { modelValue: newModelValue } = normalizeFormValueAndRules(
+        formItems,
+        defaultValue,
+      )
+
+      // 仅更新发生变化的字段
+      let hasChanges = false
+      for (const field in newModelValue) {
+        if (formData.value[field] !== newModelValue[field]) {
+          formData.value[field] = cloneDeep(newModelValue[field])
+          hasChanges = true
+        }
+      }
+
+      if (hasChanges) {
+        triggerRef(formData)
+      }
+
       triggerRef(formItems)
       triggerRef(formRules)
     },
+    { deep: true },
   )
 
   return {
@@ -104,7 +122,7 @@ export function useWatchForm(
   formData: ShallowRef<ReFormModelValue>,
   props: ReFormProps,
   emits: ReFormEmits,
-  itemConfigCache: Map<string, ReFormItem> // 接收实例缓存
+  itemConfigCache: Map<string, ReFormItem>, // 接收实例缓存
 ) {
   const renderFormItemsCache = computed(() => unref(formItems))
 
@@ -116,7 +134,7 @@ export function useWatchForm(
         const path = parentPath ? `${parentPath}.${formItem.field}` : formItem.field
         const cacheKey = formItem.field
           ? `${path}_${typeof formItem.component === 'string' ? formItem.component : 'component'}`
-          : JSON.stringify({type: formItem.type, component: typeof formItem.component === 'string' ? formItem.component : 'component', path})
+          : JSON.stringify({ type: formItem.type, component: typeof formItem.component === 'string' ? formItem.component : 'component', path })
 
         // 尝试从缓存获取配置，但只在非分组项上使用缓存
         if (formItem.type !== 'group' && itemConfigCache.has(cacheKey)) {
