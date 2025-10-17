@@ -111,7 +111,7 @@ export async function runBuildCli(params: RunBuildCliParams, cli?: RunBuildCliOp
   const command = (firstArg === 'build' || firstArg === 'build-publish')
     ? firstArg
     : (cli?.command || 'build-publish')
-  const mode = getFlagValue(args, 'mode', 'all')
+  const mode = getFlagValue(args, 'mode', 'allComponent')
   // const excludeHeavyPlugins = parseBoolean(getFlagValue(args, 'excludeHeavyPlugins', 'false'), false)
   const excludeHeavyPlugins = parseBoolean(getFlagValue(args, 'excludeHeavyPlugins', 'true'), false)
   const uploadType = getFlagValue(args, 'uploadType', cli?.uploadType)

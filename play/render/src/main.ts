@@ -24,8 +24,9 @@ import { useSystemStore } from './stores/modules/system.ts'
 import '@/assets/styles/main.css'
 
 import 'moment/dist/locale/zh-cn' // 中文化
-import { registerAllComponent } from '@moluoxixi/utils/_utils/loadComponent.ts'
+import { registerAllComponent } from '@moluoxixi/utils/_utils/loadComponent'
 import { getList } from '@moluoxixi/utils/_api'
+import { COMPONENT_SETTING_TYPE } from '@moluoxixi/constant'
 
 moment.locale('zh-cn')
 
@@ -94,8 +95,9 @@ async function render(props: QiankunProps) {
   // proxy(container as HTMLElement)
   app = createApp(App)
   const allComponentList = await getList()
-  await idbStorage.setItem('Vue3', JSON.stringify(allComponentList))
-  await registerAllComponent(Vue, app)
+  await idbStorage.setItem(COMPONENT_SETTING_TYPE, JSON.stringify(allComponentList))
+  const isLongRange = false
+  await registerAllComponent(Vue, app, COMPONENT_SETTING_TYPE, isLongRange)
   console.log('app', app._context.components, app._context.components.TsFooter)
   // window.$remoteLoad = load
   // const res = await load(Vue)
