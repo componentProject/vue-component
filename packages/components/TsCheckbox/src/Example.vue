@@ -7,7 +7,6 @@
         :options="localData"
         label="name"
         value="age"
-        :checkbox-props="{ size: 'large', border: true }"
         @change="onLocalChange"
       />
       <div class="value-display">
@@ -48,7 +47,7 @@ const requestParams = ref({
 })
 // 本地数据
 const localData = [
-  { name: '测试1', age: '12' },
+  { name: '测试1222222222222222', age: '12' },
   { name: '测试2', age: '13' },
   { name: '测试3', age: '14' },
   { name: '测试4', age: '15' },

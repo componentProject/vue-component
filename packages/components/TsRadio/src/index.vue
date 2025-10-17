@@ -2,7 +2,7 @@
   <ElRadioGroup
     :id="radioId"
     v-model="data"
-    class="flex flex-wrap"
+    :style="computedStyle"
     v-bind="$attrs"
     @change="handleRadioChange"
   >
@@ -39,6 +39,9 @@ defineOptions({
 })
 
 const props = withDefaults(defineProps<TsRadioProps>(), {
+  layout: 'flex',
+  xGap: 16,
+  gridColumns: 4,
   label: 'label',
   value: 'value',
   disabledValues: () => [],
@@ -54,7 +57,25 @@ const props = withDefaults(defineProps<TsRadioProps>(), {
 })
 
 const emits = defineEmits<TsRadioEmits>()
-
+const computedStyle = computed(() => {
+  const baseStyle = {
+    'column-gap': `${props.xGap}px`,
+  }
+  if (props.layout === 'grid') {
+    return {
+      ...baseStyle,
+      'display': 'grid',
+      'grid-template-columns': `repeat(${props.gridColumns}, minmax(max-content, 1fr))`,
+    }
+  }
+  else {
+    return {
+      ...baseStyle,
+      'display': 'flex',
+      'flex-wrap': 'wrap',
+    }
+  }
+})
 const radioId = `radio-${Math.random().toString(36).substr(2, 9)}`
 
 const data = defineModel<any>()
