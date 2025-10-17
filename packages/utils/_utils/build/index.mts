@@ -1005,12 +1005,12 @@ async function buildComponent(
   const esOutputDir = resolve(outputDir, 'es')
   const libOutputDir = resolve(outputDir, 'lib')
   const umdOutputDir = resolve(outputDir, 'umd')
-  const iifeOutputDir = resolve(outputDir, 'iife')
+  // const iifeOutputDir = resolve(outputDir, 'iife')
   try {
     await clearDir(esOutputDir)
     await clearDir(libOutputDir)
     await clearDir(umdOutputDir)
-    await clearDir(iifeOutputDir)
+    // await clearDir(iifeOutputDir)
     // 使用传入的依赖分析结果
     const deps = dependencies
 
@@ -1339,7 +1339,7 @@ export async function buildComponentsWithOptions(options: BuildOptions): Promise
     useExternal = false,
     requireExternalPacks: reqExternal = [],
     entryBaseUrl: ebu = '/',
-    presetGlobals,
+    presetGlobals: _presetGlobals,
     uploadType,
   } = options || ({} as BuildOptions)
 
@@ -1352,6 +1352,12 @@ export async function buildComponentsWithOptions(options: BuildOptions): Promise
   if (!packDir)
     throw new Error('缺少必填参数：packDir')
 
+  const presetGlobals = {
+    'vue': 'Vue',
+    'vite': 'Vite',
+    '@vue/shared': 'vueShared',
+    ..._presetGlobals,
+  }
   const peerDepList = Object.keys(presetGlobals)
   // 生成上下文
   const ctx: BuildContext = {
