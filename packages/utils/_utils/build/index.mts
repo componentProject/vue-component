@@ -250,25 +250,6 @@ function createBaseConfig(ctx: BuildContext, comp: string, internalDeps: string[
         resolvers: [ElementPlusResolver()],
         dts: resolve(ctx.packDir, './_typings/auto-imports.d.ts'),
       } as any),
-      // 与自定义element组件冲突
-      // Components({
-      //   resolvers: [
-      //     ElementPlusResolver({
-      //       exclude: new RegExp(
-      //         ([]).map(item => `^${item}$`).join('|'),
-      //       ),
-      //     }),
-      //   ],
-      //   globs: [
-      //     `.${ctx.entryBaseUrl}**/index.vue`,
-      //     `.${ctx.entryBaseUrl}**/index.ts`,
-      //     `!.${ctx.entryBaseUrl}**/base/**/*`,
-      //     `!.${ctx.entryBaseUrl}**/components/**/*`,
-      //     `!.${ctx.entryBaseUrl}**/src/**/*`,
-      //     `!.${ctx.entryBaseUrl}**/_*/**/*`,
-      //   ],
-      //   dts: resolve(ctx.packDir, './_typings/components.d.ts'),
-      // }),
       // 按需启用图片压缩（重型插件）
       ...(!ctx.excludeHeavyPlugins
         ? [
@@ -1029,6 +1010,7 @@ async function buildComponent(
     await clearDir(esOutputDir)
     await clearDir(libOutputDir)
     await clearDir(umdOutputDir)
+    await clearDir(iifeOutputDir)
     // 使用传入的依赖分析结果
     const deps = dependencies
 
