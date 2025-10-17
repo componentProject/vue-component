@@ -36,6 +36,7 @@
             v-model="row[column.field]"
             :options="column.params.options"
             class="m-2"
+            :popper-style="computedPopperStyle"
             placeholder="Select"
             size="small"
             :disabled="!row.resizable"
@@ -71,37 +72,20 @@ import { VxeGrid } from 'vxe-table'
 import '@moluoxixi/components/VxeUI/VxeGrid/variable.scss'
 import { ElButton, ElCheckbox, ElInput, ElSwitch } from 'element-plus'
 import { getTypeName } from '@moluoxixi/components/DraggableTable/src/_utils'
-import type { ColumnType } from '@moluoxixi/components/DraggableTable/src/_types'
+import type { CustomConfigDialogEmits, CustomConfigDialogProps } from '@moluoxixi/components/DraggableTable/src/_types'
 import { flattenTree } from '@moluoxixi/utils/_utils'
 import { cloneDeep } from 'lodash'
 import type { VxeGridInstance } from 'vxe-table'
 
-const props = defineProps({
-  columns: {
-    type: Array as PropType<ColumnType[]>,
-    default: () => [],
-  },
-  collectColumns: {
-    type: Array as PropType<ColumnType[]>,
-    default: () => [],
-  },
-  customColumns: {
-    type: Array as PropType<ColumnType[]>,
-    default: () => [],
-  },
-  isConfiguration: {
-    type: Boolean,
-    default: false,
-  },
-  dialogProps: {
-    type: Object,
-    default: () => {},
-  },
+const props = withDefaults(defineProps<CustomConfigDialogProps>(), {
+  columns: () => [],
+  collectColumns: () => [],
+  customColumns: () => [],
+  isConfiguration: false,
+  dialogProps: () => ({ zIndex: 1000 }),
 })
 
-const emit = defineEmits<{
-  (e: 'confirm', customColumns: any[]): void
-}>()
+const emit = defineEmits<CustomConfigDialogEmits>()
 const xTable = useTemplateRef<VxeGridInstance>('xTable')
 
 const computedDialogProps = computed(() => {
@@ -111,6 +95,17 @@ const computedDialogProps = computed(() => {
     height: '60%',
     teleportTo: '.containerMain',
     ...props.dialogProps,
+  }
+})
+
+const computedPopperStyle = computed(() => {
+  if (props.dialogProps?.zIndex) {
+    return {
+      'z-index': `${props.dialogProps.zIndex + 1}`,
+    }
+  }
+  else {
+    return {}
   }
 })
 
