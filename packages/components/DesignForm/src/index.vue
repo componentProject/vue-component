@@ -7,7 +7,7 @@
       <div v-if="!formConfig" class="empty-form">
         <p>请从左侧添加表单项</p>
       </div>
-      <ReForm v-else v-bind="formConfig" @submit="handleFormSubmit" @form-item-click="handleReFormClick" />
+      <ReForm v-else v-bind="formConfig" draggable @submit="handleFormSubmit" @form-item-click="handleReFormClick" />
     </div>
     <div class="design-form-right">
       <DesignFormRules
@@ -40,24 +40,6 @@ const selectedItem = ref<any>(null)
 const selectedItemIndex = ref<number | null>(null)
 
 const formRulesRef = ref<any>(null)
-
-//给表单项添加点击选择事件
-function setupItemClickHandler(item: any) {
-  return item
-  // return {
-  //   ...item,
-  //   events: {
-  //     ...item.events,
-  //     click: (event: MouseEvent) => {
-  //       event.stopPropagation()
-  //       const itemIndex = formConfig.value.items.findIndex(i => i.field === item.field)
-  //       if (itemIndex !== -1) {
-  //         handleReFormClick(itemIndex)
-  //       }
-  //     },
-  //   },
-  // }
-}
 
 // 添加表单项
 function handleAddFormItem(componentKey: string) {

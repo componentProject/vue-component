@@ -12,7 +12,11 @@
       :scroll-to-error="scrollToError"
     >
       <!-- 使用动态class绑定，根据layout的值直接选择不同的布局类 -->
-      <div :class="layout === 'flex' ? 'ap-form-flex' : 'ap-form-grid'" :style="gridTemplateStyle">
+      <div 
+        ref="draggableContainerRef"
+        :class="layout === 'flex' ? 'ap-form-flex' : 'ap-form-grid'" 
+        :style="gridTemplateStyle"
+      >
         <ReFormRenderItems :items="renderFormItems">
           <template v-for="slotName in slotsNames[0]" #[slotName]="slotScoped">
             <slot :name="slotName" v-bind="slotScoped" />
@@ -52,7 +56,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, onMounted, onUnmounted, provide, unref, useAttrs } from 'vue'
+import { computed, nextTick, onMounted, onUnmounted, provide, ref, unref, useAttrs } from 'vue'
 import type { ReFormEmits, ReFormProps } from './_types'
 import useForm, { useWatchForm } from './_utils/useForm'
 import { cloneDeep, isUndefined } from 'lodash'
@@ -63,6 +67,7 @@ import type { Arrayable } from '@vueuse/core'
 import type { FormValidateCallback } from 'element-plus'
 import { ElButton, ElForm, ElFormItem } from 'element-plus'
 import ReFormRenderItems from './components/renderItems.vue'
+import Sortable from 'sortablejs'
 
 defineOptions({
   name: 'ReForm',
@@ -82,13 +87,21 @@ const props = withDefaults(defineProps<ReFormProps>(), {
   submitBtnText: '确定',
   cancelBtnText: '取消',
   layout: 'grid', // 默认使用grid布局
+  draggable: false, // 新增拖拽排序功能开关
 })
 
 const emits = defineEmits<ReFormEmits>()
 
 //组件实例标识和核心服务初始化
 const formInstanceId = Symbol('ap-re-form-instance')
-const localItems = computed(() => props.items)
+const localItems = computed({
+  get: () => props.items,
+  set: (value) => emits('update:items', value)
+})
+
+// 拖拽功能相关
+const draggableContainerRef = ref<HTMLElement>()
+let sortableInstance: Sortable | null = null
 
 //布局相关计算属性
 const $attrs = useAttrs()
@@ -326,15 +339,40 @@ provide(Symbol.for('ap-re-form'), {
 })
 
 //生命周期钩子
-onMounted(() => {
+onMounted(async () => {
   if (props.formRef) {
     props.formRef(unref(reFormRef))
   }
   reFormRef.value && reFormRef.value.clearValidate() // 默认清空校验 - 避免初始化就飘红色
+  
+  // 初始化拖拽功能
+  if (props.draggable && draggableContainerRef.value) {
+    await nextTick()
+    // 确保ReFormRenderItems已经渲染完成
+    sortableInstance = new Sortable(draggableContainerRef.value, {
+      animation: 150,
+      handle: '.ap-form-grid-item',
+      filter: '.ap-form-grid-item--btns', // 排除按钮区域
+      onEnd: (evt) => {
+        if (evt.oldIndex !== undefined && evt.newIndex !== undefined) {
+          const newItems = [...props.items]
+          const [movedItem] = newItems.splice(evt.oldIndex, 1)
+          newItems.splice(evt.newIndex, 0, movedItem)
+          localItems.value = newItems
+        }
+      },
+    })
+  }
 })
 onUnmounted(() => {
   if (props.formRef) {
     clearItemConfigCache() // 调用实例的清理方法
+  }
+  
+  // 清理拖拽实例
+  if (sortableInstance) {
+    sortableInstance.destroy()
+    sortableInstance = null
   }
 })
 
@@ -355,6 +393,38 @@ defineExpose({
   getRef: () => reFormRef.value,
 })
 </script>
+
+<style lang="scss" scoped>
+/* 拖拽相关样式 */
+.ap-form-grid-item {
+  cursor: move;
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.02);
+  }
+}
+
+/* 排除按钮区域的拖拽样式 */
+.ap-form-grid-item--btns {
+  cursor: default;
+  &:hover {
+    background-color: transparent;
+  }
+}
+</style>
+
+/* 全局拖拽状态样式 */
+:global(.sortable-ghost) {
+  opacity: 0.5;
+  background: #c8ebfb;
+}
+
+:global(.sortable-chosen) {
+  background-color: rgba(144, 224, 239, 0.3);
+}
+
+:global(.sortable-drag) {
+  opacity: 0;
+}
 
 <style lang="scss" scoped>
 .ap-form {
