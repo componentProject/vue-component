@@ -92,6 +92,26 @@ function handleItemsUpdate(newItems: any[]) {
     // 深拷贝确保响应式更新
     const updatedConfig = { ...formConfig.value, items: deepClone(newItems) }
     formConfig.value = updatedConfig
+
+    // 更新selectedItemIndex，确保选中项索引与新顺序保持一致
+    if (selectedItemIndex.value !== null) {
+      // 获取当前选中项的field或唯一标识
+      const currentSelectedField = selectedItem.value?.field
+
+      if (currentSelectedField) {
+        // 在新的items数组中查找该field的新索引位置
+        const newIndex = formConfig.value.items.findIndex(item => item.field === currentSelectedField)
+
+        // 如果找到了对应的项，则更新索引
+        if (newIndex !== -1) {
+          selectedItemIndex.value = newIndex
+        }
+        else {
+          // 如果找不到（比如项被删除），则重置选中状态
+          selectedItemIndex.value = null
+        }
+      }
+    }
   }
 }
 
@@ -128,6 +148,7 @@ function handleSelectedItemUpdate(updatedItem: any) {
             // 清理validator代码中的TypeScript类型注解，确保JavaScript语法正确
             let cleanValidatorCode = updatedItem.validator
             cleanValidatorCode = cleanValidatorCode.replace(/\b(\w+):\s*\w+/g, '$1')
+            // eslint-disable-next-line no-new-func
             const validatorFn = new Function(`return ${cleanValidatorCode}`)()
 
             // 检查并更新或添加validator规则
@@ -163,6 +184,7 @@ function handleSelectedItemUpdate(updatedItem: any) {
             itemObj.rules = []
           }
           // 查找或创建required规则
+          // eslint-disable-next-line prefer-const
           let requiredRuleIndex = itemObj.rules.findIndex(rule => rule.required !== undefined && !rule.validator)
           if (requiredRuleIndex === -1) {
             // 创建新的required规则
@@ -196,7 +218,6 @@ function handleSelectedItemUpdate(updatedItem: any) {
         itemObj[key] = updatedItem[key]
       }
     })
-    console.log('跟新表单项数据', itemObj)
     // 使用深拷贝创建完全新的items数组，确保响应式系统能检测到rules数组的变化
     const newItems = deepClone(formConfig.value.items)
     // 完全替换目标项，确保所有嵌套属性都被更新
@@ -218,7 +239,6 @@ function handleSelectedItemUpdate(updatedItem: any) {
 }
 
 function handleReFormClick(event) {
-  console.log('点击表单项22222', event)
   // 获取点击的表单项field值或索引
   const fieldOrIndex = event.detail?.field || event.detail?.item?.field || event.index || event
 
@@ -278,6 +298,7 @@ function handleDeleteItem() {
     selectedItem.value = null
     selectedItemIndex.value = null
 
+    console.log('删除表单项索引:', selectedItemIndex.value)
     // 创建全新的formConfig对象，确保响应式更新
     formConfig.value = {
       ...formConfig.value,

@@ -35,7 +35,7 @@
 
 <script setup lang="ts">
 import { watch } from 'vue'
-import { ElMessageBox } from 'element-plus'
+import { ElButton, ElMessageBox } from 'element-plus'
 import Tabs from '@moluoxixi/components/Tabs'
 import ReForm from '@moluoxixi/components/ReForm'
 import { formItemConfig as defaultFormItemConfig } from '../datas/formData'

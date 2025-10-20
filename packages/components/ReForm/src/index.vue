@@ -17,7 +17,7 @@
         :class="layout === 'flex' ? 'ap-form-flex' : 'ap-form-grid'"
         :style="gridTemplateStyle"
       >
-        <ReFormRenderItems :items="renderFormItems">
+        <ReFormRenderItems :items="renderFormItems" :draggable="draggable">
           <template v-for="slotName in slotsNames[0]" #[slotName]="slotScoped">
             <slot :name="slotName" v-bind="slotScoped" />
           </template>
@@ -30,6 +30,7 @@
           class="ap-form-grid-item ap-form-grid-item--btns"
           :style="localBtnSpanStyle"
         >
+          1111
           <ElFormItem :label="btnLabelText" :label-width="btnLabelWidth">
             <template v-if="btnLabelText" #label>
               <div style="display: inline-block; width: 1px">
@@ -96,7 +97,7 @@ const emits = defineEmits<ReFormEmits>()
 const formInstanceId = Symbol('ap-re-form-instance')
 const localItems = computed({
   get: () => props.items,
-  set: (value) => emits('update:items', value)
+  set: value => emits('update:items', value),
 })
 
 // 拖拽功能相关
@@ -372,9 +373,10 @@ onMounted(async () => {
 
             // 创建新数组并按照DOM中的顺序重新排列
             const newItems = []
-            fieldNames.forEach(field => {
+            fieldNames.forEach((field) => {
               const item = props.items.find(i => i.field === field)
-              if (item) newItems.push(cloneDeep(item))
+              if (item)
+                newItems.push(cloneDeep(item))
             })
 
             // 验证重新排序是否有效
@@ -387,9 +389,11 @@ onMounted(async () => {
                 console.log('拖拽更新后的数据:', newItems)
               })
             }
-          } catch (error) {
+          }
+          catch (error) {
             console.error('拖拽排序失败:', error)
-          } finally {
+          }
+          finally {
             onEndDebounceTimer = null
           }
         }, 50) // 50ms防抖延迟
