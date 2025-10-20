@@ -1,8 +1,5 @@
 <template>
   <div class="design-form-list-main">
-    <!-- <div class="list-header">
-      <h3>组件列表</h3>
-    </div> -->
     <ElMenu
       class="el-menu-vertical-demo"
       @select="handleClick"
@@ -22,7 +19,7 @@ defineOptions({ name: 'DesignFormList' })
 
 // 定义事件
 const emits = defineEmits<{
-  (e: 'addFormItem', componentKey: string): void;
+  (e: 'addFormItem', componentKey: string): void
 }>()
 
 // 组件列表数据

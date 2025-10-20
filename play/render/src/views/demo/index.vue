@@ -42,7 +42,7 @@ defineOptions({ name: '调试与演示' })
 // const componentName = ref('ReForm')
 // const componentName = ref('DraggableTable')
 // const componentName = ref('HisFooter')
-const componentName = ref('TsFooter')
+const componentName = ref('DesignForm')
 // 调试组件
 const localComponent = ref<any>(null)
 // 用于存储动态组件
@@ -170,7 +170,7 @@ onMounted(async () => {
 
 .main {
   margin: 20px;
-  height: 200px;
+  height: 600px;
   text-align: center;
 }
 

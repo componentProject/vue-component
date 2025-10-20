@@ -1,4 +1,4 @@
-import { ElCheckbox, ElCheckboxGroup, ElInput, ElRadio, ElRadioGroup, ElSelect } from 'element-plus'
+import { ElCheckbox, ElCheckboxGroup, ElInput, ElInputNumber, ElRadio, ElRadioGroup, ElSelect } from 'element-plus'
 
 // 默认的表单配置
 export const defaultFormConfig = {
@@ -235,8 +235,50 @@ export const formItemConfig = {
       },
     },
     {
+      label: '表单项固定宽度(水平布局下有效)',
+      field: 'itemWidth',
+      component: ElInput,
+      props: {
+        clearable: true,
+        maxheight: 40,
+      },
+    },
+    {
+      label: '表单项响应式宽度',
+      field: 'span',
+      component: ElInputNumber,
+      tooltip: '在水平布局下, 如果设置表单项宽度，响应式宽度将无效',
+      tips: '只能输入1-24之间的整数',
+      props: {
+        clearable: true,
+        min: 1,
+        max: 24,
+        maxheight: 2,
+      },
+    },
+    {
+      label: 'tooltip提示',
+      field: 'tooltip',
+      defaultValue: '',
+      component: ElInput,
+      props: {
+        clearable: true,
+        maxheight: 100,
+      },
+    },
+    {
       label: '提示信息',
       field: 'tips',
+      defaultValue: '',
+      component: ElInput,
+      props: {
+        clearable: true,
+        maxheight: 100,
+      },
+    },
+    {
+      label: '长度',
+      field: 'maxlength',
       defaultValue: '',
       component: ElInput,
       props: {
@@ -251,6 +293,44 @@ export const formItemConfig = {
       props: {
         clearable: true,
         maxheight: 40,
+      },
+    },
+    {
+      label: '最小值',
+      field: 'min',
+      defaultValue: '',
+      component: ElInput,
+      props: {
+        clearable: true,
+        maxheight: 20,
+      },
+      visible: {
+        conditions: [
+          {
+            field: 'component',
+            value: 'ElInputNumber',
+            type: '=',
+          },
+        ],
+      },
+    },
+    {
+      label: '最大值',
+      field: 'max',
+      defaultValue: '',
+      component: ElInput,
+      props: {
+        clearable: true,
+        maxheight: 20,
+      },
+      visible: {
+        conditions: [
+          {
+            field: 'component',
+            value: 'ElInputNumber',
+            type: '=',
+          },
+        ],
       },
     },
     {
@@ -325,43 +405,43 @@ export const formItemConfig = {
     },
     {
       label: '错误信息',
-      field: 'errorTips',
+      field: 'message',
       defaultValue: '',
       component: ElInput,
       props: {
         clearable: true,
         maxheight: 100,
+      },
+      visible: {
+        conditions: [
+          {
+            field: 'required',
+            value: true,
+            type: '=',
+          },
+        ],
       },
     },
     {
-      label: '长度',
-      field: 'length',
+      label: '验证规则',
+      field: 'validator',
       defaultValue: '',
       component: ElInput,
       props: {
+        placeholder: '请输入验证规则，例如：(rule, value, callback, form) => { if (!value) { callback(new Error("该字段不能为空")); } else { callback(); } }',
+        type: 'textarea',
         clearable: true,
-        maxheight: 100,
+        rows: 4,
+      },
+      visible: {
+        conditions: [
+          {
+            field: 'required',
+            value: true,
+            type: '=',
+          },
+        ],
       },
     },
-    // {
-    //   label: '最小值',
-    //   field: 'min',
-    //   defaultValue: '',
-    //   component: ElInput,
-    //   props: {
-    //     clearable: true,
-    //     maxheight: 20,
-    //   },
-    // },
-    // {
-    //   label: '最大值',
-    //   field: 'max',
-    //   defaultValue: '',
-    //   component: ElInput,
-    //   props: {
-    //     clearable: true,
-    //     maxheight: 20,
-    //   },
-    // },
   ],
 }

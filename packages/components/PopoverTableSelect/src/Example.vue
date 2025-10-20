@@ -31,21 +31,21 @@
           :columns="columns"
           :data="tableData"
         >
-          <el-select
+          <ElSelect
             v-model="inputValue2Select"
             :teleported="false"
             placeholder="请选择"
             style="width: 100%"
           >
-            <el-option
+            <ElOption
               label="1"
               :value="1"
             />
-            <el-option
+            <ElOption
               label="2"
               :value="2"
             />
-          </el-select>
+          </ElSelect>
         </PopoverTableSelect>
       </div>
     </div>
@@ -69,7 +69,7 @@
 </template>
 
 <script lang="tsx" setup>
-import { ElInput } from 'element-plus'
+import { ElInput, ElOption, ElSelect } from 'element-plus'
 import { ref, useTemplateRef } from 'vue'
 import PopoverTableSelect from './index.vue'
 

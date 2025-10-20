@@ -52,6 +52,8 @@ export interface ReFormProps {
   emptyText?: string
   /**表单提交远程请求方法 */
   request?: (model: Record<string, any>) => Promise<any>
+  /**新增拖拽排序功能开关 */
+  draggable?: boolean
 }
 
 export interface ReFormEmits {
@@ -62,6 +64,7 @@ export interface ReFormEmits {
     model: MaybeRef<ReFormModelValue>
   ): void
   (e: 'update:modelValue', model: MaybeRef<ReFormModelValue>): void
+  (e: 'update:items', items: ReFormItem[]): void
   (e: 'submit', model?: Record<string, any>): void
   (e: 'cancel'): void
   (e: 'success' | 'error', res: unknown): void

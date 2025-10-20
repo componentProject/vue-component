@@ -9,7 +9,8 @@
   },
   "scripts": {
     "publish": "tsx _scripts/buildComponent.mts build-publish",
-    "build": "tsx _scripts/buildComponent.mts build"
+    "build": "tsx _scripts/buildComponent.mts build",
+    "eslint": "eslint . --ext .vue,.js,.jsx,.ts,.tsx --fix"
   },
   "dependencies": {
     "@antv/g2": "^5.4.1",

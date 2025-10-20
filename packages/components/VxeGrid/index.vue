@@ -23,6 +23,6 @@ defineExpose({
 
 <style scoped lang="scss">
 :deep(*) {
-  @import '@moluoxixi/components/VxeUI/VxeGrid/style.scss';
+  @import '@moluoxixi/components/VxeGrid/style.scss';
 }
 </style>

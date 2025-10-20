@@ -35,12 +35,14 @@
 
 <script setup lang="ts">
 import { watch } from 'vue'
+import { ElButton, ElMessageBox } from 'element-plus'
 import Tabs from '@moluoxixi/components/Tabs'
 import ReForm from '@moluoxixi/components/ReForm'
 import { formItemConfig as defaultFormItemConfig } from '../datas/formData'
 import { deepClone } from '../utils/formSerializer'
 
 const props = defineProps<{
+  selectedItemIndex?: number
   formConfig?: any
   selectedItem?: any
 }>()
@@ -71,6 +73,17 @@ const formItemConfig = ref<any>(deepClone(defaultFormItemConfig))
 
 // 监听外部表单配置变化
 watch(
+  () => props.selectedItemIndex,
+  (newIndex) => {
+    if (newIndex !== undefined) {
+      formItemConfig.value = deepClone(defaultFormItemConfig)
+    }
+  },
+  { immediate: true },
+)
+
+// 监听外部表单配置变化
+watch(
   () => props.formConfig,
   (newConfig) => {
     if (newConfig) {
@@ -88,6 +101,9 @@ watch(
       setFormItemConfig(newItem)
       activeTab.value = 'component'
     }
+    else {
+      activeTab.value = 'form'
+    }
   },
 )
 
@@ -98,7 +114,12 @@ function setFormItemConfig(item: any) {
   if (item && typeof item === 'object') {
     Object.keys(item).forEach((key) => {
       if (key === 'component') {
-        itemObj[key] = item[key].name
+        if (item[key].name === 'ElInput' && item?.props?.type === 'textarea') {
+          itemObj[key] = 'ElTextarea'
+        }
+        else {
+          itemObj[key] = item[key].name
+        }
       }
       else if (key === 'props') {
         Object.keys(item[key]).forEach((propKey) => {
@@ -125,9 +146,13 @@ function handleFormConfigChange() {
 
 // 删除表单项
 function handleDeleteItem() {
-  if (props.selectedItem && confirm('确定要删除当前表单项吗？')) {
-    emits('deleteItem')
-    console.log('删除表单项:', props.selectedItem)
+  if (props.selectedItem) {
+    ElMessageBox.confirm('确定要删除当前表单项吗？', '提示', {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+    }).then(async () => {
+      emits('deleteItem')
+    }).catch(() => {})
   }
 }
 
@@ -146,8 +171,6 @@ defineExpose({
 
   .config-section {
     height: 100%;
-    display: flex;
-    flex-direction: column;
   }
 
   .empty-state {
@@ -158,10 +181,17 @@ defineExpose({
     color: #999;
   }
 
+  #pane-component {
+    position: relative;
+    padding-bottom: 40px;
+  }
+
   .item-actions {
-    margin-top: 20px;
-    padding-top: 20px;
-    border-top: 1px solid #f0f0f0;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: white;
   }
 
   :deep(#pane-component) {

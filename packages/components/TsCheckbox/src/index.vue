@@ -8,18 +8,18 @@
   >
     <ElCheckbox
       v-for="(item) in serverOrLocalOptions"
-      :key="item[props.value]"
-      :label="item[props.value]"
+      :key="item[props.valueKey]"
+      :label="item[props.valueKey]"
       :disabled="
         computedDisabledHandler({
-          label: item[props.label],
-          value: item[props.value],
+          label: item[props.labelKey],
+          value: item[props.valueKey],
           data: item,
         })
       "
       v-bind="props.checkboxProps"
     >
-      {{ item[props.label] }}
+      {{ item[props.labelKey] }}
     </ElCheckbox>
   </ElCheckboxGroup>
 </template>
@@ -29,18 +29,18 @@ import { computed, withDefaults } from 'vue'
 import { ElCheckbox, ElCheckboxGroup } from 'element-plus'
 import { getTypeDefault } from '@moluoxixi/utils/_utils'
 import { useOptions } from '../../_hooks'
-import type { TsCheckboxEmits, TsCheckboxProps } from './_types'
+import type { emitsType, propsType } from './_types'
 
 defineOptions({
   name: 'TsCheckbox',
 })
 
-const props = withDefaults(defineProps<TsCheckboxProps>(), {
+const props = withDefaults(defineProps<propsType>(), {
   layout: 'flex',
   xGap: 16,
   gridColumns: 4,
-  label: 'label',
-  value: 'value',
+  labelKey: 'label',
+  valueKey: 'value',
   disabledValues: () => [],
   disabledLabels: () => [],
   options: () => [],
@@ -53,7 +53,7 @@ const props = withDefaults(defineProps<TsCheckboxProps>(), {
   checkboxProps: () => ({}),
 })
 
-const emits = defineEmits<TsCheckboxEmits>()
+const emits = defineEmits<emitsType>()
 const computedStyle = computed(() => {
   const baseStyle = {
     'column-gap': `${props.xGap}px`,

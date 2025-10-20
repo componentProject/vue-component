@@ -3,11 +3,11 @@
   --el-table-border-color: #dcdfe6;
 }
 
-.bg-primary{
+.bg-primary {
   background-color: var(--el-color-primary);
 }
 
-:deep(*){
+:deep(*) {
   box-sizing: border-box;
   margin: 0;
   font-weight: normal;

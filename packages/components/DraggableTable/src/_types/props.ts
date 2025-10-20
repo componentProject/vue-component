@@ -18,7 +18,7 @@ export type types = VxeColumnPropTypes.Type & customCustomTypes
 /**
  * DraggableTable 组件的 Props 类型定义
  */
-export interface DraggableTableProps {
+export interface propsType {
   //#region 其他原始配置加默认值
   /** 是否显示表格边框 */
   border: boolean
@@ -176,7 +176,7 @@ interface customColumnProps {
 export type ColumnType = VxeTableDefines.ColumnOptions & customColumnProps & { renderWidth?: number }
 
 // Props for CustomConfigDialog component
-export interface CustomConfigDialogProps {
+export interface CustomConfigDialogPropsType {
   columns: ColumnType[]
   collectColumns: ColumnType[]
   customColumns: ColumnType[]

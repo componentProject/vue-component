@@ -10,7 +10,7 @@
       <!-- 标签 -->
       <template v-if="item.label" #label>
         <slot :name="item.labelSlot">
-          <span class="inline-flex items-center">
+          <span class="inline-flex items-center" @click="handleItemClick">
             <span>{{ item.label }}</span>
             <ElTooltip
               v-if="item.tooltip"
@@ -155,6 +155,40 @@ function getOptionLabel(
     return opt?.[item.labelKey] ?? val
   })
   return labelArr.join(joinChar)
+}
+
+// 防抖时间间隔常量
+const DEBOUNCE_INTERVAL = 200
+// 上次点击时间记录
+let lastClickTime = 0
+
+// 处理表单项点击事件
+function handleItemClick(event: MouseEvent) {
+  // 阻止事件冒泡，避免触发表单其他元素的点击事件
+  event.stopPropagation()
+
+  // 添加防抖逻辑，避免短时间内多次触发
+  const currentTime = Date.now()
+  if (currentTime - lastClickTime < DEBOUNCE_INTERVAL) {
+    return // 如果两次点击时间间隔小于防抖时间，则忽略此次点击
+  }
+  lastClickTime = currentTime
+
+  // 先检查并执行用户传入的click事件
+  if (props.item.events && typeof props.item.events.click === 'function') {
+    props.item.events.click(event, props.item)
+  }
+
+  // 触发自定义事件，传递表单项信息
+  const target = event.currentTarget as HTMLElement
+  const customEvent = new CustomEvent('form-item-click', {
+    bubbles: true,
+    detail: {
+      field: props.item.field,
+      item: props.item,
+    },
+  })
+  target.dispatchEvent(customEvent)
 }
 </script>
 

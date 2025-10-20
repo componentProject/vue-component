@@ -1,5 +1,5 @@
 //#region use v4 如果用它，需要修改依赖tailwindcss和@tailwindcss/postcss为"^4.1.8"
-@forward "tailwindcss";
+@forward 'tailwindcss';
 @source '../../../components';
 
 @theme {

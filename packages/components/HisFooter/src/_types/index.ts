@@ -1,1 +1,2 @@
-export * from './props.ts'
+export * from './emits'
+export * from './props'

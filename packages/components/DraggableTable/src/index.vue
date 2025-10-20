@@ -59,10 +59,8 @@ import type {
   VxeTableDefines,
   VxeTablePropTypes,
 } from 'vxe-table'
-import { VxeGrid } from 'vxe-table'
-import '@moluoxixi/components/VxeUI/VxeGrid/variable.scss'
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, useAttrs, useTemplateRef, watch } from 'vue'
-import type { ColumnType, DraggableTableEmits, DraggableTableProps } from './_types'
+import type { ColumnType, emitsType, propsType } from './_types'
 import { ElMessage } from 'element-plus'
 import { cloneDeep, groupBy } from 'lodash'
 import { diff, isEmpty } from 'radash'
@@ -85,14 +83,14 @@ import { getCustomType, handleGetRequiredFields } from './_utils'
 import './renderers'
 import type { slotsType } from '@moluoxixi/components/_types'
 import CustomConfigDialog from './components/CustomConfigDialog.vue'
-import { getMemoryQuery, setMemoryUpload } from '@moluoxixi/utils/_api'
+import { getMemoryQuery, setMemoryUpload } from '@moluoxixi/utils/_api/cache'
 import './variable.scss'
 
 defineOptions({
   name: 'DraggableTable',
 })
 // 定义组件属性
-const props = withDefaults(defineProps<DraggableTableProps>(), {
+const props = withDefaults(defineProps<propsType>(), {
   //#region 其他原始配置加默认值
   /** 是否显示表格边框 */
   border: true,
@@ -255,13 +253,13 @@ const props = withDefaults(defineProps<DraggableTableProps>(), {
   ],
   //是否有权限统一配置（个性话化列配置）
   isConfiguration: false,
-  dialogProps: {},
+  dialogProps: () => ({ zIndex: 1000 }),
   //#endregion
 })
 // 组件事件
 // 当在表格中最后一个输入元素按下Enter键时触发
 // 当在表格中select下拉为空时触发
-const emit = defineEmits<DraggableTableEmits>()
+const emit = defineEmits<emitsType>()
 // 注册 VxeUI 组件
 // 获取插槽
 // eslint-disable-next-line style/max-statements-per-line
@@ -280,7 +278,8 @@ const tableData = defineModel({
 })
 
 // 表格引用
-const xTable = useTemplateRef<VxeGridInstance>('xTable')
+const xTableRef = useTemplateRef<VxeGridInstance>('xTable')
+const xTable = computed(() => xTableRef.value?.tableRef)
 
 //#region 回车下一个功能
 const tableVirtualRefs = ref<HTMLElement[]>([])
@@ -1334,9 +1333,6 @@ defineExpose({
 </script>
 
 <style scoped lang="scss">
-:deep(*) {
-  @import '@moluoxixi/components/VxeUI/VxeGrid/style.scss';
-}
 .table-box {
   :deep(.vxe-table--filter-template) {
     display: flex !important;
