@@ -8,21 +8,21 @@
   >
     <ElRadio
       v-for="(item) in serverOrLocalOptions"
-      :key="item[props.valueKey]"
+      :key="item[props.value]"
       :style="{
         'margin-right': '16px',
       }"
-      :label="item[props.valueKey]"
+      :label="item[props.value]"
       :disabled="
         computedDisabledHandler({
-          label: item[props.labelKey],
-          value: item[props.valueKey],
+          label: item[props.label],
+          value: item[props.value],
           data: item,
         })
       "
       v-bind="props.radioProps"
     >
-      {{ item[props.labelKey] }}
+      {{ item[props.label] }}
     </ElRadio>
   </ElRadioGroup>
 </template>
@@ -42,8 +42,8 @@ const props = withDefaults(defineProps<propsType>(), {
   layout: 'flex',
   xGap: 16,
   gridColumns: 4,
-  labelKey: 'label',
-  valueKey: 'value',
+  label: 'label',
+  value: 'value',
   disabledValues: () => [],
   disabledLabels: () => [],
   options: () => [],
