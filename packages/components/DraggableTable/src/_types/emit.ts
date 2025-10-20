@@ -3,7 +3,7 @@ import type { VxeTableDefines } from 'vxe-table'
 /**
  * DraggableTable 组件的 Emits 类型定义
  */
-export interface DraggableTableEmits {
+export interface emitsType {
   (e: 'headerContextMenu', params: HTMLElement): void
   (e: 'headerCellMenu', params: VxeTableDefines.HeaderCellMenuParams & { cell?: HTMLElement }): void
   (e: 'checkboxAll', params: VxeTableDefines.CheckboxAllParams): void
@@ -23,7 +23,7 @@ export interface CustomConfigDialogConfirmPayload {
   customColumns: any[]
   isCommon: boolean
 }
-export interface CustomConfigDialogEmits {
+export interface CustomConfigDialogEmitsType {
   (e: 'confirm', payload: CustomConfigDialogConfirmPayload): void
 }
 /** 当没有下一个输入元素时触发的事件参数 */

@@ -5,8 +5,8 @@
       <TsSelect
         v-model="localValue"
         :options="localData"
-        label="name"
-        value="age"
+        label-key="name"
+        value-key="age"
         :option-props="{ size: 'large', disabled: false }"
         @change="onLocalChange"
       />
@@ -26,8 +26,8 @@
           token: '84677795-e391-4a79-a313-4fc89598a73d',
         }"
         response-data-path="rows"
-        label="name"
-        value="id"
+        label-key="name"
+        value-key="id"
         @change="onRemoteChange"
       />
       <div class="value-display">

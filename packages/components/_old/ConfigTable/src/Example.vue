@@ -41,8 +41,6 @@
       </ConfigTable>
     </div>
 
-
-
     <div class="example-section">
       <h3>完整功能示例</h3>
       <ConfigTable
@@ -78,7 +76,6 @@
             {{ row.status ? '启用' : '禁用' }}
           </ElTag>
         </template>
-
       </ConfigTable>
     </div>
   </div>

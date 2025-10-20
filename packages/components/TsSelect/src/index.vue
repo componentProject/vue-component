@@ -15,13 +15,13 @@
   >
     <ElOption
       v-for="(item) in computedOptions"
-      :key="item[props.value]"
-      :label="item[props.label]"
-      :value="item[props.value]"
+      :key="item[props.valueKey]"
+      :label="item[props.labelKey]"
+      :value="item[props.valueKey]"
       :disabled="
         computedDisabledHandler({
-          label: item[props.label],
-          value: item[props.value],
+          label: item[props.labelKey],
+          value: item[props.valueKey],
           data: item,
         })
       "
@@ -42,21 +42,21 @@ import { computed, nextTick, onUnmounted, ref, withDefaults } from 'vue'
 import { ElOption, ElSelect } from 'element-plus'
 import { getType, getTypeDefault } from '@moluoxixi/utils/_utils'
 import { useOptions } from '../../_hooks'
-import type { TsSelectEmits, TsSelectProps } from './_types'
+import type { emitsType, propsType } from './_types'
 
 defineOptions({
   name: 'TsSelect',
 })
 
-const props = withDefaults(defineProps<TsSelectProps>(), {
+const props = withDefaults(defineProps<propsType>(), {
   tagType: 'primary',
   teleported: true,
   clearable: true,
   filterable: true,
   collapseTagsTooltip: true,
   collapseTags: true,
-  label: 'label',
-  value: 'value',
+  labelKey: 'label',
+  valueKey: 'value',
   disabledValues: () => [],
   disabledLabels: () => [],
   options: () => [],
@@ -73,7 +73,7 @@ const props = withDefaults(defineProps<TsSelectProps>(), {
   optionProps: () => ({}),
 })
 
-const emits = defineEmits<TsSelectEmits>()
+const emits = defineEmits<emitsType>()
 const selectId = `select-${Math.random().toString(36).substr(2, 9)}`
 
 const data = defineModel<any>()
@@ -93,8 +93,8 @@ const allFilterFields = computed(() => {
         'pyCode',
         'wbcode',
         'pycode',
-        props.label,
-        props.value,
+        props.labelKey,
+        props.valueKey,
       ].filter(item => item),
     ),
   )

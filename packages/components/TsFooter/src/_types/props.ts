@@ -1,7 +1,7 @@
 /**
- * TsFooter 组件入参类型定义
+ * TsFooter 组件的 Props 类型定义
  */
-export interface tsFooterParamsType {
+export interface propsType {
   /**
    * 展示项：字符串表示纯文本；对象形式可提供 text 与可选的 link
    */
@@ -18,4 +18,9 @@ export interface tsFooterParamsType {
   mb?: number
   /** 字体大小 & 行高 */
   size?: number
+}
+
+export interface NormalizedItem {
+  text: string
+  link?: string
 }

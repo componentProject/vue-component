@@ -8,21 +8,21 @@
   >
     <ElRadio
       v-for="(item) in serverOrLocalOptions"
-      :key="item[props.value]"
+      :key="item[props.valueKey]"
       :style="{
         'margin-right': '16px',
       }"
-      :label="item[props.value]"
+      :label="item[props.valueKey]"
       :disabled="
         computedDisabledHandler({
-          label: item[props.label],
-          value: item[props.value],
+          label: item[props.labelKey],
+          value: item[props.valueKey],
           data: item,
         })
       "
       v-bind="props.radioProps"
     >
-      {{ item[props.label] }}
+      {{ item[props.labelKey] }}
     </ElRadio>
   </ElRadioGroup>
 </template>
@@ -32,18 +32,18 @@ import { computed, withDefaults } from 'vue'
 import { ElRadio, ElRadioGroup } from 'element-plus'
 import { getTypeDefault } from '@moluoxixi/utils/_utils'
 import { useOptions } from '../../_hooks'
-import type { TsRadioEmits, TsRadioProps } from './_types'
+import type { emitsType, propsType } from './_types'
 
 defineOptions({
   name: 'TsRadio',
 })
 
-const props = withDefaults(defineProps<TsRadioProps>(), {
+const props = withDefaults(defineProps<propsType>(), {
   layout: 'flex',
   xGap: 16,
   gridColumns: 4,
-  label: 'label',
-  value: 'value',
+  labelKey: 'label',
+  valueKey: 'value',
   disabledValues: () => [],
   disabledLabels: () => [],
   options: () => [],
@@ -56,7 +56,7 @@ const props = withDefaults(defineProps<TsRadioProps>(), {
   radioProps: () => ({}),
 })
 
-const emits = defineEmits<TsRadioEmits>()
+const emits = defineEmits<emitsType>()
 const computedStyle = computed(() => {
   const baseStyle = {
     'column-gap': `${props.xGap}px`,

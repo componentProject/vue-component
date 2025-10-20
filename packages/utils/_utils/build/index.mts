@@ -292,7 +292,6 @@ function createBaseConfig(ctx: BuildContext, comp: string, internalDeps: string[
         scss: {
           // 使用legacy避免initAsyncCompiler错误
           api: 'legacy',
-          additionalData: `@forward '@moluoxixi/components/_assets/styles/main.scss';`,
         },
       },
     },
