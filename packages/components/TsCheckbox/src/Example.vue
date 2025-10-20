@@ -5,8 +5,8 @@
       <TsCheckbox
         v-model="localValues"
         :options="localData"
-        label-key="name"
-        value-key="age"
+        label="name"
+        value="age"
         @change="onLocalChange"
       />
       <div class="value-display">
