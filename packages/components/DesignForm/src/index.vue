@@ -7,7 +7,7 @@
       <div v-if="!formConfig" class="empty-form">
         <p>请从左侧添加表单项</p>
       </div>
-      <ReForm v-else v-bind="formConfig" draggable @submit="handleFormSubmit" @form-item-click="handleReFormClick" />
+      <ReForm v-else v-bind="formConfig" draggable @submit="handleFormSubmit" @update:items="handleItemsUpdate" @form-item-click="handleReFormClick" />
     </div>
     <div class="design-form-right">
       <DesignFormRules
@@ -71,6 +71,7 @@ function handleAddFormItem(componentKey: string) {
       ...item,
       customClass: index === selectedItemIndex.value ? 'selected-form-item' : '',
     }))
+    console.log('添加表单项顺序', newItemConfig)
     formConfig.value = { ...newItemConfig }
   }
 }
@@ -82,6 +83,15 @@ function handleFormConfigUpdate(newConfig: any) {
       ...formConfig.value,
       ...newConfig,
     }
+  }
+}
+
+// 拖动排序更新表单项
+function handleItemsUpdate(newItems: any[]) {
+  if (formConfig.value) {
+    // 深拷贝确保响应式更新
+    const updatedConfig = { ...formConfig.value, items: deepClone(newItems) }
+    formConfig.value = updatedConfig
   }
 }
 

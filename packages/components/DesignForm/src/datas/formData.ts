@@ -248,7 +248,7 @@ export const formItemConfig = {
       field: 'span',
       component: ElInputNumber,
       tooltip: '在水平布局下, 如果设置表单项宽度，响应式宽度将无效',
-      tips: '1-24之间的整数',
+      tips: '只能输入1-24之间的整数',
       props: {
         clearable: true,
         min: 1,

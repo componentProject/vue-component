@@ -4,6 +4,7 @@
       v-if="formVisible[item.field]"
       class="ap-form-grid-item"
       :style="getItemStyle(item)"
+      :data-field="item.field"
     >
       <template v-if="item.type === 'group'">
         <div class="ap-form-group">

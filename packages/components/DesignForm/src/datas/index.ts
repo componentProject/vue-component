@@ -12,7 +12,6 @@ export const formItemObj = {
     label: '输入框',
     component: ElInput,
     props: {
-      maxlength: 5,
       clearable: true,
       disabled: false,
     },
