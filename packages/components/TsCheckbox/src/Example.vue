@@ -25,8 +25,8 @@
           token: '84677795-e391-4a79-a313-4fc89598a73d',
         }"
         response-data-path="rows"
-        label-key="name"
-        value-key="id"
+        label="name"
+        value="id"
         @change="onRemoteChange"
       />
       <div class="value-display">

@@ -24,8 +24,8 @@ export interface propsType {
   filterMethod?: FilterMethod
   collapseTagsTooltip: boolean
   collapseTags: boolean
-  labelKey: string
-  valueKey: string
+  label: string
+  value: string
   disabledValues: any[]
   disabledLabels: any[]
   disabledHandler?: DisabledHandler

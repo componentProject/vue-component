@@ -8,18 +8,18 @@
   >
     <ElCheckbox
       v-for="(item) in serverOrLocalOptions"
-      :key="item[props.valueKey]"
-      :label="item[props.valueKey]"
+      :key="item[props.value]"
+      :label="item[props.value]"
       :disabled="
         computedDisabledHandler({
-          label: item[props.labelKey],
-          value: item[props.valueKey],
+          label: item[props.label],
+          value: item[props.value],
           data: item,
         })
       "
       v-bind="props.checkboxProps"
     >
-      {{ item[props.labelKey] }}
+      {{ item[props.label] }}
     </ElCheckbox>
   </ElCheckboxGroup>
 </template>
@@ -39,8 +39,8 @@ const props = withDefaults(defineProps<propsType>(), {
   layout: 'flex',
   xGap: 16,
   gridColumns: 4,
-  labelKey: 'label',
-  valueKey: 'value',
+  label: 'label',
+  value: 'value',
   disabledValues: () => [],
   disabledLabels: () => [],
   options: () => [],

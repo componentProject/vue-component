@@ -17,8 +17,8 @@ export interface propsType {
   xGap: number
   layout: string
   gridColumns: number
-  labelKey: string
-  valueKey: string
+  label: string
+  value: string
   disabledValues: any[]
   disabledLabels: any[]
   disabledHandler?: DisabledHandler
