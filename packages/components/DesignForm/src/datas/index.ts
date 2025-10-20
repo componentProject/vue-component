@@ -7,6 +7,7 @@ export const componentMap = {
   elinputnumber: ElInputNumber,
   elselect: ElSelect,
   tsselect: TsSelect,
+  eloption: ElSelect.Option,
 }
 
 export const formItemObj = {
