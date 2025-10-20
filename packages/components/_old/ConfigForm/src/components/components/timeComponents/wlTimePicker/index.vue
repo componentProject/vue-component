@@ -13,10 +13,10 @@ import { isType } from '@moluoxixi/utils/_utils'
 
 const props = withDefaults(
   defineProps<{
-    prop: string
-    slots: Record<string, any>
-    model: FormModelProps
-    config: configType
+    prop?: string
+    slots?: Record<string, any>
+    model?: FormModelProps
+    config?: configType
   }>(),
   {
     prop: '',

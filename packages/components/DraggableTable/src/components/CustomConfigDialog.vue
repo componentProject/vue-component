@@ -70,19 +70,19 @@
 import { computed, ref, useTemplateRef } from 'vue'
 import { ElButton, ElCheckbox, ElInput, ElSwitch } from 'element-plus'
 import { getTypeName } from '@moluoxixi/components/DraggableTable/src/_utils'
-import type { CustomConfigDialogEmits, CustomConfigDialogProps } from '@moluoxixi/components/DraggableTable/src/_types'
+import type { CustomConfigDialogEmitsType, CustomConfigDialogPropsType } from '@moluoxixi/components/DraggableTable/src/_types'
 import { flattenTree } from '@moluoxixi/utils/_utils'
 import { cloneDeep } from 'lodash'
 import type { VxeGridInstance } from 'vxe-table'
 
-const props = withDefaults(defineProps<CustomConfigDialogProps>(), {
+const props = withDefaults(defineProps<CustomConfigDialogPropsType>(), {
   columns: () => [],
   collectColumns: () => [],
   customColumns: () => [],
   isConfiguration: false,
 })
 
-const emit = defineEmits<CustomConfigDialogEmits>()
+const emit = defineEmits<CustomConfigDialogEmitsType>()
 const xTableRef = useTemplateRef<VxeGridInstance>('xTable')
 const xTable = computed(() => xTableRef.value?.tableRef)
 

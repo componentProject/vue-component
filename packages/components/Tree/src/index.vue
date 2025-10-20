@@ -72,7 +72,7 @@ import type { Component as VueComponent } from 'vue'
 import { computed, nextTick, onMounted, onUnmounted, ref, useTemplateRef } from 'vue'
 import type { TreeNode, TreeNodeData } from 'element-plus'
 import { ElIcon, ElTreeV2 } from 'element-plus'
-import type { ButtonsItem, TreeProps } from './types'
+import type { ButtonsItem, propsType } from './_types'
 import { Buttons } from '@moluoxixi/components/_utilComponents'
 import { Delete, Edit, Plus } from '@element-plus/icons-vue'
 
@@ -81,7 +81,7 @@ defineOptions({
   inheritAttrs: false,
 })
 
-const props = withDefaults(defineProps<TreeProps>(), {
+const props = withDefaults(defineProps<propsType>(), {
   childrenField: 'children',
   rowField: 'id',
   parentField: '',

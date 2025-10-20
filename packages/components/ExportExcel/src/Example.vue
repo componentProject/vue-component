@@ -4,11 +4,11 @@
 
     <div class="example-section">
       <h3>基本用法</h3>
-      <el-table :data="tableData" border>
-        <el-table-column prop="name" label="姓名" />
-        <el-table-column prop="age" label="年龄" />
-        <el-table-column prop="address" label="地址" />
-      </el-table>
+      <ElTable :data="tableData" border>
+        <ElTableColumn prop="name" label="姓名" />
+        <ElTableColumn prop="age" label="年龄" />
+        <ElTableColumn prop="address" label="地址" />
+      </ElTable>
 
       <div class="export-actions">
         <ExportExcel :table-data="tableData" :columns="columns" file-name="用户数据" />
@@ -17,11 +17,11 @@
 
     <div class="example-section">
       <h3>自定义按钮</h3>
-      <el-table :data="tableData" border>
-        <el-table-column prop="name" label="姓名" />
-        <el-table-column prop="age" label="年龄" />
-        <el-table-column prop="address" label="地址" />
-      </el-table>
+      <ElTable :data="tableData" border>
+        <ElTableColumn prop="name" label="姓名" />
+        <ElTableColumn prop="age" label="年龄" />
+        <ElTableColumn prop="address" label="地址" />
+      </ElTable>
 
       <div class="export-actions">
         <ExportExcel
@@ -38,19 +38,19 @@
 
     <div class="example-section">
       <h3>嵌套数据</h3>
-      <el-table :data="nestedData" border>
-        <el-table-column prop="name" label="姓名" />
-        <el-table-column label="年龄">
+      <ElTable :data="nestedData" border>
+        <ElTableColumn prop="name" label="姓名" />
+        <ElTableColumn label="年龄">
           <template #default="{ row }">
             {{ row.info.age }}
           </template>
-        </el-table-column>
-        <el-table-column label="地址">
+        </ElTableColumn>
+        <ElTableColumn label="地址">
           <template #default="{ row }">
             {{ row.info.address }}
           </template>
-        </el-table-column>
-      </el-table>
+        </ElTableColumn>
+      </ElTable>
 
       <div class="export-actions">
         <ExportExcel
@@ -65,11 +65,11 @@
 
     <div class="example-section">
       <h3>使用 title/field 键</h3>
-      <el-table :data="tableData" border>
-        <el-table-column prop="name" label="姓名" />
-        <el-table-column prop="age" label="年龄" />
-        <el-table-column prop="address" label="地址" />
-      </el-table>
+      <ElTable :data="tableData" border>
+        <ElTableColumn prop="name" label="姓名" />
+        <ElTableColumn prop="age" label="年龄" />
+        <ElTableColumn prop="address" label="地址" />
+      </ElTable>
 
       <div class="export-actions">
         <ExportExcel
@@ -84,11 +84,11 @@
 
     <div class="example-section">
       <h3>自定义 titles/fields 键名</h3>
-      <el-table :data="tableData" border>
-        <el-table-column prop="name" label="姓名" />
-        <el-table-column prop="age" label="年龄" />
-        <el-table-column prop="address" label="地址" />
-      </el-table>
+      <ElTable :data="tableData" border>
+        <ElTableColumn prop="name" label="姓名" />
+        <ElTableColumn prop="age" label="年龄" />
+        <ElTableColumn prop="address" label="地址" />
+      </ElTable>
 
       <div class="export-actions">
         <ExportExcel
@@ -108,6 +108,7 @@
 <script setup>
 import { ref } from 'vue'
 import ExportExcel from './index.vue'
+import { ElTable, ElTableColumn } from 'element-plus'
 
 // 基本数据
 const tableData = ref([

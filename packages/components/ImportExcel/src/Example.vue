@@ -6,14 +6,14 @@
       <h3>基本用法（数组 columns + 默认 titles/fields）</h3>
       <ImportExcel :columns="columnsArrayBasic" @success="onSuccessBasic" />
 
-      <el-table v-if="basicRows.length" :data="basicRows" border style="margin-top: 16px;">
-        <el-table-column
+      <ElTable v-if="basicRows.length" :data="basicRows" border style="margin-top: 16px;">
+        <ElTableColumn
           v-for="col in viewColumnsArrayBasic"
           :key="col.dataKey"
           :prop="col.dataKey"
           :label="col.headerLabel"
         />
-      </el-table>
+      </ElTable>
     </div>
 
     <div class="example-section">
@@ -24,14 +24,14 @@
         </template>
       </ImportExcel>
 
-      <el-table v-if="titleFieldRows.length" :data="titleFieldRows" border style="margin-top: 16px;">
-        <el-table-column
+      <ElTable v-if="titleFieldRows.length" :data="titleFieldRows" border style="margin-top: 16px;">
+        <ElTableColumn
           v-for="col in viewColumnsArrayTF"
           :key="col.dataKey"
           :prop="col.dataKey"
           :label="col.headerLabel"
         />
-      </el-table>
+      </ElTable>
     </div>
     <div class="example-section">
       <h3>数组写法（混合 label/prop 与 title/field，且自定义优先级）</h3>
@@ -41,14 +41,14 @@
         </template>
       </ImportExcel>
 
-      <el-table v-if="arrayRows.length" :data="arrayRows" border style="margin-top: 16px;">
-        <el-table-column
+      <ElTable v-if="arrayRows.length" :data="arrayRows" border style="margin-top: 16px;">
+        <ElTableColumn
           v-for="col in viewColumnsArray"
           :key="col.dataKey"
           :prop="col.dataKey"
           :label="col.headerLabel"
         />
-      </el-table>
+      </ElTable>
     </div>
   </div>
 </template>
@@ -56,6 +56,7 @@
 <script setup>
 import { computed, ref } from 'vue'
 import ImportExcel from './index.vue'
+import { ElTable, ElTableColumn } from 'element-plus'
 
 const basicRows = ref([])
 const titleFieldRows = ref([])
@@ -74,11 +75,12 @@ const columnsArrayTF = ref([
   { title: '年龄', field: 'age' },
 ])
 function onSuccessBasic(rows) {
-  basicRows.value = rows
+  console.log('rows', rows)
+  basicRows.value = rows.data
 }
 
 function onSuccessTitleField(rows) {
-  titleFieldRows.value = rows
+  titleFieldRows.value = rows.data
 }
 
 // 数组写法，混合 label/prop 与 title/field
@@ -88,7 +90,7 @@ const columnsArray = ref([
   { label: ['住址', '地址'], prop: 'address' },
 ])
 function onSuccessArray(rows) {
-  arrayRows.value = rows
+  arrayRows.value = rows.data
 }
 
 // 动态生成表格列（数组 columns：label/prop）

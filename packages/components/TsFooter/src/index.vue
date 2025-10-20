@@ -16,7 +16,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import type { NormalizedItem, tsFooterParamsType } from './_types'
+import type { NormalizedItem, propsType } from './_types'
 
 defineOptions({ name: 'TsFooter' })
 
@@ -25,7 +25,7 @@ defineOptions({ name: 'TsFooter' })
  * - 支持文本与链接两种元素
  * - 支持左、中、右三种对齐方式
  */
-const props = withDefaults(defineProps<tsFooterParamsType>(), {
+const props = withDefaults(defineProps<propsType>(), {
   items: () => [],
   align: 'center',
   mt: 8,

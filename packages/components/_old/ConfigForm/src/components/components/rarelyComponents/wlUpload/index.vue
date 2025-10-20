@@ -23,7 +23,7 @@ const props = withDefaults(
     prop: string
     slots?: Record<string, any>
     model: FormModelProps
-    config: configType
+    config?: configType
   }>(),
   {
     slots: () => ({}),
