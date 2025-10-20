@@ -199,6 +199,7 @@ export const formItemConfig = {
           { label: '多文本框', value: 'ElTextarea' },
           { label: '数字输入框', value: 'ElInputNumber' },
           { label: '下拉框', value: 'ElSelect' },
+          { label: '增强下拉框', value: 'TsSelect' },
           { label: '多选', value: 'ElCheckboxGroup' },
           { label: '单选', value: 'ElRadioGroup' },
         ],
@@ -274,6 +275,177 @@ export const formItemConfig = {
       props: {
         clearable: true,
         maxheight: 100,
+      },
+    },
+    {
+      label: '数据类型',
+      field: 'dataType',
+      component: ElRadioGroup,
+      childComp: ElRadio,
+      props: {
+        clearable: true,
+        maxheight: 40,
+      },
+      options: [
+        {
+          label: '静态数据',
+          value: false,
+        },
+        {
+          label: '远程数据',
+          value: true,
+        },
+      ],
+      rules: [{ required: true, message: '请选择数据类型' }],
+      visible: {
+        conditions: [
+          {
+            field: 'component',
+            value: 'TsSelect',
+            type: '=',
+          },
+        ],
+      },
+    },
+    // TsSelect 特有配置项
+    {
+      label: '请求地址(增强下拉框)',
+      field: 'requestUrl',
+      defaultValue: '',
+      component: ElInput,
+      props: {
+        clearable: true,
+        placeholder: '请输入API接口地址',
+      },
+      rules: [{ required: true, message: '请输入请求地址' }],
+      visible: {
+        conditions: [
+          {
+            field: 'dataType',
+            value: true,
+            type: '=',
+          },
+        ],
+      },
+    },
+    {
+      label: '请求方法(增强下拉框)',
+      field: 'requestMethod',
+      defaultValue: 'POST',
+      component: ElSelect,
+      rules: [{ required: true, message: '请输入请求地址' }],
+      props: {
+        options: [
+          { label: 'GET', value: 'GET' },
+          { label: 'POST', value: 'POST' },
+          { label: 'PUT', value: 'PUT' },
+          { label: 'DELETE', value: 'DELETE' },
+        ],
+      },
+      visible: {
+        conditions: [
+          {
+            field: 'dataType',
+            value: true,
+            type: '=',
+          },
+        ],
+      },
+    },
+    {
+      label: '请求参数(增强下拉框)',
+      field: 'requestParams',
+      defaultValue: '{}',
+      component: ElInput,
+      props: {
+        type: 'textarea',
+        rows: 3,
+        placeholder: 'JSON格式，如：{"page": 1, "size": 10}',
+      },
+      visible: {
+        conditions: [
+          {
+            field: 'dataType',
+            value: true,
+            type: '=',
+          },
+        ],
+      },
+    },
+    {
+      label: '显示字段名(增强下拉框)',
+      field: 'label',
+      defaultValue: 'label',
+      component: ElInput,
+      props: {
+        clearable: true,
+      },
+      visible: {
+        conditions: [
+          {
+            field: 'dataType',
+            value: true,
+            type: '=',
+          },
+        ],
+      },
+    },
+    {
+      label: '值字段名(增强下拉框)',
+      field: 'value',
+      defaultValue: 'value',
+      component: ElInput,
+      props: {
+        clearable: true,
+      },
+      visible: {
+        conditions: [
+          {
+            field: 'dataType',
+            value: true,
+            type: '=',
+          },
+        ],
+      },
+    },
+    {
+      label: '响应数据路径(增强下拉框)',
+      field: 'responseDataPath',
+      defaultValue: '',
+      component: ElInput,
+      props: {
+        clearable: true,
+        placeholder: '如：data.list',
+      },
+      visible: {
+        conditions: [
+          {
+            field: 'dataType',
+            value: true,
+            type: '=',
+          },
+        ],
+      },
+    },
+    {
+      label: '静态选项数据(增强下拉框)',
+      field: 'options',
+      defaultValue: '[]',
+      component: ElInput,
+      props: {
+        type: 'textarea',
+        rows: 4,
+        placeholder: 'JSON数组格式，如：[{"label": "选项1", "value": "1"}]',
+      },
+      rules: [{ required: true, message: '请输入静态选项数据' }],
+      visible: {
+        conditions: [
+          {
+            field: 'dataType',
+            value: false,
+            type: '=',
+          },
+        ],
       },
     },
     {

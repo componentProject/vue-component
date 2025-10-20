@@ -1,10 +1,12 @@
 import { ElCheckbox, ElCheckboxGroup, ElInput, ElInputNumber, ElRadio, ElRadioGroup, ElSelect } from 'element-plus'
+import TsSelect from '@moluoxixi/components/TsSelect'
 
 export const componentMap = {
   elinput: ElInput,
   eltextarea: ElInput,
   elinputnumber: ElInputNumber,
   elselect: ElSelect,
+  tsselect: TsSelect,
 }
 
 export const formItemObj = {
@@ -30,6 +32,14 @@ export const formItemObj = {
   elselect: {
     label: '下拉框',
     component: ElSelect,
+  },
+  tsselect: {
+    label: '增强下拉框',
+    component: TsSelect,
+    props: {
+      clearable: true,
+      filterable: true,
+    },
   },
   elcheckboxgroup: {
     label: '多选',

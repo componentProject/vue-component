@@ -58,6 +58,19 @@ function handleAddFormItem(componentKey: string) {
     const timestamp = Date.now()
     const random = Math.floor(Math.random() * 1000)
     newItem.field = `${componentKey}_${timestamp}_${random}`
+
+    // 对TsSelect组件进行特殊处理
+    if (componentKey === 'tsselect') {
+      // 初始化JSON格式的属性
+      newItem.options = []
+      newItem.requestParams = {}
+      newItem.requestMethod = 'POST'
+      newItem.label = 'label'
+      newItem.value = 'value'
+      newItem.requestUrl = ''
+      newItem.responseDataPath = ''
+    }
+
     const newItemConfig = {
       ...formConfig.value,
       items: [...formConfig.value.items, newItem],
@@ -71,7 +84,7 @@ function handleAddFormItem(componentKey: string) {
       ...item,
       customClass: index === selectedItemIndex.value ? 'selected-form-item' : '',
     }))
-    console.log('添加表单项顺序', newItemConfig)
+    console.log('00000000000000', newItemConfig)
     formConfig.value = { ...newItemConfig }
   }
 }
@@ -123,6 +136,7 @@ function handleSelectedItemUpdate(updatedItem: any) {
     const itemObj: any = deepClone(originalItem || {})
 
     Object.keys(updatedItem).forEach((key) => {
+      //文本输入框的时候需要添加type属性
       if (key === 'component') {
         const componentType = updatedItem[key].toLowerCase()
         itemObj[key] = componentMap[componentType]
@@ -130,6 +144,18 @@ function handleSelectedItemUpdate(updatedItem: any) {
           itemObj.props = {
             type: 'textarea',
           }
+        }
+        if (componentType !== 'tsselect') {
+          delete updatedItem?.dataType
+          delete updatedItem?.requestUrl
+          delete updatedItem?.requestParams
+          delete updatedItem?.requestMethod
+          delete updatedItem?.responseDataPath
+          delete updatedItem?.options
+        }
+        if (componentType !== 'ElInputNumber') {
+          delete updatedItem?.min
+          delete updatedItem?.max
         }
       }
       else if (key === 'required' || key === 'trigger' || key === 'message' || key === 'validator') {
@@ -207,6 +233,11 @@ function handleSelectedItemUpdate(updatedItem: any) {
           }
         }
       }
+      else if (key === 'options' && updatedItem[key]) {
+        console.log('888888888888', updatedItem[key])
+        // 处理options属性，确保是数组格式
+        //itemObj[key] = JSON.parse(updatedItem[key] || '[]')
+      }
       else if (key === 'maxlength' || key === 'min' || key === 'max' || key === 'disabled' || key === 'clearable') {
         // 组装props属性对象
         if (!itemObj.props) {
@@ -232,7 +263,7 @@ function handleSelectedItemUpdate(updatedItem: any) {
       ...formConfig.value,
       items: newItems,
     })
-    console.log('更新后的表单项rules:', itemObj.rules || [])
+    console.log('更新后的表单项', itemObj)
 
     selectedItem.value = itemObj
   }

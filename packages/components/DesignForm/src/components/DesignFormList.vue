@@ -28,6 +28,7 @@ const sourceObj = ref([
   { value: 'eltextarea', label: '多行输入框' },
   { value: 'elinputnumber', label: '数字输入框' },
   { value: 'elselect', label: '下拉框' },
+  { value: 'tsselect', label: '增强下拉框' },
   { value: 'elcheckboxgroup', label: '多选' },
   { value: 'elradiogroup', label: '单选' },
   // 可以根据需要添加更多组件类型
