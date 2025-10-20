@@ -1,6 +1,7 @@
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { runBuildCliAndExit } from '../_utils/build/index.mts'
+import { UTIL_SETTING_TYPE } from '@moluoxixi/constant'
 
 // === 组件库命名空间配置 ===
 const LIB_NAMESPACE = 'moluoxixi'
@@ -10,7 +11,7 @@ const LIB_NAMESPACE = 'moluoxixi'
 const aliasComponentPath = '@moluoxixi/utils'
 
 /**
- * 必须要排除依赖的工具包(部分node包需要依赖本地运行，不排除依赖会出错）
+ * node环境下运行的必须要排除依赖，不可打包成单文件
  */
 const requireExternalPacks = ['ViteConfig', 'EslintConfig']
 
@@ -22,11 +23,7 @@ const rootDir = resolve(__dirname, '../../../')
  */
 const packDir = resolve(__dirname, '../')
 
-/** 示例用的 uploadType */
-const EXAMPLE_UPLOAD_TYPE = 'UtilityClass'
-
 // 使用通用打印
-
 runBuildCliAndExit(
   {
     libNamespace: LIB_NAMESPACE,
@@ -34,6 +31,8 @@ runBuildCliAndExit(
     rootDir,
     packDir,
     requireExternalPacks,
+    presetGlobals: {
+    },
   },
-  { command: 'build-publish' },
+  { command: 'build-publish', uploadType: UTIL_SETTING_TYPE },
 )

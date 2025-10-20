@@ -4,8 +4,6 @@ import type { objType } from '@moluoxixi/components/_types'
 import { ElInput } from 'element-plus'
 import { computed, defineComponent, ref, watch } from 'vue'
 import { detectDateFormatByReplace, getMomentIsValidIsNoNum } from '@moluoxixi/utils/_utils'
-import DateRangePicker from '@moluoxixi/components/DateRangePicker'
-import Select from '@moluoxixi/components/TsSelect'
 
 export default defineComponent({
   name: 'EditRenderer',
@@ -73,7 +71,7 @@ export default defineComponent({
     const SelectRender = computed(() => {
       return (
         propsOptions.value && (
-          <Select
+          <TsSelect
             class="w-full!"
             size="small"
             options={propsOptions.value}

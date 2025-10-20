@@ -1,5 +1,6 @@
 import { getHttpService } from '../../utils/AjaxPackage/netseriver.js'
 import FormData from 'form-data'
+import { COMPONENT_SETTING_TYPE } from '@moluoxixi/constant'
 
 const httpApi: any = getHttpService({
   baseURL: 'http://192.168.209.103:10019/ts-fm',
@@ -37,8 +38,13 @@ export function setWebUpload(data: any) {
   })
 }
 //获取组件列表
-export function getList(data: any) {
-  return httpApi.post('/file/getList', data)
+export async function getList(data: any) {
+  const res = await httpApi.post('file/getList', {
+    productCode: 'webFile_his',
+    vue: [COMPONENT_SETTING_TYPE],
+    ...data,
+  })
+  return res[COMPONENT_SETTING_TYPE]
 }
 
 //获取组件实例
@@ -47,6 +53,13 @@ export function getDownLoadByIds(data: any) {
 }
 
 //删除组件库组件
-export function setDeleteByPathAndCode(data: any) {
-  return httpApi.post('/file/deleteByPathAndCode', data)
+export function setDeleteByPathAndCode(componentCode: string, code: string = 'webfile') {
+  return httpApi.post('/file/deleteByPathAndCode', {
+    code,
+    paraMeters: {
+      productCode: 'webFile_his',
+      Vue: COMPONENT_SETTING_TYPE,
+      componentCode,
+    },
+  })
 }

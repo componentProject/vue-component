@@ -67,6 +67,7 @@
       :filterable="filterable"
       :sortable="sortable"
       show-pagination
+      @page-change="pageChangeHandler"
     >
       <!-- 自定义操作列插槽 -->
       <template #aaa>
@@ -82,7 +83,6 @@
 import { ElButton, ElMessage } from 'element-plus'
 import { onMounted, ref, useTemplateRef } from 'vue'
 import DraggableTable from './index.vue'
-import TsButton from '@moluoxixi/components/TsButton'
 // 表格加载状态
 const loading = ref(false)
 // 拖拽开关状态
@@ -268,7 +268,9 @@ const cellTypeList = ref([
     },
   },
 ])
-
+function pageChangeHandler(params) {
+  console.log('params', params)
+}
 function changeCellType(type: string) {
   const item = columns.value.at(-2)
   columns.value[columns.value.length - 2] = {

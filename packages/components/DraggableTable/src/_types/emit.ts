@@ -1,14 +1,9 @@
 import type { VxeTableDefines } from 'vxe-table'
-import type { NoNextInputParams, NoSelectValueParams } from './index'
 
 /**
  * DraggableTable 组件的 Emits 类型定义
  */
 export interface DraggableTableEmits {
-  (e: 'currentChange', params: number): void
-  (e: 'update:pagination', params: number): void
-  (e: 'sizeChange', params: number): void
-  (e: 'pageChange', params: number): void
   (e: 'headerContextMenu', params: HTMLElement): void
   (e: 'headerCellMenu', params: VxeTableDefines.HeaderCellMenuParams & { cell?: HTMLElement }): void
   (e: 'checkboxAll', params: VxeTableDefines.CheckboxAllParams): void
@@ -22,4 +17,31 @@ export interface DraggableTableEmits {
   // 当在表格中select下拉为空时触发
   (e: 'noSelectValue', params: NoSelectValueParams): void
   (e: 'toggleTreeExpand', params: VxeTableDefines.ToggleRowExpandEventParams): void
+}
+// Emits for CustomConfigDialog component
+export interface CustomConfigDialogConfirmPayload {
+  customColumns: any[]
+  isCommon: boolean
+}
+export interface CustomConfigDialogEmits {
+  (e: 'confirm', payload: CustomConfigDialogConfirmPayload): void
+}
+/** 当没有下一个输入元素时触发的事件参数 */
+export interface NoNextInputParams {
+  /** 当前行数据 */
+  row: any
+  /** 行索引 */
+  rowIndex: number
+  /** 列索引 */
+  colIndex: number
+}
+
+/** 当select下拉为空时触发的事件参数 */
+export interface NoSelectValueParams {
+  /** 当前行数据 */
+  row: any
+  /** 行索引 */
+  rowIndex: number
+  /** 列索引 */
+  colIndex: number
 }

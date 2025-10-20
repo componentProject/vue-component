@@ -37,7 +37,6 @@ import { computed, nextTick, onUnmounted, ref, useTemplateRef, watch } from 'vue
 import type { VxeTableDefines, VxeTablePropTypes } from 'vxe-table'
 import type { ColumnType } from '@moluoxixi/components/DraggableTable'
 import { ElPopover } from 'element-plus'
-import DraggableTable from '@moluoxixi/components/DraggableTable'
 import type { slotsType } from '@moluoxixi/components/_types'
 
 defineOptions({

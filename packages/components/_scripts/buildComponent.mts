@@ -32,6 +32,8 @@ runBuildCliAndExit(
     alias,
     rootDir,
     packDir,
+    presetGlobals: {
+    },
   },
   { uploadType: COMPONENT_SETTING_TYPE, command: 'build-publish' },
 )

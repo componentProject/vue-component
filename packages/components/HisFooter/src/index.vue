@@ -3,7 +3,6 @@
 </template>
 
 <script setup lang="ts">
-import TsFooter from '@moluoxixi/components/TsFooter'
 import { getQueryMedicaIInsuranceInfoApi } from '@moluoxixi/utils/_api'
 import { onMounted, ref } from 'vue'
 

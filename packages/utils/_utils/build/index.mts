@@ -15,7 +15,6 @@ import type { ICruiseOptions, ICruiseResult } from 'dependency-cruiser'
 import { cruise } from 'dependency-cruiser'
 import AutoImport from 'unplugin-auto-import/vite'
 import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
-import Components from 'unplugin-vue-components/vite'
 import viteImagemin from 'vite-plugin-imagemin'
 import { obfuscator } from 'rollup-obfuscator'
 import transformAliasPlugin from './plugins/transformAliasPlugin/index.mts'
@@ -112,7 +111,7 @@ export async function runBuildCli(params: RunBuildCliParams, cli?: RunBuildCliOp
   const command = (firstArg === 'build' || firstArg === 'build-publish')
     ? firstArg
     : (cli?.command || 'build-publish')
-  const mode = getFlagValue(args, 'mode', 'all')
+  const mode = getFlagValue(args, 'mode', 'allComponent')
   // const excludeHeavyPlugins = parseBoolean(getFlagValue(args, 'excludeHeavyPlugins', 'false'), false)
   const excludeHeavyPlugins = parseBoolean(getFlagValue(args, 'excludeHeavyPlugins', 'true'), false)
   const uploadType = getFlagValue(args, 'uploadType', cli?.uploadType)
@@ -251,25 +250,6 @@ function createBaseConfig(ctx: BuildContext, comp: string, internalDeps: string[
         resolvers: [ElementPlusResolver()],
         dts: resolve(ctx.packDir, './_typings/auto-imports.d.ts'),
       } as any),
-      // 与自定义element组件冲突
-      Components({
-        resolvers: [
-          ElementPlusResolver({
-            exclude: new RegExp(
-              ([]).map(item => `^${item}$`).join('|'),
-            ),
-          }),
-        ],
-        globs: [
-          `.${ctx.entryBaseUrl}**/index.vue`,
-          `.${ctx.entryBaseUrl}**/index.ts`,
-          `!.${ctx.entryBaseUrl}**/base/**/*`,
-          `!.${ctx.entryBaseUrl}**/components/**/*`,
-          `!.${ctx.entryBaseUrl}**/src/**/*`,
-          `!.${ctx.entryBaseUrl}**/_*/**/*`,
-        ],
-        dts: resolve(ctx.packDir, './_typings/components.d.ts'),
-      }),
       // 按需启用图片压缩（重型插件）
       ...(!ctx.excludeHeavyPlugins
         ? [
@@ -312,13 +292,7 @@ function createBaseConfig(ctx: BuildContext, comp: string, internalDeps: string[
         scss: {
           // 使用legacy避免initAsyncCompiler错误
           api: 'legacy',
-          additionalData(content: string, filename: string) {
-            if (filename.includes('element')) {
-              const addStr = `$namespace: el;`
-              return `${addStr}\n${content}`
-            }
-            return content
-          },
+          additionalData: `@forward '@moluoxixi/components/_assets/styles/main.scss';`,
         },
       },
     },
@@ -861,11 +835,13 @@ async function bundleComponentModule(ctx: BuildContext, {
     build: {
       outDir,
       emptyOutDir: true,
+      // 是否压缩
+      // minify: false,
       minify: 'esbuild',
       cssCodeSplit: false, // 关闭CSS代码分割，避免文件拆分
       lib: {
         entry,
-        name: `/${comp || ''}`,
+        name: `${comp || ''}`,
         formats: [format],
       },
       rollupOptions: {
@@ -889,13 +865,17 @@ async function bundleComponentModule(ctx: BuildContext, {
               return !(componentMatch && componentMatch[1] === currentComponent.toLowerCase())
             }
           }
-          // 检查Vue相关依赖
-          const isVueDep = ['vue', '@vue/runtime-core', '@vue/runtime-dom'].includes(id)
-          // Node.js核心模块，标记为外部依赖
-          const isNodeBuiltin = id.startsWith('node:')
-            || ['path', 'module', 'fs', 'os', 'events', 'stream', 'buffer', 'crypto', 'zlib', 'http', 'https', 'url', 'querystring', 'child_process'].includes(id)
+          // 全部交给presetGlobals
+          // // 检查Vue相关依赖
+          // const isVueDep = ['@vue/runtime-core', '@vue/runtime-dom'].includes(id)
+          // // Node.js核心模块，标记为外部依赖
+          // const isNodeBuiltin = id.startsWith('node:')
+          //   || ['path', 'module', 'fs', 'os', 'events', 'stream', 'buffer', 'crypto', 'zlib', 'http', 'https', 'url', 'querystring', 'child_process'].includes(id)
 
-          if (isVueDep || isNodeBuiltin || ctx.peerDepList.includes(id)) {
+          // if (isVueDep || isNodeBuiltin || ctx.peerDepList.includes(id)) {
+          //   return true
+          // }
+          if (ctx.peerDepList.includes(id)) {
             return true
           }
           const isExternal = ctx.useExternal || ctx.requireExternalPacks.includes(comp)
@@ -1025,10 +1005,12 @@ async function buildComponent(
   const esOutputDir = resolve(outputDir, 'es')
   const libOutputDir = resolve(outputDir, 'lib')
   const umdOutputDir = resolve(outputDir, 'umd')
+  // const iifeOutputDir = resolve(outputDir, 'iife')
   try {
     await clearDir(esOutputDir)
     await clearDir(libOutputDir)
     await clearDir(umdOutputDir)
+    // await clearDir(iifeOutputDir)
     // 使用传入的依赖分析结果
     const deps = dependencies
 
@@ -1037,7 +1019,8 @@ async function buildComponent(
     for (const compName of deps.internal) {
       // 当打包的是组件时，排除当前组件的自引用
       if (compName !== comp) {
-        globals[`${ctx.aliasComponentPath}/${compName}`] = `@${ctx.LIB_NAMESPACE}/${compName.toLowerCase()}`
+        // globals[`${ctx.aliasComponentPath}/${compName}`] = `@${ctx.LIB_NAMESPACE}/${compName.toLowerCase()}`
+        globals[`@${ctx.LIB_NAMESPACE}/${compName.toLowerCase()}`] = compName
       }
     }
 
@@ -1045,8 +1028,23 @@ async function buildComponent(
     // 创建基础配置
     const baseConfig = createBaseConfig(ctx, comp, deps.internal)
 
+    const callbacks = []
+    // // 打包iife模块
+    // callbacks.push(bundleComponentModule(ctx, {
+    //   comp,
+    //   entry,
+    //   outDir: iifeOutputDir,
+    //   format: 'iife',
+    //   dependencies,
+    //   globals,
+    //   baseConfig,
+    //   entryFileNames: `[name].js`,
+    //   chunkFileNames: `[name].js`,
+    //   skipManualChunks: true,
+    // }))
+
     // 打包UMD模块
-    await bundleComponentModule(ctx, {
+    callbacks.push(bundleComponentModule(ctx, {
       comp,
       entry,
       outDir: umdOutputDir,
@@ -1057,10 +1055,10 @@ async function buildComponent(
       entryFileNames: `[name].js`,
       chunkFileNames: `[name].js`,
       skipManualChunks: true,
-    })
+    }))
 
     // 打包ES模块
-    await bundleComponentModule(ctx, {
+    callbacks.push(bundleComponentModule(ctx, {
       comp,
       entry,
       outDir: esOutputDir,
@@ -1070,10 +1068,10 @@ async function buildComponent(
       baseConfig,
       entryFileNames: `[name].mjs`,
       chunkFileNames: `[name].mjs`,
-    })
+    }))
 
     // 打包CJS模块
-    await bundleComponentModule(ctx, {
+    callbacks.push(bundleComponentModule(ctx, {
       comp,
       entry,
       outDir: libOutputDir,
@@ -1084,7 +1082,9 @@ async function buildComponent(
       entryFileNames: `[name].cjs`,
       chunkFileNames: `[name].cjs`,
       exportsType: 'named',
-    })
+    }))
+
+    await Promise.all(callbacks)
 
     // 复制README.md
     const componentName = `\\${comp}`
@@ -1163,12 +1163,11 @@ async function buildComponent(
 
     // 写入package.json
     await fsp.writeFile(resolve(outputDir, 'package.json'), JSON.stringify(pkgJson, null, 2), 'utf-8')
-    const fileUrl = resolve(`${outputDir}/es/index.mjs`)
     console.log(`==========  ${buildName} 打包完成 ==========`)
     // 如果需要发布，执行发布
     if (shouldPublish) {
       if (ctx.uploadType) {
-        const res = await UploadEvent(fileUrl, buildName, ctx.uploadType)
+        const res = await UploadEvent(outputDir, buildName, ctx.uploadType)
         console.log('res', res)
       }
       else {
@@ -1340,7 +1339,7 @@ export async function buildComponentsWithOptions(options: BuildOptions): Promise
     useExternal = false,
     requireExternalPacks: reqExternal = [],
     entryBaseUrl: ebu = '/',
-    presetGlobals: presetGlobalsArg,
+    presetGlobals: _presetGlobals,
     uploadType,
   } = options || ({} as BuildOptions)
 
@@ -1353,19 +1352,12 @@ export async function buildComponentsWithOptions(options: BuildOptions): Promise
   if (!packDir)
     throw new Error('缺少必填参数：packDir')
 
-  const presetGlobals = useExternal
-    ? {
-        'vxe-table': 'VXETable',
-        'element-plus': 'ElementPlus',
-        'vite': 'Vite',
-        'vue': 'Vue',
-        ...presetGlobalsArg,
-      }
-    : {
-        vue: 'Vue',
-        vite: 'Vite',
-        ...presetGlobalsArg,
-      }
+  const presetGlobals = {
+    'vue': 'Vue',
+    'vite': 'Vite',
+    '@vue/shared': 'vueShared',
+    ..._presetGlobals,
+  }
   const peerDepList = Object.keys(presetGlobals)
   // 生成上下文
   const ctx: BuildContext = {

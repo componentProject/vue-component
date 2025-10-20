@@ -6,7 +6,7 @@
     <!-- <el-button type="primary" @click="handleClick">
       删除组件库组件
     </el-button> -->
-    <div class="main">
+    <div v-if="localComponent" class="main">
       <div class="list-title">
         开发调试组件
       </div>
@@ -15,7 +15,7 @@
         v-bind="componentProps"
       />
     </div>
-    <!-- <div class="main">
+    <div v-if="dynamicComponent" class="main">
       <div class="list-title">
         引用组件库解析的组件
       </div>
@@ -23,23 +23,26 @@
         :is="dynamicComponent"
         v-bind="secondComponentProps"
       />
-    </div> -->
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import * as vue from 'vue'
 import { computed, onMounted, ref } from 'vue'
-import { load } from '../../../utils.ts'
+import { load } from '@moluoxixi/utils/_utils/loadComponent'
 // 虚拟模块由 Vite 插件在运行时提供
 import { setDeleteByPathAndCode } from '@moluoxixi/utils/_api'
 import componentData from './data.ts'
+import { COMPONENT_SETTING_TYPE } from '@moluoxixi/constant'
 
 defineOptions({ name: '调试与演示' })
 // 使用ref替代data属性
 // 调试与演示组件库的组件，直接修改组件名
 // const componentName = ref('ReForm')
-const componentName = ref('DesignForm')
+// const componentName = ref('DraggableTable')
+// const componentName = ref('HisFooter')
+const componentName = ref('TsFooter')
 // 调试组件
 const localComponent = ref<any>(null)
 // 用于存储动态组件
@@ -137,9 +140,9 @@ async function loadLocalComponent(componentName: string) {
  */
 async function loadComponents(components: string[]) {
   try {
-    const loadedComponents = await load(vue, components, true)
+    const loadedComponents = await load(vue, components, COMPONENT_SETTING_TYPE, 'es', true)
     dynamicComponent.value = loadedComponents[componentName.value]
-    console.log('动态组件加载成功:', dynamicComponent)
+    console.log('动态组件加载成功:', dynamicComponent, componentName.value, loadedComponents[componentName.value])
   }
   catch (error) {
     console.error('加载动态组件失败:', error)
@@ -147,21 +150,12 @@ async function loadComponents(components: string[]) {
 }
 
 async function handleClick() {
-  const params = {
-    code: 'webfile',
-    paraMeters: {
-      productCode: 'webFile_his',
-      Vue: 'Vue3',
-      componentCode: '',
-    },
-  }
-  //ConfigTable、
-  await setDeleteByPathAndCode(params)
+  await setDeleteByPathAndCode('ConfigTable')
 }
 
 onMounted(async () => {
   await loadLocalComponent(componentName.value)
-  return
+  // return
   await loadComponents([componentName.value])
 })
 </script>
@@ -176,7 +170,7 @@ onMounted(async () => {
 
 .main {
   margin: 20px;
-  height: 600px;
+  height: 200px;
   text-align: center;
 }
 

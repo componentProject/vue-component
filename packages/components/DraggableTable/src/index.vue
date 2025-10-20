@@ -2,8 +2,6 @@
   <div ref="container" class="h-full w-full flex-1 overflow-hidden outline-0 table-box containerMain">
     <VxeGrid
       ref="xTable"
-      :header-cell-config="{ height: '30px' }"
-      :cell-config="{ height: '30px' }"
       v-bind="gridProps"
       @checkbox-all="handleCheckboxAll"
       @checkbox-change="handleCheckboxChange"
@@ -61,8 +59,7 @@ import type {
   VxeTableDefines,
   VxeTablePropTypes,
 } from 'vxe-table'
-import { VxeGrid } from 'vxe-table'
-import { computed, nextTick, onBeforeMount, onBeforeUnmount, onMounted, ref, useAttrs, useTemplateRef, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, useAttrs, useTemplateRef, watch } from 'vue'
 import type { ColumnType, DraggableTableEmits, DraggableTableProps } from './_types'
 import { ElMessage } from 'element-plus'
 import { cloneDeep, groupBy } from 'lodash'
@@ -85,9 +82,8 @@ import { getCustomType, handleGetRequiredFields } from './_utils'
 // 导入自定义渲染器
 import './renderers'
 import type { slotsType } from '@moluoxixi/components/_types'
-import EnterNextContainer from '@moluoxixi/components/EnterNextContainer'
 import CustomConfigDialog from './components/CustomConfigDialog.vue'
-import { getMemoryQuery, setMemoryUpload } from '@moluoxixi/utils/_api'
+import { getMemoryQuery, setMemoryUpload } from '@moluoxixi/utils/_api/cache'
 import './variable.scss'
 
 defineOptions({
@@ -233,7 +229,7 @@ const props = withDefaults(defineProps<DraggableTableProps>(), {
         },
         {
           label: '默认',
-          value: 'default',
+          value: '',
         },
       ],
     }, slots: { default: 'select' } },
@@ -257,7 +253,7 @@ const props = withDefaults(defineProps<DraggableTableProps>(), {
   ],
   //是否有权限统一配置（个性话化列配置）
   isConfiguration: false,
-  dialogProps: {},
+  dialogProps: () => ({ zIndex: 1000 }),
   //#endregion
 })
 // 组件事件
@@ -282,7 +278,8 @@ const tableData = defineModel({
 })
 
 // 表格引用
-const xTable = useTemplateRef<VxeGridInstance>('xTable')
+const xTableRef = useTemplateRef<VxeGridInstance>('xTable')
+const xTable = computed(() => xTableRef.value?.tableRef)
 
 //#region 回车下一个功能
 const tableVirtualRefs = ref<HTMLElement[]>([])
@@ -685,6 +682,8 @@ const computedColumns = computed<ColumnType[]>(() => {
 // 计算表格配置属性
 const gridProps = computed<VxeGridProps>(() => {
   return {
+    headerCellConfig: { height: 30 },
+    cellConfig: { height: 30 },
     // 基本配置
     id: props.id,
     border: props.border,
@@ -1051,8 +1050,7 @@ function handleColumnResizableChange(params: VxeTableDefines.ResizableChangePara
   dispatchEvents(document, ['mousedown', 'mouseup', 'click'])
   emit('resizableChange', params)
 }
-/** 监听props.columns的变化 */
-onBeforeMount(async () => {
+async function loadColumns() {
   const newColumns = cloneDeep(props.columns)
   if (isNoSave.value) {
     localColumns.value = newColumns
@@ -1079,6 +1077,11 @@ onBeforeMount(async () => {
   // - 两边都存在时：以 props 为底，stored 覆盖；children 递归处理
   // - 同级末尾追加 props 中新增但存储里没有的项
   localColumns.value = mergeColumnsLevel(storedColumns, newColumns)
+}
+/** 监听props.columns的变化 */
+watch(() => props.columns, loadColumns, {
+  deep: true,
+  immediate: true,
 })
 //#endregion
 
@@ -1325,13 +1328,11 @@ watch(
 defineExpose({
   // 暴露表格实例
   getTable: () => xTable.value,
+  loadColumns,
 })
 </script>
 
 <style scoped lang="scss">
-:deep(*) {
-  @import '@moluoxixi/components/VxeUI/VxeGrid/style.scss';
-}
 .table-box {
   :deep(.vxe-table--filter-template) {
     display: flex !important;
