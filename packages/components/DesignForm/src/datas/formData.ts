@@ -199,7 +199,7 @@ export const formItemConfig = {
           { label: '多文本框', value: 'ElTextarea' },
           { label: '数字输入框', value: 'ElInputNumber' },
           { label: '下拉框', value: 'TsSelect' },
-          { label: '多选', value: 'ElCheckboxGroup' },
+          { label: '多选', value: 'TsCheckbox' },
           { label: '单选', value: 'ElRadioGroup' },
         ],
       },
@@ -297,10 +297,16 @@ export const formItemConfig = {
       ],
       rules: [{ required: true, message: '请选择数据类型' }],
       visible: {
+        type: '|',
         conditions: [
           {
             field: 'component',
             value: 'TsSelect',
+            type: '=',
+          },
+          {
+            field: 'component',
+            value: 'TsCheckbox',
             type: '=',
           },
         ],
