@@ -1,5 +1,4 @@
 <template>
-  {{ $attrs }}
   <ElSelect
     :id="selectId"
     v-model="data"
