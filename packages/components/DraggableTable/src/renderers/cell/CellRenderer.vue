@@ -34,10 +34,9 @@
       v-bind="renderOptsProps"
       v-model="currRow[currColumn.field]"
     />
-    <template v-else-if="renderOptsPropsType === 'tag' && TagRender">
+    <template v-else-if="renderOptsPropsType === 'tag' && TagRender && propsOptions">
       <ElTag
         v-for="item in propsOptions"
-        v-if="propsOptions"
         :key="item.value"
         class="mr-8!"
         v-bind="item"
