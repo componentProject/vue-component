@@ -31,11 +31,6 @@
 - 充分理解用户需求，站在用户角度思考。
 - 作为产品经理，分析需求是否存在缺漏，与用户讨论并完善需求。
 - 选择最简单的解决方案来满足用户需求。
-#### 组件查询与资料获取规范
-- 当用户询问组件时，优先阅读公司组件库文档 `http://192.168.209.103:9099/vueComponents/index.html`。
-- 如内网文档在当前环境不可访问，应立即告知用户
-- 阅读完成后，无须输出文档；直接围绕用户问题作答。仅在用户明确要求详细清单/示例时再提供。
-- 实现优先级：公司组件库 > vxe-table > element-plus > 其他组件库；如需跨库补足，且项目文档存在，则在文档中标注来源。
 
 ### 编写代码时：
 
@@ -74,10 +69,8 @@
 
 #### vue开发规范：
 - 使用Vue 3的Composition API进行开发，合理使用setup语法糖。
-- 所有props类型必须在`_types/props.ts`中定义
-- 使用`withDefaults`为所有props提供默认值
-- 所有emit事件类型必须在`_types/emit.ts`中定义
-- 必须使用`defineEmits`定义所有emit事件
+- 所有props类型必须在`_types/props.ts`中定义,并使用`withDefaults`为所有props提供默认值
+- 所有emit事件类型必须在`_types/emit.ts`中定义,并使用`defineEmits`定义所有emit事件
 - 遵循Vue.js的最佳实践和设计模式，如单文件组件(SFC)。
 - 利用Vue Router进行路由管理，实现页面导航和路由守卫。
 - 使用Pinia进行状态管理，合理组织store结构。
