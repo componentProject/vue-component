@@ -540,4 +540,5 @@ watch(
 
 <style lang="scss" scoped>
 @forward 'element-plus/theme-chalk/el-date-picker.css';
+@forward '@moluoxixi/components/_assets/styles/tailwind.scss';
 </style>

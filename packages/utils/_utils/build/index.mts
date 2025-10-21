@@ -2,8 +2,8 @@ import { dirname, resolve } from 'node:path'
 import fs from 'node:fs'
 import fsp from 'node:fs/promises'
 import glob from 'fast-glob'
-import type { InlineConfig } from 'vite'
-import { build } from 'vite'
+import type { ConfigEnv, InlineConfig, UserConfig } from 'vite'
+import { build, mergeConfig } from 'vite'
 
 import pluginVue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
@@ -22,6 +22,7 @@ import cssInjectedByJsPlugin from './plugins/cssInjectedByJsPlugin/index.mts'
 // import { lazyImport, VxeResolver } from 'vite-plugin-lazy-import'
 import { UploadEvent } from './utils/UploadComponent.ts'
 
+export type ViteConfigType = UserConfig | ((mode: ConfigEnv) => UserConfig)
 //#region CLI 辅助函数
 /**
  * 将字符串形式的布尔开关解析为布尔值。
@@ -180,6 +181,7 @@ export interface BuildContext {
   aliasPacks: string[]
   /** 上传类型（用于 UploadEvent），默认 'Vue3' */
   uploadType?: string
+  viteConfig?: ViteConfigType
 }
 
 export type ModuleFormat = 'es' | 'cjs' | 'umd'
@@ -218,7 +220,7 @@ function sleep(ms: number): Promise<void> {
  * @returns 基础配置对象
  */
 function createBaseConfig(ctx: BuildContext, comp: string, internalDeps: string[]): InlineConfig {
-  return {
+  return mergeConfig({
     root: ctx.packDir,
     configFile: false,
     publicDir: false,
@@ -295,7 +297,7 @@ function createBaseConfig(ctx: BuildContext, comp: string, internalDeps: string[
         },
       },
     },
-  }
+  }, ctx?.viteConfig || {})
 }
 
 /** 获取组件列表（只分目录的组件） */
@@ -829,8 +831,7 @@ async function bundleComponentModule(ctx: BuildContext, {
   skipManualChunks,
 }: BundleComponentModuleOptions) {
   const currentComponent = comp
-  await build({
-    ...baseConfig,
+  await build(mergeConfig(baseConfig, {
     build: {
       outDir,
       emptyOutDir: true,
@@ -910,7 +911,7 @@ async function bundleComponentModule(ctx: BuildContext, {
         },
       },
     },
-  })
+  }))
 }
 
 /**

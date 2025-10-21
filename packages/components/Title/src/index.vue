@@ -38,6 +38,7 @@ const props = defineProps({
 </script>
 
 <style lang="scss" scoped>
+@forward '@moluoxixi/components/_assets/styles/tailwind.scss';
 .custom-title {
   :deep(.el-divider--horizontal) {
     margin: 12px 0;

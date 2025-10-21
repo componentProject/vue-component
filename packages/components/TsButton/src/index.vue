@@ -107,5 +107,6 @@ const onClick = (() => {
 })()
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+@forward '@moluoxixi/components/_assets/styles/tailwind.scss';
 </style>

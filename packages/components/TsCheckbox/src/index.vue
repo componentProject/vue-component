@@ -8,18 +8,18 @@
   >
     <ElCheckbox
       v-for="(item) in serverOrLocalOptions"
-      :key="item[props.value]"
-      :label="item[props.value]"
+      :key="item[computedValue]"
+      :label="item[computedValue]"
       :disabled="
         computedDisabledHandler({
-          label: item[props.label],
-          value: item[props.value],
+          label: item[computedLabel],
+          value: item[computedValue],
           data: item,
         })
       "
       v-bind="props.checkboxProps"
     >
-      {{ item[props.label] }}
+      {{ item[computedLabel] }}
     </ElCheckbox>
   </ElCheckboxGroup>
 </template>
@@ -54,6 +54,10 @@ const props = withDefaults(defineProps<propsType>(), {
 })
 
 const emits = defineEmits<emitsType>()
+
+const computedLabel = computed(() => props.labelKey || props.label)
+const computedValue = computed(() => props.valueKey || props.value)
+
 const computedStyle = computed(() => {
   const baseStyle = {
     'column-gap': `${props.xGap}px`,
@@ -104,4 +108,5 @@ const computedDisabledHandler = computed(() => {
 </script>
 
 <style lang="scss" scoped>
+@forward '@moluoxixi/components/_assets/styles/tailwind.scss';
 </style>

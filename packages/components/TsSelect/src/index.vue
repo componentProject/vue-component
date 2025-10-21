@@ -1,4 +1,5 @@
 <template>
+  {{ $attrs }}
   <ElSelect
     :id="selectId"
     v-model="data"
@@ -9,19 +10,22 @@
     :tag-type="props.tagType"
     :teleported="props.teleported"
     :collapse-tags-tooltip="props.collapseTagsTooltip"
+    :popper-style="{
+      'z-index': '9999',
+    }"
     v-bind="$attrs"
     @change="handleSelectChange"
     @visible-change="handleVisibleChange"
   >
     <ElOption
       v-for="(item) in computedOptions"
-      :key="item[props.value]"
-      :label="item[props.label]"
-      :value="item[props.value]"
+      :key="item[computedValue]"
+      :label="item[computedLabel]"
+      :value="item[computedValue]"
       :disabled="
         computedDisabledHandler({
-          label: item[props.label],
-          value: item[props.value],
+          label: item[computedLabel],
+          value: item[computedValue],
           data: item,
         })
       "
@@ -74,6 +78,10 @@ const props = withDefaults(defineProps<propsType>(), {
 })
 
 const emits = defineEmits<emitsType>()
+
+const computedLabel = computed(() => props.labelKey || props.label)
+const computedValue = computed(() => props.valueKey || props.value)
+
 const selectId = `select-${Math.random().toString(36).substr(2, 9)}`
 
 const data = defineModel<any>()
@@ -93,8 +101,8 @@ const allFilterFields = computed(() => {
         'pyCode',
         'wbcode',
         'pycode',
-        props.label,
-        props.value,
+        computedLabel.value,
+        computedValue.value,
       ].filter(item => item),
     ),
   )
@@ -239,7 +247,8 @@ onUnmounted(() => {
 })
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+@forward '@moluoxixi/components/_assets/styles/tailwind.scss';
 .load-more-trigger {
   padding: 8px 12px;
   text-align: center;
