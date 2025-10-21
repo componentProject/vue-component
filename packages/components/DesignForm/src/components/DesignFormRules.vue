@@ -40,6 +40,7 @@ import Tabs from '@moluoxixi/components/Tabs'
 import ReForm from '@moluoxixi/components/ReForm'
 import { formItemConfig as defaultFormItemConfig } from '../datas/formData'
 import { deepClone } from '../utils/formSerializer'
+import { debounce } from 'lodash'
 
 const props = defineProps<{
   selectedItemIndex?: number
@@ -128,7 +129,12 @@ function setFormItemConfig(item: any) {
     }
     else if (key === 'props') {
       Object.keys(item[key]).forEach((propKey) => {
-        itemObj[propKey] = item[key][propKey]
+        if (propKey === 'options' || propKey === 'requestParams') {
+          itemObj[propKey] = JSON.stringify(item[key][propKey]) || null
+        }
+        else {
+          itemObj[propKey] = item[key][propKey]
+        }
       })
     }
     else {
@@ -139,14 +145,24 @@ function setFormItemConfig(item: any) {
   formData.value = itemObj
 }
 
+// 创建防抖的更新函数，延迟300ms执行
+const debouncedUpdateSelectedItem = debounce((data: any) => {
+  emits('update:selectedItem', data)
+}, 300)
+
+// 创建防抖的表单配置更新函数，延迟300ms执行
+const debouncedUpdateFormConfig = debounce((data: any) => {
+  emits('update:formConfig', data)
+}, 300)
+
 // 表单项配置实时变化
 function handleItemConfigChange() {
-  emits('update:selectedItem', formItemConfigRef.value.formData)
+  debouncedUpdateSelectedItem(formItemConfigRef.value.formData)
 }
 
 // 表单配置实时变化
 function handleFormConfigChange() {
-  emits('update:formConfig', formConfigRef.value.formData)
+  debouncedUpdateFormConfig(formConfigRef.value.formData)
 }
 
 // 删除表单项
