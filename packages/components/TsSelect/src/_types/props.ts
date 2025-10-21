@@ -8,7 +8,7 @@ export interface OptionItem {
 }
 
 // 禁用处理函数类型
-export type DisabledHandler = (params: { label: string, value: any, data: OptionItem }) => boolean
+export type DisabledHandler = (params: { label: string; value: any; data: OptionItem }) => boolean
 
 // 过滤方法类型
 export type FilterMethod = (query: string) => void
@@ -24,8 +24,6 @@ export interface propsType {
   filterMethod?: FilterMethod
   collapseTagsTooltip: boolean
   collapseTags: boolean
-  label: string
-  value: string
   labelKey: string
   valueKey: string
   disabledValues: any[]

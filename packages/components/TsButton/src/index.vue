@@ -20,25 +20,14 @@
 import { computed } from 'vue'
 import { ElButton, ElPopover } from 'element-plus'
 import { debounce as wlDebounce, throttle as wlThrottle } from '@moluoxixi/utils/_utils'
-import type { DebounceSettings, ThrottleSettings } from 'lodash'
+import type { emitsType, propsType, ThrottleOrDebounceOptions } from './_types'
 
 defineOptions({
   name: 'TsButton',
   inheritAttrs: false,
 })
 
-const props = withDefaults(defineProps<{
-  // popover 相关
-  showType?: ShowType
-  content?: string
-  popoverProps?: Record<string, any>
-  disabled?: boolean
-  // 交互增强：参考 PopoverTableSelect；二者若同时传入，优先防抖
-  debounce?: number
-  throttle?: number
-  zIndex?: number
-  options?: ThrottleOrDebounceOptions
-}>(), {
+const props = withDefaults(defineProps<propsType>(), {
   showType: 'content',
   content: '',
   debounce: 0,
@@ -48,13 +37,7 @@ const props = withDefaults(defineProps<{
   options: () => ({}),
 })
 
-const emit = defineEmits<{
-  (e: 'click', ev: MouseEvent): void
-}>()
-
-type ThrottleOrDebounceOptions = Partial<DebounceSettings & ThrottleSettings> & { promise?: boolean }
-
-type ShowType = 'disabled' | 'content'
+const emit = defineEmits<emitsType>()
 
 const computedShowPopover = computed(() => {
   if (!props.content) {

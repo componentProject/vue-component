@@ -122,6 +122,18 @@ function getiifeComponent(Vue: any, vueShared: any, componentCode: string, compo
 function getumdComponent(Vue: any, vueShared: any, componentCode: string, componentName: string, componentMapping: Record<string, any> = {}) {
   componentMapping.Vue = Vue
   componentMapping.vueShared = vueShared
+
+  // 正则表达式：匹配 define([ ... ]) 中方括号内的所有内容
+  const regex = /define\s*\(\s*\[([^\]]*)\]/g
+
+  const matches = [...componentCode.matchAll(regex)]
+
+  // 捕获组 1 包含了方括号内的整个字符串（例如："vue","@vue/shared"）
+  const dependencyArrays = matches.map((match) => {
+    return match[1].trim()
+  })
+
+  console.log(componentName, dependencyArrays)
   // eslint-disable-next-line no-new-func
   new Function(
     '_this',

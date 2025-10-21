@@ -9,22 +9,19 @@
     :tag-type="props.tagType"
     :teleported="props.teleported"
     :collapse-tags-tooltip="props.collapseTagsTooltip"
-    :popper-style="{
-      'z-index': '9999',
-    }"
     v-bind="$attrs"
     @change="handleSelectChange"
     @visible-change="handleVisibleChange"
   >
     <ElOption
       v-for="(item) in computedOptions"
-      :key="item[computedValue]"
-      :label="item[computedLabel]"
-      :value="item[computedValue]"
+      :key="item[props.valueKey]"
+      :label="item[props.labelKey]"
+      :value="item[props.valueKey]"
       :disabled="
         computedDisabledHandler({
-          label: item[computedLabel],
-          value: item[computedValue],
+          label: item[props.labelKey],
+          value: item[props.valueKey],
           data: item,
         })
       "
@@ -58,8 +55,8 @@ const props = withDefaults(defineProps<propsType>(), {
   filterable: true,
   collapseTagsTooltip: true,
   collapseTags: true,
-  label: 'label',
-  value: 'value',
+  labelKey: 'label',
+  valueKey: 'value',
   disabledValues: () => [],
   disabledLabels: () => [],
   options: () => [],
@@ -77,10 +74,6 @@ const props = withDefaults(defineProps<propsType>(), {
 })
 
 const emits = defineEmits<emitsType>()
-
-const computedLabel = computed(() => props.labelKey || props.label)
-const computedValue = computed(() => props.valueKey || props.value)
-
 const selectId = `select-${Math.random().toString(36).substr(2, 9)}`
 
 const data = defineModel<any>()
@@ -100,8 +93,8 @@ const allFilterFields = computed(() => {
         'pyCode',
         'wbcode',
         'pycode',
-        computedLabel.value,
-        computedValue.value,
+        props.labelKey,
+        props.valueKey,
       ].filter(item => item),
     ),
   )
@@ -246,8 +239,7 @@ onUnmounted(() => {
 })
 </script>
 
-<style lang="scss" scoped>
-@forward '@moluoxixi/components/_assets/styles/tailwind.scss';
+<style scoped>
 .load-more-trigger {
   padding: 8px 12px;
   text-align: center;

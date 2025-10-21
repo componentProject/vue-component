@@ -74,7 +74,6 @@ import type { CustomConfigDialogEmitsType, CustomConfigDialogPropsType } from '@
 import { flattenTree } from '@moluoxixi/utils/_utils'
 import { cloneDeep } from 'lodash'
 import type { VxeGridInstance } from 'vxe-table'
-import TsSelect from '@moluoxixi/components/TsSelect'
 
 const props = withDefaults(defineProps<CustomConfigDialogPropsType>(), {
   columns: () => [],
@@ -98,12 +97,9 @@ const computedDialogProps = computed(() => {
 })
 
 const computedPopperStyle = computed(() => {
-  console.log('props.dialogProps?.zIndex', {
-    zIndex: `${props.dialogProps.zIndex + 1}`,
-  })
   if (props.dialogProps?.zIndex) {
     return {
-      'z-index': props.dialogProps.zIndex + 1,
+      'z-index': `${props.dialogProps.zIndex + 1}`,
     }
   }
   else {

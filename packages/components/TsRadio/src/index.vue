@@ -8,21 +8,21 @@
   >
     <ElRadio
       v-for="(item) in serverOrLocalOptions"
-      :key="item[computedValue]"
+      :key="item[props.valueKey]"
       :style="{
         'margin-right': '16px',
       }"
-      :label="item[computedValue]"
+      :label="item[props.valueKey]"
       :disabled="
         computedDisabledHandler({
-          label: item[computedLabel],
-          value: item[computedValue],
+          label: item[props.labelKey],
+          value: item[props.valueKey],
           data: item,
         })
       "
       v-bind="props.radioProps"
     >
-      {{ item[computedLabel] }}
+      {{ item[props.labelKey] }}
     </ElRadio>
   </ElRadioGroup>
 </template>
@@ -42,8 +42,8 @@ const props = withDefaults(defineProps<propsType>(), {
   layout: 'flex',
   xGap: 16,
   gridColumns: 4,
-  label: 'label',
-  value: 'value',
+  labelKey: 'label',
+  valueKey: 'value',
   disabledValues: () => [],
   disabledLabels: () => [],
   options: () => [],
@@ -55,9 +55,8 @@ const props = withDefaults(defineProps<propsType>(), {
   responseDataPath: '',
   radioProps: () => ({}),
 })
+
 const emits = defineEmits<emitsType>()
-const computedLabel = computed(() => props.labelKey || props.label)
-const computedValue = computed(() => props.valueKey || props.value)
 const computedStyle = computed(() => {
   const baseStyle = {
     'column-gap': `${props.xGap}px`,
@@ -104,7 +103,3 @@ const computedDisabledHandler = computed(() => {
   return getTypeDefault(props.disabledHandler, 'function') || defaultDisabledHandler
 })
 </script>
-
-<style lang="scss" scoped>
-@forward '@moluoxixi/components/_assets/styles/tailwind.scss';
-</style>

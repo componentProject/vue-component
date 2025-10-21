@@ -50,6 +50,16 @@ function handleTabChange(val: any) {
 }
 </script>
 
+<style scoped>
+@import 'element-plus/theme-chalk/el-tabs.css';
+@import 'element-plus/theme-chalk/el-tab-pane.css';
+
+:deep(*) {
+  @import 'element-plus/theme-chalk/el-tab-pane.css';
+  @import 'element-plus/theme-chalk/el-tabs.css';
+}
+</style>
+
 <style scoped lang="scss">
 @forward '@moluoxixi/components/_assets/styles/tailwind.scss';
 .tabs-card {
