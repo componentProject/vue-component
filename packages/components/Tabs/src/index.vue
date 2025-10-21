@@ -22,8 +22,6 @@
 
 <script setup lang="ts">
 import { ElTabPane, ElTabs } from 'element-plus'
-import 'element-plus/es/components/tabs/style/css.mjs'
-import 'element-plus/es/components/tab-pane/style/css.mjs'
 
 defineOptions({
   name: 'Tabs',
@@ -53,6 +51,7 @@ function handleTabChange(val: any) {
 </script>
 
 <style scoped lang="scss">
+@forward '@moluoxixi/components/_assets/styles/tailwind.scss';
 .tabs-card {
   background: #fff;
   border-radius: 8px !important;

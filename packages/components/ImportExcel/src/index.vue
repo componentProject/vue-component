@@ -191,6 +191,7 @@ function handleFileChange(e) {
 </script>
 
 <style scoped>
+@forward '@moluoxixi/components/_assets/styles/tailwind.scss';
 .import-excel-wrapper {
   display: inline-block;
 }

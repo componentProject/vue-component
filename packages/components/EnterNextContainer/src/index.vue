@@ -232,4 +232,6 @@ onUnmounted(() => {
 })
 </script>
 
-<style scoped></style>
+<style scoped>
+@forward '@moluoxixi/components/_assets/styles/tailwind.scss';
+</style>

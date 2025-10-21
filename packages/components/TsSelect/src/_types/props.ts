@@ -26,6 +26,8 @@ export interface propsType {
   collapseTags: boolean
   label: string
   value: string
+  labelKey: string
+  valueKey: string
   disabledValues: any[]
   disabledLabels: any[]
   disabledHandler?: DisabledHandler

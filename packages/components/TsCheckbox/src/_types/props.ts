@@ -19,6 +19,8 @@ export interface propsType {
   gridColumns: number
   label: string
   value: string
+  labelKey: string
+  valueKey: string
   disabledValues: any[]
   disabledLabels: any[]
   disabledHandler?: DisabledHandler
