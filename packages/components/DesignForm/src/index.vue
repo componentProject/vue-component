@@ -32,6 +32,7 @@ import { componentMap, formItemObj } from './datas/index'
 import { defaultFormConfig } from './datas/formData'
 import { deepClone } from './utils/formSerializer'
 import { ElMessage } from 'element-plus'
+import { isObject } from 'lodash'
 
 defineOptions({ name: 'DesignForm' })
 
@@ -42,6 +43,7 @@ const selectedItemIndex = ref<number | null>(null)
 
 const formRulesRef = ref<any>(null)
 
+//新增表单项事件
 function addFormItemEvent(componentKey, componentConfig) {
   // 初始化表单配置
   if (!formConfig.value) {
@@ -59,17 +61,9 @@ function addFormItemEvent(componentKey, componentConfig) {
     newItem.field = `${componentKey}_${timestamp}_${random}`
 
     // 对TsSelect组件进行特殊处理
-    if (componentKey === 'tsselect' || componentKey === 'tscheckbox') {
-      // 初始化JSON格式的属性
-      newItem.requestParams = {}
-      newItem.options = []
-      newItem.requestMethod = 'POST'
-      newItem.labelKey = 'label'
-      newItem.valueKey = 'value'
-      newItem.requestUrl = ''
-      newItem.responseDataPath = ''
+    if (componentKey === 'tsselect' || componentKey === 'tscheckbox' || componentKey === 'tsradio') {
+      newItem.dataType = false
     }
-
     const newItemConfig = {
       ...formConfig.value,
       items: [...formConfig.value.items, newItem],
@@ -167,13 +161,20 @@ function handleSelectedItemUpdate(updatedItem: any) {
             type: 'textarea',
           }
         }
-        if (componentType !== 'tsselect') {
+        if (componentType !== 'tsselect' && componentType !== 'tscheckbox' && componentType !== 'tsradio') {
           delete updatedItem?.dataType
           delete updatedItem?.requestUrl
           delete updatedItem?.requestParams
           delete updatedItem?.requestMethod
           delete updatedItem?.responseDataPath
           delete updatedItem?.options
+          delete updatedItem?.valueKey
+          delete updatedItem?.labelKey
+        }
+        else {
+          if (updatedItem?.dataType) {
+            delete updatedItem?.options
+          }
         }
         if (componentType !== 'ElInputNumber') {
           delete updatedItem?.min
@@ -181,7 +182,6 @@ function handleSelectedItemUpdate(updatedItem: any) {
         }
       }
       else if (key === 'required' || key === 'trigger' || key === 'message' || key === 'validator') {
-        // let validatorObj = {}
         // 组装验证信息对象
         if (!itemObj.rules) {
           itemObj.rules = []
@@ -255,19 +255,24 @@ function handleSelectedItemUpdate(updatedItem: any) {
           }
         }
       }
-      // else if (key === 'options' && updatedItem[key]?.length > 0) {
-      //   // 处理options属性，确保是数组格式
-      //   itemObj[key] = JSON.parse(updatedItem[key] || '[]')
-      // }
-      else if (key === 'maxlength' || key === 'min' || key === 'max' || key === 'disabled' || key === 'clearable' || key === 'options') {
+      else if (key === 'maxlength' || key === 'min' || key === 'max' || key === 'disabled' || key === 'clearable' || key === 'options' || key === 'requestParams' || key === 'requestMethod' || key === 'responseDataPath' || key === 'labelKey' || key === 'valueKey' || key === 'requestUrl') {
         // 组装props属性对象
         if (!itemObj.props) {
           itemObj.props = {}
         }
-        if (key === 'options' && updatedItem[key]?.length > 0) {
-          itemObj[key] = updatedItem[key]
+        if ((key === 'options' || key === 'requestParams') && updatedItem[key]?.length > 0) {
           // 处理options属性，确保是数组格式
-          itemObj.props.options = JSON.parse(updatedItem[key] || '[]')
+          if (key === 'options') {
+            itemObj.props.options = typeof updatedItem[key] === 'string'
+              ? JSON.parse(updatedItem[key] || '[]')
+              : (Array.isArray(updatedItem[key]) ? updatedItem[key] : [])
+          }
+          else if (key === 'requestParams') {
+            console.log('requestParams', updatedItem[key], typeof updatedItem[key])
+            itemObj.props.requestParams = typeof updatedItem[key] === 'string'
+              ? JSON.parse(updatedItem[key] || '{}')
+              : (isObject(updatedItem[key]) ? updatedItem[key] : {})
+          }
         }
         else {
           itemObj.props[key] = updatedItem[key]
@@ -277,6 +282,7 @@ function handleSelectedItemUpdate(updatedItem: any) {
         itemObj[key] = updatedItem[key]
       }
     })
+
     // 使用深拷贝创建完全新的items数组，确保响应式系统能检测到rules数组的变化
     const newItems = deepClone(formConfig.value.items)
     // 完全替换目标项，确保所有嵌套属性都被更新
@@ -371,6 +377,19 @@ watch(selectedItemIndex, (newIndex) => {
   if (newIndex !== null && formConfig.value && newIndex < formConfig.value.items.length) {
     selectedItem.value = formConfig.value.items[newIndex]
   }
+})
+
+function getFormConfigEvent() {
+  const formConfigEvent = deepClone(formConfig.value)
+  formConfigEvent?.items.forEach((item) => {
+    delete item.customClass
+    item.component = item.component.name
+  })
+  return formConfigEvent
+}
+// 暴露方法给外部调用
+defineExpose({
+  getFinalFormConfig: getFormConfigEvent,
 })
 </script>
 
