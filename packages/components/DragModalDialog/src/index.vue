@@ -157,12 +157,13 @@
 <script setup lang="ts">
 import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import { Buttons } from '@moluoxixi/components/_utilComponents'
+import type { emitsType, propsType } from './_types'
 
 defineOptions({
   name: 'DragModalDialog',
 })
 
-const props = withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<propsType>(), {
   visible: false,
   title: '提示',
   content: '',
@@ -189,79 +190,8 @@ const props = withDefaults(defineProps<Props>(), {
   destroyOnClose: false,
 })
 
-const emit = defineEmits<Emits>()
+const emit = defineEmits<emitsType>()
 
-type ButtonType = 'confirm' | 'cancel'
-interface ButtonsItem {
-  type?: ButtonType
-  slot?: string | ((...args: any[]) => any)
-  icon?: Component | string
-  event?: (data?: any, node?: any) => void
-  tooltip?: string
-}
-interface Props {
-  buttons: ButtonsItem[]
-  /** 控制对话框显示/隐藏 */
-  visible?: boolean
-  /** 对话框标题 */
-  title?: string
-  /** 对话框内容文本，支持HTML */
-  content?: string
-  /** 对话框宽度，支持数字(px)或字符串(如'50%') */
-  width?: string | number
-  /** 对话框高度，支持数字(px)或字符串(如'50%') */
-  height?: string | number
-  /** 预设尺寸：small(400px)、medium(520px)、large(720px) */
-  size?: 'small' | 'medium' | 'large'
-  /** 对话框顶部距离，支持数字(px)或字符串(如'50%') */
-  top?: string | number
-  /** 对话框左侧距离，支持数字(px)或字符串(如'50%') */
-  left?: string | number
-  /** 是否可拖拽移动，开启后可通过标题栏拖拽 */
-  draggable?: boolean
-  /** 是否可调整大小，开启后显示8方向调整手柄 */
-  resizable?: boolean
-  /** 是否显示关闭按钮 */
-  showClose?: boolean
-  /** 是否显示底部操作区 */
-  showFooter?: boolean
-  /** 是否显示取消按钮 */
-  showCancel?: boolean
-  /** 是否显示确认按钮 */
-  showConfirm?: boolean
-  /** 取消按钮文本 */
-  cancelText?: string
-  /** 确认按钮文本 */
-  confirmText?: string
-  /** 是否禁用确认按钮 */
-  confirmDisabled?: boolean
-  /** 是否显示遮罩层 */
-  mask?: boolean
-  /** 点击遮罩层是否可关闭对话框 */
-  maskClosable?: boolean
-  /** 对话框层级，默认1000 */
-  zIndex?: number
-  /** 最小宽度限制(px)，默认300 */
-  minWidth?: number
-  /** 最小高度限制(px)，默认200 */
-  minHeight?: number
-  /** 最大宽度限制(px)，未设置时自动适应容器 */
-  maxWidth?: number
-  /** 最大高度限制(px)，未设置时自动适应容器 */
-  maxHeight?: number
-  /** 边距保护值(px)，拖拽/缩放时保持与容器边距，默认16 */
-  margin?: number
-  /** 是否启用位置记忆功能 */
-  rememberPosition?: boolean
-  /** 位置记忆的唯一标识符，用于区分不同的对话框 */
-  positionKey?: string
-  /** 是否允许遮罩层穿透，开启后点击事件可传递到下方元素 */
-  penetrate?: boolean
-  /** 指定弹窗挂载的目标元素，可以是 CSS 选择器字符串或 DOM 元素，默认挂载到 body */
-  teleportTo?: string | HTMLElement | null | undefined
-  /** 关闭时是否销毁对话框内容 */
-  destroyOnClose?: boolean
-}
 
 const renderModal = ref(false)
 
@@ -284,17 +214,6 @@ function handleAfterLeave() {
   emit('closed')
 }
 
-interface Emits {
-  (e: 'update:visible', visible: boolean): void
-  (e: 'close'): void
-  (e: 'cancel'): void
-  (e: 'confirm'): void
-  (e: 'open'): void
-  (e: 'opened'): void
-  (e: 'closed'): void
-  (e: 'update:top', top: string | number): void
-  (e: 'update:left', left: string | number): void
-}
 
 // 状态管理
 const modalRef = ref<HTMLElement>()

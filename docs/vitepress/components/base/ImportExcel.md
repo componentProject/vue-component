@@ -13,12 +13,6 @@ Excel/CSV 导入组件。点击按钮选择文件后，组件会将首行表头�
 ImportExcel/base/basic
 :::
 
-使用 `DraggableTable` 展示结果。
-
-:::demo
-ImportExcel/base/draggable
-:::
-
 ### 按钮内容（默认插槽）
 
 通过默认插槽自定义按钮文案或内容。

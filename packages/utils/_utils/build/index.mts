@@ -14,7 +14,6 @@ import { execSync } from 'node:child_process'
 import type { ICruiseOptions, ICruiseResult } from 'dependency-cruiser'
 import { cruise } from 'dependency-cruiser'
 import AutoImport from 'unplugin-auto-import/vite'
-import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
 import viteImagemin from 'vite-plugin-imagemin'
 import { obfuscator } from 'rollup-obfuscator'
 import transformAliasPlugin from './plugins/transformAliasPlugin/index.mts'
@@ -249,7 +248,7 @@ function createBaseConfig(ctx: BuildContext, comp: string, internalDeps: string[
       // 自动引入
       AutoImport({
         imports: ['vue'],
-        resolvers: [ElementPlusResolver()],
+        resolvers: [],
         dts: resolve(ctx.packDir, './_typings/auto-imports.d.ts'),
       } as any),
       // 按需启用图片压缩（重型插件）

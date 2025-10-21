@@ -29,7 +29,7 @@ import { computed, withDefaults } from 'vue'
 import { ElCheckbox, ElCheckboxGroup } from 'element-plus'
 import { getTypeDefault } from '@moluoxixi/utils/_utils'
 import { useOptions } from '../../_hooks'
-import type { emitsType, propsType } from './_types'
+import type { emitsType, propsType, slotsType } from './_types'
 
 defineOptions({
   name: 'TsCheckbox',
@@ -54,6 +54,9 @@ const props = withDefaults(defineProps<propsType>(), {
 })
 
 const emits = defineEmits<emitsType>()
+
+// 获取插槽
+const slots = defineSlots<slotsType>()
 
 const computedLabel = computed(() => props.labelKey || props.label)
 const computedValue = computed(() => props.valueKey || props.value)
@@ -108,5 +111,4 @@ const computedDisabledHandler = computed(() => {
 </script>
 
 <style lang="scss" scoped>
-@forward '@moluoxixi/components/_assets/styles/tailwind.scss';
 </style>

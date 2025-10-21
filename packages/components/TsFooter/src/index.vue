@@ -16,7 +16,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import type { NormalizedItem, propsType } from './_types'
+import type { emitsType, NormalizedItem, propsType, slotsType } from './_types'
 
 defineOptions({ name: 'TsFooter' })
 
@@ -33,6 +33,11 @@ const props = withDefaults(defineProps<propsType>(), {
   yGap: 6,
   size: 12,
 })
+
+const emit = defineEmits<emitsType>()
+
+// 获取插槽
+const slots = defineSlots<slotsType>()
 
 /**
  * 规格化 items，统一成渲染单元
@@ -78,5 +83,4 @@ function textStyle(item: NormalizedItem): CSSStyleDeclaration {
 </script>
 
 <style lang="scss" scoped>
-@forward '@moluoxixi/components/_assets/styles/tailwind.scss';
 </style>

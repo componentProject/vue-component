@@ -11,6 +11,11 @@
         删除组件库组件
       </ElButton>
     </div>
+    <div class="flex">
+      <div class="w-[200px]">
+        <TsSelect v-model="componentName" placeholder="请选择展示的组件" label="componentCode" value="id" :options="componentOptions" />
+      </div>
+    </div>
     <div v-if="localComponent" class="main">
       <div class="list-title">
         开发调试组件
@@ -151,7 +156,7 @@ async function handleClick() {
 }
 
 onMounted(async () => {
-  getComponentOptions()
+  await getComponentOptions()
   // await loadLocalComponent(componentName.value)
 })
 </script>
