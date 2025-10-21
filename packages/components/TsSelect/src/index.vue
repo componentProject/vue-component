@@ -15,13 +15,13 @@
   >
     <ElOption
       v-for="(item) in computedOptions"
-      :key="item[props.valueKey]"
-      :label="item[props.labelKey]"
-      :value="item[props.valueKey]"
+      :key="item[computedValue]"
+      :label="item[computedLabel]"
+      :value="item[computedValue]"
       :disabled="
         computedDisabledHandler({
-          label: item[props.labelKey],
-          value: item[props.valueKey],
+          label: item[computedLabel],
+          value: item[computedValue],
           data: item,
         })
       "
@@ -55,8 +55,8 @@ const props = withDefaults(defineProps<propsType>(), {
   filterable: true,
   collapseTagsTooltip: true,
   collapseTags: true,
-  labelKey: 'label',
-  valueKey: 'value',
+  label: 'label',
+  value: 'value',
   disabledValues: () => [],
   disabledLabels: () => [],
   options: () => [],
@@ -74,6 +74,10 @@ const props = withDefaults(defineProps<propsType>(), {
 })
 
 const emits = defineEmits<emitsType>()
+
+const computedLabel = computed(() => props.labelKey || props.label)
+const computedValue = computed(() => props.valueKey || props.value)
+
 const selectId = `select-${Math.random().toString(36).substr(2, 9)}`
 
 const data = defineModel<any>()
@@ -93,8 +97,8 @@ const allFilterFields = computed(() => {
         'pyCode',
         'wbcode',
         'pycode',
-        props.labelKey,
-        props.valueKey,
+        computedLabel.value,
+        computedValue.value,
       ].filter(item => item),
     ),
   )

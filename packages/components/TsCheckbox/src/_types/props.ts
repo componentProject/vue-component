@@ -8,7 +8,7 @@ export interface OptionItem {
 }
 
 // 禁用处理函数类型
-export type DisabledHandler = (params: { label: string; value: any; data: OptionItem }) => boolean
+export type DisabledHandler = (params: { label: string, value: any, data: OptionItem }) => boolean
 
 /**
  * TsCheckbox 组件的 Props 类型定义
@@ -17,6 +17,8 @@ export interface propsType {
   xGap: number
   layout: string
   gridColumns: number
+  label: string
+  value: string
   labelKey: string
   valueKey: string
   disabledValues: any[]
