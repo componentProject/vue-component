@@ -105,33 +105,38 @@ watch(
       activeTab.value = 'form'
     }
   },
+  { immediate: true },
 )
 
 // 根据添加的组件设置表单项配置
 function setFormItemConfig(item: any) {
-  const itemObj = {}
-  // 简单循环item对象的所有属性
-  if (item && typeof item === 'object') {
-    Object.keys(item).forEach((key) => {
-      if (key === 'component') {
-        if (item[key].name === 'ElInput' && item?.props?.type === 'textarea') {
-          itemObj[key] = 'ElTextarea'
-        }
-        else {
-          itemObj[key] = item[key].name
-        }
-      }
-      else if (key === 'props') {
-        Object.keys(item[key]).forEach((propKey) => {
-          itemObj[propKey] = item[key][propKey]
-        })
+  // 添加空值检查
+  if (!item || typeof item !== 'object') {
+    return
+  }
+  // 创建新的配置对象
+  const itemObj: any = {}
+  // 一次性收集所有属性
+  Object.keys(item).forEach((key) => {
+    if (key === 'component') {
+      if (item[key].name === 'ElInput' && item?.props?.type === 'textarea') {
+        itemObj[key] = 'ElTextarea'
       }
       else {
-        itemObj[key] = item[key]
+        itemObj[key] = item[key].name
       }
-      formData.value = itemObj
-    })
-  }
+    }
+    else if (key === 'props') {
+      Object.keys(item[key]).forEach((propKey) => {
+        itemObj[propKey] = item[key][propKey]
+      })
+    }
+    else {
+      itemObj[key] = item[key]
+    }
+  })
+  // 一次性赋值，避免多次更新导致的重复渲染
+  formData.value = itemObj
 }
 
 // 表单项配置实时变化
@@ -162,6 +167,10 @@ function getFormData() {
 
 defineExpose({
   getFormData,
+  // 修改为符合ReForm标准的回调函数形式
+  validate: (callback) => {
+    return formItemConfigRef?.value?.validate(callback)
+  },
 })
 </script>
 

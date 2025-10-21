@@ -198,8 +198,7 @@ export const formItemConfig = {
           { label: '输入框', value: 'ElInput' },
           { label: '多文本框', value: 'ElTextarea' },
           { label: '数字输入框', value: 'ElInputNumber' },
-          { label: '下拉框', value: 'ElSelect' },
-          { label: '增强下拉框', value: 'TsSelect' },
+          { label: '下拉框', value: 'TsSelect' },
           { label: '多选', value: 'ElCheckboxGroup' },
           { label: '单选', value: 'ElRadioGroup' },
         ],
@@ -309,7 +308,7 @@ export const formItemConfig = {
     },
     // TsSelect 特有配置项
     {
-      label: '请求地址(增强下拉框)',
+      label: '请求地址',
       field: 'requestUrl',
       defaultValue: '',
       component: ElInput,
@@ -329,7 +328,7 @@ export const formItemConfig = {
       },
     },
     {
-      label: '请求方法(增强下拉框)',
+      label: '请求方法',
       field: 'requestMethod',
       defaultValue: 'POST',
       component: ElSelect,
@@ -353,7 +352,7 @@ export const formItemConfig = {
       },
     },
     {
-      label: '请求参数(增强下拉框)',
+      label: '请求参数',
       field: 'requestParams',
       defaultValue: '{}',
       component: ElInput,
@@ -373,8 +372,8 @@ export const formItemConfig = {
       },
     },
     {
-      label: '显示字段名(增强下拉框)',
-      field: 'label',
+      label: '显示字段名',
+      field: 'labelKey',
       defaultValue: 'label',
       component: ElInput,
       props: {
@@ -383,16 +382,16 @@ export const formItemConfig = {
       visible: {
         conditions: [
           {
-            field: 'dataType',
-            value: true,
+            field: 'component',
+            value: 'TsSelect',
             type: '=',
           },
         ],
       },
     },
     {
-      label: '值字段名(增强下拉框)',
-      field: 'value',
+      label: '值字段名',
+      field: 'valueKey',
       defaultValue: 'value',
       component: ElInput,
       props: {
@@ -401,15 +400,15 @@ export const formItemConfig = {
       visible: {
         conditions: [
           {
-            field: 'dataType',
-            value: true,
+            field: 'component',
+            value: 'TsSelect',
             type: '=',
           },
         ],
       },
     },
     {
-      label: '响应数据路径(增强下拉框)',
+      label: '响应数据路径',
       field: 'responseDataPath',
       defaultValue: '',
       component: ElInput,
@@ -428,9 +427,8 @@ export const formItemConfig = {
       },
     },
     {
-      label: '静态选项数据(增强下拉框)',
+      label: '静态选项数据',
       field: 'options',
-      defaultValue: '[]',
       component: ElInput,
       props: {
         type: 'textarea',
