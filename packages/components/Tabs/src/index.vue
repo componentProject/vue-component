@@ -52,10 +52,8 @@ function handleTabChange(val: any) {
 
 <style scoped>
 @import 'element-plus/theme-chalk/el-tabs.css';
-@import 'element-plus/theme-chalk/el-tab-pane.css';
 
 :deep(*) {
-  @import 'element-plus/theme-chalk/el-tab-pane.css';
   @import 'element-plus/theme-chalk/el-tabs.css';
 }
 </style>
