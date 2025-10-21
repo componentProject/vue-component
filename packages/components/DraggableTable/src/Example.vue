@@ -265,11 +265,11 @@ const cellTypeList = ref([
 function pageChangeHandler(params) {
   console.log('params', params)
 }
-function changeCellType(type: string) {
-  const item = columns.value.at(-2)
-  columns.value[columns.value.length - 2] = {
+function changeCellType(type: any) {
+  const item = columns.value.at(-3)
+  columns.value[columns.value.length - 3] = {
     ...item,
-    type,
+    ...type,
   }
 }
 

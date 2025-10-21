@@ -1,7 +1,8 @@
 <template>
-  <div>
+  <div class="h-full flex items-center">
     <DateRangePicker
       v-if="dateType && DateRender"
+      size="small"
       :format="valueFormat"
       :value-format="valueFormat"
       :type="dateType"
@@ -13,6 +14,7 @@
       v-else-if="renderOptsPropsType === 'select' && propsOptions && SelectRender"
       v-bind="renderOptsProps"
       v-model="currRow[currColumn.field]"
+      size="small"
       class="w-full!"
       filterable
       automatic-dropdown
@@ -22,6 +24,7 @@
       v-else-if="renderOptsPropsType === 'input' && InputRender"
       v-bind="renderOptsProps"
       v-model="inputValue"
+      size="small"
       @blur="() => (currRow[currColumn.field] = inputValue)"
     />
     <ElSwitch
@@ -63,10 +66,6 @@ import { ElInput, ElProgress, ElSwitch, ElTag } from 'element-plus'
 import { computed, onMounted, ref, watch } from 'vue'
 import { detectDateFormatByReplace } from '@moluoxixi/utils/_utils'
 
-// 导入组件
-import DateRangePicker from '@moluoxixi/components/DateRangePicker'
-import TsSelect from '@moluoxixi/components/TsSelect'
-
 const props = defineProps<cellRendererPropsType>()
 
 const renderOptsProps = computed<objType>(() => props.renderOpts?.props || {})
@@ -86,6 +85,12 @@ function load() {
 }
 
 watch(() => [props.renderParams, props.renderOpts], load, {
+  immediate: true,
+})
+watch(() => props.renderOpts, (v) => {
+  console.log(v)
+}, {
+  deep: true,
   immediate: true,
 })
 

@@ -615,10 +615,12 @@ const computedColumns = computed<ColumnType[]>(() => {
       //#endregion
 
       //#region 添加基于field的自定义默认渲染器，额外提供以下type功能：'input' | 'select' | 'date' | 'datetime' | 'switch' | 'progress' | 'tag'
+      console.log('item.type', item.type)
       const customType = getCustomType(item.type)
       if (customType) {
         delete item.type
       }
+
       if (
         isEmpty(item.cellRender)
         && isEmpty(item.contentRender)
@@ -635,6 +637,7 @@ const computedColumns = computed<ColumnType[]>(() => {
             ...cellProps,
           },
         }
+        console.log('aaaaaa', item.cellRender)
       }
       //#endregion
     }
@@ -655,7 +658,6 @@ const computedColumns = computed<ColumnType[]>(() => {
     }
   }
 
-  console.log('columns.map(transformColumn).filter(Boolean)', columns.map(transformColumn).filter(Boolean))
   return columns.map(transformColumn).filter(Boolean) as ColumnType[]
 })
 //#endregion

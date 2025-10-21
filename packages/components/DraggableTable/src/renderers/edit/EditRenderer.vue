@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="h-full flex items-center">
     <DateRangePicker
       v-if="isDateType && DateRender"
       :format="valueFormat"
@@ -49,10 +49,6 @@ import type { editRendererPropsType } from './_types'
 import { ElInput } from 'element-plus'
 import { computed, ref, watch } from 'vue'
 import { detectDateFormatByReplace, getMomentIsValidIsNoNum } from '@moluoxixi/utils/_utils'
-
-// 导入组件
-import DateRangePicker from '@moluoxixi/components/DateRangePicker'
-import TsSelect from '@moluoxixi/components/TsSelect'
 
 const props = defineProps<editRendererPropsType>()
 
