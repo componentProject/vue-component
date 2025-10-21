@@ -59,7 +59,7 @@ function addFormItemEvent(componentKey, componentConfig) {
     newItem.field = `${componentKey}_${timestamp}_${random}`
 
     // 对TsSelect组件进行特殊处理
-    if (componentKey === 'tsselect') {
+    if (componentKey === 'tsselect' || componentKey === 'tscheckbox') {
       // 初始化JSON格式的属性
       newItem.requestParams = {}
       newItem.options = []
@@ -89,8 +89,6 @@ function addFormItemEvent(componentKey, componentConfig) {
 
 // 添加表单项
 async function handleAddFormItem(componentKey: string) {
-  // 先记录formRulesRef.value的日志
-  console.log('formRulesRef.value', formRulesRef.value)
   // 获取组件配置
   const componentConfig = formItemObj[componentKey]
   if (selectedItem.value && selectedItemIndex.value !== null) {
