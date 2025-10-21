@@ -2,9 +2,8 @@
  * Splitter 组件的 Emits 类型定义
  */
 export interface emitsType {
-  /**
-   * 分割面板大小改变时触发
-   * @param sizes 各个面板的大小比例
-   */
+  /** 面板大小变化时触发 */
   (e: 'resize', sizes: number[]): void
+  /** 面板折叠状态变化时触发 */
+  (e: 'collapse', panelIndex: number, collapsed: boolean): void
 }

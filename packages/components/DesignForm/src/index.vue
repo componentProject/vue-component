@@ -31,6 +31,7 @@ import DesignFormList from './components/DesignFormList.vue'
 import { componentMap, formItemObj } from './datas/index'
 import { defaultFormConfig } from './datas/formData'
 import { deepClone } from './utils/formSerializer'
+import { ElMessage } from 'element-plus'
 
 defineOptions({ name: 'DesignForm' })
 
@@ -41,9 +42,7 @@ const selectedItemIndex = ref<number | null>(null)
 
 const formRulesRef = ref<any>(null)
 
-// 添加表单项
-function handleAddFormItem(componentKey: string) {
-  const componentConfig = formItemObj[componentKey]
+function addFormItemEvent(componentKey, componentConfig) {
   // 初始化表单配置
   if (!formConfig.value) {
     // 深拷贝默认配置，避免直接修改源数据
@@ -58,6 +57,19 @@ function handleAddFormItem(componentKey: string) {
     const timestamp = Date.now()
     const random = Math.floor(Math.random() * 1000)
     newItem.field = `${componentKey}_${timestamp}_${random}`
+
+    // 对TsSelect组件进行特殊处理
+    if (componentKey === 'tsselect' || componentKey === 'tscheckbox') {
+      // 初始化JSON格式的属性
+      newItem.requestParams = {}
+      newItem.options = []
+      newItem.requestMethod = 'POST'
+      newItem.labelKey = 'label'
+      newItem.valueKey = 'value'
+      newItem.requestUrl = ''
+      newItem.responseDataPath = ''
+    }
+
     const newItemConfig = {
       ...formConfig.value,
       items: [...formConfig.value.items, newItem],
@@ -71,8 +83,31 @@ function handleAddFormItem(componentKey: string) {
       ...item,
       customClass: index === selectedItemIndex.value ? 'selected-form-item' : '',
     }))
-    console.log('添加表单项顺序', newItemConfig)
     formConfig.value = { ...newItemConfig }
+  }
+}
+
+// 添加表单项
+async function handleAddFormItem(componentKey: string) {
+  // 获取组件配置
+  const componentConfig = formItemObj[componentKey]
+  if (selectedItem.value && selectedItemIndex.value !== null) {
+    // 使用回调函数方式调用validate方法
+    formRulesRef.value.validate((valid: boolean) => {
+      console.log('验证结果:', valid)
+      if (valid) {
+        addFormItemEvent(componentKey, componentConfig)
+      }
+      else {
+        ElMessage.error({
+          message: '请先完成必填项，再添加',
+          duration: 5 * 1000,
+        })
+      }
+    })
+  }
+  else {
+    addFormItemEvent(componentKey, componentConfig)
   }
 }
 
@@ -123,6 +158,7 @@ function handleSelectedItemUpdate(updatedItem: any) {
     const itemObj: any = deepClone(originalItem || {})
 
     Object.keys(updatedItem).forEach((key) => {
+      //文本输入框的时候需要添加type属性
       if (key === 'component') {
         const componentType = updatedItem[key].toLowerCase()
         itemObj[key] = componentMap[componentType]
@@ -130,6 +166,18 @@ function handleSelectedItemUpdate(updatedItem: any) {
           itemObj.props = {
             type: 'textarea',
           }
+        }
+        if (componentType !== 'tsselect') {
+          delete updatedItem?.dataType
+          delete updatedItem?.requestUrl
+          delete updatedItem?.requestParams
+          delete updatedItem?.requestMethod
+          delete updatedItem?.responseDataPath
+          delete updatedItem?.options
+        }
+        if (componentType !== 'ElInputNumber') {
+          delete updatedItem?.min
+          delete updatedItem?.max
         }
       }
       else if (key === 'required' || key === 'trigger' || key === 'message' || key === 'validator') {
@@ -207,12 +255,23 @@ function handleSelectedItemUpdate(updatedItem: any) {
           }
         }
       }
-      else if (key === 'maxlength' || key === 'min' || key === 'max' || key === 'disabled' || key === 'clearable') {
+      // else if (key === 'options' && updatedItem[key]?.length > 0) {
+      //   // 处理options属性，确保是数组格式
+      //   itemObj[key] = JSON.parse(updatedItem[key] || '[]')
+      // }
+      else if (key === 'maxlength' || key === 'min' || key === 'max' || key === 'disabled' || key === 'clearable' || key === 'options') {
         // 组装props属性对象
         if (!itemObj.props) {
           itemObj.props = {}
         }
-        itemObj.props[key] = updatedItem[key]
+        if (key === 'options' && updatedItem[key]?.length > 0) {
+          itemObj[key] = updatedItem[key]
+          // 处理options属性，确保是数组格式
+          itemObj.props.options = JSON.parse(updatedItem[key] || '[]')
+        }
+        else {
+          itemObj.props[key] = updatedItem[key]
+        }
       }
       else {
         itemObj[key] = updatedItem[key]
@@ -232,7 +291,7 @@ function handleSelectedItemUpdate(updatedItem: any) {
       ...formConfig.value,
       items: newItems,
     })
-    console.log('更新后的表单项rules:', itemObj.rules || [])
+    console.log('更新后的表单项', itemObj)
 
     selectedItem.value = itemObj
   }

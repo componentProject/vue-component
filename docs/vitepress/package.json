@@ -39,6 +39,7 @@
   },
   "devDependencies": {
     "@moluoxixi/components": "workspace:*",
+    "@moluoxixi/constant": "workspace:*",
     "@moluoxixi/utils": "workspace:*",
     "@highlightjs/vue-plugin": "^2.1.0",
     "@types/js-cookie": "^3.0.3",

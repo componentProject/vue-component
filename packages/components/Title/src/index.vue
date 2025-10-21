@@ -17,27 +17,27 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
+import type { emitsType, propsType, slotsType } from './_types'
+
 defineOptions({
   name: 'Title',
 })
-const props = defineProps({
-  fontSize: {
-    type: [Number, String],
-    default: 14,
-  },
-  type: {
-    type: String,
-    default: 'line',
-  },
-  name: {
-    type: String,
-    default: '',
-  },
+
+const props = withDefaults(defineProps<propsType>(), {
+  fontSize: 14,
+  type: 'line',
+  name: '',
 })
+
+const emit = defineEmits<emitsType>()
+
+// 获取插槽
+const slots = defineSlots<slotsType>()
 </script>
 
 <style lang="scss" scoped>
+@forward '@moluoxixi/components/_assets/styles/tailwind.scss';
 .custom-title {
   :deep(.el-divider--horizontal) {
     margin: 12px 0;

@@ -9,12 +9,13 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ElButton } from 'element-plus'
 import fileSaver from 'file-saver'
 import { computed } from 'vue'
 import { utils, write } from 'xlsx'
 import { getTypeDefault } from '@moluoxixi/utils/_utils/index.ts'
+import type { emitsType, propsType, slotsType } from './_types'
 
 // 设置组件不继承属性到根元素，而是手动通过$attrs绑定
 defineOptions({
@@ -22,66 +23,21 @@ defineOptions({
   inheritAttrs: false,
 })
 
-const props = defineProps({
-  // 表格数据
-  tableData: {
-    type: Array,
-    required: true,
-  },
-  // 表格列配置
-  columns: {
-    type: Array,
-    required: true,
-  },
-  // 从 columns 中匹配列头名称的字段优先级
-  titles: {
-    type: Array,
-    default: () => ['title', 'label'],
-  },
-  // 从 tableData 中匹配值的字段优先级
-  fields: {
-    type: Array,
-    default: () => ['field', 'prop'],
-  },
-  // 导出文件名
-  fileName: {
-    type: String,
-    default: '导出数据',
-  },
-  // 按钮文本 (当没有默认插槽时使用)
-  buttonText: {
-    type: String,
-    default: '导出',
-  },
-  // 导出类型 xlsx/csv
-  exportType: {
-    type: String,
-    default: 'xlsx',
-    validator: value => ['xlsx', 'csv'].includes(value),
-  },
-  // 是否自动宽度
-  autoWidth: {
-    type: Boolean,
-    default: true,
-  },
-  // 是否允许空数据导出
-  allowEmptyExport: {
-    type: Boolean,
-    default: true,
-  },
-  // 空数据导出提示信息
-  emptyMessage: {
-    type: String,
-    default: '暂无数据可导出',
-  },
+const props = withDefaults(defineProps<propsType>(), {
+  titles: () => ['title', 'label'],
+  fields: () => ['field', 'prop'],
+  fileName: '导出数据',
+  buttonText: '导出',
+  exportType: 'xlsx',
+  autoWidth: true,
+  allowEmptyExport: true,
+  emptyMessage: '暂无数据可导出',
 })
-const emits = defineEmits([
-  // 导入成功，抛出解析后的数组数据
-  'success',
-  // 导入失败或中断，抛出错误信息
-  'error',
-  'warning',
-])
+
+const emit = defineEmits<emitsType>()
+
+// 获取插槽
+const slots = defineSlots<slotsType>()
 // 计算按钮是否禁用
 const isDisabled = computed(() => {
   return !props.allowEmptyExport && (!props.tableData || props.tableData.length === 0)
@@ -125,10 +81,7 @@ function handleExport() {
   if (!props.tableData || props.tableData.length === 0) {
     if (props.allowEmptyExport) {
       // 允许空数据导出，但给出提示
-      emits('warning', {
-        message: '当前数据为空，将导出表头信息',
-        data: [],
-      })
+      emit('warning', '当前数据为空，将导出表头信息')
       // 创建仅包含表头的数据
       const emptyData = [{}] // 创建一个空对象，以便生成工作表
       const header = computedHeader.value
@@ -139,10 +92,7 @@ function handleExport() {
     }
     else {
       // 不允许空数据导出
-      emits('error', {
-        message: 'props.emptyMessage',
-        data: [],
-      })
+      emit('error', new Error(props.emptyMessage))
     }
   }
   else {
@@ -288,10 +238,7 @@ function exportExcel(data, header, fileName, keys = null) {
   fileSaver.saveAs(blob, fullFileName)
 
   // 导出成功提示
-  emits('success', {
-    message: '导出成功',
-    data: [],
-  })
+  emit('success')
 }
 
 /**

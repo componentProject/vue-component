@@ -2,8 +2,7 @@ import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { COMPONENT_SETTING_TYPE } from '@moluoxixi/constant'
 
-import { runBuildCliAndExit } from '../../utils/_utils/build/index.mts'
-
+import { runBuildCliAndExit } from '@moluoxixi/utils/_utils/build/index.mts'
 // === 组件库命名空间配置 ===
 const LIB_NAMESPACE = 'moluoxixi'
 /**
@@ -33,6 +32,9 @@ runBuildCliAndExit(
     rootDir,
     packDir,
     presetGlobals: {
+    },
+    viteConfig: {
+      plugins: [],
     },
   },
   { uploadType: COMPONENT_SETTING_TYPE, command: 'build-publish' },

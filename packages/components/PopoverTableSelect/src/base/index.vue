@@ -31,92 +31,52 @@
 </template>
 
 <script lang="ts" setup>
-import type { InputInstance } from 'element-plus'
-import type { ComponentInternalInstance, ComponentPublicInstance, PropType } from 'vue'
+import type { ComponentPublicInstance } from 'vue'
 import { computed, nextTick, onUnmounted, ref, useTemplateRef, watch } from 'vue'
 import type { VxeTableDefines, VxeTablePropTypes } from 'vxe-table'
-import type { ColumnType } from '@moluoxixi/components/DraggableTable'
 import { ElPopover } from 'element-plus'
 import type { slotsType } from '@moluoxixi/components/_types'
+import type { baseEmitsType, basePropsType } from '../_types'
 
 defineOptions({
   name: 'PopoverTableSelectBase',
 })
-const props = defineProps({
-  //#region 透传给popover
-  virtualRef: {
-    type: Object as () =>
-      | ComponentPublicInstance
-      | ComponentInternalInstance
-      | InputInstance
-      | HTMLElement
-      | null,
-    required: true,
-  },
-  popoverProps: {
-    type: Object as PropType<Record<string, any>>,
-    default: () => ({
-      placement: 'bottom',
-      trigger: 'hover',
-      title: '',
-      effect: 'light',
-      content: '',
-      disabled: false,
-      offset: 12,
-      transition: 'el-fade-in-linear',
-      showArrow: true,
-      popperOptions: {
-        modifiers: [{ name: 'computeStyles', options: { gpuAcceleration: false } }],
-      },
-      popperClass: '',
-      popperStyle: '',
-      showAfter: 0,
-      hideAfter: 200,
-      autoClose: 0,
-      tabindex: undefined,
-      teleported: true,
-      persistent: true,
-      width: 400,
-    }),
-  },
-  height: {
-    type: [String, Number],
-    default: 300,
-  },
-  //#endregion
-  //#region 透传给DraggableTable
-  id: {
-    type: String,
-    default: 'popoverTableSelect',
-  },
-  columns: {
-    type: Array as () => ColumnType[],
-    default: () => [],
-  },
-  data: {
-    type: Array as () => VxeTablePropTypes.Data,
-    default: () => [],
-  },
-  selectTrigger: {
-    type: String as PropType<'click' | 'dblclick' | 'none'>,
-    default: 'click',
-    validator: (value: string) => ['click', 'dblclick', 'none'].includes(value),
-  },
-  //#endregion
+
+const props = withDefaults(defineProps<basePropsType>(), {
+  popoverProps: () => ({
+    placement: 'bottom',
+    trigger: 'hover',
+    title: '',
+    effect: 'light',
+    content: '',
+    disabled: false,
+    offset: 12,
+    transition: 'el-fade-in-linear',
+    showArrow: true,
+    popperOptions: {
+      modifiers: [{ name: 'computeStyles', options: { gpuAcceleration: false } }],
+    },
+    popperClass: '',
+    popperStyle: '',
+    showAfter: 0,
+    hideAfter: 200,
+    autoClose: 0,
+    tabindex: undefined,
+    teleported: true,
+    persistent: true,
+    width: 400,
+  }),
+  height: 300,
+  id: 'popoverTableSelect',
+  columns: () => [],
+  data: () => [],
+  selectTrigger: 'click',
 })
-const emit = defineEmits([
-  'select',
-  'cellClick',
-  'cellDblClick',
-  'resizableChange',
-  'headerContextMenu',
-  'enter',
-])
+
+const emit = defineEmits<baseEmitsType>()
 
 // 获取插槽
 const slots = defineSlots<slotsType>()
-
-// 移除未使用的类型，避免 linter 提示
 
 const slotNames = computed<string[]>(() => Object.keys(slots) as string[])
 const popoverVisible = defineModel({

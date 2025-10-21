@@ -8,21 +8,21 @@
   >
     <ElRadio
       v-for="(item) in serverOrLocalOptions"
-      :key="item[props.valueKey]"
+      :key="item[computedValue]"
       :style="{
         'margin-right': '16px',
       }"
-      :label="item[props.valueKey]"
+      :label="item[computedValue]"
       :disabled="
         computedDisabledHandler({
-          label: item[props.labelKey],
-          value: item[props.valueKey],
+          label: item[computedLabel],
+          value: item[computedValue],
           data: item,
         })
       "
       v-bind="props.radioProps"
     >
-      {{ item[props.labelKey] }}
+      {{ item[computedLabel] }}
     </ElRadio>
   </ElRadioGroup>
 </template>
@@ -32,7 +32,7 @@ import { computed, withDefaults } from 'vue'
 import { ElRadio, ElRadioGroup } from 'element-plus'
 import { getTypeDefault } from '@moluoxixi/utils/_utils'
 import { useOptions } from '../../_hooks'
-import type { emitsType, propsType } from './_types'
+import type { emitsType, propsType, slotsType } from './_types'
 
 defineOptions({
   name: 'TsRadio',
@@ -42,8 +42,8 @@ const props = withDefaults(defineProps<propsType>(), {
   layout: 'flex',
   xGap: 16,
   gridColumns: 4,
-  labelKey: 'label',
-  valueKey: 'value',
+  label: 'label',
+  value: 'value',
   disabledValues: () => [],
   disabledLabels: () => [],
   options: () => [],
@@ -57,6 +57,13 @@ const props = withDefaults(defineProps<propsType>(), {
 })
 
 const emits = defineEmits<emitsType>()
+
+// 获取插槽
+const slots = defineSlots<slotsType>()
+
+const computedLabel = computed(() => props.labelKey || props.label)
+const computedValue = computed(() => props.valueKey || props.value)
+
 const computedStyle = computed(() => {
   const baseStyle = {
     'column-gap': `${props.xGap}px`,

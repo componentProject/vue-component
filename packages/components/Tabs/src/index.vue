@@ -22,37 +22,39 @@
 
 <script setup lang="ts">
 import { ElTabPane, ElTabs } from 'element-plus'
-import 'element-plus/es/components/tabs/style/css.mjs'
-import 'element-plus/es/components/tab-pane/style/css.mjs'
+import type { emitsType, propsType, slotsType } from './_types'
 
 defineOptions({
   name: 'Tabs',
 })
-const props = defineProps({
-  tabList: {
-    type: Array<{
-      label: string
-      name: string | number
-      slot?: string
-      lazy?: boolean
-      show?: (item: any) => boolean
-    }>,
-    default: () => [],
-  },
-  type: {
-    type: String as PropType<'border-card' | 'card'>,
-    default: '',
-  },
+
+const props = withDefaults(defineProps<propsType>(), {
+  tabList: () => [],
+  type: '',
 })
-const emits = defineEmits(['tabChange'])
+
+const emit = defineEmits<emitsType>()
+
+// 获取插槽
+const slots = defineSlots<slotsType>()
+
 const activeName = defineModel({ default: '0', type: String })
 
 function handleTabChange(val: any) {
-  emits('tabChange', val)
+  emit('tabChange', val)
 }
 </script>
 
+<style scoped>
+@import 'element-plus/theme-chalk/el-tabs.css';
+
+:deep(*) {
+  @import 'element-plus/theme-chalk/el-tabs.css';
+}
+</style>
+
 <style scoped lang="scss">
+@forward '@moluoxixi/components/_assets/styles/tailwind.scss';
 .tabs-card {
   background: #fff;
   border-radius: 8px !important;

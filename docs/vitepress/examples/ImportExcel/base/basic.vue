@@ -1,7 +1,7 @@
 <template>
   <div>
     <ImportExcel :columns="columns" @success="onSuccess" />
-    <ConfigTable v-if="rows.length" :data="rows" :columns="tableColumns" :show-pagination="false" />
+    <DraggableTable v-if="rows.length" v-model="rows" :columns="columns" :show-pagination="false" />
   </div>
 </template>
 
@@ -10,21 +10,14 @@ import { ref } from 'vue'
 
 const rows = ref<any[]>([])
 
-// ImportExcel 使用的列配置
 const columns = ref([
-  { title: '姓名', field: 'name' },
-  { title: '年龄', field: 'age' },
-  { title: '地址', field: 'address' },
+  { field: 'name', title: '姓名', minWidth: 120 },
+  { field: 'age', title: '年龄', width: 80 },
+  { field: 'address', title: '地址', minWidth: 180 },
 ])
 
-// 展示结果用的表格列配置（ConfigTable）
-const tableColumns = ref([
-  { prop: 'name', label: '姓名', minWidth: 120 },
-  { prop: 'age', label: '年龄', width: 80 },
-  { prop: 'address', label: '地址', minWidth: 180 },
-])
-
-function onSuccess(data: any[]) {
-  rows.value = data
+function onSuccess(data: any) {
+  console.log('data', data)
+  rows.value = data.data
 }
 </script>

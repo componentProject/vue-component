@@ -22,6 +22,7 @@ defineExpose({
 </script>
 
 <style scoped lang="scss">
+@forward '@moluoxixi/components/_assets/styles/tailwind.scss';
 :deep(*) {
   @import '@moluoxixi/components/VxeGrid/style.scss';
 }
