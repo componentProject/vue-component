@@ -60,8 +60,9 @@
 - 示例：`/suno/cover/generate` → 方法名：`sunoCoverGenerate` → 类型：`sunoCoverGenerateParamsType`
 
 #### 类型文件分类规范：
-- `_types/props.ts` - Vue组件props类型定义
-- `_types/emit.ts` - Vue组件emit事件类型定义
+- `_types/props.ts` - Vue组件props类型定义,首个props类型，命名为propsType,其他命名为xxxPropsType
+- `_types/emits.ts` - Vue组件emit事件类型定义,首个emits类型，命名为emitsType,其他命名为xxxEmitsType
+- `_types/slots.ts` - Vue组件slot插槽类型定义,首个slots类型，命名为slotsType,其他命名为xxxSlotsType
 - `_types/api.ts` - API接口相关类型定义
 - `_types/common.ts` - 通用类型定义
 - `_types/index.ts` - 统一导出所有类型

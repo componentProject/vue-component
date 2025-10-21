@@ -6,7 +6,7 @@
   </router-view>
 </template>
 
-<script setup>
+<script lang="ts" setup>
 import { h, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 

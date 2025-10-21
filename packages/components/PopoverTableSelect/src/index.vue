@@ -30,97 +30,38 @@
 </template>
 
 <script setup lang="ts">
-import type { InputInstance, InputProps, PopoverProps } from 'element-plus'
-import type { ComponentInternalInstance, ComponentPublicInstance, PropType } from 'vue'
+import type { InputInstance } from 'element-plus'
+import type { ComponentInternalInstance, ComponentPublicInstance } from 'vue'
 import { ElInput } from 'element-plus'
 import { debounce as wlDebounce, throttle as wlThrottle } from '@moluoxixi/utils/_utils'
-import type { DebounceSettings, ThrottleSettings } from 'lodash'
 import { computed, ref, useTemplateRef, watch } from 'vue'
 import PopoverTableSelect from '@moluoxixi/components/PopoverTableSelect/src/base/index.vue'
 import type { slotsType } from '@moluoxixi/components/_types'
+import type { emitsType, propsType, ThrottleOrDebounceOptions } from './_types'
 
 defineOptions({
   name: 'PopoverTableSelect',
 })
-const props = defineProps({
-  debounce: { type: Number, default: 0 },
-  throttle: { type: Number, default: 300 },
-  /**
-   * 防抖节流的配置
-   * @see https://github.com/pikax/vue-throttle-debounce#throttle
-   * @see https://github.com/pikax/vue-throttle-debounce#debounce
-   */
-  options: { type: Object as PropType<ThrottleOrDebounceOptions>, default: () => ({}) },
-  /**
-   * 当类型为input时，默认显示输入框
-   */
-  popType: {
-    type: String as PropType<'default' | 'input'>,
-    default: 'default',
-  },
-  placeholder: {
-    type: String,
-    default: '点击或按下方向键试试',
-  },
-  popoverProps: {
-    type: Object as PropType<PopoverProps>,
-    default: () => ({}),
-  },
-  inputProps: {
-    type: Object as PropType<InputProps>,
-    default: () => ({}),
-  },
-  inputValue: {
-    type: String,
-    default: '',
-  },
-  virtualRef: {
-    type: Object as () =>
-      | ComponentPublicInstance
-      | ComponentInternalInstance
-      | InputInstance
-      | HTMLElement
-      | null,
-    default: null,
-    required: false,
-  },
-  /**
-   * 再次聚焦的触发方式(会打开弹窗）
-   * @values 'enter' | 'input'
-   */
-  successiveShowType: {
-    type: String as PropType<'enter' | 'input'>,
-    default: '',
-  },
-  onInput: {
-    type: Function,
-  },
-  scrollY: {
-    type: Object as PropType<{ enabled: boolean, threshold: number }>,
-    default: () => ({}),
-  },
-  enableLoadMore: {
-    type: Boolean,
-    default: false,
-  },
-  // 是否还有更多数据
-  hasMore: {
-    type: Boolean,
-    default: false,
-  },
-  // 加载中
-  loading: {
-    type: Boolean,
-    default: false,
-  },
+
+const props = withDefaults(defineProps<propsType>(), {
+  debounce: 0,
+  throttle: 300,
+  options: () => ({}),
+  popType: 'default',
+  placeholder: '点击或按下方向键试试',
+  inputValue: '',
+  virtualRef: null,
+  successiveShowType: 'enter' as const,
+  scrollY: () => ({ enabled: false, threshold: 0 }),
+  enableLoadMore: false,
+  hasMore: false,
+  loading: false,
 })
 
-const emits = defineEmits(['focus', 'blur', 'enter', 'clear', 'loadMore'])
+const emit = defineEmits<emitsType>()
 
 // 获取插槽
 const slots = defineSlots<slotsType>()
-
-type ThrottleOrDebounceOptions = Partial<DebounceSettings & ThrottleSettings> & { promise?: boolean }
 
 const slotNames = computed<string[]>(() => Object.keys(slots) as string[])
 
@@ -154,20 +95,20 @@ const computedVirtualRef = computed<HTMLElement | ComponentPublicInstance
 function handleFocus() {
   cacheInputValue.value = currentInputValue.value
   currentInputValue.value = ''
-  emits('focus')
+  emit('focus')
   if (!popoverModel.value) {
     handleInput(currentInputValue.value)
   }
 }
 
 function handleBlur() {
-  emits('blur')
+  emit('blur')
   currentInputValue.value = cacheInputValue.value
   cacheInputValue.value = ''
 }
 
 function handleEnter(val: any) {
-  emits('enter', val)
+  emit('enter', val)
   if (props.successiveShowType === 'enter') {
     popoverModel.value = true
   }
@@ -185,7 +126,7 @@ function handleClear() {
   cacheInputValue.value = ''
   currentInputValue.value = ''
   popoverModel.value = false
-  emits('clear')
+  emit('clear')
 }
 
 const computedOptions = computed<ThrottleOrDebounceOptions>(() => {
@@ -208,7 +149,7 @@ const computedInput = computed(() => {
 
 function handleScrollBoundary(obj) {
   if (props.enableLoadMore && props.hasMore && obj.direction === 'bottom') {
-    emits('loadMore')
+    emit('loadMore')
   }
 }
 </script>
