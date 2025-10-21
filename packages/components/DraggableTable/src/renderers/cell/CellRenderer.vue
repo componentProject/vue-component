@@ -34,21 +34,22 @@
       v-bind="renderOptsProps"
       v-model="currRow[currColumn.field]"
     />
-    <template v-else-if="renderOptsPropsType === 'tag' && TagRender && propsOptions">
-      <ElTag
-        v-for="item in propsOptions"
-        :key="item.value"
-        class="mr-8!"
-        v-bind="item"
-      >
-        {{ item.label }}
-      </ElTag>
-      <ElTag
-        v-else
-        v-bind="renderOptsProps"
-      >
-        {{ currRow[currColumn.field] }}
-      </ElTag>
+    <template v-else-if="renderOptsPropsType === 'tag' && TagRender">
+      <template v-for="item in propsOptions" :key="item.value">
+        <ElTag
+          v-if="propsOptions"
+          class="mr-8!"
+          v-bind="item"
+        >
+          {{ item.label }}
+        </ElTag>
+        <ElTag
+          v-else
+          v-bind="renderOptsProps"
+        >
+          {{ currRow[currColumn.field] }}
+        </ElTag>
+      </template>
     </template>
   </div>
 </template>
