@@ -7,7 +7,7 @@
 <script setup lang="ts">
 import type { ComponentInternalInstance, ComponentPublicInstance } from 'vue'
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
-import type { emitsType, propsType } from './_types'
+import type { emitsType, propsType, slotsType } from './_types'
 
 defineOptions({
   name: 'EnterNextContainer',
@@ -19,6 +19,9 @@ const props = withDefaults(defineProps<propsType>(), {
 
 // 定义可以发出的事件
 const emit = defineEmits<emitsType>()
+
+// 获取插槽
+const slots = defineSlots<slotsType>()
 
 
 const containerRef = ref<HTMLElement | null>(null)

@@ -25,11 +25,8 @@
 </template>
 
 <script lang="ts" setup>
-import type { DatePickerProps } from 'element-plus'
 import zhCn from 'element-plus/dist/locale/zh-cn.mjs'
 import { ElConfigProvider, ElDatePicker } from 'element-plus'
-import type { Moment, unitOfTime } from 'moment'
-import type { PropType } from 'vue'
 import moment from 'moment'
 import { isEmpty } from 'radash'
 import { computed, ref, useTemplateRef, watch } from 'vue'
@@ -42,124 +39,36 @@ import {
   getTypeDefault,
   validateDate,
 } from '@moluoxixi/utils/_utils'
+import type { emitsType, propsType, slotsType } from './_types'
 
 defineOptions({
   name: 'DateRangePicker',
 })
-// 组件属性
-const props = defineProps({
-  //#region 透传给el-date-picker
-  // 日期选择类型，支持 date(单日期) 和 daterange(日期范围)
-  type: {
-    type: String as () => DatePickerProps['type'],
-    default: 'date',
-    validator: (val: string) =>
-      ['year', 'month', 'date', 'datetime', 'week', 'datetimerange', 'daterange'].includes(val),
-  },
-  // 显示在输入框中的格式
-  format: {
-    type: String,
-    default: null,
-  },
-  // 可选，绑定值的格式，对显示值无效
-  valueFormat: {
-    type: String,
-    default: 'YYYY-MM-DD HH:mm:ss',
-  },
-  // 非范围选择时的占位内容
-  placeholder: {
-    type: String,
-    default: '请选择日期',
-  },
-  // 范围选择时开始日期的占位内容
-  startPlaceholder: {
-    type: String,
-    default: '开始日期',
-  },
-  // 范围选择时结束日期的占位内容
-  endPlaceholder: {
-    type: String,
-    default: '结束日期',
-  },
-  rangeSeparator: {
-    type: String,
-    default: '至',
-  },
-  //#endregion
-  //#region 默认值相关
-  // 绑定值
-  modelValue: {
-    type: Array,
-    default: () => [],
-  },
-  outputFormat: {
-    type: [String, Array] as PropType<string, string[]>,
-  },
-  // 当无选定值时，是否默认返回今天的日期范围
-  defaultToday: {
-    type: Boolean,
-    default: true,
-  },
-  /**
-   * 日期范围，可以是数字或数组
-   * 正数表示当前日期往后n天（dateRangeType）
-   * 负数表示往前n天（dateRangeType）
-   * 数组[n,m]表示从前n天到后m天（dateRangeType）
-   */
-  dateRange: {
-    type: [Array, Number] as PropType<number[] | number>,
-    default: null,
-  },
-  /**
-   * 日期范围类型
-   * @default day
-   */
-  dateRangeType: {
-    type: String as () => unitOfTime.DurationConstructor,
-    default: 'day',
-  },
-  /**
-   * 日期范围的基准日期
-   * @default 当前日期
-   */
-  dateRangeBaseDate: {
-    type: [String, Object],
-    default: moment(),
-  },
-  //#endregion
-  //#region 禁用相关
-  // 最小可选日期
-  minDate: {
-    type: [String, Object],
-    default: null,
-  },
-  // 最大可选日期
-  maxDate: {
-    type: [String, Object],
-    default: null,
-  },
-  // 禁用日期范围，格式为 [minDate, maxDate]
-  disabledDateRange: {
-    type: Array,
-    default: null,
-  },
-  /**
-   * 当类型为datetime/datetimerange时，如果存在min/maxDate/disabledDateRange时的时分秒禁用规则
-   */
-  datetimeDisableTypes: {
-    type: Array,
-    default: () => ['hours', 'minutes', 'seconds'],
-  },
-  //#endregion
-  // 是否显示快速选择选项
-  shortcuts: {
-    type: [Boolean, Array],
-    default: false,
-  },
+
+const props = withDefaults(defineProps<propsType>(), {
+  type: 'date',
+  format: null,
+  valueFormat: 'YYYY-MM-DD HH:mm:ss',
+  placeholder: '请选择日期',
+  startPlaceholder: '开始日期',
+  endPlaceholder: '结束日期',
+  rangeSeparator: '至',
+  modelValue: () => [],
+  defaultToday: true,
+  dateRange: null,
+  dateRangeType: 'day',
+  dateRangeBaseDate: () => moment(),
+  minDate: null,
+  maxDate: null,
+  disabledDateRange: null,
+  datetimeDisableTypes: () => ['hours', 'minutes', 'seconds'],
+  shortcuts: false,
 })
 
-// 定义emit
-const emit = defineEmits(['update:modelValue', 'change'])
+const emit = defineEmits<emitsType>()
+
+// 获取插槽
+const slots = defineSlots<slotsType>()
 
 // 本地日期值，用于与el-date-picker交互
 const localDateValue = ref([])

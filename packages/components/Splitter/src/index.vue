@@ -22,7 +22,7 @@
 import { computed } from 'vue'
 import { ElSplitter, ElSplitterPanel } from 'element-plus'
 import type { slotsType } from '@moluoxixi/components/_types'
-import type { propsType } from './_types'
+import type { emitsType, propsType } from './_types'
 
 // 面板配置接口
 interface PanelConfig {
@@ -46,6 +46,8 @@ const props = withDefaults(defineProps<propsType>(), {
   splitWidth: 8,
   panels: () => [],
 })
+
+const emit = defineEmits<emitsType>()
 
 // 获取可用的插槽名称
 const slots = defineSlots<slotsType>()

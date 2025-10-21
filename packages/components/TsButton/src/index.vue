@@ -20,7 +20,7 @@
 import { computed } from 'vue'
 import { ElButton, ElPopover } from 'element-plus'
 import { debounce as wlDebounce, throttle as wlThrottle } from '@moluoxixi/utils/_utils'
-import type { emitsType, propsType, ThrottleOrDebounceOptions } from './_types'
+import type { emitsType, propsType, slotsType, ThrottleOrDebounceOptions } from './_types'
 
 defineOptions({
   name: 'TsButton',
@@ -38,6 +38,9 @@ const props = withDefaults(defineProps<propsType>(), {
 })
 
 const emit = defineEmits<emitsType>()
+
+// 获取插槽
+const slots = defineSlots<slotsType>()
 
 const computedShowPopover = computed(() => {
   if (!props.content) {

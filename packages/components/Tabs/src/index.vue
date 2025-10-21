@@ -22,31 +22,26 @@
 
 <script setup lang="ts">
 import { ElTabPane, ElTabs } from 'element-plus'
+import type { emitsType, propsType, slotsType } from './_types'
 
 defineOptions({
   name: 'Tabs',
 })
-const props = defineProps({
-  tabList: {
-    type: Array<{
-      label: string
-      name: string | number
-      slot?: string
-      lazy?: boolean
-      show?: (item: any) => boolean
-    }>,
-    default: () => [],
-  },
-  type: {
-    type: String as PropType<'border-card' | 'card'>,
-    default: '',
-  },
+
+const props = withDefaults(defineProps<propsType>(), {
+  tabList: () => [],
+  type: '',
 })
-const emits = defineEmits(['tabChange'])
+
+const emit = defineEmits<emitsType>()
+
+// 获取插槽
+const slots = defineSlots<slotsType>()
+
 const activeName = defineModel({ default: '0', type: String })
 
 function handleTabChange(val: any) {
-  emits('tabChange', val)
+  emit('tabChange', val)
 }
 </script>
 
