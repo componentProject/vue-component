@@ -7,13 +7,16 @@
       删除组件库组件
     </el-button> -->
     <div v-if="localComponent" class="main">
-      <el-button type="primary" @click="handleSave">保存</el-button>
+      <el-button type="primary" @click="handleSave">
+        保存
+      </el-button>
       <div class="list-title">
         开发调试组件
       </div>
       <component
-        ref="localComponentRef"
         :is="localComponent"
+        ref="localComponentRef"
+        :initial-form-config="myFormConfig"
         v-bind="componentProps"
       />
     </div>
@@ -37,6 +40,7 @@ import { load } from '@moluoxixi/utils/_utils/loadComponent'
 import { setDeleteByPathAndCode } from '@moluoxixi/utils/_api'
 import componentData from './data.ts'
 import { COMPONENT_SETTING_TYPE } from '@moluoxixi/constant'
+import { deserializeWithFunctions } from '@moluoxixi/components/DesignForm/src/utils/formSerializer'
 
 defineOptions({ name: '调试与演示' })
 // 使用ref替代data属性
@@ -162,12 +166,18 @@ onMounted(async () => {
   await loadComponents([componentName.value])
 })
 
+const strObj = ''
+
+//let myFormConfig = JSON.parse(JSON.stringify({ formName: '', formCode: '', size: 'default', layout: 'grid', colGap: 16, labelPosition: 'right', labelWidth: 120, scrollToError: true, hideBtns: true, submitBtnText: '确定', cancelBtnText: '取消', items: [{ label: '输入框', component: 'ElInput', props: { clearable: true, disabled: false, maxlength: '3' }, field: 'elInput_1761034725634_159', labelWidth: '200', tooltip: '这是一个提示', tips: '底部说明信息', defaultValue: '10', rules: [{ required: true, message: '输入框不能为空哦', trigger: ['blur', 'change'] }] }, { label: '多行输入框', component: 'ElInput', props: { type: 'textarea', disabled: true }, field: 'eltextarea_1761034726283_507', rules: [{ required: false, message: '不能为空', trigger: ['blur', 'change'] }] }, { label: '输入框数字', component: 'ElInputNumber', props: { clearable: true, disabled: false }, field: 'elInput_1761034725307_284', rules: [{ required: false, message: '不能为空', trigger: ['blur', 'change'] }] }, { label: '下拉框', component: 'TsSelect', props: { clearable: true, filterable: true, options: [{ label: '选项1', value: '1' }, { label: '选项2', value: '2' }, { label: '选项3', value: '3' }], requestParams: null }, field: 'tsselect_1761034727885_611', dataType: false, rules: [{ required: false, message: '不能为空', trigger: ['blur', 'change'] }] }, { label: '多选', component: 'TsCheckbox', props: { options: [{ label: '多选1', value: '1' }, { label: '多选2', value: '2' }], clearable: true }, field: 'tscheckbox_1761034729144_945', dataType: false }, { label: '单选', component: 'TsRadio', props: { options: [{ label: '单选1', value: '1' }, { label: '单选2', value: '2' }], disabled: false, labelKey: 'lable', valueKey: 'value' }, field: 'tsradio_1761034729575_336', dataType: false, rules: [{ required: false, message: '不能为空', trigger: ['blur', 'change'] }] }] }))
+const myFormConfig = deserializeWithFunctions(JSON.stringify({ formName: '', formCode: '', size: 'default', layout: 'grid', colGap: 16, labelPosition: 'right', labelWidth: 120, scrollToError: true, hideBtns: true, submitBtnText: '确定', cancelBtnText: '取消', items: [{ label: '输入框', component: 'ElInput', props: { clearable: true, disabled: false, maxlength: '3' }, field: 'elInput_1761034725634_159', labelWidth: '200', tooltip: '这是一个提示', tips: '底部说明信息', defaultValue: '10', rules: [{ required: true, message: '输入框不能为空哦', trigger: ['blur', 'change'] }, { validator: '[FUNCTION](rule, value, callback, form) => { if (value>10) { callback(new Error("该字段不能大于10")); } else { callback(); } }', trigger: ['blur', 'change'] }] }, { label: '多行输入框', component: 'ElInput', props: { type: 'textarea', disabled: true }, field: 'eltextarea_1761034726283_507', rules: [{ required: false, message: '不能为空', trigger: ['blur', 'change'] }] }, { label: '输入框数字', component: 'ElInputNumber', props: { clearable: true, disabled: false }, field: 'elInput_1761034725307_284', rules: [{ required: false, message: '不能为空', trigger: ['blur', 'change'] }] }, { label: '下拉框', component: 'TsSelect', props: { clearable: true, filterable: true, options: [{ label: '选项1', value: '1' }, { label: '选项2', value: '2' }, { label: '选项3', value: '3' }], requestParams: null }, field: 'tsselect_1761034727885_611', dataType: false, rules: [{ required: false, message: '不能为空', trigger: ['blur', 'change'] }] }, { label: '多选', component: 'TsCheckbox', props: { options: [{ label: '多选1', value: '1' }, { label: '多选2', value: '2' }], clearable: true, requestParams: null }, field: 'tscheckbox_1761034729144_945', dataType: false, defaultValue: ['1', '2'], rules: [{ required: false, message: '不能为空', trigger: ['blur', 'change'] }] }, { label: '单选', component: 'TsRadio', props: { options: [{ label: '单选1', value: '1' }, { label: '单选2', value: '2' }] }, field: 'tsradio_1761123562740_267', dataType: false, defaultValue: '1', rules: [{ required: false, message: '不能为空', trigger: ['blur', 'change'] }] }] }))
+//let myFormConfig = []
+
 /**
  * 保存表单配置
  */
 async function handleSave() {
   const formConfig = await localComponentRef.value.getFinalFormConfig()
-  console.log('保存的表单配置:', JSON.stringify(formConfig))
+  console.log('保存的表单配置:', formConfig)
 }
 </script>
 

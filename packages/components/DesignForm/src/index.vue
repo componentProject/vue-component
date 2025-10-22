@@ -24,17 +24,32 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import ReForm from '@moluoxixi/components/ReForm'
 import DesignFormRules from './components/DesignFormRules.vue'
 import DesignFormList from './components/DesignFormList.vue'
 import { componentMap, formItemObj } from './datas/index'
 import { defaultFormConfig } from './datas/formData'
-import { deepClone } from './utils/formSerializer'
+import { deepClone, serializeWithFunctions } from './utils/formSerializer'
 import { ElMessage } from 'element-plus'
 import { isObject } from 'lodash'
 
 defineOptions({ name: 'DesignForm' })
+
+// 定义组件属性，接收外部传入的表单配置
+const props = defineProps({
+  /**
+   * 外部传入的表单配置对象
+   * 如果提供，则会覆盖默认配置并回显
+   */
+  initialFormConfig: {
+    type: Object,
+    default: null,
+  },
+})
+
+// 定义emit事件
+const emit = defineEmits(['update:formConfig'])
 
 const formConfig = ref(null)
 // 存储当前选中的表单项
@@ -290,6 +305,56 @@ function handleSelectedItemUpdate(updatedItem: any) {
 
     newItems.forEach((item, index) => {
       item.customClass = index === selectedItemIndex.value ? 'selected-form-item' : ''
+
+      // 对于TsCheckbox组件，确保默认值是数组类型
+      const isTsCheckbox = (
+        // 检查对象形式的组件名称
+        (item.component && typeof item.component === 'object' && item.component.name?.toLowerCase() === 'tscheckbox')
+        // 检查字符串形式的组件名称
+        || (typeof item.component === 'string' && item.component.toLowerCase() === 'tscheckbox')
+      )
+
+      if (isTsCheckbox) {
+        // 检查并转换defaultValue为数组类型
+        if (item.defaultValue !== undefined && item.defaultValue !== null) {
+          if (typeof item.defaultValue === 'string') {
+            try {
+              // 尝试将字符串解析为JSON数组
+              const parsedArray = JSON.parse(item.defaultValue)
+              if (Array.isArray(parsedArray)) {
+                item.defaultValue = parsedArray
+              }
+              else {
+                // 如果字符串包含逗号，按逗号分割为数组
+                if (item.defaultValue.includes(',')) {
+                  item.defaultValue = item.defaultValue.split(',').map(str => str.trim())
+                } else {
+                  // 否则创建包含该字符串的数组
+                  item.defaultValue = [item.defaultValue]
+                }
+              }
+            }
+            catch {
+              // 如果解析失败，检查是否包含逗号
+              if (item.defaultValue.includes(',')) {
+                item.defaultValue = item.defaultValue.split(',').map(str => str.trim())
+              }
+              else {
+                // 否则创建包含该字符串的数组
+                item.defaultValue = [item.defaultValue]
+              }
+            }
+          }
+          else if (!Array.isArray(item.defaultValue)) {
+            // 其他非数组类型转换为数组
+            item.defaultValue = [item.defaultValue]
+          }
+        }
+        else if (item.defaultValue === null || item.defaultValue === undefined) {
+          // 如果是null或undefined，设为空数组
+          item.defaultValue = []
+        }
+      }
     })
 
     // 使用深拷贝创建全新的formConfig对象，确保响应式更新
@@ -379,13 +444,62 @@ watch(selectedItemIndex, (newIndex) => {
   }
 })
 
+// 组件挂载后，处理初始配置
+onMounted(() => {
+  // 如果传入了初始表单配置，则处理并显示
+  if (props.initialFormConfig && props.initialFormConfig?.items) {
+    try {
+      // 深拷贝避免直接修改props
+      const initialConfig = deepClone(props.initialFormConfig)
+
+      // 处理组件引用，确保组件名称被正确映射为组件对象
+      if (initialConfig.items && Array.isArray(initialConfig.items)) {
+        initialConfig.items.forEach((item, index) => {
+          // 处理组件引用
+          if (typeof item.component === 'string') {
+            const componentName = item.component.toLowerCase()
+            if (componentMap[componentName]) {
+              item.component = componentMap[componentName]
+            }
+          }
+          // 初始化自定义类，未选中状态
+          item.customClass = ''
+        })
+      }
+
+      // 设置表单配置
+      formConfig.value = initialConfig
+
+      console.log('初始表单配置已加载:', formConfig.value)
+    }
+    catch (error) {
+      console.error('加载初始表单配置失败:', error)
+      ElMessage.error('表单配置格式错误，请检查配置对象')
+    }
+  }
+})
+
 function getFormConfigEvent() {
+  // 检查formConfig是否存在
+  if (!formConfig.value) {
+    return null
+  }
+
   const formConfigEvent = deepClone(formConfig.value)
-  formConfigEvent?.items.forEach((item) => {
-    delete item.customClass
-    item.component = item.component.name
-  })
-  return formConfigEvent
+
+  // 处理items数组中的每个表单项
+  if (formConfigEvent?.items && Array.isArray(formConfigEvent.items)) {
+    formConfigEvent.items.forEach((item) => {
+      // 移除内部使用的自定义类
+      delete item.customClass
+
+      // 将组件对象转换为组件名称字符串
+      if (item.component && typeof item.component === 'object' && item.component.name) {
+        item.component = item.component.name
+      }
+    })
+  }
+  return serializeWithFunctions(formConfigEvent)
 }
 // 暴露方法给外部调用
 defineExpose({

@@ -137,6 +137,28 @@ function setFormItemConfig(item: any) {
         }
       })
     }
+    else if (key === 'rules') {
+      item[key].forEach((rule: any) => {
+        if (rule) {
+          Object.keys(rule).forEach((propKey) => {
+            if (propKey === 'validator') {
+              const validatorValue = rule[propKey]
+              // 根据类型处理不同情况
+              if (typeof validatorValue === 'function') {
+                itemObj[propKey] = validatorValue.toString()
+              }
+              else {
+                // 已经是字符串或其他类型，直接赋值
+                itemObj[propKey] = validatorValue
+              }
+            }
+            else {
+              itemObj[propKey] = rule[propKey]
+            }
+          })
+        }
+      })
+    }
     else {
       itemObj[key] = item[key]
     }
