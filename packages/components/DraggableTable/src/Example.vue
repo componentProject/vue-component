@@ -26,22 +26,16 @@
 
       <div class="flex items-center">
         <span class="mr-8!">扩展type选择：</span>
-        <el-select
+        <TsSelect
           v-model="cellType"
           style="width: 200px"
           clearable
           value-key="type"
           placeholder="请选择"
+          :options="cellTypeList"
           @clear="changeCellType('')"
           @change="changeCellType"
-        >
-          <el-option
-            v-for="item in cellTypeList"
-            :key="item.label"
-            :label="item.label"
-            :value="item.value"
-          />
-        </el-select>
+        />
       </div>
     </div>
     <ElButton @click="loading = !loading">
@@ -51,7 +45,7 @@
       校验表格
     </ElButton>
     <!-- 使用DraggableTable组件 -->
-    <DraggableTable
+    <aDraggableTable
       id="demo_table_12355666"
       ref="draggableTableRef"
       v-model="tableData"
@@ -75,14 +69,14 @@
           aaa自定义插槽按钮
         </TsButton>
       </template>
-    </DraggableTable>
+    </aDraggableTable>
   </div>
 </template>
 
 <script lang="ts" setup>
 import { ElButton, ElMessage } from 'element-plus'
 import { onMounted, ref, useTemplateRef } from 'vue'
-import DraggableTable from './index.vue'
+import aDraggableTable from './index.vue'
 // 表格加载状态
 const loading = ref(false)
 // 拖拽开关状态
@@ -271,11 +265,11 @@ const cellTypeList = ref([
 function pageChangeHandler(params) {
   console.log('params', params)
 }
-function changeCellType(type: string) {
-  const item = columns.value.at(-2)
-  columns.value[columns.value.length - 2] = {
+function changeCellType(type: any) {
+  const item = columns.value.at(-3)
+  columns.value[columns.value.length - 3] = {
     ...item,
-    type,
+    ...type,
   }
 }
 

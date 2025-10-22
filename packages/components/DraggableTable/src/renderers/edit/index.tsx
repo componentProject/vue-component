@@ -1,5 +1,5 @@
 import { VxeUI } from 'vxe-pc-ui'
-import EditRenderer from './EditRenderer.tsx'
+import EditRenderer from './EditRenderer.vue'
 
 // 创建一个编辑渲染器
 VxeUI.renderer.add('editRenderer', {
