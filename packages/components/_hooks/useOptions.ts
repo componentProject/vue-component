@@ -29,6 +29,7 @@ export interface UseOptionsReturn {
  * @returns 返回处理后的 options 和加载状态
  */
 export function useOptions(props: UseOptionsProps): UseOptionsReturn {
+  console.log('props', props)
   const serverOrLocalOptions = ref<any[]>([])
   const isLoading = ref(false)
   const error = ref<string | null>(null)
@@ -101,9 +102,7 @@ export function useOptions(props: UseOptionsProps): UseOptionsReturn {
         // 其他情况使用POST请求
         response = await api.post(props.requestUrl, props.requestParams)
       }
-
-      const data = response
-
+      const data = response || []
       // 确保返回的是数组
       return Array.isArray(data) ? data : []
     }
