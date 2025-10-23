@@ -1,5 +1,5 @@
 import { VxeUI } from 'vxe-pc-ui'
-import CellRenderer from './CellRenderer.tsx'
+import CellRenderer from './CellRenderer.vue'
 
 // 创建一个默认渲染器
 VxeUI.renderer.add('cellRenderer', {

@@ -14,6 +14,10 @@ async function getComponentByFile(allComponentList: any[], componentName: string
       content,
     }]
   }
+  else {
+    console.error('文件未能正常加载')
+    return []
+  }
 }
 
 /**
@@ -37,7 +41,7 @@ export async function fetchFileContent(componentName: string, moduleType: string
     }
 
     // 动态导入模块
-    const module = await modules[moduleKey]()
+    const module: any = await modules[moduleKey!]()
     const content = module.default || module
     console.log(`成功加载组件 ${componentName} 的文件内容,大小为${(content?.length / 1024 / 1024).toFixed(2)}M`)
     return content
@@ -84,7 +88,7 @@ export async function registerAllComponent(Vue: any, app: any, type?: string, is
   const componentItemKey = type ?? (vueVersion === 'vue2' ? 'Vue2' : 'Vue3')
   const allComponentListStr = await idbStorage.getItem(componentItemKey)
   isString(componentItemKey)
-  const allComponentList: any[] = JSON.parse(allComponentListStr)
+  const allComponentList: any[] = JSON.parse(allComponentListStr!)
   allComponentList.forEach((item) => {
     const loadingComponent = {
       name: 'AsyncLoading',
@@ -158,7 +162,6 @@ export async function loadRemoteComponent(Vue: any, componentName: string, allCo
   else {
     componentDownList = await getComponentByFile(allComponentList, componentName, moduleType)
   }
-  console.log('componentName', componentName)
   const componentCode = componentDownList[0]?.content
   if (moduleType === 'iife') {
     return getiifeComponent(Vue, vueShared, componentCode, componentName)
@@ -175,7 +178,7 @@ export async function load(Vue: any, originComponentNames: string[], type?: stri
   const componentItemKey = type ?? (vueVersion === 'vue2' ? 'Vue2' : 'Vue3')
   const allComponentListStr = await idbStorage.getItem(componentItemKey)
   isString(componentItemKey)
-  const allComponentList = JSON.parse(allComponentListStr)
+  const allComponentList: any[] = JSON.parse(allComponentListStr!)
   const componentNames
     = originComponentNames?.length > 0
       ? originComponentNames

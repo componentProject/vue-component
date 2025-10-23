@@ -2,6 +2,7 @@
   <div ref="container" class="h-full w-full flex-1 overflow-hidden outline-0 table-box containerMain">
     <VxeGrid
       ref="xTable"
+      :columns="computedColumns"
       v-bind="gridProps"
       @checkbox-all="handleCheckboxAll"
       @checkbox-change="handleCheckboxChange"
@@ -19,14 +20,6 @@
         <slot :name="name" v-bind="slotParams" />
       </template>
     </VxeGrid>
-    <!--    表头右键菜单，有bug，暂时关闭 -->
-    <!--    <ContextMenu -->
-    <!--      v-model="contextMenuVisible" -->
-    <!--      :columns="collectColumn" -->
-    <!--      :virtual-ref="virtualRef" -->
-    <!--      @menu-confirm="handleMenuConfirm" -->
-    <!--      @header-context-menu="handleHeaderContextMenu" -->
-    <!--    /> -->
 
     <template v-if="needCollect">
       <EnterNextContainer
@@ -66,7 +59,8 @@ import { cloneDeep, groupBy } from 'lodash'
 import { diff, isEmpty } from 'radash'
 import Sortable from 'sortablejs'
 import VxeUI, { VxePager, VxeTooltip } from 'vxe-pc-ui'
-
+import './variable.scss'
+import { VxeGrid } from 'vxe-table'
 import {
   debounce,
   dispatchEvents,
@@ -84,7 +78,6 @@ import './renderers'
 import type { slotsType } from '@moluoxixi/components/_types'
 import CustomConfigDialog from './components/CustomConfigDialog.vue'
 import { getMemoryQuery, setMemoryUpload } from '@moluoxixi/utils/_api/cache'
-import './variable.scss'
 
 defineOptions({
   name: 'DraggableTable',
@@ -262,9 +255,9 @@ const props = withDefaults(defineProps<propsType>(), {
 const emit = defineEmits<emitsType>()
 // 注册 VxeUI 组件
 // 获取插槽
-// eslint-disable-next-line style/max-statements-per-line
-const slots = defineSlots<slotsType>(); (VxeUI as any).component(VxePager)
-;(VxeUI as any).component(VxeTooltip)
+const slots = defineSlots<slotsType>()
+VxeUI.component(VxePager)
+VxeUI.component(VxeTooltip)
 
 const customConfigDialogVisible = ref(false)
 const customConfigDialogRef = useTemplateRef<HTMLElement>('customConfigDialogRef')
@@ -278,8 +271,7 @@ const tableData = defineModel({
 })
 
 // 表格引用
-const xTableRef = useTemplateRef<VxeGridInstance>('xTable')
-const xTable = computed(() => xTableRef.value?.tableRef)
+const xTable = useTemplateRef<VxeGridInstance>('xTable')
 
 //#region 回车下一个功能
 const tableVirtualRefs = ref<HTMLElement[]>([])
@@ -390,18 +382,7 @@ const collectColumn = computed<ColumnType[]>(() => {
   const { collectColumn } = xTable.value.getTableColumn()
   return collectColumn as any[]
 })
-// /**
-//  * 表头右键菜单确定事件
-//  * @param columns
-//  */
-// function handleMenuConfirm(columns: ColumnType[]) {
-//   saveColumns(columns)
-// }
-//
-// /** 表头右键菜单显示事件 */
-// function handleHeaderContextMenu(params: HTMLElement) {
-//   emit('headerContextMenu', params)
-// }
+
 const contextMenuVisible = ref(false)
 const virtualRef = ref<HTMLElement>()
 /**
@@ -638,6 +619,7 @@ const computedColumns = computed<ColumnType[]>(() => {
       if (customType) {
         delete item.type
       }
+
       if (
         isEmpty(item.cellRender)
         && isEmpty(item.contentRender)
@@ -654,6 +636,7 @@ const computedColumns = computed<ColumnType[]>(() => {
             ...cellProps,
           },
         }
+        console.log('aaaaaa', item.cellRender)
       }
       //#endregion
     }
@@ -682,8 +665,8 @@ const computedColumns = computed<ColumnType[]>(() => {
 // 计算表格配置属性
 const gridProps = computed<VxeGridProps>(() => {
   return {
-    headerCellConfig: { height: 30 },
-    cellConfig: { height: 30 },
+    headerCellConfig: { height: 32 },
+    cellConfig: { height: 32 },
     // 基本配置
     id: props.id,
     border: props.border,
@@ -834,8 +817,6 @@ const gridProps = computed<VxeGridProps>(() => {
       ...props.filterConfig,
     },
     ...attrs,
-    // 使用计算后的列配置（递归移除内部校验相关属性，保持渲染结构）
-    columns: computedColumns.value,
   } as VxeGridProps
 })
 //#endregion
@@ -989,11 +970,14 @@ function mergeColumnsLevel(storedLevel: any[] = [], propsLevel: any[] = []): any
     matchedKeys.add(k)
   })
 
+  console.log('result', [...result])
   // 末尾追加 props 中新增（同级）
   propsLevel.forEach((propCol: any) => {
     const k = getColumnUniqueKey(propCol)
-    if (!k || !matchedKeys.has(k))
+    if (!k || !matchedKeys.has(k)) {
+      console.log('propCol', propCol)
       result.push(propCol)
+    }
   })
 
   return result
@@ -1334,6 +1318,10 @@ defineExpose({
 
 <style scoped lang="scss">
 @forward '@moluoxixi/components/_assets/styles/tailwind.scss';
+
+:deep(*) {
+  @import '@moluoxixi/components/DraggableTable/src/style.scss';
+}
 .table-box {
   :deep(.vxe-table--filter-template) {
     display: flex !important;

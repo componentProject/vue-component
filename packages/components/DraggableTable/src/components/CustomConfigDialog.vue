@@ -6,7 +6,6 @@
       v-bind="computedDialogProps"
     >
       <VxeGrid
-        id="custom"
         ref="xTable"
         v-bind="gridProps"
       >
@@ -34,6 +33,7 @@
           <TsSelect
             v-if="column.field !== 'fixed' || !row.parentId"
             v-model="row[column.field]"
+            :empty-values="[undefined]"
             :options="column.params.options"
             class="m-2"
             :popper-style="computedPopperStyle"
@@ -73,6 +73,7 @@ import { getTypeName } from '@moluoxixi/components/DraggableTable/src/_utils'
 import type { CustomConfigDialogEmitsType, CustomConfigDialogPropsType } from '@moluoxixi/components/DraggableTable/src/_types'
 import { flattenTree } from '@moluoxixi/utils/_utils'
 import { cloneDeep } from 'lodash'
+import { VxeGrid } from 'vxe-table'
 import type { VxeGridInstance } from 'vxe-table'
 
 const props = withDefaults(defineProps<CustomConfigDialogPropsType>(), {
@@ -83,8 +84,9 @@ const props = withDefaults(defineProps<CustomConfigDialogPropsType>(), {
 })
 
 const emit = defineEmits<CustomConfigDialogEmitsType>()
-const xTableRef = useTemplateRef<VxeGridInstance>('xTable')
-const xTable = computed(() => xTableRef.value?.tableRef)
+// const xTableRef = useTemplateRef<VxeGridInstance>('xTable')
+// const xTable = computed(() => xTableRef.value?.tableRef)
+const xTable = useTemplateRef<VxeGridInstance>('xTable')
 
 const computedDialogProps = computed(() => {
   return {
@@ -148,8 +150,11 @@ watch(() => visible.value, (v: boolean) => {
 const gridProps = computed(() => {
   return {
     border: true,
-    headerCellConfig: { height: 30 },
-    cellConfig: { height: 30 },
+    showOverflow: 'title',
+    showHeaderOverflow: 'title',
+    showFooterOverflow: 'title',
+    headerCellConfig: { height: 32 },
+    cellConfig: { height: 32 },
     height: '100%',
     columns: props.customColumns,
     checkboxConfig: { checkField: 'visible' },
@@ -199,4 +204,8 @@ defineExpose({
 
 <style scoped lang="scss">
 @forward '@moluoxixi/components/_assets/styles/tailwind.scss';
+
+:deep(*) {
+  @import '@moluoxixi/components/DraggableTable/src/style.scss';
+}
 </style>

@@ -1,5 +1,5 @@
 import { VxeUI } from 'vxe-pc-ui'
-import FilterRenderer from './FilterRenderer.tsx'
+import FilterRenderer from './FilterRenderer.vue'
 
 // 创建一个显示列表的筛选的筛选渲染器
 VxeUI.renderer.add('filterRenderer', {

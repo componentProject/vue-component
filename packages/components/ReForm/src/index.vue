@@ -30,7 +30,6 @@
           class="ap-form-grid-item ap-form-grid-item--btns"
           :style="localBtnSpanStyle"
         >
-          1111
           <ElFormItem :label="btnLabelText" :label-width="btnLabelWidth">
             <template v-if="btnLabelText" #label>
               <div style="display: inline-block; width: 1px">

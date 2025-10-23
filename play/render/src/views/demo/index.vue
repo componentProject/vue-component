@@ -7,10 +7,12 @@
       删除组件库组件
     </el-button> -->
     <div v-if="localComponent" class="main">
+      <el-button type="primary" @click="handleSave">保存</el-button>
       <div class="list-title">
         开发调试组件
       </div>
       <component
+        ref="localComponentRef"
         :is="localComponent"
         v-bind="componentProps"
       />
@@ -45,6 +47,7 @@ defineOptions({ name: '调试与演示' })
 const componentName = ref('DesignForm')
 // 调试组件
 const localComponent = ref<any>(null)
+const localComponentRef = ref<any>(null)
 // 用于存储动态组件
 const dynamicComponent = ref<any>(null)
 
@@ -158,6 +161,14 @@ onMounted(async () => {
   // return
   await loadComponents([componentName.value])
 })
+
+/**
+ * 保存表单配置
+ */
+async function handleSave() {
+  const formConfig = await localComponentRef.value.getFinalFormConfig()
+  console.log('保存的表单配置:', JSON.stringify(formConfig))
+}
 </script>
 
 <style scoped lang="scss">
