@@ -1,8 +1,5 @@
 <template>
   <div class="design-form-list-main">
-    <!-- <div class="list-header">
-      <h3>组件列表</h3>
-    </div> -->
     <ElMenu
       class="el-menu-vertical-demo"
       @select="handleClick"
@@ -22,7 +19,7 @@ defineOptions({ name: 'DesignFormList' })
 
 // 定义事件
 const emits = defineEmits<{
-  (e: 'addFormItem', componentKey: string): void;
+  (e: 'addFormItem', componentKey: string): void
 }>()
 
 // 组件列表数据
@@ -30,9 +27,9 @@ const sourceObj = ref([
   { value: 'elInput', label: '输入框' },
   { value: 'eltextarea', label: '多行输入框' },
   { value: 'elinputnumber', label: '数字输入框' },
-  { value: 'elselect', label: '下拉框' },
-  { value: 'elcheckboxgroup', label: '多选' },
-  { value: 'elradiogroup', label: '单选' },
+  { value: 'tsselect', label: '下拉框' },
+  { value: 'tscheckbox', label: '多选' },
+  { value: 'tsradio', label: '单选' },
   // 可以根据需要添加更多组件类型
 ])
 

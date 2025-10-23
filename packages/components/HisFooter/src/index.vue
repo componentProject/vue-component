@@ -5,26 +5,23 @@
 <script setup lang="ts">
 import { getQueryMedicaIInsuranceInfoApi } from '@moluoxixi/utils/_api'
 import { onMounted, ref } from 'vue'
+import type { emitsType, propsType, slotsType } from './_types'
 
 defineOptions({ name: 'HisFooter' })
 
-const props = defineProps({
-  token: {
-    type: String,
-    default: null,
-  },
-  addSign: {
-    type: Function,
-    default: () => {},
-  },
-  paramsObj: {
-    type: Object,
-    default: () => ({
-      medicalInsuranceCode: '国家医疗机构个人编码',
-      paltOrgCode: '国家定点医疗机构编码',
-    }),
-  },
+const props = withDefaults(defineProps<propsType>(), {
+  token: '',
+  paramsObj: () => ({
+    medicalInsuranceCode: '国家医疗机构个人编码',
+    paltOrgCode: '国家定点医疗机构编码',
+  }),
+  addSign: () => {},
 })
+
+const emit = defineEmits<emitsType>()
+
+// 获取插槽
+const slots = defineSlots<slotsType>()
 
 const items = ref<any[]>([])
 
@@ -66,4 +63,6 @@ defineExpose({
 })
 </script>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+@forward '@moluoxixi/components/_assets/styles/tailwind.scss';
+</style>

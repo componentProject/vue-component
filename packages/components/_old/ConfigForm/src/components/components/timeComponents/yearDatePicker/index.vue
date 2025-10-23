@@ -123,14 +123,12 @@ const yearPicker = ref<HTMLElement | null>(null)
 const inputLeft = ref<HTMLInputElement | null>(null)
 const inputRight = ref<HTMLInputElement | null>(null)
 
-const itemBg = ref({})
 const startShowYear = ref<string | null>(null)
 const endShowYear = ref<string | null>(null)
 const yearList = ref<number[]>([])
 const showPanel = ref(false)
 const startYear = ref<number | null>(null)
 const endYear = ref<number | null>(null)
-const curYear = ref(0)
 const curSelectedYear = ref(0)
 const curState = ref(SELECT_STATE.UNSELECT)
 
@@ -179,7 +177,7 @@ watch(
 )
 
 function checkStartInput() {
-  if (isNaN(Number(startShowYear.value))) {
+  if (Number.isNaN(Number(startShowYear.value))) {
     startShowYear.value = startYear.value?.toString() || null
   }
   else {
@@ -188,7 +186,7 @@ function checkStartInput() {
 }
 
 function checkEndInput() {
-  if (isNaN(Number(endShowYear.value))) {
+  if (Number.isNaN(Number(endShowYear.value))) {
     endShowYear.value = endYear.value?.toString() || null
   }
   else {

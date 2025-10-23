@@ -2,9 +2,14 @@
   <template v-for="item in items" :key="item.field">
     <div
       v-if="formVisible[item.field]"
-      class="ap-form-grid-item"
+      class="ap-form-grid-item" :class="[{ 'ap-form-grid-item-draggable': props.draggable }]"
       :style="getItemStyle(item)"
+      :data-field="item.field"
     >
+      <!-- 真实的拖拽手柄元素，可用于绑定拖拽功能 -->
+      <div v-if="props.draggable" class="ap-form-drag-handle">
+        ⋮⋮
+      </div>
       <template v-if="item.type === 'group'">
         <div class="ap-form-group">
           <div class="ap-form-group__trigger">
@@ -72,6 +77,7 @@ defineOptions({
 
 const props = defineProps<{
   items: ReFormItem[]
+  draggable: boolean
 }>()
 
 const {
@@ -141,6 +147,35 @@ const collapsedTriggerMargin = computed(() => {
 </script>
 
 <style lang="scss" scoped>
+.ap-form-grid-item-draggable {
+  cursor: default !important;
+  position: relative !important;
+}
+
+/* 真实拖拽手柄样式 */
+.ap-form-drag-handle {
+  position: absolute;
+  left: 4px;
+  top: 2px;
+  font-size: 20px;
+  color: #409eff;
+  font-family: sans-serif;
+  line-height: 1;
+  letter-spacing: -2px;
+  opacity: 0;
+  cursor: move !important;
+  padding: 4px;
+  z-index: 9999;
+  font-weight: bold;
+  transition: opacity 0.2s ease;
+  user-select: none;
+}
+
+/* 鼠标悬停在表单项上时显示拖拽手柄 */
+.ap-form-grid-item:hover .ap-form-drag-handle {
+  opacity: 1;
+}
+
 .ap-form-group {
   @apply relative w-full;
 

@@ -20,40 +20,22 @@ import { ElButton } from 'element-plus'
 import { computed } from 'vue'
 import { read, utils } from 'xlsx'
 import { getTypeDefault } from '@moluoxixi/utils/_utils'
+import type { emitsType, propsType, slotsType } from './_types'
 
 defineOptions({
   name: 'ImportExcel',
   inheritAttrs: false,
 })
 
-const props = defineProps({
-  // 列配置（数组）：例如 [{ label/title, prop/field, ... }]
-  // 具体使用哪个键由 titles/fields 两个优先级数组决定
-  columns: {
-    type: Array,
-    required: true,
-  },
-  // 从 columns 中匹配列头名称时用到的字段名优先级
-  // 例如：['title', 'label'] 将优先取 col.title，其次取 col.label
-  titles: {
-    type: Array,
-    default: () => ['title', 'label'],
-  },
-  // 从 columns/tableData 中匹配字段 key 时用到的字段名优先级
-  // 例如：['field', 'prop'] 将优先取 col.field，其次取 col.prop
-  fields: {
-    type: Array,
-    default: () => ['field', 'prop'],
-  },
+const props = withDefaults(defineProps<propsType>(), {
+  titles: () => ['title', 'label'],
+  fields: () => ['field', 'prop'],
 })
 
-const emits = defineEmits([
-  // 导入成功，抛出解析后的数组数据
-  'success',
-  // 导入失败或中断，抛出错误信息
-  'error',
-  'warning',
-])
+const emit = defineEmits<emitsType>()
+
+// 获取插槽
+const slots = defineSlots<slotsType>()
 
 const fileInputRef = useTemplateRef('fileInputRef')
 
@@ -139,7 +121,7 @@ function handleFileChange(e) {
       // 将sheet转为json，包含第一行表头
       const sheetJson = utils.sheet_to_json(ws, { header: 1, defval: '' })
       if (!sheetJson.length) {
-        emits('warning', {
+        emit('warning', {
           message: '文件为空',
           data: [],
         })
@@ -167,21 +149,21 @@ function handleFileChange(e) {
         return obj
       })
 
-      emits('success', {
+      emit('success', {
         message: '导入成功',
         data: result,
       })
     }
     catch (err) {
       console.error(err)
-      emits('error', {
+      emit('error', {
         message: '解析失败，请检查文件格式',
         error: err,
       })
     }
   }
   reader.onerror = (err) => {
-    emits('error', {
+    emit('error', {
       message: '文件读取失败',
       error: err,
     })
@@ -191,6 +173,7 @@ function handleFileChange(e) {
 </script>
 
 <style scoped>
+@forward '@moluoxixi/components/_assets/styles/tailwind.scss';
 .import-excel-wrapper {
   display: inline-block;
 }

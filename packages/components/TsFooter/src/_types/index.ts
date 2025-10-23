@@ -1,5 +1,3 @@
-export * from './props.ts'
-export interface NormalizedItem {
-  text: string
-  link?: string
-}
+export * from './emits'
+export * from './props'
+export * from './slots'

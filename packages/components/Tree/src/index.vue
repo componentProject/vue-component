@@ -72,7 +72,7 @@ import type { Component as VueComponent } from 'vue'
 import { computed, nextTick, onMounted, onUnmounted, ref, useTemplateRef } from 'vue'
 import type { TreeNode, TreeNodeData } from 'element-plus'
 import { ElIcon, ElTreeV2 } from 'element-plus'
-import type { ButtonsItem, TreeProps } from './types'
+import type { ButtonsItem, emitsType, propsType, slotsType } from './_types'
 import { Buttons } from '@moluoxixi/components/_utilComponents'
 import { Delete, Edit, Plus } from '@element-plus/icons-vue'
 
@@ -81,7 +81,7 @@ defineOptions({
   inheritAttrs: false,
 })
 
-const props = withDefaults(defineProps<TreeProps>(), {
+const props = withDefaults(defineProps<propsType>(), {
   childrenField: 'children',
   rowField: 'id',
   parentField: '',
@@ -94,10 +94,10 @@ const props = withDefaults(defineProps<TreeProps>(), {
   expandAllOnClickNode: false,
 })
 
-const emit = defineEmits<{
-  (event: 'nodeClick', data: TreeNodeData, node: TreeNode, evt: MouseEvent): void
-  (event: 'change', rows: any[]): void
-}>()
+const emit = defineEmits<emitsType>()
+
+// 获取插槽
+const slots = defineSlots<slotsType>()
 
 const treeProps = computed(() => {
   const { class: _classNames, ...rest } = props.props || {}

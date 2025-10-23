@@ -16,7 +16,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import type { NormalizedItem, tsFooterParamsType } from './_types'
+import type { emitsType, NormalizedItem, propsType, slotsType } from './_types'
 
 defineOptions({ name: 'TsFooter' })
 
@@ -25,7 +25,7 @@ defineOptions({ name: 'TsFooter' })
  * - 支持文本与链接两种元素
  * - 支持左、中、右三种对齐方式
  */
-const props = withDefaults(defineProps<tsFooterParamsType>(), {
+const props = withDefaults(defineProps<propsType>(), {
   items: () => [],
   align: 'center',
   mt: 8,
@@ -33,6 +33,11 @@ const props = withDefaults(defineProps<tsFooterParamsType>(), {
   yGap: 6,
   size: 12,
 })
+
+const emit = defineEmits<emitsType>()
+
+// 获取插槽
+const slots = defineSlots<slotsType>()
 
 /**
  * 规格化 items，统一成渲染单元

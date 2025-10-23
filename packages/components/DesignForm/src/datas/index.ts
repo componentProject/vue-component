@@ -1,10 +1,15 @@
-import { ElCheckbox, ElCheckboxGroup, ElInput, ElInputNumber, ElRadio, ElRadioGroup, ElSelect } from 'element-plus'
+import { ElInput, ElInputNumber } from 'element-plus'
+import TsSelect from '@moluoxixi/components/TsSelect'
+import TsCheckbox from '@moluoxixi/components/TsCheckbox'
+import TsRadio from '@moluoxixi/components/TsRadio'
 
 export const componentMap = {
   elinput: ElInput,
   eltextarea: ElInput,
   elinputnumber: ElInputNumber,
-  elselect: ElSelect,
+  tsselect: TsSelect,
+  tscheckbox: TsCheckbox,
+  tsradio: TsRadio,
 }
 
 export const formItemObj = {
@@ -27,18 +32,46 @@ export const formItemObj = {
     label: '数字输入框',
     component: ElInputNumber,
   },
-  elselect: {
+  tsselect: {
     label: '下拉框',
-    component: ElSelect,
+    component: TsSelect,
+    props: {
+      clearable: true,
+      filterable: true,
+      options: [{
+        label: '选项1',
+        value: '1',
+      }, {
+        label: '选项2',
+        value: '2',
+      }],
+    },
   },
-  elcheckboxgroup: {
+  tscheckbox: {
     label: '多选',
-    component: ElCheckboxGroup,
-    childComp: ElCheckbox,
+    component: TsCheckbox,
+    props: {
+      options: [{
+        label: '多选1',
+        value: '1',
+      }, {
+        label: '多选2',
+        value: '2',
+      }],
+      clearable: true,
+    },
   },
-  elradiogroup: {
+  tsradio: {
     label: '单选',
-    component: ElRadioGroup,
-    childComp: ElRadio,
+    component: TsRadio,
+    props: {
+      options: [{
+        label: '单选1',
+        value: '1',
+      }, {
+        label: '单选2',
+        value: '2',
+      }],
+    },
   },
 }

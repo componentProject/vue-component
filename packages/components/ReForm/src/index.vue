@@ -12,8 +12,12 @@
       :scroll-to-error="scrollToError"
     >
       <!-- 使用动态class绑定，根据layout的值直接选择不同的布局类 -->
-      <div :class="layout === 'flex' ? 'ap-form-flex' : 'ap-form-grid'" :style="gridTemplateStyle">
-        <ReFormRenderItems :items="renderFormItems">
+      <div
+        ref="draggableContainerRef"
+        :class="layout === 'flex' ? 'ap-form-flex' : 'ap-form-grid'"
+        :style="gridTemplateStyle"
+      >
+        <ReFormRenderItems :items="renderFormItems" :draggable="draggable">
           <template v-for="slotName in slotsNames[0]" #[slotName]="slotScoped">
             <slot :name="slotName" v-bind="slotScoped" />
           </template>
@@ -52,7 +56,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, onMounted, onUnmounted, provide, unref, useAttrs } from 'vue'
+import { computed, nextTick, onMounted, onUnmounted, provide, ref, unref, useAttrs } from 'vue'
 import type { ReFormEmits, ReFormProps } from './_types'
 import useForm, { useWatchForm } from './_utils/useForm'
 import { cloneDeep, isUndefined } from 'lodash'
@@ -63,6 +67,7 @@ import type { Arrayable } from '@vueuse/core'
 import type { FormValidateCallback } from 'element-plus'
 import { ElButton, ElForm, ElFormItem } from 'element-plus'
 import ReFormRenderItems from './components/renderItems.vue'
+import Sortable from 'sortablejs'
 
 defineOptions({
   name: 'ReForm',
@@ -82,13 +87,22 @@ const props = withDefaults(defineProps<ReFormProps>(), {
   submitBtnText: '确定',
   cancelBtnText: '取消',
   layout: 'grid', // 默认使用grid布局
+  draggable: false, // 新增拖拽排序功能开关
 })
 
 const emits = defineEmits<ReFormEmits>()
 
 //组件实例标识和核心服务初始化
 const formInstanceId = Symbol('ap-re-form-instance')
-const localItems = computed(() => props.items)
+const localItems = computed({
+  get: () => props.items,
+  set: value => emits('update:items', value),
+})
+
+// 拖拽功能相关
+const draggableContainerRef = ref<HTMLElement>()
+let sortableInstance: Sortable | null = null
+let onEndDebounceTimer: number | null = null // 防抖计时器
 
 //布局相关计算属性
 const $attrs = useAttrs()
@@ -326,18 +340,82 @@ provide(Symbol.for('ap-re-form'), {
 })
 
 //生命周期钩子
-onMounted(() => {
+onMounted(async () => {
   if (props.formRef) {
     props.formRef(unref(reFormRef))
   }
   reFormRef.value && reFormRef.value.clearValidate() // 默认清空校验 - 避免初始化就飘红色
+
+  // 初始化拖拽功能
+  if (props.draggable && draggableContainerRef.value) {
+    await nextTick()
+    // 确保ReFormRenderItems已经渲染完成
+    sortableInstance = new Sortable(draggableContainerRef.value, {
+      sort: true,
+      delay: 0,
+      delayOnTouch0nly: false,
+      touchStartThreshold: 0,
+      animation: 150,
+      handle: '.ap-form-grid-item',
+      filter: '.ap-form-grid-item--btns', // 排除按钮区域
+      onEnd: () => {
+        // 清除之前的计时器，实现防抖
+        if (onEndDebounceTimer) {
+          clearTimeout(onEndDebounceTimer)
+        }
+        // 使用防抖延迟处理，确保DOM已经稳定
+        onEndDebounceTimer = setTimeout(() => {
+          try {
+            // 获取真实的DOM状态，使用document.querySelectorAll确保获取的是最新DOM结构
+            const formItems = document.querySelectorAll('.ap-form-grid-item[data-field]')
+            const fieldNames = Array.from(formItems).map(el => el.getAttribute('data-field'))
+
+            // 创建新数组并按照DOM中的顺序重新排列
+            const newItems = []
+            fieldNames.forEach((field) => {
+              const item = props.items.find(i => i.field === field)
+              if (item)
+                newItems.push(cloneDeep(item))
+            })
+
+            // 验证重新排序是否有效
+            const isDifferent = JSON.stringify(newItems) !== JSON.stringify(props.items)
+            if (isDifferent) {
+              // 确保在Vue的下一个更新周期中更新数据
+              nextTick(() => {
+                localItems.value = newItems
+                emits('update:items', newItems)
+                console.log('拖拽更新后的数据:', newItems)
+              })
+            }
+          }
+          catch (error) {
+            console.error('拖拽排序失败:', error)
+          }
+          finally {
+            onEndDebounceTimer = null
+          }
+        }, 50) // 50ms防抖延迟
+      },
+    })
+  }
 })
 onUnmounted(() => {
   if (props.formRef) {
     clearItemConfigCache() // 调用实例的清理方法
   }
-})
 
+  // 清理拖拽实例onUnmounted(() => {
+  if (sortableInstance) {
+    sortableInstance.destroy()
+    sortableInstance = null
+  }
+  // 清理防抖计时器
+  if (onEndDebounceTimer) {
+    clearTimeout(onEndDebounceTimer)
+    onEndDebounceTimer = null
+  }
+})
 defineExpose({
   submiting,
   reFormRef,
@@ -355,6 +433,38 @@ defineExpose({
   getRef: () => reFormRef.value,
 })
 </script>
+
+<style lang="scss" scoped>
+/* 拖拽相关样式 */
+.ap-form-grid-item {
+  cursor: move;
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.02);
+  }
+}
+
+/* 排除按钮区域的拖拽样式 */
+.ap-form-grid-item--btns {
+  cursor: default;
+  &:hover {
+    background-color: transparent;
+  }
+}
+</style>
+
+/* 全局拖拽状态样式 */
+:global(.sortable-ghost) {
+  opacity: 0.5;
+  background: #c8ebfb;
+}
+
+:global(.sortable-chosen) {
+  background-color: rgba(144, 224, 239, 0.3);
+}
+
+:global(.sortable-drag) {
+  opacity: 0;
+}
 
 <style lang="scss" scoped>
 .ap-form {

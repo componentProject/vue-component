@@ -35,12 +35,15 @@
 
 <script setup lang="ts">
 import { watch } from 'vue'
+import { ElButton, ElMessageBox } from 'element-plus'
 import Tabs from '@moluoxixi/components/Tabs'
 import ReForm from '@moluoxixi/components/ReForm'
 import { formItemConfig as defaultFormItemConfig } from '../datas/formData'
 import { deepClone } from '../utils/formSerializer'
+import { debounce } from 'lodash'
 
 const props = defineProps<{
+  selectedItemIndex?: number
   formConfig?: any
   selectedItem?: any
 }>()
@@ -71,6 +74,17 @@ const formItemConfig = ref<any>(deepClone(defaultFormItemConfig))
 
 // 监听外部表单配置变化
 watch(
+  () => props.selectedItemIndex,
+  (newIndex) => {
+    if (newIndex !== undefined) {
+      formItemConfig.value = deepClone(defaultFormItemConfig)
+    }
+  },
+  { immediate: true },
+)
+
+// 监听外部表单配置变化
+watch(
   () => props.formConfig,
   (newConfig) => {
     if (newConfig) {
@@ -88,46 +102,78 @@ watch(
       setFormItemConfig(newItem)
       activeTab.value = 'component'
     }
+    else {
+      activeTab.value = 'form'
+    }
   },
+  { immediate: true },
 )
 
 // 根据添加的组件设置表单项配置
 function setFormItemConfig(item: any) {
-  const itemObj = {}
-  // 简单循环item对象的所有属性
-  if (item && typeof item === 'object') {
-    Object.keys(item).forEach((key) => {
-      if (key === 'component') {
-        itemObj[key] = item[key].name
-      }
-      else if (key === 'props') {
-        Object.keys(item[key]).forEach((propKey) => {
-          itemObj[propKey] = item[key][propKey]
-        })
+  // 添加空值检查
+  if (!item || typeof item !== 'object') {
+    return
+  }
+  // 创建新的配置对象
+  const itemObj: any = {}
+  // 一次性收集所有属性
+  Object.keys(item).forEach((key) => {
+    if (key === 'component') {
+      if (item[key].name === 'ElInput' && item?.props?.type === 'textarea') {
+        itemObj[key] = 'ElTextarea'
       }
       else {
-        itemObj[key] = item[key]
+        itemObj[key] = item[key].name
       }
-      formData.value = itemObj
-    })
-  }
+    }
+    else if (key === 'props') {
+      Object.keys(item[key]).forEach((propKey) => {
+        if (propKey === 'options' || propKey === 'requestParams') {
+          itemObj[propKey] = JSON.stringify(item[key][propKey]) || null
+        }
+        else {
+          itemObj[propKey] = item[key][propKey]
+        }
+      })
+    }
+    else {
+      itemObj[key] = item[key]
+    }
+  })
+  // 一次性赋值，避免多次更新导致的重复渲染
+  formData.value = itemObj
 }
+
+// 创建防抖的更新函数，延迟300ms执行
+const debouncedUpdateSelectedItem = debounce((data: any) => {
+  emits('update:selectedItem', data)
+}, 300)
+
+// 创建防抖的表单配置更新函数，延迟300ms执行
+const debouncedUpdateFormConfig = debounce((data: any) => {
+  emits('update:formConfig', data)
+}, 300)
 
 // 表单项配置实时变化
 function handleItemConfigChange() {
-  emits('update:selectedItem', formItemConfigRef.value.formData)
+  debouncedUpdateSelectedItem(formItemConfigRef.value.formData)
 }
 
 // 表单配置实时变化
 function handleFormConfigChange() {
-  emits('update:formConfig', formConfigRef.value.formData)
+  debouncedUpdateFormConfig(formConfigRef.value.formData)
 }
 
 // 删除表单项
 function handleDeleteItem() {
-  if (props.selectedItem && confirm('确定要删除当前表单项吗？')) {
-    emits('deleteItem')
-    console.log('删除表单项:', props.selectedItem)
+  if (props.selectedItem) {
+    ElMessageBox.confirm('确定要删除当前表单项吗？', '提示', {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+    }).then(async () => {
+      emits('deleteItem')
+    }).catch(() => {})
   }
 }
 
@@ -137,6 +183,10 @@ function getFormData() {
 
 defineExpose({
   getFormData,
+  // 修改为符合ReForm标准的回调函数形式
+  validate: (callback) => {
+    return formItemConfigRef?.value?.validate(callback)
+  },
 })
 </script>
 
@@ -146,8 +196,6 @@ defineExpose({
 
   .config-section {
     height: 100%;
-    display: flex;
-    flex-direction: column;
   }
 
   .empty-state {
@@ -158,10 +206,17 @@ defineExpose({
     color: #999;
   }
 
+  #pane-component {
+    position: relative;
+    padding-bottom: 40px;
+  }
+
   .item-actions {
-    margin-top: 20px;
-    padding-top: 20px;
-    border-top: 1px solid #f0f0f0;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: white;
   }
 
   :deep(#pane-component) {

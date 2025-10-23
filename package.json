@@ -106,5 +106,8 @@
     "tsx": "^4.20.5",
     "typescript": "catalog:dev",
     "vite": "catalog:dev"
+  },
+  "dependencies": {
+    "@vueuse/integrations": "^13.9.0"
   }
 }

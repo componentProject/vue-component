@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@google/genai": "^1.20.0",
+    "@vue/shared": "^3.5.0",
     "axios": "catalog:build",
     "dayjs": "catalog:build",
     "element-plus": "catalog:build",

@@ -7,36 +7,22 @@
 <script setup lang="ts">
 import type { ComponentInternalInstance, ComponentPublicInstance } from 'vue'
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
+import type { emitsType, propsType, slotsType } from './_types'
 
 defineOptions({
   name: 'EnterNextContainer',
 })
-const props = withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<propsType>(), {
   virtualRef: null,
   allowSelectNextInEmpty: false,
 })
 
 // 定义可以发出的事件
-const emit = defineEmits<{
-  (e: 'noNextInput', element: HTMLElement): void // 当找不到下一个输入元素时触发
-  (e: 'noSelectValue', element: HTMLElement): void // 当select为空时触发
-}>()
+const emit = defineEmits<emitsType>()
 
-interface Props {
-  virtualRef?: ComponentPublicInstance | ComponentInternalInstance | HTMLElement | null
-  /**
-   * 是否允许在select没有选中值时跳转
-   */
-  allowSelectNextInEmpty?: boolean
-  /**
-   * 默认聚焦第几个元素
-   */
-  focusNum?: number | undefined
-  /**
-   * 禁用是否下一个
-   */
-  autoNext?: boolean
-}
+// 获取插槽
+const slots = defineSlots<slotsType>()
+
 
 const containerRef = ref<HTMLElement | null>(null)
 const inputElements = ref<HTMLElement[]>([])
@@ -232,4 +218,6 @@ onUnmounted(() => {
 })
 </script>
 
-<style scoped></style>
+<style scoped>
+@forward '@moluoxixi/components/_assets/styles/tailwind.scss';
+</style>

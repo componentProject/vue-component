@@ -2,27 +2,27 @@
   <ElRadioGroup
     :id="radioId"
     v-model="data"
-    class="flex flex-wrap"
+    :style="computedStyle"
     v-bind="$attrs"
     @change="handleRadioChange"
   >
     <ElRadio
       v-for="(item) in serverOrLocalOptions"
-      :key="item[props.value]"
+      :key="item[computedValue]"
       :style="{
         'margin-right': '16px',
       }"
-      :label="item[props.value]"
+      :label="item[computedValue]"
       :disabled="
         computedDisabledHandler({
-          label: item[props.label],
-          value: item[props.value],
+          label: item[computedLabel],
+          value: item[computedValue],
           data: item,
         })
       "
       v-bind="props.radioProps"
     >
-      {{ item[props.label] }}
+      {{ item[computedLabel] }}
     </ElRadio>
   </ElRadioGroup>
 </template>
@@ -32,13 +32,16 @@ import { computed, withDefaults } from 'vue'
 import { ElRadio, ElRadioGroup } from 'element-plus'
 import { getTypeDefault } from '@moluoxixi/utils/_utils'
 import { useOptions } from '../../_hooks'
-import type { TsRadioEmits, TsRadioProps } from './_types'
+import type { emitsType, propsType, slotsType } from './_types'
 
 defineOptions({
   name: 'TsRadio',
 })
 
-const props = withDefaults(defineProps<TsRadioProps>(), {
+const props = withDefaults(defineProps<propsType>(), {
+  layout: 'flex',
+  xGap: 16,
+  gridColumns: 4,
   label: 'label',
   value: 'value',
   disabledValues: () => [],
@@ -53,8 +56,33 @@ const props = withDefaults(defineProps<TsRadioProps>(), {
   radioProps: () => ({}),
 })
 
-const emits = defineEmits<TsRadioEmits>()
+const emits = defineEmits<emitsType>()
 
+// 获取插槽
+const slots = defineSlots<slotsType>()
+
+const computedLabel = computed(() => props.labelKey || props.label)
+const computedValue = computed(() => props.valueKey || props.value)
+
+const computedStyle = computed(() => {
+  const baseStyle = {
+    'column-gap': `${props.xGap}px`,
+  }
+  if (props.layout === 'grid') {
+    return {
+      ...baseStyle,
+      'display': 'grid',
+      'grid-template-columns': `repeat(${props.gridColumns}, minmax(max-content, 1fr))`,
+    }
+  }
+  else {
+    return {
+      ...baseStyle,
+      'display': 'flex',
+      'flex-wrap': 'wrap',
+    }
+  }
+})
 const radioId = `radio-${Math.random().toString(36).substr(2, 9)}`
 
 const data = defineModel<any>()

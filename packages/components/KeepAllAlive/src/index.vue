@@ -6,20 +6,23 @@
   </router-view>
 </template>
 
-<script setup>
+<script lang="ts" setup>
 import { h, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
+import type { emitsType, propsType, slotsType } from './_types'
 
 defineOptions({
   name: 'KeepAllAlive',
 })
-// 定义props
-const props = defineProps({
-  defaultKeepAlive: {
-    type: Function,
-    default: null,
-  },
+
+const props = withDefaults(defineProps<propsType>(), {
+  defaultKeepAlive: undefined,
 })
+
+const emit = defineEmits<emitsType>()
+
+// 获取插槽
+const slots = defineSlots<slotsType>()
 
 // 自定义name的壳的集合
 const wrapperMap = new Map()
@@ -48,12 +51,14 @@ watch(
       // 如果需要缓存但尚未加入缓存列表，则添加
       if (cacheIndex === -1) {
         include.value.push(routePath)
+        emit('cacheChange', routePath, true)
       }
     }
     else {
       // 如果不需要缓存但已在缓存列表中，则移除
       if (cacheIndex !== -1) {
         include.value.splice(cacheIndex, 1)
+        emit('cacheChange', routePath, false)
       }
     }
   },

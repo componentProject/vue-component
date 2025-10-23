@@ -1,10 +1,24 @@
-import type { VxeGridPropTypes, VxeTablePropTypes } from 'vxe-table'
-import type { ColumnType, customConfigType } from './index'
+import type { VxeGridPropTypes, VxeTableDefines, VxeTablePropTypes } from 'vxe-table'
+import type { objType } from '../../../_types'
 
+export interface customConfigType {
+  pageId: string
+  widgetId: string
+  userId: string
+}
+export type customCustomTypes
+  = | 'input'
+    | 'select'
+    | 'date'
+    | 'datetime'
+    | 'switch'
+    | 'progress'
+    | 'tag'
+export type types = VxeColumnPropTypes.Type & customCustomTypes
 /**
  * DraggableTable 组件的 Props 类型定义
  */
-export interface DraggableTableProps {
+export interface propsType {
   //#region 其他原始配置加默认值
   /** 是否显示表格边框 */
   border: boolean
@@ -138,4 +152,39 @@ export interface DraggableTableProps {
   /** 自定义弹窗配置 */
   dialogProps?: any
   //#endregion
+}
+
+interface customColumnProps {
+  type?: types
+  /** 仅贡编辑模式下select下拉框使用，传递后默认启动select */
+  options?: Array<{ label: string, value: string }>
+  /** 是否必填，用于生成编辑验证规则 */
+  required?: boolean
+  /** 最小值，用于生成编辑验证规则 */
+  min?: number
+  /** 最大值，用于生成编辑验证规则 */
+  max?: number
+  resizeWidth?: number
+  filterResetMethod?: (params: VxeTableDefines.FilterChangeParams) => void
+  filterRecoverMethod?: (params: VxeTableDefines.FilterChangeParams) => void
+  editProps?: objType
+  filterProps?: objType
+  cellProps?: objType
+  /** 过滤值格式化函数 */
+  filterFormat?: (value: any) => string
+}
+export type ColumnType = VxeTableDefines.ColumnOptions & customColumnProps & { renderWidth?: number }
+
+// Props for CustomConfigDialog component
+export interface CustomConfigDialogPropsType {
+  columns: ColumnType[]
+  collectColumns: ColumnType[]
+  customColumns: ColumnType[]
+  /** 是否是配置模式，影响底部“作为统一配置”复选框显示 */
+  isConfiguration?: boolean
+  /** 传递给 DragModalDialog 的属性 */
+  dialogProps?: {
+    zIndex?: number
+    [key: string]: any
+  }
 }

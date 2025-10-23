@@ -6,7 +6,6 @@
       v-bind="computedDialogProps"
     >
       <VxeGrid
-        id="custom"
         ref="xTable"
         v-bind="gridProps"
       >
@@ -34,8 +33,10 @@
           <TsSelect
             v-if="column.field !== 'fixed' || !row.parentId"
             v-model="row[column.field]"
+            :empty-values="[undefined]"
             :options="column.params.options"
             class="m-2"
+            :popper-style="computedPopperStyle"
             placeholder="Select"
             size="small"
             :disabled="!row.resizable"
@@ -67,41 +68,24 @@
 
 <script lang="ts" setup>
 import { computed, ref, useTemplateRef } from 'vue'
-import { VxeGrid } from 'vxe-table'
-import '@moluoxixi/components/VxeUI/VxeGrid/variable.scss'
 import { ElButton, ElCheckbox, ElInput, ElSwitch } from 'element-plus'
 import { getTypeName } from '@moluoxixi/components/DraggableTable/src/_utils'
-import type { ColumnType } from '@moluoxixi/components/DraggableTable/src/_types'
+import type { CustomConfigDialogEmitsType, CustomConfigDialogPropsType } from '@moluoxixi/components/DraggableTable/src/_types'
 import { flattenTree } from '@moluoxixi/utils/_utils'
 import { cloneDeep } from 'lodash'
+import { VxeGrid } from 'vxe-table'
 import type { VxeGridInstance } from 'vxe-table'
 
-const props = defineProps({
-  columns: {
-    type: Array as PropType<ColumnType[]>,
-    default: () => [],
-  },
-  collectColumns: {
-    type: Array as PropType<ColumnType[]>,
-    default: () => [],
-  },
-  customColumns: {
-    type: Array as PropType<ColumnType[]>,
-    default: () => [],
-  },
-  isConfiguration: {
-    type: Boolean,
-    default: false,
-  },
-  dialogProps: {
-    type: Object,
-    default: () => {},
-  },
+const props = withDefaults(defineProps<CustomConfigDialogPropsType>(), {
+  columns: () => [],
+  collectColumns: () => [],
+  customColumns: () => [],
+  isConfiguration: false,
 })
 
-const emit = defineEmits<{
-  (e: 'confirm', customColumns: any[]): void
-}>()
+const emit = defineEmits<CustomConfigDialogEmitsType>()
+// const xTableRef = useTemplateRef<VxeGridInstance>('xTable')
+// const xTable = computed(() => xTableRef.value?.tableRef)
 const xTable = useTemplateRef<VxeGridInstance>('xTable')
 
 const computedDialogProps = computed(() => {
@@ -111,6 +95,19 @@ const computedDialogProps = computed(() => {
     height: '60%',
     teleportTo: '.containerMain',
     ...props.dialogProps,
+  }
+})
+
+const computedPopperStyle = computed(() => {
+  if (props.dialogProps?.zIndex) {
+    return {
+      'z-index': `${props.dialogProps.zIndex + 1}`,
+    }
+  }
+  else {
+    return {
+      'z-index': 1001,
+    }
   }
 })
 
@@ -153,8 +150,11 @@ watch(() => visible.value, (v: boolean) => {
 const gridProps = computed(() => {
   return {
     border: true,
-    headerCellConfig: { height: 30 },
-    cellConfig: { height: 30 },
+    showOverflow: 'title',
+    showHeaderOverflow: 'title',
+    showFooterOverflow: 'title',
+    headerCellConfig: { height: 32 },
+    cellConfig: { height: 32 },
     height: '100%',
     columns: props.customColumns,
     checkboxConfig: { checkField: 'visible' },
@@ -203,7 +203,9 @@ defineExpose({
 </script>
 
 <style scoped lang="scss">
+@forward '@moluoxixi/components/_assets/styles/tailwind.scss';
+
 :deep(*) {
-  @import '@moluoxixi/components/VxeUI/VxeGrid/style.scss';
+  @import '@moluoxixi/components/DraggableTable/src/style.scss';
 }
 </style>

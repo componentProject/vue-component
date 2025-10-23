@@ -2,6 +2,7 @@
   <div ref="container" class="h-full w-full flex-1 overflow-hidden outline-0 table-box containerMain">
     <VxeGrid
       ref="xTable"
+      :columns="computedColumns"
       v-bind="gridProps"
       @checkbox-all="handleCheckboxAll"
       @checkbox-change="handleCheckboxChange"
@@ -19,14 +20,6 @@
         <slot :name="name" v-bind="slotParams" />
       </template>
     </VxeGrid>
-    <!--    表头右键菜单，有bug，暂时关闭 -->
-    <!--    <ContextMenu -->
-    <!--      v-model="contextMenuVisible" -->
-    <!--      :columns="collectColumn" -->
-    <!--      :virtual-ref="virtualRef" -->
-    <!--      @menu-confirm="handleMenuConfirm" -->
-    <!--      @header-context-menu="handleHeaderContextMenu" -->
-    <!--    /> -->
 
     <template v-if="needCollect">
       <EnterNextContainer
@@ -59,16 +52,15 @@ import type {
   VxeTableDefines,
   VxeTablePropTypes,
 } from 'vxe-table'
-import { VxeGrid } from 'vxe-table'
-import '@moluoxixi/components/VxeUI/VxeGrid/variable.scss'
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, useAttrs, useTemplateRef, watch } from 'vue'
-import type { ColumnType, DraggableTableEmits, DraggableTableProps } from './_types'
+import type { ColumnType, emitsType, propsType } from './_types'
 import { ElMessage } from 'element-plus'
 import { cloneDeep, groupBy } from 'lodash'
 import { diff, isEmpty } from 'radash'
 import Sortable from 'sortablejs'
 import VxeUI, { VxePager, VxeTooltip } from 'vxe-pc-ui'
-
+import './variable.scss'
+import { VxeGrid } from 'vxe-table'
 import {
   debounce,
   dispatchEvents,
@@ -85,14 +77,13 @@ import { getCustomType, handleGetRequiredFields } from './_utils'
 import './renderers'
 import type { slotsType } from '@moluoxixi/components/_types'
 import CustomConfigDialog from './components/CustomConfigDialog.vue'
-import { getMemoryQuery, setMemoryUpload } from '@moluoxixi/utils/_api'
-import './variable.scss'
+import { getMemoryQuery, setMemoryUpload } from '@moluoxixi/utils/_api/cache'
 
 defineOptions({
   name: 'DraggableTable',
 })
 // 定义组件属性
-const props = withDefaults(defineProps<DraggableTableProps>(), {
+const props = withDefaults(defineProps<propsType>(), {
   //#region 其他原始配置加默认值
   /** 是否显示表格边框 */
   border: true,
@@ -255,18 +246,18 @@ const props = withDefaults(defineProps<DraggableTableProps>(), {
   ],
   //是否有权限统一配置（个性话化列配置）
   isConfiguration: false,
-  dialogProps: {},
+  dialogProps: () => ({ zIndex: 1000 }),
   //#endregion
 })
 // 组件事件
 // 当在表格中最后一个输入元素按下Enter键时触发
 // 当在表格中select下拉为空时触发
-const emit = defineEmits<DraggableTableEmits>()
+const emit = defineEmits<emitsType>()
 // 注册 VxeUI 组件
 // 获取插槽
-// eslint-disable-next-line style/max-statements-per-line
-const slots = defineSlots<slotsType>(); (VxeUI as any).component(VxePager)
-;(VxeUI as any).component(VxeTooltip)
+const slots = defineSlots<slotsType>()
+VxeUI.component(VxePager)
+VxeUI.component(VxeTooltip)
 
 const customConfigDialogVisible = ref(false)
 const customConfigDialogRef = useTemplateRef<HTMLElement>('customConfigDialogRef')
@@ -391,18 +382,7 @@ const collectColumn = computed<ColumnType[]>(() => {
   const { collectColumn } = xTable.value.getTableColumn()
   return collectColumn as any[]
 })
-// /**
-//  * 表头右键菜单确定事件
-//  * @param columns
-//  */
-// function handleMenuConfirm(columns: ColumnType[]) {
-//   saveColumns(columns)
-// }
-//
-// /** 表头右键菜单显示事件 */
-// function handleHeaderContextMenu(params: HTMLElement) {
-//   emit('headerContextMenu', params)
-// }
+
 const contextMenuVisible = ref(false)
 const virtualRef = ref<HTMLElement>()
 /**
@@ -639,6 +619,7 @@ const computedColumns = computed<ColumnType[]>(() => {
       if (customType) {
         delete item.type
       }
+
       if (
         isEmpty(item.cellRender)
         && isEmpty(item.contentRender)
@@ -655,6 +636,7 @@ const computedColumns = computed<ColumnType[]>(() => {
             ...cellProps,
           },
         }
+        console.log('aaaaaa', item.cellRender)
       }
       //#endregion
     }
@@ -683,8 +665,8 @@ const computedColumns = computed<ColumnType[]>(() => {
 // 计算表格配置属性
 const gridProps = computed<VxeGridProps>(() => {
   return {
-    headerCellConfig: { height: 30 },
-    cellConfig: { height: 30 },
+    headerCellConfig: { height: 32 },
+    cellConfig: { height: 32 },
     // 基本配置
     id: props.id,
     border: props.border,
@@ -835,8 +817,6 @@ const gridProps = computed<VxeGridProps>(() => {
       ...props.filterConfig,
     },
     ...attrs,
-    // 使用计算后的列配置（递归移除内部校验相关属性，保持渲染结构）
-    columns: computedColumns.value,
   } as VxeGridProps
 })
 //#endregion
@@ -990,11 +970,14 @@ function mergeColumnsLevel(storedLevel: any[] = [], propsLevel: any[] = []): any
     matchedKeys.add(k)
   })
 
+  console.log('result', [...result])
   // 末尾追加 props 中新增（同级）
   propsLevel.forEach((propCol: any) => {
     const k = getColumnUniqueKey(propCol)
-    if (!k || !matchedKeys.has(k))
+    if (!k || !matchedKeys.has(k)) {
+      console.log('propCol', propCol)
       result.push(propCol)
+    }
   })
 
   return result
@@ -1334,8 +1317,10 @@ defineExpose({
 </script>
 
 <style scoped lang="scss">
+@forward '@moluoxixi/components/_assets/styles/tailwind.scss';
+
 :deep(*) {
-  @import '@moluoxixi/components/VxeUI/VxeGrid/style.scss';
+  @import '@moluoxixi/components/DraggableTable/src/style.scss';
 }
 .table-box {
   :deep(.vxe-table--filter-template) {

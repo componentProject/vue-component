@@ -2,8 +2,8 @@ import { dirname, resolve } from 'node:path'
 import fs from 'node:fs'
 import fsp from 'node:fs/promises'
 import glob from 'fast-glob'
-import type { InlineConfig } from 'vite'
-import { build } from 'vite'
+import type { ConfigEnv, InlineConfig, UserConfig } from 'vite'
+import { build, mergeConfig } from 'vite'
 
 import pluginVue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
@@ -14,7 +14,6 @@ import { execSync } from 'node:child_process'
 import type { ICruiseOptions, ICruiseResult } from 'dependency-cruiser'
 import { cruise } from 'dependency-cruiser'
 import AutoImport from 'unplugin-auto-import/vite'
-import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
 import viteImagemin from 'vite-plugin-imagemin'
 import { obfuscator } from 'rollup-obfuscator'
 import transformAliasPlugin from './plugins/transformAliasPlugin/index.mts'
@@ -22,6 +21,7 @@ import cssInjectedByJsPlugin from './plugins/cssInjectedByJsPlugin/index.mts'
 // import { lazyImport, VxeResolver } from 'vite-plugin-lazy-import'
 import { UploadEvent } from './utils/UploadComponent.ts'
 
+export type ViteConfigType = UserConfig | ((mode: ConfigEnv) => UserConfig)
 //#region CLI 辅助函数
 /**
  * 将字符串形式的布尔开关解析为布尔值。
@@ -180,6 +180,7 @@ export interface BuildContext {
   aliasPacks: string[]
   /** 上传类型（用于 UploadEvent），默认 'Vue3' */
   uploadType?: string
+  viteConfig?: ViteConfigType
 }
 
 export type ModuleFormat = 'es' | 'cjs' | 'umd'
@@ -218,7 +219,7 @@ function sleep(ms: number): Promise<void> {
  * @returns 基础配置对象
  */
 function createBaseConfig(ctx: BuildContext, comp: string, internalDeps: string[]): InlineConfig {
-  return {
+  return mergeConfig({
     root: ctx.packDir,
     configFile: false,
     publicDir: false,
@@ -247,28 +248,9 @@ function createBaseConfig(ctx: BuildContext, comp: string, internalDeps: string[
       // 自动引入
       AutoImport({
         imports: ['vue'],
-        resolvers: [ElementPlusResolver()],
+        resolvers: [],
         dts: resolve(ctx.packDir, './_typings/auto-imports.d.ts'),
       } as any),
-      // 与自定义element组件冲突
-      // Components({
-      //   resolvers: [
-      //     ElementPlusResolver({
-      //       exclude: new RegExp(
-      //         ([]).map(item => `^${item}$`).join('|'),
-      //       ),
-      //     }),
-      //   ],
-      //   globs: [
-      //     `.${ctx.entryBaseUrl}**/index.vue`,
-      //     `.${ctx.entryBaseUrl}**/index.ts`,
-      //     `!.${ctx.entryBaseUrl}**/base/**/*`,
-      //     `!.${ctx.entryBaseUrl}**/components/**/*`,
-      //     `!.${ctx.entryBaseUrl}**/src/**/*`,
-      //     `!.${ctx.entryBaseUrl}**/_*/**/*`,
-      //   ],
-      //   dts: resolve(ctx.packDir, './_typings/components.d.ts'),
-      // }),
       // 按需启用图片压缩（重型插件）
       ...(!ctx.excludeHeavyPlugins
         ? [
@@ -311,17 +293,10 @@ function createBaseConfig(ctx: BuildContext, comp: string, internalDeps: string[
         scss: {
           // 使用legacy避免initAsyncCompiler错误
           api: 'legacy',
-          additionalData(content: string, filename: string) {
-            if (filename.includes('element')) {
-              const addStr = `$namespace: el;`
-              return `${addStr}\n${content}`
-            }
-            return content
-          },
         },
       },
     },
-  }
+  }, ctx?.viteConfig || {})
 }
 
 /** 获取组件列表（只分目录的组件） */
@@ -855,8 +830,7 @@ async function bundleComponentModule(ctx: BuildContext, {
   skipManualChunks,
 }: BundleComponentModuleOptions) {
   const currentComponent = comp
-  await build({
-    ...baseConfig,
+  await build(mergeConfig(baseConfig, {
     build: {
       outDir,
       emptyOutDir: true,
@@ -936,7 +910,7 @@ async function bundleComponentModule(ctx: BuildContext, {
         },
       },
     },
-  })
+  }))
 }
 
 /**
@@ -1030,11 +1004,12 @@ async function buildComponent(
   const esOutputDir = resolve(outputDir, 'es')
   const libOutputDir = resolve(outputDir, 'lib')
   const umdOutputDir = resolve(outputDir, 'umd')
-  const iifeOutputDir = resolve(outputDir, 'iife')
+  // const iifeOutputDir = resolve(outputDir, 'iife')
   try {
     await clearDir(esOutputDir)
     await clearDir(libOutputDir)
     await clearDir(umdOutputDir)
+    // await clearDir(iifeOutputDir)
     // 使用传入的依赖分析结果
     const deps = dependencies
 
@@ -1052,22 +1027,23 @@ async function buildComponent(
     // 创建基础配置
     const baseConfig = createBaseConfig(ctx, comp, deps.internal)
 
-    // 打包UMD模块
-    await bundleComponentModule(ctx, {
-      comp,
-      entry,
-      outDir: iifeOutputDir,
-      format: 'iife',
-      dependencies,
-      globals,
-      baseConfig,
-      entryFileNames: `[name].js`,
-      chunkFileNames: `[name].js`,
-      skipManualChunks: true,
-    })
+    const callbacks = []
+    // // 打包iife模块
+    // callbacks.push(bundleComponentModule(ctx, {
+    //   comp,
+    //   entry,
+    //   outDir: iifeOutputDir,
+    //   format: 'iife',
+    //   dependencies,
+    //   globals,
+    //   baseConfig,
+    //   entryFileNames: `[name].js`,
+    //   chunkFileNames: `[name].js`,
+    //   skipManualChunks: true,
+    // }))
 
     // 打包UMD模块
-    await bundleComponentModule(ctx, {
+    callbacks.push(bundleComponentModule(ctx, {
       comp,
       entry,
       outDir: umdOutputDir,
@@ -1078,10 +1054,10 @@ async function buildComponent(
       entryFileNames: `[name].js`,
       chunkFileNames: `[name].js`,
       skipManualChunks: true,
-    })
+    }))
 
     // 打包ES模块
-    await bundleComponentModule(ctx, {
+    callbacks.push(bundleComponentModule(ctx, {
       comp,
       entry,
       outDir: esOutputDir,
@@ -1091,10 +1067,10 @@ async function buildComponent(
       baseConfig,
       entryFileNames: `[name].mjs`,
       chunkFileNames: `[name].mjs`,
-    })
+    }))
 
     // 打包CJS模块
-    await bundleComponentModule(ctx, {
+    callbacks.push(bundleComponentModule(ctx, {
       comp,
       entry,
       outDir: libOutputDir,
@@ -1105,7 +1081,9 @@ async function buildComponent(
       entryFileNames: `[name].cjs`,
       chunkFileNames: `[name].cjs`,
       exportsType: 'named',
-    })
+    }))
+
+    await Promise.all(callbacks)
 
     // 复制README.md
     const componentName = `\\${comp}`
@@ -1184,13 +1162,11 @@ async function buildComponent(
 
     // 写入package.json
     await fsp.writeFile(resolve(outputDir, 'package.json'), JSON.stringify(pkgJson, null, 2), 'utf-8')
-    // const fileUrl = resolve(`${outputDir}/es/index.mjs`)
-    const fileUrl = resolve(`${outputDir}/umd/index.js`)
     console.log(`==========  ${buildName} 打包完成 ==========`)
     // 如果需要发布，执行发布
     if (shouldPublish) {
       if (ctx.uploadType) {
-        const res = await UploadEvent(fileUrl, buildName, ctx.uploadType)
+        const res = await UploadEvent(outputDir, buildName, ctx.uploadType)
         console.log('res', res)
       }
       else {
@@ -1362,7 +1338,7 @@ export async function buildComponentsWithOptions(options: BuildOptions): Promise
     useExternal = false,
     requireExternalPacks: reqExternal = [],
     entryBaseUrl: ebu = '/',
-    presetGlobals,
+    presetGlobals: _presetGlobals,
     uploadType,
   } = options || ({} as BuildOptions)
 
@@ -1375,6 +1351,12 @@ export async function buildComponentsWithOptions(options: BuildOptions): Promise
   if (!packDir)
     throw new Error('缺少必填参数：packDir')
 
+  const presetGlobals = {
+    'vue': 'Vue',
+    'vite': 'Vite',
+    '@vue/shared': 'vueShared',
+    ..._presetGlobals,
+  }
   const peerDepList = Object.keys(presetGlobals)
   // 生成上下文
   const ctx: BuildContext = {

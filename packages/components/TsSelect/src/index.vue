@@ -15,13 +15,13 @@
   >
     <ElOption
       v-for="(item) in computedOptions"
-      :key="item[props.value]"
-      :label="item[props.label]"
-      :value="item[props.value]"
+      :key="item[computedValue]"
+      :label="item[computedLabel]"
+      :value="item[computedValue]"
       :disabled="
         computedDisabledHandler({
-          label: item[props.label],
-          value: item[props.value],
+          label: item[computedLabel],
+          value: item[computedValue],
           data: item,
         })
       "
@@ -42,13 +42,13 @@ import { computed, nextTick, onUnmounted, ref, withDefaults } from 'vue'
 import { ElOption, ElSelect } from 'element-plus'
 import { getType, getTypeDefault } from '@moluoxixi/utils/_utils'
 import { useOptions } from '../../_hooks'
-import type { TsSelectEmits, TsSelectProps } from './_types'
+import type { emitsType, propsType, slotsType } from './_types'
 
 defineOptions({
   name: 'TsSelect',
 })
 
-const props = withDefaults(defineProps<TsSelectProps>(), {
+const props = withDefaults(defineProps<propsType>(), {
   tagType: 'primary',
   teleported: true,
   clearable: true,
@@ -73,7 +73,14 @@ const props = withDefaults(defineProps<TsSelectProps>(), {
   optionProps: () => ({}),
 })
 
-const emits = defineEmits<TsSelectEmits>()
+const emits = defineEmits<emitsType>()
+
+// 获取插槽
+const slots = defineSlots<slotsType>()
+
+const computedLabel = computed(() => props.labelKey || props.label)
+const computedValue = computed(() => props.valueKey || props.value)
+
 const selectId = `select-${Math.random().toString(36).substr(2, 9)}`
 
 const data = defineModel<any>()
@@ -93,8 +100,8 @@ const allFilterFields = computed(() => {
         'pyCode',
         'wbcode',
         'pycode',
-        props.label,
-        props.value,
+        computedLabel.value,
+        computedValue.value,
       ].filter(item => item),
     ),
   )
