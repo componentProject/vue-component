@@ -34,48 +34,58 @@
 </template>
 
 <script setup lang="ts">
-import { watch } from 'vue'
+import { ref, watch } from 'vue'
 import { ElButton, ElMessageBox } from 'element-plus'
 import Tabs from '@moluoxixi/components/Tabs'
 import ReForm from '@moluoxixi/components/ReForm'
 import { formItemConfig as defaultFormItemConfig } from '../datas/formData'
 import { deepClone } from '../utils/formSerializer'
 import { debounce } from 'lodash'
+import type {
+  ComponentInstance,
+  FormConfig,
+  FormConfigData,
+  FormRule,
+  ItemProps,
+  ReFormInstance,
+  SelectedItem,
+  TabItem,
+} from '../types'
 
+// 定义组件属性
 const props = defineProps<{
   selectedItemIndex?: number
-  formConfig?: any
-  selectedItem?: any
+  formConfig?: FormConfig | null
+  selectedItem?: SelectedItem | null | undefined
 }>()
 
 // 定义事件
 const emits = defineEmits<{
-  (e: 'update:formConfig', config: any): void
-  (e: 'update:selectedItem', item: any): void
+  (e: 'update:formConfig', config: FormConfigData): void
+  (e: 'update:selectedItem', item: FormConfigData): void
   (e: 'deleteItem'): void
 }>()
 
 // 组件内部状态
-const activeTab = ref('form')
-const tabList = [
+const activeTab = ref<string>('form')
+const tabList: TabItem[] = [
   { label: '组件配置', name: 'component' },
   { label: '表单配置', name: 'form' },
 ]
 
-const formData = ref<any>({})
-
-const formItemConfigRef = ref<any>(null)
-const formConfigRef = ref<any>(null)
+const formData = ref<FormConfigData>({})
+const formItemConfigRef = ref<ReFormInstance | null>(null)
+const formConfigRef = ref<ReFormInstance | null>(null)
 
 // 表单配置数据（深拷贝避免修改原始数据）
-const formConfigData = ref<any>(null)
+const formConfigData = ref<FormConfig | null>(null)
 // 表单项配置（深拷贝）
 const formItemConfig = ref<any>(deepClone(defaultFormItemConfig))
 
 // 监听外部表单配置变化
 watch(
   () => props.selectedItemIndex,
-  (newIndex) => {
+  (newIndex: number | undefined) => {
     if (newIndex !== undefined) {
       formItemConfig.value = deepClone(defaultFormItemConfig)
     }
@@ -86,7 +96,7 @@ watch(
 // 监听外部表单配置变化
 watch(
   () => props.formConfig,
-  (newConfig) => {
+  (newConfig: FormConfig | null | undefined) => {
     if (newConfig) {
       formConfigData.value = { ...newConfig }
     }
@@ -97,7 +107,7 @@ watch(
 // 监听选中项变化，自动切换到组件配置标签
 watch(
   () => props.selectedItem,
-  (newItem) => {
+  (newItem: SelectedItem | null | undefined) => {
     if (newItem) {
       setFormItemConfig(newItem)
       activeTab.value = 'component'
@@ -110,104 +120,139 @@ watch(
 )
 
 // 根据添加的组件设置表单项配置
-function setFormItemConfig(item: any) {
+function setFormItemConfig(item: SelectedItem | null | undefined): void {
+  console.log('11111111111', item)
   // 添加空值检查
   if (!item || typeof item !== 'object') {
     return
   }
+
   // 创建新的配置对象
-  const itemObj: any = {}
+  const itemObj: FormConfigData = {}
+
   // 一次性收集所有属性
-  Object.keys(item).forEach((key) => {
+  Object.keys(item).forEach((key: string) => {
     if (key === 'component') {
-      if (item[key].name === 'ElInput' && item?.props?.type === 'textarea') {
+      const componentInstance = item[key] as ComponentInstance
+      if (componentInstance.name === 'ElInput' && item?.props?.type === 'textarea') {
         itemObj[key] = 'ElTextarea'
       }
       else {
-        itemObj[key] = item[key].name
+        itemObj[key] = componentInstance.name
       }
     }
     else if (key === 'props') {
-      Object.keys(item[key]).forEach((propKey) => {
+      const propsObj = item[key] as ItemProps
+      Object.keys(propsObj).forEach((propKey: string) => {
         if (propKey === 'options' || propKey === 'requestParams') {
-          itemObj[propKey] = JSON.stringify(item[key][propKey]) || null
+          try {
+            itemObj[propKey] = propsObj[propKey] !== undefined && propsObj[propKey] !== null && propsObj[propKey] !== '' ? JSON.stringify(propsObj[propKey]) : undefined
+          }
+          catch (error) {
+            // 处理JSON序列化错误
+            console.error(`序列化${propKey}失败:`, error)
+            itemObj[propKey] = undefined
+          }
         }
         else {
-          itemObj[propKey] = item[key][propKey]
+          itemObj[propKey] = propsObj[propKey]
         }
       })
     }
     else if (key === 'rules') {
-      item[key].forEach((rule: any) => {
-        if (rule) {
-          Object.keys(rule).forEach((propKey) => {
-            if (propKey === 'validator') {
-              const validatorValue = rule[propKey]
-              // 根据类型处理不同情况
-              if (typeof validatorValue === 'function') {
-                itemObj[propKey] = validatorValue.toString()
+      // 确保rules是数组类型
+      if (Array.isArray(item[key])) {
+        const rulesArray = item[key] as FormRule[]
+        rulesArray.forEach((rule: FormRule) => {
+          if (rule && typeof rule === 'object') {
+            Object.keys(rule).forEach((propKey: string) => {
+              if (propKey === 'validator') {
+                const validatorValue = rule[propKey]
+                // 根据类型处理不同情况
+                if (typeof validatorValue === 'function') {
+                  itemObj[propKey] = validatorValue.toString()
+                }
+                else {
+                  // 已经是字符串或其他类型，直接赋值
+                  itemObj[propKey] = validatorValue
+                }
               }
               else {
-                // 已经是字符串或其他类型，直接赋值
-                itemObj[propKey] = validatorValue
+                itemObj[propKey] = rule[propKey]
               }
-            }
-            else {
-              itemObj[propKey] = rule[propKey]
-            }
-          })
-        }
-      })
+            })
+          }
+        })
+      }
     }
     else {
       itemObj[key] = item[key]
     }
   })
   // 一次性赋值，避免多次更新导致的重复渲染
+  console.log('0000000000000', itemObj)
   formData.value = itemObj
 }
 
 // 创建防抖的更新函数，延迟300ms执行
-const debouncedUpdateSelectedItem = debounce((data: any) => {
+const debouncedUpdateSelectedItem = debounce((data: FormConfigData) => {
   emits('update:selectedItem', data)
 }, 300)
 
 // 创建防抖的表单配置更新函数，延迟300ms执行
-const debouncedUpdateFormConfig = debounce((data: any) => {
+const debouncedUpdateFormConfig = debounce((data: FormConfigData) => {
   emits('update:formConfig', data)
 }, 300)
 
 // 表单项配置实时变化
-function handleItemConfigChange() {
-  debouncedUpdateSelectedItem(formItemConfigRef.value.formData)
+function handleItemConfigChange(): void {
+  // 确保formItemConfigRef和formData存在
+  if (formItemConfigRef.value && formItemConfigRef.value.formData) {
+    debouncedUpdateSelectedItem(formItemConfigRef.value.formData)
+  }
 }
 
 // 表单配置实时变化
-function handleFormConfigChange() {
-  debouncedUpdateFormConfig(formConfigRef.value.formData)
+function handleFormConfigChange(): void {
+  // 确保formConfigRef和formData存在
+  if (formConfigRef.value && formConfigRef.value.formData) {
+    debouncedUpdateFormConfig(formConfigRef.value.formData)
+  }
 }
 
 // 删除表单项
-function handleDeleteItem() {
+function handleDeleteItem(): void {
   if (props.selectedItem) {
     ElMessageBox.confirm('确定要删除当前表单项吗？', '提示', {
       confirmButtonText: '确定',
       cancelButtonText: '取消',
-    }).then(async () => {
+    }).then(() => {
       emits('deleteItem')
-    }).catch(() => {})
+    }).catch(() => {
+      // 用户取消删除，无需处理
+    })
   }
 }
 
-function getFormData() {
-  return formConfigRef?.value?.formData || null
+// 获取表单配置数据
+function getFormData(): FormConfigData | null {
+  // 确保formConfigRef及其value存在
+  if (!formConfigRef.value) {
+    return null
+  }
+  return formConfigRef.value.formData || null
 }
 
+// 暴露方法给外部调用
 defineExpose({
   getFormData,
-  // 修改为符合ReForm标准的回调函数形式
-  validate: (callback) => {
-    return formItemConfigRef?.value?.validate(callback)
+  // 符合ReForm标准的回调函数形式的验证方法
+  validate(callback?: (valid: boolean) => void): boolean {
+    // 确保formItemConfigRef及其value和validate方法存在
+    if (formItemConfigRef.value && typeof formItemConfigRef.value.validate === 'function') {
+      return formItemConfigRef.value.validate(callback)
+    }
+    return false
   },
 })
 </script>
@@ -239,6 +284,7 @@ defineExpose({
     left: 0;
     width: 100%;
     background-color: white;
+    padding: 10px;
   }
 
   :deep(#pane-component) {
@@ -247,6 +293,7 @@ defineExpose({
     }
   }
 
+  // 标签样式
   :deep(.el-tabs__nav) {
     width: 100%;
 
@@ -254,10 +301,14 @@ defineExpose({
       flex: 1;
     }
   }
+
+  // 标签容器样式
   :deep(.el-tabs) {
     height: 100%;
     overflow: hidden;
   }
+
+  // 标签内容样式
   :deep(.el-tabs__content) {
     .el-tab-pane {
       padding: 16px;

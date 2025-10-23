@@ -390,7 +390,6 @@ export const formItemConfig = {
     {
       label: '请求参数',
       field: 'requestParams',
-      defaultValue: '{}',
       component: ElInput,
       props: {
         type: 'textarea',

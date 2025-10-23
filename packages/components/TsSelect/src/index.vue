@@ -68,7 +68,9 @@ const props = withDefaults(defineProps<propsType>(), {
   requestUrl: '',
   requestParams: () => ({}),
   requestParamsType: 'body',
-  requestHeaders: () => ({}),
+  requestHeaders: () => ({
+    token: 'c5e28093-fc43-43e8-9023-dd2cb34e566b',
+  }),
   responseDataPath: '',
   optionProps: () => ({}),
 })
