@@ -17,13 +17,16 @@
 
     <h3>远程数据源</h3>
     <div class="select-container">
+      <TsButton @click="setParams">
+        点
+      </TsButton>
       <TsSelect
         v-model="remoteValue"
         request-url="/ompBase/upgServices"
         :request-params="requestParams"
         request-method="GET"
         :request-headers="{
-          token: '84677795-e391-4a79-a313-4fc89598a73d',
+          token: '81307523-0a00-4610-b9d8-83c0c98d46fd',
         }"
         response-data-path="rows"
         label="name"
@@ -41,11 +44,14 @@
 import { ref } from 'vue'
 import TsSelect from '@moluoxixi/components/TsSelect'
 
-const requestParams = ref({
-  applicationId: '2',
-  pageNo: 1,
-  pageSize: 999,
-})
+const requestParams = ref({})
+function setParams() {
+  requestParams.value = {
+    applicationId: '2',
+    pageNo: 1,
+    pageSize: 999,
+  }
+}
 // 本地数据
 const localData = [
   { name: '测试1', age: '12' },

@@ -83,9 +83,9 @@ const loading = ref(false)
 const rowdragable = ref(false)
 const columndragable = ref(false)
 
-const editable = ref(false)
-const filterable = ref(false)
-const sortable = ref(false)
+const editable = ref(true)
+const filterable = ref(true)
+const sortable = ref(true)
 // 表格引用
 const draggableTableRef = useTemplateRef('draggableTableRef')
 
@@ -150,7 +150,7 @@ const tableData = ref([
 
 // 列配置
 const columns = ref([
-  { type: 'seq', width: 70 },
+  { field: 'sql', type: 'seq', width: 70 },
   { field: 'createTime', title: '日期', width: 150 },
   {
     field: 'sex',
@@ -169,15 +169,13 @@ const columns = ref([
   {
     field: 'name',
     title: 'Name',
-    fixed: 'left',
     min: 3,
     max: 10,
     required: true,
   },
   {
     field: 'name1',
-    title: 'Name',
-    fixed: 'left',
+    title: 'Name1',
     min: 3,
     max: 10,
     required: true,

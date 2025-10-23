@@ -615,7 +615,6 @@ const computedColumns = computed<ColumnType[]>(() => {
       //#endregion
 
       //#region 添加基于field的自定义默认渲染器，额外提供以下type功能：'input' | 'select' | 'date' | 'datetime' | 'switch' | 'progress' | 'tag'
-      console.log('item.type', item.type)
       const customType = getCustomType(item.type)
       if (customType) {
         delete item.type
@@ -971,11 +970,14 @@ function mergeColumnsLevel(storedLevel: any[] = [], propsLevel: any[] = []): any
     matchedKeys.add(k)
   })
 
+  console.log('result', [...result])
   // 末尾追加 props 中新增（同级）
   propsLevel.forEach((propCol: any) => {
     const k = getColumnUniqueKey(propCol)
-    if (!k || !matchedKeys.has(k))
+    if (!k || !matchedKeys.has(k)) {
+      console.log('propCol', propCol)
       result.push(propCol)
+    }
   })
 
   return result

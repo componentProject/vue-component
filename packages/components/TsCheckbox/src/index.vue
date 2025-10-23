@@ -7,7 +7,7 @@
     @change="handleCheckboxChange"
   >
     <ElCheckbox
-      v-for="(item) in serverOrLocalOptions"
+      v-for="item in serverOrLocalOptions"
       :key="item[computedValue]"
       :label="item[computedValue]"
       :disabled="
@@ -85,15 +85,7 @@ const checkboxId = `checkbox-${Math.random().toString(36).substr(2, 9)}`
 const data = defineModel<any[]>()
 
 // 使用 useOptions hook 来处理 options 获取逻辑
-const { options: serverOrLocalOptions } = useOptions({
-  options: props.options,
-  requestUrl: props.requestUrl,
-  requestParams: props.requestParams,
-  requestMethod: props.requestMethod,
-  requestParamsType: props.requestParamsType,
-  requestHeaders: props.requestHeaders,
-  responseDataPath: props.responseDataPath,
-})
+const { options: serverOrLocalOptions } = useOptions(props)
 
 // 直接使用 serverOrLocalOptions
 

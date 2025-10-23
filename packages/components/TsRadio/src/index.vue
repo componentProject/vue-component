@@ -88,15 +88,7 @@ const radioId = `radio-${Math.random().toString(36).substr(2, 9)}`
 const data = defineModel<any>()
 
 // 使用 useOptions hook 来处理 options 获取逻辑
-const { options: serverOrLocalOptions } = useOptions({
-  options: props.options,
-  requestUrl: props.requestUrl,
-  requestParams: props.requestParams,
-  requestMethod: props.requestMethod,
-  requestParamsType: props.requestParamsType,
-  requestHeaders: props.requestHeaders,
-  responseDataPath: props.responseDataPath,
-})
+const { options: serverOrLocalOptions } = useOptions(props)
 
 function defaultDisabledHandler({ label, value }: { [label: string]: any }) {
   return props.disabledValues.includes(value) || props.disabledLabels.includes(label)
