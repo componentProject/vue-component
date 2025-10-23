@@ -81,7 +81,7 @@ const slots = defineSlots<slotsType>()
 const computedLabel = computed(() => props.labelKey || props.label)
 const computedValue = computed(() => props.valueKey || props.value)
 
-const selectId = `select-${Math.random().toString(36).substr(2, 9)}`
+const selectId = `select-${Math.random().toString(36).slice(2, 11)}`
 
 const data = defineModel<any>()
 const keyword = ref('')
