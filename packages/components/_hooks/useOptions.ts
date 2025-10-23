@@ -132,6 +132,7 @@ export function useOptions(props: UseOptionsProps): UseOptionsReturn {
     {
       immediate: true,
       deep: true,
+      lazy: true,
     },
   )
 

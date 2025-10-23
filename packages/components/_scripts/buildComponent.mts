@@ -1,5 +1,6 @@
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
+// import addUuidToTemplate from './addUuidToTemplate/index.mts'
 import { COMPONENT_SETTING_TYPE } from '@moluoxixi/constant'
 
 import { runBuildCliAndExit } from '@moluoxixi/utils/_utils/build/index.mts'
@@ -34,7 +35,9 @@ runBuildCliAndExit(
     presetGlobals: {
     },
     viteConfig: {
-      plugins: [],
+      plugins: [
+        // addUuidToTemplate(),
+      ],
     },
   },
   { uploadType: COMPONENT_SETTING_TYPE, command: 'build-publish' },

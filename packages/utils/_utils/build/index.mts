@@ -1317,6 +1317,8 @@ export interface BuildOptions {
   peerDepList?: string[]
   /** 上传类型（用于 UploadEvent），默认 'Vue3' */
   uploadType?: string
+  /** Vite 配置（可选） */
+  viteConfig?: ViteConfigType
 }
 /**
  * 对外暴露的打包函数：根据入参配置执行打包
@@ -1340,6 +1342,7 @@ export async function buildComponentsWithOptions(options: BuildOptions): Promise
     entryBaseUrl: ebu = '/',
     presetGlobals: _presetGlobals,
     uploadType,
+    ...rest
   } = options || ({} as BuildOptions)
 
   // 必填参数校验
@@ -1380,6 +1383,7 @@ export async function buildComponentsWithOptions(options: BuildOptions): Promise
     },
     aliasPacks: [],
     uploadType,
+    ...rest,
   }
   ctx.aliasPacks = Object.keys(ctx.alias).filter((i: string) => !i.endsWith('*'))
 

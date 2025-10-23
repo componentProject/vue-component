@@ -299,4 +299,21 @@ export default {
       { text: '帮助中心', link: 'https://help.example.com' },
     ],
   },
+  PopoverTableSelect: {
+    throttle: 100,
+    inputValue: '',
+    popType: 'input',
+    columns: [
+      { field: 'id', title: 'ID', width: 60 },
+      { field: 'name', title: '姓名', width: 120 },
+      { field: 'age', title: '年龄' },
+    ],
+    data: [
+      { id: 1, name: '张三', age: 18 },
+      { id: 2, name: '李四', age: 20 },
+      { id: 3, name: '王五', age: 22 },
+      { id: 3, name: '王五', age: 22 },
+    ],
+    options: { },
+  },
 }
