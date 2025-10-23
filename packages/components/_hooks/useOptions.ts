@@ -102,7 +102,7 @@ export function useOptions(props: UseOptionsProps): UseOptionsReturn {
         // 其他情况使用POST请求
         response = await api.post(props.requestUrl, props.requestParams)
       }
-      const data = response || []
+      const data = response
       // 确保返回的是数组
       return Array.isArray(data) ? data : []
     }
