@@ -33,6 +33,7 @@
           <TsSelect
             v-if="column.field !== 'fixed' || !row.parentId"
             v-model="row[column.field]"
+            :empty-values="[undefined]"
             :options="column.params.options"
             class="m-2"
             :popper-style="computedPopperStyle"
