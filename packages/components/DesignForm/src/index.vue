@@ -30,7 +30,7 @@ import DesignFormRules from './components/DesignFormRules.vue'
 import DesignFormList from './components/DesignFormList.vue'
 import { componentMap, formItemObj } from './datas/index'
 import { defaultFormConfig } from './datas/formData'
-import { deepClone, serializeWithFunctions } from './utils/formSerializer'
+import { deepClone, deserializeWithFunctions, serializeWithFunctions } from './utils/formSerializer'
 import { ElMessage } from 'element-plus'
 import { isObject } from 'lodash'
 import type {
@@ -509,7 +509,8 @@ onMounted((): void => {
   if (props.initialFormConfig && props.initialFormConfig.items) {
     try {
       // 深拷贝避免直接修改props
-      const initialConfig = deepClone(props.initialFormConfig)
+      const deserializedConfig = deserializeWithFunctions(JSON.stringify(props.initialFormConfig))
+      const initialConfig = deepClone(deserializedConfig)
 
       // 处理组件引用，确保组件名称被正确映射为组件对象
       if (initialConfig.items && Array.isArray(initialConfig.items)) {

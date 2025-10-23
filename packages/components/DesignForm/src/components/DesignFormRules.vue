@@ -121,7 +121,6 @@ watch(
 
 // 根据添加的组件设置表单项配置
 function setFormItemConfig(item: SelectedItem | null | undefined): void {
-  console.log('11111111111', item)
   // 添加空值检查
   if (!item || typeof item !== 'object') {
     return
@@ -190,7 +189,6 @@ function setFormItemConfig(item: SelectedItem | null | undefined): void {
     }
   })
   // 一次性赋值，避免多次更新导致的重复渲染
-  console.log('0000000000000', itemObj)
   formData.value = itemObj
 }
 
