@@ -108,15 +108,7 @@ const allFilterFields = computed(() => {
 })
 
 // 使用 useOptions hook 来处理 options 获取逻辑
-const { options: serverOrLocalOptions, isLoading } = useOptions({
-  options: props.options,
-  requestUrl: props.requestUrl,
-  requestParams: props.requestParams,
-  requestMethod: props.requestMethod,
-  requestParamsType: props.requestParamsType,
-  requestHeaders: props.requestHeaders,
-  responseDataPath: props.responseDataPath,
-})
+const { options: serverOrLocalOptions, isLoading } = useOptions(props)
 
 const computedOptions = computed(() => {
   return getType(props.filterMethod, 'function')
