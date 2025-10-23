@@ -29,7 +29,6 @@ export interface UseOptionsReturn {
  * @returns 返回处理后的 options 和加载状态
  */
 export function useOptions(props: UseOptionsProps): UseOptionsReturn {
-  console.log('props', props)
   const serverOrLocalOptions = ref<any[]>([])
   const isLoading = ref(false)
   const error = ref<string | null>(null)
@@ -119,7 +118,7 @@ export function useOptions(props: UseOptionsProps): UseOptionsReturn {
 
   // 监听 props 变化，更新 options
   watch(
-    () => [props.options, props.requestUrl, props.requestParams],
+    () => [props.options, props.requestUrl, props.requestParams, props.responseDataPath, props.requestHeaders, props.requestParamsType, props.requestMethod],
     async ([newOptions, requestUrl]) => {
       // 优先使用动态请求
       if (requestUrl) {
