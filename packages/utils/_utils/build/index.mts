@@ -18,6 +18,7 @@ import viteImagemin from 'vite-plugin-imagemin'
 import { obfuscator } from 'rollup-obfuscator'
 import transformAliasPlugin from './plugins/transformAliasPlugin/index.mts'
 import cssInjectedByJsPlugin from './plugins/cssInjectedByJsPlugin/index.mts'
+import addUuidToTemplatePlugin from './plugins/addUuidToTemplate/index.mts'
 // import { lazyImport, VxeResolver } from 'vite-plugin-lazy-import'
 import { UploadEvent } from './utils/UploadComponent.ts'
 
@@ -180,6 +181,8 @@ export interface BuildContext {
   aliasPacks: string[]
   /** 上传类型（用于 UploadEvent），默认 'Vue3' */
   uploadType?: string
+  /** 样式类型，当为 'scoped' 时启用 addUuidToTemplate 插件 */
+  styleType?: string
   viteConfig?: ViteConfigType
 }
 
@@ -219,65 +222,55 @@ function sleep(ms: number): Promise<void> {
  * @returns 基础配置对象
  */
 function createBaseConfig(ctx: BuildContext, comp: string, internalDeps: string[]): InlineConfig {
+  const plugins = [
+    // 添加路径替换插件，将内部组件引用转换为外部包引用
+    transformAliasPlugin(ctx, internalDeps, comp),
+    pluginVue(),
+    vueJsx(),
+    // lazyImport({
+    //   resolvers: [
+    //     VxeResolver({
+    //       libraryName: 'vxe-pc-ui',
+    //     }),
+    //     VxeResolver({
+    //       libraryName: 'vxe-table',
+    //     }),
+    //   ],
+    // }),
+    // 自动引入
+    AutoImport({
+      imports: ['vue'],
+      resolvers: [],
+      dts: resolve(ctx.packDir, './_typings/auto-imports.d.ts'),
+    } as any),
+    // 按需启用图片压缩（重型插件）
+    !ctx.excludeHeavyPlugins && viteImagemin({
+      gifsicle: { optimizationLevel: 7, interlaced: false },
+      optipng: { optimizationLevel: 7 },
+      mozjpeg: { quality: 20 },
+      pngquant: { quality: [0.8, 0.9], speed: 4 },
+      svgo: {
+        plugins: [{ name: 'removeViewBox' }, { name: 'removeEmptyAttrs', active: false }],
+      },
+    }),
+    // 按需启用类型声明生成（重型插件）
+    !ctx.excludeHeavyPlugins && dts({
+      root: ctx.packDir,
+      entryRoot: `.${ctx.entryBaseUrl}${comp}`,
+      tsconfigPath: './tsconfig.build.json',
+      declarationOnly: false,
+    }),
+    cssInjectedByJsPlugin(),
+    // 根据 styleType 配置决定是否启用 addUuidToTemplate 插件
+    ctx.styleType && addUuidToTemplatePlugin(),
+  ]
   return mergeConfig({
     root: ctx.packDir,
     configFile: false,
     publicDir: false,
     logLevel: 'info',
     esbuild: ({ pure: ['console.log', 'console.info', 'console.debug'] } as any),
-    plugins: [
-      // 添加路径替换插件，将内部组件引用转换为外部包引用
-      transformAliasPlugin(ctx, internalDeps, comp),
-      pluginVue({
-        script: {
-          defineModel: true,
-          propsDestructure: true,
-        },
-      }),
-      vueJsx(),
-      // lazyImport({
-      //   resolvers: [
-      //     VxeResolver({
-      //       libraryName: 'vxe-pc-ui',
-      //     }),
-      //     VxeResolver({
-      //       libraryName: 'vxe-table',
-      //     }),
-      //   ],
-      // }),
-      // 自动引入
-      AutoImport({
-        imports: ['vue'],
-        resolvers: [],
-        dts: resolve(ctx.packDir, './_typings/auto-imports.d.ts'),
-      } as any),
-      // 按需启用图片压缩（重型插件）
-      ...(!ctx.excludeHeavyPlugins
-        ? [
-            viteImagemin({
-              gifsicle: { optimizationLevel: 7, interlaced: false },
-              optipng: { optimizationLevel: 7 },
-              mozjpeg: { quality: 20 },
-              pngquant: { quality: [0.8, 0.9], speed: 4 },
-              svgo: {
-                plugins: [{ name: 'removeViewBox' }, { name: 'removeEmptyAttrs', active: false }],
-              },
-            }),
-          ]
-        : []),
-      // 按需启用类型声明生成（重型插件）
-      ...(!ctx.excludeHeavyPlugins
-        ? [
-            dts({
-              root: ctx.packDir,
-              entryRoot: `.${ctx.entryBaseUrl}${comp}`,
-              tsconfigPath: './tsconfig.build.json',
-              declarationOnly: false,
-            }),
-          ]
-        : []),
-      cssInjectedByJsPlugin(),
-    ],
+    plugins,
     resolve: {
       extensions: ['.js', '.jsx', '.ts', '.tsx', '.vue'],
       alias: ctx.alias,
@@ -296,7 +289,7 @@ function createBaseConfig(ctx: BuildContext, comp: string, internalDeps: string[
         },
       },
     },
-  }, ctx?.viteConfig || {})
+  }, typeof ctx?.viteConfig === 'function' ? ctx.viteConfig({ command: 'build', mode: 'production' }) : (ctx?.viteConfig || {}))
 }
 
 /** 获取组件列表（只分目录的组件） */
@@ -1317,6 +1310,8 @@ export interface BuildOptions {
   peerDepList?: string[]
   /** 上传类型（用于 UploadEvent），默认 'Vue3' */
   uploadType?: string
+  /** 样式类型，当为 'scoped' 时启用 addUuidToTemplate 插件 */
+  styleType?: string
   /** Vite 配置（可选） */
   viteConfig?: ViteConfigType
 }
@@ -1342,6 +1337,7 @@ export async function buildComponentsWithOptions(options: BuildOptions): Promise
     entryBaseUrl: ebu = '/',
     presetGlobals: _presetGlobals,
     uploadType,
+    styleType,
     ...rest
   } = options || ({} as BuildOptions)
 
@@ -1383,6 +1379,7 @@ export async function buildComponentsWithOptions(options: BuildOptions): Promise
     },
     aliasPacks: [],
     uploadType,
+    styleType,
     ...rest,
   }
   ctx.aliasPacks = Object.keys(ctx.alias).filter((i: string) => !i.endsWith('*'))
