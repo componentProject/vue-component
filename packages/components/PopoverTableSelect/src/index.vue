@@ -154,10 +154,6 @@ function handleScrollBoundary(obj) {
 }
 </script>
 
-<style>
-@import 'element-plus/theme-chalk/el-input.css';
-</style>
-
 <style scoped lang="scss">
 @forward '@moluoxixi/components/_assets/styles/tailwind.scss';
 </style>
