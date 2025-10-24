@@ -46,6 +46,7 @@ import type { emitsType, propsType, slotsType } from './_types'
 
 defineOptions({
   name: 'TsSelect',
+  inheritAttrs: false,
 })
 
 const props = withDefaults(defineProps<propsType>(), {

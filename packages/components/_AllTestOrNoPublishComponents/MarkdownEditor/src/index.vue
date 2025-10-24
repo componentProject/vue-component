@@ -15,6 +15,7 @@ import { useTemplateRef } from 'vue'
 
 defineOptions({
   name: 'MarkdownEditor',
+  inheritAttrs: false,
 })
 const props = withDefaults(defineProps<propsType & eventsType>(), {
   id: 'editor',

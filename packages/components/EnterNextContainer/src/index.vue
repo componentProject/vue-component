@@ -5,7 +5,7 @@
 </template>
 
 <script setup lang="ts">
-import type { ComponentInternalInstance, ComponentPublicInstance } from 'vue'
+import type { ComponentPublicInstance } from 'vue'
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import type { emitsType, propsType, slotsType } from './_types'
 
@@ -22,7 +22,6 @@ const emit = defineEmits<emitsType>()
 
 // 获取插槽
 const slots = defineSlots<slotsType>()
-
 
 const containerRef = ref<HTMLElement | null>(null)
 const inputElements = ref<HTMLElement[]>([])

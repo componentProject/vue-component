@@ -45,31 +45,34 @@
       校验表格
     </ElButton>
     <!-- 使用DraggableTable组件 -->
-    <aDraggableTable
-      id="demo_table_12355666"
-      ref="draggableTableRef"
-      v-model="tableData"
-      page-id="page1"
-      user-id="shabi"
-      :columns="columns"
-      :loading="loading"
-      :height="500"
-      save-type="server"
-      :rowdragable="rowdragable"
-      :columndragable="columndragable"
-      :editable="editable"
-      :filterable="filterable"
-      :sortable="sortable"
-      show-pagination
-      @page-change="pageChangeHandler"
-    >
-      <!-- 自定义操作列插槽 -->
-      <template #aaa>
-        <TsButton show-type="disabled" content="你好" disabled type="danger" size="small">
-          aaa自定义插槽按钮
-        </TsButton>
-      </template>
-    </aDraggableTable>
+    <div class="border-2">
+      <aDraggableTable
+        id="demo_table_12355666"
+        ref="draggableTableRef"
+        v-model="tableData"
+        class="p-[8px]!"
+        page-id="page1"
+        user-id="shabi"
+        :columns="columns"
+        :loading="loading"
+        :height="500"
+        save-type="server"
+        :rowdragable="rowdragable"
+        :columndragable="columndragable"
+        :editable="editable"
+        :filterable="filterable"
+        :sortable="sortable"
+        show-pagination
+        @page-change="pageChangeHandler"
+      >
+        <!-- 自定义操作列插槽 -->
+        <template #aaa>
+          <TsButton show-type="disabled" content="你好" disabled type="danger" size="small">
+            aaa自定义插槽按钮
+          </TsButton>
+        </template>
+      </aDraggableTable>
+    </div>
   </div>
 </template>
 

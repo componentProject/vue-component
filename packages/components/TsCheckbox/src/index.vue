@@ -33,6 +33,7 @@ import type { emitsType, propsType, slotsType } from './_types'
 
 defineOptions({
   name: 'TsCheckbox',
+  inheritAttrs: false,
 })
 
 const props = withDefaults(defineProps<propsType>(), {

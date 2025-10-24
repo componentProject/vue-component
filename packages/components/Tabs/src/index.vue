@@ -26,6 +26,7 @@ import type { emitsType, propsType, slotsType } from './_types'
 
 defineOptions({
   name: 'Tabs',
+  inheritAttrs: false,
 })
 
 const props = withDefaults(defineProps<propsType>(), {
