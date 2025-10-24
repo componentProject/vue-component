@@ -14,19 +14,6 @@
 
 ## 第二步：需求分析和开发
 
-### 项目创建时：
-  1. 克隆模板（浅克隆，减少体积）：`git clone --depth=1 http://192.168.18.106/frontendgroup/his/template/vue-template.git <project-name>`
-  2. 进入目录：`cd <project-name>`
-  3. 清理 Git 历史并重新初始化：
-     - Unix/bash：`rm -rf .git && git init -b main`
-     - Windows PowerShell：`Remove-Item -Recurse -Force .git; git init -b main`
-  4. 清除配置：清空 `package.json` 的 `name`、`description`、`version`、`author`、`private`、`repository` 等信息
-  5. 安装依赖：按“包管理器与安装依赖（全局）”规则执行
-     - yarn：`corepack enable && corepack prepare yarn@stable --activate && yarn install --immutable`
-     - pnpm：`pnpm install --frozen-lockfile`
-     - npm：`npm ci`（或 `npm install`）
-  6. 初始化 Git 提交：`git add . && git commit -m "feat: initialize project from company template"`
-
 ### 理解用户需求时：
 - 充分理解用户需求，站在用户角度思考。
 - 作为产品经理，分析需求是否存在缺漏，与用户讨论并完善需求。
@@ -70,8 +57,10 @@
 
 #### vue开发规范：
 - 使用Vue 3的Composition API进行开发，合理使用setup语法糖。
-- 所有props类型必须在`_types/props.ts`中定义,并使用`withDefaults`为所有props提供默认值
-- 所有emit事件类型必须在`_types/emit.ts`中定义,并使用`defineEmits`定义所有emit事件
+- 所有props类型必须在`_types/props.ts`中定义
+- 使用`withDefaults`为所有props提供默认值
+- 所有emit事件类型必须在`_types/emit.ts`中定义
+- 必须使用`defineEmits`定义所有emit事件
 - 遵循Vue.js的最佳实践和设计模式，如单文件组件(SFC)。
 - 利用Vue Router进行路由管理，实现页面导航和路由守卫。
 - 使用Pinia进行状态管理，合理组织store结构。
