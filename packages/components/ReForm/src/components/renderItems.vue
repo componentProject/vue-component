@@ -27,7 +27,7 @@
               />
             </slot>
           </div>
-          <el-collapse-transition
+          <ElCollapseTransition
             v-if="!!item.children && item.children.length"
           >
             <div
@@ -48,7 +48,7 @@
                 </template>
               </ReFormRenderItems>
             </div>
-          </el-collapse-transition>
+          </ElCollapseTransition>
         </div>
       </template>
       <template v-else>
@@ -70,6 +70,7 @@ import ReCollapsedBtn from './ReCollapsedBtn.vue'
 import { computed, inject, unref } from 'vue'
 import type { ReFormItem } from '../_types'
 import ReFormRenderItem from './renderItem.vue'
+import { ElCollapseTransition } from 'element-plus'
 
 defineOptions({
   name: 'ReFormRenderItems',
@@ -77,7 +78,7 @@ defineOptions({
 
 const props = defineProps<{
   items: ReFormItem[]
-  draggable: boolean
+  draggable?: boolean
 }>()
 
 const {
