@@ -96,7 +96,7 @@ async function render(props: QiankunProps) {
   app = createApp(App)
   const allComponentList = await getList()
   await idbStorage.setItem(COMPONENT_SETTING_TYPE, JSON.stringify(allComponentList))
-  const isLongRange = false
+  const isLongRange = true
   await registerAllComponent(Vue, app, COMPONENT_SETTING_TYPE, isLongRange)
   console.log('app', app._context.components, app._context.components.TsFooter)
   // window.$remoteLoad = load

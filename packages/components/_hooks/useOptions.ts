@@ -101,9 +101,7 @@ export function useOptions(props: UseOptionsProps): UseOptionsReturn {
         // 其他情况使用POST请求
         response = await api.post(props.requestUrl, props.requestParams)
       }
-
       const data = response
-
       // 确保返回的是数组
       return Array.isArray(data) ? data : []
     }
@@ -120,7 +118,7 @@ export function useOptions(props: UseOptionsProps): UseOptionsReturn {
 
   // 监听 props 变化，更新 options
   watch(
-    () => [props.options, props.requestUrl, props.requestParams],
+    () => [props.options, props.requestUrl, props.requestParams, props.responseDataPath, props.requestHeaders, props.requestParamsType, props.requestMethod],
     async ([newOptions, requestUrl]) => {
       // 优先使用动态请求
       if (requestUrl) {
@@ -134,6 +132,7 @@ export function useOptions(props: UseOptionsProps): UseOptionsReturn {
     {
       immediate: true,
       deep: true,
+      lazy: true,
     },
   )
 

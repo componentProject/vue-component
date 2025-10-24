@@ -12,6 +12,7 @@ import 'element-plus/dist/index.css'
 
 defineOptions({
   name: 'ConfigFromPlayground',
+  inheritAttrs: false,
 })
 
 const designerRef = ref()

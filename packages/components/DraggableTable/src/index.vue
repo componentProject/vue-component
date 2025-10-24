@@ -81,6 +81,7 @@ import { getMemoryQuery, setMemoryUpload } from '@moluoxixi/utils/_api/cache'
 
 defineOptions({
   name: 'DraggableTable',
+  inheritAttrs: false,
 })
 // 定义组件属性
 const props = withDefaults(defineProps<propsType>(), {

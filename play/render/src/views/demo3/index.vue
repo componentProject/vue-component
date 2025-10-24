@@ -12,18 +12,10 @@
       </ElButton>
     </div>
     <div class="flex">
+      {{ componentName }}
       <div class="w-[200px]">
-        <TsSelect v-model="componentName" placeholder="请选择展示的组件" label="componentCode" value="id" :options="componentOptions" />
+        <TsSelect v-model="componentName" placeholder="请选择展示的组件" label="componentCode" value="componentCode" :options="componentOptions" />
       </div>
-    </div>
-    <div v-if="localComponent" class="main">
-      <div class="list-title">
-        开发调试组件
-      </div>
-      <component
-        :is="localComponent"
-        v-bind="componentProps"
-      />
     </div>
     <div v-if="componentName" class="main">
       <div class="list-title">
@@ -45,15 +37,8 @@ import componentData from './data.ts'
 import { ElButton, ElMessage } from 'element-plus'
 
 defineOptions({ name: '调试与演示iife和umd' })
-// 使用ref替代data属性
 // 调试与演示组件库的组件，直接修改组件名
-// const componentName = ref('ReForm')
 const componentName = ref('DraggableTable')
-// const componentName = ref('HisFooter')
-// const componentName = ref('TsFooter')
-// const componentName = ref('TestFooter')
-// 调试组件
-const localComponent = ref<any>(null)
 
 // 从data.ts获取当前组件的配置
 const componentConfig = computed(() => {
@@ -128,20 +113,6 @@ const secondComponentProps = computed(() => {
   return props
 })
 
-/**
- * @param componentName 要加载的组件文件名
- */
-async function loadLocalComponent(componentName: string) {
-  try {
-    const buttonModule = await import(`../../../../../packages/components/${componentName}/index.ts`)
-    localComponent.value = buttonModule.default
-  }
-  catch (error) {
-    console.error('加载调试组件失败:', error)
-    return null
-  }
-}
-
 const componentOptions = ref([])
 async function getComponentOptions() {
   componentOptions.value = await getList()
@@ -157,7 +128,6 @@ async function handleClick() {
 
 onMounted(async () => {
   await getComponentOptions()
-  // await loadLocalComponent(componentName.value)
 })
 </script>
 

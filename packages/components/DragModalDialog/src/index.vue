@@ -161,6 +161,7 @@ import type { emitsType, propsType } from './_types'
 
 defineOptions({
   name: 'DragModalDialog',
+  inheritAttrs: false,
 })
 
 const props = withDefaults(defineProps<propsType>(), {
@@ -192,7 +193,6 @@ const props = withDefaults(defineProps<propsType>(), {
 
 const emit = defineEmits<emitsType>()
 
-
 const renderModal = ref(false)
 
 // 监听 visible 变化，控制渲染
@@ -213,7 +213,6 @@ function handleAfterLeave() {
   }
   emit('closed')
 }
-
 
 // 状态管理
 const modalRef = ref<HTMLElement>()
