@@ -86,7 +86,7 @@ function getVueVersion(Vue: any): 'Vue2' | 'Vue3' {
  */
 export async function registerAllComponent(Vue: any, app: any, type?: string, isLongRange = false, moduleType: string = 'umd') {
   const vueVersion = getVueVersion(Vue)
-  const componentItemKey = type ?? (vueVersion === 'vue2' ? 'Vue2' : 'Vue3')
+  const componentItemKey = type ?? vueVersion
   const allComponentListStr = await idbStorage.getItem(componentItemKey)
   isString(componentItemKey)
   const allComponentList: any[] = JSON.parse(allComponentListStr!)
@@ -194,7 +194,7 @@ export async function loadRemoteComponent(Vue: any, componentName: string, allCo
 }
 export async function load(Vue: any, originComponentNames: string[], type?: string, moduleType?: string, isLongRange?: boolean) {
   const vueVersion = getVueVersion(Vue)
-  const componentItemKey = type ?? (vueVersion === 'vue2' ? 'Vue2' : 'Vue3')
+  const componentItemKey = type ?? vueVersion
   const allComponentListStr = await idbStorage.getItem(componentItemKey)
   isString(componentItemKey)
   const allComponentList: any[] = JSON.parse(allComponentListStr!)
