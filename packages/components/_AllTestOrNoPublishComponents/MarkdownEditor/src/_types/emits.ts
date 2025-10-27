@@ -16,8 +16,6 @@ export interface emitsType {
    * @param error - 错误信息
    */
   saveError: [error: Error]
-
-  uploadImage: [files: File[], callback: (urls: string[]) => void]
   /**
    * 内容变化事件
    * @param value - 变化后的内容

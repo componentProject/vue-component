@@ -7,6 +7,16 @@
     v-bind="$attrs"
     @save="save"
     @upload-img="handleUploadImg"
+    @change="handleChange"
+    @html-changed="handleHtmlChanged"
+    @focus="handleFocus"
+    @blur="handleBlur"
+    @error="handleError"
+    @get-catalog="handleGetCatalog"
+    @remount="handleRemount"
+    @input="handleInput"
+    @drop="handleDrop"
+    @input-box-width-change="handleInputBoxWidthChange"
   />
   <MdCatalog
     :editor-id="props.id"
@@ -398,7 +408,7 @@ function base64ToBlob(base64: string, mimeType: string): Promise<Blob> {
  * @param callback - 回调函数，用于返回图片URL
  */
 async function handleUploadImg(files: File[], callback: (urls: string[]) => void) {
-  emit('uploadImage', files, callback)
+  emit('uploadImg', files, callback)
   try {
     const urls = await uploadImages(files)
     callback(urls)
@@ -419,6 +429,88 @@ async function handleUploadImg(files: File[], callback: (urls: string[]) => void
     // 即使失败也要调用 callback，避免编辑器卡住
     callback([])
   }
+}
+//#endregion
+
+//#region 事件处理
+/**
+ * 处理内容变化事件
+ * @param value - 变化后的内容
+ */
+function handleChange(value: string): void {
+  emit('change', value)
+}
+
+/**
+ * 处理HTML变化事件
+ * @param html - 变化后的HTML内容
+ */
+function handleHtmlChanged(html: string): void {
+  emit('htmlChanged', html)
+}
+
+/**
+ * 处理焦点获得事件
+ * @param event - 焦点事件
+ */
+function handleFocus(event: FocusEvent): void {
+  emit('focus', event)
+}
+
+/**
+ * 处理焦点失去事件
+ * @param event - 焦点事件
+ */
+function handleBlur(event: FocusEvent): void {
+  emit('blur', event)
+}
+
+/**
+ * 处理错误事件
+ * @param err - 错误对象
+ */
+function handleError(err: Error): void {
+  emit('error', err)
+}
+
+/**
+ * 处理获取目录事件
+ */
+function handleGetCatalog(): void {
+  // md-editor-v3 的 get-catalog 事件不传递参数
+  emit('getCatalog', [])
+}
+
+/**
+ * 处理重新挂载事件
+ */
+function handleRemount(): void {
+  // md-editor-v3 的 remount 事件不传递参数
+  emit('remount', text.value)
+}
+
+/**
+ * 处理输入事件
+ * @param value - 输入的内容
+ */
+function handleInput(value: string): void {
+  emit('input', value)
+}
+
+/**
+ * 处理拖放事件
+ * @param event - 拖放事件
+ */
+function handleDrop(event: DragEvent): void {
+  emit('drop', event)
+}
+
+/**
+ * 处理输入框宽度变化事件
+ * @param width - 新的宽度值
+ */
+function handleInputBoxWidthChange(width: string): void {
+  emit('inputBoxWidthChange', width)
 }
 //#endregion
 
