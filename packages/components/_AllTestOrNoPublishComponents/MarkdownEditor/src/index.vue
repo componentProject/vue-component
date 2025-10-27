@@ -1,35 +1,171 @@
 <template>
-  <MdEditor ref="mdEditor" v-model="text" v-bind="props" v-on="props" />
+  <MdEditor
+    ref="mdEditor"
+    v-model="text"
+    v-bind="$attrs"
+    @save="handleSave"
+  />
   <MdCatalog :editor-id="props.id" :scroll-element="scrollElement" :theme="props.theme" />
 </template>
 
 <script setup lang="ts">
+import { computed, ref } from 'vue'
 import { config, editorExtensionsAttrs, MdCatalog, MdEditor, XSSPlugin } from 'md-editor-v3'
 import 'md-editor-v3/lib/style.css'
 import screenfull from 'screenfull'
-import type { eventsType, propsType, slotsType } from './types'
-import type { ExposeParam } from 'md-editor-v3'
 import { lineNumbers } from '@codemirror/view'
 import ancher from 'markdown-it-anchor'
-import { useTemplateRef } from 'vue'
+import { idbStorage } from '@moluoxixi/utils/_utils'
+import type { DocumentListItem, emitsType, propsType, SavedDocumentData, slotsType } from './_types'
 
 defineOptions({
   name: 'MarkdownEditor',
   inheritAttrs: false,
 })
-const props = withDefaults(defineProps<propsType & eventsType>(), {
+
+const props = withDefaults(defineProps<propsType & emitsType>(), {
   id: 'editor',
   theme: 'light',
   previewTheme: 'cyanosis',
   codeTheme: 'github',
 })
+
+const emit = defineEmits<{
+  saveSuccess: [data: { value: string, html: string }]
+  saveError: [error: Error]
+}>()
+
 defineSlots<slotsType>()
 
-useTemplateRef('mdEditor')
-// https://imzbf.github.io/md-editor-v3/zh-CN/demo
+const mdEditor = useTemplateRef('mdEditor')
 const text = ref('')
-defineExpose<ExposeParam>()
 const scrollElement = document.documentElement
+
+// 保存相关功能
+const saveKey = computed(() => `markdown-editor-${props.id}`)
+
+/**
+ * 保存内容到 IndexedDB
+ * @param content - 要保存的内容
+ * @param title - 文档标题（可选）
+ * @returns Promise<boolean> - 保存是否成功
+ */
+async function saveToIndexedDB(content: string, title?: string): Promise<boolean> {
+  try {
+    const saveData: SavedDocumentData = {
+      content,
+      title: title || `文档-${new Date().toLocaleString()}`,
+      lastModified: new Date().toISOString(),
+      id: props.id,
+    }
+    await idbStorage.setItem(saveKey.value, JSON.stringify(saveData))
+    console.log('内容已保存到 IndexedDB')
+    return true
+  }
+  catch (error) {
+    console.error('保存失败:', error)
+    return false
+  }
+}
+
+/**
+ * 从 IndexedDB 加载内容
+ * @returns Promise<SavedDocumentData | null> - 加载的文档数据或null
+ */
+async function loadFromIndexedDB(): Promise<SavedDocumentData | null> {
+  try {
+    const savedData = await idbStorage.getItem(saveKey.value)
+    if (savedData) {
+      const data: SavedDocumentData = JSON.parse(savedData)
+      text.value = data.content || ''
+      console.log('内容已从 IndexedDB 加载')
+      return data
+    }
+    return null
+  }
+  catch (error) {
+    console.error('加载失败:', error)
+    return null
+  }
+}
+
+/**
+ * 获取保存的文档列表
+ * @returns Promise<DocumentListItem[]> - 文档列表
+ */
+async function getSavedDocuments(): Promise<DocumentListItem[]> {
+  try {
+    const keys = await idbStorage.keys()
+    const markdownKeys = keys.filter(key => key.startsWith('markdown-editor-'))
+    const documents: DocumentListItem[] = []
+
+    for (const key of markdownKeys) {
+      const data = await idbStorage.getItem(key)
+      if (data) {
+        const parsed: SavedDocumentData = JSON.parse(data)
+        documents.push({
+          key,
+          ...parsed,
+        })
+      }
+    }
+
+    return documents.sort((a, b) => new Date(b.lastModified).getTime() - new Date(a.lastModified).getTime())
+  }
+  catch (error) {
+    console.error('获取文档列表失败:', error)
+    return []
+  }
+}
+
+/**
+ * 删除保存的文档
+ * @param key - 文档键名
+ * @returns Promise<boolean> - 删除是否成功
+ */
+async function deleteSavedDocument(key: string): Promise<boolean> {
+  try {
+    await idbStorage.removeItem(key)
+    console.log('文档已删除')
+    return true
+  }
+  catch (error) {
+    console.error('删除失败:', error)
+    return false
+  }
+}
+
+/**
+ * 处理保存事件
+ * @param value - Markdown内容
+ * @param html - HTML内容
+ */
+function handleSave(value: string, html: any): void {
+  // 异步保存到 IndexedDB
+  saveToIndexedDB(value).then((success) => {
+    if (success) {
+      // 触发自定义保存成功事件
+      emit('saveSuccess', { value, html })
+    }
+    else {
+      // 触发保存失败事件
+      emit('saveError', new Error('保存到 IndexedDB 失败'))
+    }
+  })
+
+  // 调用原始的 onSave 事件
+  if (props.onSave) {
+    props.onSave(value, html)
+  }
+}
+
+// 暴露方法给父组件
+defineExpose({
+  saveToIndexedDB,
+  loadFromIndexedDB,
+  getSavedDocuments,
+  deleteSavedDocument,
+})
 config({
   /**
    * 根据主题和内部默认的 codeMirror 扩展自定义新的扩展。

@@ -39,13 +39,6 @@
 #### 接口编写规范：
 - 接口编写完毕需要使用fetch请求进行调用测试，如果有文件生成，需要检测生成的文件是否符合要求
 
-
-
-### 类型命名和分类规范
-- 每个参数类型在_types目录下精准定义，按功能分类组织
-- 方法与类型命名强关联
-- 示例：`/suno/cover/generate` → 方法名：`sunoCoverGenerate` → 类型：`sunoCoverGenerateParamsType`
-
 #### 类型文件分类规范：
 - `_types/props.ts` - Vue组件props类型定义,首个props类型，命名为propsType,其他命名为xxxPropsType,如果没有props,无须创建
 - `_types/emits.ts` - Vue组件emit事件类型定义,首个emits类型，命名为emitsType,其他命名为xxxEmitsType,如果没有emits,无须创建
@@ -54,6 +47,13 @@
 - `_types/common.ts` - 通用类型定义
 - `_types/index.ts` - 统一导出所有类型
 - 每个类型文件都应该在`_types/index.ts`中导出，便于统一引用
+
+### 类型命名和分类规范
+- 每个参数类型在_types目录下精准定义，按功能分类组织
+- 方法与类型命名强关联
+- 示例：`/suno/cover/generate` → 方法名：`sunoCoverGenerate` → 类型：`sunoCoverGenerateParamsType`
+
+
 
 #### vue开发规范：
 - 使用Vue 3的Composition API进行开发，合理使用setup语法糖。

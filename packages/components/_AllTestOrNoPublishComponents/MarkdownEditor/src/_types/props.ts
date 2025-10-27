@@ -1,21 +1,24 @@
 import type { EditorProps } from 'md-editor-v3'
 
+/**
+ * MarkdownEditor 组件的 Props 类型定义
+ */
 export interface propsType {
   //#region 扩展props
+  /**
+   * 自定义配置对象
+   */
   config?: any
   /**
    * 是否显示行号
    */
   showNum?: boolean
   //#endregion
+
   /**
    * 编辑器的唯一标识，使用默认前缀和useId拼接
    */
   id?: EditorProps['id']
-  // /**
-  //  * 编辑的内容
-  //  */
-  // modelValue?: EditorProps['modelValue']
   /**
    * 编辑器主题，支持 light 和 dark 两种
    */
@@ -186,72 +189,6 @@ export interface propsType {
   noKatex?: EditorProps['noKatex']
   /**
    * 默认工具栏。可以通过该属性来配置默认显示的工具栏按钮
-   */
-  defToolbars?: EditorProps['defToolbars']
-}
-
-export interface mdPreviewEventsType {
-  /**
-   * 内容变化事件。回调参数：(value: string) => void
-   */
-  onChange?: EditorProps['onChange']
-  /**
-   * html变化回调事件。回调参数：(html: string) => void
-   */
-  onHtmlChanged?: EditorProps['onHtmlChanged']
-
-  /**
-   * >=5.3.0 内容重新挂载事件，在这个事件中能够正确获取到内容中的节点。
-   */
-  onRemount?: EditorProps['onRemount']
-  /**
-   * 动态获取markdown目录。回调参数：(catalogList: Array<HeadList>) => void
-   */
-  onGetCatalog?: EditorProps['onGetCatalog']
-}
-export interface eventsType extends mdPreviewEventsType {
-  /**
-   * 保存事件，快捷键与保存按钮均会触发。回调参数：(value: string, html: string) => void
-   */
-  onSave?: EditorProps['onSave']
-  /**
-   * 上传图片事件。回调参数：(files: Array<File>, callback: (urls: Array<string>) => void) => void
-   */
-  onUploadImg?: EditorProps['onUploadImg']
-  /**
-   * 捕获执行错误事件。回调参数：(err: Error) => void
-   */
-  onError?: EditorProps['onError']
-
-  /**
-   * 输入框失去焦点时触发事件。回调参数：(event: FocusEvent) => void
-   */
-  onBlur?: EditorProps['onBlur']
-  /**
-   * 输入框获得焦点时触发事件。回调参数：(event: FocusEvent) => void
-   */
-  onFocus?: EditorProps['onFocus']
-  /**
-   * 输入框键入内容事件。回调参数：(value: string) => void
-   */
-  onInput?: EditorProps['onInput']
-  /**
-   * 拖放内容事件。回调参数：(event: DragEvent) => void
-   */
-  onDrop?: EditorProps['onDrop']
-  /**
-   * 调整输入框宽度事件
-   */
-  onInputBoxWidthChange?: (width: string) => void
-}
-
-export interface slotsType {
-  /**
-   * 自定义扩展页脚。可以通过该插槽来自定义页脚的内容
-   */
-  defFooters?: EditorProps['defFooters']
-  /**
-   * 自定义工具栏插槽，通过使用内置的NormalToolbar普通点击触发事件组件，DropdownToolbar下拉点击触发事件组件和ModalToolbar弹窗触发事件组件进行扩展。将defToolbars插槽中的组件下标穿插在toolbars实现展示（这并不规范）。
    */
   defToolbars?: EditorProps['defToolbars']
 }
