@@ -1,5 +1,5 @@
 <template>
-  <div class="markdown-editor-example">
+  <div class="w-full h-full flex flex-col">
     <div class="example-header">
       <h2>MarkdownEditor 示例 - IndexedDB 保存功能</h2>
       <div class="controls">
@@ -12,22 +12,34 @@
         <ElButton type="info" @click="toggleCatalog">
           {{ showCatalog ? '隐藏目录' : '显示目录' }}
         </ElButton>
+        <ElButton type="warning" @click="showImageList">
+          图片管理
+        </ElButton>
         <ElButton type="danger" @click="clearAll">
           清空所有
+        </ElButton>
+        <ElButton :type="isReadOnly ? 'success' : 'default'" @click="toggleReadOnly">
+          {{ isReadOnly ? '切换到编辑模式' : '切换到只读模式' }}
+        </ElButton>
+        <ElButton :type="isPreviewMode ? 'success' : 'default'" @click="togglePreviewMode">
+          {{ isPreviewMode ? '切换到编辑模式' : '切换到预览模式' }}
         </ElButton>
       </div>
     </div>
 
-    <div class="example-content">
-      <div class="editor-section">
+    <div class="flex flex-1-hidden">
+      <div class="editor-section flex-1-hidden">
         <MarkdownEditor
           id="example-editor"
           ref="editorRef"
           v-model="content"
-          :height="500"
           :show-num="true"
           theme="light"
           preview-theme="cyanosis"
+          :read-only="isReadOnly"
+          :preview="isPreviewMode"
+          :upload-image-success="handleUploadImageSuccess"
+          :upload-image-error="handleUploadImageError"
           @save-success="handleSaveSuccess"
           @save-error="handleSaveError"
           @save="handleSave"
@@ -45,6 +57,10 @@
             <p><strong>最后保存时间:</strong> {{ lastSaveTime || '未保存' }}</p>
             <p><strong>文档数量:</strong> {{ documentCount }}</p>
             <p><strong>当前内容长度:</strong> {{ content.length }} 字符</p>
+            <p>
+              <strong>编辑模式:</strong>
+              <span :class="modeClass">{{ currentMode }}</span>
+            </p>
           </div>
         </ElCard>
 
@@ -66,8 +82,8 @@
                   ID: {{ doc.id }} |
                   修改时间: {{ formatDate(doc.lastModified) }}
                 </p>
-                <p class="document-preview">
-                  {{ doc.content.substring(0, 100) }}{{ doc.content.length > 100 ? '...' : '' }}
+                <p class="document-preview max-w-[150px] whitespace-pre">
+                  {{ doc.content?.substring(0, 100) }}{{ doc.content?.length > 100 ? '...' : '' }}
                 </p>
               </div>
               <div class="document-actions">
@@ -87,6 +103,55 @@
                 </ElButton>
               </div>
             </div>
+
+            <!-- 图片管理对话框 -->
+            <ElDialog
+              v-model="showImageDialog"
+              title="图片管理"
+              width="80%"
+              :close-on-click-modal="false"
+            >
+              <div v-if="uploadedImages.length === 0" class="no-images">
+                <p>
+                  暂无上传的图片
+                </p>
+                <p class="tip">
+                  您可以通过编辑器的图片上传功能上传图片
+                </p>
+              </div>
+              <div v-else class="image-grid">
+                <div
+                  v-for="image in uploadedImages"
+                  :key="image.id"
+                  class="image-item"
+                >
+                  <div class="image-preview">
+                    <img :src="image.data" :alt="image.name">
+                  </div>
+                  <div class="image-info">
+                    <h4>{{ image.name }}</h4>
+                    <p class="image-meta">
+                      <span>大小: {{ formatFileSize(image.size) }}</span>
+                      <span>类型: {{ image.type }}</span>
+                      <span>上传时间: {{ formatDate(image.uploadTime) }}</span>
+                    </p>
+                  </div>
+                  <div class="image-actions">
+                    <ElButton type="danger" size="small" @click="deleteImage(image.id)">
+                      删除
+                    </ElButton>
+                  </div>
+                </div>
+              </div>
+              <template #footer>
+                <ElButton @click="showImageDialog = false">
+                  关闭
+                </ElButton>
+                <ElButton type="primary" @click="refreshImageList">
+                  刷新
+                </ElButton>
+              </template>
+            </ElDialog>
           </div>
         </ElCard>
       </div>
@@ -106,7 +171,7 @@
 import { computed, onMounted, ref } from 'vue'
 import { ElButton, ElCard, ElMessage } from 'element-plus'
 import MarkdownEditor from './index.vue'
-import type { DocumentListItem, MessageType, SaveSuccessDataType } from './_types'
+import type { DocumentListItem, ImageData, MessageType, SaveSuccessDataType } from './_types'
 
 // 响应式数据
 const content = ref(`# 欢迎使用 MarkdownEditor
@@ -132,13 +197,13 @@ const content = ref(`# 欢迎使用 MarkdownEditor
 
 \`\`\`javascript
 // 保存内容
-await editorRef.value.saveToIndexedDB(content.value, '我的文档')
+await editorRef.value.save(content.value, '我的文档')
 
 // 加载内容
-const data = await editorRef.value.loadFromIndexedDB()
+const data = await editorRef.value.load()
 
 // 获取文档列表
-const docs = await editorRef.value.getSavedDocuments()
+const docs = await editorRef.value.getDocuments()
 \`\`\`
 
 ## 数学公式
@@ -168,9 +233,27 @@ const loading = ref(false)
 const lastSaveTime = ref('')
 const savedDocuments = ref<DocumentListItem[]>([])
 const showCatalog = ref(true)
+const uploadedImages = ref<ImageData[]>([])
+const showImageDialog = ref(false)
+const isReadOnly = ref(false)
+const isPreviewMode = ref(false)
 
 // 计算属性
 const documentCount = computed(() => savedDocuments.value.length)
+const currentMode = computed(() => {
+  if (isPreviewMode.value)
+    return '预览模式 (MdPreview)'
+  if (isReadOnly.value)
+    return '只读模式 (MdEditor)'
+  return '编辑模式 (MdEditor)'
+})
+const modeClass = computed(() => {
+  if (isPreviewMode.value)
+    return 'mode-preview'
+  if (isReadOnly.value)
+    return 'mode-readonly'
+  return 'mode-edit'
+})
 
 // 消息提示
 const message = ref<MessageType>({
@@ -204,7 +287,15 @@ function formatDate(dateString: string) {
  * @param data 保存的数据
  */
 function handleSaveSuccess(data: SaveSuccessDataType) {
-  lastSaveTime.value = new Date().toLocaleString('zh-CN')
+  console.log('data', data)
+  // 使用实际的保存时间，如果没有则使用当前时间
+  if (data.saveTime) {
+    lastSaveTime.value = new Date(data.saveTime).toLocaleString('zh-CN')
+  }
+  else {
+    lastSaveTime.value = new Date().toLocaleString('zh-CN')
+  }
+
   showMessage('success', '内容已成功保存到 IndexedDB！')
   refreshDocumentList()
 }
@@ -218,11 +309,118 @@ function handleSaveError(error: Error) {
 }
 
 /**
+ * 处理图片上传成功事件
+ * @param data 上传成功的图片信息
+ * @param data.files 上传的文件列表
+ * @param data.urls 生成的图片URL列表
+ */
+function handleUploadImageSuccess(data: { files: File[], urls: string[] }) {
+  const fileNames = data.files.map(file => file.name).join('、')
+  showMessage('success', `图片上传成功: ${fileNames}`)
+}
+
+/**
+ * 处理图片上传失败事件
+ * @param error 错误信息
+ */
+function handleUploadImageError(error: Error) {
+  showMessage('error', `图片上传失败: ${error.message}`)
+}
+
+/**
  * 切换目录显示
  */
 function toggleCatalog() {
   showCatalog.value = !showCatalog.value
   showMessage('info', showCatalog.value ? '目录已显示' : '目录已隐藏')
+}
+
+/**
+ * 切换只读模式
+ */
+function toggleReadOnly() {
+  isReadOnly.value = !isReadOnly.value
+  // 如果启用只读，则禁用预览模式
+  if (isReadOnly.value) {
+    isPreviewMode.value = false
+  }
+  showMessage('info', isReadOnly.value ? '已切换到只读模式' : '已切换到编辑模式')
+}
+
+/**
+ * 切换预览模式
+ */
+function togglePreviewMode() {
+  isPreviewMode.value = !isPreviewMode.value
+  // 如果启用预览模式，则禁用只读模式
+  if (isPreviewMode.value) {
+    isReadOnly.value = false
+  }
+  showMessage('info', isPreviewMode.value ? '已切换到预览模式' : '已切换到编辑模式')
+}
+
+/**
+ * 显示图片管理对话框
+ */
+async function showImageList() {
+  await refreshImageList()
+  showImageDialog.value = true
+}
+
+/**
+ * 刷新图片列表
+ */
+async function refreshImageList() {
+  if (!editorRef.value)
+    return
+
+  try {
+    uploadedImages.value = await editorRef.value.getImages()
+  }
+  catch (error) {
+    console.error('获取图片列表失败:', error)
+    showMessage('error', '获取图片列表失败')
+  }
+}
+
+/**
+ * 删除图片
+ * @param imageId 图片ID
+ */
+async function deleteImage(imageId: string) {
+  if (!editorRef.value)
+    return
+
+  try {
+    const success = await editorRef.value.deleteImage(imageId)
+    if (success) {
+      showMessage('success', '图片已删除')
+      await refreshImageList()
+    }
+    else {
+      showMessage('error', '删除图片失败')
+    }
+  }
+  catch (error) {
+    console.error('删除图片失败:', error)
+    showMessage('error', '删除图片失败')
+  }
+}
+
+/**
+ * 格式化文件大小
+ * @param bytes 字节数
+ * @returns 格式化后的大小
+ */
+function formatFileSize(bytes: number): string {
+  if (bytes === 0)
+    return '0 B'
+
+  const k = 1024
+  const sizes = ['B', 'KB', 'MB', 'GB']
+  const i = Math.floor(Math.log(bytes) / Math.log(k))
+
+  return `${Number.parseFloat((bytes / k ** i).toFixed(2))} ${sizes[i]}`
 }
 
 /**
@@ -243,7 +441,7 @@ async function loadDocument() {
 
   loading.value = true
   try {
-    const data = await editorRef.value.loadFromIndexedDB()
+    const data = await editorRef.value.load()
     if (data) {
       content.value = data.content
       showMessage('success', '文档加载成功！')
@@ -278,7 +476,7 @@ async function refreshDocumentList() {
     return
 
   try {
-    const docs = await editorRef.value.getSavedDocuments()
+    const docs = await editorRef.value.getDocuments()
     savedDocuments.value = docs
   }
   catch (error) {
@@ -310,7 +508,7 @@ async function deleteDocument(key: string) {
     return
 
   try {
-    const success = await editorRef.value.deleteSavedDocument(key)
+    const success = await editorRef.value.deleteDocument(key)
     if (success) {
       showMessage('success', '文档删除成功！')
       await refreshDocumentList()
@@ -332,7 +530,7 @@ async function clearAll() {
     return
 
   try {
-    const docs = await editorRef.value.getSavedDocuments()
+    const docs = await editorRef.value.getDocuments()
     for (const doc of docs) {
       await editorRef.value.deleteSavedDocument(doc.key)
     }
@@ -351,12 +549,6 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-.markdown-editor-example {
-  padding: 20px;
-  max-width: 1200px;
-  margin: 0 auto;
-}
-
 .example-header {
   display: flex;
   justify-content: space-between;
@@ -374,12 +566,6 @@ onMounted(async () => {
 .controls {
   display: flex;
   gap: 10px;
-}
-
-.example-content {
-  display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: 20px;
 }
 
 .editor-section {
@@ -409,6 +595,85 @@ onMounted(async () => {
   color: #ffffff;
 }
 
+/* 图片管理样式 */
+.no-images {
+  text-align: center;
+  padding: 40px 20px;
+  color: #909399;
+}
+
+.no-images .tip {
+  font-size: 14px;
+  margin-top: 10px;
+  color: #c0c4cc;
+}
+
+.image-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.image-item {
+  border: 1px solid #e4e7ed;
+  border-radius: 8px;
+  overflow: hidden;
+  background: white;
+  transition: all 0.3s ease;
+}
+
+.image-item:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.image-preview {
+  width: 100%;
+  height: 200px;
+  overflow: hidden;
+  background: #f5f7fa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.image-preview img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.image-info {
+  padding: 15px;
+}
+
+.image-info h4 {
+  margin: 0 0 10px 0;
+  color: #303133;
+  font-size: 16px;
+  font-weight: 500;
+  word-break: break-all;
+}
+
+.image-meta {
+  margin: 0;
+  font-size: 12px;
+  color: #909399;
+  line-height: 1.5;
+}
+
+.image-meta span {
+  display: block;
+  margin-bottom: 4px;
+}
+
+.image-actions {
+  padding: 0 15px 15px 15px;
+  text-align: right;
+}
+
 .info-section {
   display: flex;
   flex-direction: column;
@@ -428,6 +693,21 @@ onMounted(async () => {
 .status-info p {
   margin: 8px 0;
   color: #606266;
+}
+
+.mode-edit {
+  color: #409eff;
+  font-weight: bold;
+}
+
+.mode-readonly {
+  color: #e6a23c;
+  font-weight: bold;
+}
+
+.mode-preview {
+  color: #67c23a;
+  font-weight: bold;
 }
 
 .document-list {
@@ -477,10 +757,6 @@ onMounted(async () => {
 }
 
 @media (max-width: 768px) {
-  .example-content {
-    grid-template-columns: 1fr;
-  }
-
   .example-header {
     flex-direction: column;
     gap: 15px;

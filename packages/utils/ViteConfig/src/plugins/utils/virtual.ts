@@ -147,6 +147,8 @@ export interface VirtualPluginUserConfig {
   root?: string
   typeContent?: any
   watch?: string | string[]
+  /** 热更新防抖延迟时间（毫秒），默认 50ms */
+  debounceMs?: number
 }
 
 type GenerateDts = (params: {
@@ -162,7 +164,7 @@ export function createVirtualPlugin(
   generateModule: GenerateModule,
   generateDts?: GenerateDts,
 ): Plugin {
-  const { name, virtualModuleId, dts, root, typeContent, watch } = userConfig
+  const { name, virtualModuleId, dts, root, typeContent, watch, debounceMs = 50 } = userConfig
   const VIRTUAL_MODULE_ID = virtualModuleId
 
   const moduleCache: Map<string, string> = new Map()
@@ -173,6 +175,10 @@ export function createVirtualPlugin(
   let isWatchedPath: PathMatcher = () => true
   // 标记服务器是否正在关闭，避免关闭阶段再触发无效操作
   let isServerClosing = false
+
+  // 防抖定时器
+  let hmrDebounceTimer: NodeJS.Timeout | undefined
+  let watchChangeDebounceTimer: NodeJS.Timeout | undefined
 
   return {
     name,
@@ -244,6 +250,15 @@ export function createVirtualPlugin(
       try {
         server.httpServer?.once('close', () => {
           isServerClosing = true
+          // 清理所有防抖定时器
+          if (hmrDebounceTimer) {
+            clearTimeout(hmrDebounceTimer)
+            hmrDebounceTimer = undefined
+          }
+          if (watchChangeDebounceTimer) {
+            clearTimeout(watchChangeDebounceTimer)
+            watchChangeDebounceTimer = undefined
+          }
         })
       }
       catch {}
@@ -276,7 +291,7 @@ export function createVirtualPlugin(
           if (ids.length === 0)
             server.ws.send({ type: 'full-reload' })
         },
-        50,
+        debounceMs,
       )
     },
 
@@ -288,17 +303,36 @@ export function createVirtualPlugin(
         return
       if (isServerClosing)
         return
-      const ids = Array.from(moduleCache.keys()).filter(k => k === VIRTUAL_MODULE_ID || k.startsWith(`${VIRTUAL_MODULE_ID}/`))
-      const mods: ModuleNode[] = []
-      for (const vid of ids) {
-        moduleCache.delete(vid)
-        const m = server.moduleGraph.getModuleById(vid)
-        if (m) {
-          server.moduleGraph.invalidateModule(m)
-          mods.push(m)
-        }
+
+      // 清除之前的防抖定时器
+      if (hmrDebounceTimer) {
+        clearTimeout(hmrDebounceTimer)
       }
-      return mods
+
+      // 设置防抖定时器
+      hmrDebounceTimer = setTimeout(() => {
+        if (isServerClosing)
+          return
+
+        const ids = Array.from(moduleCache.keys()).filter(k => k === VIRTUAL_MODULE_ID || k.startsWith(`${VIRTUAL_MODULE_ID}/`))
+        const mods: ModuleNode[] = []
+        for (const vid of ids) {
+          moduleCache.delete(vid)
+          const m = server.moduleGraph.getModuleById(vid)
+          if (m) {
+            server.moduleGraph.invalidateModule(m)
+            mods.push(m)
+          }
+        }
+
+        // 触发 HMR 更新
+        if (mods.length > 0) {
+          ctx.modules = mods
+        }
+      }, debounceMs)
+
+      // 立即返回，让防抖逻辑在后台执行
+      return []
     },
 
     watchChange(id: string) {
@@ -307,11 +341,22 @@ export function createVirtualPlugin(
         const absId = normalizePath(path.isAbsolute(id) ? id : path.resolve(rootDir, id))
         if (isWatchedPath(absId)) {
           if (!isServerClosing) {
-            // 删除所有缓存的相关虚拟模块
-            for (const k of Array.from(moduleCache.keys())) {
-              if (k === VIRTUAL_MODULE_ID || k.startsWith(`${VIRTUAL_MODULE_ID}/`))
-                moduleCache.delete(k)
+            // 清除之前的防抖定时器
+            if (watchChangeDebounceTimer) {
+              clearTimeout(watchChangeDebounceTimer)
             }
+
+            // 设置防抖定时器
+            watchChangeDebounceTimer = setTimeout(() => {
+              if (isServerClosing)
+                return
+
+              // 删除所有缓存的相关虚拟模块
+              for (const k of Array.from(moduleCache.keys())) {
+                if (k === VIRTUAL_MODULE_ID || k.startsWith(`${VIRTUAL_MODULE_ID}/`))
+                  moduleCache.delete(k)
+              }
+            }, debounceMs)
           }
         }
       }

@@ -63,3 +63,71 @@ export interface markdownEditorDeleteSavedDocumentParamsType {
    */
   key: string
 }
+
+/**
+ * 图片数据结构
+ */
+export interface ImageData {
+  /**
+   * 图片ID
+   */
+  id: string
+  /**
+   * 图片名称
+   */
+  name: string
+  /**
+   * 图片大小（字节）
+   */
+  size: number
+  /**
+   * 图片类型
+   */
+  type: string
+  /**
+   * 图片数据（base64 或 blob）
+   */
+  data: string
+  /**
+   * 上传时间
+   */
+  uploadTime: string
+  /**
+   * 编辑器ID
+   */
+  editorId: string
+}
+
+/**
+ * 图片上传参数类型
+ */
+export interface markdownEditorUploadImageParamsType {
+  /**
+   * 文件列表
+   */
+  files: File[]
+  /**
+   * 回调函数，用于返回图片URL
+   */
+  callback: (urls: string[]) => void
+}
+
+/**
+ * 图片删除参数类型
+ */
+export interface markdownEditorDeleteImageParamsType {
+  /**
+   * 图片ID
+   */
+  imageId: string
+}
+
+/**
+ * 获取图片列表参数类型
+ */
+export interface markdownEditorGetImagesParamsType {
+  /**
+   * 编辑器ID
+   */
+  editorId: string
+}

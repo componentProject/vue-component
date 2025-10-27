@@ -1,5 +1,5 @@
 import type { EditorProps } from 'md-editor-v3'
-import type { DocumentListItem, SavedDocumentData } from './api'
+import type { DocumentListItem, ImageData, SavedDocumentData } from './api'
 
 /**
  * MarkdownEditor 组件的 Props 类型定义
@@ -14,6 +14,10 @@ export interface propsType {
    * 是否显示行号
    */
   showNum?: boolean
+  /**
+   * 是否启用代码折叠功能
+   */
+  enableFold?: boolean
   //#endregion
 
   /**
@@ -97,10 +101,6 @@ export interface propsType {
    */
   pageFullscreen?: EditorProps['pageFullscreen']
   /**
-   * 是否显示预览。设置为 false 时，预览区域将被隐藏
-   */
-  preview?: EditorProps['preview']
-  /**
    * 是否显示 html 预览。当设置为true时，需要将preview设置为false
    */
   htmlPreview?: EditorProps['htmlPreview']
@@ -153,6 +153,10 @@ export interface propsType {
    */
   readOnly?: EditorProps['readOnly']
   /**
+   * 是否使用预览模式。设置为 true 后，将使用 MdPreview 组件展示内容
+   */
+  preview?: boolean
+  /**
    * 最大字符数。超过该值后，将不能继续输入
    */
   maxLength?: EditorProps['maxLength']
@@ -197,7 +201,7 @@ export interface propsType {
   /**
    * 自定义保存方法
    */
-  saveMethod?: (content: string, title?: string) => Promise<boolean>
+  saveMethod?: EditorProps['onSave']
   /**
    * 自定义加载方法
    */
@@ -210,5 +214,96 @@ export interface propsType {
    * 自定义删除文档方法
    */
   deleteDocumentMethod?: (key: string) => Promise<boolean>
+  /**
+   * 自定义图片上传方法
+   */
+  uploadImageMethod?: (files: File[]) => Promise<string[]>
+  /**
+   * 自定义获取图片列表方法
+   */
+  getImagesMethod?: () => Promise<ImageData[]>
+  /**
+   * 自定义删除图片方法
+   */
+  deleteImageMethod?: (imageId: string) => Promise<boolean>
+  //#endregion
+
+  //#region 事件回调
+  /**
+   * 保存成功事件，当内容成功保存到 IndexedDB 时触发
+   * @param data - 保存的数据，包含value和html
+   */
+  saveSuccess?: (data: { value: string, html: string }) => void
+  /**
+   * 保存失败事件，当保存到 IndexedDB 失败时触发
+   * @param error - 错误信息
+   */
+  saveError?: (error: Error) => void
+  /**
+   * 上传图片事件
+   * @param files - 上传的文件列表
+   * @param callback - 回调函数，用于返回图片URL
+   */
+  onUploadImg?: EditorProps['onUploadImg']
+  /**
+   * 捕获执行错误事件
+   * @param err - 错误对象
+   */
+  onError?: EditorProps['onError']
+  /**
+   * 输入框失去焦点时触发事件
+   * @param event - 焦点事件
+   */
+  onBlur?: EditorProps['onBlur']
+  /**
+   * 输入框获得焦点时触发事件
+   * @param event - 焦点事件
+   */
+  onFocus?: EditorProps['onFocus']
+  /**
+   * 输入框键入内容事件
+   * @param value - 输入的内容
+   */
+  onInput?: EditorProps['onInput']
+  /**
+   * 拖放内容事件
+   * @param event - 拖放事件
+   */
+  onDrop?: EditorProps['onDrop']
+  /**
+   * 调整输入框宽度事件
+   * @param width - 新的宽度值
+   */
+  onInputBoxWidthChange?: (width: string) => void
+  /**
+   * 内容变化事件
+   * @param value - 变化后的内容
+   */
+  onChange?: EditorProps['onChange']
+  /**
+   * HTML变化回调事件
+   * @param html - 变化后的HTML内容
+   */
+  onHtmlChanged?: EditorProps['onHtmlChanged']
+  /**
+   * 内容重新挂载事件，在这个事件中能够正确获取到内容中的节点
+   * @param value - 重新挂载的内容
+   */
+  onRemount?: EditorProps['onRemount']
+  /**
+   * 动态获取markdown目录
+   * @param catalogList - 目录列表
+   */
+  onGetCatalog?: EditorProps['onGetCatalog']
+  /**
+   * 图片上传成功事件
+   * @param data - 上传成功的图片信息
+   */
+  uploadImageSuccess?: (data: { files: File[], urls: string[] }) => void
+  /**
+   * 图片上传失败事件
+   * @param error - 错误信息
+   */
+  uploadImageError?: (error: Error) => void
   //#endregion
 }
