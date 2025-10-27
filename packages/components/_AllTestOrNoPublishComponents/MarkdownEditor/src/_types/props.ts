@@ -14,6 +14,10 @@ export interface propsType {
    * 是否显示行号
    */
   showNum?: boolean
+  /**
+   * 是否启用代码折叠功能
+   */
+  enableFold?: boolean
   //#endregion
 
   /**

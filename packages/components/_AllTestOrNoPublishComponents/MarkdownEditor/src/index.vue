@@ -49,6 +49,7 @@
       :id="props.id"
       ref="mdEditor"
       v-model="text"
+      :toolbars="props.toolbars"
       :theme="props.theme"
       :disabled="props.disabled"
       :read-only="props.readOnly"
@@ -75,6 +76,7 @@ import { config, editorExtensionsAttrs, MdCatalog, MdEditor, MdPreview, XSSPlugi
 import 'md-editor-v3/lib/style.css'
 import screenfull from 'screenfull'
 import { lineNumbers } from '@codemirror/view'
+import { foldGutter } from '@codemirror/language'
 import ancher from 'markdown-it-anchor'
 import { idbStorage } from '@moluoxixi/utils/_utils'
 import type { DocumentListItem, emitsType, ImageData, propsType, SavedDocumentData, slotsType } from './_types'
@@ -92,6 +94,41 @@ const props = withDefaults(defineProps<propsType>(), {
   disabled: false,
   readOnly: false,
   preview: false,
+  showNum: false,
+  enableFold: true,
+  toolbars: [
+    'bold',
+    'underline',
+    'italic',
+    'strikeThrough',
+    'title',
+    'sub',
+    'sup',
+    'quote',
+    'unorderedList',
+    'orderedList',
+    'task',
+    'codeRow',
+    'code',
+    'link',
+    'image',
+    'table',
+    'mermaid',
+    'katex',
+    'revoke',
+    'next',
+    'save',
+    'prettier',
+    'pageFullscreen',
+    'fullscreen',
+    'preview',
+    'previewOnly',
+    '-',
+    'htmlPreview',
+    '-',
+    'catalog',
+    // 'github',
+  ],
 })
 
 const emit = defineEmits<emitsType>()
@@ -571,7 +608,17 @@ config({
     /**
      * 编辑器默认不显示输入框的行号，需要手动添加扩展
      */
-    props.showNum && extensions.push(lineNumbers())
+    if (props.showNum) {
+      extensions.push(lineNumbers())
+    }
+
+    /**
+     * 启用代码折叠功能
+     */
+    if (props.enableFold) {
+      extensions.push(foldGutter())
+    }
+
     return extensions
   },
   /**

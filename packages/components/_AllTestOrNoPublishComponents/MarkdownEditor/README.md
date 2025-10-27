@@ -17,6 +17,7 @@ MarkdownEditor 是一个支持实时预览、语法高亮、扩展插件的 Mark
 - ✅ **Mermaid 图表** - 支持流程图、时序图等
 - ✅ **KaTeX 公式** - 支持数学公式渲染
 - ✅ **只读模式** - 支持 disabled、readOnly 和 preview 三种模式
+- ✅ **代码折叠** - 支持代码块折叠功能，提升编辑体验
 
 ## 用法
 
@@ -83,6 +84,66 @@ const customDeleteDocument = async (key) => {
   const response = await fetch(`/api/delete/${key}`, { method: 'DELETE' })
   return response.ok
 }
+</script>
+```
+
+### 代码折叠功能
+```vue
+<template>
+  <!-- 启用代码折叠功能 -->
+  <MarkdownEditor
+    v-model="content"
+    :enableFold="true"
+    :showNum="true"
+  />
+  
+  <!-- 同时启用行号和折叠功能 -->
+  <MarkdownEditor
+    v-model="content"
+    :enableFold="true"
+    :showNum="true"
+    theme="dark"
+  />
+</template>
+
+<script setup>
+import { ref } from 'vue'
+import MarkdownEditor from './src/index.vue'
+
+const content = ref(`
+# 代码折叠示例
+
+\`\`\`javascript
+function example() {
+  // 这是一个很长的函数
+  const data = {
+    name: 'John',
+    age: 30,
+    address: {
+      street: '123 Main St',
+      city: 'New York',
+      country: 'USA'
+    }
+  }
+  
+  // 更多代码...
+  return data
+}
+\`\`\`
+
+\`\`\`python
+def calculate_fibonacci(n):
+    if n <= 1:
+        return n
+    else:
+        return calculate_fibonacci(n-1) + calculate_fibonacci(n-2)
+
+# 这个函数很长，可以折叠
+for i in range(10):
+    result = calculate_fibonacci(i)
+    print(f"Fibonacci({i}) = {result}")
+\`\`\`
+`)
 </script>
 ```
 
@@ -220,6 +281,7 @@ const customDeleteImage = async (imageId) => {
 | codeTheme | String | 'github' | 代码高亮主题 |
 | height | String/Number | - | 编辑器高度 |
 | showNum | Boolean | false | 是否显示行号 |
+| enableFold | Boolean | false | 是否启用代码折叠功能 |
 | preview | Boolean | true | 是否显示实时预览 |
 | **disabled** | Boolean | false | **完全禁用编辑器（只读模式）** |
 | **readOnly** | Boolean | false | **只读模式（内容不可编辑）** |
