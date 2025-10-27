@@ -1,5 +1,6 @@
 import { getDownLoadByIds } from '@moluoxixi/utils/_api'
 import { idbStorage } from '@moluoxixi/utils/_utils/indexdb.ts'
+import { COMPONENT_SETTING_TYPE, COMPONENT_VUE2_SETTING_TYPE } from '@moluoxixi/constant'
 import { getesComponent } from './esmodule.ts'
 import * as vueShared from '@vue/shared'
 
@@ -63,17 +64,17 @@ function isString(componentItemKey: any) {
  * @param Vue Vue实例
  * @returns Vue版本字符串 'vue2' 或 'vue3'
  */
-function getVueVersion(Vue: any): 'vue2' | 'vue3' {
+function getVueVersion(Vue: any): 'Vue2' | 'Vue3' {
   // Vue 3.x 有 createApp 方法
   if (Vue && typeof Vue.createApp === 'function') {
-    return 'vue3'
+    return COMPONENT_SETTING_TYPE
   }
   // Vue 2.x 有 version 属性且以 '2.' 开头
   else if (Vue && Vue.version && Vue.version.startsWith('2.')) {
-    return 'vue2'
+    return COMPONENT_VUE2_SETTING_TYPE
   }
   // 默认返回vue2
-  return 'vue2'
+  return COMPONENT_VUE2_SETTING_TYPE
 }
 /**
  * 用来注册所有组件
@@ -85,7 +86,7 @@ function getVueVersion(Vue: any): 'vue2' | 'vue3' {
  */
 export async function registerAllComponent(Vue: any, app: any, type?: string, isLongRange = false, moduleType: string = 'umd') {
   const vueVersion = getVueVersion(Vue)
-  const componentItemKey = type ?? (vueVersion === 'vue2' ? 'Vue2' : 'Vue3')
+  const componentItemKey = type ?? vueVersion
   const allComponentListStr = await idbStorage.getItem(componentItemKey)
   isString(componentItemKey)
   const allComponentList: any[] = JSON.parse(allComponentListStr!)
@@ -127,17 +128,17 @@ function getumdComponent(Vue: any, vueShared: any, componentCode: string, compon
   componentMapping.Vue = Vue
   componentMapping.vueShared = vueShared
 
-  // 正则表达式：匹配 define([ ... ]) 中方括号内的所有内容
-  const regex = /define\s*\(\s*\[([^\]]*)\]/g
-
-  const matches = [...componentCode.matchAll(regex)]
-
-  // 捕获组 1 包含了方括号内的整个字符串（例如："vue","@vue/shared"）
-  const dependencyArrays = matches.map((match) => {
-    return match[1].trim()
-  })
-
-  console.log(componentName, dependencyArrays)
+  // // 正则表达式：匹配 define([ ... ]) 中方括号内的所有内容
+  // const regex = /define\s*\(\s*\[([^\]]*)\]/g
+  //
+  // const matches = [...componentCode.matchAll(regex)]
+  //
+  // // 捕获组 1 包含了方括号内的整个字符串（例如："vue","@vue/shared"）
+  // const dependencyArrays = matches.map((match) => {
+  //   return match[1].trim()
+  // })
+  //
+  // console.log(componentName, dependencyArrays)
   // eslint-disable-next-line no-new-func
   new Function(
     '_this',
@@ -155,14 +156,32 @@ function getumdComponent(Vue: any, vueShared: any, componentCode: string, compon
  * @param isLongRange
  */
 export async function loadRemoteComponent(Vue: any, componentName: string, allComponentList: any[], moduleType: string = 'umd', isLongRange: boolean = false) {
-  let componentDownList: any[]
+  let componentData: any
   if (!isLongRange) {
-    componentDownList = await getDownLoadByIds(allComponentList.filter((item: any) => componentName == item.componentCode).map((i: any) => i.id))
+    const componentItemKey = getVueVersion(Vue)
+    const idbComponentData = await idbStorage.getItem(`${componentItemKey}_${componentName}`)
+    componentData = idbComponentData ? JSON.parse(idbComponentData) : ''
+    const componentItem = await idbStorage.getItem(componentItemKey)
+
+    const params = JSON.parse(componentItem).find((el: any) => el.componentCode === componentName)
+    if (!componentData || params.id !== componentData.id || !componentData?.content) {
+      const componentDownList = await getDownLoadByIds(allComponentList.filter((item: any) => componentName == item.componentCode).map((i: any) => i.id))
+      componentData = componentDownList[0]
+      await idbStorage.setItem(
+        `${componentItemKey}_${componentName}`,
+        JSON.stringify({
+          id: params.id,
+          componentCode: componentName,
+          content: componentData.content,
+        }),
+      )
+    }
   }
   else {
-    componentDownList = await getComponentByFile(allComponentList, componentName, moduleType)
+    const componentDownList = await getComponentByFile(allComponentList, componentName, moduleType)
+    componentData = componentDownList[0]
   }
-  const componentCode = componentDownList[0]?.content
+  const componentCode: string = componentData?.content
   if (moduleType === 'iife') {
     return getiifeComponent(Vue, vueShared, componentCode, componentName)
   }
@@ -175,7 +194,7 @@ export async function loadRemoteComponent(Vue: any, componentName: string, allCo
 }
 export async function load(Vue: any, originComponentNames: string[], type?: string, moduleType?: string, isLongRange?: boolean) {
   const vueVersion = getVueVersion(Vue)
-  const componentItemKey = type ?? (vueVersion === 'vue2' ? 'Vue2' : 'Vue3')
+  const componentItemKey = type ?? vueVersion
   const allComponentListStr = await idbStorage.getItem(componentItemKey)
   isString(componentItemKey)
   const allComponentList: any[] = JSON.parse(allComponentListStr!)

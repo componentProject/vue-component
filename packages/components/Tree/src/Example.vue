@@ -1,184 +1,176 @@
 <template>
-  <div class="example-container">
-    <h3>基本用法（default：按钮常显）</h3>
-    <div class="block" style="height: 100px !important;">
-      <Tree :data="treeList" children-field="children" label-field="name" :child-icon="ChildIcon" :parent-icon="ParentIcon" :buttons="renderButtons" />
+  <div class="p-4">
+    <h1 class="font-bold mb-4">
+      Tree ResizeObserver 测试
+    </h1>
+
+    <div class="mb-4">
+      <button class="px-4 py-2 bg-blue-500 text-white rounded mr-2" @click="toggleContainerSize">
+        切换容器大小
+      </button>
+      <button class="px-4 py-2 bg-green-500 text-white rounded mr-2" @click="addNode">
+        添加节点
+      </button>
+      <button class="px-4 py-2 bg-red-500 text-white rounded mr-2" @click="removeNode">
+        删除节点
+      </button>
     </div>
 
-    <h3>hover：悬浮显示按钮</h3>
-    <div class="block">
-      <Tree :data="treeList" children-field="children" label-field="name" :buttons="renderButtons" show-type="hover" />
-    </div>
-
-    <h3>click：点击行显示按钮（再点收起）</h3>
-    <div class="block">
-      <Tree :data="treeList" children-field="children" label-field="name" :buttons="renderButtons" show-type="click" />
-    </div>
-
-    <h3>显示虚线</h3>
-    <div class="block">
-      <Tree show-line show-row-line :data="treeList" children-field="children" label-field="name" :buttons="renderButtons" />
-    </div>
-
-    <h3>扁平数据（rowField + parentField 覆盖 childrenField）+ 函数 icon</h3>
-    <div class="block">
-      <Tree :data="flatList" row-field="id" parent-field="pid" label-field="name" :buttons="renderButtons" :icon="iconByType" />
-    </div>
-
-    <h3>自定义按钮：slot 名称和函数渲染</h3>
-    <div class="block">
-      <Tree :data="treeList" children-field="children" label-field="name" :buttons="renderCustomButtons">
-        <template #customSlot="{ data }">
-          <ElButton link size="small" @click.stop="() => onAlert(`slot: ${data.name}`)">
-            自定义
-          </ElButton>
-        </template>
-      </Tree>
-    </div>
-
-    <h3>级联选择（levelSelect）：点击节点高亮其及其子孙，通过 change 抛出高亮数组</h3>
-    <div class="block">
+    <div
+      ref="containerRef"
+      class="border-2 border-gray-300 transition-all duration-300"
+      :style="{
+        height: `${containerHeight}px`,
+        width: `${containerWidth}px`,
+      }"
+    >
       <Tree
-        :data="treeList"
-        children-field="children"
+        ref="treeRef"
+        :data="treeData"
         label-field="name"
-        level-select
-        @change="onCascadeChange"
+        children-field="children"
+        :height="treeHeight"
+        show-line
+        show-row-line
       />
-      <div style="margin-top: 8px">
-        已选节点（name）: {{ selectedNames }}
-      </div>
-      <pre style="margin-top: 8px">{{ selectedRows }}</pre>
+    </div>
+
+    <div class="mt-4 text-gray-600">
+      <p>容器高度: {{ containerHeight }}px</p>
+      <p>容器宽度: {{ containerWidth }}px</p>
+      <p>Tree高度: {{ treeHeight }}px</p>
+      <p>节点数量: {{ nodeCount }}</p>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import Tree from './index.vue'
-import { computed, ref } from 'vue'
-import { Document, Folder } from '@element-plus/icons-vue'
-import { ElButton } from 'element-plus'
-import type { ButtonsItem } from './types/index.ts'
+import { computed, onMounted, ref } from 'vue'
+import { Tree } from '@moluoxixi/components'
 
-const ChildIcon = Document
-const ParentIcon = Folder
+const containerRef = ref<HTMLElement>()
+const treeRef = ref()
+const containerHeight = ref(400)
+const containerWidth = ref(600)
+const treeHeight = ref(0)
 
-const treeList = [
+const treeData = ref([
   {
     id: 1,
-    name: '根 1',
+    name: '根节点 1',
     children: [
-      {
-        id: 11,
-        name: '子 1-1',
-        children: [
-          {
-            id: 111,
-            name: '子 1-1-1',
-          },
-          {
-            id: 112,
-            name: '子 1-1-2',
-            children: [
-              {
-                id: 1111,
-                name: '子 1-1-1-1',
-                children: [
-                  { id: 11111, name: '子 1-1-1-1-1' },
-                  { id: 11112, name: '子 1-1-1-1-2' },
-                ],
-              },
-              {
-                id: 1112,
-                name: '子 1-1-1-2',
-                children: [
-                  { id: 11111, name: '子 1-1-1-1-1' },
-                  { id: 11112, name: '子 1-1-1-1-2' },
-                ],
-              },
-            ],
-          },
-          // {
-          //   id: 113,
-          //   name: '子 1-1-3',
-          // },
-        ],
-      },
-      {
-        id: 12,
-        name: '子 1-2',
-        children: [
-          {
-            id: 121,
-            name: '子 1-2-1',
-          },
-        ],
-      },
+      { id: 11, name: '子节点 1-1' },
+      { id: 12, name: '子节点 1-2', children: [
+        { id: 121, name: '子节点 1-2-1' },
+        { id: 122, name: '子节点 1-2-2' },
+      ] },
     ],
   },
-]
+  {
+    id: 2,
+    name: '根节点 2',
+    children: [
+      { id: 21, name: '子节点 2-1' },
+      { id: 22, name: '子节点 2-2' },
+    ],
+  },
+  { id: 3, name: '根节点 3' },
+  {
+    id: 4,
+    name: '根节点 1',
+    children: [
+      { id: 41, name: '子节点 1-1' },
+      { id: 42, name: '子节点 1-2', children: [
+        { id: 421, name: '子节点 1-2-1' },
+        { id: 422, name: '子节点 1-2-2' },
+      ] },
+    ],
+  },
+  {
+    id: 5,
+    name: '根节点 1',
+    children: [
+      { id: 51, name: '子节点 1-1' },
+      { id: 52, name: '子节点 1-2', children: [
+        { id: 521, name: '子节点 1-2-1' },
+        { id: 522, name: '子节点 1-2-2' },
+      ] },
+    ],
+  },
+  {
+    id: 6,
+    name: '根节点 1',
+    children: [
+      { id: 61, name: '子节点 1-1' },
+      { id: 62, name: '子节点 1-2', children: [
+        { id: 621, name: '子节点 1-2-1' },
+        { id: 622, name: '子节点 1-2-2' },
+      ] },
+    ],
+  },
+  {
+    id: 7,
+    name: '根节点 1',
+    children: [
+      { id: 71, name: '子节点 1-1' },
+      { id: 72, name: '子节点 1-2', children: [
+        { id: 721, name: '子节点 1-2-1' },
+        { id: 722, name: '子节点 1-2-2' },
+      ] },
+    ],
+  },
+])
 
-const flatList = [
-  { id: 1, pid: null, name: '根 1', type: 'dir' },
-  { id: 11, pid: 1, name: '子 1-1', type: 'file' },
-  { id: 12, pid: 1, name: '子 1-2', type: 'file' },
-  { id: 2, pid: null, name: '根 2', type: 'dir' },
-  { id: 21, pid: 2, name: '子 2-1', type: 'file' },
-]
+const nodeCount = computed(() => {
+  const countNodes = (nodes: any[]): number => {
+    return nodes.reduce((count, node) => {
+      return count + 1 + (node.children ? countNodes(node.children) : 0)
+    }, 0)
+  }
+  return countNodes(treeData.value)
+})
 
-function iconByType(row: any) {
-  return row.type === 'dir' ? Folder : Document
+function toggleContainerSize() {
+  if (containerHeight.value === 400) {
+    containerHeight.value = 200
+    containerWidth.value = 400
+  }
+  else {
+    containerHeight.value = 400
+    containerWidth.value = 600
+  }
 }
 
-function renderButtons(): ButtonsItem[] {
-  return [
-    {
-      btnType: 'add',
-      tooltip: '新增子节点',
-    },
-    {
-      btnType: 'edit',
-      tooltip: '编辑',
-    },
-    {
-      btnType: 'delete',
-      tooltip: '删除',
-    },
-  ]
+function addNode() {
+  const newNode = {
+    id: Date.now(),
+    name: `新节点 ${nodeCount.value + 1}`,
+    children: [],
+  }
+  treeData.value.push(newNode)
 }
 
-function renderCustomButtons(): ButtonsItem[] {
-  return [
-    {
-      slot: 'customSlot',
-    },
-    {
-      icon: Document,
-      tooltip: '函数按钮',
-    },
-  ]
+function removeNode() {
+  if (treeData.value.length > 0) {
+    treeData.value.pop()
+  }
 }
 
-function onAlert() {
-}
+onMounted(() => {
+  // 监听Tree组件的高度变化
+  if (treeRef.value) {
+    // 通过ResizeObserver监听Tree内部容器变化
+    const observer = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        treeHeight.value = Math.ceil(entry.contentRect.height)
+      }
+    })
 
-const selectedRows = ref<any[]>([])
-const selectedNames = computed(() => selectedRows.value.map((r: any) => r?.name).filter(Boolean).join(', '))
-function onCascadeChange(rows: any[]) {
-  selectedRows.value = rows.map((item) => {
-    const { children, ...i } = item
-    return i
-  })
-}
+    // 监听Tree组件的内部容器
+    const treeContainer = treeRef.value.$el?.querySelector('.wl-tree')
+    if (treeContainer) {
+      observer.observe(treeContainer)
+    }
+  }
+})
 </script>
-
-<style scoped lang="scss">
-.example-container {
-  padding: 20px;
-}
-.block {
-  padding: 12px;
-  border: 1px solid #eee;
-  margin-bottom: 16px;
-}
-</style>
