@@ -262,7 +262,7 @@ function createBaseConfig(ctx: BuildContext, comp: string, internalDeps: string[
     }),
     cssInjectedByJsPlugin(),
     // 根据 styleType 配置决定是否启用 addUuidToTemplate 插件
-    ctx.styleType && addUuidToTemplatePlugin(),
+    ctx.styleType === 'scoped' && (addUuidToTemplatePlugin()),
   ]
   return mergeConfig({
     root: ctx.packDir,

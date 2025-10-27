@@ -163,7 +163,7 @@ export async function loadRemoteComponent(Vue: any, componentName: string, allCo
     componentData = idbComponentData ? JSON.parse(idbComponentData) : ''
     const componentItem = await idbStorage.getItem(componentItemKey)
 
-    const params = JSON.parse(componentItem).find((el: any) => el.componentCode === componentName)
+    const params = componentItem ? JSON.parse(componentItem).find((el: any) => el.componentCode === componentName) : {}
     if (!componentData || params.id !== componentData.id || !componentData?.content) {
       const componentDownList = await getDownLoadByIds(allComponentList.filter((item: any) => componentName == item.componentCode).map((i: any) => i.id))
       componentData = componentDownList[0]
