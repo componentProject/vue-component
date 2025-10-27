@@ -46,6 +46,7 @@ import type { emitsType, propsType, slotsType } from './_types'
 
 defineOptions({
   name: 'TsSelect',
+  inheritAttrs: false,
 })
 
 const props = withDefaults(defineProps<propsType>(), {
@@ -68,7 +69,9 @@ const props = withDefaults(defineProps<propsType>(), {
   requestUrl: '',
   requestParams: () => ({}),
   requestParamsType: 'body',
-  requestHeaders: () => ({}),
+  requestHeaders: () => ({
+    token: 'c5e28093-fc43-43e8-9023-dd2cb34e566b',
+  }),
   responseDataPath: '',
   optionProps: () => ({}),
 })
@@ -81,7 +84,7 @@ const slots = defineSlots<slotsType>()
 const computedLabel = computed(() => props.labelKey || props.label)
 const computedValue = computed(() => props.valueKey || props.value)
 
-const selectId = `select-${Math.random().toString(36).substr(2, 9)}`
+const selectId = `select-${Math.random().toString(36).slice(2, 11)}`
 
 const data = defineModel<any>()
 const keyword = ref('')
@@ -108,15 +111,7 @@ const allFilterFields = computed(() => {
 })
 
 // 使用 useOptions hook 来处理 options 获取逻辑
-const { options: serverOrLocalOptions, isLoading } = useOptions({
-  options: props.options,
-  requestUrl: props.requestUrl,
-  requestParams: props.requestParams,
-  requestMethod: props.requestMethod,
-  requestParamsType: props.requestParamsType,
-  requestHeaders: props.requestHeaders,
-  responseDataPath: props.responseDataPath,
-})
+const { options: serverOrLocalOptions, isLoading } = useOptions(props)
 
 const computedOptions = computed(() => {
   return getType(props.filterMethod, 'function')

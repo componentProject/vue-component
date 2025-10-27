@@ -104,9 +104,10 @@ const treeProps = computed(() => {
   const classNames = typeof _classNames === 'function' ? _classNames : () => _classNames
   return {
     class: (data: TreeNodeData) => {
+      const classNameResult = classNames(data)
       return {
         ...treeClass(data),
-        ...(classNames(data) || {}),
+        ...(typeof classNameResult === 'object' && classNameResult !== null ? classNameResult : {}),
       }
     },
     label: props.labelField,
@@ -116,22 +117,36 @@ const treeProps = computed(() => {
   }
 })
 
-//#region 动态高度计算
+//#region 动态高度计算 - 使用 ResizeObserver
 const height = ref()
 const treeContainer = useTemplateRef('treeContainer')
-function resizeChange() {
+let resizeObserver: ResizeObserver | null = null
+
+function updateHeight() {
   nextTick(() => {
-    height.value = Math.ceil(treeContainer.value?.getBoundingClientRect().height)
+    if (treeContainer.value) {
+      height.value = Math.ceil(treeContainer.value.getBoundingClientRect().height)
+    }
   })
 }
+
 onMounted(() => {
-  nextTick(() => {
-    height.value = Math.ceil(treeContainer.value?.getBoundingClientRect().height)
-  })
-  window.addEventListener('resize', resizeChange)
+  updateHeight()
+
+  // 使用 ResizeObserver 监听容器尺寸变化
+  if (treeContainer.value) {
+    resizeObserver = new ResizeObserver(() => {
+      updateHeight()
+    })
+    resizeObserver.observe(treeContainer.value)
+  }
 })
+
 onUnmounted(() => {
-  window.removeEventListener('resize', resizeChange)
+  if (resizeObserver) {
+    resizeObserver.disconnect()
+    resizeObserver = null
+  }
 })
 //#endregion
 
@@ -332,7 +347,7 @@ function toggleLevelSelect(data: TreeNodeData) {
 //#endregion
 
 //#region 跨级选择
-function getNodeKeys(data: TreeNodeData) {
+function getNodeKeys(data?: TreeNodeData) {
   if (!data) {
     return new Set<any>(treeData.value.reduce((p, item) => p.concat([item[props.rowField], ...getDescendantIds(item[props.rowField])]), []))
   }
@@ -340,7 +355,7 @@ function getNodeKeys(data: TreeNodeData) {
     return new Set<any>([data[props.rowField], ...getDescendantIds(data[props.rowField])])
   }
 }
-function toggleExpand(data: TreeNodeData, node: TreeNode) {
+function toggleExpand(data?: TreeNodeData, node?: TreeNode) {
   const nodeKeys = getNodeKeys(data)
   let expanded
   if (!node) {
@@ -350,7 +365,7 @@ function toggleExpand(data: TreeNodeData, node: TreeNode) {
     expanded = node.expanded
   }
   if (!expanded) {
-    treeRef.value?.setExpandedKeys(nodeKeys)
+    treeRef.value?.setExpandedKeys(Array.from(nodeKeys))
   }
   else {
     nodeKeys.forEach((nodeKey) => {
@@ -370,7 +385,7 @@ defineExpose({
     return treeRef.value
   },
   toggleExpand,
-  reload: resizeChange,
+  reload: updateHeight,
 })
 </script>
 

@@ -6,7 +6,6 @@ import EnterNextContainer from '@moluoxixi/components/EnterNextContainer'
 import ExportExcel from '@moluoxixi/components/ExportExcel'
 import ImportExcel from '@moluoxixi/components/ImportExcel'
 import PopoverTableSelect from '@moluoxixi/components/PopoverTableSelect'
-import ConfigFrom from '@moluoxixi/components/ConfigFrom'
 import TsSelect from '@moluoxixi/components/TsSelect'
 import Tabs from '@moluoxixi/components/Tabs'
 import TsButton from '@moluoxixi/components/TsButton'
@@ -16,13 +15,14 @@ import TsFooter from '@moluoxixi/components/TsFooter'
 import ReForm from '@moluoxixi/components/ReForm'
 import TsCheckbox from '@moluoxixi/components/TsCheckbox'
 import TsRadio from '@moluoxixi/components/TsRadio'
+import DesignForm from '@moluoxixi/components/DesignForm'
 
 // 导出 hooks
 export * from './_hooks'
 
 export {
-  ConfigFrom,
   DateRangePicker,
+  DesignForm,
   DraggableTable,
   DragModalDialog,
   EnterNextContainer,
@@ -39,7 +39,7 @@ export {
   TsSelect,
 }
 
-const components: Component[] = [TsFooter, DragModalDialog, ConfigFrom, DateRangePicker, DraggableTable, EnterNextContainer, ExportExcel, ImportExcel, TsButton, TsCheckbox, TsRadio, PopoverTableSelect, TsSelect, Tabs, Tree, ReForm]
+const components: Component[] = [TsFooter, DragModalDialog, DateRangePicker, DraggableTable, EnterNextContainer, ExportExcel, ImportExcel, TsButton, TsCheckbox, TsRadio, PopoverTableSelect, TsSelect, Tabs, Tree, ReForm, DesignForm]
 
 export default {
   install(app: App) {

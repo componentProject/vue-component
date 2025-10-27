@@ -31,10 +31,8 @@ runBuildCliAndExit(
     alias,
     rootDir,
     packDir,
+    styleType: 'scoped',
     presetGlobals: {
-    },
-    viteConfig: {
-      plugins: [],
     },
   },
   { uploadType: COMPONENT_SETTING_TYPE, command: 'build-publish' },

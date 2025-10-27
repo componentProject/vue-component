@@ -15,6 +15,7 @@ import type { slotsType } from '@moluoxixi/components/_types'
 
 defineOptions({
   name: 'ElButton',
+  inheritAttrs: false,
 })
 const props = defineProps({
   throttle: {

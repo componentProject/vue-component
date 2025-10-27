@@ -1,6 +1,7 @@
 import { computed, ref, watch } from 'vue'
 import type { ComputedRef } from 'vue'
 import BaseApi from '@moluoxixi/utils/AjaxPackage/class'
+import { isEqual } from 'lodash'
 
 // 定义请求类型
 type RequestMethod = 'GET' | 'POST' | 'PUT' | 'DELETE'
@@ -101,9 +102,7 @@ export function useOptions(props: UseOptionsProps): UseOptionsReturn {
         // 其他情况使用POST请求
         response = await api.post(props.requestUrl, props.requestParams)
       }
-
       const data = response
-
       // 确保返回的是数组
       return Array.isArray(data) ? data : []
     }
@@ -120,8 +119,11 @@ export function useOptions(props: UseOptionsProps): UseOptionsReturn {
 
   // 监听 props 变化，更新 options
   watch(
-    () => [props.options, props.requestUrl, props.requestParams],
-    async ([newOptions, requestUrl]) => {
+    () => [props.options, props.requestUrl, props.requestParams, props.responseDataPath, props.requestHeaders, props.requestParamsType, props.requestMethod],
+    async (newVal, oldVal) => {
+      if (isEqual(newVal, oldVal))
+        return
+      const [newOptions, requestUrl] = newVal
       // 优先使用动态请求
       if (requestUrl) {
         serverOrLocalOptions.value = await fetchDynamicData()

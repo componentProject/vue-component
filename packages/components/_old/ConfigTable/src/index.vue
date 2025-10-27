@@ -95,6 +95,7 @@ import ZhCn from 'element-plus/dist/locale/zh-cn.mjs'
 
 defineOptions({
   name: 'ConfigTable',
+  inheritAttrs: false,
 })
 const props = defineProps({
   // 表格加载状态
