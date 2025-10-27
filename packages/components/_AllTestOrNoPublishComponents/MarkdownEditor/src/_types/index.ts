@@ -1,9 +1,13 @@
 // 导出 API 相关类型
 export type {
   DocumentListItem,
+  ImageData,
+  markdownEditorDeleteImageParamsType,
   markdownEditorDeleteSavedDocumentParamsType,
+  markdownEditorGetImagesParamsType,
   markdownEditorLoadFromIndexedDBParamsType,
   markdownEditorSaveToIndexedDBParamsType,
+  markdownEditorUploadImageParamsType,
   SavedDocumentData,
 } from './api'
 

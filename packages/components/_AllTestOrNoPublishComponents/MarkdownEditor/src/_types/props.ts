@@ -1,5 +1,5 @@
 import type { EditorProps } from 'md-editor-v3'
-import type { DocumentListItem, SavedDocumentData } from './api'
+import type { DocumentListItem, ImageData, SavedDocumentData } from './api'
 
 /**
  * MarkdownEditor 组件的 Props 类型定义
@@ -210,6 +210,18 @@ export interface propsType {
    * 自定义删除文档方法
    */
   deleteDocumentMethod?: (key: string) => Promise<boolean>
+  /**
+   * 自定义图片上传方法
+   */
+  uploadImageMethod?: (files: File[]) => Promise<string[]>
+  /**
+   * 自定义获取图片列表方法
+   */
+  getImagesMethod?: () => Promise<ImageData[]>
+  /**
+   * 自定义删除图片方法
+   */
+  deleteImageMethod?: (imageId: string) => Promise<boolean>
   //#endregion
 
   //#region 事件回调
@@ -285,6 +297,16 @@ export interface propsType {
    * @param catalogList - 目录列表
    */
   onGetCatalog?: EditorProps['onGetCatalog']
+  /**
+   * 图片上传成功事件
+   * @param data - 上传成功的图片信息
+   */
+  uploadImageSuccess?: (data: { files: File[], urls: string[] }) => void
+  /**
+   * 图片上传失败事件
+   * @param error - 错误信息
+   */
+  uploadImageError?: (error: Error) => void
   //#endregion
 }
 

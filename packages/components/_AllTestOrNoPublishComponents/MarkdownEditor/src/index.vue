@@ -6,6 +6,7 @@
     :theme="props.theme"
     v-bind="$attrs"
     @save="save"
+    @on-upload-img="handleUploadImg"
   />
   <MdCatalog
     :editor-id="props.id"
@@ -23,7 +24,7 @@ import screenfull from 'screenfull'
 import { lineNumbers } from '@codemirror/view'
 import ancher from 'markdown-it-anchor'
 import { idbStorage } from '@moluoxixi/utils/_utils'
-import type { DocumentListItem, emitsType, propsType, SavedDocumentData, slotsType } from './_types'
+import type { DocumentListItem, emitsType, ImageData, propsType, SavedDocumentData, slotsType } from './_types'
 
 defineOptions({
   name: 'MarkdownEditor',
@@ -211,6 +212,206 @@ async function saveToIndexedDB(content: string, title?: string): Promise<boolean
   }
 }
 //#endregion
+//#endregion
+
+//#region 图片管理
+/**
+ * 上传图片（优先使用用户自定义方法）
+ * @param files - 文件列表
+ * @returns Promise<string[]> - 返回图片URL列表
+ */
+async function uploadImages(files: File[]): Promise<string[]> {
+  // 如果用户提供了自定义图片上传方法，优先使用
+  if (props.uploadImageMethod) {
+    return await props.uploadImageMethod(files)
+  }
+
+  // 否则使用默认的 IndexedDB 上传
+  return await uploadImagesToIndexedDB(files)
+}
+
+/**
+ * 上传图片到 IndexedDB
+ * @param files - 文件列表
+ * @returns Promise<string[]> - 返回图片URL列表
+ */
+async function uploadImagesToIndexedDB(files: File[]): Promise<string[]> {
+  const urls: string[] = []
+
+  try {
+    for (const file of files) {
+      // 检查文件类型
+      if (!file.type.startsWith('image/')) {
+        console.warn(`文件 ${file.name} 不是图片类型`)
+        continue
+      }
+
+      // 生成唯一ID
+      const imageId = `${props.id}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+
+      // 转换为base64
+      const base64 = await fileToBase64(file)
+
+      // 创建图片数据
+      const imageData: ImageData = {
+        id: imageId,
+        name: file.name,
+        size: file.size,
+        type: file.type,
+        data: base64,
+        uploadTime: new Date().toISOString(),
+        editorId: props.id,
+      }
+
+      // 保存到 IndexedDB（与 saveKey 相关）
+      await idbStorage.setItem(`${saveKey.value}-image-${imageId}`, JSON.stringify(imageData))
+
+      // 直接使用 base64 作为图片 URL（md-editor-v3 支持 base64 格式）
+      urls.push(base64)
+
+      console.log(`图片 ${file.name} 已上传到 IndexedDB`)
+    }
+
+    return urls
+  }
+  catch (error) {
+    console.error('图片上传失败:', error)
+    return []
+  }
+}
+
+/**
+ * 获取图片列表（优先使用用户自定义方法）
+ * @returns Promise<ImageData[]> - 图片列表
+ */
+async function getImages(): Promise<ImageData[]> {
+  // 如果用户提供了自定义获取图片列表方法，优先使用
+  if (props.getImagesMethod) {
+    return await props.getImagesMethod()
+  }
+
+  // 否则使用默认的 IndexedDB 获取
+  return await getImagesFromIndexedDB()
+}
+
+/**
+ * 从 IndexedDB 获取图片列表
+ * @returns Promise<ImageData[]> - 图片列表
+ */
+async function getImagesFromIndexedDB(): Promise<ImageData[]> {
+  try {
+    const keys = await idbStorage.keys()
+    const imageKeys = keys.filter(key => key.startsWith(`${saveKey.value}-image-`))
+    const images: ImageData[] = []
+
+    for (const key of imageKeys) {
+      const data = await idbStorage.getItem(key)
+      if (data) {
+        const imageData: ImageData = JSON.parse(data)
+        images.push(imageData)
+      }
+    }
+
+    return images.sort((a, b) => new Date(b.uploadTime).getTime() - new Date(a.uploadTime).getTime())
+  }
+  catch (error) {
+    console.error('获取图片列表失败:', error)
+    return []
+  }
+}
+
+/**
+ * 删除图片（优先使用用户自定义方法）
+ * @param imageId - 图片ID
+ * @returns Promise<boolean> - 删除是否成功
+ */
+async function deleteImage(imageId: string): Promise<boolean> {
+  // 如果用户提供了自定义删除图片方法，优先使用
+  if (props.deleteImageMethod) {
+    return await props.deleteImageMethod(imageId)
+  }
+
+  // 否则使用默认的 IndexedDB 删除
+  return await deleteImageFromIndexedDB(imageId)
+}
+
+/**
+ * 从 IndexedDB 删除图片
+ * @param imageId - 图片ID
+ * @returns Promise<boolean> - 删除是否成功
+ */
+async function deleteImageFromIndexedDB(imageId: string): Promise<boolean> {
+  try {
+    await idbStorage.removeItem(`${saveKey.value}-image-${imageId}`)
+    console.log('图片已删除')
+    return true
+  }
+  catch (error) {
+    console.error('删除图片失败:', error)
+    return false
+  }
+}
+
+/**
+ * 文件转base64
+ * @param file - 文件对象
+ * @returns Promise<string> - base64字符串
+ */
+function fileToBase64(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = () => resolve(reader.result as string)
+    reader.onerror = reject
+    reader.readAsDataURL(file)
+  })
+}
+
+/**
+ * base64转blob
+ * @param base64 - base64字符串
+ * @param mimeType - MIME类型
+ * @returns Promise<Blob> - blob对象
+ */
+function base64ToBlob(base64: string, mimeType: string): Promise<Blob> {
+  return new Promise((resolve) => {
+    const byteCharacters = atob(base64.split(',')[1])
+    const byteNumbers = Array.from({ length: byteCharacters.length }, (_, i) => byteCharacters.charCodeAt(i))
+
+    const byteArray = new Uint8Array(byteNumbers)
+    const blob = new Blob([byteArray], { type: mimeType })
+    resolve(blob)
+  })
+}
+//#endregion
+
+//#region 图片上传处理
+/**
+ * 处理图片上传
+ * @param files - 上传的文件列表
+ * @param callback - 回调函数，用于返回图片URL
+ */
+async function handleUploadImg(files: File[], callback: (urls: string[]) => void) {
+  try {
+    const urls = await uploadImages(files)
+    callback(urls)
+
+    // 触发图片上传成功事件
+    if (props.uploadImageSuccess) {
+      props.uploadImageSuccess({ files, urls })
+    }
+  }
+  catch (error) {
+    console.error('图片上传失败:', error)
+
+    // 触发图片上传失败事件
+    if (props.uploadImageError) {
+      props.uploadImageError(error as Error)
+    }
+
+    // 即使失败也要调用 callback，避免编辑器卡住
+    callback([])
+  }
+}
 //#endregion
 
 //#region 配置
@@ -407,9 +608,13 @@ config({
 
 // 暴露方法给父组件
 defineExpose({
+  mdEditor,
   save,
   load,
   getDocuments,
   deleteDocument,
+  uploadImages,
+  getImages,
+  deleteImage,
 })
 </script>

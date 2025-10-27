@@ -9,6 +9,8 @@ MarkdownEditor 是一个支持实时预览、语法高亮、扩展插件的 Mark
 - ✅ **语法高亮** - 支持多种代码语言高亮
 - ✅ **IndexedDB 存储** - 自动保存到本地数据库
 - ✅ **文档管理** - 支持多文档保存和加载
+- ✅ **图片上传** - 支持图片上传到 IndexedDB
+- ✅ **图片管理** - 支持查看和删除已上传的图片
 - ✅ **主题切换** - 支持明暗主题
 - ✅ **中文界面** - 完整的中文语言包
 - ✅ **XSS 防护** - 内置安全防护
@@ -31,7 +33,7 @@ const content = ref('# 你好，Markdown！')
 </script>
 ```
 
-### 使用自定义方法
+### 使用自定义方法（文档管理）
 ```vue
 <template>
   <MarkdownEditor
@@ -83,6 +85,53 @@ const customDeleteDocument = async (key) => {
 </script>
 ```
 
+### 使用自定义方法（图片管理）
+```vue
+<template>
+  <MarkdownEditor
+    ref="editorRef"
+    v-model="content"
+    :upload-image-method="customUploadImage"
+    :get-images-method="customGetImages"
+    :delete-image-method="customDeleteImage"
+  />
+</template>
+
+<script setup>
+import { ref } from 'vue'
+import MarkdownEditor from './src/index.vue'
+
+const editorRef = ref()
+const content = ref('# 我的文档')
+
+// 自定义图片上传方法
+const customUploadImage = async (files) => {
+  const formData = new FormData()
+  files.forEach(file => formData.append('images', file))
+  
+  const response = await fetch('/api/upload-images', {
+    method: 'POST',
+    body: formData
+  })
+  
+  const data = await response.json()
+  return data.urls // 返回图片 URL 数组
+}
+
+// 自定义获取图片列表方法
+const customGetImages = async () => {
+  const response = await fetch('/api/images')
+  return await response.json()
+}
+
+// 自定义删除图片方法
+const customDeleteImage = async (imageId) => {
+  const response = await fetch(`/api/images/${imageId}`, { method: 'DELETE' })
+  return response.ok
+}
+</script>
+```
+
 ## Props
 
 | 属性名 | 类型 | 默认值 | 说明 |
@@ -100,6 +149,9 @@ const customDeleteDocument = async (key) => {
 | loadMethod | Function | - | 自定义加载方法 |
 | getDocumentsMethod | Function | - | 自定义获取文档列表方法 |
 | deleteDocumentMethod | Function | - | 自定义删除文档方法 |
+| uploadImageMethod | Function | - | 自定义图片上传方法 |
+| getImagesMethod | Function | - | 自定义获取图片列表方法 |
+| deleteImageMethod | Function | - | 自定义删除图片方法 |
 
 ## Events
 
@@ -119,12 +171,16 @@ const customDeleteDocument = async (key) => {
 | load | - | Promise<any> | 加载内容 |
 | getDocuments | - | Promise<Array> | 获取文档列表 |
 | deleteDocument | key: string | Promise<boolean> | 删除文档 |
+| uploadImages | files: File[] | Promise<string[]> | 上传图片，返回图片 URL 数组 |
+| getImages | - | Promise<ImageData[]> | 获取图片列表 |
+| deleteImage | imageId: string | Promise<boolean> | 删除图片 |
 
 ## 示例文件
 
 查看 `src/Example.vue` 文件获取完整的使用示例，包括：
 - 保存和加载功能演示
 - 文档列表管理
+- 图片上传和管理
 - 错误处理
 - 响应式设计
 
@@ -142,4 +198,24 @@ const customDeleteDocument = async (key) => {
 - 适合博客、文档、评论等场景
 - 自动保存到 IndexedDB，刷新页面不丢失
 - 支持多文档管理
-- 完整的 TypeScript 类型定义 
+- 图片自动保存到 IndexedDB，支持离线查看
+- 完整的 TypeScript 类型定义
+
+## 图片上传功能
+
+### 默认行为
+- 点击编辑器工具栏的图片按钮上传图片
+- 图片自动转换为 base64 并保存到 IndexedDB
+- 支持多种图片格式（jpg、png、gif、webp 等）
+- 图片可通过图片管理对话框查看和删除
+
+### 自定义图片上传
+如果需要将图片上传到服务器，可以通过 `uploadImageMethod` prop 自定义上传逻辑：
+
+```vue
+<MarkdownEditor
+  :upload-image-method="customUploadImage"
+/>
+```
+
+自定义方法需要接收 `File[]` 参数并返回 `Promise<string[]>`（图片 URL 数组）。 

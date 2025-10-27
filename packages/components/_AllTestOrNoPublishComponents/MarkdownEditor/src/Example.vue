@@ -12,6 +12,9 @@
         <ElButton type="info" @click="toggleCatalog">
           {{ showCatalog ? '隐藏目录' : '显示目录' }}
         </ElButton>
+        <ElButton type="warning" @click="showImageList">
+          图片管理
+        </ElButton>
         <ElButton type="danger" @click="clearAll">
           清空所有
         </ElButton>
@@ -28,6 +31,8 @@
           :show-num="true"
           theme="light"
           preview-theme="cyanosis"
+          :upload-image-success="handleUploadImageSuccess"
+          :upload-image-error="handleUploadImageError"
           @save-success="handleSaveSuccess"
           @save-error="handleSaveError"
           @save="handleSave"
@@ -87,6 +92,55 @@
                 </ElButton>
               </div>
             </div>
+
+            <!-- 图片管理对话框 -->
+            <ElDialog
+              v-model="showImageDialog"
+              title="图片管理"
+              width="80%"
+              :close-on-click-modal="false"
+            >
+              <div v-if="uploadedImages.length === 0" class="no-images">
+                <p>
+                  暂无上传的图片
+                </p>
+                <p class="tip">
+                  您可以通过编辑器的图片上传功能上传图片
+                </p>
+              </div>
+              <div v-else class="image-grid">
+                <div
+                  v-for="image in uploadedImages"
+                  :key="image.id"
+                  class="image-item"
+                >
+                  <div class="image-preview">
+                    <img :src="image.data" :alt="image.name">
+                  </div>
+                  <div class="image-info">
+                    <h4>{{ image.name }}</h4>
+                    <p class="image-meta">
+                      <span>大小: {{ formatFileSize(image.size) }}</span>
+                      <span>类型: {{ image.type }}</span>
+                      <span>上传时间: {{ formatDate(image.uploadTime) }}</span>
+                    </p>
+                  </div>
+                  <div class="image-actions">
+                    <ElButton type="danger" size="small" @click="deleteImage(image.id)">
+                      删除
+                    </ElButton>
+                  </div>
+                </div>
+              </div>
+              <template #footer>
+                <ElButton @click="showImageDialog = false">
+                  关闭
+                </ElButton>
+                <ElButton type="primary" @click="refreshImageList">
+                  刷新
+                </ElButton>
+              </template>
+            </ElDialog>
           </div>
         </ElCard>
       </div>
@@ -106,7 +160,7 @@
 import { computed, onMounted, ref } from 'vue'
 import { ElButton, ElCard, ElMessage } from 'element-plus'
 import MarkdownEditor from './index.vue'
-import type { DocumentListItem, MessageType, SaveSuccessDataType } from './_types'
+import type { DocumentListItem, ImageData, MessageType, SaveSuccessDataType } from './_types'
 
 // 响应式数据
 const content = ref(`# 欢迎使用 MarkdownEditor
@@ -168,6 +222,8 @@ const loading = ref(false)
 const lastSaveTime = ref('')
 const savedDocuments = ref<DocumentListItem[]>([])
 const showCatalog = ref(true)
+const uploadedImages = ref<ImageData[]>([])
+const showImageDialog = ref(false)
 
 // 计算属性
 const documentCount = computed(() => savedDocuments.value.length)
@@ -218,11 +274,94 @@ function handleSaveError(error: Error) {
 }
 
 /**
+ * 处理图片上传成功事件
+ * @param data 上传成功的图片信息
+ * @param data.files 上传的文件列表
+ * @param data.urls 生成的图片URL列表
+ */
+function handleUploadImageSuccess(data: { files: File[], urls: string[] }) {
+  const fileNames = data.files.map(file => file.name).join('、')
+  showMessage('success', `图片上传成功: ${fileNames}`)
+}
+
+/**
+ * 处理图片上传失败事件
+ * @param error 错误信息
+ */
+function handleUploadImageError(error: Error) {
+  showMessage('error', `图片上传失败: ${error.message}`)
+}
+
+/**
  * 切换目录显示
  */
 function toggleCatalog() {
   showCatalog.value = !showCatalog.value
   showMessage('info', showCatalog.value ? '目录已显示' : '目录已隐藏')
+}
+
+/**
+ * 显示图片管理对话框
+ */
+async function showImageList() {
+  await refreshImageList()
+  showImageDialog.value = true
+}
+
+/**
+ * 刷新图片列表
+ */
+async function refreshImageList() {
+  if (!editorRef.value)
+    return
+
+  try {
+    uploadedImages.value = await editorRef.value.getImages()
+  }
+  catch (error) {
+    console.error('获取图片列表失败:', error)
+    showMessage('error', '获取图片列表失败')
+  }
+}
+
+/**
+ * 删除图片
+ * @param imageId 图片ID
+ */
+async function deleteImage(imageId: string) {
+  if (!editorRef.value)
+    return
+
+  try {
+    const success = await editorRef.value.deleteImage(imageId)
+    if (success) {
+      showMessage('success', '图片已删除')
+      await refreshImageList()
+    }
+    else {
+      showMessage('error', '删除图片失败')
+    }
+  }
+  catch (error) {
+    console.error('删除图片失败:', error)
+    showMessage('error', '删除图片失败')
+  }
+}
+
+/**
+ * 格式化文件大小
+ * @param bytes 字节数
+ * @returns 格式化后的大小
+ */
+function formatFileSize(bytes: number): string {
+  if (bytes === 0)
+    return '0 B'
+
+  const k = 1024
+  const sizes = ['B', 'KB', 'MB', 'GB']
+  const i = Math.floor(Math.log(bytes) / Math.log(k))
+
+  return `${Number.parseFloat((bytes / k ** i).toFixed(2))} ${sizes[i]}`
 }
 
 /**
@@ -407,6 +546,85 @@ onMounted(async () => {
   background: #1a1a1a;
   border-color: #404040;
   color: #ffffff;
+}
+
+/* 图片管理样式 */
+.no-images {
+  text-align: center;
+  padding: 40px 20px;
+  color: #909399;
+}
+
+.no-images .tip {
+  font-size: 14px;
+  margin-top: 10px;
+  color: #c0c4cc;
+}
+
+.image-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.image-item {
+  border: 1px solid #e4e7ed;
+  border-radius: 8px;
+  overflow: hidden;
+  background: white;
+  transition: all 0.3s ease;
+}
+
+.image-item:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.image-preview {
+  width: 100%;
+  height: 200px;
+  overflow: hidden;
+  background: #f5f7fa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.image-preview img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.image-info {
+  padding: 15px;
+}
+
+.image-info h4 {
+  margin: 0 0 10px 0;
+  color: #303133;
+  font-size: 16px;
+  font-weight: 500;
+  word-break: break-all;
+}
+
+.image-meta {
+  margin: 0;
+  font-size: 12px;
+  color: #909399;
+  line-height: 1.5;
+}
+
+.image-meta span {
+  display: block;
+  margin-bottom: 4px;
+}
+
+.image-actions {
+  padding: 0 15px 15px 15px;
+  text-align: right;
 }
 
 .info-section {
