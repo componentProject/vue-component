@@ -9,6 +9,9 @@
         <ElButton type="success" @click="showDocumentList">
           文档列表
         </ElButton>
+        <ElButton type="info" @click="toggleCatalog">
+          {{ showCatalog ? '隐藏目录' : '显示目录' }}
+        </ElButton>
         <ElButton type="danger" @click="clearAll">
           清空所有
         </ElButton>
@@ -164,6 +167,7 @@ const editorRef = ref()
 const loading = ref(false)
 const lastSaveTime = ref('')
 const savedDocuments = ref<DocumentListItem[]>([])
+const showCatalog = ref(true)
 
 // 计算属性
 const documentCount = computed(() => savedDocuments.value.length)
@@ -211,6 +215,14 @@ function handleSaveSuccess(data: SaveSuccessDataType) {
  */
 function handleSaveError(error: Error) {
   showMessage('error', `保存失败: ${error.message}`)
+}
+
+/**
+ * 切换目录显示
+ */
+function toggleCatalog() {
+  showCatalog.value = !showCatalog.value
+  showMessage('info', showCatalog.value ? '目录已显示' : '目录已隐藏')
 }
 
 /**
@@ -372,6 +384,29 @@ onMounted(async () => {
 
 .editor-section {
   min-height: 500px;
+  position: relative;
+}
+
+/* 确保目录能够正确显示 */
+:deep(.md-catalog) {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  max-width: 300px;
+  max-height: 80vh;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #e4e7ed;
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+}
+
+:deep(.md-catalog.dark) {
+  background: #1a1a1a;
+  border-color: #404040;
+  color: #ffffff;
 }
 
 .info-section {

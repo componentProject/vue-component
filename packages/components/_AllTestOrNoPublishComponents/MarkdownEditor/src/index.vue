@@ -1,11 +1,18 @@
 <template>
   <MdEditor
+    :id="props.id"
     ref="mdEditor"
     v-model="text"
+    :theme="props.theme"
     v-bind="$attrs"
     @save="handleSave"
   />
-  <MdCatalog :editor-id="props.id" :scroll-element="scrollElement" :theme="props.theme" />
+  <MdCatalog
+    :editor-id="props.id"
+    :theme="props.theme"
+    :offset-top="20"
+    :offset-bottom="20"
+  />
 </template>
 
 <script setup lang="ts">
@@ -51,6 +58,12 @@ const saveKey = computed(() => `markdown-editor-${props.id}`)
  * @returns Promise<boolean> - 保存是否成功
  */
 async function saveToIndexedDB(content: string, title?: string): Promise<boolean> {
+  // 如果用户提供了自定义保存方法，优先使用
+  if (props.saveMethod) {
+    return await props.saveMethod(content, title)
+  }
+
+  // 否则使用默认的 IndexedDB 保存
   try {
     const saveData: SavedDocumentData = {
       content,
@@ -73,6 +86,12 @@ async function saveToIndexedDB(content: string, title?: string): Promise<boolean
  * @returns Promise<SavedDocumentData | null> - 加载的文档数据或null
  */
 async function loadFromIndexedDB(): Promise<SavedDocumentData | null> {
+  // 如果用户提供了自定义加载方法，优先使用
+  if (props.loadMethod) {
+    return await props.loadMethod()
+  }
+
+  // 否则使用默认的 IndexedDB 加载
   try {
     const savedData = await idbStorage.getItem(saveKey.value)
     if (savedData) {
@@ -94,6 +113,12 @@ async function loadFromIndexedDB(): Promise<SavedDocumentData | null> {
  * @returns Promise<DocumentListItem[]> - 文档列表
  */
 async function getSavedDocuments(): Promise<DocumentListItem[]> {
+  // 如果用户提供了自定义获取文档列表方法，优先使用
+  if (props.getDocumentsMethod) {
+    return await props.getDocumentsMethod()
+  }
+
+  // 否则使用默认的 IndexedDB 获取
   try {
     const keys = await idbStorage.keys()
     const markdownKeys = keys.filter(key => key.startsWith('markdown-editor-'))
@@ -124,6 +149,12 @@ async function getSavedDocuments(): Promise<DocumentListItem[]> {
  * @returns Promise<boolean> - 删除是否成功
  */
 async function deleteSavedDocument(key: string): Promise<boolean> {
+  // 如果用户提供了自定义删除方法，优先使用
+  if (props.deleteDocumentMethod) {
+    return await props.deleteDocumentMethod(key)
+  }
+
+  // 否则使用默认的 IndexedDB 删除
   try {
     await idbStorage.removeItem(key)
     console.log('文档已删除')
@@ -141,7 +172,13 @@ async function deleteSavedDocument(key: string): Promise<boolean> {
  * @param html - HTML内容
  */
 function handleSave(value: string, html: any): void {
-  // 异步保存到 IndexedDB
+  // 如果用户提供了自定义的保存事件，优先使用用户的
+  if (props.onSave) {
+    props.onSave(value, html)
+    return
+  }
+
+  // 否则使用默认的 IndexedDB 保存
   saveToIndexedDB(value).then((success) => {
     if (success) {
       // 触发自定义保存成功事件
@@ -152,20 +189,7 @@ function handleSave(value: string, html: any): void {
       emit('saveError', new Error('保存到 IndexedDB 失败'))
     }
   })
-
-  // 调用原始的 onSave 事件
-  if (props.onSave) {
-    props.onSave(value, html)
-  }
 }
-
-// 暴露方法给父组件
-defineExpose({
-  saveToIndexedDB,
-  loadFromIndexedDB,
-  getSavedDocuments,
-  deleteSavedDocument,
-})
 config({
   /**
    * 根据主题和内部默认的 codeMirror 扩展自定义新的扩展。
@@ -354,5 +378,13 @@ config({
     }
   },
   ...props.config,
+})
+
+// 暴露方法给父组件
+defineExpose({
+  saveToIndexedDB,
+  loadFromIndexedDB,
+  getSavedDocuments,
+  deleteSavedDocument,
 })
 </script>

@@ -31,19 +31,16 @@ const content = ref('# 你好，Markdown！')
 </script>
 ```
 
-### 完整示例
+### 使用自定义方法
 ```vue
 <template>
   <MarkdownEditor
     ref="editorRef"
     v-model="content"
-    id="my-editor"
-    :height="500"
-    :show-num="true"
-    theme="light"
-    preview-theme="cyanosis"
-    @save-success="handleSaveSuccess"
-    @save-error="handleSaveError"
+    :save-method="customSave"
+    :load-method="customLoad"
+    :get-documents-method="customGetDocuments"
+    :delete-document-method="customDeleteDocument"
   />
 </template>
 
@@ -54,31 +51,34 @@ import MarkdownEditor from './src/index.vue'
 const editorRef = ref()
 const content = ref('# 我的文档')
 
-const handleSaveSuccess = (data) => {
-  console.log('保存成功:', data)
+// 自定义保存方法
+const customSave = async (content, title) => {
+  // 保存到服务器
+  const response = await fetch('/api/save', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ content, title })
+  })
+  return response.ok
 }
 
-const handleSaveError = (error) => {
-  console.error('保存失败:', error)
+// 自定义加载方法
+const customLoad = async () => {
+  const response = await fetch('/api/load')
+  const data = await response.json()
+  return data
 }
 
-// 手动保存
-const saveDocument = async () => {
-  await editorRef.value.saveToIndexedDB(content.value, '我的文档')
+// 自定义获取文档列表方法
+const customGetDocuments = async () => {
+  const response = await fetch('/api/documents')
+  return await response.json()
 }
 
-// 加载文档
-const loadDocument = async () => {
-  const data = await editorRef.value.loadFromIndexedDB()
-  if (data) {
-    content.value = data.content
-  }
-}
-
-// 获取文档列表
-const getDocuments = async () => {
-  const docs = await editorRef.value.getSavedDocuments()
-  console.log('已保存的文档:', docs)
+// 自定义删除文档方法
+const customDeleteDocument = async (key) => {
+  const response = await fetch(`/api/delete/${key}`, { method: 'DELETE' })
+  return response.ok
 }
 </script>
 ```
@@ -96,6 +96,10 @@ const getDocuments = async () => {
 | showNum | Boolean | false | 是否显示行号 |
 | preview | Boolean | true | 是否显示实时预览 |
 | config | Object | - | 自定义配置 |
+| saveMethod | Function | - | 自定义保存方法 |
+| loadMethod | Function | - | 自定义加载方法 |
+| getDocumentsMethod | Function | - | 自定义获取文档列表方法 |
+| deleteDocumentMethod | Function | - | 自定义删除文档方法 |
 
 ## Events
 

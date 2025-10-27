@@ -1,4 +1,5 @@
 import type { EditorProps } from 'md-editor-v3'
+import type { DocumentListItem, SavedDocumentData } from './api'
 
 /**
  * MarkdownEditor 组件的 Props 类型定义
@@ -191,4 +192,23 @@ export interface propsType {
    * 默认工具栏。可以通过该属性来配置默认显示的工具栏按钮
    */
   defToolbars?: EditorProps['defToolbars']
+
+  //#region 自定义方法
+  /**
+   * 自定义保存方法
+   */
+  saveMethod?: (content: string, title?: string) => Promise<boolean>
+  /**
+   * 自定义加载方法
+   */
+  loadMethod?: () => Promise<SavedDocumentData | null>
+  /**
+   * 自定义获取文档列表方法
+   */
+  getDocumentsMethod?: () => Promise<DocumentListItem[]>
+  /**
+   * 自定义删除文档方法
+   */
+  deleteDocumentMethod?: (key: string) => Promise<boolean>
+  //#endregion
 }
