@@ -64,7 +64,7 @@ function isString(componentItemKey: any) {
  * @param Vue Vue实例
  * @returns Vue版本字符串 'vue2' 或 'vue3'
  */
-function getVueVersion(Vue: any): 'vue2' | 'vue3' {
+function getVueVersion(Vue: any): 'Vue2' | 'Vue3' {
   // Vue 3.x 有 createApp 方法
   if (Vue && typeof Vue.createApp === 'function') {
     return COMPONENT_SETTING_TYPE

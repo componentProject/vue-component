@@ -49,4 +49,12 @@ export interface propsType<T = any> {
    * 层级选择：点击某节点时高亮该节点及其所有子孙节点
    */
   levelSelect?: boolean
+  /**
+   * 点击节点时是否展开所有子节点
+   */
+  expandAllOnClickNode?: boolean
+  /**
+   * 默认展开所有节点
+   */
+  defaultExpandAll?: boolean
 }
