@@ -132,13 +132,13 @@ const content = ref(`# 欢迎使用 MarkdownEditor
 
 \`\`\`javascript
 // 保存内容
-await editorRef.value.saveToIndexedDB(content.value, '我的文档')
+await editorRef.value.save(content.value, '我的文档')
 
 // 加载内容
-const data = await editorRef.value.loadFromIndexedDB()
+const data = await editorRef.value.load()
 
 // 获取文档列表
-const docs = await editorRef.value.getSavedDocuments()
+const docs = await editorRef.value.getDocuments()
 \`\`\`
 
 ## 数学公式
@@ -243,7 +243,7 @@ async function loadDocument() {
 
   loading.value = true
   try {
-    const data = await editorRef.value.loadFromIndexedDB()
+    const data = await editorRef.value.load()
     if (data) {
       content.value = data.content
       showMessage('success', '文档加载成功！')
@@ -278,7 +278,7 @@ async function refreshDocumentList() {
     return
 
   try {
-    const docs = await editorRef.value.getSavedDocuments()
+    const docs = await editorRef.value.getDocuments()
     savedDocuments.value = docs
   }
   catch (error) {
@@ -310,7 +310,7 @@ async function deleteDocument(key: string) {
     return
 
   try {
-    const success = await editorRef.value.deleteSavedDocument(key)
+    const success = await editorRef.value.deleteDocument(key)
     if (success) {
       showMessage('success', '文档删除成功！')
       await refreshDocumentList()
@@ -332,7 +332,7 @@ async function clearAll() {
     return
 
   try {
-    const docs = await editorRef.value.getSavedDocuments()
+    const docs = await editorRef.value.getDocuments()
     for (const doc of docs) {
       await editorRef.value.deleteSavedDocument(doc.key)
     }

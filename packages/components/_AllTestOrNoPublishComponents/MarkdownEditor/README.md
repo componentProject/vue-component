@@ -115,10 +115,10 @@ const customDeleteDocument = async (key) => {
 
 | 方法名 | 参数 | 返回值 | 说明 |
 | ------ | ---- | ------ | ---- |
-| saveToIndexedDB | content: string, title?: string | Promise<boolean> | 保存内容到 IndexedDB |
-| loadFromIndexedDB | - | Promise<any> | 从 IndexedDB 加载内容 |
-| getSavedDocuments | - | Promise<Array> | 获取所有保存的文档 |
-| deleteSavedDocument | key: string | Promise<boolean> | 删除指定文档 |
+| save | content: string, title?: string | Promise<boolean> | 保存内容 |
+| load | - | Promise<any> | 加载内容 |
+| getDocuments | - | Promise<Array> | 获取文档列表 |
+| deleteDocument | key: string | Promise<boolean> | 删除文档 |
 
 ## 示例文件
 
