@@ -97,10 +97,6 @@ export interface propsType {
    */
   pageFullscreen?: EditorProps['pageFullscreen']
   /**
-   * 是否显示预览。设置为 false 时，预览区域将被隐藏
-   */
-  preview?: EditorProps['preview']
-  /**
    * 是否显示 html 预览。当设置为true时，需要将preview设置为false
    */
   htmlPreview?: EditorProps['htmlPreview']
@@ -152,6 +148,10 @@ export interface propsType {
    * 是否只读模式。设置为 true 后，编辑器内容将不能被修改
    */
   readOnly?: EditorProps['readOnly']
+  /**
+   * 是否使用预览模式。设置为 true 后，将使用 MdPreview 组件展示内容
+   */
+  preview?: boolean
   /**
    * 最大字符数。超过该值后，将不能继续输入
    */

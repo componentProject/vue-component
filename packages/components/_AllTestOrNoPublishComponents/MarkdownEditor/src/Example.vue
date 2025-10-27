@@ -1,5 +1,5 @@
 <template>
-  <div class="markdown-editor-example">
+  <div class="w-full h-full flex flex-col">
     <div class="example-header">
       <h2>MarkdownEditor 示例 - IndexedDB 保存功能</h2>
       <div class="controls">
@@ -18,19 +18,26 @@
         <ElButton type="danger" @click="clearAll">
           清空所有
         </ElButton>
+        <ElButton :type="isReadOnly ? 'success' : 'default'" @click="toggleReadOnly">
+          {{ isReadOnly ? '切换到编辑模式' : '切换到只读模式' }}
+        </ElButton>
+        <ElButton :type="isPreviewMode ? 'success' : 'default'" @click="togglePreviewMode">
+          {{ isPreviewMode ? '切换到编辑模式' : '切换到预览模式' }}
+        </ElButton>
       </div>
     </div>
 
-    <div class="example-content">
-      <div class="editor-section">
+    <div class="flex flex-1-hidden">
+      <div class="editor-section flex-1-hidden">
         <MarkdownEditor
           id="example-editor"
           ref="editorRef"
           v-model="content"
-          :height="500"
           :show-num="true"
           theme="light"
           preview-theme="cyanosis"
+          :read-only="isReadOnly"
+          :preview="isPreviewMode"
           :upload-image-success="handleUploadImageSuccess"
           :upload-image-error="handleUploadImageError"
           @save-success="handleSaveSuccess"
@@ -50,6 +57,10 @@
             <p><strong>最后保存时间:</strong> {{ lastSaveTime || '未保存' }}</p>
             <p><strong>文档数量:</strong> {{ documentCount }}</p>
             <p><strong>当前内容长度:</strong> {{ content.length }} 字符</p>
+            <p>
+              <strong>编辑模式:</strong>
+              <span :class="modeClass">{{ currentMode }}</span>
+            </p>
           </div>
         </ElCard>
 
@@ -224,9 +235,25 @@ const savedDocuments = ref<DocumentListItem[]>([])
 const showCatalog = ref(true)
 const uploadedImages = ref<ImageData[]>([])
 const showImageDialog = ref(false)
+const isReadOnly = ref(false)
+const isPreviewMode = ref(false)
 
 // 计算属性
 const documentCount = computed(() => savedDocuments.value.length)
+const currentMode = computed(() => {
+  if (isPreviewMode.value)
+    return '预览模式 (MdPreview)'
+  if (isReadOnly.value)
+    return '只读模式 (MdEditor)'
+  return '编辑模式 (MdEditor)'
+})
+const modeClass = computed(() => {
+  if (isPreviewMode.value)
+    return 'mode-preview'
+  if (isReadOnly.value)
+    return 'mode-readonly'
+  return 'mode-edit'
+})
 
 // 消息提示
 const message = ref<MessageType>({
@@ -306,6 +333,30 @@ function handleUploadImageError(error: Error) {
 function toggleCatalog() {
   showCatalog.value = !showCatalog.value
   showMessage('info', showCatalog.value ? '目录已显示' : '目录已隐藏')
+}
+
+/**
+ * 切换只读模式
+ */
+function toggleReadOnly() {
+  isReadOnly.value = !isReadOnly.value
+  // 如果启用只读，则禁用预览模式
+  if (isReadOnly.value) {
+    isPreviewMode.value = false
+  }
+  showMessage('info', isReadOnly.value ? '已切换到只读模式' : '已切换到编辑模式')
+}
+
+/**
+ * 切换预览模式
+ */
+function togglePreviewMode() {
+  isPreviewMode.value = !isPreviewMode.value
+  // 如果启用预览模式，则禁用只读模式
+  if (isPreviewMode.value) {
+    isReadOnly.value = false
+  }
+  showMessage('info', isPreviewMode.value ? '已切换到预览模式' : '已切换到编辑模式')
 }
 
 /**
@@ -498,12 +549,6 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-.markdown-editor-example {
-  padding: 20px;
-  max-width: 1200px;
-  margin: 0 auto;
-}
-
 .example-header {
   display: flex;
   justify-content: space-between;
@@ -521,12 +566,6 @@ onMounted(async () => {
 .controls {
   display: flex;
   gap: 10px;
-}
-
-.example-content {
-  display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: 20px;
 }
 
 .editor-section {
@@ -656,6 +695,21 @@ onMounted(async () => {
   color: #606266;
 }
 
+.mode-edit {
+  color: #409eff;
+  font-weight: bold;
+}
+
+.mode-readonly {
+  color: #e6a23c;
+  font-weight: bold;
+}
+
+.mode-preview {
+  color: #67c23a;
+  font-weight: bold;
+}
+
 .document-list {
   max-height: 400px;
   overflow-y: auto;
@@ -703,10 +757,6 @@ onMounted(async () => {
 }
 
 @media (max-width: 768px) {
-  .example-content {
-    grid-template-columns: 1fr;
-  }
-
   .example-header {
     flex-direction: column;
     gap: 15px;

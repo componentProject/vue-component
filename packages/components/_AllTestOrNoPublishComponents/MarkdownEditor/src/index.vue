@@ -1,34 +1,77 @@
 <template>
-  <MdEditor
-    :id="props.id"
-    ref="mdEditor"
-    v-model="text"
-    :theme="props.theme"
-    v-bind="$attrs"
-    @save="save"
-    @upload-img="handleUploadImg"
-    @change="handleChange"
-    @html-changed="handleHtmlChanged"
-    @focus="handleFocus"
-    @blur="handleBlur"
-    @error="handleError"
-    @get-catalog="handleGetCatalog"
-    @remount="handleRemount"
-    @input="handleInput"
-    @drop="handleDrop"
-    @input-box-width-change="handleInputBoxWidthChange"
-  />
-  <MdCatalog
-    :editor-id="props.id"
-    :theme="props.theme"
-    :offset-top="20"
-    :offset-bottom="20"
-  />
+  <!-- 预览模式：MdCatalog + MdPreview -->
+  <div class="flex h-full">
+    <template v-if="props.preview">
+      <!-- 左侧：目录组件 -->
+      <div class="max-w-[240px] pr-4">
+        <MdCatalog
+          :editor-id="props.id"
+          :theme="props.theme"
+          :offset-top="20"
+          :offset-bottom="20"
+        />
+      </div>
+      <!-- 右侧：预览组件 -->
+      <div class="flex-1-hidden h-full">
+        <MdPreview
+          :id="props.id"
+          :scroll-element="scrollElement"
+          :model-value="text"
+          :theme="props.theme"
+          :preview-theme="props.previewTheme"
+          :code-theme="props.codeTheme"
+          :md-heading-id="props.mdHeadingId"
+          :sanitize="props.sanitize"
+          :format-copied-text="props.formatCopiedText"
+          :code-style-reverse="props.codeStyleReverse"
+          :code-style-reverse-list="props.codeStyleReverseList"
+          :no-highlight="props.noHighlight"
+          :no-img-zoom-in="props.noImgZoomIn"
+          :custom-icon="props.customIcon"
+          :sanitize-mermaid="props.sanitizeMermaid"
+          :code-foldable="props.codeFoldable"
+          :auto-fold-threshold="props.autoFoldThreshold"
+          :footers="props.footers"
+          :no-mermaid="props.noMermaid"
+          :no-katex="props.noKatex"
+          :transform-img-url="props.transformImgUrl"
+          v-bind="$attrs"
+          @html-changed="handleHtmlChanged"
+          @error="handleError"
+          @get-catalog="handleGetCatalog"
+        />
+      </div>
+    </template>
+
+    <!-- 编辑模式：使用 MdEditor 组件 -->
+    <MdEditor
+      v-else
+      :id="props.id"
+      ref="mdEditor"
+      v-model="text"
+      :theme="props.theme"
+      :disabled="props.disabled"
+      :read-only="props.readOnly"
+      v-bind="$attrs"
+      @save="save"
+      @upload-img="handleUploadImg"
+      @change="handleChange"
+      @html-changed="handleHtmlChanged"
+      @focus="handleFocus"
+      @blur="handleBlur"
+      @error="handleError"
+      @get-catalog="handleGetCatalog"
+      @remount="handleRemount"
+      @input="handleInput"
+      @drop="handleDrop"
+      @input-box-width-change="handleInputBoxWidthChange"
+    />
+  </div>
 </template>
 
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { config, editorExtensionsAttrs, MdCatalog, MdEditor, XSSPlugin } from 'md-editor-v3'
+import { config, editorExtensionsAttrs, MdCatalog, MdEditor, MdPreview, XSSPlugin } from 'md-editor-v3'
 import 'md-editor-v3/lib/style.css'
 import screenfull from 'screenfull'
 import { lineNumbers } from '@codemirror/view'
@@ -46,6 +89,9 @@ const props = withDefaults(defineProps<propsType>(), {
   theme: 'light',
   previewTheme: 'cyanosis',
   codeTheme: 'github',
+  disabled: false,
+  readOnly: false,
+  preview: false,
 })
 
 const emit = defineEmits<emitsType>()
@@ -54,7 +100,7 @@ defineSlots<slotsType>()
 
 const mdEditor = useTemplateRef('mdEditor')
 const text = ref('')
-
+const scrollElement = document.documentElement
 //#region 增删改查文档
 const saveKey = computed(() => `markdown-editor-${props.id}`)
 //#region 加载文档
@@ -491,10 +537,10 @@ function handleRemount(): void {
 
 /**
  * 处理输入事件
- * @param value - 输入的内容
+ * @param event - 输入事件
  */
-function handleInput(value: string): void {
-  emit('input', value)
+function handleInput(event: Event): void {
+  emit('input', (event.target as HTMLTextAreaElement)?.value || '')
 }
 
 /**
@@ -708,7 +754,7 @@ config({
 
 // 暴露方法给父组件
 defineExpose({
-  mdEditor,
+  mdEditor: props.preview ? null : mdEditor,
   save,
   load,
   getDocuments,
@@ -718,3 +764,12 @@ defineExpose({
   deleteImage,
 })
 </script>
+
+<style scoped lang="scss">
+@forward '@moluoxixi/components/_assets/styles/tailwind.scss';
+
+.md-editor {
+  height: 100%;
+  overflow: auto;
+}
+</style>
