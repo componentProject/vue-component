@@ -52,7 +52,16 @@ import type {
   VxeTableDefines,
   VxeTablePropTypes,
 } from 'vxe-table'
-import { computed, nextTick, onBeforeUnmount, onMounted, ref, useAttrs, useTemplateRef, watch } from 'vue'
+import {
+  computed,
+  nextTick,
+  onBeforeUnmount,
+  onMounted,
+  ref,
+  useAttrs,
+  useTemplateRef,
+  watch,
+} from 'vue'
 import type { ColumnType, emitsType, propsType } from './_types'
 import { ElMessage } from 'element-plus'
 import { cloneDeep, groupBy } from 'lodash'
@@ -445,7 +454,7 @@ const defaultEditRules = ref<VxeTablePropTypes.EditRules>({})
  * 4. 添加基于field的自定义默认渲染器，额外提供以下type功能：'input' | 'select' | 'date' | 'datetime' | 'switch' | 'progress' | 'tag'
  */
 const computedColumns = computed<ColumnType[]>(() => {
-  const columns: any[] = localColumns.value
+  const columns: any[] = cloneDeep(localColumns.value)
   if (!getType(columns, 'array'))
     return []
 
@@ -1063,9 +1072,8 @@ async function loadColumns() {
   // - 同级末尾追加 props 中新增但存储里没有的项
   localColumns.value = mergeColumnsLevel(storedColumns, newColumns)
 }
-/** 监听props.columns的变化 */
+// /** 监听props.columns的变化 */
 watch(() => props.columns, loadColumns, {
-  deep: true,
   immediate: true,
 })
 //#endregion

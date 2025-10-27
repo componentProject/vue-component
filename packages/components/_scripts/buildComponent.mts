@@ -31,7 +31,6 @@ runBuildCliAndExit(
     alias,
     rootDir,
     packDir,
-    styleType: 'scoped',
     presetGlobals: {
     },
   },
