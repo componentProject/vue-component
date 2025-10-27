@@ -82,7 +82,7 @@
                   ID: {{ doc.id }} |
                   修改时间: {{ formatDate(doc.lastModified) }}
                 </p>
-                <p class="document-preview">
+                <p class="document-preview max-w-[150px] whitespace-pre">
                   {{ doc.content?.substring(0, 100) }}{{ doc.content?.length > 100 ? '...' : '' }}
                 </p>
               </div>
