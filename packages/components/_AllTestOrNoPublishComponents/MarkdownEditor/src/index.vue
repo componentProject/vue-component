@@ -6,7 +6,7 @@
     :theme="props.theme"
     v-bind="$attrs"
     @save="save"
-    @on-upload-img="handleUploadImg"
+    @upload-img="handleUploadImg"
   />
   <MdCatalog
     :editor-id="props.id"
@@ -164,17 +164,23 @@ async function deleteDocumentFormIndexedDB(key: string): Promise<boolean> {
  * @param html - HTML内容
  */
 function save(value: string, html: any): void {
-  // 如果用户提供了自定义的保存事件，优先使用用户的
-  if (props.onSave) {
-    props.onSave(value, html)
+  emit('save', value, html)
+  // 如果用户提供了自定义的保存方法，优先使用
+  if (props.saveMethod) {
+    props.saveMethod(value, html)
     return
   }
 
   // 否则使用默认的 IndexedDB 保存
-  saveToIndexedDB(value).then((success) => {
-    if (success) {
-      // 触发自定义保存成功事件
-      emit('saveSuccess', { value, html })
+  saveToIndexedDB(value).then((result) => {
+    console.log('result', result)
+    if (result.success) {
+      // 触发自定义保存成功事件，使用扩展运算符传递所有结果
+      emit('saveSuccess', {
+        value,
+        html,
+        ...result,
+      })
     }
     else {
       // 触发保存失败事件
@@ -186,29 +192,30 @@ function save(value: string, html: any): void {
  * 保存内容到 IndexedDB
  * @param content - 要保存的内容
  * @param title - 文档标题（可选）
- * @returns Promise<boolean> - 保存是否成功
+ * @returns Promise<{ success: boolean, saveTime?: string, title?: string }> - 保存结果
  */
-async function saveToIndexedDB(content: string, title?: string): Promise<boolean> {
-  // 如果用户提供了自定义保存方法，优先使用
-  if (props.saveMethod) {
-    return await props.saveMethod(content, title)
-  }
-
-  // 否则使用默认的 IndexedDB 保存
+async function saveToIndexedDB(content: string, title?: string): Promise<{ success: boolean, saveTime?: string, title?: string }> {
   try {
+    const saveTime = new Date().toISOString()
+    const documentTitle = title || `文档-${new Date().toLocaleString()}`
+
     const saveData: SavedDocumentData = {
       content,
-      title: title || `文档-${new Date().toLocaleString()}`,
-      lastModified: new Date().toISOString(),
+      title: documentTitle,
+      lastModified: saveTime,
       id: props.id,
     }
     await idbStorage.setItem(saveKey.value, JSON.stringify(saveData))
     console.log('内容已保存到 IndexedDB')
-    return true
+    return {
+      success: true,
+      saveTime,
+      title: documentTitle,
+    }
   }
   catch (error) {
     console.error('保存失败:', error)
-    return false
+    return { success: false }
   }
 }
 //#endregion
@@ -391,6 +398,7 @@ function base64ToBlob(base64: string, mimeType: string): Promise<Blob> {
  * @param callback - 回调函数，用于返回图片URL
  */
 async function handleUploadImg(files: File[], callback: (urls: string[]) => void) {
+  emit('uploadImage', files, callback)
   try {
     const urls = await uploadImages(files)
     callback(urls)

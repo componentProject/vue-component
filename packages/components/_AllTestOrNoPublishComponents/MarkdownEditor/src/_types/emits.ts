@@ -1,17 +1,23 @@
 /**
- * MarkdownEditor 组件的 emit 事件类型定义
+ * MarkdownEditor 组件的 emit 事件类型定义（用于 defineEmits）
  */
-export interface emitEventsType {
+export interface emitsType {
+  /**
+   * 保存事件
+   */
+  save: [value: string, html: string]
   /**
    * 保存成功事件
-   * @param data - 保存的数据，包含value和html
+   * @param data - 保存的数据，包含value、html、saveTime和title
    */
-  saveSuccess: [data: { value: string, html: string }]
+  saveSuccess: [data: { value: string, html: string, saveTime?: string, title?: string }]
   /**
    * 保存失败事件
    * @param error - 错误信息
    */
   saveError: [error: Error]
+
+  uploadImage: [files: File[], callback: (urls: string[]) => void]
   /**
    * 内容变化事件
    * @param value - 变化后的内容

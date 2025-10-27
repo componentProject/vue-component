@@ -72,7 +72,7 @@
                   修改时间: {{ formatDate(doc.lastModified) }}
                 </p>
                 <p class="document-preview">
-                  {{ doc.content.substring(0, 100) }}{{ doc.content.length > 100 ? '...' : '' }}
+                  {{ doc.content?.substring(0, 100) }}{{ doc.content?.length > 100 ? '...' : '' }}
                 </p>
               </div>
               <div class="document-actions">
@@ -260,7 +260,15 @@ function formatDate(dateString: string) {
  * @param data 保存的数据
  */
 function handleSaveSuccess(data: SaveSuccessDataType) {
-  lastSaveTime.value = new Date().toLocaleString('zh-CN')
+  console.log('data', data)
+  // 使用实际的保存时间，如果没有则使用当前时间
+  if (data.saveTime) {
+    lastSaveTime.value = new Date(data.saveTime).toLocaleString('zh-CN')
+  }
+  else {
+    lastSaveTime.value = new Date().toLocaleString('zh-CN')
+  }
+
   showMessage('success', '内容已成功保存到 IndexedDB！')
   refreshDocumentList()
 }

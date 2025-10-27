@@ -40,9 +40,9 @@
 - 接口编写完毕需要使用fetch请求进行调用测试，如果有文件生成，需要检测生成的文件是否符合要求
 
 #### 类型文件分类规范：
-- `_types/props.ts` - Vue组件props类型定义,首个props类型，命名为propsType,其他命名为xxxPropsType,如果没有props,无须创建，示例：`withDefaults(defineProps<propsType>(),默认值)`
-- `_types/emits.ts` - Vue组件emit事件类型定义,首个emits类型，命名为emitsType,其他命名为xxxEmitsType,如果没有emits,无须创建，示例：`defineEmits<emitsType>()`
-- `_types/slots.ts` - Vue组件slot插槽类型定义,首个slots类型，命名为slotsType,其他命名为xxxSlotsType,如果没有slots,无须创建，示例：`defineSlots<slotsType>()`
+- `_types/props.ts` - 用于定义Vue组件所有props相关类型,首个props类型，命名为propsType,其他命名为xxxPropsType,如果没有props,无须创建，示例：`withDefaults(defineProps<propsType>(),默认值)`
+- `_types/emits.ts` - 用于定义Vue组件所有emits相关类型,首个emits类型，命名为emitsType,其他命名为xxxEmitsType,如果没有emits,无须创建，示例：`defineEmits<emitsType>()`
+- `_types/slots.ts` - 用于定义Vue组件所有slots相关类型,首个slots类型，命名为slotsType,其他命名为xxxSlotsType,如果没有slots,无须创建，示例：`defineSlots<slotsType>()`
 - `_types/api.ts` - API接口相关类型定义
 - `_types/common.ts` - 通用类型定义
 - `_types/index.ts` - 统一导出所有类型
