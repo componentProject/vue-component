@@ -144,9 +144,9 @@ function handleSelect(row: any) {
 }
 const computedSelect = computed(() => {
   if (props.debounce)
-    return wlDebounce(handleEnter, props.debounce, computedOptions.value)
+    return wlDebounce(handleSelect, props.debounce, computedOptions.value)
   if (props.throttle) {
-    return wlThrottle(handleEnter, props.throttle, computedOptions.value)
+    return wlThrottle(handleSelect, props.throttle, computedOptions.value)
   }
   return handleEnter
 })
