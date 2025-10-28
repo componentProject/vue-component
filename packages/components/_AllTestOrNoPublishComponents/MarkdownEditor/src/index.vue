@@ -1,78 +1,47 @@
 <template>
   <!-- 预览模式：MdCatalog + MdPreview -->
   <div class="flex h-full">
-    <template v-if="props.preview">
-      <!-- 左侧：目录组件 -->
-      <div class="max-w-[240px] pr-4">
-        <MdCatalog
-          :editor-id="props.id"
-          :theme="props.theme"
-          :offset-top="20"
-          :offset-bottom="20"
-        />
-      </div>
-      <!-- 右侧：预览组件 -->
-      <div class="flex-1-hidden h-full">
-        <MdPreview
-          :id="props.id"
-          :scroll-element="scrollElement"
-          :model-value="text"
-          :theme="props.theme"
-          :preview-theme="props.previewTheme"
-          :code-theme="props.codeTheme"
-          :md-heading-id="props.mdHeadingId"
-          :sanitize="props.sanitize"
-          :format-copied-text="props.formatCopiedText"
-          :code-style-reverse="props.codeStyleReverse"
-          :code-style-reverse-list="props.codeStyleReverseList"
-          :no-highlight="props.noHighlight"
-          :no-img-zoom-in="props.noImgZoomIn"
-          :custom-icon="props.customIcon"
-          :sanitize-mermaid="props.sanitizeMermaid"
-          :code-foldable="props.codeFoldable"
-          :auto-fold-threshold="props.autoFoldThreshold"
-          :footers="props.footers"
-          :no-mermaid="props.noMermaid"
-          :no-katex="props.noKatex"
-          :transform-img-url="props.transformImgUrl"
-          v-bind="$attrs"
-          @html-changed="handleHtmlChanged"
-          @error="handleError"
-          @get-catalog="handleGetCatalog"
-        />
-      </div>
-    </template>
-
-    <!-- 编辑模式：使用 MdEditor 组件 -->
-    <MdEditor
-      v-else
-      :id="props.id"
-      ref="mdEditor"
-      v-model="text"
-      :toolbars="props.toolbars"
-      :theme="props.theme"
-      :disabled="props.disabled"
-      :read-only="props.readOnly"
-      v-bind="$attrs"
-      @save="save"
-      @upload-img="handleUploadImg"
-      @change="handleChange"
-      @html-changed="handleHtmlChanged"
-      @focus="handleFocus"
-      @blur="handleBlur"
-      @error="handleError"
-      @get-catalog="handleGetCatalog"
-      @remount="handleRemount"
-      @input="handleInput"
-      @drop="handleDrop"
-      @input-box-width-change="handleInputBoxWidthChange"
-    />
+    <!-- 左侧：目录组件 -->
+    <div v-if="props.showCatalog && props.preview" class="max-w-[240px] pr-4">
+      <MdCatalog
+        :editor-id="saveKey"
+        :theme="props.theme"
+        :offset-top="20"
+        :offset-bottom="20"
+      />
+    </div>
+    <!-- 右侧：预览组件 -->
+    <div class="flex-1-hidden h-full">
+      <MdEditor
+        :id="saveKey"
+        ref="mdEditor"
+        v-model="text"
+        :toolbars="computedToolbars"
+        :footers="computedFooters"
+        :theme="props.theme"
+        :disabled="props.disabled"
+        :read-only="props.readOnly"
+        v-bind="$attrs"
+        @save="save"
+        @upload-img="handleUploadImg"
+        @change="handleChange"
+        @html-changed="handleHtmlChanged"
+        @focus="handleFocus"
+        @blur="handleBlur"
+        @error="handleError"
+        @get-catalog="handleGetCatalog"
+        @remount="handleRemount"
+        @input="handleInput"
+        @drop="handleDrop"
+        @input-box-width-change="handleInputBoxWidthChange"
+      />
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
-import { config, editorExtensionsAttrs, MdCatalog, MdEditor, MdPreview, XSSPlugin } from 'md-editor-v3'
+import { computed, nextTick, ref, watch } from 'vue'
+import { config, editorExtensionsAttrs, MdCatalog, MdEditor, XSSPlugin } from 'md-editor-v3'
 import 'md-editor-v3/lib/style.css'
 import screenfull from 'screenfull'
 import { lineNumbers } from '@codemirror/view'
@@ -93,41 +62,72 @@ const props = withDefaults(defineProps<propsType>(), {
   codeTheme: 'github',
   disabled: false,
   readOnly: false,
+  showCatalog: true,
   preview: false,
   showNum: false,
   enableFold: true,
   toolbars: [
     'bold',
+    '-',
     'underline',
+    '-',
     'italic',
+    '-',
     'strikeThrough',
+    '-',
     'title',
+    '-',
     'sub',
+    '-',
     'sup',
+    '-',
     'quote',
+    '-',
     'unorderedList',
+    '-',
     'orderedList',
+    '-',
     'task',
+    '-',
     'codeRow',
+    '-',
     'code',
+    '-',
     'link',
+    '-',
     'image',
+    '-',
     'table',
+    '-',
     'mermaid',
+    '-',
     'katex',
+    '-',
     'revoke',
+    '-',
     'next',
+    '-',
     'save',
+    '=',
     'prettier',
+    '-',
     'pageFullscreen',
+    '-',
     'fullscreen',
+    '-',
     'preview',
+    '-',
     'previewOnly',
     '-',
     'htmlPreview',
     '-',
     'catalog',
     // 'github',
+  ],
+  footers: [
+    'markdownTotal',
+    '=',
+    'scrollSwitch',
   ],
 })
 
@@ -136,10 +136,29 @@ const emit = defineEmits<emitsType>()
 defineSlots<slotsType>()
 
 const mdEditor = useTemplateRef('mdEditor')
+const computedToolbars = computed(() => {
+  return props.preview ? [] : props.toolbars
+})
+
+const computedFooters = computed(() => {
+  // return props.preview ? [] : props.footers
+  return props.footers
+})
+watch(() => props.preview, (newVal, oldVal) => {
+  nextTick(() => {
+    if (newVal !== oldVal && mdEditor.value) {
+      mdEditor.value.togglePreviewOnly(newVal)
+    }
+  })
+}, {
+  immediate: true,
+})
+
 const text = ref('')
-const scrollElement = document.documentElement
-//#region 增删改查文档
+/** 保存/编辑模式的键名 */
 const saveKey = computed(() => `markdown-editor-${props.id}`)
+
+//#region 增删改查文档
 //#region 加载文档
 /**
  * 从 IndexedDB 加载内容
@@ -801,7 +820,7 @@ config({
 
 // 暴露方法给父组件
 defineExpose({
-  mdEditor: props.preview ? null : mdEditor,
+  mdEditor,
   save,
   load,
   getDocuments,

@@ -236,7 +236,7 @@ const showCatalog = ref(true)
 const uploadedImages = ref<ImageData[]>([])
 const showImageDialog = ref(false)
 const isReadOnly = ref(false)
-const isPreviewMode = ref(false)
+const isPreviewMode = ref(true)
 
 // 计算属性
 const documentCount = computed(() => savedDocuments.value.length)
@@ -693,21 +693,6 @@ onMounted(async () => {
 .status-info p {
   margin: 8px 0;
   color: #606266;
-}
-
-.mode-edit {
-  color: #409eff;
-  font-weight: bold;
-}
-
-.mode-readonly {
-  color: #e6a23c;
-  font-weight: bold;
-}
-
-.mode-preview {
-  color: #67c23a;
-  font-weight: bold;
 }
 
 .document-list {

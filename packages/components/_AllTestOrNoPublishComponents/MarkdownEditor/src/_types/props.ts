@@ -7,6 +7,10 @@ import type { DocumentListItem, ImageData, SavedDocumentData } from './api'
 export interface propsType {
   //#region 扩展props
   /**
+   * 是否显示目录
+   */
+  showCatalog?: boolean
+  /**
    * 自定义配置对象
    */
   config?: any
