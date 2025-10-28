@@ -1,54 +1,43 @@
 <template>
-  <div>
+  <div class="h-full flex flex-col">
     <div class="title">
       调试与演示
     </div>
     <div class="flex">
       <div class="w-[200px]">
-        <TsSelect v-model="componentCode" placeholder="请选择要删除的组件" label="componentCode" value="id" :options="componentOptions" />
+        <TsSelect v-model="componentCode" placeholder="请选择要删除的组件" label="componentCode" value="componentCode" :options="componentOptions" />
       </div>
       <ElButton type="primary" @click="handleClick">
         删除组件库组件
       </ElButton>
     </div>
-    <div class="flex">
-      {{ componentName }}
-      <div class="w-[200px]">
-        <TsSelect v-model="componentName" placeholder="请选择展示的组件" label="componentCode" value="componentCode" :options="componentOptions" />
-      </div>
-    </div>
-    <div v-if="componentName" class="main">
-      <div class="list-title">
-        引用组件库解析的组件
-      </div>
-      <component
-        :is="componentName"
-        v-bind="secondComponentProps"
-      />
+    <div class="flex-1-hidden">
+      <Tabs v-model="componentName" placeholder="请选择展示的组件" label="componentCode" value="componentCode" :options="componentOptions">
+        <template #default="{ item }">
+          <component
+            :is="item.componentCode"
+            v-bind="getComponentProps(item)"
+          />
+        </template>
+      </Tabs>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { onBeforeMount, ref } from 'vue'
 // 虚拟模块由 Vite 插件在运行时提供
 import { getList, setDeleteByPathAndCode } from '@moluoxixi/utils/_api'
 import componentData from './data.ts'
 import { ElButton, ElMessage } from 'element-plus'
+// import Tabs from '@moluoxixi/components/Tabs'
 
 defineOptions({ name: '调试与演示iife和umd' })
 // 调试与演示组件库的组件，直接修改组件名
 const componentName = ref('DraggableTable')
 
-// 从data.ts获取当前组件的配置
-const componentConfig = computed(() => {
-  const name = componentName.value as keyof typeof componentData
-  return componentData[name] || {}
-})
-
-// 构建完整的组件属性，支持不同的数据绑定方式
-const componentProps = computed(() => {
-  const config = componentConfig.value
+function getComponentProps(item: any) {
+  const config = componentData[item.componentCode] || {}
   // 创建新对象，避免直接修改原始数据
   const props = { ...config }
 
@@ -101,17 +90,7 @@ const componentProps = computed(() => {
   delete props.bindings
 
   return props
-})
-
-// 第二个组件的属性，使用不同的pageId和userId
-const secondComponentProps = computed(() => {
-  const props = { ...componentProps.value }
-  props.id = '123456789'
-  props.pageId = '123456789'
-  props.userId = '123456789'
-  props.saveType = 'server'
-  return props
-})
+}
 
 const componentOptions = ref([])
 async function getComponentOptions() {
@@ -124,9 +103,10 @@ async function handleClick() {
     return
   }
   await setDeleteByPathAndCode(componentCode.value)
+  await getComponentOptions()
 }
 
-onMounted(async () => {
+onBeforeMount(async () => {
   await getComponentOptions()
 })
 </script>

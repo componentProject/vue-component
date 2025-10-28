@@ -8,6 +8,7 @@
       :popover-props="props.popoverProps"
       v-bind="$attrs"
       @scroll-boundary="handleScrollBoundary"
+      @select="computedSelect"
       @enter="handleEnter"
     >
       <template v-for="name in slotNames" #[name]="slotParams" :key="name">
@@ -138,6 +139,17 @@ const computedOptions = computed<ThrottleOrDebounceOptions>(() => {
   return { trailing: true, leading: false, ...o }
 })
 
+function handleSelect(row: any) {
+  emit('select', row)
+}
+const computedSelect = computed(() => {
+  if (props.debounce)
+    return wlDebounce(handleEnter, props.debounce, computedOptions.value)
+  if (props.throttle) {
+    return wlThrottle(handleEnter, props.throttle, computedOptions.value)
+  }
+  return handleEnter
+})
 const computedInput = computed(() => {
   if (props.debounce)
     return wlDebounce(handleInput, props.debounce, computedOptions.value)

@@ -373,7 +373,7 @@ watch(
       debouncedCollectTableVirtualRefs()
     })
   },
-  { deep: true, immediate: true },
+  { immediate: true },
 )
 
 // 为了处理表格渲染完成后的场景
