@@ -1,4 +1,4 @@
-import { withInstall } from '@moluoxixi/utils/_utils/base'
+import { withInstall } from '@moluoxixi/utils/_utils'
 import DesignFormC from './src/index.vue'
 
 export const DesignFormComponent = withInstall(DesignFormC)
