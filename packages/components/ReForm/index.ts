@@ -3,7 +3,7 @@ import ReForm from './src/index.vue'
 /** 导入 useForm 组合式函数 */
 import useForm from './src/_utils/useForm'
 /** 导入组件安装工具函数 */
-import { withInstall } from '@moluoxixi/utils/_utils/base'
+import { withInstall } from '@moluoxixi/utils/_utils'
 
 /** 更新类型导入路径 - 导出所有类型定义 */
 export * from './src/_types'
