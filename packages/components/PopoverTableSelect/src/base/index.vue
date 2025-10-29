@@ -44,7 +44,24 @@ defineOptions({
 })
 
 const props = withDefaults(defineProps<basePropsType>(), {
-  popoverProps: () => ({
+  popoverProps: () => ({}),
+  height: 300,
+  id: 'popoverTableSelect',
+  columns: () => [],
+  data: () => [],
+  selectTrigger: 'click',
+})
+
+const emit = defineEmits<baseEmitsType>()
+
+// 获取插槽
+const slots = defineSlots<slotsType>()
+
+const slotNames = computed<string[]>(() => Object.keys(slots) as string[])
+
+const computedPopoverProps = computed(() => {
+  const popoverProps = {
+    popperStyle: {},
     placement: 'bottom',
     trigger: 'hover',
     title: '',
@@ -65,24 +82,6 @@ const props = withDefaults(defineProps<basePropsType>(), {
     teleported: true,
     persistent: true,
     width: 400,
-  }),
-  height: 300,
-  id: 'popoverTableSelect',
-  columns: () => [],
-  data: () => [],
-  selectTrigger: 'click',
-})
-
-const emit = defineEmits<baseEmitsType>()
-
-// 获取插槽
-const slots = defineSlots<slotsType>()
-
-const slotNames = computed<string[]>(() => Object.keys(slots) as string[])
-
-const computedPopoverProps = computed(() => {
-  const popoverProps = {
-    popperStyle: {},
     ...props.popoverProps,
   }
   if (props.zIndex) {
