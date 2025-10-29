@@ -40,12 +40,28 @@ import type { baseEmitsType, basePropsType } from '../_types'
 
 defineOptions({
   name: 'PopoverTableSelectBase',
-  inheritAttrs: false,
 })
 
 const props = withDefaults(defineProps<basePropsType>(), {
-  popoverProps: () => ({
-    placement: 'bottom',
+  popoverProps: () => ({}),
+  height: 300,
+  id: 'popoverTableSelect',
+  columns: () => [],
+  data: () => [],
+  selectTrigger: 'click',
+})
+
+const emit = defineEmits<baseEmitsType>()
+
+// 获取插槽
+const slots = defineSlots<slotsType>()
+
+const slotNames = computed<string[]>(() => Object.keys(slots) as string[])
+
+const computedPopoverProps = computed(() => {
+  const popoverProps = {
+    popperStyle: {},
+    placement: props.placement || 'bottom',
     trigger: 'hover',
     title: '',
     effect: 'light',
@@ -64,25 +80,7 @@ const props = withDefaults(defineProps<basePropsType>(), {
     tabindex: undefined,
     teleported: true,
     persistent: true,
-    width: 400,
-  }),
-  height: 300,
-  id: 'popoverTableSelect',
-  columns: () => [],
-  data: () => [],
-  selectTrigger: 'click',
-})
-
-const emit = defineEmits<baseEmitsType>()
-
-// 获取插槽
-const slots = defineSlots<slotsType>()
-
-const slotNames = computed<string[]>(() => Object.keys(slots) as string[])
-
-const computedPopoverProps = computed(() => {
-  const popoverProps = {
-    popperStyle: {},
+    width: props.width || 400,
     ...props.popoverProps,
   }
   if (props.zIndex) {

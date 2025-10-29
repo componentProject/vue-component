@@ -59,6 +59,10 @@
           pop-type="input"
           :columns="columns"
           :data="tableData"
+          :popover-props="{
+            placement: 'bottom-start',
+          }"
+          :width="600"
           @select="handleInputSelect"
           @input="handleInput"
           @enter="handleEnter"
