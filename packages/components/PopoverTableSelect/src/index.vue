@@ -1,9 +1,8 @@
 <template>
-  <div>
+  <div class="w-full">
     <PopoverTableSelect
       v-model="popoverModel"
       :virtual-ref="computedVirtualRef"
-      :z-index="3000"
       :loading="loading"
       :popover-props="props.popoverProps"
       v-bind="$attrs"
@@ -34,7 +33,7 @@
 import type { InputInstance } from 'element-plus'
 import type { ComponentInternalInstance, ComponentPublicInstance } from 'vue'
 import { ElInput } from 'element-plus'
-import { debounce as wlDebounce, throttle as wlThrottle } from '@moluoxixi/utils/_utils'
+import { debounce as wlDebounce, throttle as wlThrottle } from '@moluoxixi/utils/_utils/event'
 import { computed, ref, useTemplateRef, watch } from 'vue'
 import PopoverTableSelect from '@moluoxixi/components/PopoverTableSelect/src/base/index.vue'
 import type { slotsType } from '@moluoxixi/components/_types'
@@ -42,6 +41,7 @@ import type { emitsType, propsType, ThrottleOrDebounceOptions } from './_types'
 
 defineOptions({
   name: 'PopoverTableSelect',
+  inheritAttrs: false,
 })
 
 const props = withDefaults(defineProps<propsType>(), {

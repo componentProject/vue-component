@@ -71,13 +71,16 @@ import VxeUI, { VxePager, VxeTooltip } from 'vxe-pc-ui'
 import './variable.scss'
 import { VxeGrid } from 'vxe-table'
 import {
-  debounce,
-  dispatchEvents,
   getClass,
   getType,
-  onHotkeys,
   sleep,
 } from '@moluoxixi/utils/_utils'
+import {
+  debounce,
+  dispatchEvents,
+  onHotkeys,
+} from '@moluoxixi/utils/_utils/event'
+
 import { getCustomType, handleGetRequiredFields } from './_utils'
 
 /** 自定义右键菜单 */

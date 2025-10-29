@@ -19,7 +19,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { ElButton, ElPopover } from 'element-plus'
-import { debounce as wlDebounce, throttle as wlThrottle } from '@moluoxixi/utils/_utils'
+import { debounce as wlDebounce, throttle as wlThrottle } from '@moluoxixi/utils/_utils/event'
 import type { emitsType, propsType, slotsType, ThrottleOrDebounceOptions } from './_types'
 
 defineOptions({

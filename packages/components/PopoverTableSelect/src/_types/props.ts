@@ -63,4 +63,5 @@ export interface basePropsType {
   data?: VxeTablePropTypes.Data
   /** 选择触发方式 */
   selectTrigger?: SelectTrigger
+  zIndex?: number
 }

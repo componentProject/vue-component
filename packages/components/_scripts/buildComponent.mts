@@ -33,6 +33,11 @@ runBuildCliAndExit(
     packDir,
     presetGlobals: {
     },
+    viteConfig: {
+      build: {
+        minify: false,
+      },
+    },
   },
   { uploadType: COMPONENT_SETTING_TYPE, command: 'build-publish' },
 )

@@ -823,12 +823,12 @@ async function bundleComponentModule(ctx: BuildContext, {
   skipManualChunks,
 }: BundleComponentModuleOptions) {
   const currentComponent = comp
-  await build(mergeConfig(baseConfig, {
+  await build(mergeConfig({
+    ...baseConfig,
     build: {
       outDir,
       emptyOutDir: true,
       // 是否压缩
-      // minify: false,
       minify: 'esbuild',
       cssCodeSplit: false, // 关闭CSS代码分割，避免文件拆分
       lib: {
@@ -903,7 +903,7 @@ async function bundleComponentModule(ctx: BuildContext, {
         },
       },
     },
-  }))
+  },typeof ctx?.viteConfig === 'function' ? ctx.viteConfig({ command: 'build', mode: 'production' }) : (ctx?.viteConfig || {})))
 }
 
 /**
