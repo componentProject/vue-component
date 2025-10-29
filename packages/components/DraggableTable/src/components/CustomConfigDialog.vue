@@ -101,12 +101,12 @@ const computedDialogProps = computed(() => {
 const computedPopperStyle = computed(() => {
   if (props.dialogProps?.zIndex) {
     return {
-      'z-index': `${props.dialogProps.zIndex + 1}`,
+      zIndex: props.dialogProps.zIndex + 1,
     }
   }
   else {
     return {
-      'z-index': 1001,
+      zIndex: 1001,
     }
   }
 })
