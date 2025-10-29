@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="w-full">
     <PopoverTableSelect
       v-model="popoverModel"
       :virtual-ref="computedVirtualRef"
