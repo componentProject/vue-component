@@ -40,7 +40,6 @@ import type { baseEmitsType, basePropsType } from '../_types'
 
 defineOptions({
   name: 'PopoverTableSelectBase',
-  inheritAttrs: false,
 })
 
 const props = withDefaults(defineProps<basePropsType>(), {
@@ -62,7 +61,7 @@ const slotNames = computed<string[]>(() => Object.keys(slots) as string[])
 const computedPopoverProps = computed(() => {
   const popoverProps = {
     popperStyle: {},
-    placement: 'bottom',
+    placement: props.placement || 'bottom',
     trigger: 'hover',
     title: '',
     effect: 'light',
@@ -81,7 +80,7 @@ const computedPopoverProps = computed(() => {
     tabindex: undefined,
     teleported: true,
     persistent: true,
-    width: 400,
+    width: props.width || 400,
     ...props.popoverProps,
   }
   if (props.zIndex) {

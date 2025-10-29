@@ -49,6 +49,8 @@ export interface propsType {
  * PopoverTableSelectBase 组件的 Props 类型定义
  */
 export interface basePropsType {
+  width?: number | string
+  placement?: string
   /** 虚拟引用元素 */
   virtualRef: ComponentPublicInstance | ComponentInternalInstance | InputInstance | HTMLElement | null
   /** Popover 组件的属性 */
