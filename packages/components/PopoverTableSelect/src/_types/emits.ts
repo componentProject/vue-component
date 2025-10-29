@@ -14,6 +14,10 @@ export interface emitsType {
   (e: 'clear'): void
   /** 加载更多数据时触发 */
   (e: 'loadMore'): void
+  /** 选择行时触发 */
+  (e: 'select', row: any): void
+  /** 输入时触发 */
+  (e: 'input', val: any): void
 }
 
 /**

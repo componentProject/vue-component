@@ -64,7 +64,7 @@ import type { customCustomTypes } from '../../_types'
 import type { cellRendererPropsType } from './_types'
 import { ElInput, ElProgress, ElSwitch, ElTag } from 'element-plus'
 import { computed, onMounted, ref, watch } from 'vue'
-import { detectDateFormatByReplace } from '@moluoxixi/utils/_utils'
+import { detectDateFormatByReplace } from '@moluoxixi/utils/_utils/date'
 
 const props = defineProps<cellRendererPropsType>()
 

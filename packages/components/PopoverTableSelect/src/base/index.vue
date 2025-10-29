@@ -3,7 +3,7 @@
     :visible="popoverVisible"
     virtual-triggering
     :virtual-ref="props.virtualRef"
-    v-bind="props.popoverProps"
+    v-bind="computedPopoverProps"
   >
     <div ref="popoverRef">
       <slot name="default" />
@@ -40,6 +40,7 @@ import type { baseEmitsType, basePropsType } from '../_types'
 
 defineOptions({
   name: 'PopoverTableSelectBase',
+  inheritAttrs: false,
 })
 
 const props = withDefaults(defineProps<basePropsType>(), {
@@ -57,7 +58,6 @@ const props = withDefaults(defineProps<basePropsType>(), {
       modifiers: [{ name: 'computeStyles', options: { gpuAcceleration: false } }],
     },
     popperClass: '',
-    popperStyle: '',
     showAfter: 0,
     hideAfter: 200,
     autoClose: 0,
@@ -79,6 +79,20 @@ const emit = defineEmits<baseEmitsType>()
 const slots = defineSlots<slotsType>()
 
 const slotNames = computed<string[]>(() => Object.keys(slots) as string[])
+
+const computedPopoverProps = computed(() => {
+  const popoverProps = {
+    popperStyle: {},
+    ...props.popoverProps,
+  }
+  if (props.zIndex) {
+    popoverProps.popperStyle = {
+      zIndex: props.zIndex,
+      ...popoverProps.popperStyle,
+    }
+  }
+  return popoverProps
+})
 const popoverVisible = defineModel({
   type: Boolean,
   default: false,

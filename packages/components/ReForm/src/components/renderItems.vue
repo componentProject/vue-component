@@ -234,7 +234,7 @@ const collapsedTriggerMargin = computed(() => {
   /** 分组触发器样式 */
   &__trigger {
     /** 相对定位，全宽，下边距 */
-    @apply relative w-full mb-4;
+    @apply relative w-full;
   }
 
   /** 分组内容样式 */
