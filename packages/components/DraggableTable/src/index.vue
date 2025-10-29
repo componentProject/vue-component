@@ -1338,5 +1338,13 @@ defineExpose({
   :deep(.vxe-table--filter-template) {
     display: flex !important;
   }
+  :deep(.vxe-body--row.row--current) {
+    td.vxe-table--column.vxe-body--column.col--edit {
+      overflow: visible;
+      .vxe-cell.c--title {
+        overflow: visible;
+      }
+    }
+  }
 }
 </style>

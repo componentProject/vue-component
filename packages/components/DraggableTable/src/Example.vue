@@ -103,7 +103,7 @@ const tableData = ref([
     phone: '13800000001',
     email: 'zhangsan@example.com',
     status: 1,
-    createTime: '2023-01-01',
+    createTime: '2023-01-01 12:30',
   },
   {
     id: 2,
@@ -114,7 +114,7 @@ const tableData = ref([
     phone: '13800000002',
     email: 'lisi@example.com',
     status: 2,
-    createTime: '2023-01-02',
+    createTime: '2023-01-02 12:30',
   },
   {
     id: 3,
@@ -125,7 +125,7 @@ const tableData = ref([
     phone: '13800000003',
     email: 'wangwu@example.com',
     status: 3,
-    createTime: '2023-01-03',
+    createTime: '2023-01-03 12:30',
   },
   {
     id: 4,
@@ -136,7 +136,7 @@ const tableData = ref([
     phone: '13800000004',
     email: 'zhaoliu@example.com',
     status: 1,
-    createTime: '2023-01-04',
+    createTime: '2023-01-04 12:30',
   },
   {
     id: 5,
@@ -147,7 +147,7 @@ const tableData = ref([
     phone: '13800000005',
     email: 'sunqi@example.com',
     status: 2,
-    createTime: '2023-01-05',
+    createTime: '2023-01-05 12:30',
   },
 ])
 

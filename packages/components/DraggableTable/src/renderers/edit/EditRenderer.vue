@@ -5,7 +5,7 @@
       :format="valueFormat"
       :value-format="valueFormat"
       size="small"
-      type="date"
+      :type="computedType"
       v-bind="renderOptsProps"
       :model-value="currRow[currColumn.field]"
       @update:model-value="(val: string[]) => {
@@ -66,6 +66,13 @@ function load() {
   currColumn.value = column
 }
 
+function clearEdit() {
+  const xTable = props.renderParams?.$grid
+  if (xTable) {
+    xTable.clearEdit()
+  }
+}
+
 function validateHandle() {
   const xTable = props.renderParams?.$grid
   if (xTable) {
@@ -85,7 +92,14 @@ const currentValue = computed<any>(() => {
 
 const propsOptions = computed(() => renderOptsProps.value.options)
 const valueFormat = computed(() => detectDateFormatByReplace(currentValue.value))
-
+const computedType = computed(() => {
+  if (valueFormat.value.includes('H')) {
+    return 'datetime'
+  }
+  else {
+    return 'date'
+  }
+})
 // 判断是否为日期类型
 const isDateType = computed(() => getMomentIsValidIsNoNum(currentValue.value))
 
