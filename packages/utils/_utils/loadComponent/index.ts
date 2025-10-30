@@ -139,11 +139,12 @@ function getumdComponent(Vue: any, vueShared: any, componentCode: string, compon
   // })
   //
   // console.log(componentName, dependencyArrays)
+  const replaceStr = componentCode.replace('(this, (function(', '(_this, (function(')
   // eslint-disable-next-line no-new-func
   new Function(
     '_this',
     'globalThis',
-    componentCode.replace('this', '_this'),
+    replaceStr,
   )(componentMapping)
   return componentMapping[componentName]
 }
