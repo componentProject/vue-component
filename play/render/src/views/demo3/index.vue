@@ -28,13 +28,13 @@
 import { onBeforeMount, ref } from 'vue'
 // 虚拟模块由 Vite 插件在运行时提供
 import { getList, setDeleteByPathAndCode } from '@moluoxixi/utils/_api'
-import componentData from './data.ts'
+import componentData from './data'
 import { ElButton, ElMessage } from 'element-plus'
 // import Tabs from '@moluoxixi/components/Tabs'
 
 defineOptions({ name: '调试与演示iife和umd' })
 // 调试与演示组件库的组件，直接修改组件名
-const componentName = ref('DraggableTable')
+const componentName = ref('DesignForm')
 
 function getComponentProps(item: any) {
   const config = componentData[item.componentCode] || {}

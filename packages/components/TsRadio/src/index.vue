@@ -28,7 +28,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, withDefaults } from 'vue'
+import { computed } from 'vue'
 import { ElRadio, ElRadioGroup } from 'element-plus'
 import { getTypeDefault } from '@moluoxixi/utils/_utils'
 import { useOptions } from '../../_hooks'

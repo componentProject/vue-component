@@ -21,7 +21,7 @@
         :style="gridTemplateStyle"
       >
         <!-- 表单项列表渲染组件 -->
-        <ReFormRenderItems :items="renderFormItems" :draggable="draggable">
+        <ReFormRenderItems :items="renderFormItems" :draggable="draggable" @form-item-click="fomItemClickHandle">
           <!-- 作用域插槽 -->
           <template v-for="slotName in slotsNames[0]" #[slotName]="slotScoped">
             <slot :name="slotName" v-bind="slotScoped" />
@@ -284,6 +284,10 @@ const btnLabelText = computed<string>(() => {
 const slotsNames = computed<[string[], string[]]>(() =>
   getSlotsNames(unref(renderFormItems)),
 )
+
+function fomItemClickHandle(val: any) {
+  emits('formItemClick', val)
+}
 
 /** 表单功能方法 */
 function autoCollapseByErrors(errors?: Record<string, any>) {

@@ -3,7 +3,11 @@ export async function getesComponent(Vue: any, vueShared: any, orginComponentCod
   componentMapping.vueShared = vueShared
   const componentsCode = replaceImportsAndExports(orginComponentCode, componentName)
   // eslint-disable-next-line no-new-func
-  return new Function('componentMapping', componentsCode)(componentMapping)
+  return new Function('componentMapping', 'process', componentsCode)(componentMapping, {
+    env: {
+      NODE_ENV: 'production',
+    },
+  })
 }
 /**
  * 清理代码中所有的import语句

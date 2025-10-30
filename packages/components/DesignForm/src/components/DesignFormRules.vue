@@ -36,8 +36,6 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
 import { ElButton, ElMessageBox } from 'element-plus'
-import Tabs from '@moluoxixi/components/Tabs'
-import ReForm from '@moluoxixi/components/ReForm'
 import { formItemConfig as defaultFormItemConfig } from '../datas/formData'
 import { deepClone } from '../utils/formSerializer'
 import { debounce } from 'lodash'

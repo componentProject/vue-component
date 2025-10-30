@@ -107,6 +107,10 @@ export async function registerAllComponent(Vue: any, app: any, type?: string, is
     app.component(item.componentCode, Vue.defineAsyncComponent({
       async loader() {
         const component = await loadRemoteComponent(Vue, item.componentCode, allComponentList, moduleType, isLongRange)
+        if (!component) {
+          console.error(`${item.componentCode}解析失败，请检查`)
+          return errorComponent
+        }
         return component.default || component
       },
       loadingComponent,
@@ -120,8 +124,13 @@ function getiifeComponent(Vue: any, vueShared: any, componentCode: string, compo
   return new Function(
     'Vue',
     'vueShared',
+    'process',
     `return function(){${componentCode} return ${componentName}}`,
-  )(Vue, vueShared)()
+  )(Vue, vueShared, {
+    env: {
+      NODE_ENV: 'production',
+    },
+  })()
 }
 
 function getumdComponent(Vue: any, vueShared: any, componentCode: string, componentName: string, componentMapping: Record<string, any> = {}) {
@@ -139,12 +148,18 @@ function getumdComponent(Vue: any, vueShared: any, componentCode: string, compon
   // })
   //
   // console.log(componentName, dependencyArrays)
+  const replaceStr = componentCode.replace('(this, (function(', '(_this, (function(')
   // eslint-disable-next-line no-new-func
   new Function(
     '_this',
+    'process',
     'globalThis',
-    componentCode.replace('this', '_this'),
-  )(componentMapping)
+    replaceStr,
+  )(componentMapping, {
+    env: {
+      NODE_ENV: 'production',
+    },
+  })
   return componentMapping[componentName]
 }
 /**

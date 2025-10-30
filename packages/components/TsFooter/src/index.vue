@@ -59,7 +59,6 @@ const justifyMap = {
   right: 'flex-end',
 }
 const computedStyle = computed<CSSStyleDeclaration>(() => {
-  console.log('props.my', props.my)
   return {
     'margin-top': `${props.mt || props.my}px`,
     'margin-bottom': `${props.mb || props.my}px`,
