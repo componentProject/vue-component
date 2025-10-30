@@ -159,7 +159,8 @@ const computedCols = computed<ReGridResponsive>(() => {
   }
   return props.cols as ReGridResponsive
 })
-/** 按钮组栅格占比 */
+//#region 按钮区域宽度计算（依赖 useGridCols 输出）
+/** 按钮组栅格占比（用于计算按钮区域宽度/占比的基础配置） */
 const btnSpanWithDefault = computed(() => {
   if (!isUndefined(props.btnSpan))
     return props.btnSpan
@@ -171,6 +172,45 @@ const { gridResponsive, responsiveWidth, localBtnSpan } = useGridCols(
   computedCols,
   btnSpanWithDefault,
 )
+
+// （移动到按钮区域宽度计算区域之后，避免混入不相关逻辑）
+
+/** 样式相关计算属性 */
+const gridTemplateStyle = computed(() => {
+  const style: CSSProperties = {}
+
+  /** 如果是grid布局 */
+  if (props.layout === 'grid') {
+    /** 设置列间距 */
+    style['column-gap'] = `${props.colGap}px`
+    /** 设置行间距 */
+    style['row-gap'] = `${props.colGap}px`
+    /** 计算有效列数 */
+    const effectiveColumns = Math.max(gridResponsive.value, 24)
+    /** 设置网格模板列 */
+    style['grid-template-columns'] = `repeat(${effectiveColumns}, 1fr)`
+  }
+  else {
+    /** 设置flex布局间距 */
+    style.gap = `${props.colGap}px`
+  }
+
+  return style
+})
+
+/** 按钮组栅格样式（grid 下使用 span，flex 下按百分比宽度计算） */
+const localBtnSpanStyle = computed<string>(() => {
+  /** 如果是grid布局 */
+  if (layout.value === 'grid') {
+    return props.btnSpanStyle || `grid-column-start: span ${localBtnSpan.value}`
+  }
+  else {
+    /** flex布局下计算宽度 */
+    const width = (100 / gridResponsive.value) * localBtnSpan.value
+    return props.btnSpanStyle || `width: calc(${width}% - ${(props.colGap * (localBtnSpan.value - 1)) / gridResponsive.value}px)`
+  }
+})
+//#endregion 按钮区域宽度计算（依赖 useGridCols 输出）
 
 /** 表单核心状态 - 从useForm获取的核心状态 */
 const {
@@ -197,42 +237,6 @@ const {
   emits,
   itemConfigCache,
 )
-
-/** 样式相关计算属性 */
-const gridTemplateStyle = computed(() => {
-  const style: CSSProperties = {}
-
-  /** 如果是grid布局 */
-  if (props.layout === 'grid') {
-    /** 设置列间距 */
-    style['column-gap'] = `${props.colGap}px`
-    /** 设置行间距 */
-    style['row-gap'] = `${props.colGap}px`
-    /** 计算有效列数 */
-    const effectiveColumns = Math.max(gridResponsive.value, 24)
-    /** 设置网格模板列 */
-    style['grid-template-columns'] = `repeat(${effectiveColumns}, 1fr)`
-  }
-  else {
-    /** 设置flex布局间距 */
-    style.gap = `${props.colGap}px`
-  }
-
-  return style
-})
-
-/** 按钮组栅格样式 */
-const localBtnSpanStyle = computed<string>(() => {
-  /** 如果是grid布局 */
-  if (layout.value === 'grid') {
-    return props.btnSpanStyle || `grid-column-start: span ${localBtnSpan.value}`
-  }
-  else {
-    /** flex布局下计算宽度 */
-    const width = (100 / gridResponsive.value) * localBtnSpan.value
-    return props.btnSpanStyle || `width: calc(${width}% - ${(props.colGap * (localBtnSpan.value - 1)) / gridResponsive.value}px)`
-  }
-})
 
 /** 标签和按钮相关计算属性 */
 const labelWidth = computed(() =>
