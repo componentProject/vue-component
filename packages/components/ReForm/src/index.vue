@@ -72,7 +72,7 @@
 /** 导入 Vue 组合式 API */
 import { computed, nextTick, onMounted, onUnmounted, provide, ref, unref, useAttrs } from 'vue'
 /** 导入类型定义 */
-import type { ReFormEmits, ReFormProps } from './_types'
+import type { ReFormEmits, ReFormProps, ReGridResponsive } from './_types'
 /** 导入表单组合式函数 */
 import useForm, { useWatchForm } from './_utils/useForm'
 /** 导入 lodash 工具函数 */
@@ -142,20 +142,22 @@ const localItems = computed({
 /** 拖拽功能相关 */
 const draggableContainerRef = ref<HTMLElement>()
 let sortableInstance: Sortable | null = null
-let onEndDebounceTimer: number | null = null // 防抖计时器
+let onEndDebounceTimer: ReturnType<typeof setTimeout> | null = null // 防抖计时器
 
 /** 布局相关计算属性 */
 const $attrs = useAttrs()
 /** 布局类型 */
 const layout = computed(() => props.layout || 'grid')
-/** 有效列数 */
-const effectiveCols = computed(() => {
+/** 有效列数（重命名为 computedCols） */
+const computedCols = computed<ReGridResponsive>(() => {
   if (isUndefined(props.cols)) {
     return { lg: 24, sm: 24, xl: 24, md: 24 }
   }
-  else {
-    return { lg: props.cols, sm: props.cols, xl: props.cols, md: props.cols }
+  if (typeof props.cols === 'number') {
+    const n = props.cols
+    return { lg: n, sm: n, xl: n, md: n }
   }
+  return props.cols as ReGridResponsive
 })
 /** 按钮组栅格占比 */
 const btnSpanWithDefault = computed(() => {
@@ -166,7 +168,7 @@ const btnSpanWithDefault = computed(() => {
 
 /** 使用栅格列数组合式函数 */
 const { gridResponsive, responsiveWidth, localBtnSpan } = useGridCols(
-  effectiveCols,
+  computedCols,
   btnSpanWithDefault,
 )
 
@@ -182,7 +184,7 @@ const {
   formGroupDependency,
   clearItemConfigCache,
   itemConfigCache,
-} = useForm(localItems, props.modelValue, effectiveCols, layout)
+} = useForm(localItems, props.modelValue, computedCols, layout)
 
 /** 使用表单监听组合式函数 */
 const {
@@ -310,8 +312,8 @@ function autoCollapseByErrors(errors?: Record<string, any>) {
     /** 存在展开变化，重新自动滚动到第一个校验错误字段 */
     nextTick(() => {
       /** 获取表单字段 */
-      const formFields = reFormRef.value.fields.map((field: { prop: any }) =>
-        unref(field.prop),
+      const formFields = (reFormRef.value.fields as any[]).map((field: any) =>
+        unref(field?.prop as any),
       ) as string[]
       /** 查找第一个错误字段 */
       const field = formFields.find(field => errorKeys.includes(field))
