@@ -1,4 +1,8 @@
-/** 响应式栅格配置接口 */
+/**
+ * 响应式栅格配置
+ * 作用：为各断点（或自定义媒体表达式）提供列数，
+ * 可选地允许 undefined 表示缺省，后续规范化时会自动补齐。
+ */
 export interface ReGridResponsive {
   /** 任意键名，值为数字或undefined */
   [key: string]: number | undefined

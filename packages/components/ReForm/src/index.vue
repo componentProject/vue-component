@@ -74,7 +74,7 @@ import { computed, nextTick, onMounted, onUnmounted, provide, ref, unref, useAtt
 /** 导入类型定义 */
 import type { ReFormEmits, ReFormProps, ReGridResponsive } from './_types'
 /** 导入表单组合式函数 */
-import useForm, { useWatchForm } from './_utils/useForm'
+import useForm, { useSyncFormData } from './_utils/useForm'
 /** 导入 lodash 工具函数 */
 import { cloneDeep, isUndefined } from 'lodash'
 /** 导入工具函数 */
@@ -215,7 +215,6 @@ const localBtnSpanStyle = computed<string>(() => {
 /** 表单核心状态 - 从useForm获取的核心状态 */
 const {
   submiting,
-  reFormRef,
   formData,
   formRules,
   formItems,
@@ -226,11 +225,14 @@ const {
   itemConfigCache,
 } = useForm(localItems, props.modelValue, computedCols, layout)
 
+/** 使用模板ref持有 ElForm 实例 */
+const reFormRef = ref<InstanceType<typeof ElForm> | null>(null)
+
 /** 使用表单监听组合式函数 */
 const {
   renderFormItems,
   formDataProxy,
-} = useWatchForm(
+} = useSyncFormData(
   formItems,
   formData,
   props,
