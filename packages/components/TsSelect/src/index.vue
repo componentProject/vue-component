@@ -38,7 +38,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, onUnmounted, ref, withDefaults } from 'vue'
+import { computed, nextTick, onUnmounted, ref } from 'vue'
 import { ElOption, ElSelect } from 'element-plus'
 import { getType, getTypeDefault } from '@moluoxixi/utils/_utils'
 import { useOptions } from '../../_hooks'

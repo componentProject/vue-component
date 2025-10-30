@@ -374,8 +374,7 @@ function handleItemsUpdate(newItems: FormItem[]): void {
 
   // 深拷贝确保响应式更新
   const updatedItems = deepClone(newItems)
-  const updatedConfig = { ...formConfig.value, items: updatedItems }
-  formConfig.value = updatedConfig
+  formConfig.value = { ...formConfig.value, items: updatedItems }
 
   // 更新selectedItemIndex，确保选中项索引与新顺序保持一致
   if (selectedItemIndex.value !== null && selectedItem.value?.field) {

@@ -21,7 +21,7 @@
         :style="gridTemplateStyle"
       >
         <!-- 表单项列表渲染组件 -->
-        <ReFormRenderItems :items="renderFormItems" :draggable="draggable" @form-item-click="fomItemClickHandle">
+        <ReFormRenderItems :items="renderFormItems" :draggable="draggable" @form-item-click="computedFormItemClick">
           <!-- 作用域插槽 -->
           <template v-for="slotName in slotsNames[0]" #[slotName]="slotScoped">
             <slot :name="slotName" v-bind="slotScoped" />
@@ -93,6 +93,7 @@ import { ElButton, ElForm, ElFormItem } from 'element-plus'
 import ReFormRenderItems from './components/renderItems.vue'
 /** 导入拖拽排序库 */
 import Sortable from 'sortablejs'
+import { throttle } from '@moluoxixi/utils/_utils/event'
 
 /** 组件选项配置 */
 defineOptions({
@@ -288,6 +289,7 @@ const slotsNames = computed<[string[], string[]]>(() =>
 function fomItemClickHandle(val: any) {
   emits('formItemClick', val)
 }
+const computedFormItemClick = computed(() => throttle(fomItemClickHandle, 300))
 
 /** 表单功能方法 */
 function autoCollapseByErrors(errors?: Record<string, any>) {
