@@ -173,8 +173,8 @@ const computedRowConfig = computed(() => ({
 const computedRowDragConfig = computed(() => ({
   isPeerDrag: true,
   showGuidesStatus: true,
-  showIcon: false,
-  trigger: 'row',
+  showIcon: true,
+  trigger: 'cell',
 }))
 const computedTreeConfig = computed(() => ({
   expandAll: true,
