@@ -69,6 +69,7 @@ export class IndexDBManager {
 
   /**
    * 设置数据项
+   * 注意：每次调用都会创建新的事务，不会复用事务
    */
   public async setItem(key: string, value: any): Promise<void> {
     await this.ensureInitialized()
@@ -79,6 +80,7 @@ export class IndexDBManager {
         return
       }
 
+      // 每次都创建新的事务，确保不复用
       const tx = this.db.transaction(this.storeName, 'readwrite')
       const store = tx.objectStore(this.storeName)
       const req = store.put({ key, value } as StorageRecord)
@@ -90,6 +92,7 @@ export class IndexDBManager {
 
   /**
    * 获取数据项
+   * 注意：每次调用都会创建新的事务，不会复用事务
    */
   public async getItem(key: string): Promise<any> {
     await this.ensureInitialized()
@@ -100,6 +103,7 @@ export class IndexDBManager {
         return
       }
 
+      // 每次都创建新的事务，确保不复用
       const tx = this.db.transaction(this.storeName, 'readonly')
       const store = tx.objectStore(this.storeName)
       const req = store.get(key)
@@ -185,14 +189,16 @@ export class IndexDBManager {
 
   /**
    * 批量设置数据项
+   * 注意：每次调用都会创建新的事务，不会复用事务
    */
-  public async batchSetItems(items: Array<{ key: string, value: any }>): Promise<void> {
+  public async setItems(items: Array<{ key: string, value: any }>): Promise<void> {
     await this.ensureInitialized()
 
     if (!this.db) {
       throw new Error('Database not initialized')
     }
 
+    // 每次都创建新的事务，确保不复用
     const tx = this.db.transaction(this.storeName, 'readwrite')
     const store = tx.objectStore(this.storeName)
 
@@ -208,11 +214,17 @@ export class IndexDBManager {
 
   /**
    * 批量获取数据项
+   * 注意：每次调用都会创建新的事务，不会复用事务
+   * 返回对象格式，key 为键名，value 为对应的值（不存在则为 null）
    */
-  public async batchGetItems(keys: string[]): Promise<Array<{ key: string, value: any } | null>> {
+  public async getItems(keys: string[]): Promise<Record<string, any>> {
     const promises = keys.map(key => this.getItem(key))
     const values = await Promise.all(promises)
-    return keys.map((key, index) => ({ key, value: values[index] }))
+    const result: Record<string, any> = {}
+    for (let i = 0; i < keys.length; i++) {
+      result[keys[i]] = values[i]
+    }
+    return result
   }
 
   /**

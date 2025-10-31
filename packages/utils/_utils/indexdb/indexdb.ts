@@ -18,8 +18,6 @@ import { IndexDBManager } from './IndexDBManager'
  */
 export class IndexDBStorage {
   private readonly dbManager: IndexDBManager
-  private transactionCache: Map<string, IDBTransaction> = new Map()
-  private cacheTimer: NodeJS.Timeout | null = null
 
   // Web Worker 相关属性
   private worker: Worker | null = null
@@ -157,17 +155,6 @@ export class IndexDBStorage {
     await this.dbManager.init()
   }
 
-  /**
-   * 清理所有缓存
-   */
-  private clearCache(): void {
-    this.transactionCache.clear()
-    if (this.cacheTimer) {
-      clearTimeout(this.cacheTimer)
-      this.cacheTimer = null
-    }
-  }
-
   // 直接以 { key, value } 的形式写入对象仓库
 
   async setItem(key: string, value: any): Promise<void> {
@@ -285,7 +272,79 @@ export class IndexDBStorage {
   }
 
   /**
-   * 关闭数据库连接并清理缓存
+   * 批量设置数据项
+   * @param items - 数据项数组，格式为 [{ key: string, value: any }, ...] 或对象格式 { key: value, ... }
+   */
+  async setItems(items: Array<{ key: string, value: any }> | Record<string, any>): Promise<void> {
+    if (this.useWorker && this.worker) {
+      try {
+        // 统一转换为数组格式
+        const itemsArray = Array.isArray(items)
+          ? items
+          : Object.entries(items).map(([key, value]) => ({ key, value }))
+        await this.sendToWorker('setItems', itemsArray)
+        return
+      }
+      catch (error) {
+        console.warn('Worker setItems failed, falling back to main thread:', error)
+        // 回退到主线程模式
+        this.worker = null
+        void this.init()
+      }
+    }
+
+    try {
+      // 统一转换为数组格式
+      const itemsArray = Array.isArray(items)
+        ? items
+        : Object.entries(items).map(([key, value]) => ({ key, value }))
+      await this.dbManager.setItems(itemsArray)
+    }
+    catch (e) {
+      // fallback to localStorage
+      const itemsArray = Array.isArray(items)
+        ? items
+        : Object.entries(items).map(([key, value]) => ({ key, value }))
+      for (const item of itemsArray) {
+        localStorage.setItem(item.key, JSON.stringify(item.value))
+      }
+    }
+  }
+
+  /**
+   * 批量获取数据项
+   * @param keys - 键名数组
+   * @returns 返回对象格式，key 为键名，value 为对应的值（不存在则为 null）
+   */
+  async getItems(keys: string[]): Promise<Record<string, any>> {
+    if (this.useWorker && this.worker) {
+      try {
+        return await this.sendToWorker('getItems', keys)
+      }
+      catch (error) {
+        console.warn('Worker getItems failed, falling back to main thread:', error)
+        // 回退到主线程模式
+        this.worker = null
+        void this.init()
+      }
+    }
+
+    try {
+      return await this.dbManager.getItems(keys)
+    }
+    catch (e) {
+      // fallback to localStorage
+      const result: Record<string, any> = {}
+      for (const key of keys) {
+        const raw = localStorage.getItem(key)
+        result[key] = raw == null ? null : JSON.parse(raw)
+      }
+      return result
+    }
+  }
+
+  /**
+   * 关闭数据库连接
    */
   async close(): Promise<void> {
     if (this.useWorker && this.worker) {
@@ -301,7 +360,6 @@ export class IndexDBStorage {
       }
     }
 
-    this.clearCache()
     await this.dbManager.close()
   }
 }
