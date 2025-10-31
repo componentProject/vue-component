@@ -1,7 +1,7 @@
 import type { QiankunProps } from 'vite-plugin-qiankun/dist/helper'
 import { createApp } from 'vue'
 import * as Vue from 'vue'
-import { idbStorage } from '@moluoxixi/utils/_utils/indexdb.ts'
+import { idbStorage } from '@moluoxixi/utils/_utils/indexdb'
 import {
   browserTracingIntegration,
   init,

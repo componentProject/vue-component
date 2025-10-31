@@ -1,3 +1,3 @@
-export * from './base.ts'
-export * from './indexdb.ts'
-export * from './object.ts'
+export * from './base'
+export * from './indexdb'
+export * from './object'
