@@ -11,6 +11,7 @@
       show-header-overflow
       show-footer-overflow
       keep-source
+      :header-cell-style="{ height: '32px' }"
       :pager-config="computedPagerConfig"
       :virtual-y-config="computedVirtualYConfig"
       :virtual-x-config="computedVirtualXConfig"
@@ -132,7 +133,6 @@ const props = withDefaults(defineProps<propsType>(), {
   filterType: 'filter',
   /** 筛选器布局配置，支持 input, checkbox, select */
   filterLayout: () => ['input', 'checkbox'],
-  filterConfig: () => ({}),
   //#endregion
   //#region 行列拖拽
   dragable: false,
@@ -319,6 +319,7 @@ const computedSortConfig = computed(() => {
 })
 const computedRowConfig = computed(() => {
   return {
+    height: 32,
     resizable: true,
     drag: props.dragType === 'vxe' && (props.rowdragable || props.dragable),
     keyField: props.rowId,
@@ -382,7 +383,6 @@ const computedEditRules = computed(() => {
 
 const computedColumnConfig = computed(() => {
   return {
-    useKey: true,
     resizable: props.resizable,
     drag: props.dragType === 'vxe' && (props.columndragable || props.dragable),
     ...props.columnConfig,
@@ -862,7 +862,7 @@ function handleCustomConfigSave({
 const getStorageKey = () => (props.id ? `table_columns_${props.id}` : ``)
 /** 是否不使用内部存储实现 */
 const isNoSave = computed(
-  () => props.customConfig.storage || !['server', 'local'].includes(props.saveType),
+  () => attrs.customConfig?.storage || !['server', 'local'].includes(props.saveType),
 )
 /** 获取本地存储的列配置 */
 async function handleGetStoredColumns(): Promise<ColumnType[]> {
