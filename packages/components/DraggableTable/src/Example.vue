@@ -59,7 +59,6 @@
         :columns="columns"
         :loading="loading"
         save-type="server"
-        drag-type="draggable"
         :rowdragable="rowdragable"
         :columndragable="columndragable"
         :editable="editable"
@@ -156,7 +155,7 @@ onMounted(() => {
 // 列配置
 const columns = ref([
   { field: 'sql', type: 'seq', width: 70 },
-  { field: 'createTime', title: '日期', width: 150 },
+  { dragSort: true, field: 'createTime', title: '日期', width: 150 },
   {
     field: 'sex',
     title: 'Sex1',
