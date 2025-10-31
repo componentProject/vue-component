@@ -144,7 +144,9 @@ const props = withDefaults(defineProps<propsType>(), {
    * 拖拽模式
    * vxe模式下，表格数据发生变化时整个表格会刷新key重新渲染，而draggable模式下不会重新渲染
    */
-  dragType: 'vxe',
+  // dragType: 'vxe',
+  // 4.9版本才能用vxe的
+  dragType: 'draggable',
   /** 需要禁用拖拽的行class */
   rowDisabledClass: '',
   /** 行拖拽配置对象 */
