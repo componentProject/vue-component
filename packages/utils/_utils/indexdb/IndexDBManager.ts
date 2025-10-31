@@ -25,7 +25,6 @@ export class IndexDBManager {
   private db: IDBDatabase | null = null
   private readonly dbName: string
   private readonly storeName: string
-  private isInitialized: boolean = false
 
   constructor(options: IndexDBManagerOptions) {
     this.dbName = options.dbName
@@ -36,7 +35,7 @@ export class IndexDBManager {
    * 初始化 IndexDB 数据库
    */
   public async init(): Promise<IDBDatabase> {
-    if (this.isInitialized && this.db) {
+    if (this.db) {
       return this.db
     }
 
@@ -46,7 +45,6 @@ export class IndexDBManager {
       req.onerror = () => reject(new Error(req.error?.message || 'Failed to open database'))
       req.onsuccess = () => {
         this.db = req.result
-        this.isInitialized = true
         resolve(this.db)
       }
       req.onupgradeneeded = (event) => {
@@ -62,7 +60,7 @@ export class IndexDBManager {
    * 确保数据库已初始化
    */
   private async ensureInitialized(): Promise<void> {
-    if (!this.isInitialized || !this.db) {
+    if (!this.db) {
       await this.init()
     }
   }
@@ -228,20 +226,6 @@ export class IndexDBManager {
   }
 
   /**
-   * 获取数据库统计信息
-   */
-  public async getStats(): Promise<IndexDBManagerStats> {
-    const keys = await this.keys()
-
-    return {
-      totalKeys: keys.length,
-      dbName: this.dbName,
-      storeName: this.storeName,
-      isConnected: this.db !== null,
-    }
-  }
-
-  /**
    * 检查数据库是否支持
    */
   public static isSupported(): boolean {
@@ -255,7 +239,6 @@ export class IndexDBManager {
     if (this.db) {
       this.db.close()
       this.db = null
-      this.isInitialized = false
     }
   }
 
@@ -277,6 +260,20 @@ export class IndexDBManager {
    * 检查是否已初始化
    */
   public isReady(): boolean {
-    return this.isInitialized && this.db !== null
+    return this.db !== null
+  }
+
+  /**
+   * 获取数据库统计信息
+   */
+  public async getStats(): Promise<IndexDBManagerStats> {
+    const keys = await this.keys()
+
+    return {
+      totalKeys: keys.length,
+      dbName: this.dbName,
+      storeName: this.storeName,
+      isConnected: this.db !== null,
+    }
   }
 }
