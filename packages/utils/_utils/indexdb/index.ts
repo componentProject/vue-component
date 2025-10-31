@@ -3,6 +3,7 @@
  * 统一导出所有 IndexDB 相关功能
  */
 
+import { IndexDBStorage } from './indexdb'
 // 重新导出类型定义
 export type {
   IndexDBOperation,
@@ -12,12 +13,14 @@ export type {
   WorkerMessage,
   WorkerResponse,
 } from '../_types/indexdb'
-// 导出默认实例
-export { idbStorage } from './indexdb'
+// 导出默认实例（ Web Worker 模式）
+export const idbStorage = new IndexDBStorage({
+  dbName: 'DefaultIndexDBStorage',
+  storeName: 'default',
+  useWorker: true,
+})
 
-// 导出主要类
 export { IndexDBStorage } from './indexdb'
-
 export { IndexDBManager } from './IndexDBManager'
 
 // 导出类型

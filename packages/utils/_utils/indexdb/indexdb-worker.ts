@@ -111,6 +111,26 @@ class IndexDBWorker {
   }
 
   /**
+   * 执行 setItems 操作（批量设置）
+   */
+  public async setItems(items: Array<{ key: string, value: any }>): Promise<void> {
+    if (!this.dbManager) {
+      throw new Error('Database manager not initialized')
+    }
+    await this.dbManager.setItems(items)
+  }
+
+  /**
+   * 执行 getItems 操作（批量获取）
+   */
+  public async getItems(keys: string[]): Promise<Record<string, any>> {
+    if (!this.dbManager) {
+      throw new Error('Database manager not initialized')
+    }
+    return await this.dbManager.getItems(keys)
+  }
+
+  /**
    * 关闭数据库连接
    */
   public async close(): Promise<void> {
@@ -165,6 +185,15 @@ globalThis.onmessage = async function (event: MessageEvent<WorkerMessage>) {
       }
       case 'length': {
         result = await workerInstance.getLength()
+        break
+      }
+      case 'setItems': {
+        await workerInstance.setItems(args[0])
+        result = undefined
+        break
+      }
+      case 'getItems': {
+        result = await workerInstance.getItems(args[0])
         break
       }
       case 'close': {

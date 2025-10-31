@@ -3,7 +3,29 @@
     <VxeGrid
       ref="xTable"
       :columns="computedColumns"
-      v-bind="gridProps"
+      :header-cell-config="{ height: 32 }"
+      :cell-config="{ height: 32 }"
+      border
+      auto-resize
+      show-overflow
+      show-header-overflow
+      show-footer-overflow
+      keep-source
+      :pager-config="computedPagerConfig"
+      :virtual-y-config="computedVirtualYConfig"
+      :virtual-x-config="computedVirtualXConfig"
+      :sort-config="computedSortConfig"
+      :row-config="computedRowConfig"
+      :row-drag-config="computedRowDragConfig"
+      :column-config="computedColumnConfig"
+      :column-drag-config="computedColumnDragConfig"
+      :resizable-config="computedResizableConfig"
+      :filter-config="computedFilterConfig"
+      :edit-config="computedEditConfig"
+      :edit-rules="computedEditRules"
+      height="100%"
+      :data="tableData"
+      v-bind="$attrs"
       @checkbox-all="handleCheckboxAll"
       @checkbox-change="handleCheckboxChange"
       @resizable-change="handleColumnResizableChange"
@@ -94,24 +116,6 @@ defineOptions({
 })
 // 定义组件属性
 const props = withDefaults(defineProps<propsType>(), {
-  //#region 其他原始配置加默认值
-  /** 是否显示表格边框 */
-  border: true,
-  /** 表格列对齐方式 */
-  align: 'left',
-  /** 表格内容溢出隐藏并显示tooltip */
-  showOverflow: true,
-  /** 头部溢出隐藏并显示tooltip */
-  showHeaderOverflow: true,
-  /** 底部溢出隐藏并显示tooltip */
-  showFooterOverflow: true,
-  resizable: true,
-  /** 是否自动调整列宽 */
-  autoResize: true,
-  /** 是否允许列宽拖拽 */
-  /** 列宽拖拽配置 */
-  resizableConfig: () => ({}),
-  //#endregion
   //#region 编辑相关
   /** 是否允许编辑 */
   editable: false,
@@ -166,11 +170,6 @@ const props = withDefaults(defineProps<propsType>(), {
   /** 行虚拟滚动配置 */
   virtualYConfig: () => ({}),
   //#endregion
-  //#region 右键菜单配置
-  /** 头部右键菜单是否允许配置列隐藏显示 */
-  menuConfigColumn: true,
-  menuConfig: () => ({}),
-  //#endregion
   //#region 排序相关配置
   sortable: false,
   sortConfig: () => ({}),
@@ -209,7 +208,7 @@ const props = withDefaults(defineProps<propsType>(), {
   //#endregion
   //#region 回车容器相关
   allowSelectNextInEmpty: false,
-  containerType: 'row',
+  containerType: '',
   //#endregion
   //#region 存储相关
   saveType: 'default',
@@ -266,6 +265,175 @@ const slots = defineSlots<slotsType>()
 // 注册 VxeUI 组件
 VxeUI.component(VxePager)
 VxeUI.component(VxeTooltip)
+
+//#region 根据props动态计算的vxeGrid属性
+const computedPagerConfig = computed(() => {
+  return {
+    enabled: props.showPagination,
+    currentPage: 1,
+    pageSize: 10,
+    total: 100,
+    pageSizes: [10, 20, 30, 50, 100],
+    layouts: [
+      'Home',
+      'PrevJump',
+      'PrevPage',
+      'Number',
+      'NextPage',
+      'NextJump',
+      'End',
+      'Sizes',
+      'FullJump',
+      'Total',
+    ],
+    ...props.pagerConfig,
+  }
+})
+const computedVirtualXConfig = computed(() => {
+  return {
+    enabled: true,
+    gt: 0,
+    threshold: 30,
+    ...props.virtualXConfig,
+  }
+})
+const computedVirtualYConfig = computed(() => {
+  return {
+    enabled: true,
+    gt: 0,
+    threshold: 30,
+    ...props.virtualYConfig,
+  }
+})
+const computedSortConfig = computed(() => {
+  return {
+    iconVisibleMethod(params: any) {
+      const {
+        column: { field },
+      } = params
+      const fieldValues = Object.keys(groupBy(tableData.value, field))
+      return fieldValues?.length > 1
+    },
+    ...props.sortConfig,
+  }
+})
+const computedRowConfig = computed(() => {
+  return {
+    resizable: true,
+    drag: props.dragType === 'vxe' && (props.rowdragable || props.dragable),
+    keyField: props.rowId,
+    isCurrent: true,
+    isHover: true,
+    ...props.rowConfig,
+  }
+})
+const computedRowDragConfig = computed(() => {
+  return {
+    showGuidesStatus: true,
+    showIcon: false,
+    trigger: 'row',
+    isPeerDrag: true,
+    dragEndMethod: (params: any) => {
+      const isDrag = props.rowDragEndMethod ? props.rowDragEndMethod(params) : true
+      if (isDrag) {
+        emit('rowDragend', params)
+      }
+      const { newRow, oldRow, dragToChild } = params
+      if (!dragToChild) {
+        const oldIndex = tableData.value.findIndex((item: any) => item === oldRow)
+        const newIndex = tableData.value.findIndex((item: any) => item === newRow)
+        if (oldIndex !== -1 && newIndex !== -1) {
+          tableData.value.splice(newIndex, 0, tableData.value.splice(oldIndex, 1)[0])
+        }
+      }
+      return isDrag
+    },
+    disabledMethod(params: {
+      $table: VxeTableConstructor
+      row: any
+      column: VxeTableDefines.ColumnInfo
+      rowid: any
+    }) {
+      const currentRowDom = xTable.value?.$el.querySelector(`tr[rowid="${params.rowid}"]`)
+      return (
+        props.rowDragDisabledMethod?.(params)
+        || [...(currentRowDom?.classList.values() || [])].includes(getClass(props.rowDisabledClass))
+      )
+    },
+    ...props.rowDragConfig,
+  }
+})
+const computedEditConfig = computed(() => {
+  return {
+    enabled: props.editable,
+    trigger: 'dblclick',
+    mode: 'cell',
+    showStatus: true,
+    showIcon: false,
+    ...props.editConfig,
+  }
+})
+const computedEditRules = computed(() => {
+  return {
+    ...defaultEditRules.value,
+    ...props.editRules,
+  }
+})
+
+const computedColumnConfig = computed(() => {
+  return {
+    useKey: true,
+    resizable: props.resizable,
+    drag: props.dragType === 'vxe' && (props.columndragable || props.dragable),
+    ...props.columnConfig,
+  } as VxeGridProps['columnConfig']
+})
+
+const computedColumnDragConfig = computed(() => {
+  const columnDragConfig = {
+    showGuidesStatus: true,
+    showIcon: false,
+    trigger: 'cell',
+    isPeerDrag: true,
+    dragEndMethod: (params: any) => {
+      const isDrag = props.columnDragEndMethod ? props.columnDragEndMethod(params) : true
+      if (isDrag) {
+        emit('columnDragend', params)
+        handleSaveColumnsToStorage()
+      }
+      return isDrag
+    },
+    disabledMethod(params: any) {
+      return props.columnDragDisabledMethod?.(params)
+    },
+    ...props.columnDragConfig,
+  }
+
+  return columnDragConfig as VxeGridProps['columnDragConfig']
+})
+
+const computedResizableConfig = computed(() => {
+  return {
+    minWidth: 50,
+    ...props.resizableConfig,
+  } as VxeGridProps['resizableConfig']
+})
+
+const computedFilterConfig = computed(() => {
+  const baseConfig = {
+    iconVisibleMethod(params: any) {
+      const {
+        column: { field },
+      } = params
+      const fieldValues = Object.keys(groupBy(tableData.value, field))
+      return fieldValues.length > 1
+    },
+    ...props.filterConfig,
+  }
+
+  return baseConfig as VxeGridProps['filterConfig']
+})
+//#endregion
 
 const customConfigDialogVisible = ref(false)
 const customConfigDialogRef = useTemplateRef<HTMLElement>('customConfigDialogRef')
@@ -647,166 +815,6 @@ const computedColumns = computed<ColumnType[]>(() => {
   }
 
   return columns.map(transformColumn).filter(Boolean) as ColumnType[]
-})
-//#endregion
-
-//#region 动态计算gridProps
-// 计算表格配置属性
-const gridProps = computed<VxeGridProps>(() => {
-  return {
-    headerCellConfig: { height: 32 },
-    cellConfig: { height: 32 },
-    // 基本配置
-    id: props.id,
-    border: props.border,
-    autoResize: props.autoResize,
-    data: tableData.value,
-    showOverflow: props.showOverflow ? 'title' : false,
-    showHeaderOverflow: props.showHeaderOverflow ? 'title' : false,
-    showFooterOverflow: props.showFooterOverflow ? 'title' : false,
-    height: '100%',
-    keepSource: true,
-    sortable: props.sortable,
-    mouseConfig: {
-      selected: false,
-      ...props.mouseConfig,
-    },
-    customConfig: {
-      ...props.customConfig,
-    },
-    pagerConfig: {
-      enabled: props.showPagination,
-      ...props.pagerConfig,
-    },
-    editConfig: {
-      enabled: props.editable,
-      trigger: 'dblclick',
-      mode: 'cell',
-      showStatus: true,
-      showIcon: false,
-      ...props.editConfig,
-    },
-    // 合并默认验证规则和用户传入的验证规则
-    editRules: {
-      ...defaultEditRules.value,
-      ...props.editRules,
-    },
-    rowConfig: {
-      useKey: true,
-      resizable: true,
-      drag: props.dragType === 'vxe' && (props.rowdragable || props.dragable),
-      keyField: props.rowId,
-      isCurrent: true,
-      isHover: true,
-      ...props.rowConfig,
-    },
-    rowDragConfig: {
-      showGuidesStatus: true,
-      showIcon: false,
-      trigger: 'row',
-      isPeerDrag: true,
-      dragEndMethod: (params: any) => {
-        const isDrag = props.rowDragEndMethod ? props.rowDragEndMethod(params) : true
-        if (isDrag) {
-          emit('rowDragend', params)
-        }
-        const { newRow, oldRow, dragToChild } = params
-        if (!dragToChild) {
-          const oldIndex = tableData.value.findIndex((item: any) => item === oldRow)
-          const newIndex = tableData.value.findIndex((item: any) => item === newRow)
-          if (oldIndex !== -1 && newIndex !== -1) {
-            tableData.value.splice(newIndex, 0, tableData.value.splice(oldIndex, 1)[0])
-          }
-        }
-        return isDrag
-      },
-      disabledMethod(params: {
-        $table: VxeTableConstructor
-        row: any
-        column: VxeTableDefines.ColumnInfo
-        rowid: any
-      }) {
-        const currentRowDom = xTable.value?.$el.querySelector(`tr[rowid="${params.rowid}"]`)
-        return (
-          props.rowDragDisabledMethod?.(params)
-          || [...(currentRowDom?.classList.values() || [])].includes(getClass(props.rowDisabledClass))
-        )
-      },
-      ...props.rowDragConfig,
-    },
-    columnConfig: {
-      useKey: true,
-      resizable: props.resizable,
-      drag: props.dragType === 'vxe' && (props.columndragable || props.dragable),
-      ...props.columnConfig,
-    },
-    columnDragConfig: {
-      showGuidesStatus: true,
-      showIcon: false,
-      trigger: 'cell',
-      isPeerDrag: true,
-      dragEndMethod: (params: any) => {
-        const isDrag = props.columnDragEndMethod ? props.columnDragEndMethod(params) : true
-        // Vxe自带逻辑，无须添加
-        // const { oldColumn, newColumn } = params
-        // const hasFixed = oldColumn.fixed || newColumn.fixed
-        // if (hasFixed) {
-        //   ElMessage.warning('固定列不允许拖动！')
-        //   return false
-        // }
-        if (isDrag) {
-          emit('columnDragend', params)
-          handleSaveColumnsToStorage()
-        }
-        return isDrag
-      },
-      disabledMethod(params: any) {
-        return props.columnDragDisabledMethod?.(params)
-      },
-      ...props.columnDragConfig,
-    },
-    resizableConfig: {
-      minWidth: 50,
-      ...props.resizableConfig,
-    },
-    virtualXConfig: {
-      enabled: true,
-      gt: 0,
-      threshold: 30,
-      ...props.virtualXConfig,
-    },
-    virtualYConfig: {
-      enabled: true,
-      gt: 0,
-      threshold: 30,
-      ...props.virtualYConfig,
-    },
-    menuConfig: {
-      enabled: true,
-      ...props.menuConfig,
-    },
-    sortConfig: {
-      iconVisibleMethod(params: any) {
-        const {
-          column: { field },
-        } = params
-        const fieldValues = Object.keys(groupBy(tableData.value, field))
-        return fieldValues?.length > 1
-      },
-      ...props.sortConfig,
-    },
-    filterConfig: {
-      iconVisibleMethod(params: any) {
-        const {
-          column: { field },
-        } = params
-        const fieldValues = Object.keys(groupBy(tableData.value, field))
-        return fieldValues.length > 1
-      },
-      ...props.filterConfig,
-    },
-    ...attrs,
-  } as VxeGridProps
 })
 //#endregion
 

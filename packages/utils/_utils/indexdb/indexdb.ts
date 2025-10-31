@@ -18,8 +18,6 @@ import { IndexDBManager } from './IndexDBManager'
  */
 export class IndexDBStorage {
   private readonly dbManager: IndexDBManager
-  private transactionCache: Map<string, IDBTransaction> = new Map()
-  private cacheTimer: NodeJS.Timeout | null = null
 
   // Web Worker 相关属性
   private worker: Worker | null = null
@@ -47,32 +45,6 @@ export class IndexDBStorage {
   }
 
   /**
-   * 获取 Worker 文件 URL
-   * 优先使用编译后的 JS 文件，回退到 TS 文件
-   */
-  private getWorkerUrl(): string {
-    // 在开发环境中，优先尝试使用 TypeScript 文件
-    if (import.meta.env?.DEV) {
-      try {
-        return new URL('./indexdb-worker.ts', import.meta.url).href
-      }
-      catch {
-        // 如果 TS 文件不可用，使用 JS 文件
-        return new URL('./indexdb-worker.js', import.meta.url).href
-      }
-    }
-
-    // 在生产环境中，优先使用编译后的 JavaScript 文件
-    try {
-      return new URL('./indexdb-worker.js', import.meta.url).href
-    }
-    catch {
-      // 回退到 TypeScript 文件
-      return new URL('./indexdb-worker.ts', import.meta.url).href
-    }
-  }
-
-  /**
    * 初始化 Web Worker
    */
   private initWorker(): void {
@@ -82,48 +54,57 @@ export class IndexDBStorage {
       return
     }
 
-    try {
-      // 创建 Web Worker - 智能选择文件类型
-      const workerUrl = this.getWorkerUrl()
-      this.worker = new Worker(workerUrl)
+    // 异步初始化 Worker，确保 Vite 正确处理 TypeScript 和 ES 模块
+    void (async () => {
+      try {
+        // 使用 new URL 构造 Worker URL，Vite 在开发环境会自动处理 TypeScript 转换
+        // 指定 type: 'module' 以支持 ES 模块语法（import/export）
+        const workerUrl = new URL('./indexdb-worker.ts', import.meta.url)
+        this.worker = new Worker(workerUrl, { type: 'module' })
 
-      // 监听 Worker 消息
-      this.worker.onmessage = (event: MessageEvent<WorkerResponse>) => {
-        const { id, success, result, error } = event.data
-        const operation = this.pendingOperations.get(id)
+        this.setupWorkerHandlers()
 
-        if (operation) {
-          this.pendingOperations.delete(id)
-          if (success) {
-            operation.resolve(result)
-          }
-          else {
-            operation.reject(new Error(error || 'Worker operation failed'))
-          }
-        }
+        // 初始化 Worker
+        await this.sendToWorker('init', {
+          dbName: this.dbManager.getDbName(),
+          storeName: this.dbManager.getStoreName(),
+        })
       }
-
-      // 监听 Worker 错误
-      this.worker.onerror = (error) => {
-        console.error('IndexDB Worker Error:', error)
-        // 回退到主线程模式
-        this.worker = null
+      catch (error) {
+        console.warn('Failed to create Web Worker, falling back to main thread:', error)
         void this.init()
       }
+    })()
+  }
 
-      // 初始化 Worker
-      this.sendToWorker('init', {
-        dbName: this.dbManager.getDbName(),
-        storeName: this.dbManager.getStoreName(),
-      })
-        .catch(() => {
-          // 如果 Worker 初始化失败，回退到主线程
-          this.worker = null
-          void this.init()
-        })
+  /**
+   * 设置 Worker 事件处理器
+   */
+  private setupWorkerHandlers(): void {
+    if (!this.worker)
+      return
+
+    // 监听 Worker 消息
+    this.worker.onmessage = (event: MessageEvent<WorkerResponse>) => {
+      const { id, success, result, error } = event.data
+      const operation = this.pendingOperations.get(id)
+
+      if (operation) {
+        this.pendingOperations.delete(id)
+        if (success) {
+          operation.resolve(result)
+        }
+        else {
+          operation.reject(new Error(error || 'Worker operation failed'))
+        }
+      }
     }
-    catch (error) {
-      console.warn('Failed to create Web Worker, falling back to main thread:', error)
+
+    // 监听 Worker 错误
+    this.worker.onerror = (error) => {
+      console.error('IndexDB Worker Error:', error)
+      // 回退到主线程模式
+      this.worker = null
       void this.init()
     }
   }
@@ -155,17 +136,6 @@ export class IndexDBStorage {
       return
 
     await this.dbManager.init()
-  }
-
-  /**
-   * 清理所有缓存
-   */
-  private clearCache(): void {
-    this.transactionCache.clear()
-    if (this.cacheTimer) {
-      clearTimeout(this.cacheTimer)
-      this.cacheTimer = null
-    }
   }
 
   // 直接以 { key, value } 的形式写入对象仓库
@@ -285,7 +255,79 @@ export class IndexDBStorage {
   }
 
   /**
-   * 关闭数据库连接并清理缓存
+   * 批量设置数据项
+   * @param items - 数据项数组，格式为 [{ key: string, value: any }, ...] 或对象格式 { key: value, ... }
+   */
+  async setItems(items: Array<{ key: string, value: any }> | Record<string, any>): Promise<void> {
+    if (this.useWorker && this.worker) {
+      try {
+        // 统一转换为数组格式
+        const itemsArray = Array.isArray(items)
+          ? items
+          : Object.entries(items).map(([key, value]) => ({ key, value }))
+        await this.sendToWorker('setItems', itemsArray)
+        return
+      }
+      catch (error) {
+        console.warn('Worker setItems failed, falling back to main thread:', error)
+        // 回退到主线程模式
+        this.worker = null
+        void this.init()
+      }
+    }
+
+    try {
+      // 统一转换为数组格式
+      const itemsArray = Array.isArray(items)
+        ? items
+        : Object.entries(items).map(([key, value]) => ({ key, value }))
+      await this.dbManager.setItems(itemsArray)
+    }
+    catch (e) {
+      // fallback to localStorage
+      const itemsArray = Array.isArray(items)
+        ? items
+        : Object.entries(items).map(([key, value]) => ({ key, value }))
+      for (const item of itemsArray) {
+        localStorage.setItem(item.key, JSON.stringify(item.value))
+      }
+    }
+  }
+
+  /**
+   * 批量获取数据项
+   * @param keys - 键名数组
+   * @returns 返回对象格式，key 为键名，value 为对应的值（不存在则为 null）
+   */
+  async getItems(keys: string[]): Promise<Record<string, any>> {
+    if (this.useWorker && this.worker) {
+      try {
+        return await this.sendToWorker('getItems', keys)
+      }
+      catch (error) {
+        console.warn('Worker getItems failed, falling back to main thread:', error)
+        // 回退到主线程模式
+        this.worker = null
+        void this.init()
+      }
+    }
+
+    try {
+      return await this.dbManager.getItems(keys)
+    }
+    catch (e) {
+      // fallback to localStorage
+      const result: Record<string, any> = {}
+      for (const key of keys) {
+        const raw = localStorage.getItem(key)
+        result[key] = raw == null ? null : JSON.parse(raw)
+      }
+      return result
+    }
+  }
+
+  /**
+   * 关闭数据库连接
    */
   async close(): Promise<void> {
     if (this.useWorker && this.worker) {
@@ -301,14 +343,6 @@ export class IndexDBStorage {
       }
     }
 
-    this.clearCache()
     await this.dbManager.close()
   }
 }
-
-// 导出默认实例（ Web Worker 模式）
-export const idbStorage = new IndexDBStorage({
-  dbName: 'DefaultIndexDBStorage',
-  storeName: 'default',
-  useWorker: true,
-})

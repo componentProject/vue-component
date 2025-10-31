@@ -35,6 +35,8 @@ export type IndexDBOperation =
   | 'init'
   | 'setItem'
   | 'getItem'
+  | 'setItems'
+  | 'getItems'
   | 'removeItem'
   | 'clear'
   | 'keys'
