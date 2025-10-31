@@ -7,7 +7,6 @@
       @checkbox-all="handleCheckboxAll"
       @checkbox-change="handleCheckboxChange"
       @resizable-change="handleColumnResizableChange"
-      @header-cell-menu.prevent="handleHeaderCellMenu"
       @toggle-tree-expand="handleTableRendered"
     >
       <template #loading="params">
@@ -83,8 +82,6 @@ import {
 
 import { getCustomType, handleGetRequiredFields } from './_utils'
 
-/** 自定义右键菜单 */
-// import ContextMenu from './components/ContextMenu/index.vue'
 // 导入自定义渲染器
 import './renderers'
 import type { slotsType } from '@moluoxixi/components/_types'
@@ -263,12 +260,10 @@ const props = withDefaults(defineProps<propsType>(), {
   //#endregion
 })
 // 组件事件
-// 当在表格中最后一个输入元素按下Enter键时触发
-// 当在表格中select下拉为空时触发
 const emit = defineEmits<emitsType>()
-// 注册 VxeUI 组件
 // 获取插槽
 const slots = defineSlots<slotsType>()
+// 注册 VxeUI 组件
 VxeUI.component(VxePager)
 VxeUI.component(VxeTooltip)
 
@@ -396,25 +391,6 @@ const collectColumn = computed<ColumnType[]>(() => {
   return collectColumn as any[]
 })
 
-const contextMenuVisible = ref(false)
-const virtualRef = ref<HTMLElement>()
-/**
- * 表头右键事件
- * @param params
- */
-function handleHeaderCellMenu(
-  params: VxeTableDefines.HeaderCellMenuParams & { cell?: HTMLElement },
-) {
-  emit('headerCellMenu', params)
-  if (
-    isEmpty(props.menuConfig)
-    || isEmpty(props.menuConfig.header)
-    || props.menuConfig.header?.disabled
-  ) {
-    virtualRef.value = params.cell
-    contextMenuVisible.value = true
-  }
-}
 //#endregion
 
 //#region 多选功能

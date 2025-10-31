@@ -3,7 +3,7 @@
  * 封装所有 IndexDB 操作的核心逻辑，供主线程和 Worker 线程共享使用
  */
 
-import type { StorageRecord } from '../_types/indexdb.js'
+import type { StorageRecord } from '../_types/indexdb'
 
 export interface IndexDBManagerOptions {
   dbName: string
@@ -186,7 +186,7 @@ export class IndexDBManager {
   /**
    * 批量设置数据项
    */
-  public async batchSetItems(items: Array<{ key: string; value: any }>): Promise<void> {
+  public async batchSetItems(items: Array<{ key: string, value: any }>): Promise<void> {
     await this.ensureInitialized()
 
     if (!this.db) {
@@ -209,7 +209,7 @@ export class IndexDBManager {
   /**
    * 批量获取数据项
    */
-  public async batchGetItems(keys: string[]): Promise<Array<{ key: string; value: any } | null>> {
+  public async batchGetItems(keys: string[]): Promise<Array<{ key: string, value: any } | null>> {
     const promises = keys.map(key => this.getItem(key))
     const values = await Promise.all(promises)
     return keys.map((key, index) => ({ key, value: values[index] }))

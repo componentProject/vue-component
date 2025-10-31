@@ -3,7 +3,7 @@
  * 在后台线程中处理 IndexDB 操作，避免阻塞主线程
  */
 
-import { IndexDBManager } from './IndexDBManager.js'
+import { IndexDBManager } from './IndexDBManager'
 
 interface WorkerMessage {
   id: number

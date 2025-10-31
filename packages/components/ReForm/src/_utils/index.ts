@@ -23,7 +23,13 @@ import {
 /** 导入栅格响应式工具函数 */
 import { normalizeGridResponsive } from './useGridResponsive'
 
-/** 获取组件名称，确保组件类型比较的一致性 */
+/**
+ * 获取组件名称（统一组件名识别）
+ * 作用：将字符串组件或组件对象归一为可比较的名称，
+ * 以便在映射表（如子组件映射）或缓存 key 中稳定使用。
+ * @param component 可为字符串组件名或组件对象
+ * @returns 组件名称字符串，若无法识别返回 'unknown-component'
+ */
 export function getComponentName(component: any): string {
   /** 如果是字符串类型，直接返回 */
   if (typeof component === 'string') {
@@ -33,7 +39,13 @@ export function getComponentName(component: any): string {
   return component.__vccOpts?.name || component.name || component.displayName || 'unknown-component'
 }
 
-/** 解包响应式引用，将嵌套的响应式对象转换为普通对象 */
+/**
+ * 解包响应式引用（浅层键）
+ * 作用：将形如 { a: ref(1), b: computed(...) } 的模型转为普通对象，
+ * 并进行一次深拷贝，适用于提交前的数据快照。
+ * @param data 表单模型对象或其响应式引用
+ * @returns 纯对象（已取消内部 key 的响应式包装，且深拷贝）
+ */
 export function unwrapperShadowRef(data: MaybeRef<ReFormModelValue>) {
   /** 获取响应式数据的值 */
   const model = unref(data)
@@ -47,7 +59,12 @@ export function unwrapperShadowRef(data: MaybeRef<ReFormModelValue>) {
   return cloneDeep(model)
 }
 
-/** 获取表单项中所有插槽名称 */
+/**
+ * 收集 schema 中可能用到的插槽名
+ * 作用：便于父级在模板中一次性声明可用插槽（作用域/命名）。
+ * @param items ReFormItem 数组
+ * @returns [scopedSlotNames, namedSlotNames]
+ */
 export function getSlotsNames(items: ReFormItem[]): [string[], string[]] {
   /** 命名插槽数组 */
   const slotNames: string[] = []
@@ -89,11 +106,13 @@ export function getSlotsNames(items: ReFormItem[]): [string[], string[]] {
 }
 
 /**
- * 规范化表单配置
- * @param items 表单配置
- * @param span 表单字段栅格占比
- * @param layout 布局类型
- * @returns 表单配置
+ * 规范化表单项配置
+ * 作用：合并默认项、根据布局/列数推导 span、为 group 自动注入折叠配置与插槽、
+ * 并对需要子组件的组件（如 Select/Radio/Checkbox 组）自动补齐子组件名。
+ * @param items 原始 schema 列表
+ * @param span 列数/响应式列数（非 grid/flex 下作为默认 span）
+ * @param layout 'grid' | 'flex' | 其他（其他表示使用响应式 span）
+ * @returns 规范化后的 schema
  */
 export function normalizeFormItems(
   items: ReFormItem[],
@@ -123,13 +142,13 @@ export function normalizeFormItems(
         }
         /** 如果传入了span参数 */
         else if (!isUndefined(span)) {
-          formItem.span = span
+          formItem.span = span as number | ReGridResponsive
         }
       }
 
       /** 如果不是flex或grid布局，规范化响应式span */
       if (layout !== 'flex' && layout !== 'grid') {
-        formItem.span = normalizeGridResponsive(formItem.span)
+        formItem.span = normalizeGridResponsive(formItem.span as number | ReGridResponsive)
       }
 
       /** 如果是分组类型 */
@@ -169,10 +188,10 @@ export function normalizeFormItems(
         /** 获取组件名称 */
         const componentName = getComponentName(formItem.component)
         /** 检查是否需要子组件 */
-        if (!isUndefined(HAS_CHILD_COMPONENT_MAP[componentName])) {
+        if (!isUndefined((HAS_CHILD_COMPONENT_MAP as Record<string, string>)[componentName])) {
           /** 如果没有设置子组件，使用默认子组件 */
           if (isUndefined(formItem.childComp)) {
-            formItem.childComp = HAS_CHILD_COMPONENT_MAP[componentName]
+            formItem.childComp = (HAS_CHILD_COMPONENT_MAP as Record<string, string>)[componentName]
           }
         }
         /** 如果是文本域组件 */
@@ -201,9 +220,10 @@ export function normalizeFormItems(
 
 /**
  * 初始化表单数据
- * @param items 表单配置
- * @param defaultValue 默认值
- * @returns 表单数据
+ * 作用：只遍历非 group 项，将默认值（优先 defaultValue，其次 item.defaultValue）拷贝到模型。
+ * @param items schema
+ * @param defaultValue 外部默认值（优先级更高）
+ * @returns 模型对象
  */
 export function normalizeFormModelValue(
   items: MaybeRef<ReFormItem[]>,
@@ -236,7 +256,12 @@ export function normalizeFormModelValue(
   return modelValue
 }
 
-/** 初始化表单校验规则 */
+/**
+ * 初始化表单校验规则
+ * 作用：只遍历非 group 项，提取每个字段的 rules 合并成 ElementPlus 表单规则对象。
+ * @param items schema
+ * @returns 规则字典
+ */
 export function normalizeFormRules(items: MaybeRef<ReFormItem[]>): ReFormRules {
   /** 初始化规则对象 */
   const rules: ReFormRules = {}
@@ -266,10 +291,11 @@ export function normalizeFormRules(items: MaybeRef<ReFormItem[]>): ReFormRules {
 }
 
 /**
- * 初始化表单数据和校验规则
- * @param items 表单配置
- * @param defaultValue 默认值
- * @returns 表单数据 / 表单校验规则
+ * 初始化表单数据与规则（单次遍历）
+ * 作用：在一次 DFS 中同时产出 modelValue 与 rules，减少重复遍历。
+ * @param items schema
+ * @param defaultValue 外部默认值
+ * @returns 产出对象，包含 modelValue 与 rules
  */
 export function normalizeFormValueAndRules(
   items: MaybeRef<ReFormItem[]>,
@@ -310,9 +336,11 @@ export function normalizeFormValueAndRules(
 }
 
 /**
- * 获取表单字段组默认展开状态
- * @param items 表单配置
- * @returns 表单折叠状态 / 分组依赖反转字段路径-用于校验失败自动展开定位
+ * 计算分组折叠状态与依赖
+ * 作用：为每个 group 生成默认折叠态；同时构建“子字段 → 父分组路径”的依赖，
+ * 便于在校验失败时自动展开定位。
+ * @param items schema
+ * @returns 产出对象，包含 collapsedStatus 与 groupDependency
  */
 export function normalizeCollapsed(items: MaybeRef<ReFormItem[]>) {
   /** 初始化折叠状态对象 */
@@ -357,7 +385,12 @@ export function normalizeCollapsed(items: MaybeRef<ReFormItem[]>) {
   return { collapsedStatus, groupDependency }
 }
 
-/** 规范化折叠按钮文字配置 */
+/**
+ * 规范化折叠按钮文字
+ * 作用：支持未配置/字符串/数组三种形式，最终产出 [展开文案, 收起文案]。
+ * @param collpasedText 未配置 | 同文案字符串 | [展开, 收起]
+ * @returns [openText, closeText]
+ */
 export function normalizeCollapsedText(
   collpasedText?: ReFormItem['collapsedText'],
 ): [string, string] {
@@ -386,10 +419,12 @@ export function normalizeCollapsedText(
 }
 
 /**
- * 表单元素可视控制
- * @param items 表单元素配置
+ * 计算字段可见性字典
+ * 作用：根据每项的 visible 规则（布尔/条件/规则对象）与当前 formData，
+ * 生成 { [field]: boolean } 映射，供渲染层快速判断显示/隐藏。
+ * @param items schema
  * @param formData 表单数据
- * @returns 字段可见性状态对象
+ * @returns 可见性映射
  */
 export function normalizeVisible(
   items: MaybeRef<ReFormItem[]>,
@@ -416,7 +451,13 @@ export function normalizeVisible(
   return visible
 }
 
-/** 规范化单个表单项的可见性 */
+/**
+ * 规范化单项可见性
+ * 作用：统一处理 visible 为布尔/条件/规则对象三种情况。
+ * @param item 表单项
+ * @param formData 表单数据
+ * @returns 该项是否可见
+ */
 export function normalizeItemVisible(
   item: ReFormItem,
   formData: MaybeRef<ReFormModelValue>,
@@ -433,7 +474,12 @@ export function normalizeItemVisible(
   return validateVisible(visibleRule, formData)
 }
 
-/** 规范化可见性规则 */
+/**
+ * 规范化可见性规则
+ * 作用：若传入的是单个条件，则包装为 { type: '|', conditions: [condition] } 的规则。
+ * @param rule 条件或规则
+ * @returns 规则对象
+ */
 export function normalizeVisibleRule(
   rule: ReFormItemVisibleRule | ReFormItemVisibleRuleCondition,
 ): ReFormItemVisibleRule {
@@ -451,7 +497,14 @@ export function normalizeVisibleRule(
   return rule as ReFormItemVisibleRule
 }
 
-/** 验证可见性规则 */
+/**
+ * 验证可见性规则
+ * 作用：根据规则的条件组合方式（'&' 全满足、'|' 任意满足），
+ * 将每个条件通过 customCompare 进行比对，得到最终可见性。
+ * @param rule 规则对象
+ * @param formData 当前表单数据
+ * @returns 是否可见
+ */
 export function validateVisible(
   rule: ReFormItemVisibleRule,
   formData: MaybeRef<ReFormModelValue>,
@@ -464,17 +517,18 @@ export function validateVisible(
       /** 解构条件参数 */
       const { field, value, type, ignoreCase = false } = condition
       /** 执行自定义比较 */
-      return customCompare(
-        type,
-        unref(formData[field]),
-        unref(value),
-        ignoreCase,
-      )
+      const fd = unref(formData as any)
+      return customCompare(type, fd[field], unref(value), ignoreCase)
     },
   )
 }
 
-/** 忽略大小写处理函数 */
+/**
+ * 忽略大小写预处理
+ * 作用：将字符串或字符串数组进行 toLowerCase 归一化。
+ * @param value 任意值（字符串/字符串数组/其他）
+ * @returns 处理后的值
+ */
 export function ignoreCaseFunc(value: any): any {
   /** 如果是数组，递归处理每个元素 */
   return isArray(value)
@@ -484,7 +538,16 @@ export function ignoreCaseFunc(value: any): any {
       : value
 }
 
-/** 自定义比较函数 */
+/**
+ * 自定义比较函数
+ * 作用：支持等于/不等/集合包含/交集/前缀/后缀等多种比较，
+ * 可选忽略大小写，用于 visible 条件判断。
+ * @param type 比较类型（=、!=、.、!.、&.、!&.、|.、^=、=$、!^=、!=$）
+ * @param value 表单中的当前值
+ * @param filterValue 条件中的目标值
+ * @param ignoreCase 是否忽略大小写
+ * @returns 比较是否成立
+ */
 export function customCompare(
   type: ReFormItemVisibleRuleCondition['type'],
   value: any,

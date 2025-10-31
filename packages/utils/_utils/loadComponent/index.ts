@@ -1,5 +1,5 @@
 import { getDownLoadByIds } from '@moluoxixi/utils/_api'
-import { idbStorage } from '@moluoxixi/utils/_utils/indexdb.ts'
+import { idbStorage } from '@moluoxixi/utils/_utils/indexdb'
 import { COMPONENT_SETTING_TYPE, COMPONENT_VUE2_SETTING_TYPE } from '@moluoxixi/constant'
 import { getesComponent } from './esmodule.ts'
 import * as vueShared from '@vue/shared'
@@ -107,6 +107,10 @@ export async function registerAllComponent(Vue: any, app: any, type?: string, is
     app.component(item.componentCode, Vue.defineAsyncComponent({
       async loader() {
         const component = await loadRemoteComponent(Vue, item.componentCode, allComponentList, moduleType, isLongRange)
+        if (!component) {
+          console.error(`${item.componentCode}解析失败，请检查`)
+          return errorComponent
+        }
         return component.default || component
       },
       loadingComponent,
@@ -120,8 +124,13 @@ function getiifeComponent(Vue: any, vueShared: any, componentCode: string, compo
   return new Function(
     'Vue',
     'vueShared',
+    'process',
     `return function(){${componentCode} return ${componentName}}`,
-  )(Vue, vueShared)()
+  )(Vue, vueShared, {
+    env: {
+      NODE_ENV: 'production',
+    },
+  })()
 }
 
 function getumdComponent(Vue: any, vueShared: any, componentCode: string, componentName: string, componentMapping: Record<string, any> = {}) {
@@ -143,9 +152,14 @@ function getumdComponent(Vue: any, vueShared: any, componentCode: string, compon
   // eslint-disable-next-line no-new-func
   new Function(
     '_this',
+    'process',
     'globalThis',
     replaceStr,
-  )(componentMapping)
+  )(componentMapping, {
+    env: {
+      NODE_ENV: 'production',
+    },
+  })
   return componentMapping[componentName]
 }
 /**

@@ -11,17 +11,17 @@ export type {
   StorageRecord,
   WorkerMessage,
   WorkerResponse,
-} from '../_types/indexdb.js'
-// 导出主要类
-export { IndexDBStorage } from './indexdb.js'
-
+} from '../_types/indexdb'
 // 导出默认实例
-export { idbStorage } from './indexdb.js'
+export { idbStorage } from './indexdb'
 
-export { IndexDBManager } from './IndexDBManager.js'
+// 导出主要类
+export { IndexDBStorage } from './indexdb'
+
+export { IndexDBManager } from './IndexDBManager'
 
 // 导出类型
 export type {
   IndexDBManagerOptions,
   IndexDBManagerStats,
-} from './IndexDBManager.js'
+} from './IndexDBManager'

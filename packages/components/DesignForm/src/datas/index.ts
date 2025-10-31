@@ -1,15 +1,12 @@
 import { ElInput, ElInputNumber } from 'element-plus'
-import TsSelect from '@moluoxixi/components/TsSelect'
-import TsCheckbox from '@moluoxixi/components/TsCheckbox'
-import TsRadio from '@moluoxixi/components/TsRadio'
 
 export const componentMap = {
   elinput: ElInput,
   eltextarea: ElInput,
   elinputnumber: ElInputNumber,
-  tsselect: TsSelect,
-  tscheckbox: TsCheckbox,
-  tsradio: TsRadio,
+  tsselect: 'TsSelect',
+  tscheckbox: 'TsCheckbox',
+  tsradio: 'TsRadio',
 }
 
 export const formItemObj = {
@@ -34,7 +31,7 @@ export const formItemObj = {
   },
   tsselect: {
     label: '下拉框',
-    component: TsSelect,
+    component: 'TsSelect',
     props: {
       clearable: true,
       filterable: true,
@@ -49,7 +46,7 @@ export const formItemObj = {
   },
   tscheckbox: {
     label: '多选',
-    component: TsCheckbox,
+    component: 'TsCheckbox',
     props: {
       options: [{
         label: '多选1',
@@ -63,7 +60,7 @@ export const formItemObj = {
   },
   tsradio: {
     label: '单选',
-    component: TsRadio,
+    component: 'TsRadio',
     props: {
       options: [{
         label: '单选1',

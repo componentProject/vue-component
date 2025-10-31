@@ -38,6 +38,8 @@ function isType(value, type) {
 watch(
   () => currentRoute,
   (currentRoute) => {
+    if (!currentRoute)
+      return
     // 根据query参数中keepAlive的值或默认值决定是否缓存该路由
     const shouldCache = isType(props.defaultKeepAlive, 'function')
       ? props.defaultKeepAlive(currentRoute)

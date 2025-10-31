@@ -7,7 +7,14 @@
       <div v-if="!formConfig" class="empty-form">
         <p>请从左侧添加表单项</p>
       </div>
-      <ReForm v-else v-bind="formConfig" draggable @submit="handleFormSubmit" @update:items="handleItemsUpdate" @form-item-click="handleReFormClick" />
+      <ReForm
+        v-else
+        v-bind="formConfig"
+        draggable
+        @submit="handleFormSubmit"
+        @update:items="handleItemsUpdate"
+        @form-item-click="handleReFormClick"
+      />
     </div>
     <div class="design-form-right">
       <DesignFormRules
@@ -25,7 +32,6 @@
 
 <script setup lang="ts">
 import { onMounted, ref, watch } from 'vue'
-import ReForm from '@moluoxixi/components/ReForm'
 import DesignFormRules from './components/DesignFormRules.vue'
 import DesignFormList from './components/DesignFormList.vue'
 import { componentMap, formItemObj } from './datas/index'
@@ -368,8 +374,7 @@ function handleItemsUpdate(newItems: FormItem[]): void {
 
   // 深拷贝确保响应式更新
   const updatedItems = deepClone(newItems)
-  const updatedConfig = { ...formConfig.value, items: updatedItems }
-  formConfig.value = updatedConfig
+  formConfig.value = { ...formConfig.value, items: updatedItems }
 
   // 更新selectedItemIndex，确保选中项索引与新顺序保持一致
   if (selectedItemIndex.value !== null && selectedItem.value?.field) {

@@ -5,7 +5,6 @@ import type { VxeTableDefines } from 'vxe-table'
  */
 export interface emitsType {
   (e: 'headerContextMenu', params: HTMLElement): void
-  (e: 'headerCellMenu', params: VxeTableDefines.HeaderCellMenuParams & { cell?: HTMLElement }): void
   (e: 'checkboxAll', params: VxeTableDefines.CheckboxAllParams): void
   (e: 'checkboxChange', params: VxeTableDefines.CheckboxAllParams): void
   (e: 'resizableChange', params: VxeTableDefines.ResizableChangeParams): void

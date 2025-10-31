@@ -9,7 +9,7 @@ import {
   watch,
 } from 'vue'
 /** 导入 Vue 类型定义 */
-import type { MaybeRef, Ref, ShallowRef } from 'vue'
+import type { ComputedRef, MaybeRef, Ref, ShallowRef } from 'vue'
 /** 导入工具函数 */
 import {
   normalizeCollapsed,
@@ -27,26 +27,72 @@ import type {
   ReFormRules,
   ReGridResponsive,
 } from '../_types'
-/** 导入 Element Plus 类型 */
-import type { ElForm } from 'element-plus'
 /** 导入 lodash 工具函数 */
 import { cloneDeep, isUndefined } from 'lodash'
 
-/** 表单组合式函数 */
+/** useForm 返回值类型 */
+export interface UseFormResult {
+  /** 提交状态标记（发起 props.request 时置为 true） */
+  submiting: Ref<boolean>
+  /** 规范化后的表单数据模型（浅 ref，以差量更新为主） */
+  formData: ShallowRef<ReFormModelValue>
+  /** 汇总后的表单校验规则（与 formItems 同步） */
+  formRules: ShallowRef<Partial<ReFormRules>>
+  /** 规范化后的表单项 schema */
+  formItems: ShallowRef<ReFormItem[]>
+  /** 每个字段是否可见（由 visible 规则和 formData 推导） */
+  formVisible: ComputedRef<Record<string, boolean>>
+  /** 分组折叠状态（key 为分组字段名） */
+  formCollapsed: Ref<Record<string, boolean>>
+  /** 子字段到父分组路径映射（用于错误展开定位） */
+  formGroupDependency: Ref<Record<string, string[]>>
+  /** 监听 items/layout 的停止函数 */
+  unwatchForm: () => void
+  /** 渲染配置缓存清理函数（实例级） */
+  clearItemConfigCache: () => void
+  /** 渲染配置缓存（实例级，key 基于 path/field/component） */
+  itemConfigCache: Map<string, ReFormItem>
+}
+
+/** useSyncFormData 返回值类型 */
+export interface UseSyncFormDataResult {
+  /** 供渲染使用的 items（已注入 v-model props/events，最小化变更） */
+  renderFormItems: ComputedRef<ReFormItem[]>
+  /** 渲染前的原始 items 引用（computed 缓存） */
+  renderFormItemsCache: ComputedRef<ReFormItem[]>
+  /** 提供给 ElForm 的 model 代理对象（避免直接持有 shallowRef） */
+  formDataProxy: ComputedRef<ReFormModelValue>
+  /** 停止外部→内部 model 同步的监听 */
+  unwatchModelValue: () => void
+  /** 停止内部→外部 model 同步的监听 */
+  unwatchFormData: () => void
+}
+
+/**
+ * 功能：
+ * 统一规范化表单 schema（items）、默认值（modelValue）、列数/布局（span/layout），
+ * 产出可直接驱动渲染与校验的响应式状态（formData、formRules、可见性、折叠等）。
+ *
+ * 作用：
+ * - 聚合“表单状态层”：生成/维护表单的核心状态与派生状态；
+ * - 实例级缓存 itemConfigCache：与渲染层配合，保持组件实例稳定并降本；
+ * - 监听 items/layout 变化，差量更新数据与规则，触发依赖更新；
+ * - 提供清理函数 clearItemConfigCache 与表单引用 getFormRef。
+ *
+ * @param items 表单项配置（schema）
+ * @param defaultValue 默认模型值（可选）
+ * @param span 列数/响应式列数配置（可选）
+ * @param layout 布局类型：grid | flex（可选）
+ * @returns 聚合后的表单核心状态与方法（submiting、reFormRef、formData、formRules、formItems、formVisible、formCollapsed、formGroupDependency、unwatchForm、clearItemConfigCache、itemConfigCache）
+ */
 export default function useForm(
   items: MaybeRef<ReFormItem[]>,
   defaultValue?: MaybeRef<ReFormModelValue>,
   span?: MaybeRef<number | ReGridResponsive>,
   layout?: MaybeRef<string>,
-) {
+): UseFormResult {
   /** 提交状态 */
   const submiting = ref(false)
-  /** 表单引用 */
-  const reFormRef = ref<InstanceType<typeof ElForm> | null>(null)
-  /** 获取表单引用的函数 */
-  const getFormRef = (form: MaybeRef<InstanceType<typeof ElForm> | null>) => {
-    reFormRef.value = unref(form)
-  }
 
   /** 每个组件实例创建独立的缓存 */
   const itemConfigCache = new Map<string, ReFormItem>()
@@ -80,7 +126,7 @@ export default function useForm(
     = ref(groupDependency)
 
   /** 表单字段可见性 */
-  const formVisible: Ref<Record<string, boolean>> = computed(() => {
+  const formVisible: ComputedRef<Record<string, boolean>> = computed(() => {
     return normalizeVisible(formItems, unref(formData))
   })
 
@@ -129,8 +175,6 @@ export default function useForm(
   /** 返回表单相关状态和方法 */
   return {
     submiting,
-    reFormRef,
-    getFormRef,
     formData,
     formRules,
     formItems,
@@ -138,19 +182,36 @@ export default function useForm(
     formCollapsed,
     formGroupDependency,
     unwatchForm,
-    clearItemConfigCache, // 导出清理方法
-    itemConfigCache, // 导出缓存对象，供useWatchForm使用
+    clearItemConfigCache,
+    itemConfigCache,
   }
 }
 
-/** 表单监听组合式函数 */
-export function useWatchForm(
+/**
+ * 功能：
+ * 将 useForm 产出的 formItems 与 formData 适配为“可渲染的 items”（自动注入 v-model props/events），
+ * 并负责内外部 model 的双向同步与事件合并（优先用户事件，再写回表单）。
+ *
+ * 作用：
+ * - 生成 renderFormItems：最小化变更，结合 itemConfigCache 复用实例；
+ * - 内→外：formData 变更时 emit('update:modelValue')；
+ * - 外→内：props.modelValue 变更时差量写回 formData；
+ * - 事件包装：合并原有事件与更新事件，保持用户行为与数据一致。
+ *
+ * @param formItems 规范化后的表单项（来自 useForm）
+ * @param formData 表单数据（来自 useForm）
+ * @param props 组件 props（用于同步 modelValue 等）
+ * @param emits 组件 emits（用于对外派发更新/变更）
+ * @param itemConfigCache 实例级渲染缓存（来自 useForm）
+ * @returns 渲染与同步相关对象（renderFormItems、renderFormItemsCache、formDataProxy、unwatchModelValue、unwatchFormData）
+ */
+export function useSyncFormData(
   formItems: ShallowRef<ReFormItem[]>,
   formData: ShallowRef<ReFormModelValue>,
   props: ReFormProps,
   emits: ReFormEmits,
   itemConfigCache: Map<string, ReFormItem>, // 接收实例缓存
-) {
+): UseSyncFormDataResult {
   /** 表单配置项缓存 */
   const renderFormItemsCache = computed(() => unref(formItems))
 
@@ -171,7 +232,8 @@ export function useWatchForm(
           const cachedItem = itemConfigCache.get(cacheKey)!
           /** 只更新必要的属性，不重建整个对象 */
           if (cachedItem.props && cachedItem.field) {
-            cachedItem.props[cachedItem.modelProp] = unref(formData)[cachedItem.field]
+            const modelPropKey = (cachedItem.modelProp ?? 'modelValue') as string
+            ;(cachedItem.props as Record<string, any>)[modelPropKey] = unref(formData)[cachedItem.field]
           }
           return cachedItem
         }
@@ -197,7 +259,7 @@ export function useWatchForm(
             }
 
             /** 修复wrapperEvent函数，正确调用事件处理函数 */
-            const wrapperEvent = (originalEvent: Function | undefined, updateEvent: Function) => {
+            const wrapperEvent = (originalEvent: ((v: any) => void) | undefined, updateEvent: (v: any) => void) => {
               return (value: any) => {
                 /** 先执行用户自定义事件 */
                 if (typeof originalEvent === 'function') {
@@ -212,14 +274,16 @@ export function useWatchForm(
             if (isUndefined(item.props)) {
               item.props = {}
             }
-            item.props[item.modelProp] = unref(formData)[field]
+            const modelPropKey = (item.modelProp ?? 'modelValue') as string
+            ;(item.props as Record<string, any>)[modelPropKey] = unref(formData)[field]
 
             /** 确保events对象存在并设置事件处理函数 */
             if (isUndefined(item.events)) {
               item.events = {}
             }
-            const originalEvent = item.events[item.modelEvent]
-            item.events[item.modelEvent] = wrapperEvent(originalEvent, updateEvent)
+            const modelEventKey = (item.modelEvent ?? 'update:modelValue') as string
+            const originalEvent = (item.events as Record<string, any>)[modelEventKey] as ((v: any) => void) | undefined
+            ;(item.events as Record<string, any>)[modelEventKey] = wrapperEvent(originalEvent, updateEvent)
           }
 
           /** 存入缓存，确保组件实例的稳定性 */

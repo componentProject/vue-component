@@ -64,6 +64,7 @@ export interface ReFormProps {
 
 /** ReForm 组件事件接口定义 */
 export interface ReFormEmits {
+  (e: 'formItemClick', val: any): void
   /** 表单字段值变化事件 */
   (
     e: 'change',
@@ -130,7 +131,7 @@ export interface ReFormItem extends ReFormGroupItem {
   /** 表单控件属性配置 */
   props?: Record<string, any>
   /** 表单控件事件监听 */
-  events?: Record<string, Function>
+  events?: Record<string, (val: any) => any>
   /** 表单字段组 */
   children?: ReFormItem[]
   /** 自定义插槽 */

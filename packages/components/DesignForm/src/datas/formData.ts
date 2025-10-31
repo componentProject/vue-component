@@ -1,8 +1,5 @@
 // 导入所需组件
 import { ElInput, ElInputNumber } from 'element-plus'
-import TsSelect from '@moluoxixi/components/TsSelect'
-import TsCheckbox from '@moluoxixi/components/TsCheckbox'
-import TsRadio from '@moluoxixi/components/TsRadio'
 
 // 表单配置相关常量定义
 // 可复用的选项列表
@@ -132,7 +129,7 @@ export const defaultFormConfig = {
       label: '表单大小',
       field: 'size',
       defaultValue: 'default',
-      component: TsSelect,
+      component: 'TsSelect',
       props: {
         clearable: true,
         options: COMMON_OPTIONS.formSizeOptions,
@@ -142,7 +139,7 @@ export const defaultFormConfig = {
       label: '表单布局',
       field: 'layout',
       defaultValue: 'grid',
-      component: TsSelect,
+      component: 'TsSelect',
       props: {
         clearable: true,
         options: COMMON_OPTIONS.formLayoutOptions,
@@ -174,7 +171,7 @@ export const defaultFormConfig = {
       label: '标签位置',
       field: 'labelPosition',
       defaultValue: 'right',
-      component: TsSelect,
+      component: 'TsSelect',
       props: {
         clearable: true,
         options: COMMON_OPTIONS.labelPositionOptions,
@@ -192,7 +189,7 @@ export const defaultFormConfig = {
       label: '提交时是否滚动到第一个错误位置',
       field: 'scrollToError',
       defaultValue: true,
-      component: TsRadio,
+      component: 'TsRadio',
       props: {
         options: COMMON_OPTIONS.booleanOptions,
       },
@@ -202,7 +199,7 @@ export const defaultFormConfig = {
       label: '隐藏表单按钮组',
       field: 'hideBtns',
       defaultValue: true,
-      component: TsRadio,
+      component: 'TsRadio',
       props: {
         options: COMMON_OPTIONS.booleanOptions,
       },
@@ -246,7 +243,7 @@ export const formItemConfig = {
       label: '组件类型',
       field: 'component',
       defaultValue: 'ElInput',
-      component: TsSelect,
+      component: 'TsSelect',
       props: {
         clearable: true,
         placeholder: '请选择组件类型',
@@ -350,7 +347,7 @@ export const formItemConfig = {
     {
       label: '数据类型',
       field: 'dataType',
-      component: TsRadio,
+      component: 'TsRadio',
       props: {
         clearable: true,
         maxheight: 40,
@@ -380,7 +377,7 @@ export const formItemConfig = {
       label: '请求方法',
       field: 'requestMethod',
       defaultValue: 'POST',
-      component: TsSelect,
+      component: 'TsSelect',
       props: {
         options: COMMON_OPTIONS.requestMethodOptions,
       },
@@ -487,7 +484,7 @@ export const formItemConfig = {
     {
       label: '是否禁用',
       field: 'disabled',
-      component: TsRadio,
+      component: 'TsRadio',
       props: {
         clearable: true,
         maxheight: 40,
@@ -500,7 +497,7 @@ export const formItemConfig = {
       label: '是否必填',
       field: 'required',
       defaultValue: false,
-      component: TsRadio,
+      component: 'TsRadio',
       props: {
         clearable: true,
         maxheight: 40,
@@ -512,7 +509,7 @@ export const formItemConfig = {
       field: 'trigger',
       labelKey: 'label',
       valueKey: 'value',
-      component: TsCheckbox,
+      component: 'TsCheckbox',
       props: {
         clearable: true,
         options: COMMON_OPTIONS.validatorTriggerOptions,

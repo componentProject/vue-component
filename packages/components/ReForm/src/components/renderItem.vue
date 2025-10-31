@@ -1,7 +1,7 @@
 <!-- 表单项渲染组件模板 -->
 <template>
   <!-- 表单项容器 -->
-  <div class="ap-form-item ap-form-control">
+  <div class="ap-form-item ap-form-control" @click.stop="handleItemClick">
     <!-- Element Plus 表单项组件 -->
     <ElFormItem
       :class="[item.customClass || '']"
@@ -14,7 +14,7 @@
       <template v-if="item.label" #label>
         <slot :name="item.labelSlot">
           <!-- 标签内容 -->
-          <span class="inline-flex items-center" @click="handleItemClick">
+          <span class="inline-flex items-center">
             <!-- 标签文字 -->
             <span>{{ item.label }}</span>
             <!-- 提示图标 -->
@@ -30,89 +30,92 @@
       </template>
       <!-- 控件插槽 -->
       <template #default>
-        <!-- 纯文本类型 -->
-        <template v-if="item.type === 'text'">
-          <div class="ap-form-control--text">
-            {{ formData[item.field] || emptyText }}
-          </div>
-        </template>
-        <template v-else>
-          <!-- 自定义插槽 -->
-          <template v-if="item.slot">
-            <slot :name="item.slot" :item="item" :readonly="readonly" />
+        <!-- 如果点击组件也要选中干掉这个div -->
+        <div class="contents" @click.stop>
+          <!-- 纯文本类型 -->
+          <template v-if="item.type === 'text'">
+            <div class="ap-form-control--text">
+              {{ formData[item.field] || emptyText }}
+            </div>
           </template>
           <template v-else>
-            <!-- 带子组件 -->
-            <template v-if="childComps.includes(getComponentName(item.component))">
-              <!-- 编辑状态 -->
-              <component
-                :is="item.component"
-                v-if="!readonly"
-                :key="getComponentKey(item.component, item.field)"
-                :class="[item.controlClass || '']"
-                v-bind="item.props"
-                v-on="item.events"
-              >
-                <!-- 子组件选项 -->
-                <template v-for="opt in item.options" :key="opt[item.valueKey]">
-                  <component
-                    :is="item.childComp"
-                    :item="opt"
-                    :value="opt[item.valueKey!]"
-                    :label="opt[item.labelKey!]"
-                  >
-                    {{ opt[item.labelKey!] }}
-                  </component>
-                </template>
-              </component>
-              <!-- 只读状态 -->
-              <div v-else class="ap-form-control--text">
-                {{ getOptionLabel(item.props.modelValue, item) || emptyText }}
-              </div>
+            <!-- 自定义插槽 -->
+            <template v-if="item.slot">
+              <slot :name="item.slot" :item="item" :readonly="readonly" />
             </template>
-            <!-- 多行文本框 -->
-            <template
-              v-else-if="
-                item.component === 'el-textarea' || item.component === 'textarea'
-              "
-            >
-              <!-- 编辑状态 -->
-              <ElInput
-                v-if="!readonly"
-                type="textarea"
-                :class="[item.controlClass || '']"
-                v-bind="item.props"
-                v-on="item.events"
-              />
-              <!-- 只读状态 -->
-              <div v-else class="ap-form-control--text">
-                {{ item.props.modelValue || emptyText }}
-              </div>
-            </template>
-            <!-- 一般表单控件/全局控件 -->
             <template v-else>
-              <!-- 编辑状态 -->
-              <component
-                :is="item.component"
-                v-if="!readonly"
-                :key="getComponentKey(item.component, item.field)"
-                :class="[item.controlClass || '']"
-                v-bind="item.props"
-                v-on="item.events"
-              />
-              <!-- 只读状态 -->
-              <div v-else class="ap-form-control--text">
-                {{ item.props.modelValue || emptyText }}
-              </div>
+              <!-- 带子组件 -->
+              <template v-if="childComps.includes(getComponentName(item.component))">
+                <!-- 编辑状态 -->
+                <component
+                  :is="item.component"
+                  v-if="!readonly"
+                  :key="getComponentKey(item.component, item.field)"
+                  :class="[item.controlClass || '']"
+                  v-bind="item.props"
+                  v-on="item.events"
+                >
+                  <!-- 子组件选项 -->
+                  <template v-for="opt in item.options" :key="opt[item.valueKey]">
+                    <component
+                      :is="item.childComp"
+                      :item="opt"
+                      :value="opt[item.valueKey!]"
+                      :label="opt[item.labelKey!]"
+                    >
+                      {{ opt[item.labelKey!] }}
+                    </component>
+                  </template>
+                </component>
+                <!-- 只读状态 -->
+                <div v-else class="ap-form-control--text">
+                  {{ getOptionLabel(item.props.modelValue, item) || emptyText }}
+                </div>
+              </template>
+              <!-- 多行文本框 -->
+              <template
+                v-else-if="
+                  item.component === 'el-textarea' || item.component === 'textarea'
+                "
+              >
+                <!-- 编辑状态 -->
+                <ElInput
+                  v-if="!readonly"
+                  type="textarea"
+                  :class="[item.controlClass || '']"
+                  v-bind="item.props"
+                  v-on="item.events"
+                />
+                <!-- 只读状态 -->
+                <div v-else class="ap-form-control--text">
+                  {{ item.props.modelValue || emptyText }}
+                </div>
+              </template>
+              <!-- 一般表单控件/全局控件 -->
+              <template v-else>
+                <!-- 编辑状态 -->
+                <component
+                  :is="item.component"
+                  v-if="!readonly"
+                  :key="getComponentKey(item.component, item.field)"
+                  :class="[item.controlClass || '']"
+                  v-bind="item.props"
+                  v-on="item.events"
+                />
+                <!-- 只读状态 -->
+                <div v-else class="ap-form-control--text">
+                  {{ item.props.modelValue || emptyText }}
+                </div>
+              </template>
             </template>
           </template>
-        </template>
-        <!-- 提示信息 -->
-        <div
-          v-if="item.tips"
-          class="ap-form-control--tip" :class="[item.tipsClass || '']"
-        >
-          {{ item.tips || "" }}
+          <!-- 提示信息 -->
+          <div
+            v-if="item.tips"
+            class="ap-form-control--tip" :class="[item.tipsClass || '']"
+          >
+            {{ item.tips || "" }}
+          </div>
         </div>
       </template>
     </ElFormItem>
@@ -146,7 +149,9 @@ const props = defineProps<{
   /** 表单项配置 */
   item: ReFormItem
 }>()
-
+const emits = defineEmits<{
+  (e: 'formItemClick', val: any): void
+}>()
 /** 生成稳定的组件key，确保组件实例复用 */
 function getComponentKey(component: any, field?: string): string {
   /** 基础key基于组件名称 */
@@ -194,38 +199,15 @@ function getOptionLabel(
   return labelArr.join(joinChar)
 }
 
-/** 防抖时间间隔常量 */
-const DEBOUNCE_INTERVAL = 200
-/** 上次点击时间记录 */
-let lastClickTime = 0
-
 /** 处理表单项点击事件 */
-function handleItemClick(event: MouseEvent) {
-  /** 阻止事件冒泡，避免触发表单其他元素的点击事件 */
-  event.stopPropagation()
-
-  /** 添加防抖逻辑，避免短时间内多次触发 */
-  const currentTime = Date.now()
-  if (currentTime - lastClickTime < DEBOUNCE_INTERVAL) {
-    return // 如果两次点击时间间隔小于防抖时间，则忽略此次点击
-  }
-  lastClickTime = currentTime
-
-  /** 先检查并执行用户传入的click事件 */
-  if (props.item.events && typeof props.item.events.click === 'function') {
-    props.item.events.click(event, props.item)
-  }
-
-  /** 触发自定义事件，传递表单项信息 */
-  const target = event.currentTarget as HTMLElement
-  const customEvent = new CustomEvent('form-item-click', {
+function handleItemClick() {
+  emits('formItemClick', {
     bubbles: true,
     detail: {
       field: props.item.field,
       item: props.item,
     },
   })
-  target.dispatchEvent(customEvent)
 }
 </script>
 

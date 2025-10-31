@@ -21,7 +21,7 @@
         :style="gridTemplateStyle"
       >
         <!-- 表单项列表渲染组件 -->
-        <ReFormRenderItems :items="renderFormItems" :draggable="draggable">
+        <ReFormRenderItems :items="renderFormItems" :draggable="draggable" @form-item-click="computedFormItemClick">
           <!-- 作用域插槽 -->
           <template v-for="slotName in slotsNames[0]" #[slotName]="slotScoped">
             <slot :name="slotName" v-bind="slotScoped" />
@@ -72,9 +72,9 @@
 /** 导入 Vue 组合式 API */
 import { computed, nextTick, onMounted, onUnmounted, provide, ref, unref, useAttrs } from 'vue'
 /** 导入类型定义 */
-import type { ReFormEmits, ReFormProps } from './_types'
+import type { ReFormEmits, ReFormProps, ReGridResponsive } from './_types'
 /** 导入表单组合式函数 */
-import useForm, { useWatchForm } from './_utils/useForm'
+import useForm, { useSyncFormData } from './_utils/useForm'
 /** 导入 lodash 工具函数 */
 import { cloneDeep, isUndefined } from 'lodash'
 /** 导入工具函数 */
@@ -93,6 +93,7 @@ import { ElButton, ElForm, ElFormItem } from 'element-plus'
 import ReFormRenderItems from './components/renderItems.vue'
 /** 导入拖拽排序库 */
 import Sortable from 'sortablejs'
+import { throttle } from '@moluoxixi/utils/_utils/event'
 
 /** 组件选项配置 */
 defineOptions({
@@ -142,22 +143,25 @@ const localItems = computed({
 /** 拖拽功能相关 */
 const draggableContainerRef = ref<HTMLElement>()
 let sortableInstance: Sortable | null = null
-let onEndDebounceTimer: number | null = null // 防抖计时器
+let onEndDebounceTimer: ReturnType<typeof setTimeout> | null = null // 防抖计时器
 
 /** 布局相关计算属性 */
 const $attrs = useAttrs()
 /** 布局类型 */
 const layout = computed(() => props.layout || 'grid')
-/** 有效列数 */
-const effectiveCols = computed(() => {
+/** 有效列数（重命名为 computedCols） */
+const computedCols = computed<ReGridResponsive>(() => {
   if (isUndefined(props.cols)) {
     return { lg: 24, sm: 24, xl: 24, md: 24 }
   }
-  else {
-    return { lg: props.cols, sm: props.cols, xl: props.cols, md: props.cols }
+  if (typeof props.cols === 'number') {
+    const n = props.cols
+    return { lg: n, sm: n, xl: n, md: n }
   }
+  return props.cols as ReGridResponsive
 })
-/** 按钮组栅格占比 */
+//#region 按钮区域宽度计算（依赖 useGridCols 输出）
+/** 按钮组栅格占比（用于计算按钮区域宽度/占比的基础配置） */
 const btnSpanWithDefault = computed(() => {
   if (!isUndefined(props.btnSpan))
     return props.btnSpan
@@ -166,35 +170,11 @@ const btnSpanWithDefault = computed(() => {
 
 /** 使用栅格列数组合式函数 */
 const { gridResponsive, responsiveWidth, localBtnSpan } = useGridCols(
-  effectiveCols,
+  computedCols,
   btnSpanWithDefault,
 )
 
-/** 表单核心状态 - 从useForm获取的核心状态 */
-const {
-  submiting,
-  reFormRef,
-  formData,
-  formRules,
-  formItems,
-  formVisible,
-  formCollapsed,
-  formGroupDependency,
-  clearItemConfigCache,
-  itemConfigCache,
-} = useForm(localItems, props.modelValue, effectiveCols, layout)
-
-/** 使用表单监听组合式函数 */
-const {
-  renderFormItems,
-  formDataProxy,
-} = useWatchForm(
-  formItems,
-  formData,
-  props,
-  emits,
-  itemConfigCache,
-)
+// （移动到按钮区域宽度计算区域之后，避免混入不相关逻辑）
 
 /** 样式相关计算属性 */
 const gridTemplateStyle = computed(() => {
@@ -219,7 +199,7 @@ const gridTemplateStyle = computed(() => {
   return style
 })
 
-/** 按钮组栅格样式 */
+/** 按钮组栅格样式（grid 下使用 span，flex 下按百分比宽度计算） */
 const localBtnSpanStyle = computed<string>(() => {
   /** 如果是grid布局 */
   if (layout.value === 'grid') {
@@ -231,6 +211,35 @@ const localBtnSpanStyle = computed<string>(() => {
     return props.btnSpanStyle || `width: calc(${width}% - ${(props.colGap * (localBtnSpan.value - 1)) / gridResponsive.value}px)`
   }
 })
+//#endregion 按钮区域宽度计算（依赖 useGridCols 输出）
+
+/** 表单核心状态 - 从useForm获取的核心状态 */
+const {
+  submiting,
+  formData,
+  formRules,
+  formItems,
+  formVisible,
+  formCollapsed,
+  formGroupDependency,
+  clearItemConfigCache,
+  itemConfigCache,
+} = useForm(localItems, props.modelValue, computedCols, layout)
+
+/** 使用模板ref持有 ElForm 实例 */
+const reFormRef = ref<InstanceType<typeof ElForm> | null>(null)
+
+/** 使用表单监听组合式函数 */
+const {
+  renderFormItems,
+  formDataProxy,
+} = useSyncFormData(
+  formItems,
+  formData,
+  props,
+  emits,
+  itemConfigCache,
+)
 
 /** 标签和按钮相关计算属性 */
 const labelWidth = computed(() =>
@@ -277,6 +286,11 @@ const slotsNames = computed<[string[], string[]]>(() =>
   getSlotsNames(unref(renderFormItems)),
 )
 
+function fomItemClickHandle(val: any) {
+  emits('formItemClick', val)
+}
+const computedFormItemClick = computed(() => throttle(fomItemClickHandle, 300))
+
 /** 表单功能方法 */
 function autoCollapseByErrors(errors?: Record<string, any>) {
   /** 如果不启用自动展开或没有错误 */
@@ -310,8 +324,8 @@ function autoCollapseByErrors(errors?: Record<string, any>) {
     /** 存在展开变化，重新自动滚动到第一个校验错误字段 */
     nextTick(() => {
       /** 获取表单字段 */
-      const formFields = reFormRef.value.fields.map((field: { prop: any }) =>
-        unref(field.prop),
+      const formFields = (reFormRef.value.fields as any[]).map((field: any) =>
+        unref(field?.prop as any),
       ) as string[]
       /** 查找第一个错误字段 */
       const field = formFields.find(field => errorKeys.includes(field))

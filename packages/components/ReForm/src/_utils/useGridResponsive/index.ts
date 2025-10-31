@@ -31,7 +31,13 @@ export {
 /** 导出类型 */
 export type { ReGridResponsive }
 
-/** 获取媒体查询字符串 */
+/**
+ * 获取媒体查询字符串
+ * 作用：将预设断点键（xs/sm/md/lg/xl）映射为对应的媒体查询表达式；
+ * 若为自定义键（如 ">=1400px" 或 "_1400px"），则把下划线前缀替换为默认比较符（>=）。
+ * @param key 断点键或自定义媒体表达式
+ * @returns 媒体查询表达式字符串
+ */
 export function getMedia(key: string) {
   /** 如果键存在于默认配置中，返回对应的媒体查询 */
   return Reflect.has(DEFAULT_FORM_GRID_RESPONSIVE_ITEMS, key)
@@ -39,7 +45,12 @@ export function getMedia(key: string) {
     : key.replace('_', DEFAULT_CUSTOM_MEDIA_TYPE)
 }
 
-/** 排序响应式配置键名 */
+/**
+ * 对响应式配置键名按媒体尺寸升序排序
+ * 作用：便于后续从大到小或从小到大遍历匹配断点。
+ * @param responsive 响应式栅格配置
+ * @returns 已排序的键名数组（从小到大）
+ */
 export function sortResponsive(responsive: ReGridResponsive): string[] {
   /** 获取所有键名 */
   const allKeys = Object.keys(responsive)
@@ -72,7 +83,13 @@ export function sortResponsive(responsive: ReGridResponsive): string[] {
   })
 }
 
-/** 匹配响应式配置 */
+/**
+ * 根据容器宽度匹配当前生效的栅格列数
+ * 作用：输入当前容器宽度与响应式配置，返回命中的列数；若无匹配使用默认值。
+ * @param width 容器宽度（px）
+ * @param responsive 响应式栅格配置
+ * @returns 当前应生效的列数
+ */
 export function matchResponsive(
   width: number,
   responsive: ReGridResponsive,
@@ -134,7 +151,15 @@ export function matchResponsive(
   return match
 }
 
-/** 规范化响应式栅格配置 */
+/**
+ * 规范化响应式栅格配置
+ * 作用：
+ * - 若传入数字：对所有预设断点统一赋值；
+ * - 若传入对象：缺失的断点按“向上/向下”就近补齐；
+ * - 支持附加自定义断点键（匹配 CUSTOM_MEDIA_TYPE_REGEX）。
+ * @param span 数字或响应式配置对象
+ * @returns 标准化后的响应式配置对象
+ */
 export function normalizeGridResponsive(
   span: number | ReGridResponsive,
 ): ReGridResponsive {
@@ -197,7 +222,14 @@ export function normalizeGridResponsive(
   return responsive
 }
 
-/** 栅格响应式组合式函数 */
+/**
+ * 栅格响应式组合式函数
+ * 作用：监听目标容器尺寸变化，根据响应式配置计算当前列数与尺寸信息。
+ * @param cols 列数配置（数字或响应式对象的 ref）
+ * @param targetDOM 监听尺寸变化的 DOM（默认 document.body）
+ * @param defaultGrid 初始列数（默认 0）
+ * @returns { responsive, gridResponsive, responsiveWidth, responsiveHeight }
+ */
 export default function useGridResponsive(
   cols: Ref<number | ReGridResponsive>,
   targetDOM = document.body,

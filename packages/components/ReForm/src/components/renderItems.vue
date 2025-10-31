@@ -44,7 +44,7 @@
               :style="gridTemplateStyle"
             >
               <!-- 递归渲染子项 -->
-              <ReFormRenderItems :items="item.children">
+              <ReFormRenderItems :items="item.children" @form-item-click="fomItemClickHandle">
                 <!-- 作用域插槽 -->
                 <template
                   v-for="slotName in item.groupSlots[0]"
@@ -64,7 +64,7 @@
       <!-- 普通表单项 -->
       <template v-else>
         <!-- 渲染单个表单项 -->
-        <ReFormRenderItem :item="item">
+        <ReFormRenderItem :item="item" @form-item-click="fomItemClickHandle">
           <!-- 标签插槽 -->
           <template v-if="item.labelSlot" #[item.labelSlot]>
             <slot :name="item.labelSlot" />
@@ -104,7 +104,9 @@ const props = defineProps<{
   /** 是否启用拖拽排序 */
   draggable?: boolean
 }>()
-
+const emits = defineEmits<{
+  (event: 'formItemClick', value: any): void
+}>()
 /** 注入表单上下文 */
 const {
   gridTemplateStyle,
@@ -118,6 +120,10 @@ const {
   itemWidth = computed(() => undefined),
   colGap = computed(() => 16), // 新增colGap注入，默认16px
 } = inject(Symbol.for('ap-re-form')) as any
+
+function fomItemClickHandle(val: any) {
+  emits('formItemClick', val)
+}
 
 /** 提取为单独的方法，提高可读性和可维护性 */
 function getItemStyle(item: ReFormItem): string {

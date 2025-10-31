@@ -4,8 +4,8 @@ import type {
   PendingOperation,
   WorkerMessage,
   WorkerResponse,
-} from '../_types/indexdb.js'
-import { IndexDBManager } from './IndexDBManager.js'
+} from '../_types/indexdb'
+import { IndexDBManager } from './IndexDBManager'
 
 // 使用主键 'key'，不再附加时间戳，结构更轻量
 

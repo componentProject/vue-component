@@ -121,6 +121,9 @@ export function useOptions(props: UseOptionsProps): UseOptionsReturn {
   watch(
     () => [props.options, props.requestUrl, props.requestParams, props.responseDataPath, props.requestHeaders, props.requestParamsType, props.requestMethod],
     async (newVal, oldVal) => {
+      if (newVal.requestUrl) {
+        console.log('isEqual(newVal, oldVal)', isEqual(newVal, oldVal), newVal, oldVal)
+      }
       if (isEqual(newVal, oldVal))
         return
       const [newOptions, requestUrl] = newVal
