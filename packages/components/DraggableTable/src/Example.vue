@@ -59,6 +59,7 @@
         :columns="columns"
         :loading="loading"
         save-type="server"
+        drag-type="draggable"
         :rowdragable="rowdragable"
         :columndragable="columndragable"
         :editable="editable"
