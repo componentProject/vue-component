@@ -145,8 +145,8 @@ const props = withDefaults(defineProps<propsType>(), {
    * 拖拽模式
    * vxe模式下，表格数据发生变化时整个表格会刷新key重新渲染，而draggable模式下不会重新渲染
    */
-  // dragType: 'vxe',
-  dragType: 'draggable',
+  dragType: 'vxe',
+  // dragType: 'draggable',
   /** 需要禁用拖拽的行class */
   rowDisabledClass: '',
   /** 行拖拽配置对象 */
@@ -218,7 +218,7 @@ const props = withDefaults(defineProps<propsType>(), {
   /** 自定义自定义存储弹窗的columns */
   customColumns: () => [
     { type: 'checkbox', width: 45, align: 'center' },
-    { field: 'field', minWidth: 160, title: '字段', treeNode: true, dragSort: true },
+    { field: 'field', dragSort: true, minWidth: 160, title: '字段', treeNode: true, dragSort: true },
     { field: 'title', minWidth: 160, title: '列名称', slots: { default: 'title' } },
     { field: 'width', width: 70, title: '宽度', editable: true, slots: { default: 'input' } },
     { field: 'fixed', width: 100, title: '固定位置', editable: true, params: {
