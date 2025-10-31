@@ -19,6 +19,7 @@ export type types = VxeColumnPropTypes.Type & customCustomTypes
  * DraggableTable 组件的 Props 类型定义
  */
 export interface propsType {
+  resizable: boolean
   //#region 编辑相关
   /** 是否允许编辑 */
   editable: boolean

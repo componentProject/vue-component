@@ -117,6 +117,7 @@ defineOptions({
 })
 // 定义组件属性
 const props = withDefaults(defineProps<propsType>(), {
+  resizable: true,
   //#region 编辑相关
   /** 是否允许编辑 */
   editable: false,
@@ -145,7 +146,6 @@ const props = withDefaults(defineProps<propsType>(), {
    * vxe模式下，表格数据发生变化时整个表格会刷新key重新渲染，而draggable模式下不会重新渲染
    */
   // dragType: 'vxe',
-  // 4.9版本才能用vxe的
   dragType: 'draggable',
   /** 需要禁用拖拽的行class */
   rowDisabledClass: '',
