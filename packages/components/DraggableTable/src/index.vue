@@ -862,7 +862,7 @@ function handleCustomConfigSave({
 const getStorageKey = () => (props.id ? `table_columns_${props.id}` : ``)
 /** 是否不使用内部存储实现 */
 const isNoSave = computed(
-  () => props.customConfig.storage || !['server', 'local'].includes(props.saveType),
+  () => attrs.customConfig?.storage || !['server', 'local'].includes(props.saveType),
 )
 /** 获取本地存储的列配置 */
 async function handleGetStoredColumns(): Promise<ColumnType[]> {
