@@ -215,7 +215,7 @@ const props = withDefaults(defineProps<propsType>(), {
   saveHotKeys: () => ['shift', 'alt', 'ctrl', 'f12'],
   /** 自定义自定义存储弹窗的columns */
   customColumns: () => [
-    { type: 'checkbox', width: 40 },
+    { type: 'checkbox', width: 45, align: 'center' },
     { field: 'field', minWidth: 160, title: '字段', treeNode: true, dragSort: true },
     { field: 'title', minWidth: 160, title: '列名称', slots: { default: 'title' } },
     { field: 'width', width: 70, title: '宽度', editable: true, slots: { default: 'input' } },
