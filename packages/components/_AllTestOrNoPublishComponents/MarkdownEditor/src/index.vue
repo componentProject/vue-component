@@ -47,7 +47,7 @@ import screenfull from 'screenfull'
 import { lineNumbers } from '@codemirror/view'
 import { foldGutter } from '@codemirror/language'
 import ancher from 'markdown-it-anchor'
-import { idbStorage } from '@moluoxixi/utils/_utils'
+import { idbStorage } from '@moluoxixi/utils/_utils/indexdb'
 import type { DocumentListItem, emitsType, ImageData, propsType, SavedDocumentData, slotsType } from './_types'
 
 defineOptions({

@@ -209,7 +209,7 @@ const props = withDefaults(defineProps<propsType>(), {
   //#endregion
   //#region 回车容器相关
   allowSelectNextInEmpty: false,
-  containerType: 'row',
+  containerType: '',
   //#endregion
   //#region 存储相关
   saveType: 'default',
