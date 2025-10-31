@@ -45,6 +45,22 @@ export class IndexDBStorage {
   }
 
   /**
+   * 获取 Worker 文件 URL
+   * 优先使用编译后的 JS 文件，回退到 TS 文件
+   */
+  private getWorker(): string {
+    // 在开发环境中，优先尝试使用 TypeScript 文件
+    if (import.meta.env?.DEV) {
+      const workerUrl = new URL('./indexdb-worker.ts', import.meta.url)
+      return new Worker(workerUrl, { type: 'module' })
+    }
+    else {
+      const workerUrl = new URL('./indexdb-worker.js', import.meta.url).href
+      return new Worker(workerUrl)
+    }
+  }
+
+  /**
    * 初始化 Web Worker
    */
   private initWorker(): void {
@@ -57,10 +73,7 @@ export class IndexDBStorage {
     // 异步初始化 Worker，确保 Vite 正确处理 TypeScript 和 ES 模块
     void (async () => {
       try {
-        // 使用 new URL 构造 Worker URL，Vite 在开发环境会自动处理 TypeScript 转换
-        // 指定 type: 'module' 以支持 ES 模块语法（import/export）
-        const workerUrl = new URL('./indexdb-worker.ts', import.meta.url)
-        this.worker = new Worker(workerUrl, { type: 'module' })
+        this.worker = this.getWorker()
 
         this.setupWorkerHandlers()
 
