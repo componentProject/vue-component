@@ -274,7 +274,7 @@ const computedPagerConfig = computed(() => {
     enabled: props.showPagination,
     currentPage: 1,
     pageSize: 10,
-    total: 100,
+    total: 0,
     pageSizes: [10, 20, 30, 50, 100],
     layouts: [
       'Home',
@@ -446,6 +446,12 @@ const slotNames = computed<string[]>(() => Object.keys(slots) as string[])
 const tableData = defineModel({
   type: Array,
   default: [],
+})
+
+watch(() => tableData.value, (newValue) => {
+  console.log('tableData', newValue)
+}, {
+  immediate: true,
 })
 
 // 表格引用

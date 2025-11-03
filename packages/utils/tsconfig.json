@@ -25,7 +25,7 @@
       "vite/client"
     ],
     "module": "ESNext",
-    "moduleResolution": "nodenext",
+    "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "allowJs": true,
     "strict": true,

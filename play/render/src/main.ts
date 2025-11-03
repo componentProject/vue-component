@@ -95,10 +95,9 @@ async function render(props: QiankunProps) {
   // proxy(container as HTMLElement)
   app = createApp(App)
   const allComponentList = await getList()
-  await idbStorage.setItem(COMPONENT_SETTING_TYPE, JSON.stringify(allComponentList))
-  const isLongRange = true
+  await idbStorage.setItem(COMPONENT_SETTING_TYPE, allComponentList, true)
+  const isLongRange = false
   await registerAllComponent(Vue, app, COMPONENT_SETTING_TYPE, isLongRange)
-  console.log('app', app._context.components, app._context.components.TsFooter)
   // window.$remoteLoad = load
   // const res = await load(Vue)
   // Object.keys(res).forEach((name) => {

@@ -2,7 +2,6 @@
  * IndexDB 模块入口文件
  * 统一导出所有 IndexDB 相关功能
  */
-
 import { IndexDBStorage } from './indexdb'
 // 重新导出类型定义
 export type {
@@ -17,7 +16,7 @@ export type {
 export const idbStorage = new IndexDBStorage({
   dbName: 'DefaultIndexDBStorage',
   storeName: 'default',
-  useWorker: true,
+  useWorker: false,
 })
 
 export { IndexDBStorage } from './indexdb'

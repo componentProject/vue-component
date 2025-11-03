@@ -58,6 +58,7 @@
         user-id="shabi"
         :columns="columns"
         :loading="loading"
+        :row-config="{ height: 60 }"
         save-type="server"
         :rowdragable="rowdragable"
         :columndragable="columndragable"

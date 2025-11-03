@@ -3,24 +3,22 @@
  * 在后台线程中处理 IndexDB 操作，避免阻塞主线程
  */
 
+import type { IndexDBOperation, WorkerMessage, WorkerResponse } from '../_types/indexdb'
 import { IndexDBManager } from './IndexDBManager'
 
-interface WorkerMessage {
-  id: number
-  operation: string
-  args: any[]
-}
-
-interface WorkerResponse {
-  id: number
-  success: boolean
-  result?: any
-  error?: string
-}
-
 interface DBConfig {
-  dbName: string
-  storeName: string
+  dbName?: string
+  storeName?: string
+  /**
+   * 缓存配置
+   */
+  cache?: {
+    /**
+     * 是否启用缓存，默认 false
+     * 启用后，setItem/setItems 会将数据写入缓存，getItem/getItems 会优先从缓存读取
+     */
+    enabled?: boolean
+  }
 }
 
 /**
@@ -35,7 +33,7 @@ class IndexDBWorker {
    */
   public async initDB(): Promise<void> {
     if (!this.dbManager) {
-      throw new Error('Database manager not initialized. Call setConfig first.')
+      throw new Error('数据库管理器未初始化，请先调用 setConfig')
     }
     await this.dbManager.init()
   }
@@ -47,87 +45,72 @@ class IndexDBWorker {
     this.dbManager = new IndexDBManager({
       dbName: config.dbName || 'IndexDBStorage',
       storeName: config.storeName || 'storage',
+      cache: config.cache,
     })
   }
 
   /**
    * 执行 setItem 操作
    */
-  public async setItem(key: string, value: any): Promise<void> {
-    if (!this.dbManager) {
-      throw new Error('Database manager not initialized')
-    }
-    await this.dbManager.setItem(key, value)
+  public async setItem(key: string, value: any, useCache?: boolean): Promise<void> {
+    this.ensureInitialized()
+    await this.dbManager!.setItem(key, value, useCache)
   }
 
   /**
    * 执行 getItem 操作
    */
-  public async getItem(key: string): Promise<any> {
-    if (!this.dbManager) {
-      throw new Error('Database manager not initialized')
-    }
-    return await this.dbManager.getItem(key)
+  public async getItem(key: string): Promise<{ result: any, cacheHit: boolean }> {
+    this.ensureInitialized()
+    return await this.dbManager!.getItem(key)
   }
 
   /**
    * 执行 removeItem 操作
    */
   public async removeItem(key: string): Promise<void> {
-    if (!this.dbManager) {
-      throw new Error('Database manager not initialized')
-    }
-    await this.dbManager.removeItem(key)
+    this.ensureInitialized()
+    await this.dbManager!.removeItem(key)
   }
 
   /**
    * 执行 clear 操作
    */
   public async clear(): Promise<void> {
-    if (!this.dbManager) {
-      throw new Error('Database manager not initialized')
-    }
-    await this.dbManager.clear()
+    this.ensureInitialized()
+    await this.dbManager!.clear()
   }
 
   /**
    * 执行 keys 操作
    */
   public async keys(): Promise<string[]> {
-    if (!this.dbManager) {
-      throw new Error('Database manager not initialized')
-    }
-    return await this.dbManager.keys()
+    this.ensureInitialized()
+    return await this.dbManager!.keys()
   }
 
   /**
    * 执行 length 操作
    */
   public async getLength(): Promise<number> {
-    if (!this.dbManager) {
-      throw new Error('Database manager not initialized')
-    }
-    return await this.dbManager.length()
+    this.ensureInitialized()
+    return await this.dbManager!.length()
   }
 
   /**
    * 执行 setItems 操作（批量设置）
    */
-  public async setItems(items: Array<{ key: string, value: any }>): Promise<void> {
-    if (!this.dbManager) {
-      throw new Error('Database manager not initialized')
-    }
-    await this.dbManager.setItems(items)
+  public async setItems(items: Array<{ key: string, value: any }>, useCache?: boolean): Promise<void> {
+    this.ensureInitialized()
+    await this.dbManager!.setItems(items, useCache)
   }
 
   /**
    * 执行 getItems 操作（批量获取）
    */
-  public async getItems(keys: string[]): Promise<Record<string, any>> {
-    if (!this.dbManager) {
-      throw new Error('Database manager not initialized')
-    }
-    return await this.dbManager.getItems(keys)
+  public async getItems(keys: string[]): Promise<{ result: Record<string, any>, cacheHitCount: number, totalCount: number }> {
+    this.ensureInitialized()
+    return await this.dbManager!.getItems(keys) as any
   }
 
   /**
@@ -136,6 +119,16 @@ class IndexDBWorker {
   public async close(): Promise<void> {
     if (this.dbManager) {
       await this.dbManager.close()
+      this.dbManager = null
+    }
+  }
+
+  /**
+   * 检查数据库管理器是否已初始化
+   */
+  private ensureInitialized(): void {
+    if (!this.dbManager) {
+      throw new Error('数据库管理器未初始化，请先执行 init 操作')
     }
   }
 }
@@ -149,27 +142,47 @@ const workerInstance = new IndexDBWorker()
 globalThis.onmessage = async function (event: MessageEvent<WorkerMessage>) {
   const { id, operation, args } = event.data
 
+  // 验证消息格式
+  if (typeof id !== 'number' || typeof operation !== 'string' || !Array.isArray(args)) {
+    const response: WorkerResponse = {
+      id: id ?? -1,
+      success: false,
+      error: '消息格式无效',
+    }
+    globalThis.postMessage(response)
+    return
+  }
+
   try {
     let result: any
 
-    switch (operation) {
+    switch (operation as IndexDBOperation) {
       case 'init': {
-        const config = args[0] as DBConfig
-        workerInstance.setConfig(config || {})
+        const config = (args[0] as DBConfig) || {}
+        workerInstance.setConfig(config)
         await workerInstance.initDB()
-        result = { success: true }
+        result = undefined
         break
       }
       case 'setItem': {
-        await workerInstance.setItem(args[0], args[1])
+        if (typeof args[0] !== 'string') {
+          throw new TypeError('setItem: 键名必须是字符串类型')
+        }
+        await workerInstance.setItem(args[0], args[1], args[2])
         result = undefined
         break
       }
       case 'getItem': {
+        if (typeof args[0] !== 'string') {
+          throw new TypeError('getItem: 键名必须是字符串类型')
+        }
         result = await workerInstance.getItem(args[0])
         break
       }
       case 'removeItem': {
+        if (typeof args[0] !== 'string') {
+          throw new TypeError('removeItem: 键名必须是字符串类型')
+        }
         await workerInstance.removeItem(args[0])
         result = undefined
         break
@@ -188,11 +201,17 @@ globalThis.onmessage = async function (event: MessageEvent<WorkerMessage>) {
         break
       }
       case 'setItems': {
-        await workerInstance.setItems(args[0])
+        if (!Array.isArray(args[0]) && typeof args[0] !== 'object') {
+          throw new TypeError('setItems: 数据项必须是数组或对象类型')
+        }
+        await workerInstance.setItems(args[0], args[1])
         result = undefined
         break
       }
       case 'getItems': {
+        if (!Array.isArray(args[0])) {
+          throw new TypeError('getItems: 键名必须是数组类型')
+        }
         result = await workerInstance.getItems(args[0])
         break
       }
@@ -202,7 +221,7 @@ globalThis.onmessage = async function (event: MessageEvent<WorkerMessage>) {
         break
       }
       default:
-        throw new Error(`Unknown operation: ${operation}`)
+        throw new Error(`未知操作: ${operation}`)
     }
 
     // 发送成功响应
@@ -218,13 +237,22 @@ globalThis.onmessage = async function (event: MessageEvent<WorkerMessage>) {
     const response: WorkerResponse = {
       id,
       success: false,
-      error: error instanceof Error ? error.message : 'Unknown error',
+      error: error instanceof Error ? error.message : '未知错误',
     }
     globalThis.postMessage(response)
   }
 }
 
-// 错误处理
-globalThis.onerror = function (event: Event | string) {
-  console.error('IndexDB Worker Error:', event)
+// 全局错误处理
+globalThis.onerror = function (event: ErrorEvent | Event | string) {
+  console.error('IndexDB Worker 全局错误:', event)
+  // 发送错误响应（如果可能）
+  if (typeof event === 'object' && 'error' in event) {
+    console.error('错误详情:', event.error)
+  }
+}
+
+// 处理未捕获的 Promise 拒绝
+globalThis.onunhandledrejection = function (event: PromiseRejectionEvent) {
+  console.error('IndexDB Worker 未处理的 Promise 拒绝:', event.reason)
 }
