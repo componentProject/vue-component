@@ -903,7 +903,7 @@ async function bundleComponentModule(ctx: BuildContext, {
         },
       },
     },
-  },typeof ctx?.viteConfig === 'function' ? ctx.viteConfig({ command: 'build', mode: 'production' }) : (ctx?.viteConfig || {})))
+  }, typeof ctx?.viteConfig === 'function' ? ctx.viteConfig({ command: 'build', mode: 'production' }) : (ctx?.viteConfig || {})))
 }
 
 /**
@@ -995,12 +995,12 @@ async function buildComponent(
 
   console.log(`\n========== 开始打包: ${buildName}，版本：${currentVersion} ==========`)
   const esOutputDir = resolve(outputDir, 'es')
-  const libOutputDir = resolve(outputDir, 'lib')
+  // const libOutputDir = resolve(outputDir, 'lib')
   const umdOutputDir = resolve(outputDir, 'umd')
   // const iifeOutputDir = resolve(outputDir, 'iife')
   try {
     await clearDir(esOutputDir)
-    await clearDir(libOutputDir)
+    // await clearDir(libOutputDir)
     await clearDir(umdOutputDir)
     // await clearDir(iifeOutputDir)
     // 使用传入的依赖分析结果
@@ -1062,19 +1062,19 @@ async function buildComponent(
       chunkFileNames: `[name].mjs`,
     }))
 
-    // 打包CJS模块
-    callbacks.push(bundleComponentModule(ctx, {
-      comp,
-      entry,
-      outDir: libOutputDir,
-      format: 'cjs',
-      dependencies,
-      globals,
-      baseConfig,
-      entryFileNames: `[name].cjs`,
-      chunkFileNames: `[name].cjs`,
-      exportsType: 'named',
-    }))
+    // // 打包CJS模块
+    // callbacks.push(bundleComponentModule(ctx, {
+    //   comp,
+    //   entry,
+    //   outDir: libOutputDir,
+    //   format: 'cjs',
+    //   dependencies,
+    //   globals,
+    //   baseConfig,
+    //   entryFileNames: `[name].cjs`,
+    //   chunkFileNames: `[name].cjs`,
+    //   exportsType: 'named',
+    // }))
 
     await Promise.all(callbacks)
 
@@ -1092,7 +1092,7 @@ async function buildComponent(
       name: `@${ctx.LIB_NAMESPACE}${(comp ? `/${comp}` : '/components').toLowerCase()}`,
       version: currentVersion,
       description: `${comp} 组件`,
-      main: 'lib/index.cjs',
+      main: 'umd/index.js',
       module: 'es/index.mjs',
       types: 'es/index.d.ts',
       exports: {
@@ -1102,8 +1102,8 @@ async function buildComponent(
             default: './es/index.mjs',
           },
           require: {
-            types: './lib/index.d.ts',
-            default: './lib/index.cjs',
+            types: './umd/index.d.ts',
+            default: './umd/index.js',
           },
         },
         './es': {
@@ -1114,8 +1114,8 @@ async function buildComponent(
         },
         './lib': {
           require: {
-            types: './lib/index.d.ts',
-            default: './lib/index.cjs',
+            types: './umd/index.d.ts',
+            default: './umd/index.js',
           },
         },
       },
@@ -1224,8 +1224,8 @@ async function buildAllComponents(ctx: BuildContext, shouldPublish = false) {
         if (success)
           successCount++
 
-        // 每个组件打包完成后，主动等待 3 秒,等待内存释放
-        await sleep(3000)
+        // 每个组件打包完成后，主动等待
+        await sleep(200)
       }
       catch (error) {
         console.error(`组件 ${comp} ${shouldPublish ? '打包发布' : '打包'}失败:`, error)
@@ -1252,8 +1252,8 @@ async function doBuild(ctx: BuildContext, mode = 'all', shouldPublish = false) {
   try {
     if (mode === 'all') {
       const librarySuccess = await buildLibrary(ctx, shouldPublish)
-      // 每个组件打包完成后，主动等待 15 秒
-      await sleep(15000)
+      // 每个组件打包完成后，主动等待
+      await sleep(200)
       const componentsSuccess = await buildAllComponents(ctx, shouldPublish)
       return componentsSuccess && librarySuccess
     }

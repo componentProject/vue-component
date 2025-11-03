@@ -34,13 +34,11 @@ import { ElButton, ElMessage } from 'element-plus'
 
 defineOptions({ name: '调试与演示iife和umd' })
 // 调试与演示组件库的组件，直接修改组件名
-const componentName = ref('DesignForm')
+// const componentName = ref('DesignForm')
+const componentName = ref('DraggableTable')
 
 function getComponentProps(item: any) {
-  const config = componentData[item.componentCode] || {}
-  // 创建新对象，避免直接修改原始数据
-  const props = { ...config }
-
+  const props = componentData[item.componentCode] || {}
   // 根据绑定类型处理数据绑定
   if (props.bindings && props.bindings.length) {
     props.bindings.forEach((binding: string) => {
@@ -70,7 +68,7 @@ function getComponentProps(item: any) {
       }
       // 处理v-model绑定（包括变体）
       if (isModelBinding) {
-        props[modelKey] = config[prop]
+        props[modelKey] = props[prop]
         props[`onUpdate:${modelKey}`] = (value: any) => {
           console.log(`${prop} updated:`, value)
           // 实际更新配置值
@@ -81,14 +79,12 @@ function getComponentProps(item: any) {
       }
       else {
         // 普通属性绑定
-        props[type] = config[prop]
+        props[type] = props[prop]
       }
     })
   }
 
-  // 删除不需要传递给组件的配置属性
-  delete props.bindings
-
+  console.log('props', props)
   return props
 }
 

@@ -1,22 +1,22 @@
-const statusMap = {
-  1: '一',
-  2: '二',
-  3: '三',
-}
-export default {
+import { reactive } from 'vue'
+
+const props = reactive({
   // 基础数据
+  pagerConfig: {
+    enable: true,
+    total: 0,
+    currentPage: 1,
+    pageSize: 30,
+  },
+  loading: false,
+  tableData: [],
+  showPagination: true,
   columns: [
     { type: 'seq', title: '', width: 60 },
     {
       field: 'id',
       title: 'ID',
       width: 60,
-      formatter: ({ row }) => {
-        return statusMap[row.id] || row
-      },
-      filterFormatter: ({ value }) => {
-        return statusMap[value] || value
-      },
     },
     { field: 'name', title: '姓名', width: 120 },
     { field: 'age', title: '年龄', sortable: true },
@@ -48,11 +48,6 @@ export default {
       },
     },
   ],
-  tableData: [
-    { id: 1, name: '张三', age: '' },
-    { id: 2, name: '李四', age: '' },
-    { id: 3, name: '王五', age: '18' },
-  ],
   id: '123456789321',
   pageId: '123456789321321',
   userId: '123456789321',
@@ -64,7 +59,39 @@ export default {
     title: '个性化列配置1111',
     zIndex: 10000,
   },
+  onPageChange: pageChange,
   // columndragable: true,
   // 数据绑定配置
   bindings: ['v-model=tableData'],
+})
+let id = 0
+const data = Array.from({ length: 10000 }).map(() => ({
+  id: id++,
+  name: `张${id}`,
+  age: 28,
+  sex: '1',
+  address: '北京市朝阳区',
+  phone: '13800000001',
+  email: 'zhangsan@example.com',
+  status: 1,
+  createTime: '2023-01-01 12:30',
+}))
+
+function pageChange({ pageSize, currentPage }) {
+  props.pagerConfig.currentPage = currentPage
+  props.pagerConfig.pageSize = pageSize
+  handlePageData()
 }
+
+function handlePageData() {
+  props.loading = true
+  setTimeout(() => {
+    const { pageSize, currentPage } = props.pagerConfig
+    props.pagerConfig.total = data.length
+    props.tableData = data.slice((currentPage - 1) * pageSize, currentPage * pageSize)
+    console.log('props.tableData', props.tableData, props)
+    props.loading = false
+  }, 100)
+}
+handlePageData()
+export default props
