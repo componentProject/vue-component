@@ -307,8 +307,9 @@ export class IndexDBManager {
   public async getItem(key: string): Promise<{ result: any, cacheHit: boolean }> {
     this.validateKey(key)
 
-    // 如果启用了缓存，优先从缓存读取
-    if (this.cacheEnabled && this.cache.has(key)) {
+    // 优先从缓存读取（无论是否启用类级别的缓存，只要缓存中有数据就可以读取）
+    // 这样可以支持单次操作级别的缓存（useCache=true）
+    if (this.cache.has(key)) {
       return { result: this.cache.get(key), cacheHit: true }
     }
 
@@ -555,44 +556,32 @@ export class IndexDBManager {
     }
 
     let cacheHitCount = 0
-
-    // 如果启用了缓存，先尝试从缓存读取
-    if (this.cacheEnabled) {
-      const result: Record<string, any> = {}
-      const uncachedKeys: string[] = []
-
-      for (const key of keys) {
-        if (this.cache.has(key)) {
-          result[key] = this.cache.get(key)
-          cacheHitCount++
-        }
-        else {
-          uncachedKeys.push(key)
-        }
-      }
-
-      // 如果有未缓存的 key，从数据库读取
-      if (uncachedKeys.length > 0) {
-        const promises = uncachedKeys.map(key => this.getItem(key))
-        const itemResults = await Promise.all(promises)
-        for (let i = 0; i < uncachedKeys.length; i++) {
-          const itemResult = itemResults[i]
-          result[uncachedKeys[i]] = itemResult.result || itemResult
-        }
-      }
-
-      return { result, cacheHitCount, totalCount: keys.length } as any
-    }
-
-    // 如果未启用缓存，直接从数据库读取
-    const promises = keys.map(key => this.getItem(key))
-    const itemResults = await Promise.all(promises)
     const result: Record<string, any> = {}
-    for (let i = 0; i < keys.length; i++) {
-      const itemResult = itemResults[i]
-      result[keys[i]] = itemResult.result || itemResult
+    const uncachedKeys: string[] = []
+
+    // 先尝试从缓存读取（无论是否启用类级别的缓存，只要缓存中有数据就可以读取）
+    // 这样可以支持单次操作级别的缓存（useCache=true）
+    for (const key of keys) {
+      if (this.cache.has(key)) {
+        result[key] = this.cache.get(key)
+        cacheHitCount++
+      }
+      else {
+        uncachedKeys.push(key)
+      }
     }
-    return { result, cacheHitCount: 0, totalCount: keys.length } as any
+
+    // 如果有未缓存的 key，从数据库读取
+    if (uncachedKeys.length > 0) {
+      const promises = uncachedKeys.map(key => this.getItem(key))
+      const itemResults = await Promise.all(promises)
+      for (let i = 0; i < uncachedKeys.length; i++) {
+        const itemResult = itemResults[i]
+        result[uncachedKeys[i]] = itemResult.result || itemResult
+      }
+    }
+
+    return { result, cacheHitCount, totalCount: keys.length } as any
   }
 
   /**
