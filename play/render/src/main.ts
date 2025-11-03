@@ -95,7 +95,7 @@ async function render(props: QiankunProps) {
   // proxy(container as HTMLElement)
   app = createApp(App)
   const allComponentList = await getList()
-  await idbStorage.setItem(COMPONENT_SETTING_TYPE, JSON.stringify(allComponentList))
+  await idbStorage.setItem(COMPONENT_SETTING_TYPE, allComponentList)
   const isLongRange = true
   await registerAllComponent(Vue, app, COMPONENT_SETTING_TYPE, isLongRange)
   console.log('app', app._context.components, app._context.components.TsFooter)

@@ -6,6 +6,25 @@ export interface MinimalOptions {
   dbName?: string
   storeName?: string
   useWorker?: boolean
+  /**
+   * 性能监控配置
+   */
+  performance?: {
+    /**
+     * 是否启用性能监控（耗时打印），默认 true
+     */
+    enabled?: boolean
+  }
+  /**
+   * 缓存配置
+   */
+  cache?: {
+    /**
+     * 是否启用缓存，默认 false
+     * 启用后，setItem/setItems 会将数据写入缓存，getItem/getItems 会优先从缓存读取
+     */
+    enabled?: boolean
+  }
 }
 
 export interface StorageRecord {
