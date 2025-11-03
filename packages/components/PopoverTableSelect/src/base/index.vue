@@ -3,7 +3,7 @@
     :visible="popoverVisible"
     virtual-triggering
     :virtual-ref="props.virtualRef"
-    v-bind="props.popoverProps"
+    v-bind="computedPopoverProps"
   >
     <div ref="popoverRef">
       <slot name="default" />
@@ -43,29 +43,7 @@ defineOptions({
 })
 
 const props = withDefaults(defineProps<basePropsType>(), {
-  popoverProps: () => ({
-    placement: 'bottom',
-    trigger: 'hover',
-    title: '',
-    effect: 'light',
-    content: '',
-    disabled: false,
-    offset: 12,
-    transition: 'el-fade-in-linear',
-    showArrow: true,
-    popperOptions: {
-      modifiers: [{ name: 'computeStyles', options: { gpuAcceleration: false } }],
-    },
-    popperClass: '',
-    popperStyle: '',
-    showAfter: 0,
-    hideAfter: 200,
-    autoClose: 0,
-    tabindex: undefined,
-    teleported: true,
-    persistent: true,
-    width: 400,
-  }),
+  popoverProps: () => ({}),
   height: 300,
   id: 'popoverTableSelect',
   columns: () => [],
@@ -79,6 +57,40 @@ const emit = defineEmits<baseEmitsType>()
 const slots = defineSlots<slotsType>()
 
 const slotNames = computed<string[]>(() => Object.keys(slots) as string[])
+
+const computedPopoverProps = computed(() => {
+  const popoverProps = {
+    popperStyle: {},
+    placement: props.placement || 'bottom',
+    trigger: 'hover',
+    title: '',
+    effect: 'light',
+    content: '',
+    disabled: false,
+    offset: 12,
+    transition: 'el-fade-in-linear',
+    showArrow: true,
+    popperOptions: {
+      modifiers: [{ name: 'computeStyles', options: { gpuAcceleration: false } }],
+    },
+    popperClass: '',
+    showAfter: 0,
+    hideAfter: 200,
+    autoClose: 0,
+    tabindex: undefined,
+    teleported: true,
+    persistent: true,
+    width: props.width || 400,
+    ...props.popoverProps,
+  }
+  if (props.zIndex) {
+    popoverProps.popperStyle = {
+      zIndex: props.zIndex,
+      ...popoverProps.popperStyle,
+    }
+  }
+  return popoverProps
+})
 const popoverVisible = defineModel({
   type: Boolean,
   default: false,

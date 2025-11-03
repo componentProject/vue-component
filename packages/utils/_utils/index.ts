@@ -1,5 +1,2 @@
-export * from './base.ts'
-export * from './date.ts'
-export * from './event.ts'
-export * from './indexdb.ts'
-export * from './object.ts'
+export * from './base'
+export * from './object'

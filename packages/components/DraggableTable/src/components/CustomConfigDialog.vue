@@ -7,7 +7,20 @@
     >
       <VxeGrid
         ref="xTable"
-        v-bind="gridProps"
+        border
+        show-overflow="title"
+        show-header-overflow="title"
+        show-footer-overflow="title"
+        :header-cell-style="{ height: '32px' }"
+        :header-cell-config="{ height: 32 }"
+        :cell-config="{ height: 32 }"
+        height="100%"
+        :columns="computedColumns"
+        :checkbox-config="computedCheckboxConfig"
+        :row-config="computedRowConfig"
+        :row-drag-config="computedRowDragConfig"
+        :tree-config="computedTreeConfig"
+        :data="computedGridData"
       >
         <template #title="{ row }">
           <div>{{ getTypeName(row.type) || row.title }}</div>
@@ -67,7 +80,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, ref, useTemplateRef } from 'vue'
+import { computed, ref, useTemplateRef, watch } from 'vue'
 import { ElButton, ElCheckbox, ElInput, ElSwitch } from 'element-plus'
 import { getTypeName } from '@moluoxixi/components/DraggableTable/src/_utils'
 import type { CustomConfigDialogEmitsType, CustomConfigDialogPropsType } from '@moluoxixi/components/DraggableTable/src/_types'
@@ -101,12 +114,12 @@ const computedDialogProps = computed(() => {
 const computedPopperStyle = computed(() => {
   if (props.dialogProps?.zIndex) {
     return {
-      'z-index': `${props.dialogProps.zIndex + 1}`,
+      zIndex: props.dialogProps.zIndex + 1,
     }
   }
   else {
     return {
-      'z-index': 1001,
+      zIndex: 1001,
     }
   }
 })
@@ -147,37 +160,29 @@ watch(() => visible.value, (v: boolean) => {
 }, {
   immediate: true,
 })
-const gridProps = computed(() => {
-  return {
-    border: true,
-    showOverflow: 'title',
-    showHeaderOverflow: 'title',
-    showFooterOverflow: 'title',
-    headerCellConfig: { height: 32 },
-    cellConfig: { height: 32 },
-    height: '100%',
-    columns: props.customColumns,
-    checkboxConfig: { checkField: 'visible' },
-    rowConfig: {
-      // useKey: true,
-      // resizable: true,
-      drag: true,
-    },
-    rowDragConfig: {
-      isPeerDrag: true,
-      showGuidesStatus: true,
-      showIcon: false,
-      trigger: 'row',
-    },
-    treeConfig: {
-      expandAll: true,
-      transform: true,
-      rowField: 'id',
-      parentField: 'parentId',
-    },
-    data: tableData.value,
-  }
-})
+const computedColumns = computed(() => props.customColumns)
+const computedCheckboxConfig = computed(() => ({
+  checkField: 'visible',
+}))
+const computedRowConfig = computed(() => ({
+  // useKey: true,
+  // resizable: true,
+  height: 32,
+  drag: true,
+}))
+const computedRowDragConfig = computed(() => ({
+  isPeerDrag: true,
+  showGuidesStatus: true,
+  showIcon: true,
+  trigger: 'cell',
+}))
+const computedTreeConfig = computed(() => ({
+  expandAll: true,
+  transform: true,
+  rowField: 'id',
+  parentField: 'parentId',
+}))
+const computedGridData = computed(() => tableData.value)
 const isCommon = ref(false)
 
 function handleEvent(type: 'confirm' | 'reset' | 'cancel') {

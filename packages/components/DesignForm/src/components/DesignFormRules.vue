@@ -36,8 +36,6 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
 import { ElButton, ElMessageBox } from 'element-plus'
-import Tabs from '@moluoxixi/components/Tabs'
-import ReForm from '@moluoxixi/components/ReForm'
 import { formItemConfig as defaultFormItemConfig } from '../datas/formData'
 import { deepClone } from '../utils/formSerializer'
 import { debounce } from 'lodash'
@@ -133,11 +131,17 @@ function setFormItemConfig(item: SelectedItem | null | undefined): void {
   Object.keys(item).forEach((key: string) => {
     if (key === 'component') {
       const componentInstance = item[key] as ComponentInstance
-      if (componentInstance.name === 'ElInput' && item?.props?.type === 'textarea') {
-        itemObj[key] = 'ElTextarea'
+      const isObjectComponent = typeof componentInstance === 'object'
+      if (isObjectComponent) {
+        itemObj[key] = componentInstance.name
       }
       else {
-        itemObj[key] = componentInstance.name
+        if (componentInstance.name === 'ElInput' && item?.props?.type === 'textarea') {
+          itemObj[key] = 'ElTextarea'
+        }
+        else {
+          itemObj[key] = componentInstance
+        }
       }
     }
     else if (key === 'props') {

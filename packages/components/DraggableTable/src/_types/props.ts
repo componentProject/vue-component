@@ -19,25 +19,7 @@ export type types = VxeColumnPropTypes.Type & customCustomTypes
  * DraggableTable 组件的 Props 类型定义
  */
 export interface propsType {
-  //#region 其他原始配置加默认值
-  /** 是否显示表格边框 */
-  border: boolean
-  /** 表格列对齐方式 */
-  align: VxeTablePropTypes.Align
-  /** 表格内容溢出隐藏并显示tooltip */
-  showOverflow: VxeTablePropTypes.ShowOverflow
-  /** 头部溢出隐藏并显示tooltip */
-  showHeaderOverflow: VxeTablePropTypes.ShowOverflow
-  /** 底部溢出隐藏并显示tooltip */
-  showFooterOverflow: VxeTablePropTypes.ShowOverflow
   resizable: boolean
-  /** 是否自动调整列宽 */
-  autoResize: boolean
-  /** 是否允许列宽拖拽 */
-  /** 列宽拖拽配置 */
-  resizableConfig: VxeTablePropTypes.ResizableConfig
-  //#endregion
-
   //#region 编辑相关
   /** 是否允许编辑 */
   editable: boolean
@@ -106,23 +88,9 @@ export interface propsType {
   virtualYConfig: VxeTablePropTypes.VirtualYConfig
   //#endregion
 
-  //#region 右键菜单配置
-  /** 头部右键菜单是否允许配置列隐藏显示 */
-  menuConfigColumn: boolean
-  menuConfig: VxeTablePropTypes.MenuConfig
-  //#endregion
-
   //#region 排序相关配置
   sortable: boolean
   sortConfig: VxeTablePropTypes.SortConfig
-  //#endregion
-
-  //#region 自定义相关配置
-  customConfig: VxeTablePropTypes.CustomConfig
-  //#endregion
-
-  //#region 鼠标相关配置
-  mouseConfig: VxeTablePropTypes.MouseConfig
   //#endregion
 
   //#region 分页配置

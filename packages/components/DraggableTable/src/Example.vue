@@ -1,5 +1,5 @@
 <template>
-  <div class="draggable-table-demo">
+  <div class="h-full flex flex-col">
     <h2>可拖拽表格演示</h2>
     <div class="demo-actions">
       <ElButton @click="addRow">
@@ -38,24 +38,27 @@
         />
       </div>
     </div>
-    <ElButton @click="loading = !loading">
-      转变loading
-    </ElButton>
-    <ElButton @click="handleValidate">
-      校验表格
-    </ElButton>
+    <div>
+      <ElButton @click="loading = !loading">
+        转变loading
+      </ElButton>
+      <ElButton @click="handleValidate">
+        校验表格
+      </ElButton>
+    </div>
     <!-- 使用DraggableTable组件 -->
-    <div class="border-2">
+    <div class="border-2 flex-1-hidden">
       <aDraggableTable
         id="demo_table_12355666"
         ref="draggableTableRef"
         v-model="tableData"
+        :pager-config="pagerConfig"
         class="p-[8px]!"
         page-id="page1"
         user-id="shabi"
         :columns="columns"
         :loading="loading"
-        :height="500"
+        :row-config="{ height: 60 }"
         save-type="server"
         :rowdragable="rowdragable"
         :columndragable="columndragable"
@@ -63,13 +66,22 @@
         :filterable="filterable"
         :sortable="sortable"
         show-pagination
-        @page-change="pageChangeHandler"
+        @page-change="pageChange"
       >
         <!-- 自定义操作列插槽 -->
         <template #aaa>
           <TsButton show-type="disabled" content="你好" disabled type="danger" size="small">
             aaa自定义插槽按钮
           </TsButton>
+        </template>
+        <template #name>
+          <TsSelect :options="options" />
+        </template>
+        <template #name1>
+          <TsSelect :options="options" />
+        </template>
+        <template #sex>
+          <TsSelect :options="options" />
         </template>
       </aDraggableTable>
     </div>
@@ -92,72 +104,65 @@ const sortable = ref(true)
 // 表格引用
 const draggableTableRef = useTemplateRef('draggableTableRef')
 
+let id = 0
+const data = Array.from({ length: 10000 }).map(() => ({
+  id: id++,
+  name: `张${id}`,
+  age: 28,
+  sex: '1',
+  address: '北京市朝阳区',
+  phone: '13800000001',
+  email: 'zhangsan@example.com',
+  status: 1,
+  createTime: '2023-01-01 12:30',
+}))
 // 表格数据
-const tableData = ref([
-  {
-    id: 1,
-    name: '张三',
-    age: 28,
-    sex: '1',
-    address: '北京市朝阳区',
-    phone: '13800000001',
-    email: 'zhangsan@example.com',
-    status: 1,
-    createTime: '2023-01-01',
-  },
-  {
-    id: 2,
-    name: '李四',
-    age: 32,
-    sex: '1',
-    address: '上海市浦东新区',
-    phone: '13800000002',
-    email: 'lisi@example.com',
-    status: 2,
-    createTime: '2023-01-02',
-  },
-  {
-    id: 3,
-    name: '王五',
-    age: 45,
-    sex: '1',
-    address: '广州市天河区',
-    phone: '13800000003',
-    email: 'wangwu@example.com',
-    status: 3,
-    createTime: '2023-01-03',
-  },
-  {
-    id: 4,
-    name: '赵六',
-    age: 36,
-    sex: '1',
-    address: '深圳市南山区',
-    phone: '13800000004',
-    email: 'zhaoliu@example.com',
-    status: 1,
-    createTime: '2023-01-04',
-  },
-  {
-    id: 5,
-    name: '孙七',
-    age: 29,
-    sex: '1',
-    address: '杭州市西湖区',
-    phone: '13800000005',
-    email: 'sunqi@example.com',
-    status: 2,
-    createTime: '2023-01-05',
-  },
-])
+const tableData = ref([])
+
+const pagerConfig = ref({
+  enable: true,
+  total: 0,
+  currentPage: 1,
+  pageSize: 30,
+})
+const options = ref([{
+  label: '男',
+  value: '1',
+}, {
+  label: '女',
+  value: '2',
+}])
+
+function pageChange({ pageSize, currentPage }) {
+  pagerConfig.value.currentPage = currentPage
+  pagerConfig.value.pageSize = pageSize
+  handlePageData()
+}
+
+function handlePageData() {
+  loading.value = true
+  setTimeout(() => {
+    const { pageSize, currentPage } = pagerConfig.value
+    pagerConfig.value.total = data.length
+    tableData.value = data.slice((currentPage - 1) * pageSize, currentPage * pageSize)
+    loading.value = false
+  }, 100)
+}
+
+onMounted(() => {
+  handlePageData()
+})
 
 // 列配置
 const columns = ref([
   { field: 'sql', type: 'seq', width: 70 },
-  { field: 'createTime', title: '日期', width: 150 },
+  { dragSort: true, field: 'createTime', title: '日期', width: 150 },
   {
     field: 'sex',
     title: 'Sex1',
+    slots: {
+      default: 'sex',
+    },
     options: [
       {
         label: '男',
@@ -175,6 +180,9 @@ const columns = ref([
     min: 3,
     max: 10,
     required: true,
+    slots: {
+      default: 'name',
+    },
   },
   {
     field: 'name1',
@@ -182,20 +190,33 @@ const columns = ref([
     min: 3,
     max: 10,
     required: true,
+    slots: {
+      default: 'name1',
+    },
   },
   {
     field: 'age1',
     title: 'Age1',
+    slots: {
+      default: 'age1',
+    },
     children: [
       { field: 'bbb', title: 'bbb', width: 140 },
-      { field: 'baaa', title: 'baaa', width: 120, children: [
-        { field: 'dddd', title: 'dddd', width: 120 },
-        { field: 'gggg', title: 'gggg', width: 220 },
-      ] },
+      {
+        field: 'baaa',
+        title: 'baaa',
+        width: 120,
+        children: [
+          { field: 'dddd', title: 'dddd', width: 120 },
+          { field: 'gggg', title: 'gggg', width: 220 },
+        ],
+      },
 
     ],
   },
-  { field: 'aaa', title: '操作' },
+  { field: 'aaa', title: '操作', slots: {
+    default: 'aaa',
+  } },
 ])
 
 const cellType = ref({})
@@ -263,9 +284,7 @@ const cellTypeList = ref([
     },
   },
 ])
-function pageChangeHandler(params) {
-  console.log('params', params)
-}
+
 function changeCellType(type: any) {
   const item = columns.value.at(-3)
   columns.value[columns.value.length - 3] = {

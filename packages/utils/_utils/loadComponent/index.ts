@@ -1,5 +1,5 @@
 import { getDownLoadByIds } from '@moluoxixi/utils/_api'
-import { idbStorage } from '@moluoxixi/utils/_utils/indexdb.ts'
+import { idbStorage } from '@moluoxixi/utils/_utils/indexdb'
 import { COMPONENT_SETTING_TYPE, COMPONENT_VUE2_SETTING_TYPE } from '@moluoxixi/constant'
 import { getesComponent } from './esmodule.ts'
 import * as vueShared from '@vue/shared'
@@ -87,9 +87,8 @@ function getVueVersion(Vue: any): 'Vue2' | 'Vue3' {
 export async function registerAllComponent(Vue: any, app: any, type?: string, isLongRange = false, moduleType: string = 'umd') {
   const vueVersion = getVueVersion(Vue)
   const componentItemKey = type ?? vueVersion
-  const allComponentListStr = await idbStorage.getItem(componentItemKey)
   isString(componentItemKey)
-  const allComponentList: any[] = JSON.parse(allComponentListStr!)
+  const allComponentList: any[] = await idbStorage.getItem(componentItemKey)
   allComponentList.forEach((item) => {
     const loadingComponent = {
       name: 'AsyncLoading',
@@ -107,6 +106,10 @@ export async function registerAllComponent(Vue: any, app: any, type?: string, is
     app.component(item.componentCode, Vue.defineAsyncComponent({
       async loader() {
         const component = await loadRemoteComponent(Vue, item.componentCode, allComponentList, moduleType, isLongRange)
+        if (!component) {
+          console.error(`${item.componentCode}解析失败，请检查`)
+          return errorComponent
+        }
         return component.default || component
       },
       loadingComponent,
@@ -120,8 +123,13 @@ function getiifeComponent(Vue: any, vueShared: any, componentCode: string, compo
   return new Function(
     'Vue',
     'vueShared',
+    'process',
     `return function(){${componentCode} return ${componentName}}`,
-  )(Vue, vueShared)()
+  )(Vue, vueShared, {
+    env: {
+      NODE_ENV: 'production',
+    },
+  })()
 }
 
 function getumdComponent(Vue: any, vueShared: any, componentCode: string, componentName: string, componentMapping: Record<string, any> = {}) {
@@ -139,12 +147,18 @@ function getumdComponent(Vue: any, vueShared: any, componentCode: string, compon
   // })
   //
   // console.log(componentName, dependencyArrays)
+  const replaceStr = componentCode.replace('(this, (function(', '(_this, (function(')
   // eslint-disable-next-line no-new-func
   new Function(
     '_this',
+    'process',
     'globalThis',
-    componentCode.replace('this', '_this'),
-  )(componentMapping)
+    replaceStr,
+  )(componentMapping, {
+    env: {
+      NODE_ENV: 'production',
+    },
+  })
   return componentMapping[componentName]
 }
 /**
@@ -160,20 +174,20 @@ export async function loadRemoteComponent(Vue: any, componentName: string, allCo
   if (!isLongRange) {
     const componentItemKey = getVueVersion(Vue)
     const idbComponentData = await idbStorage.getItem(`${componentItemKey}_${componentName}`)
-    componentData = idbComponentData ? JSON.parse(idbComponentData) : ''
+    componentData = idbComponentData || ''
     const componentItem = await idbStorage.getItem(componentItemKey)
 
-    const params = componentItem ? JSON.parse(componentItem).find((el: any) => el.componentCode === componentName) : {}
+    const params = componentItem ? componentItem.find((el: any) => el.componentCode === componentName) : {}
     if (!componentData || params.id !== componentData.id || !componentData?.content) {
       const componentDownList = await getDownLoadByIds(allComponentList.filter((item: any) => componentName == item.componentCode).map((i: any) => i.id))
       componentData = componentDownList[0]
       await idbStorage.setItem(
         `${componentItemKey}_${componentName}`,
-        JSON.stringify({
+        {
           id: params.id,
           componentCode: componentName,
           content: componentData.content,
-        }),
+        },
       )
     }
   }
@@ -195,9 +209,8 @@ export async function loadRemoteComponent(Vue: any, componentName: string, allCo
 export async function load(Vue: any, originComponentNames: string[], type?: string, moduleType?: string, isLongRange?: boolean) {
   const vueVersion = getVueVersion(Vue)
   const componentItemKey = type ?? vueVersion
-  const allComponentListStr = await idbStorage.getItem(componentItemKey)
   isString(componentItemKey)
-  const allComponentList: any[] = JSON.parse(allComponentListStr!)
+  const allComponentList: any[] = await idbStorage.getItem(componentItemKey)
   const componentNames
     = originComponentNames?.length > 0
       ? originComponentNames

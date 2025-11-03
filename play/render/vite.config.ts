@@ -17,7 +17,7 @@ export default viteConfig(
           VITE_GLOB_APP_CODE: viteEnv.VITE_GLOB_APP_CODE,
           VITE_DEVTOOLS: false,
           VITE_PURE_CONSOLE_AND_DEBUGGER: false,
-          VITE_PORT: 3300,
+          VITE_PORT: 3301,
           VITE_OPEN: false,
           VITE_USE_QIANKUN: true,
           VITE_QIANKUN_DEV: false,

@@ -5,7 +5,7 @@
       :format="valueFormat"
       :value-format="valueFormat"
       size="small"
-      type="date"
+      :type="computedType"
       v-bind="renderOptsProps"
       :model-value="currRow[currColumn.field]"
       @update:model-value="(val: string[]) => {
@@ -48,7 +48,7 @@ import type { objType } from '@moluoxixi/components/_types'
 import type { editRendererPropsType } from './_types'
 import { ElInput } from 'element-plus'
 import { computed, ref, watch } from 'vue'
-import { detectDateFormatByReplace, getMomentIsValidIsNoNum } from '@moluoxixi/utils/_utils'
+import { detectDateFormatByReplace, getMomentIsValidIsNoNum } from '@moluoxixi/utils/_utils/date'
 
 const props = defineProps<editRendererPropsType>()
 
@@ -64,6 +64,13 @@ function load() {
   const { row, column } = renderParams
   currRow.value = row
   currColumn.value = column
+}
+
+function clearEdit() {
+  const xTable = props.renderParams?.$grid
+  if (xTable) {
+    xTable.clearEdit()
+  }
 }
 
 function validateHandle() {
@@ -85,7 +92,14 @@ const currentValue = computed<any>(() => {
 
 const propsOptions = computed(() => renderOptsProps.value.options)
 const valueFormat = computed(() => detectDateFormatByReplace(currentValue.value))
-
+const computedType = computed(() => {
+  if (valueFormat.value.includes('H')) {
+    return 'datetime'
+  }
+  else {
+    return 'date'
+  }
+})
 // 判断是否为日期类型
 const isDateType = computed(() => getMomentIsValidIsNoNum(currentValue.value))
 
