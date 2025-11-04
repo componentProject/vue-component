@@ -166,7 +166,9 @@ ${linksText}`
 <Contributors id="${componentId}" />`
 
   // 将内容添加到页脚
-  append.footers.push(sourceSection, isComponent ? contributorsSection : '')
+  if (isComponent) {
+    append.footers.push(sourceSection, contributorsSection)
+  }
 
   return code
 }

@@ -38,7 +38,7 @@ export function setWebUpload(data: any) {
   })
 }
 //获取组件列表
-export async function getList(data: any) {
+export async function getList(data?: any) {
   const res = await httpApi.post('file/getList', {
     productCode: 'webFile_his',
     vue: [COMPONENT_SETTING_TYPE],

@@ -16,6 +16,7 @@ import ReForm from '@moluoxixi/components/ReForm'
 import TsCheckbox from '@moluoxixi/components/TsCheckbox'
 import TsRadio from '@moluoxixi/components/TsRadio'
 import DesignForm from '@moluoxixi/components/DesignForm'
+import QrCode from '@moluoxixi/components/QrCode'
 
 // 导出 hooks
 export * from './_hooks'
@@ -29,6 +30,7 @@ export {
   ExportExcel,
   ImportExcel,
   PopoverTableSelect,
+  QrCode,
   ReForm,
   Tabs,
   Tree,
@@ -39,7 +41,7 @@ export {
   TsSelect,
 }
 
-const components: Component[] = [TsFooter, DragModalDialog, DateRangePicker, DraggableTable, EnterNextContainer, ExportExcel, ImportExcel, TsButton, TsCheckbox, TsRadio, PopoverTableSelect, TsSelect, Tabs, Tree, ReForm, DesignForm]
+const components: Component[] = [TsFooter, DragModalDialog, DateRangePicker, DraggableTable, EnterNextContainer, ExportExcel, ImportExcel, TsButton, TsCheckbox, TsRadio, PopoverTableSelect, TsSelect, Tabs, Tree, ReForm, DesignForm, QrCode]
 
 export default {
   install(app: App) {

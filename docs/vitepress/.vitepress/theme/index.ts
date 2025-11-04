@@ -30,7 +30,7 @@ export default define<Theme>({
   Layout,
   async enhanceApp({ app }: { app: VueApp }) {
     const allComponentList = await getList()
-    await idbStorage.setItem(COMPONENT_SETTING_TYPE, JSON.stringify(allComponentList))
+    await idbStorage.setItem(COMPONENT_SETTING_TYPE, allComponentList)
     const isLongRange = false
     await registerAllComponent(Vue, app, COMPONENT_SETTING_TYPE, isLongRange)
     // 注册vue-component组件库
