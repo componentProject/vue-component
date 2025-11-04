@@ -58,7 +58,8 @@
         user-id="shabi"
         :columns="columns"
         :loading="loading"
-        :row-config="{ height: 60 }"
+        :header-cell-config="{ height: 60 }"
+        :cell-config="{ height: 60 }"
         save-type="server"
         :rowdragable="rowdragable"
         :columndragable="columndragable"
@@ -67,6 +68,7 @@
         :sortable="sortable"
         show-pagination
         @page-change="pageChange"
+        @data-change="handleDataChange"
       >
         <!-- 自定义操作列插槽 -->
         <template #aaa>
@@ -132,6 +134,10 @@ const options = ref([{
   label: '女',
   value: '2',
 }])
+
+function handleDataChange() {
+  console.log('aaaa')
+}
 
 function pageChange({ pageSize, currentPage }) {
   pagerConfig.value.currentPage = currentPage

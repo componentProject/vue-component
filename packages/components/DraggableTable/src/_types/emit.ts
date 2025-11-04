@@ -16,6 +16,7 @@ export interface emitsType {
   // 当在表格中select下拉为空时触发
   (e: 'noSelectValue', params: NoSelectValueParams): void
   (e: 'toggleTreeExpand', params: VxeTableDefines.ToggleRowExpandEventParams): void
+  (e: 'cellClick', params: VxeTableDefines.CellClickEventParams): void
 }
 // Emits for CustomConfigDialog component
 export interface CustomConfigDialogConfirmPayload {

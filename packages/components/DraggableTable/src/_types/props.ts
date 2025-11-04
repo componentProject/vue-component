@@ -20,6 +20,11 @@ export type types = VxeColumnPropTypes.Type & customCustomTypes
  */
 export interface propsType {
   resizable: boolean
+
+  cellConfig: VxeTablePropTypes.CellConfig
+  headerCellConfig: VxeTablePropTypes.HeaderCellConfig
+  headerCellStyle: VxeTablePropTypes.HeaderCellStyle
+
   //#region 编辑相关
   /** 是否允许编辑 */
   editable: boolean

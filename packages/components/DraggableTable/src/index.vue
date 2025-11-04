@@ -3,15 +3,13 @@
     <VxeGrid
       ref="xTable"
       :columns="computedColumns"
-      :header-cell-config="{ height: 32 }"
-      :cell-config="{ height: 32 }"
       border
       auto-resize
       show-overflow
       show-header-overflow
       show-footer-overflow
       keep-source
-      :header-cell-style="{ height: '32px' }"
+      :header-cell-style="computedHeaderCellStyle"
       :pager-config="computedPagerConfig"
       :virtual-y-config="computedVirtualYConfig"
       :virtual-x-config="computedVirtualXConfig"
@@ -31,6 +29,7 @@
       @checkbox-change="handleCheckboxChange"
       @resizable-change="handleColumnResizableChange"
       @toggle-tree-expand="handleTableRendered"
+      @cell-click="handleCellClick"
     >
       <template #loading="params">
         <slot name="loading" v-bind="params">
@@ -179,9 +178,6 @@ const props = withDefaults(defineProps<propsType>(), {
   //#region 自定义相关配置
   customConfig: () => ({}),
   //#endregion
-  //#region 鼠标相关配置
-  mouseConfig: () => ({}),
-  //#endregion
   //#region 分页配置
   /**
    * layouts 可选值：Home, PrevJump, PrevPage, Number, JumpNumber, NextPage, NextJump, End, Sizes, Jump, FullJump, PageCount, Total
@@ -291,6 +287,17 @@ const computedPagerConfig = computed(() => {
     ...props.pagerConfig,
   }
 })
+
+const computedHeaderCellStyle = computed(() => {
+  const height = props.headerCellConfig?.height
+  return (params: any) => {
+    return {
+      height: height ? `${height}px` : '32px',
+      ...(getType(props.headerCellStyle, 'object') ? props.headerCellStyle : props.headerCellStyle?.(params)),
+    }
+  }
+})
+
 const computedVirtualXConfig = computed(() => {
   return {
     enabled: true,
@@ -321,7 +328,7 @@ const computedSortConfig = computed(() => {
 })
 const computedRowConfig = computed(() => {
   return {
-    height: 32,
+    height: props.cellConfig?.height ?? 32,
     resizable: true,
     drag: props.dragType === 'vxe' && (props.rowdragable || props.dragable),
     keyField: props.rowId,
@@ -448,12 +455,6 @@ const tableData = defineModel({
   default: [],
 })
 
-watch(() => tableData.value, (newValue) => {
-  console.log('tableData', newValue)
-}, {
-  immediate: true,
-})
-
 // 表格引用
 const xTable = useTemplateRef<VxeGridInstance>('xTable')
 
@@ -544,12 +545,19 @@ watch(
   () => tableData.value,
   () => {
     nextTick(() => {
+      emit('dataChange')
       debouncedCollectTableVirtualRefs()
     })
   },
   { immediate: true },
 )
-
+function handleCellClick(params: VxeTableDefines.CellClickEventParams) {
+  const { column } = params
+  if (props.columnConfig?.isCurrent) {
+    xTable.value?.setCurrentColumn(column)
+  }
+  emit('cellClick', params)
+}
 // 为了处理表格渲染完成后的场景
 function handleTableRendered(params: VxeTableDefines.ToggleRowExpandEventParams) {
   nextTick(() => {
