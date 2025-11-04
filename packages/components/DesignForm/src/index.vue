@@ -34,7 +34,7 @@
 import { onMounted, ref, watch } from 'vue'
 import DesignFormRules from './components/DesignFormRules.vue'
 import DesignFormList from './components/DesignFormList.vue'
-import { componentMap, formItemObj } from './datas/index'
+import { componentMap, formItemObj } from './datas'
 import { defaultFormConfig } from './datas/formData'
 import { deepClone, deserializeWithFunctions, serializeWithFunctions } from './utils/formSerializer'
 import { ElMessage } from 'element-plus'
@@ -187,7 +187,7 @@ function handleValidationRules(itemObj: FormItem, key: string, updatedItem: Reco
       let cleanValidatorCode = updatedItem.validator
       cleanValidatorCode = cleanValidatorCode.replace(/\b(\w+):\s*\w+/g, '$1')
       // eslint-disable-next-line no-new-func
-      const validatorFn = new Function(`return ${cleanValidatorCode}`)() as (rule: any, value: any, callback: Function) => void
+      const validatorFn = new Function(`return ${cleanValidatorCode}`)() as (rule: any, value: any, callback: (...item: any) => any) => void
 
       // 检查并更新或添加validator规则
       const validatorIndex = itemObj.rules.findIndex(rule => rule.validator)

@@ -132,16 +132,17 @@ function setFormItemConfig(item: SelectedItem | null | undefined): void {
     if (key === 'component') {
       const componentInstance = item[key] as ComponentInstance
       const isObjectComponent = typeof componentInstance === 'object'
+      console.log('isObjectComponent', isObjectComponent)
       if (isObjectComponent) {
-        itemObj[key] = componentInstance.name
-      }
-      else {
         if (componentInstance.name === 'ElInput' && item?.props?.type === 'textarea') {
           itemObj[key] = 'ElTextarea'
         }
         else {
-          itemObj[key] = componentInstance
+          itemObj[key] = componentInstance.name
         }
+      }
+      else {
+        itemObj[key] = componentInstance
       }
     }
     else if (key === 'props') {
