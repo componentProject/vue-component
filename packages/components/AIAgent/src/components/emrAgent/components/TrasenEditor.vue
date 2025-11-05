@@ -9,7 +9,7 @@
           class="readonly-info-item-content"
           :class="{ 'important-content': importantContent.includes(item.deCode) }"
         >
-          {{ item.content || '' }}
+          {{ item.content || "" }}
         </div>
       </div>
     </div>
@@ -37,10 +37,7 @@ import 'monaco-editor/esm/vs/editor/contrib/inlineCompletions/ghostTextControlle
 // import 'monaco-editor/esm/vs/editor/contrib/tokenization/browser/tokenization.js'; // 代码联想提示
 
 import AILoading from '../../ui/Loading.vue'
-import {
-  getModelField,
-  updateEmrContentByLineNumber,
-} from '../js/editorConfig/model'
+import { getModelField, updateEmrContentByLineNumber } from '../js/editorConfig/model'
 import MedicalLanguage from '../js/editorConfig/language'
 import { themeName } from '../js/editorConfig/theme'
 import { dealTabCommand } from '../js/editorConfig/command'
@@ -174,8 +171,13 @@ export default {
       // 编辑器光标停留
       editorInstance.onDidChangeCursorPosition((e) => {
         this.clearGhostText()
-        const markers = monaco.editor.getModelMarkers(editorInstance.getModel(), MedicalLanguage.markName)
-        const currentLineMarkers = markers.filter(m => m.startLineNumber === e.position.lineNumber)
+        const markers = monaco.editor.getModelMarkers(
+          editorInstance.getModel(),
+          MedicalLanguage.markName,
+        )
+        const currentLineMarkers = markers.filter(
+          m => m.startLineNumber === e.position.lineNumber,
+        )
         if (currentLineMarkers.length > 0) {
           return
         }
@@ -215,7 +217,10 @@ export default {
       editorInstance.onDidChangeCursorSelection((e) => {
         const selection = e.selection
         // 判断是否有选中内容
-        if (selection.startLineNumber !== selection.endLineNumber || selection.startColumn !== selection.endColumn) {
+        if (
+          selection.startLineNumber !== selection.endLineNumber
+          || selection.startColumn !== selection.endColumn
+        ) {
           this.selectedLineNum = []
           for (let i = selection.startLineNumber; i <= selection.endLineNumber; i++) {
             this.selectedLineNum.push(i)
@@ -416,7 +421,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .editor-container {
   width: 100%;
   height: 100%;

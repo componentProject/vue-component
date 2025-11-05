@@ -53,7 +53,7 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .conversations-container {
   width: 160px;
   border-left: 1px solid #e3e6e9;

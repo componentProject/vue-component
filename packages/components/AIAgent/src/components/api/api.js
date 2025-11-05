@@ -216,10 +216,11 @@ export async function feedback(d) {
   return data
 }
 
-export async function getConversationList(agentId) {
+export async function getConversationList(agentInfo) {
   const params = new URLSearchParams({
     userId: apiConfig.userCode,
-    agentId,
+    agentId: agentInfo.id,
+    sourceAgentType: agentInfo.sourceAgentType,
     pageNo: 1,
     pageSize: 100,
   })

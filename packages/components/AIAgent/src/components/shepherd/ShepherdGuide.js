@@ -34,30 +34,30 @@ const SHEPHERD_CONFIG = {
     wordContent: '你是一名具备丰富临床经验的专业药剂师，负责对医生为患者开立的药品进行全面、严谨的合理性分析。具体要求如下：\n一、输入信息说明\n 1. 患者基本信息，可能包括年龄、性别、体重、身高等：{{patInfo}}\n 2.诊疗信息：\n- 主诉:{{main_suit}}\n- 现病史:{{nowMedicalHistory}}\n- 既往病史：{{pastMedicalHistory}}\n- 药物过敏史：{{allerg}} \n- 诊断信息：{{diagnosis}}\n3. 开立药品信息：{{med_lis}}\n\n二、输出格式（请按以下 markdown 格式呈现分析结果）\nmarkdown\n#### 一、总体合理性判断  ​\n| 分析维度                | 结果                              |​\n|-------------------------|-----------------------------------|​\n| 总体结论                | [例如：用药方案整体合理/部分不合理/不合理] |​\n| 用药与诊断匹配度        | [合理/不合理]                     |​\n| 药物剂量与用法          | [合理/不合理]                     |​\n| 药物相互作用            | [无显著不良相互作用/存在不良相互作用] |​\n| 患者个体因素适配性      | [适配/不适配]                     |​\n| 用药疗程                | [合理/不合理]                     | \n\n#### 二、详细分析依据  \n1. **用药与诊断匹配度分析**：  \n   [结合权威指南/说明书，说明药品是否针对诊断病症。例如：患者诊断为"社区获得性肺炎（细菌性）"，头孢呋辛酯属于第二代头孢菌素，对肺炎链球菌、流感嗜血杆菌等常见致病菌有效，符合《成人社区获得性肺炎诊疗指南（2023年版）》中对非重症患者的经验性治疗推荐，用药与诊断匹配度合理。]  \n\n2. **药物剂量与用法分析**：  \n   [对比说明书/指南推荐剂量，结合患者个体情况说明。例如：药品说明书推荐成人常规剂量为每次0.25g，每日2次，与当前用法用量一致；患者体重65kg，按体重计算（约3.8mg/kg/次）在推荐范围内；给药途径为口服，与头孢呋辛酯的常规给药方式一致，剂量与用法合理。]  \n\n3. **药物相互作用分析**：  \n   [列出联用药物间的相互作用及风险。例如：患者正在使用的"硝苯地平控释片"与"头孢呋辛酯"无明确不良相互作用；目前无其他联用药物，暂未发现显著药物相互作用。]  \n\n4. **患者个体因素适配性分析**：  \n   [结合过敏史/病史评估安全性。例如：患者无头孢类药物过敏史，且既往过敏史（青霉素皮疹）与头孢呋辛酯无明确交叉过敏证据；患者虽有"慢性肾功能不全（CKD3期）"，但头孢呋辛酯在CKD3期（肌酐清除率30-50ml/min）时无需调整剂量，与个体因素适配性合理。]  \n\n5. **用药疗程分析**：  \n   [结合疾病特点及指南判断。例如：社区获得性肺炎的抗菌治疗疗程通常为7-14天，患者无基础疾病且感染程度较轻，当前"连续使用10天"的疗程符合临床常规，疗程合理。]  \n\n#### 三、改进建议\n- **具体调整方案**：[若方案合理则写"无调整建议"；若不合理，例如：建议将剂量调整为"每次0.125g，每日2次"]  \n- **调整依据**：[对应调整方案的说明，如方案合理则写"当前方案符合临床规范，无需调整"；若有调整，例如：根据药品说明书，肌酐清除率＜30ml/min时需减半剂量，患者当前肌酐清除率25ml/min，符合减量指征]  \n- **用药注意事项**：[若方案合理则写"遵循现有方案，注意观察患者用药反应"；若有调整，例如：用药期间多饮水，促进药物排泄；监测肾功能（每3天复查肌酐），如肌酐进一步升高需及时停药]  \n\n#### 四、补充说明  \n- [例如：头孢呋辛酯可能引起胃肠道反应（如腹泻、恶心），若患者出现持续腹泻需警惕伪膜性肠炎，建议及时就医；与食物同服可增加吸收，建议餐后服用。]  ',
   },
   DEMO_CONFIG_PARAMS:
-        [
-          {
-            id: '37464862221275136',
-            paramType: '2',
-            paramName: 'patientDataStr',
-            paramExplain: '年龄、性别、体重、身高等',
-            isRequired: '1',
-          },
-          {
-            id: '37464862221275137',
-            paramType: '2',
-            paramName: 'medicalRecordDataStr',
-            paramExplain: '现病史',
-            isRequired: '1',
-          },
-          {
-            id: '37464862221275138',
-            paramType: '2',
-            paramName: 'prescriptionDataStr',
-            paramExplain: '开立的药品信息',
-            isRequired: '1',
-          },
+    [
+      {
+        id: '37464862221275136',
+        paramType: '2',
+        paramName: 'patientDataStr',
+        paramExplain: '年龄、性别、体重、身高等',
+        isRequired: '1',
+      },
+      {
+        id: '37464862221275137',
+        paramType: '2',
+        paramName: 'medicalRecordDataStr',
+        paramExplain: '现病史',
+        isRequired: '1',
+      },
+      {
+        id: '37464862221275138',
+        paramType: '2',
+        paramName: 'prescriptionDataStr',
+        paramExplain: '开立的药品信息',
+        isRequired: '1',
+      },
 
-        ],
+    ],
   DEMO_CHAT_LIST: [
     {
       conversation_id: 'e40c159d-2e63-4234-b4bf-9291b2da2871',
@@ -163,9 +163,13 @@ export class ShepherdGuide {
 
   /**
    * 初始化 Shepherd 引导流程
+   * @param {string|null} restoreAgentId - 需要恢复的智能体ID
    */
-  async init() {
+  async init(restoreAgentId = null) {
     try {
+      // 保存恢复信息
+      this.restoreAgentId = restoreAgentId
+
       // 初始化数据
       this._initializeData()
 
@@ -176,6 +180,13 @@ export class ShepherdGuide {
 
       // 初始化 Shepherd 实例
       this.shepherd = shepherd({ steps: shepherdSteps })
+
+      // 监听引导完成和取消事件
+      this._setupShepherdEventListeners()
+
+      // 确保引导层级足够高
+      // this._ensureHighZIndex();
+
       this.shepherd.start()
     }
     catch (error) {
@@ -199,11 +210,22 @@ export class ShepherdGuide {
    */
   _skipShepherd() {
     localStorage.setItem(SHEPHERD_CONFIG.STORAGE_KEY, true)
-    this.context.refreshAgentList()
-    this.context.currentAgent = {}
-    this.context.currentAgentId = ''
-    this.context.currentView = 'findAgent'
-    console.log(this.context.chatList)
+
+    // 如果有需要恢复的智能体状态，直接调用恢复方法
+    if (this.restoreAgentId) {
+      const agentIdToRestore = this.restoreAgentId // 保存值，避免异步执行时被清理
+      this.context.currentView = 'chatAgent'
+      this.context.$nextTick(() => {
+        this.context.restoreAgentState(agentIdToRestore)
+      })
+    }
+    else {
+      // 否则使用原有逻辑
+      this.context.refreshAgentList()
+      this.context.currentAgent = {}
+      this.context.currentAgentId = ''
+      this.context.currentView = 'findAgent'
+    }
   }
 
   /**
@@ -272,7 +294,15 @@ export class ShepherdGuide {
           element: '#tsAiAgent-find-agent-tabs',
           on: 'bottom',
         },
-        buttons: this._createStepButtons(),
+        buttons: [
+          {
+            action: () => {
+              this.shepherd.next()
+            },
+            text: '下一步',
+          },
+          this._createCancelStep(),
+        ],
       },
 
       // 步骤2：收藏入口介绍
@@ -576,6 +606,97 @@ export class ShepherdGuide {
   }
 
   /**
+   * 设置 Shepherd 事件监听器
+   */
+  _setupShepherdEventListeners() {
+    if (this.shepherd) {
+      // 监听引导完成事件
+      this.shepherd.on('complete', () => {
+        this._onShepherdComplete()
+      })
+
+      // 监听引导取消事件
+      this.shepherd.on('cancel', () => {
+        this._onShepherdCancel()
+      })
+    }
+  }
+
+  /**
+   * 引导完成处理
+   */
+  _onShepherdComplete() {
+    localStorage.setItem(SHEPHERD_CONFIG.STORAGE_KEY, true)
+
+    // 如果有需要恢复的智能体状态，直接调用恢复方法
+    if (this.restoreAgentId) {
+      const agentIdToRestore = this.restoreAgentId // 保存值，避免异步执行时被清理
+      this.context.currentView = 'chatAgent'
+      this.context.$nextTick(() => {
+        this.context.restoreAgentState(agentIdToRestore)
+      })
+    }
+    else {
+      this.context.refreshAgentList()
+      this.context.currentAgent = {}
+      this.context.currentAgentId = ''
+      this.context.currentView = 'findAgent'
+    }
+
+    // 清理恢复信息
+    this.restoreAgentId = null
+  }
+
+  /**
+   * 引导取消处理
+   */
+  _onShepherdCancel() {
+    // 如果有需要恢复的智能体状态，直接调用恢复方法
+    if (this.restoreAgentId) {
+      const agentIdToRestore = this.restoreAgentId // 保存值，避免异步执行时被清理
+      this.context.currentView = 'chatAgent'
+      this.context.$nextTick(() => {
+        this.context.restoreAgentState(agentIdToRestore)
+      })
+    }
+    else {
+      this.context.refreshAgentList()
+      this.context.currentAgent = {}
+      this.context.currentAgentId = ''
+      this.context.currentView = 'findAgent'
+    }
+
+    // 清理恢复信息
+    this.restoreAgentId = null
+  }
+
+  /**
+   * 确保引导层级足够高
+   */
+  _ensureHighZIndex() {
+    // 使用 setTimeout 确保 DOM 元素已经创建
+    setTimeout(() => {
+      // 设置 Shepherd 元素的层级
+      const shepherdElements = document.querySelectorAll('.shepherd-element')
+      shepherdElements.forEach((element) => {
+        element.style.zIndex = '202510'
+      })
+
+      // 设置遮罩层的层级
+      const overlayContainers = document.querySelectorAll('.shepherd-modal-overlay-container')
+      overlayContainers.forEach((container) => {
+        container.style.zIndex = '202509'
+      })
+
+      // 设置模态框的层级
+      const modals = document.querySelectorAll('.shepherd-modal')
+      modals.forEach((modal) => {
+        modal.style.zIndex = '202509'
+      })
+    }, 50)
+  }
+
+  /**
    * 销毁引导实例
    */
   destroy() {
@@ -583,5 +704,7 @@ export class ShepherdGuide {
       this.shepherd.cancel()
       this.shepherd = null
     }
+    // 清理恢复相关数据
+    this.restoreAgentId = null
   }
 }

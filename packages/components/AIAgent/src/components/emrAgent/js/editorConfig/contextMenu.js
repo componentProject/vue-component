@@ -135,7 +135,7 @@ class ContextMenuManager {
             border: 1px solid #ccc;
             border-radius: 4px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-            z-index: 10000;
+            z-index: 202511;
             min-width: 120px;
             padding: 4px 0;
         `

@@ -15,11 +15,17 @@
       <!-- 左边调整句柄 -->
       <div class="resize-handle resize-handle-left" @mousedown="handleMouseDown($event, 'left')" />
       <!-- 右边调整句柄 -->
-      <div class="resize-handle resize-handle-right" @mousedown="handleMouseDown($event, 'right')" />
+      <div
+        class="resize-handle resize-handle-right"
+        @mousedown="handleMouseDown($event, 'right')"
+      />
       <!-- 上边调整句柄 -->
       <div class="resize-handle resize-handle-top" @mousedown="handleMouseDown($event, 'top')" />
       <!-- 下边调整句柄 -->
-      <div class="resize-handle resize-handle-bottom" @mousedown="handleMouseDown($event, 'bottom')" />
+      <div
+        class="resize-handle resize-handle-bottom"
+        @mousedown="handleMouseDown($event, 'bottom')"
+      />
       <!-- 四个角的调整句柄 -->
       <div
         class="resize-handle resize-handle-corner resize-handle-top-left"
@@ -402,7 +408,7 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .floating-panel {
   position: fixed;
   z-index: 202508;

@@ -11,25 +11,25 @@
         <span>待接诊</span>
       </div>
       <div class="patient-card-title-right">
-        <span>{{ user['DE04.01.119.00'].content ? '预问诊' : '' }}</span>
+        <span>{{ user["DE04.01.119.00"].content ? "预问诊" : "" }}</span>
       </div>
     </div>
     <div class="patient-card-content">
       <div class="patient-card-content-department">
-        {{ user['DE08.10.026.00'].content }}
+        {{ user["DE08.10.026.00"].content }}
       </div>
       <div class="patient-card-content-info">
         <div class="patient-card-content-info-row">
           <div class="patient-card-content-info-content">
-            {{ user['DE02.01.039.01'].content }}
+            {{ user["DE02.01.039.01"].content }}
           </div>
           <div class="patient-card-content-info-content">
-            {{ user['DE02.01.026.00'].content }}岁
+            {{ user["DE02.01.026.00"].content }}岁
           </div>
         </div>
         <div class="patient-card-content-info-row">
           <div class="patient-card-content-info-chief-complaint" :class="{ loading: isLoading }">
-            {{ user['DE04.01.119.00'].content ? user['DE04.01.119.00'].content : '未提供主诉信息' }}
+            {{ user["DE04.01.119.00"].content ? user["DE04.01.119.00"].content : "未提供主诉信息" }}
           </div>
         </div>
       </div>
@@ -66,7 +66,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .patient-card {
   width: 240px;
   height: 135px;
