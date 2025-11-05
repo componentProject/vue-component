@@ -4,5 +4,6 @@
 export interface propsType {
   token: string
   paramsObj: any
+  params: object
   addSign?: () => void
 }

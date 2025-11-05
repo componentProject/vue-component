@@ -1,16 +1,17 @@
 <template>
-  <TsFooter v-if="items.length" :items="items" />
+  <TsFooter v-if="items.length" :items="items" v-bind="$attrs" />
 </template>
 
 <script setup lang="ts">
 import { getQueryMedicaIInsuranceInfoApi } from '@moluoxixi/utils/_api'
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, useAttrs } from 'vue'
 import type { emitsType, propsType, slotsType } from './_types'
 
-defineOptions({ name: 'HisFooter' })
+defineOptions({ name: 'HisFooter', inheritAttrs: false })
 
 const props = withDefaults(defineProps<propsType>(), {
   token: '',
+  params: {},
   paramsObj: () => ({
     medicalInsuranceCode: '国家医疗机构个人编码',
     paltOrgCode: '国家定点医疗机构编码',
@@ -23,6 +24,8 @@ const emit = defineEmits<emitsType>()
 // 获取插槽
 const slots = defineSlots<slotsType>()
 
+const attrs = useAttrs()
+
 const items = ref<any[]>([])
 
 async function getMedicalInsuranceInfo() {
@@ -32,7 +35,7 @@ async function getMedicalInsuranceInfo() {
       headers: {
         Token: props.token,
       },
-    }, props.addSign)
+    }, props.addSign, props.params)
     // 清空现有数据
     items.value = []
     // 检查响应和参数字典是否有效
