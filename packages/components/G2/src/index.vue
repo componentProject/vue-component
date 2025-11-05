@@ -23,6 +23,11 @@ const container = useTemplateRef('container')
 let chart
 
 async function renderChart() {
+  if (!chart) {
+    chart = new Chart({
+      container: container.value,
+    })
+  }
   if (props.options) {
     chart.options(props.options)
   }
