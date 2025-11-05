@@ -46,7 +46,7 @@ const props = withDefaults(defineProps<propsType>(), {
   colorLight: '#ffffff',
   margin: 4,
   showBorder: false,
-  borderWidth: 0,
+  borderWidth: 1,
   borderColor: '#000000',
   showLogo: false,
   logoUrl: '',
@@ -167,8 +167,9 @@ async function generateQRCode() {
     // 处理文本，如果是URL且需要自动补全，则补全协议
     const processedText = processText(props.text)
 
+    const borderWidth = props.showBorder ? props.borderWidth * 2 : 0
     const options: QRCodeRenderersOptions = {
-      width: props.size - props.borderWidth * 2,
+      width: props.size - borderWidth,
       margin: props.margin,
       color: {
         dark: props.colorDark,
