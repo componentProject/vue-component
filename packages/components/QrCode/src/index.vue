@@ -168,7 +168,7 @@ async function generateQRCode() {
     const processedText = processText(props.text)
 
     const options: QRCodeRenderersOptions = {
-      width: props.size - props.borderWidth - 0.5,
+      width: props.size - props.borderWidth * 2,
       margin: props.margin,
       color: {
         dark: props.colorDark,
