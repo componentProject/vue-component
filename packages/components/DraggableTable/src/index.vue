@@ -916,13 +916,21 @@ async function handleGetStoredColumns(): Promise<ColumnType[]> {
 }
 /** 存到服务器端 */
 async function handleSaveColumnsToServer(key: string, columns: string) {
-  const { isCommon } = customRestConfig.value || {}
-  await setMemoryUpload({
-    pageId: props.pageId,
-    widgetId: key,
-    userId: !isCommon ? props.userId : '',
-    data: columns,
-  })
+  const { isCommon, isReset } = customRestConfig.value || {}
+  const callbacks = []
+  if (isReset) {
+  //   执行删除逻辑
+  }
+  else {
+    callbacks.push(setMemoryUpload({
+      pageId: props.pageId,
+      widgetId: key,
+      userId: !isCommon ? props.userId : '',
+      data: columns,
+    }))
+  }
+
+  await Promise.all(callbacks)
 }
 /** 递归映射列，仅保留必要字段并保留 children */
 function mapColumnsTree(nodes: any[], requiredFieldsList: string[]): any[] {

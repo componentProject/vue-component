@@ -191,6 +191,7 @@ function handleEvent(type: 'confirm' | 'reset' | 'cancel') {
       emit('confirm', {
         customColumns: cloneDeep(props.columns),
         isCommon: isCommon.value,
+        isReset: true,
       })
       break
     case 'confirm':

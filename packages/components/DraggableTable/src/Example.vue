@@ -58,6 +58,7 @@
         user-id="shabi"
         :columns="columns"
         :loading="loading"
+        is-configuration
         :header-cell-config="{ height: 60 }"
         :cell-config="{ height: 60 }"
         save-type="server"
