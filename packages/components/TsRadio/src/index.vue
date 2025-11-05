@@ -30,7 +30,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { ElRadio, ElRadioGroup } from 'element-plus'
-import { getTypeDefault } from '@moluoxixi/utils/_utils'
 import { useOptions } from '../../_hooks'
 import type { emitsType, propsType, slotsType } from './_types'
 
@@ -45,6 +44,7 @@ const props = withDefaults(defineProps<propsType>(), {
   gridColumns: 4,
   label: 'label',
   value: 'value',
+  disabledHandler: null,
   disabledValues: () => [],
   disabledLabels: () => [],
   options: () => [],
@@ -100,6 +100,6 @@ function handleRadioChange(value: any) {
 }
 
 const computedDisabledHandler = computed(() => {
-  return getTypeDefault(props.disabledHandler, 'function') || defaultDisabledHandler
+  return props.disabledHandler || defaultDisabledHandler
 })
 </script>

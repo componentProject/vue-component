@@ -31,7 +31,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { ElTabPane, ElTabs } from 'element-plus'
-import { getTypeDefault } from '@moluoxixi/utils/_utils'
 import { useOptions } from '../../_hooks'
 import type { emitsType, propsType, slotsType } from './_types'
 
@@ -47,6 +46,7 @@ const props = withDefaults(defineProps<propsType>(), {
   options: () => [],
   label: 'label',
   value: 'name',
+  disabledHandler: null,
   disabledValues: () => [],
   disabledLabels: () => [],
   requestMethod: 'POST',
@@ -87,7 +87,7 @@ function defaultDisabledHandler({ label, value }: { [label: string]: any }) {
 }
 
 const computedDisabledHandler = computed(() => {
-  return getTypeDefault(props.disabledHandler, 'function') || defaultDisabledHandler
+  return props.disabledHandler || defaultDisabledHandler
 })
 
 function handleTabChange(val: any) {

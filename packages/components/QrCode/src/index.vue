@@ -112,13 +112,10 @@ const containerStyle = computed(() => {
   const baseStyle: Record<string, string> = {
     position: 'relative',
     display: 'inline-block',
-    width: `${props.size}px`,
-    height: `${props.size}px`,
   }
 
   if (props.showBorder) {
     baseStyle.border = `${props.borderWidth}px solid ${props.borderColor}`
-    baseStyle.borderRadius = '4px'
   }
 
   return baseStyle

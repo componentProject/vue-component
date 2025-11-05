@@ -1,0 +1,50 @@
+<template>
+  <div class="container">
+    <Tabs
+      v-model="activeTab"
+      :options="options"
+      label="label"
+      value="name"
+    >
+      <template #default="{ item }">
+        <div class="panel-content">
+          {{ item.label }} 的内容
+        </div>
+      </template>
+    </Tabs>
+    <div class="value">
+      使用 show 函数控制显示：只显示选项1和选项3
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { ref } from 'vue'
+
+const activeTab = ref('1')
+const options = ref([
+  { label: '选项1', name: '1', show: () => true },
+  { label: '选项2', name: '2', show: () => false },
+  { label: '选项3', name: '3', show: () => true },
+  { label: '选项4', name: '4', show: () => false },
+])
+</script>
+
+<style scoped>
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.panel-content {
+  padding: 20px;
+  min-height: 200px;
+}
+
+.value {
+  font-size: 14px;
+  color: #666;
+}
+</style>
+

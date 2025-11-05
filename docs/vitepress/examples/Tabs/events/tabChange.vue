@@ -1,15 +1,30 @@
 <template>
   <div class="container">
-    <Tabs v-model="active" :tab-list="tabList" @tab-change="last = $event">
+    <Tabs
+      v-model="active"
+      :tab-list="tabList"
+      @tab-change="handleTabChange"
+    >
       <template #A>
-        面板 A
+        <div class="panel-content">
+          面板 A
+        </div>
       </template>
       <template #B>
-        面板 B
+        <div class="panel-content">
+          面板 B
+        </div>
       </template>
     </Tabs>
     <div class="value">
-      最近一次 tabChange：{{ last }}
+      <div v-if="lastChange !== null">
+        最近一次 tabChange：{{ lastChange }}
+        <br>
+        触发时间：{{ changeTime }}
+      </div>
+      <div v-else>
+        切换标签页查看 tabChange 事件
+      </div>
     </div>
   </div>
 </template>
@@ -17,18 +32,36 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-const active = ref()
-const last = ref(null)
-const tabList = [
-  { label: 'A' },
-  { label: 'B' },
-]
+const active = ref('A')
+const lastChange = ref<any>(null)
+const changeTime = ref('')
+const tabList = ref([
+  { label: 'A', name: 'A' },
+  { label: 'B', name: 'B' },
+])
+
+function handleTabChange(val: any) {
+  lastChange.value = val
+  changeTime.value = new Date().toLocaleTimeString()
+  console.log('tabChange 事件:', val)
+}
 </script>
 
 <style scoped>
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.panel-content {
+  padding: 20px;
+  min-height: 200px;
+}
+
 .value {
-  margin-top: 8px;
-  font-size: 12px;
-  color: #555;
+  font-size: 14px;
+  color: #666;
+  min-height: 60px;
 }
 </style>

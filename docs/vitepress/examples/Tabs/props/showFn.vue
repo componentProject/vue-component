@@ -5,12 +5,19 @@
     </ElButton>
     <Tabs v-model="active" :tab-list="tabList">
       <template #A>
-        面板 A
+        <div class="panel-content">
+          面板 A
+        </div>
       </template>
       <template #B>
-        面板 B（由 show 决定是否展示）
+        <div class="panel-content">
+          面板 B（由 show 决定是否展示）
+        </div>
       </template>
     </Tabs>
+    <div class="value">
+      第二个标签的显示状态：{{ visible ? '显示' : '隐藏' }}
+    </div>
   </div>
 </template>
 
@@ -18,23 +25,40 @@
 import { computed, ref } from 'vue'
 import { ElButton } from 'element-plus'
 
-const active = ref()
+const active = ref('A')
 const visible = ref(false)
 const tabList = computed(() => [
-  { label: 'A' },
-  { label: 'B', show: () => visible.value },
+  { label: 'A', name: 'A' },
+  { label: 'B', name: 'B', show: () => visible.value },
 ])
 
 function toggle() {
   visible.value = !visible.value
-  if (!visible.value && active.value === '1')
-    active.value = '0'
+  if (!visible.value && active.value === 'B')
+    active.value = 'A'
 }
 </script>
 
 <style scoped>
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
 .btn {
   padding: 6px 10px;
   margin-bottom: 8px;
+  width: fit-content;
+}
+
+.panel-content {
+  padding: 20px;
+  min-height: 200px;
+}
+
+.value {
+  font-size: 14px;
+  color: #666;
 }
 </style>

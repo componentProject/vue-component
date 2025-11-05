@@ -58,6 +58,7 @@ const props = withDefaults(defineProps<propsType>(), {
   collapseTags: true,
   label: 'label',
   value: 'value',
+  disabledHandler: null,
   disabledValues: () => [],
   disabledLabels: () => [],
   options: () => [],
@@ -233,7 +234,7 @@ function cleanupObserver() {
 }
 
 const computedDisabledHandler = computed(() => {
-  return getTypeDefault(props.disabledHandler, 'function') || defaultDisabledHandler
+  return props.disabledHandler || defaultDisabledHandler
 })
 
 onUnmounted(() => {

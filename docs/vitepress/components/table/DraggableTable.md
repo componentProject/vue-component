@@ -42,33 +42,6 @@ DraggableTable/filter/filterType
 DraggableTable/filter/filterLayout
 :::
 
-### 拖拽（dragType / dragable / rowdragable / columndragable / rowDisabledClass / rowDragDisabledMethod / columnDragDisabledMethod）
-
-示例：VXE 拖拽模式（dragType='vxe'，启用行列拖拽）
-:::demo
-DraggableTable/drag/dragType-vxe
-:::
-
-示例：原生拖拽模式（dragType='draggable'，dragable=true）
-:::demo
-DraggableTable/drag/dragType-draggable
-:::
-
-示例：禁用指定行拖拽（rowDisabledClass）
-:::demo
-DraggableTable/drag/rowDisabledClass
-:::
-
-示例：通过回调禁用某些行拖拽,仅vxe模式有效（rowDragDisabledMethod）
-:::demo
-DraggableTable/drag/rowDragDisabledMethod
-:::
-
-示例：通过回调拦截列拖拽,仅vxe模式有效（columnDragDisabledMethod）
-:::demo
-DraggableTable/drag/columnDragDisabledMethod
-:::
-
 ### 排序（sortable）
 
 示例：启用全局排序（sortable=true）
