@@ -150,7 +150,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .user-notice-container {
   width: 100%;
   height: 100%;

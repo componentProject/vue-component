@@ -304,7 +304,7 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .floating-button {
   position: fixed;
   cursor: pointer;
@@ -316,7 +316,7 @@ export default {
   border: 1px solid #ddd;
   padding: 4px;
   overflow: hidden;
-  z-index: 101;
+  z-index: 2025;
   box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.2);
 
   // 悬停效果

@@ -14,7 +14,11 @@
           </div>
         </div>
         <div v-else class="bubble-content">
-          <div v-if="role === 'assistant'" class="bubble-content-text markdown-body" v-html="processedContent" />
+          <div
+            v-if="role === 'assistant'"
+            class="bubble-content-text markdown-body"
+            v-html="processedContent"
+          />
           <div v-else-if="role === 'error'" class="bubble-content-text error">
             {{ content }}
           </div>
@@ -213,7 +217,10 @@ export default {
           if (content.includes('</details>') || content.includes('</summary>')) {
             setTimeout(() => {
               // 检查是否还在观察中且仍然打开
-              if (details.hasAttribute('open') && details.getAttribute('data-auto-collapse') === 'true') {
+              if (
+                details.hasAttribute('open')
+                && details.getAttribute('data-auto-collapse') === 'true'
+              ) {
                 // 更新summary内容为完成状态
                 this.updateSummaryToCompleted(details)
 
@@ -316,7 +323,7 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .bubble {
   margin-bottom: 40px;
   display: flex;

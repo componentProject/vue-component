@@ -191,7 +191,7 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .ts-select {
   position: relative;
   width: 100%;
