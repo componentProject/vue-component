@@ -5,9 +5,9 @@
     <div class="section">
       <h3>使用 virtualRef</h3>
       <div ref="customContainerRef" class="input-group">
-        <el-input v-model="form2.field1" placeholder="字段1" />
-        <el-input v-model="form2.field2" placeholder="字段2" />
-        <el-input v-model="form2.field3" placeholder="字段3" />
+        <ElInput v-model="form2.field1" placeholder="字段1" />
+        <ElInput v-model="form2.field2" placeholder="字段2" />
+        <ElInput v-model="form2.field3" placeholder="字段3" />
       </div>
       <EnterNextContainer :virtual-ref="customContainerRef" @no-next-input="handleNoNextInput" />
       <div class="description">
@@ -19,14 +19,14 @@
       <h3>结合下拉选择组件</h3>
       <EnterNextContainer @no-next-input="handleNoNextInput">
         <div class="input-group">
-          <el-input v-model="form3.input1" placeholder="输入框1" />
-          <el-select v-model="form3.select1" placeholder="选择器1">
-            <el-option v-for="i in 5" :key="i" :label="`选项${i}`" :value="i" />
-          </el-select>
-          <el-input v-model="form3.input2" placeholder="输入框2" />
-          <el-select v-model="form3.select2" placeholder="选择器2">
-            <el-option v-for="i in 5" :key="i" :label="`选项${i}`" :value="i" />
-          </el-select>
+          <ElInput v-model="form3.input1" placeholder="输入框1" />
+          <ElSelect v-model="form3.select1" placeholder="选择器1">
+            <ElOption v-for="i in 5" :key="i" :label="`选项${i}`" :value="i" />
+          </ElSelect>
+          <ElInput v-model="form3.input2" placeholder="输入框2" />
+          <ElSelect v-model="form3.select2" placeholder="选择器2">
+            <ElOption v-for="i in 5" :key="i" :label="`选项${i}`" :value="i" />
+          </ElSelect>
         </div>
       </EnterNextContainer>
       <div class="description">
@@ -37,7 +37,7 @@
 </template>
 
 <script setup lang="ts">
-import { ElMessage } from 'element-plus'
+import { ElInput, ElMessage, ElOption, ElSelect } from 'element-plus'
 import { ref } from 'vue'
 import EnterNextContainer from './index.vue'
 

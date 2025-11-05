@@ -46,7 +46,7 @@ const props = withDefaults(defineProps<propsType>(), {
   colorLight: '#ffffff',
   margin: 4,
   showBorder: false,
-  borderWidth: 1,
+  borderWidth: 0,
   borderColor: '#000000',
   showLogo: false,
   logoUrl: '',
@@ -112,6 +112,8 @@ const containerStyle = computed(() => {
   const baseStyle: Record<string, string> = {
     position: 'relative',
     display: 'inline-block',
+    width: `${props.size}px`,
+    height: `${props.size}px`,
   }
 
   if (props.showBorder) {
@@ -166,7 +168,7 @@ async function generateQRCode() {
     const processedText = processText(props.text)
 
     const options: QRCodeRenderersOptions = {
-      width: props.size,
+      width: props.size - props.borderWidth - 0.5,
       margin: props.margin,
       color: {
         dark: props.colorDark,
