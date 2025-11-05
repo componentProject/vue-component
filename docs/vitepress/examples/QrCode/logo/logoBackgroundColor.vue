@@ -5,30 +5,36 @@
         :text="text"
         :size="200"
         :show-logo="true"
-        logo-url="https://via.placeholder.com/100"
+        logo-url="https://www.baidu.com/favicon.ico"
         logo-background-color="#ffffff"
       />
-      <div class="label">白色背景（默认）</div>
+      <div class="label">
+        白色背景（默认）
+      </div>
     </div>
     <div class="example-item">
       <QrCode
         :text="text"
         :size="200"
         :show-logo="true"
-        logo-url="https://via.placeholder.com/100"
+        logo-url="https://www.baidu.com/favicon.ico"
         logo-background-color="#f0f8ff"
       />
-      <div class="label">浅蓝背景</div>
+      <div class="label">
+        浅蓝背景
+      </div>
     </div>
     <div class="example-item">
       <QrCode
         :text="text"
         :size="200"
         :show-logo="true"
-        logo-url="https://via.placeholder.com/100"
+        logo-url="https://www.baidu.com/favicon.ico"
         logo-background-color="#fffacd"
       />
-      <div class="label">浅黄背景</div>
+      <div class="label">
+        浅黄背景
+      </div>
     </div>
   </div>
 </template>
@@ -58,4 +64,3 @@ const text = ref('https://www.example.com')
   color: #666;
 }
 </style>
-

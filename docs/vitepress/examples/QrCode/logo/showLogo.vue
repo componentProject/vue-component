@@ -6,16 +6,20 @@
         :size="200"
         :show-logo="false"
       />
-      <div class="label">无Logo</div>
+      <div class="label">
+        无Logo
+      </div>
     </div>
     <div class="example-item">
       <QrCode
         :text="text"
         :size="200"
         :show-logo="true"
-        logo-url="https://via.placeholder.com/100"
+        logo-url="https://www.baidu.com/favicon.ico"
       />
-      <div class="label">有Logo</div>
+      <div class="label">
+        有Logo
+      </div>
     </div>
   </div>
 </template>
@@ -45,4 +49,3 @@ const text = ref('https://www.example.com')
   color: #666;
 }
 </style>
-
