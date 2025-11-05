@@ -25,8 +25,8 @@
   },
   "devDependencies": {
     "@antfu/eslint-config": "^4.16.1",
-    "@moluoxixi/utils": "workspace:*",
     "@moluoxixi/constant": "workspace:*",
+    "@moluoxixi/utils": "workspace:*",
     "@tailwindcss/postcss": "catalog:dev",
     "@types/lodash": "catalog:type",
     "@types/node": "catalog:type",

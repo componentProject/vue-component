@@ -18,6 +18,37 @@ import type {
 import axios from 'axios'
 import { ElMessage } from 'element-plus'
 
+// 检查 document 是否存在
+const hasDocument = typeof document !== 'undefined'
+
+// 创建消息实例的包装函数
+function createMessageWrapper() {
+  if (hasDocument) {
+    return ElMessage
+  }
+  return {
+    success: (options: string | { message?: string; [key: string]: any }) => {
+      const message = typeof options === 'string' ? options : options?.message || ''
+      console.log(`[Message Success] ${message}`)
+    },
+    error: (options: string | { message?: string; [key: string]: any }) => {
+      const message = typeof options === 'string' ? options : options?.message || ''
+      console.error(`[Message Error] ${message}`)
+    },
+    warning: (options: string | { message?: string; [key: string]: any }) => {
+      const message = typeof options === 'string' ? options : options?.message || ''
+      console.warn(`[Message Warning] ${message}`)
+    },
+    info: (options: string | { message?: string; [key: string]: any }) => {
+      const message = typeof options === 'string' ? options : options?.message || ''
+      console.info(`[Message Info] ${message}`)
+    },
+  }
+}
+
+// 定义消息实例类型
+type MessageInstance = ReturnType<typeof createMessageWrapper>
+
 // 定义配置接口
 interface BaseApiConfig {
   baseURL: string
@@ -40,10 +71,12 @@ export default class BaseApi {
   protected onTimeout: () => void
   instance: ReturnType<typeof axios.create>
   private cancelTokenSources: Map<string, CancelTokenSource> = new Map()
+  protected messageInstance: MessageInstance
 
   constructor(config: BaseApiConfig) {
     this.baseURL = config.baseURL
     this.timeout = config.timeout || 5000
+    this.messageInstance = createMessageWrapper()
     this.responseFields = {
       code: 'code',
       message: 'message',
@@ -99,7 +132,7 @@ export default class BaseApi {
     }
 
     if (code && code !== 200) {
-      ElMessage.error({
+      this.messageInstance?.error({
         message: message || '请求失败',
         duration: 5 * 1000,
       })
@@ -140,7 +173,7 @@ export default class BaseApi {
         // 处理超时错误
         if (error.code === 'ECONNABORTED' && error.message.includes('timeout')) {
           this.onTimeout()
-          ElMessage.error({
+          this.messageInstance?.error({
             message: '请求超时，请检查网络连接或稍后重试',
             duration: 5 * 1000,
           })
@@ -151,7 +184,7 @@ export default class BaseApi {
         }
         // 处理其他错误
         else {
-          ElMessage.error({
+          this.messageInstance?.error({
             message: error.response?.data as string || error.message || '网络错误',
             duration: 5 * 1000,
           })

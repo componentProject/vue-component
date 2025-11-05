@@ -28,7 +28,7 @@ export type ViteConfigType = UserConfig | ((mode: ConfigEnv) => UserConfig)
  * 将字符串形式的布尔开关解析为布尔值。
  *
  * @param input 旗标值，例如 'true'|'false'|'1'|'0'；未传则返回默认值
- * @param [defaultValue] 当未传入 input 时返回的默认布尔值，函数内默认为 false
+ * @param [defaultValue] 当未传入 input 时返回的默认布尔值，函数内默认为 falsec
  * @returns {boolean} 解析后的布尔值
  */
 export function parseBoolean(input: string | undefined, defaultValue = false): boolean {

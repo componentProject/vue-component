@@ -46,7 +46,7 @@ function createHttpService(options = {}) {
   const httpInstance = new HttpRequest(axiosInstance)
 
   // 创建统一的HTTP服务对象
-  const httpService = {
+  return {
     // 核心实例
     instance: httpInstance,
 
@@ -83,8 +83,6 @@ function createHttpService(options = {}) {
       return httpInstance.all(requests)
     },
   }
-
-  return httpService
 }
 
 /**

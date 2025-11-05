@@ -1,6 +1,77 @@
 import axios from 'axios'
 import { ElMessage, ElNotification } from 'element-plus'
 
+// 检查 document 是否存在
+const hasDocument = typeof document !== 'undefined'
+
+// 创建消息实例的包装函数
+const createMessageWrapper = () => {
+  if (hasDocument) {
+    return ElMessage
+  }
+  return {
+    success: (options) => {
+      const message = typeof options === 'string' ? options : options?.message || ''
+      console.log(`[Message Success] ${message}`)
+    },
+    error: (options) => {
+      const message = typeof options === 'string' ? options : options?.message || ''
+      console.error(`[Message Error] ${message}`)
+    },
+    warning: (options) => {
+      const message = typeof options === 'string' ? options : options?.message || ''
+      console.warn(`[Message Warning] ${message}`)
+    },
+    info: (options) => {
+      const message = typeof options === 'string' ? options : options?.message || ''
+      console.info(`[Message Info] ${message}`)
+    },
+  }
+}
+
+// 创建通知实例的包装函数
+const createNotificationWrapper = () => {
+  if (hasDocument) {
+    return ElNotification
+  }
+  const consoleNotification = (options, level = 'info') => {
+    const opts = typeof options === 'string' ? { message: options } : options
+    const message = opts?.message || ''
+    const title = opts?.title || '提示'
+    const logMessage = `[Notification ${level}] ${title}: ${message}`
+
+    switch (level) {
+      case 'success':
+        console.log(logMessage)
+        break
+      case 'error':
+        console.error(logMessage)
+        break
+      case 'warning':
+        console.warn(logMessage)
+        break
+      default:
+        console.info(logMessage)
+    }
+  }
+
+  const wrapper = (options) => {
+    const opts = typeof options === 'string' ? { message: options } : options
+    const type = opts?.type || 'info'
+    consoleNotification(options, type)
+  }
+
+  wrapper.success = (options) => consoleNotification(options, 'success')
+  wrapper.error = (options) => consoleNotification(options, 'error')
+  wrapper.warning = (options) => consoleNotification(options, 'warning')
+  wrapper.info = (options) => consoleNotification(options, 'info')
+
+  return wrapper
+}
+
+const MessageWrapper = createMessageWrapper()
+const NotificationWrapper = createNotificationWrapper()
+
 /**
  * 创建基础的axios实例
  * @param {string} baseURL - 基础URL
@@ -91,11 +162,9 @@ export function createAxiosInstance(baseURL, timeout = 5000, options = {}) {
 
       // 处理其他错误码
       if (code != 200) {
-        ElMessage({
+        MessageWrapper.error({
           message,
-          type: 'error',
           duration: 100 * 1000,
-          center: true,
         })
         return Promise.reject(new Error(message || 'Error'))
       }
@@ -107,13 +176,21 @@ export function createAxiosInstance(baseURL, timeout = 5000, options = {}) {
         errors.forEach((item) => {
           html += `<div style="font-size: 14px;color:red">${item.code}：${item.message}</div>`
         })
-        ElNotification({
-          title: '提示',
-          type: 'error',
-          dangerouslyUseHTMLString: true,
-          duration: 10000,
-          message: html,
-        })
+        if (hasDocument) {
+          NotificationWrapper.error({
+            title: '提示',
+            message: html,
+            dangerouslyUseHTMLString: true,
+            duration: 10000,
+          })
+        }
+        else {
+          const errorMessages = errors.map(item => `${item.code}：${item.message}`).join('\n')
+          NotificationWrapper.error({
+            title: '提示',
+            message: errorMessages,
+          })
+        }
         return Promise.reject(new Error('请求错误'))
       }
 
@@ -124,13 +201,21 @@ export function createAxiosInstance(baseURL, timeout = 5000, options = {}) {
         tips.forEach((item) => {
           html += `<div style="font-size: 14px;color:#E6A23C">${item.code}：${item.message}</div>`
         })
-        ElNotification({
-          title: '提示',
-          type: 'warning',
-          dangerouslyUseHTMLString: true,
-          duration: 10000,
-          message: html,
-        })
+        if (hasDocument) {
+          NotificationWrapper.warning({
+            title: '提示',
+            message: html,
+            dangerouslyUseHTMLString: true,
+            duration: 10000,
+          })
+        }
+        else {
+          const tipMessages = tips.map(item => `${item.code}：${item.message}`).join('\n')
+          NotificationWrapper.warning({
+            title: '提示',
+            message: tipMessages,
+          })
+        }
       }
 
       return {
@@ -143,7 +228,7 @@ export function createAxiosInstance(baseURL, timeout = 5000, options = {}) {
       if (error.response?.status === 401) {
         // token过期，触发回调
         onLoginRequired()
-        ElMessage.error({
+        MessageWrapper.error({
           message: '登录已过期，请重新登录',
           duration: 5 * 1000,
         })
@@ -151,21 +236,21 @@ export function createAxiosInstance(baseURL, timeout = 5000, options = {}) {
       else if (error.code === 'ECONNABORTED') {
         // timeout错误处理
         if (error.message.includes('timeout')) {
-          ElMessage.error({
+          MessageWrapper.error({
             message: '请求超时，请检查网络连接或稍后重试',
             duration: 5 * 1000,
           })
         }
         else {
           // 其他连接中止错误
-          ElMessage.error({
+          MessageWrapper.error({
             message: '网络连接异常，请检查网络设置',
             duration: 5 * 1000,
           })
         }
       }
       else {
-        ElMessage.error({
+        MessageWrapper.error({
           message: error.response?.data || '网络错误',
           duration: 5 * 1000,
         })
