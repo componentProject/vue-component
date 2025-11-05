@@ -829,7 +829,7 @@ async function bundleComponentModule(ctx: BuildContext, {
       outDir,
       emptyOutDir: true,
       // 是否压缩
-      minify: 'esbuild',
+      minify: ctx.useObfuscator ? 'esbuild' : false,
       cssCodeSplit: false, // 关闭CSS代码分割，避免文件拆分
       lib: {
         entry,
