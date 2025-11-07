@@ -14,14 +14,8 @@ export default viteConfig(
         base: {
           appTitle: viteEnv.VITE_GLOB_APP_TITLE,
           appCode: viteEnv.VITE_GLOB_APP_CODE,
-          devtools: false,
-          dropConsole: false,
           port: 3301,
           open: false,
-          qiankun: true,
-          qiankunDevMode: false,
-          compression: true,
-          imagemin: true,
           autoRoutes: {
             routeConfig: {
               componentExamples: {
