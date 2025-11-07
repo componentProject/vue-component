@@ -36,6 +36,7 @@
     "@vue-macros/volar": "catalog:dev",
     "@vue/compiler-sfc": "^3.5.13",
     "autoprefixer": "catalog:dev",
+    "code-inspector-plugin": "^1.2.10",
     "dependency-cruiser": "^15.3.0",
     "dotenv": "catalog:dev",
     "eslint": "catalog:dev",

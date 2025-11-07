@@ -99,6 +99,10 @@ export interface PluginConfig {
    * PWA配置，true表示使用默认配置，对象表示覆盖默认配置
    */
   pwa?: boolean | VitePWAOptions
+  /**
+   * Code Inspector配置，true表示使用默认配置，对象表示覆盖默认配置
+   */
+  codeInspector?: boolean | Parameters<typeof import('code-inspector-plugin').codeInspectorPlugin>[0]
 }
 
 export interface ModeConfig extends PluginConfig {

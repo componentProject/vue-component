@@ -19,6 +19,7 @@ import importToCDN from 'vite-plugin-cdn-import'
 import viteCompression from 'vite-plugin-compression'
 import viteImagemin from 'vite-plugin-imagemin'
 import { VitePWA } from 'vite-plugin-pwa'
+import { codeInspectorPlugin } from 'code-inspector-plugin'
 import { modules } from './constants/index.ts'
 
 // qiankun
@@ -71,6 +72,7 @@ export default function createViteConfig(Config: ViteConfigType) {
       autoRoutes = true,
       pageRoutes = false,
       pwa = true,
+      codeInspector = true,
       devtools,
       port,
       open,
@@ -221,6 +223,15 @@ export default function createViteConfig(Config: ViteConfigType) {
             },
           },
           pwa,
+        ),
+      ),
+      isDev && codeInspector && codeInspectorPlugin(
+        deepMerge(
+          {
+            bundler: 'vite' as const,
+            showSwitch: true,
+          },
+          codeInspector,
         ),
       ),
     ].filter(Boolean)
