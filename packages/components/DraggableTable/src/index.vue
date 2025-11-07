@@ -626,9 +626,13 @@ const defaultEditRules = ref<VxeTablePropTypes.EditRules>({})
  * 4. 添加基于field的自定义默认渲染器，额外提供以下type功能：'input' | 'select' | 'date' | 'datetime' | 'switch' | 'progress' | 'tag'
  */
 const computedColumns = computed<ColumnType[]>(() => {
-  const columns: any[] = cloneDeep(localColumns.value)
-  if (!getType(columns, 'array') || !localColumns.value?.length)
+  const columns: any[] = localColumns.value
+  if (!columns?.length) {
+    return props.columns
+  }
+  if (!getType(columns, 'array')) {
     return []
+  }
 
   // 清空验证规则
   // eslint-disable-next-line vue/no-side-effects-in-computed-properties
@@ -927,17 +931,17 @@ async function handleGetStoredColumns(): Promise<ColumnType[]> {
 async function handleSaveColumnsToServer(key: string, columns: string) {
   const { isCommon, isReset } = customRestConfig.value || {}
   const callbacks = []
-  if (isReset) {
-  //   执行删除逻辑
-  }
-  else {
-    callbacks.push(setMemoryUpload({
-      pageId: props.pageId,
-      widgetId: key,
-      userId: !isCommon ? props.userId : '',
-      data: columns,
-    }))
-  }
+  // if (isReset) {
+  // //   执行删除逻辑
+  // }
+  // else {
+  callbacks.push(setMemoryUpload({
+    pageId: props.pageId,
+    widgetId: key,
+    userId: !isCommon ? props.userId : '',
+    data: columns,
+  }))
+  // }
 
   await Promise.all(callbacks)
 }
