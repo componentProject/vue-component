@@ -618,7 +618,7 @@ const defaultEditRules = ref<VxeTablePropTypes.EditRules>({})
  */
 const computedColumns = computed<ColumnType[]>(() => {
   const columns: any[] = cloneDeep(localColumns.value)
-  if (!getType(columns, 'array'))
+  if (!getType(columns, 'array') || !localColumns.value?.length)
     return []
 
   // 清空验证规则

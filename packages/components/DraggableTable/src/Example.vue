@@ -64,9 +64,6 @@
         save-type="server"
         :rowdragable="rowdragable"
         :columndragable="columndragable"
-        :editable="editable"
-        :filterable="filterable"
-        :sortable="sortable"
         show-pagination
         @page-change="pageChange"
         @data-change="handleDataChange"
