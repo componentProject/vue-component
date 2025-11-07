@@ -265,6 +265,15 @@ VxeUI.component(VxePager)
 VxeUI.component(VxeTooltip)
 
 //#region 根据props动态计算的vxeGrid属性
+function getHeight(height?: number | string): number {
+  if (typeof height === 'string' && height.endsWith('px')) {
+    return +height.replace('px', '') || 32
+  }
+  else {
+    return +height || 32
+  }
+}
+
 const computedPagerConfig = computed(() => {
   return {
     enabled: props.showPagination,
@@ -292,7 +301,7 @@ const computedHeaderCellStyle = computed(() => {
   const height = props.headerCellConfig?.height
   return (params: any) => {
     return {
-      height: height ? `${height}px` : '32px',
+      height: `${getHeight(height)}px`,
       ...(getType(props.headerCellStyle, 'object') ? props.headerCellStyle : props.headerCellStyle?.(params)),
     }
   }
@@ -328,7 +337,7 @@ const computedSortConfig = computed(() => {
 })
 const computedRowConfig = computed(() => {
   return {
-    height: props.cellConfig?.height ?? 32,
+    height: getHeight(props.cellConfig?.height),
     resizable: true,
     drag: props.dragType === 'vxe' && (props.rowdragable || props.dragable),
     keyField: props.rowId,
