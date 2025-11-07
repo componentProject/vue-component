@@ -11,6 +11,7 @@ docs/vitepress/.vitepress/cache
 typings
 _typings
 stats.html
+dev-dist
 
 pnpm-lock.yaml
 yarn.lock

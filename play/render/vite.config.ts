@@ -42,31 +42,8 @@ export default viteConfig(
           //     },
           //   ],
           // },
-          autoRoutes: {
-            routeConfig: {
-              componentExamples: {
-                glob: [
-                  '/../../packages/components/**/Example.vue',
-                  '!/../../packages/components/**/components/*',
-                  '!/../../packages/components/**/_*/*',
-                ],
-                baseRoute: {
-                  path: '/components',
-                  name: '组件示例',
-                },
-              },
-              AllTestComponentExamples: {
-                glob: [
-                  '/../../packages/components/_AllTestOrNoPublishComponents/**/Example.vue',
-                  '!/../../packages/components/_AllTestOrNoPublishComponents/**/components/*',
-                ],
-                baseRoute: {
-                  path: '/test-components',
-                  name: '待发布/测试组件示例(放一些demo，也许后面会发布)',
-                },
-              },
-            },
-          },
+          // 也可以传入配置对象来自定义
+          autoRoutes: true,
         },
         development: {},
         production: {},

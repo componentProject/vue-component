@@ -27,6 +27,9 @@ import scopedCssPrefixPlugin from './plugins/addScopedAndReplacePrefix.ts'
 
 // 自动路由
 import autoRoutesPlugin from './plugins/autoRoutes/index.ts'
+// 页面路由
+import PageRoutes from 'unplugin-vue-router/vite'
+import type { Options as VueRouterOptions } from 'unplugin-vue-router'
 
 import type {
   CompressionOptions,
@@ -66,6 +69,7 @@ export default function createViteConfig(Config: ViteConfigType) {
       cdn = true,
       visualizer = true,
       autoRoutes = true,
+      pageRoutes = false,
       pwa = true,
       devtools,
       port,
@@ -79,6 +83,20 @@ export default function createViteConfig(Config: ViteConfigType) {
     const envSystemCode = isDev && !qiankunDevMode ? 'el' : (namespace ?? appCode)
 
     const plugins = [
+      pageRoutes && PageRoutes(
+        deepMerge(
+          {
+            routesFolder: path.resolve(rootPath, './src/pages'),
+            dts: path.resolve(rootPath, './src/typings/vue-router.d.ts'),
+            extensions: ['.vue'],
+            exclude: [
+              '**/components/**',
+              '**/__tests__/**',
+            ],
+          },
+          pageRoutes,
+        ) as VueRouterOptions,
+      ),
       pluginVue(),
       vueJsx(),
       isDev && devtools && vueDevTools(),

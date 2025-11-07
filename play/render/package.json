@@ -63,6 +63,7 @@
     "typescript": "catalog:dev",
     "unplugin-auto-import": "catalog:dev",
     "unplugin-vue-components": "catalog:dev",
+    "unplugin-vue-router": "^0.16.1",
     "vite": "catalog:dev",
     "vite-plugin-qiankun": "catalog:dev"
   },
