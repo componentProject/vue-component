@@ -1,81 +1,105 @@
 import type { ConfigEnv, PluginOption, UserConfig } from 'vite'
 import type { Options as unpluginVueComponentsOptions } from 'unplugin-vue-components/types'
 import type { Options as unpluginAutoImportOptions } from 'unplugin-auto-import/types'
-import type { Options as CDNImportOptions } from 'vite-plugin-cdn-import'
+import type viteCompression from 'vite-plugin-compression'
+import type viteImagemin from 'vite-plugin-imagemin'
+import type importToCDN from 'vite-plugin-cdn-import'
+import type { visualizer } from 'rollup-plugin-visualizer'
 
-export interface ModeConfig {
-  /**
-   * 项目标题
-   */
-  VITE_GLOB_APP_TITLE?: string
-  /**
-   * 项目code
-   */
-  VITE_GLOB_APP_CODE?: string
-  /**
-   * 是否启用vue-devtools
-   */
-  VITE_DEVTOOLS?: boolean
-  /**
-   * 是否在打包时，删除console和debugger
-   */
-  VITE_PURE_CONSOLE_AND_DEBUGGER?: boolean
-  /**
-   * 项目端口
-   */
-  VITE_PORT?: number
-  /**
-   * 是否在npm run dev时，自动打开浏览器
-   */
-  VITE_OPEN?: boolean
-  /**
-   * 是否启用qiankun
-   */
-  VITE_USE_QIANKUN?: boolean
-  /**
-   * dev环境是否启用qiankun
-   */
-  VITE_QIANKUN_DEV?: boolean
-  /**
-   * 是否启用命名空间
-   */
-  VITE_USE_NAMESPACE?: boolean
-  /**
-   * 是否生成包预览文件
-   */
-  VITE_REPORT?: boolean
-  /**
-   * 是否压缩代码
-   */
-  VITE_COMPRESS?: boolean
-  /**
-   * 是否压缩图片
-   */
-  VITE_IMAGEMIN?: boolean
-  /**
-   * 是否启用CDN加速 不知道为什么会导致storybook打包会丢失cdn里的包
-   */
-  VITE_USE_CDN?: boolean
-  /**
-   * dev环境是否启用CDN
-   */
-  VITE_USE_CDN_IS_DEV?: boolean
+export type CompressionOptions = Parameters<typeof viteCompression>[0]
+export type ImageminOptions = Parameters<typeof viteImagemin>[0]
+export type CDNOptions = Parameters<typeof importToCDN>[0] & {
   /**
    * CDN的基本url
    */
-  VITE_CDN_BASE_URL?: string
+  baseUrl?: string
   /**
-   * 是否开启gzip压缩,需要先开启压缩代码才有效
+   * dev环境是否启用CDN
    */
-  VITE_BUILD_GZIP?: boolean
+  enableInDevMode?: boolean
+}
+export type VisualizerOptions = Parameters<typeof visualizer>[0]
+
+/**
+ * 插件配置类型，仅在 ModeConfig 中使用
+ */
+export interface PluginConfig {
   /**
-   * 是否删除生产环境 console
+   * AutoImport配置，true表示使用默认配置，对象表示覆盖默认配置
    */
-  VITE_DROP_CONSOLE?: boolean
+  autoImport?: boolean | unpluginAutoImportOptions
   /**
-   * 是否启用自动路由
+   * Components配置，true表示使用默认配置，对象表示覆盖默认配置
    */
-  VITE_AUTO_ROUTES?: boolean
+  autoComponent?: boolean | (unpluginVueComponentsOptions & {
+    /**
+     * 需要排除的element-plus组件
+     */
+    elementExcludes?: string[]
+    /**
+     * 除resolve规则外，额外需要引入的组件所需匹配规则
+     */
+    globs?: string[]
+  })
+  /**
+   * 压缩配置，true表示使用默认配置，对象表示覆盖默认配置
+   */
+  compression?: boolean | CompressionOptions
+  /**
+   * 图片压缩配置，true表示使用默认配置，对象表示覆盖默认配置
+   */
+  imagemin?: boolean | ImageminOptions
+  /**
+   * CDN配置，true表示使用默认配置，对象表示覆盖默认配置
+   */
+  cdn?: boolean | CDNOptions
+  /**
+   * 包预览配置，true表示使用默认配置，对象表示覆盖默认配置
+   */
+  visualizer?: boolean | VisualizerOptions
+  /**
+   * 自动路由配置，true表示使用默认配置，对象表示覆盖默认配置
+   */
+  autoRoutes?: boolean | AutoRoutesConfig
+  /**
+   * 是否启用vue-devtools
+   */
+  devtools?: boolean
+  /**
+   * 项目端口
+   */
+  port?: number
+  /**
+   * 是否在npm run dev时，自动打开浏览器
+   */
+  open?: boolean
+  /**
+   * dev环境是否启用qiankun
+   */
+  qiankunDevMode?: boolean
+  /**
+   * 是否启用qiankun
+   */
+  qiankun?: boolean
+  /**
+   * 命名空间，启用后在非dev环境下的envSystemCode将等于此值
+   */
+  namespace?: string
+  /**
+   * 是否在打包时，删除console和debugger
+   */
+  dropConsole?: boolean
+}
+
+export interface ModeConfig extends PluginConfig {
+  /**
+   * 项目标题
+   */
+  appTitle?: string
+  /**
+   * 项目code
+   */
+  appCode?: string
 }
 
 export interface objRouteConfig {
@@ -123,32 +147,7 @@ export interface Config {
   mode: {
     [key: string]: ModeConfig
   }
-  /**
-   * 自动路由配置
-   */
-  autoRoutes?: AutoRoutesConfig
   viteConfig?: UserConfig | ((mode: ConfigEnv) => UserConfig)
-  /**
-   * unplugin-auto-import的配置项
-   */
-  unpluginAutoImportOptions?: unpluginAutoImportOptions
-  /**
-   * unplugin-vue-components的配置项
-   */
-  unpluginVueComponentsOptions?: unpluginVueComponentsOptions & {
-    /**
-     * 需要排除的element-plus组件
-     */
-    elementExcludes: string[]
-    /**
-     * 除resolve规则外，额外需要引入的组件所需匹配规则
-     */
-    globs: string[]
-  }
-  /**
-   * vite-plugin-cdn-import的配置项
-   */
-  CDNImportOptions?: CDNImportOptions
 }
 
 export type ViteConfigType = Config | ((mode: ConfigEnv) => Config)

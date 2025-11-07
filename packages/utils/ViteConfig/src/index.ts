@@ -11,8 +11,9 @@ import autoprefixer from 'autoprefixer'
 import tailwindcss from '@tailwindcss/postcss'
 
 // 性能优化模块
-import { visualizer } from 'rollup-plugin-visualizer'
+import { visualizer as visualizerPlugin } from 'rollup-plugin-visualizer'
 import AutoImport from 'unplugin-auto-import/vite'
+import Components from 'unplugin-vue-components/vite'
 import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
 import importToCDN from 'vite-plugin-cdn-import'
 import viteCompression from 'vite-plugin-compression'
@@ -20,13 +21,14 @@ import viteImagemin from 'vite-plugin-imagemin'
 import { modules } from './constants/index.ts'
 
 // qiankun
-import qiankun from 'vite-plugin-qiankun'
+import qiankunPlugin from 'vite-plugin-qiankun'
 import scopedCssPrefixPlugin from './plugins/addScopedAndReplacePrefix.ts'
 
 // 自动路由
 import autoRoutesPlugin from './plugins/autoRoutes/index.ts'
 
-import type { PluginMap, PluginType, ViteConfigType } from './_types/index.ts'
+import type { CompressionOptions, ImageminOptions, PluginMap, PluginType, ViteConfigType } from './_types/index.ts'
+import { deepMerge } from '../../_utils/object.ts'
 
 // 其余vite插件与配置
 import { defineConfig, mergeConfig } from 'vite'
@@ -45,49 +47,60 @@ export default function createViteConfig(Config: ViteConfigType) {
     const baseConfig = modeConfig?.base || {}
     const currentModeConfig = modeConfig?.[mode] || {}
     const viteEnv = { ...baseConfig, ...currentModeConfig }
-    const appTitle = viteEnv.VITE_GLOB_APP_TITLE
+    const { appTitle, appCode } = viteEnv
     const isDev = mode === 'development'
-    const systemCode = viteEnv.VITE_GLOB_APP_CODE
-    const useDevMode = viteEnv.VITE_QIANKUN_DEV
-    const envSystemCode = isDev && !useDevMode ? 'el' : viteEnv.VITE_USE_NAMESPACE ? viteEnv.VITE_GLOB_APP_CODE : systemCode
 
-    const useDoc = mode === 'github'
-    const useQianKun = viteEnv.VITE_USE_QIANKUN && !useDoc
-    const useCDN = viteEnv.VITE_USE_CDN && !useDoc && !useQianKun
-    const vuePlugins = [
+    // 插件配置，从 viteEnv 中读取（viteEnv 来自 ModeConfig，包含所有插件配置）
+    const {
+      autoImport = true,
+      autoComponent = true,
+      compression = true,
+      imagemin = true,
+      cdn = true,
+      visualizer = true,
+      autoRoutes = true,
+      devtools,
+      port,
+      open,
+      qiankunDevMode,
+      qiankun,
+      namespace,
+      dropConsole,
+    } = viteEnv
+
+    const envSystemCode = isDev && !qiankunDevMode ? 'el' : (namespace ?? appCode)
+
+    const plugins = [
       pluginVue(),
       vueJsx(),
-      isDev && viteEnv.VITE_DEVTOOLS && vueDevTools(), // // 自动引入
-      // 自动引入
-      AutoImport({
-        imports: ['vue'],
-        resolvers: [ElementPlusResolver()],
-        dts: path.resolve(rootPath, './src/typings/auto-imports.d.ts'),
-        ...config.unpluginAutoImportOptions,
-      }),
-      // 与自定义element组件冲突
-      // Components({
-      //   resolvers: [
-      //     ElementPlusResolver({
-      //       exclude: !useDoc && config.unpluginVueComponentsOptions?.elementExcludes
-      //         ? new RegExp(config.unpluginVueComponentsOptions?.elementExcludes.map((item: string) => `^${item}$`).join('|'))
-      //         : undefined,
-      //     }),
-      //   ],
-      //   globs: [
-      //     'src/components/**/index.vue',
-      //     'src/components/**/index.ts',
-      //     '!src/components/**/base/**/*',
-      //     '!src/components/**/components/**/*',
-      //     '!src/components/**/src/**/*',
-      //     '!src/components/**/_*/**/*',
-      //   ],
-      //   dts: path.resolve(rootPath, './src/typings/components.d.ts'),
-      //   ...config.unpluginVueComponentsOptions,
-      // }),
-    ].filter(i => !!i)
-
-    const performancePlugins = [
+      isDev && devtools && vueDevTools(),
+      autoImport && AutoImport(
+        deepMerge(
+          {
+            imports: ['vue'],
+            resolvers: [ElementPlusResolver()],
+            dts: path.resolve(rootPath, './src/typings/auto-imports.d.ts'),
+          },
+          autoImport,
+        ),
+      ),
+      autoComponent && Components(
+        deepMerge(
+          {
+            resolvers: [ElementPlusResolver()],
+            globs: [
+              'src/components/**/index.vue',
+              'src/components/**/index.ts',
+              '!src/components/**/base/**/*',
+              '!src/components/**/components/**/*',
+              '!src/components/**/src/**/*',
+              '!src/components/**/_*/**/*',
+            ],
+            dts: path.resolve(rootPath, './src/typings/components.d.ts'),
+          },
+          autoComponent,
+        ),
+      ),
       createHtmlPlugin({
         inject: {
           data: {
@@ -95,105 +108,111 @@ export default function createViteConfig(Config: ViteConfigType) {
           },
         },
       }),
-      // 代码压缩
-      viteEnv.VITE_COMPRESS
-      && viteCompression({
-        algorithm: viteEnv.VITE_BUILD_GZIP ? 'gzip' : 'brotliCompress',
-        verbose: true,
-        disable: false,
-        ext: '.gz',
-        threshold: 10240,
-        deleteOriginFile: false,
-      }),
-      // 图片压缩
-      viteEnv.VITE_IMAGEMIN
-      && viteImagemin({
-        gifsicle: { optimizationLevel: 7, interlaced: false },
-        optipng: { optimizationLevel: 7 },
-        mozjpeg: { quality: 20 },
-        pngquant: { quality: [0.8, 0.9], speed: 4 },
-        svgo: {
-          plugins: [{ name: 'removeViewBox' }, { name: 'removeEmptyAttrs', active: false }],
-        },
-      }),
-      useCDN
-      && importToCDN({
-        enableInDevMode: viteEnv.VITE_USE_CDN_IS_DEV,
-        prodUrl: `${viteEnv.VITE_CDN_BASE_URL}/{name}@{version}{path}`,
-        modules,
-        generateScriptTag: (_name, scriptUrl) => {
-          const esmArr = ['esm', '.mjs']
-          const isESM = esmArr.some(item => scriptUrl.includes(item))
-          if (isESM) {
-            return {
-              attrs: {
-                src: scriptUrl,
-                type: 'module',
-                crossorigin: 'anonymous',
-              },
-              injectTo: 'head',
-            }
-          }
-          else {
-            return {
-              attrs: {
-                src: scriptUrl,
-                crossorigin: 'anonymous',
-              },
-              injectTo: 'head',
-            }
-          }
-        },
-        ...config.CDNImportOptions,
-      }),
-    ].filter(i => !!i)
-
-    const monitorPlugins = [
-      // 是否生成包预览
-      viteEnv.VITE_REPORT
-      && visualizer({
-        open: true,
-      }),
-    ].filter(i => !!i)
-
-    const qianKunPlugins = useQianKun
-      ? [
-          qiankun(envSystemCode!, { useDevMode }),
-          scopedCssPrefixPlugin({
-            prefixScoped: `div[data-qiankun='${envSystemCode}']`,
-            oldPrefix: 'el',
-            newPrefix: systemCode,
-            useDevMode,
-          }),
-        ]
-      : []
-    const defaultConfig: UserConfig = {
-      base: `/${systemCode}`,
-      plugins: [
-        ...vuePlugins,
-        ...performancePlugins,
-        ...monitorPlugins,
-        ...qianKunPlugins,
-        viteEnv.VITE_AUTO_ROUTES && autoRoutesPlugin({
-          root: rootPath,
-          routeConfig: {
-            views: ['/src/views/**/index.vue', '!/src/views/**/components/*'],
-            examples: '/src/examples/**/index.vue',
-            componentExamples: {
-              glob: ['/src/components/**/Example.vue', '!/src/components/**/components/*'],
-              baseRoute: {
-                path: '/components',
-                name: '组件示例',
-              },
-            },
-            ...config.autoRoutes?.routeConfig,
+      compression && viteCompression(
+        deepMerge(
+          {
+            algorithm: 'brotliCompress' as const,
+            verbose: true,
+            disable: false,
+            ext: '.gz',
+            threshold: 10240,
+            deleteOriginFile: false,
           },
-          dts: config.autoRoutes?.dts || path.resolve(rootPath, './src/typings/auto-routes.d.ts'),
+          compression,
+        ) as CompressionOptions,
+      ),
+      imagemin && viteImagemin(
+        deepMerge(
+          {
+            gifsicle: { optimizationLevel: 7, interlaced: false },
+            optipng: { optimizationLevel: 7 },
+            mozjpeg: { quality: 20 },
+            pngquant: { quality: [0.8, 0.9] as [number, number], speed: 4 },
+            svgo: {
+              plugins: [{ name: 'removeViewBox' }, { name: 'removeEmptyAttrs', active: false }],
+            },
+          },
+          imagemin,
+        ) as ImageminOptions,
+      ),
+      cdn && importToCDN(
+        deepMerge(
+          {
+            enableInDevMode: false,
+            prodUrl: '/{name}@{version}{path}',
+            modules,
+            generateScriptTag: (_name: string, scriptUrl: string) => {
+              const esmArr = ['esm', '.mjs']
+              const isESM = esmArr.some(item => scriptUrl.includes(item))
+              if (isESM) {
+                return {
+                  attrs: {
+                    src: scriptUrl,
+                    type: 'module',
+                    crossorigin: 'anonymous',
+                  },
+                  injectTo: 'head' as const,
+                }
+              }
+              else {
+                return {
+                  attrs: {
+                    src: scriptUrl,
+                    crossorigin: 'anonymous',
+                  },
+                  injectTo: 'head' as const,
+                }
+              }
+            },
+          },
+          cdn,
+        ),
+      ),
+      visualizer && visualizerPlugin(
+        deepMerge(
+          {
+            open: true,
+          },
+          visualizer,
+        ),
+      ),
+    ].filter(Boolean)
+
+    const defaultConfig: UserConfig = {
+      base: `/${appCode}`,
+      plugins: [
+        ...plugins,
+        qiankun && qiankunPlugin(envSystemCode!, { useDevMode: qiankunDevMode }),
+        qiankun && scopedCssPrefixPlugin({
+          prefixScoped: `div[data-qiankun='${envSystemCode}']`,
+          oldPrefix: 'el',
+          newPrefix: appCode,
+          useDevMode: qiankunDevMode,
         }),
-      ],
+        autoRoutes && autoRoutesPlugin(
+          deepMerge(
+            {
+              root: rootPath,
+              routeConfig: {
+                views: ['/src/views/**/index.vue', '!/src/views/**/components/*'],
+                examples: '/src/examples/**/index.vue',
+                componentExamples: {
+                  glob: ['/src/components/**/Example.vue', '!/src/components/**/components/*'],
+                  baseRoute: {
+                    path: '/components',
+                    name: '组件示例',
+                  },
+                },
+              },
+              dts: path.resolve(rootPath, './src/typings/auto-routes.d.ts'),
+            },
+            autoRoutes,
+          ),
+        ),
+      ].filter(Boolean),
       esbuild: {
         pure:
-          !isDev && viteEnv.VITE_PURE_CONSOLE_AND_DEBUGGER
+          !isDev && dropConsole
             ? ['console.log', 'console.info', 'console.debug']
             : [],
       },
@@ -204,8 +223,7 @@ export default function createViteConfig(Config: ViteConfigType) {
       },
       build: {
         sourcemap: isDev,
-        // outDir: `${systemCode}`,
-        outDir: useDoc ? './docs/pages' : `${systemCode}`,
+        outDir: `${appCode}`,
         cssCodeSplit: true,
         chunkSizeWarningLimit: 1500,
         minify: 'esbuild',
@@ -217,9 +235,17 @@ export default function createViteConfig(Config: ViteConfigType) {
             entryFileNames: 'static/js/[name]-[hash].js',
             assetFileNames: 'static/[ext]/[name]-[hash].[ext]',
             manualChunks: (id: string) => {
-              // 优化拆分策略
               if (id.includes('node_modules')) {
-                return id.toString().split('node_modules/')[1].split('/')[0].toString()
+                if (id.includes('lodash-es')) {
+                  return 'lodash-vendor'
+                }
+                if (id.includes('element-plus')) {
+                  return 'el-vendor'
+                }
+                if (id.includes('@vue') || id.includes('vue')) {
+                  return 'vue-vendor'
+                }
+                return 'vendor'
               }
             },
           },
@@ -242,8 +268,8 @@ export default function createViteConfig(Config: ViteConfigType) {
       },
       server: {
         host: '0.0.0.0',
-        port: viteEnv.VITE_PORT,
-        open: viteEnv.VITE_OPEN,
+        port,
+        open,
         cors: true,
         proxy: {},
       },

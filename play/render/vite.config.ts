@@ -12,18 +12,41 @@ export default viteConfig(
       rootPath,
       mode: {
         base: {
-          VITE_AUTO_ROUTES: true,
-          VITE_GLOB_APP_TITLE: viteEnv.VITE_GLOB_APP_TITLE,
-          VITE_GLOB_APP_CODE: viteEnv.VITE_GLOB_APP_CODE,
-          VITE_DEVTOOLS: false,
-          VITE_PURE_CONSOLE_AND_DEBUGGER: false,
-          VITE_PORT: 3301,
-          VITE_OPEN: false,
-          VITE_USE_QIANKUN: true,
-          VITE_QIANKUN_DEV: false,
-          VITE_COMPRESS: true,
-          VITE_IMAGEMIN: true,
-          VITE_BUILD_GZIP: true,
+          appTitle: viteEnv.VITE_GLOB_APP_TITLE,
+          appCode: viteEnv.VITE_GLOB_APP_CODE,
+          devtools: false,
+          dropConsole: false,
+          port: 3301,
+          open: false,
+          qiankun: true,
+          qiankunDevMode: false,
+          compression: true,
+          imagemin: true,
+          autoRoutes: {
+            routeConfig: {
+              componentExamples: {
+                glob: [
+                  '/../../packages/components/**/Example.vue',
+                  '!/../../packages/components/**/components/*',
+                  '!/../../packages/components/**/_*/*',
+                ],
+                baseRoute: {
+                  path: '/components',
+                  name: '组件示例',
+                },
+              },
+              AllTestComponentExamples: {
+                glob: [
+                  '/../../packages/components/_AllTestOrNoPublishComponents/**/Example.vue',
+                  '!/../../packages/components/_AllTestOrNoPublishComponents/**/components/*',
+                ],
+                baseRoute: {
+                  path: '/test-components',
+                  name: '待发布/测试组件示例(放一些demo，也许后面会发布)',
+                },
+              },
+            },
+          },
         },
         development: {},
         production: {},
@@ -90,25 +113,6 @@ export default viteConfig(
               api: 'modern-compiler',
               additionalData: `@forward '@moluoxixi/components/_assets/styles/main.scss';`,
             },
-          },
-        },
-      },
-      autoRoutes: {
-        routeConfig: {
-          componentExamples: {
-            glob: [
-              '/../../packages/components/**/Example.vue',
-              '!/../../packages/components/**/components/*',
-              '!/../../packages/components/**/_*/*',
-            ],
-            baseRoute: '组件示例',
-          },
-          AllTestComponentExamples: {
-            glob: [
-              '/../../packages/components/_AllTestOrNoPublishComponents/**/Example.vue',
-              '!/../../packages/components/_AllTestOrNoPublishComponents/**/components/*',
-            ],
-            baseRoute: '待发布/测试组件示例(放一些demo，也许后面会发布)',
           },
         },
       },
