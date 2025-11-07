@@ -2,7 +2,6 @@
   <div ref="container" class="h-full w-full flex-1 overflow-hidden outline-0 table-box containerMain">
     <VxeGrid
       ref="xTable"
-      :columns="computedColumns"
       border
       auto-resize
       show-overflow
@@ -608,6 +607,8 @@ function handleCheckboxChange(params: VxeTableDefines.CheckboxChangeParams) {
 //#region 动态计算columns
 // 编辑验证规则
 const defaultEditRules = ref<VxeTablePropTypes.EditRules>({})
+// 本地保存的列配置
+const localColumns = ref<ColumnType[]>([])
 /**
  * 计算后的columns，用于提供额外功能，目前功能如下：
  * 1. 提供基于field的插槽，规则如下：
@@ -627,9 +628,6 @@ const defaultEditRules = ref<VxeTablePropTypes.EditRules>({})
  */
 const computedColumns = computed<ColumnType[]>(() => {
   const columns: any[] = localColumns.value
-  if (!columns?.length) {
-    return props.columns
-  }
   if (!getType(columns, 'array')) {
     return []
   }
@@ -845,6 +843,10 @@ const computedColumns = computed<ColumnType[]>(() => {
 
   return columns.map(transformColumn).filter(Boolean) as ColumnType[]
 })
+watch(() => computedColumns.value, (newValue) => {
+  // xTable.value.loadColumn(newValue)
+  xTable.value.reloadColumn(newValue)
+})
 //#endregion
 
 //#region 存储相关
@@ -857,8 +859,7 @@ onMounted(() => {
   }
 })
 onBeforeUnmount(() => offEffect.value?.())
-// 本地保存的列配置
-const localColumns = ref<ColumnType[]>([])
+
 const customRestConfig = ref({})
 
 /**
@@ -1004,12 +1005,10 @@ function mergeColumnsLevel(storedLevel: any[] = [], propsLevel: any[] = []): any
     matchedKeys.add(k)
   })
 
-  console.log('result', [...result])
   // 末尾追加 props 中新增（同级）
   propsLevel.forEach((propCol: any) => {
     const k = getColumnUniqueKey(propCol)
     if (!k || !matchedKeys.has(k)) {
-      console.log('propCol', propCol)
       result.push(propCol)
     }
   })
