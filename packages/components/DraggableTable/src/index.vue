@@ -8,6 +8,7 @@
       show-header-overflow
       show-footer-overflow
       keep-source
+      :columns="computedColumns"
       :header-cell-style="computedHeaderCellStyle"
       :pager-config="computedPagerConfig"
       :virtual-y-config="computedVirtualYConfig"
@@ -842,10 +843,6 @@ const computedColumns = computed<ColumnType[]>(() => {
   }
 
   return columns.map(transformColumn).filter(Boolean) as ColumnType[]
-})
-watch(() => computedColumns.value, (newValue) => {
-  // xTable.value.loadColumn(newValue)
-  xTable.value.reloadColumn(newValue)
 })
 //#endregion
 
