@@ -821,7 +821,6 @@ const computedColumns = computed<ColumnType[]>(() => {
             ...cellProps,
           },
         }
-        console.log('aaaaaa', item.cellRender)
       }
       //#endregion
     }

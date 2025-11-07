@@ -287,13 +287,13 @@ export function cancelBatchRequest() {
 
 #### BaseApi(config)
 
-| 参数 | 说明 | 类型 | 默认值 |
-|------|------|------|--------|
-| `config.baseURL` | 基础URL | `string` | - |
-| `config.timeout` | 超时时间（毫秒） | `number` | `5000` |
-| `config.responseFields` | 响应字段映射 | `ResponseFields` | `{ code: 'code', message: 'message', data: 'data', errors: 'errors', tips: 'tips' }` |
-| `config.onTimeout` | 超时回调函数 | `() => void` | `() => {}` |
-| `config[key]` | 其他 axios 配置项 | `any` | - |
+| 参数 | 说明 | 类型 | 默认值         |
+|------|------|------|-------------|
+| `config.baseURL` | 基础URL | `string` | -           |
+| `config.timeout` | 超时时间（毫秒） | `number` | `5000`      |
+| `config.responseFields` | 响应字段映射 | `ResponseFields` | ^[Object]`{ code: 'code', message: 'message', data: 'data', errors: 'errors', tips: 'tips' }` |
+| `config.onTimeout` | 超时回调函数 | `() => void` | `() => {}`  |
+| `config[key]` | 其他 axios 配置项 | `any` | -           |
 
 #### ResponseFields
 
