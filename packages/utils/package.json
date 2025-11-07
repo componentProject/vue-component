@@ -63,6 +63,7 @@
     "vite-plugin-html": "catalog:dev",
     "vite-plugin-imagemin": "catalog:dev",
     "vite-plugin-lazy-import": "^1.0.7",
+    "vite-plugin-pwa": "^1.1.0",
     "vite-plugin-qiankun": "catalog:dev",
     "vite-plugin-vue-devtools": "^7.7.2"
   },

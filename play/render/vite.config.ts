@@ -16,6 +16,32 @@ export default viteConfig(
           appCode: viteEnv.VITE_GLOB_APP_CODE,
           port: 3301,
           open: false,
+          // pwa: {
+          //   icons: [
+          //     {
+          //       src: 'pwa-192x192.png',
+          //       sizes: '192x192',
+          //       type: 'image/png',
+          //       purpose: 'any' as const,
+          //     },
+          //     {
+          //       src: 'pwa-512x512.png',
+          //       sizes: '512x512',
+          //       type: 'image/png',
+          //       purpose: 'any' as const,
+          //     },
+          //   ],
+          //   // 桌面设备安装界面所需的屏幕截图
+          //   screenshots: [
+          //     {
+          //       src: '/images/img.png',
+          //       sizes: '1280x720',
+          //       type: 'image/png',
+          //       form_factor: 'wide' as const,
+          //       label: '桌面端应用截图',
+          //     },
+          //   ],
+          // },
           autoRoutes: {
             routeConfig: {
               componentExamples: {

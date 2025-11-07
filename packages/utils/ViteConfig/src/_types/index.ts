@@ -5,6 +5,7 @@ import type viteCompression from 'vite-plugin-compression'
 import type viteImagemin from 'vite-plugin-imagemin'
 import type importToCDN from 'vite-plugin-cdn-import'
 import type { visualizer } from 'rollup-plugin-visualizer'
+import type { Options as VitePWAOptions } from 'vite-plugin-pwa'
 
 export type CompressionOptions = Parameters<typeof viteCompression>[0]
 export type ImageminOptions = Parameters<typeof viteImagemin>[0]
@@ -89,6 +90,10 @@ export interface PluginConfig {
    * 是否在打包时，删除console和debugger
    */
   dropConsole?: boolean
+  /**
+   * PWA配置，true表示使用默认配置，对象表示覆盖默认配置
+   */
+  pwa?: boolean | VitePWAOptions
 }
 
 export interface ModeConfig extends PluginConfig {

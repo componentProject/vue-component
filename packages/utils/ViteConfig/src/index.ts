@@ -18,6 +18,7 @@ import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
 import importToCDN from 'vite-plugin-cdn-import'
 import viteCompression from 'vite-plugin-compression'
 import viteImagemin from 'vite-plugin-imagemin'
+import { VitePWA } from 'vite-plugin-pwa'
 import { modules } from './constants/index.ts'
 
 // qiankun
@@ -27,7 +28,13 @@ import scopedCssPrefixPlugin from './plugins/addScopedAndReplacePrefix.ts'
 // 自动路由
 import autoRoutesPlugin from './plugins/autoRoutes/index.ts'
 
-import type { CompressionOptions, ImageminOptions, PluginMap, PluginType, ViteConfigType } from './_types/index.ts'
+import type {
+  CompressionOptions,
+  ImageminOptions,
+  PluginMap,
+  PluginType,
+  ViteConfigType,
+} from './_types/index.ts'
 import { deepMerge } from '../../_utils/object.ts'
 
 // 其余vite插件与配置
@@ -59,6 +66,7 @@ export default function createViteConfig(Config: ViteConfigType) {
       cdn = true,
       visualizer = true,
       autoRoutes = true,
+      pwa = true,
       devtools,
       port,
       open,
@@ -174,6 +182,27 @@ export default function createViteConfig(Config: ViteConfigType) {
             open: true,
           },
           visualizer,
+        ),
+      ),
+      pwa && VitePWA(
+        deepMerge(
+          {
+            registerType: 'autoUpdate' as const,
+            // 开发模式下也启用
+            devOptions: {
+              enabled: true,
+            },
+            includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg'],
+            manifest: {
+              id: `/${appCode}/`,
+              start_url: `/${appCode}/`,
+              name: appTitle || 'Vue 应用',
+              short_name: appTitle || '应用',
+              description: '渐进式 Web 应用',
+              display: 'standalone' as const,
+            },
+          },
+          pwa,
         ),
       ),
     ].filter(Boolean)
