@@ -53,6 +53,17 @@ export function getFlagValue(args: string[], name: string, defaultValue?: string
 }
 
 /**
+ * 检查命令行参数中是否存在指定的布尔标志（如 --publish）。
+ *
+ * @param args process.argv.slice(2) 后的参数数组
+ * @param name 标志名称（不含前缀 --），如 'publish'
+ * @returns 如果标志存在则返回 true，否则返回 false
+ */
+export function hasFlag(args: string[], name: string): boolean {
+  return args.includes(`--${name}`)
+}
+
+/**
  * 打印统一的 CLI 使用说明。
  *
  * @param options 配置
@@ -65,7 +76,7 @@ export function printUsage(options: RunBuildCliOptions): void {
   const publishLine = `  build-publish - 构建并发布组件${command === 'build-publish' ? '（默认）' : ''}`
   console.log(`
 使用方法:
-  tsx [引用runBuildCliAndExit方法的文件路径] [command] --mode=[mode] --excludeHeavyPlugins=[excludeHeavyPlugins] --uploadType=${uploadType}
+  tsx [引用runBuildCliAndExit方法的文件路径] [command] --mode=[mode] --excludeHeavyPlugins=[excludeHeavyPlugins] --uploadType=${uploadType} [--publish]
 
 命令(可选):
 ${buildLine}
@@ -78,6 +89,7 @@ ${publishLine}
 
 可选参数:
   [excludeHeavyPlugins]  是否排除重型插件，true/false（默认 false）
+  [--publish]            是否启用 npm publish（需要配合 build-publish 命令使用）
 
 必填参数:
   --uploadType=${uploadType}  上传类型
@@ -85,13 +97,14 @@ ${publishLine}
 示例:
   tsx _scripts/buildComponent.mts build --uploadType=${uploadType}
   tsx _scripts/buildComponent.mts build-publish --mode=library --uploadType=${uploadType}
+  tsx _scripts/buildComponent.mts build-publish --mode=library --uploadType=${uploadType} --publish
   tsx _scripts/buildComponent.mts --uploadType=${uploadType}
   `)
 }
 //#endregion
 
 //#region CLI 运行器
-export type RunBuildCliParams = Omit<BuildOptions, 'mode' | 'shouldPublish' | 'excludeHeavyPlugins' | 'uploadType'>
+export type RunBuildCliParams = Omit<BuildOptions, 'mode' | 'shouldPublish' | 'excludeHeavyPlugins' | 'uploadType' | 'npmPublish'>
 export interface RunBuildCliOptions {
   uploadType?: string
   command?: 'build' | 'build-publish'
@@ -116,6 +129,8 @@ export async function runBuildCli(params: RunBuildCliParams, cli?: RunBuildCliOp
   // const excludeHeavyPlugins = parseBoolean(getFlagValue(args, 'excludeHeavyPlugins', 'false'), false)
   const excludeHeavyPlugins = parseBoolean(getFlagValue(args, 'excludeHeavyPlugins', 'true'), false)
   const uploadType = getFlagValue(args, 'uploadType', cli?.uploadType)
+  // 检查 --publish 标志，如果存在则设置 npmPublish 为 true
+  const npmPublish = hasFlag(args, 'publish')
 
   if (!uploadType) {
     console.error('错误: 缺少必填参数 uploadType')
@@ -129,6 +144,7 @@ export async function runBuildCli(params: RunBuildCliParams, cli?: RunBuildCliOp
     shouldPublish: command === 'build-publish',
     excludeHeavyPlugins,
     uploadType,
+    npmPublish,
   })
   return result ? 0 : 1
 }
@@ -183,6 +199,8 @@ export interface BuildContext {
   uploadType?: string
   /** 样式类型，当为 'scoped' 时启用 addUuidToTemplate 插件 */
   styleType?: string
+  /** 是否启用 npm 发布 */
+  npmPublish?: boolean
   viteConfig?: ViteConfigType
 }
 
@@ -1158,11 +1176,8 @@ async function buildComponent(
     console.log(`==========  ${buildName} 打包完成 ==========`)
     // 如果需要发布，执行发布
     if (shouldPublish) {
-      if (ctx.uploadType) {
-        const res = await UploadEvent(outputDir, buildName, ctx.uploadType)
-        console.log('res', res)
-      }
-      else {
+      // 如果启用了 npm publish，执行 npm 发布
+      if (ctx.npmPublish) {
         console.log(`准备发布 ${buildName}，版本：${currentVersion} -> ${newVersion}`)
         await writeComponentVersions(ctx, {
           [componentKey]: newVersion,
@@ -1180,6 +1195,11 @@ async function buildComponent(
           console.error('发布失败:', error)
           return false
         }
+      }
+      // 有 uploadType，使用 UploadEvent 上传
+      if (ctx.uploadType) {
+        const res = await UploadEvent(outputDir, buildName, ctx.uploadType)
+        console.log('res', res)
       }
     }
 
@@ -1312,6 +1332,8 @@ export interface BuildOptions {
   uploadType?: string
   /** 样式类型，当为 'scoped' 时启用 addUuidToTemplate 插件 */
   styleType?: string
+  /** 是否启用 npm 发布 */
+  npmPublish?: boolean
   /** Vite 配置（可选） */
   viteConfig?: ViteConfigType
 }
@@ -1338,6 +1360,7 @@ export async function buildComponentsWithOptions(options: BuildOptions): Promise
     presetGlobals: _presetGlobals,
     uploadType,
     styleType,
+    npmPublish,
     ...rest
   } = options || ({} as BuildOptions)
 
@@ -1380,6 +1403,7 @@ export async function buildComponentsWithOptions(options: BuildOptions): Promise
     aliasPacks: [],
     uploadType,
     styleType,
+    npmPublish,
     ...rest,
   }
   ctx.aliasPacks = Object.keys(ctx.alias).filter((i: string) => !i.endsWith('*'))
