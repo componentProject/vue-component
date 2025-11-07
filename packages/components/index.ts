@@ -14,6 +14,7 @@ import DragModalDialog from '@moluoxixi/components/DragModalDialog'
 import TsFooter from '@moluoxixi/components/TsFooter'
 import ReForm from '@moluoxixi/components/ReForm'
 import TsCheckbox from '@moluoxixi/components/TsCheckbox'
+import TsExpand from '@moluoxixi/components/TsExpand'
 import TsRadio from '@moluoxixi/components/TsRadio'
 import DesignForm from '@moluoxixi/components/DesignForm'
 import QrCode from '@moluoxixi/components/QrCode'
@@ -36,12 +37,13 @@ export {
   Tree,
   TsButton,
   TsCheckbox,
+  TsExpand,
   TsFooter,
   TsRadio,
   TsSelect,
 }
 
-const components: Component[] = [TsFooter, DragModalDialog, DateRangePicker, DraggableTable, EnterNextContainer, ExportExcel, ImportExcel, TsButton, TsCheckbox, TsRadio, PopoverTableSelect, TsSelect, Tabs, Tree, ReForm, DesignForm, QrCode]
+const components: Component[] = [TsFooter, DragModalDialog, DateRangePicker, DraggableTable, EnterNextContainer, ExportExcel, ImportExcel, TsButton, TsCheckbox, TsExpand, TsRadio, PopoverTableSelect, TsSelect, Tabs, Tree, ReForm, DesignForm, QrCode]
 
 export default {
   install(app: App) {
