@@ -37,6 +37,22 @@ runBuildCliAndExit(
       build: {
         minify: false,
       },
+      css: {
+        preprocessorOptions: {
+          scss: {
+            api: 'legacy',
+            additionalData: (source: string, filename: string) => {
+              if (filename.includes('.vue') && !filename.includes('AIAgent')) {
+                return `@forward '@moluoxixi/components/_assets/styles/main.scss';
+                ${source}`
+              }
+              else {
+                return source
+              }
+            },
+          },
+        },
+      },
     },
   },
   { uploadType: COMPONENT_SETTING_TYPE, command: 'build-publish' },

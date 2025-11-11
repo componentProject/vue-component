@@ -92,7 +92,15 @@ const viteConfig = {
       scss: {
         silenceDeprecations: ['legacy-js-api'],
         api: 'modern-compiler',
-        additionalData: `@forward '@moluoxixi/components/_assets/styles/main.scss';`,
+        additionalData: (source: string, filename: string) => {
+          if (filename.includes('.vue') && !filename.includes('AIAgent')) {
+            return `@forward '@moluoxixi/components/_assets/styles/main.scss';
+                ${source}`
+          }
+          else {
+            return source
+          }
+        },
       },
     },
     postcss: {
