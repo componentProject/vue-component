@@ -155,6 +155,16 @@ export interface CustomConfigDialogPropsType {
   customColumns: ColumnType[]
   /** 是否是配置模式，影响底部“作为统一配置”复选框显示 */
   isConfiguration?: boolean
+  dragable?: boolean
+  rowdragable?: boolean
+  columndragable?: boolean
+  /** 需要禁用拖拽的行class */
+  rowDisabledClass: string
+  /** 行拖拽结束回调方法 */
+  rowDragEndMethod?: (...args: any[]) => any
+  /** 列拖拽结束回调方法 */
+  columnDragEndMethod?: (...args: any[]) => any
+  dragType?: string
   /** 传递给 DragModalDialog 的属性 */
   dialogProps?: {
     zIndex?: number

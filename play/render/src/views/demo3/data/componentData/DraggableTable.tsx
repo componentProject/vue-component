@@ -89,7 +89,6 @@ function handlePageData() {
     const { pageSize, currentPage } = props.pagerConfig
     props.pagerConfig.total = data.length
     props.tableData = data.slice((currentPage - 1) * pageSize, currentPage * pageSize)
-    console.log('props.tableData', props.tableData, props)
     props.loading = false
   }, 100)
 }

@@ -47,12 +47,20 @@ export function setupDevAllWatcher(
   watchPatterns: string[],
   isWatchedPath: PathMatcher,
   onInvalidate: () => void,
-  debounceMs = 50,
+  debounceMs = 2000,
+  onInitialized?: () => void,
 ): void {
   let timer: NodeJS.Timeout | undefined
   const schedule = () => {
-    clearTimeout(timer)
-    timer = setTimeout(onInvalidate, debounceMs)
+    // 清除之前的防抖定时器，确保多次操作仅执行最后一次
+    if (timer) {
+      clearTimeout(timer)
+      timer = undefined
+    }
+    timer = setTimeout(() => {
+      onInvalidate()
+      timer = undefined
+    }, debounceMs)
     ;(timer as any)?.unref?.()
   }
   let watcherReady = false
@@ -108,6 +116,11 @@ export function setupDevAllWatcher(
       server.httpServer?.once('close', removeAll)
     }
     catch {}
+
+    // 初始化完成，调用回调
+    if (onInitialized) {
+      onInitialized()
+    }
   }
 
   try {
@@ -147,7 +160,7 @@ export interface VirtualPluginUserConfig {
   root?: string
   typeContent?: any
   watch?: string | string[]
-  /** 热更新防抖延迟时间（毫秒），默认 50ms */
+  /** 热更新防抖延迟时间（毫秒），默认 2000ms */
   debounceMs?: number
 }
 
@@ -164,7 +177,7 @@ export function createVirtualPlugin(
   generateModule: GenerateModule,
   generateDts?: GenerateDts,
 ): Plugin {
-  const { name, virtualModuleId, dts, root, typeContent, watch, debounceMs = 50 } = userConfig
+  const { name, virtualModuleId, dts, root, typeContent, watch, debounceMs = 2000 } = userConfig
   const VIRTUAL_MODULE_ID = virtualModuleId
 
   const moduleCache: Map<string, string> = new Map()
@@ -175,6 +188,10 @@ export function createVirtualPlugin(
   let isWatchedPath: PathMatcher = () => true
   // 标记服务器是否正在关闭，避免关闭阶段再触发无效操作
   let isServerClosing = false
+  // 标记初始化是否完成
+  let isInitialized = false
+  // 标记初始化期间是否有变化
+  let hasPendingChange = false
 
   // 防抖定时器
   let hmrDebounceTimer: NodeJS.Timeout | undefined
@@ -263,35 +280,60 @@ export function createVirtualPlugin(
       }
       catch {}
 
+      // 执行刷新操作的函数
+      const performInvalidate = () => {
+        if (isServerClosing)
+          return
+        // 失效所有以 VIRTUAL_MODULE_ID 开头的虚拟模块
+        const ids = Array.from(moduleCache.keys()).filter(k => k === VIRTUAL_MODULE_ID || k.startsWith(`${VIRTUAL_MODULE_ID}/`))
+        if (ids.length === 0) {
+          invalidateVirtualModuleInDev(server, VIRTUAL_MODULE_ID, moduleCache)
+          return
+        }
+        for (const vid of ids) {
+          moduleCache.delete(vid)
+          const mod = server.moduleGraph.getModuleById(vid)
+          if (mod) {
+            server.moduleGraph.invalidateModule(mod)
+            try {
+              (server as any).reloadModule?.(mod)
+            }
+            catch {}
+          }
+        }
+
+        if (ids.length === 0)
+          server.ws.send({ type: 'full-reload' })
+      }
+
       setupDevAllWatcher(
         server,
         watchPatterns,
         isWatchedPath,
         () => {
-          if (isServerClosing)
-            return
-          // 失效所有以 VIRTUAL_MODULE_ID 开头的虚拟模块
-          const ids = Array.from(moduleCache.keys()).filter(k => k === VIRTUAL_MODULE_ID || k.startsWith(`${VIRTUAL_MODULE_ID}/`))
-          if (ids.length === 0) {
-            invalidateVirtualModuleInDev(server, VIRTUAL_MODULE_ID, moduleCache)
+          // 初始化期间只记录变化，不执行刷新
+          if (!isInitialized) {
+            hasPendingChange = true
             return
           }
-          for (const vid of ids) {
-            moduleCache.delete(vid)
-            const mod = server.moduleGraph.getModuleById(vid)
-            if (mod) {
-              server.moduleGraph.invalidateModule(mod)
-              try {
-                (server as any).reloadModule?.(mod)
-              }
-              catch {}
-            }
-          }
-
-          if (ids.length === 0)
-            server.ws.send({ type: 'full-reload' })
+          // 初始化完成后正常执行刷新
+          performInvalidate()
         },
         debounceMs,
+        () => {
+          // 初始化完成回调
+          isInitialized = true
+          // 如果初始化期间有变化，执行一次刷新
+          if (hasPendingChange) {
+            hasPendingChange = false
+            // 使用 setTimeout 确保在下一个事件循环中执行，避免阻塞初始化流程
+            setTimeout(() => {
+              if (!isServerClosing) {
+                performInvalidate()
+              }
+            }, 0)
+          }
+        },
       )
     },
 
@@ -304,15 +346,24 @@ export function createVirtualPlugin(
       if (isServerClosing)
         return
 
-      // 清除之前的防抖定时器
-      if (hmrDebounceTimer) {
-        clearTimeout(hmrDebounceTimer)
+      // 初始化期间只记录变化，不执行刷新
+      if (!isInitialized) {
+        hasPendingChange = true
+        return []
       }
 
-      // 设置防抖定时器
+      // 清除之前的防抖定时器，确保多次操作仅执行最后一次
+      if (hmrDebounceTimer) {
+        clearTimeout(hmrDebounceTimer)
+        hmrDebounceTimer = undefined
+      }
+
+      // 设置防抖定时器，延迟执行更新
       hmrDebounceTimer = setTimeout(() => {
-        if (isServerClosing)
+        if (isServerClosing) {
+          hmrDebounceTimer = undefined
           return
+        }
 
         const ids = Array.from(moduleCache.keys()).filter(k => k === VIRTUAL_MODULE_ID || k.startsWith(`${VIRTUAL_MODULE_ID}/`))
         const mods: ModuleNode[] = []
@@ -325,13 +376,41 @@ export function createVirtualPlugin(
           }
         }
 
-        // 触发 HMR 更新
+        // 触发 HMR 更新：手动发送更新消息
         if (mods.length > 0) {
-          ctx.modules = mods
+          try {
+            // 尝试使用 reloadModule 方法
+            for (const mod of mods) {
+              try {
+                (server as any).reloadModule?.(mod)
+              }
+              catch {}
+            }
+            // 发送 HMR 更新消息
+            server.ws.send({
+              type: 'update',
+              updates: mods.map(mod => ({
+                type: 'js-update' as const,
+                path: mod.url,
+                acceptedPath: mod.url,
+                timestamp: Date.now(),
+              })),
+            })
+          }
+          catch {
+            // 如果发送失败，回退到全量刷新
+            server.ws.send({ type: 'full-reload' })
+          }
         }
+        else {
+          // 没有找到模块，执行全量刷新
+          server.ws.send({ type: 'full-reload' })
+        }
+
+        hmrDebounceTimer = undefined
       }, debounceMs)
 
-      // 立即返回，让防抖逻辑在后台执行
+      // 立即返回空数组，让防抖逻辑在后台执行
       return []
     },
 
@@ -341,21 +420,32 @@ export function createVirtualPlugin(
         const absId = normalizePath(path.isAbsolute(id) ? id : path.resolve(rootDir, id))
         if (isWatchedPath(absId)) {
           if (!isServerClosing) {
-            // 清除之前的防抖定时器
-            if (watchChangeDebounceTimer) {
-              clearTimeout(watchChangeDebounceTimer)
+            // 初始化期间只记录变化，不执行刷新
+            if (!isInitialized) {
+              hasPendingChange = true
+              return
             }
 
-            // 设置防抖定时器
+            // 清除之前的防抖定时器，确保多次操作仅执行最后一次
+            if (watchChangeDebounceTimer) {
+              clearTimeout(watchChangeDebounceTimer)
+              watchChangeDebounceTimer = undefined
+            }
+
+            // 设置防抖定时器，延迟执行缓存清理
             watchChangeDebounceTimer = setTimeout(() => {
-              if (isServerClosing)
+              if (isServerClosing) {
+                watchChangeDebounceTimer = undefined
                 return
+              }
 
               // 删除所有缓存的相关虚拟模块
               for (const k of Array.from(moduleCache.keys())) {
                 if (k === VIRTUAL_MODULE_ID || k.startsWith(`${VIRTUAL_MODULE_ID}/`))
                   moduleCache.delete(k)
               }
+
+              watchChangeDebounceTimer = undefined
             }, debounceMs)
           }
         }

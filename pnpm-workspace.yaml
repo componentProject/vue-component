@@ -48,7 +48,7 @@ catalogs:
     vue-router: 4.5.0
     # vue的npm包
     vuedraggable: ^4.1.0
-    vxe-table: 4.9.9
+    vxe-table: 4.7.94
   dev:
     '@antfu/eslint-config': 6.2.0
     '@moluoxixi/ajaxpackage': ^0.0.2

@@ -17,6 +17,7 @@
         height="100%"
         :columns="computedColumns"
         :checkbox-config="computedCheckboxConfig"
+        :row-class-name="handleRowClassName"
         :row-config="computedRowConfig"
         :row-drag-config="computedRowDragConfig"
         :tree-config="computedTreeConfig"
@@ -84,15 +85,20 @@ import { computed, ref, useTemplateRef, watch } from 'vue'
 import { ElButton, ElCheckbox, ElInput, ElSwitch } from 'element-plus'
 import { getTypeName } from '@moluoxixi/components/DraggableTable/src/_utils'
 import type { CustomConfigDialogEmitsType, CustomConfigDialogPropsType } from '@moluoxixi/components/DraggableTable/src/_types'
-import { flattenTree } from '@moluoxixi/utils/_utils'
+import { flattenTree, getClass } from '@moluoxixi/utils/_utils'
 import { cloneDeep } from 'lodash'
 import { VxeGrid } from 'vxe-table'
 import type { VxeGridInstance } from 'vxe-table'
+import Sortable from 'sortablejs'
 
 const props = withDefaults(defineProps<CustomConfigDialogPropsType>(), {
   columns: () => [],
   collectColumns: () => [],
   customColumns: () => [],
+  dragType: 'draggable',
+  rowdragable: true,
+  /** 需要禁用拖拽的行class */
+  rowDisabledClass: '.has-parent',
   isConfiguration: false,
 })
 
@@ -203,6 +209,224 @@ function handleEvent(type: 'confirm' | 'reset' | 'cancel') {
   }
   visible.value = false
 }
+
+//#region draggable模式逻辑
+function handleRowClassName({ row }) {
+  if (row.level > 1) {
+    return 'has-parent'
+  }
+}
+// 保存拖拽实例的引用
+const rowSortableInstance = ref<InstanceType<typeof Sortable> | null>()
+const columnSortableInstance = ref<InstanceType<typeof Sortable> | null>()
+
+// 销毁行拖拽实例
+function destroyRowSortable() {
+  if (rowSortableInstance.value) {
+    rowSortableInstance.value.destroy()
+    rowSortableInstance.value = null
+  }
+}
+
+// 销毁列拖拽实例
+function destroyColumnSortable() {
+  if (columnSortableInstance.value) {
+    columnSortableInstance.value.destroy()
+    columnSortableInstance.value = null
+  }
+}
+
+// 初始化行拖拽
+function initRowDraggable() {
+  // 先销毁旧实例
+  destroyRowSortable()
+
+  if (!xTable.value)
+    return
+
+  const tableBody = xTable.value.$el.querySelector('.vxe-table--body tbody')
+
+  if (!tableBody)
+    return
+
+  // 创建Sortable实例
+  rowSortableInstance.value = Sortable.create(tableBody, {
+    animation: 150,
+    handle: 'tr',
+    filter: getClass(props.rowDisabledClass, true),
+    onEnd: ({ oldIndex = 0, newIndex = 0, item }: Record<string, any>) => {
+      if (oldIndex === newIndex || !xTable.value)
+        return
+      // 获取源数据副本
+      const tableDataCopy = [...tableData.value]
+      // 移动行数据
+      const rowData = tableDataCopy.splice(oldIndex, 1)[0]
+      tableDataCopy.splice(newIndex, 0, rowData)
+      const dragPos = oldIndex > newIndex ? 'top' : 'bottom'
+      const newRow = dragPos === 'top' ? tableDataCopy[newIndex + 1] : tableDataCopy[newIndex - 1]
+      const oldRow = tableDataCopy[newIndex]
+      const hasParent = newRow.level > 1 || oldRow.level > 1
+      const flag = props.rowDragEndMethod
+        ? props.rowDragEndMethod({
+            oldIndex,
+            newIndex,
+            newRow,
+            oldRow,
+            dragRow: rowData,
+            dragPos,
+            dragToChild: false,
+          })
+        : true
+      if (!flag || hasParent) {
+        const wrapperElem = item.parentNode
+        if (wrapperElem) {
+          const nodeList = Array.from(wrapperElem.childNodes)
+          if (dragPos === 'top') {
+            wrapperElem.insertBefore(nodeList[newIndex], nodeList[oldIndex + 1])
+          }
+          else {
+            wrapperElem.insertBefore(nodeList[newIndex], nodeList[oldIndex])
+          }
+        }
+        return
+      }
+      // 更新数据并发送事件
+      tableData.value = tableDataCopy
+      // { newRow, oldRow, dragRow, dragPos, dragToChild, offsetIndex, $event }
+      // 构造vxe格式的事件参数
+      const eventParams = {
+        dragRow: rowData,
+        newRow,
+        oldRow,
+        dragPos,
+        offsetIndex: Math.abs(newIndex - oldIndex),
+        dragToChild: false,
+      }
+      emit('rowDragend', eventParams)
+    },
+  })
+}
+
+// 初始化列拖拽
+function initColumnDraggable() {
+  // 先销毁旧实例
+  destroyColumnSortable()
+
+  if (!xTable.value)
+    return
+
+  const headerTr = xTable.value.$el.querySelector(
+    '.vxe-table--header-wrapper .vxe-table--header tr',
+    '.vxe-table--header tr',
+  )
+  if (!headerTr)
+    return
+
+  // 创建Sortable实例
+  columnSortableInstance.value = Sortable.create(headerTr, {
+    animation: 150,
+    handle: 'th',
+    onEnd: ({ oldIndex = 0, newIndex = 0, item }: Record<string, any>) => {
+      if (oldIndex === newIndex || !xTable.value)
+        return
+
+      // 获取列配置副本
+      const { fullColumn, tableColumn } = xTable.value.getTableColumn() || {}
+      if (!fullColumn || !tableColumn)
+        return
+      const wrapperElem = item.parentNode
+      const newColumn = fullColumn[newIndex]
+      if (newColumn.fixed) {
+        // 错误的移动
+        const oldTrElement = wrapperElem?.children[oldIndex]
+        if (oldTrElement) {
+          if (newIndex > oldIndex) {
+            wrapperElem?.insertBefore(item, oldTrElement)
+          }
+          else {
+            wrapperElem?.insertBefore(oldTrElement, item)
+          }
+        }
+        return ElMessage.warning('固定列不允许拖动！')
+      }
+      // 转换真实索引
+      const oldColumnIndex = xTable.value.getColumnIndex(tableColumn[oldIndex])
+      const newColumnIndex = xTable.value.getColumnIndex(tableColumn[newIndex])
+      // 移动到目标列
+      const currRow = fullColumn.splice(oldColumnIndex, 1)[0]
+      fullColumn.splice(newColumnIndex, 0, currRow)
+
+      // 将修改后的列配置保存到本地
+      saveColumns(fullColumn)
+
+      // 构造vxe格式的事件参数
+      const dragColumn = tableColumn[oldIndex]
+      const oldColumn = tableColumn[oldIndex]
+      const dragPos = newIndex > oldIndex ? 'right' : 'left'
+      const dragToChild = false
+
+      const eventParams = {
+        dragColumn,
+        dragPos,
+        dragToChild,
+        newColumn: tableColumn[newIndex],
+        offsetIndex: Math.abs(newIndex - oldIndex),
+        oldColumn,
+      }
+
+      // 发送与vxe格式相同的事件参数
+      emit('columnDragend', eventParams)
+      // 调用用户自定义的拖拽结束方法
+      props.columnDragEndMethod?.({
+        newColumn: tableColumn[newIndex],
+        oldColumn: tableColumn[oldIndex],
+        dragColumn,
+        dragPos,
+        dragToChild,
+      })
+    },
+  })
+}
+
+function destroySortable() {
+  if (props.dragable) {
+    destroyRowSortable()
+    destroyColumnSortable()
+  }
+  else if (props.rowdragable) {
+    destroyRowSortable()
+  }
+  else if (props.columndragable) {
+    destroyColumnSortable()
+  }
+}
+
+function initSortable() {
+  setTimeout(() => {
+    if (props.dragable) {
+      initRowDraggable()
+      initColumnDraggable()
+    }
+    else if (props.columndragable) {
+      initColumnDraggable()
+    }
+    else if (props.rowdragable) {
+      initRowDraggable()
+    }
+  }, 100)
+}
+watch(() => visible.value, (newVal) => {
+  if (newVal) {
+    initSortable()
+  }
+  else {
+    destroySortable()
+  }
+}, {
+  immediate: true,
+})
+//#endregion
+
 defineExpose({
   isCommon,
 })

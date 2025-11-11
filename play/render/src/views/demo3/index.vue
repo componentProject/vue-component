@@ -84,7 +84,6 @@ function getComponentProps(item: any) {
     })
   }
 
-  console.log('props', props)
   return props
 }
 

@@ -67,11 +67,9 @@ export function findParentRouteHandle(
 export function generateRoutes(
   files: FilesMap,
   prefix: string = '',
-  // baseRoute?: RouteModule | string,
-  baseRoute?: string,
+  baseRoute?: RouteModule | string,
 ): RouteModule[] {
-  // const newBaseRoute: RouteModule | undefined = typeof baseRoute === 'string' ? { name: baseRoute } : baseRoute
-  const newBaseRoute: RouteModule | undefined = baseRoute ? { name: baseRoute } : baseRoute
+  const newBaseRoute: RouteModule | undefined = typeof baseRoute === 'string' ? { name: baseRoute } : baseRoute
   const modules: RouteModule[] = newBaseRoute ? [newBaseRoute] : []
   return Object.keys(files)
     .sort((a, b) => {
