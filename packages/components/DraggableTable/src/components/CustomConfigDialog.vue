@@ -432,7 +432,4 @@ defineExpose({
 </script>
 
 <style scoped lang="scss">
-:deep(*) {
-  @import '@moluoxixi/components/DraggableTable/src/style.scss';
-}
 </style>

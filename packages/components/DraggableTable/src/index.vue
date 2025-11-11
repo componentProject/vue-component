@@ -91,7 +91,6 @@ import { cloneDeep, groupBy } from 'lodash'
 import { diff, isEmpty } from 'radash'
 import Sortable from 'sortablejs'
 import VxeUI, { VxePager, VxeTooltip } from 'vxe-pc-ui'
-import './variable.scss'
 
 import {
   getClass,
@@ -1348,9 +1347,6 @@ defineExpose({
 </script>
 
 <style scoped lang="scss">
-:deep(*) {
-  @import '@moluoxixi/components/DraggableTable/src/style.scss';
-}
 .table-box {
   :deep(.vxe-table--filter-template) {
     display: flex !important;

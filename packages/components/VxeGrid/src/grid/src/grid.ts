@@ -10,7 +10,9 @@ import tableComponentProps from '../../table/src/props'
 import tableComponentEmits from '../../table/src/emits'
 import { getSlotVNs } from '../../ui/src/vn'
 import { errLog } from '../../ui/src/log'
-
+// 导入 CSS Modules 样式文件
+// 注意：grid 组件中已经有 styles 变量（来自 computeStyles），所以使用 cssModules 作为变量名
+import cssModules from '../../styles/modules/all.module.scss'
 import type { ValueOf, VxeFormComponent, VxeFormEvents, VxeFormInstance, VxeFormItemProps, VxePagerComponent, VxePagerEvents, VxePagerInstance } from 'vxe-pc-ui'
 import type { GridMethods, GridPrivateMethods, GridPrivateRef, GridReactData, VxeGridConstructor, VxeGridEmits, VxeGridPrivateComputed, VxeGridPrivateMethods, VxeGridProps, VxeGridPropTypes, VxeTableConstructor, VxeTableDefines, VxeTableEventProps, VxeTableEvents, VxeTableMethods, VxeTablePrivateMethods, VxeTableProps, VxeToolbarInstance, VxeToolbarPropTypes } from '../../../types'
 
@@ -1331,13 +1333,19 @@ export default defineComponent({
       const styles = computeStyles.value
       return h('div', {
         ref: refElem,
-        class: ['vxe-grid', {
-          [`size--${vSize}`]: vSize,
-          'is--animat': !!props.animat,
-          'is--round': props.round,
-          'is--maximize': reactData.isZMax,
-          'is--loading': props.loading || reactData.tableLoading,
-        }],
+        class: [
+          // 使用 CSS Modules 的 root 类名（会被转换为 hash 值，如 .root_abc123）
+          cssModules.root,
+          // 其他全局类名
+          'vxe-grid',
+          {
+            [`size--${vSize}`]: vSize,
+            'is--animat': !!props.animat,
+            'is--round': props.round,
+            'is--maximize': reactData.isZMax,
+            'is--loading': props.loading || reactData.tableLoading,
+          },
+        ],
         style: styles,
       }, renderLayout())
     }

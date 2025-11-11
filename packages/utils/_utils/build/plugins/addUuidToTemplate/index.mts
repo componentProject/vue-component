@@ -1,3 +1,4 @@
+/** 已废弃，采用cssModule更友好 */
 import type { Plugin } from 'vite'
 import { parse as vueParse } from '@vue/compiler-sfc'
 import { v4 as uuidv4 } from 'uuid'
