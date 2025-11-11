@@ -55,5 +55,3 @@ export interface propsType {
   /** 是否自动补全URL（如果text是URL但没有协议，自动添加https://） */
   autoCompleteUrl: boolean
 }
-
-

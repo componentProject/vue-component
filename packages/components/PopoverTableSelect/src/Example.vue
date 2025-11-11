@@ -53,9 +53,9 @@
       <h2>自带input用法</h2>
       <div class="w-[240px]!">
         <PopoverTableSelect
+          v-model:input-value="inputValue1"
           :z-index="999999"
           :throttle="100"
-          :input-value="inputValue1"
           pop-type="input"
           :columns="columns"
           :data="tableData"

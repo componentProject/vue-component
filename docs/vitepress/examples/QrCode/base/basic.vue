@@ -30,4 +30,3 @@ const size = ref(200)
   color: #666;
 }
 </style>
-

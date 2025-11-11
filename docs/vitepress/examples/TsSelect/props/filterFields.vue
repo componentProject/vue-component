@@ -40,4 +40,3 @@ const options = ref([
   color: #666;
 }
 </style>
-

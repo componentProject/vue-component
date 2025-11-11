@@ -41,4 +41,3 @@ const options = ref({
   background-color: #fff;
 }
 </style>
-

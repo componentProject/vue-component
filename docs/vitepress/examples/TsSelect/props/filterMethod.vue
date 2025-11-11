@@ -42,4 +42,3 @@ function customFilter(query: string) {
   color: #666;
 }
 </style>
-

@@ -1,21 +1,21 @@
 <template>
   <div style="padding: 16px;">
     <ConfigForm
-      :formOptions="formOptions"
+      :form-options="formOptions"
       :rows="rows"
     />
   </div>
 </template>
 
 <script setup lang="ts">
-import { reactive, h } from 'vue'
+import { h, reactive } from 'vue'
 
 const formOptions = reactive({
   model: {
     name: '',
-    description: ''
+    description: '',
   },
-  labelWidth: '120px'
+  labelWidth: '120px',
 })
 
 const rows = reactive([
@@ -27,10 +27,10 @@ const rows = reactive([
         type: 'input',
         colConfig: { span: 24 },
         config: {
-          placeholder: '请输入姓名'
-        }
-      }
-    ]
+          placeholder: '请输入姓名',
+        },
+      },
+    ],
   },
   {
     render: () => h('div', {
@@ -40,9 +40,9 @@ const rows = reactive([
         border: '1px solid #b3e5fc',
         borderRadius: '4px',
         margin: '16px 0',
-        textAlign: 'center'
-      }
-    }, '这是一个自定义渲染的行内容')
+        textAlign: 'center',
+      },
+    }, '这是一个自定义渲染的行内容'),
   },
   {
     formItems: [
@@ -54,10 +54,10 @@ const rows = reactive([
         config: {
           type: 'textarea',
           placeholder: '请输入描述',
-          rows: 3
-        }
-      }
-    ]
-  }
+          rows: 3,
+        },
+      },
+    ],
+  },
 ])
 </script>

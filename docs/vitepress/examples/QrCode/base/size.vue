@@ -2,19 +2,27 @@
   <div class="container">
     <div class="example-item">
       <QrCode :text="text" :size="100" />
-      <div class="label">100px</div>
+      <div class="label">
+        100px
+      </div>
     </div>
     <div class="example-item">
       <QrCode :text="text" :size="150" />
-      <div class="label">150px</div>
+      <div class="label">
+        150px
+      </div>
     </div>
     <div class="example-item">
       <QrCode :text="text" :size="200" />
-      <div class="label">200px</div>
+      <div class="label">
+        200px
+      </div>
     </div>
     <div class="example-item">
       <QrCode :text="text" :size="300" />
-      <div class="label">300px</div>
+      <div class="label">
+        300px
+      </div>
     </div>
   </div>
 </template>
@@ -45,4 +53,3 @@ const text = ref('https://www.example.com')
   color: #666;
 }
 </style>
-

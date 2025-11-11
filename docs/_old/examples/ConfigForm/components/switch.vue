@@ -1,12 +1,14 @@
 <template>
   <div style="padding: 16px;">
     <ConfigForm
-      :formOptions="formOptions"
+      :form-options="formOptions"
       :rows="rows"
     />
 
     <div style="margin-top: 16px; padding: 12px; background-color: #f5f5f5; border-radius: 4px;">
-      <h4 style="margin: 0 0 8px 0;">表单数据：</h4>
+      <h4 style="margin: 0 0 8px 0;">
+        表单数据：
+      </h4>
       <pre style="margin: 0; font-size: 12px;">{{ JSON.stringify(formOptions.model, null, 2) }}</pre>
     </div>
   </div>
@@ -19,9 +21,9 @@ const formOptions = reactive({
   model: {
     enabled: false,
     notifications: true,
-    autoSave: false
+    autoSave: false,
   },
-  labelWidth: '120px'
+  labelWidth: '120px',
 })
 
 const rows = reactive([
@@ -34,8 +36,8 @@ const rows = reactive([
         colConfig: { span: 24 },
         config: {
           activeText: '开启',
-          inactiveText: '关闭'
-        }
+          inactiveText: '关闭',
+        },
       },
       {
         prop: 'notifications',
@@ -44,8 +46,8 @@ const rows = reactive([
         colConfig: { span: 24 },
         config: {
           activeColor: '#13ce66',
-          inactiveColor: '#ff4949'
-        }
+          inactiveColor: '#ff4949',
+        },
       },
       {
         prop: 'autoSave',
@@ -54,10 +56,10 @@ const rows = reactive([
         colConfig: { span: 24 },
         config: {
           activeValue: 'yes',
-          inactiveValue: 'no'
-        }
-      }
-    ]
-  }
+          inactiveValue: 'no',
+        },
+      },
+    ],
+  },
 ])
 </script>

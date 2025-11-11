@@ -2,11 +2,15 @@
   <div class="container">
     <div class="example-item">
       <QrCode :text="text" :size="200" :show-border="false" />
-      <div class="label">无边框</div>
+      <div class="label">
+        无边框
+      </div>
     </div>
     <div class="example-item">
       <QrCode :text="text" :size="200" :show-border="true" />
-      <div class="label">有边框（默认样式）</div>
+      <div class="label">
+        有边框（默认样式）
+      </div>
     </div>
   </div>
 </template>
@@ -36,4 +40,3 @@ const text = ref('https://www.example.com')
   color: #666;
 }
 </style>
-

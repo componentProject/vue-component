@@ -26,7 +26,7 @@ const readyUrl = ref<string>('')
 
 function handleReady(url: string) {
   readyUrl.value = url
-  console.log('二维码生成完成:', url.substring(0, 50) + '...')
+  console.log('二维码生成完成:', `${url.substring(0, 50)}...`)
 }
 </script>
 
@@ -45,4 +45,3 @@ function handleReady(url: string) {
   min-height: 60px;
 }
 </style>
-

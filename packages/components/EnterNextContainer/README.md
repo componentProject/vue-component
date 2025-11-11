@@ -1,4 +1,5 @@
 # EnterNextContainer 组件
+
 回车自动跳转下一个输入框/下拉框
 EnterNextContainer 是一个用于管理表单输入流程的容器组件，它可以让用户在输入表单时通过按回车键自动跳转到下一个输入框/下拉框，提高表单填写的效率。
 
@@ -96,7 +97,7 @@ const formRef = ref(null)
 
 ```vue
 <template>
-  <EnterNextContainer @noNextInput="handleNoNextInput">
+  <EnterNextContainer @no-next-input="handleNoNextInput">
     <div>
       <el-input v-model="form.field1" placeholder="字段1" />
       <el-input v-model="form.field2" placeholder="字段2" />
@@ -132,10 +133,10 @@ function handleNoNextInput(element) {
 
 ## Events
 
-| 事件名           | 参数                                            | 说明                                  |
-|---------------|-----------------------------------------------|-------------------------------------|
+| 事件名        | 参数                                          | 说明                                                              |
+| ------------- | --------------------------------------------- | ----------------------------------------------------------------- |
 | noNextInput   | element: HTMLElement                          | 当用户在最后一个输入元素上按下Enter键，或者只有一个输入元素时触发 |
-| noSelectValue | {row:objType,rowIndex:number,colIndex:number} | 当select下拉框没有选中值时但按了回车触发             |
+| noSelectValue | {row:objType,rowIndex:number,colIndex:number} | 当select下拉框没有选中值时但按了回车触发                          |
 
 ## Slots
 

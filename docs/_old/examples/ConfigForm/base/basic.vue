@@ -1,13 +1,15 @@
 <template>
   <div style="padding: 16px;">
     <ConfigForm
-      :formOptions="formOptions"
+      :form-options="formOptions"
       :rows="rows"
       @update:rows="updateRows"
     />
 
     <div style="margin-top: 16px; padding: 12px; background-color: #f5f5f5; border-radius: 4px;">
-      <h4 style="margin: 0 0 8px 0;">表单数据：</h4>
+      <h4 style="margin: 0 0 8px 0;">
+        表单数据：
+      </h4>
       <pre style="margin: 0; font-size: 12px;">{{ JSON.stringify(formOptions.model, null, 2) }}</pre>
     </div>
   </div>
@@ -19,9 +21,9 @@ import { reactive } from 'vue'
 const formOptions = reactive({
   model: {
     name: '',
-    email: ''
+    email: '',
   },
-  labelWidth: '100px'
+  labelWidth: '100px',
 })
 
 const rows = reactive([
@@ -33,8 +35,8 @@ const rows = reactive([
         type: 'input',
         colConfig: { span: 12 },
         config: {
-          placeholder: '请输入姓名'
-        }
+          placeholder: '请输入姓名',
+        },
       },
       {
         prop: 'email',
@@ -42,14 +44,14 @@ const rows = reactive([
         type: 'input',
         colConfig: { span: 12 },
         config: {
-          placeholder: '请输入邮箱'
-        }
-      }
-    ]
-  }
+          placeholder: '请输入邮箱',
+        },
+      },
+    ],
+  },
 ])
 
-const updateRows = (newRows: any) => {
+function updateRows(newRows: any) {
   Object.assign(rows, newRows)
 }
 </script>

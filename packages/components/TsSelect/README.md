@@ -100,29 +100,29 @@ function handleChange(value) {
 
 ### Props
 
-| 参数 | 说明 | 类型 | 默认值 |
-|------|------|------|--------|
-| v-model | 绑定值 | `any` | - |
-| options | 静态选项数据 | `Array` | `[]` |
-| requestUrl | 请求地址 | `string` | `''` |
-| requestParams | 请求参数 | `Object` | `{}` |
-| requestMethod | 请求方法 | `'GET' \| 'POST' \| 'PUT' \| 'DELETE'` | `'POST'` |
-| requestParamsType | 参数类型 | `'query' \| 'body' \| 'form'` | `'body'` |
-| requestHeaders | 请求头 | `Object` | `{}` |
-| responseDataPath | 响应数据路径 | `string` | `''` |
-| label | 显示字段名 | `string` | `'label'` |
-| value | 值字段名 | `string` | `'value'` |
-| disabledValues | 禁用的值数组 | `Array` | `[]` |
-| disabledLabels | 禁用的标签数组 | `Array` | `[]` |
-| disabledHandler | 自定义禁用逻辑 | `Function` | - |
-| optionProps | ElOption 组件属性 | `Object` | `{}` |
+| 参数              | 说明              | 类型                                   | 默认值    |
+| ----------------- | ----------------- | -------------------------------------- | --------- |
+| v-model           | 绑定值            | `any`                                  | -         |
+| options           | 静态选项数据      | `Array`                                | `[]`      |
+| requestUrl        | 请求地址          | `string`                               | `''`      |
+| requestParams     | 请求参数          | `Object`                               | `{}`      |
+| requestMethod     | 请求方法          | `'GET' \| 'POST' \| 'PUT' \| 'DELETE'` | `'POST'`  |
+| requestParamsType | 参数类型          | `'query' \| 'body' \| 'form'`          | `'body'`  |
+| requestHeaders    | 请求头            | `Object`                               | `{}`      |
+| responseDataPath  | 响应数据路径      | `string`                               | `''`      |
+| label             | 显示字段名        | `string`                               | `'label'` |
+| value             | 值字段名          | `string`                               | `'value'` |
+| disabledValues    | 禁用的值数组      | `Array`                                | `[]`      |
+| disabledLabels    | 禁用的标签数组    | `Array`                                | `[]`      |
+| disabledHandler   | 自定义禁用逻辑    | `Function`                             | -         |
+| optionProps       | ElOption 组件属性 | `Object`                               | `{}`      |
 
 ### Events
 
-| 事件名 | 说明 | 回调参数 |
-|--------|------|----------|
-| change | 选中值发生变化时触发 | `(value: any)` |
-| loadMore | 加载更多时触发 | - |
+| 事件名   | 说明                 | 回调参数       |
+| -------- | -------------------- | -------------- |
+| change   | 选中值发生变化时触发 | `(value: any)` |
+| loadMore | 加载更多时触发       | -              |
 
 ### 插槽
 

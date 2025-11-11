@@ -7,4 +7,3 @@ export interface slotsType {
   /** 自定义展开/收起按钮插槽 */
   toggle?: (params: { expanded: boolean, toggle: () => void }) => any
 }
-

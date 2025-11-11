@@ -12,24 +12,24 @@
 
 ## Props
 
-| 参数 | 说明 | 类型 | 默认值 |
-| --- | --- | --- | --- |
-| columns | 列配置数组 | `Array<{ label?: string|string[]; title?: string|string[]; prop?: string|string[]; field?: string|string[] }>` | 必填 |
-| titles | 列头读取键优先级 | `string[]` | `['title','label']` |
-| fields | 字段键读取优先级 | `string[]` | `['field','prop']` |
-| tableData | 与导出组件接口保持一致（不直接使用） | any[] | `[]` |
+| 参数      | 说明                                 | 类型                    | 默认值                   |
+| --------- | ------------------------------------ | ----------------------- | ------------------------ | ----------------------- | ------------------------ | ------------ | ---- |
+| columns   | 列配置数组                           | `Array<{ label?: string | string[]; title?: string | string[]; prop?: string | string[]; field?: string | string[] }>` | 必填 |
+| titles    | 列头读取键优先级                     | `string[]`              | `['title','label']`      |
+| fields    | 字段键读取优先级                     | `string[]`              | `['field','prop']`       |
+| tableData | 与导出组件接口保持一致（不直接使用） | any[]                   | `[]`                     |
 
 ## Events
 
-| 事件名 | 说明 | 回调参数 |
-| --- | --- | --- |
+| 事件名  | 说明     | 回调参数                |
+| ------- | -------- | ----------------------- |
 | success | 解析成功 | `(rows: any[]) => void` |
-| error | 解析失败 | `(err: any) => void` |
+| error   | 解析失败 | `(err: any) => void`    |
 
 ## Slots
 
-| 名称 | 说明 |
-| --- | --- |
+| 名称    | 说明           |
+| ------- | -------------- |
 | default | 自定义按钮内容 |
 
 ## 说明与规则
@@ -44,4 +44,3 @@
 ## 支持的文件类型
 
 `.xlsx`、`.xls`、`.csv`
-

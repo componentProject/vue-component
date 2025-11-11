@@ -30,4 +30,3 @@ export interface propsType {
   /** 自定义样式 */
   style?: Record<string, any>
 }
-

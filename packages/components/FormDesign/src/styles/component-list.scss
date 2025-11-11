@@ -1,0 +1,64 @@
+.starfish-editor {
+  .editor_pages_left {
+    width: 100%;
+    height: 100%;
+    background-color: white;
+    .filter {
+      padding: 12px;
+    }
+    .list-group {
+      // display: flex;
+      // flex-wrap: wrap;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr); /* 4列，每列平均分配空间 */
+      // gap: 10px; /* 网格项之间的间隙 */
+    }
+
+    .list-group-item {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      margin: 7px 10px 0;
+      width: 55px;
+      .form-item {
+        width: 42px;
+        height: 42px;
+        border: 1px solid #dfdada;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-around;
+        transition: all 0.1s ease-in-out;
+        margin-bottom: 5px;
+        border-radius: 5px;
+        &:hover {
+          background: #409eff;
+          // border: 1px solid #409eff;
+          color: #fff;
+        }
+        .el-icon {
+          font-size: 18px;
+        }
+      }
+      .item-text {
+        height: 30px;
+        // display: flex;
+        align-items: center;
+        font-size: 12px;
+        display: inline-block;
+        width: 100%;
+        -webkit-box-orient: vertical;
+        /*! autoprefixer: on*/
+
+        -webkit-line-clamp: 2;
+        display: -webkit-box;
+        overflow: hidden;
+        // overflow: hidden;
+        // text-overflow: ellipsis;
+        // white-space: nowrap;
+      }
+    }
+  }
+}

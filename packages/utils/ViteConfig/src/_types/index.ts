@@ -6,7 +6,7 @@ import type viteImagemin from 'vite-plugin-imagemin'
 import type importToCDN from 'vite-plugin-cdn-import'
 import type { visualizer } from 'rollup-plugin-visualizer'
 import type { Options as VitePWAOptions } from 'vite-plugin-pwa'
-import type { Options as VueRouterOptions } from 'unplugin-vue-router'
+import type { Options as PagesOptions } from 'vite-plugin-pages'
 
 export type CompressionOptions = Parameters<typeof viteCompression>[0]
 export type ImageminOptions = Parameters<typeof viteImagemin>[0]
@@ -64,9 +64,9 @@ export interface PluginConfig {
    */
   autoRoutes?: boolean | AutoRoutesConfig
   /**
-   * 页面路由配置（unplugin-vue-router），true表示使用默认配置，对象表示覆盖默认配置
+   * 页面路由配置（vite-plugin-pages），true表示使用默认配置，对象表示覆盖默认配置
    */
-  pageRoutes?: boolean | VueRouterOptions
+  pageRoutes?: boolean | PagesOptions
   /**
    * 是否启用vue-devtools
    */

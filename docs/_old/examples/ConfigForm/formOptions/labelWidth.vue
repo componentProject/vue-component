@@ -1,7 +1,7 @@
 <template>
   <div style="padding: 16px;">
     <ConfigForm
-      :formOptions="formOptions"
+      :form-options="formOptions"
       :rows="rows"
     />
   </div>
@@ -13,9 +13,9 @@ import { reactive } from 'vue'
 const formOptions = reactive({
   model: {
     name: '',
-    description: ''
+    description: '',
   },
-  labelWidth: '150px'
+  labelWidth: '150px',
 })
 
 const rows = reactive([
@@ -27,8 +27,8 @@ const rows = reactive([
         type: 'input',
         colConfig: { span: 24 },
         config: {
-          placeholder: '请输入用户名'
-        }
+          placeholder: '请输入用户名',
+        },
       },
       {
         prop: 'description',
@@ -37,10 +37,10 @@ const rows = reactive([
         colConfig: { span: 24 },
         config: {
           type: 'textarea',
-          placeholder: '请输入详细描述'
-        }
-      }
-    ]
-  }
+          placeholder: '请输入详细描述',
+        },
+      },
+    ],
+  },
 ])
 </script>

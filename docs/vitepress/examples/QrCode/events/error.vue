@@ -45,4 +45,3 @@ function handleError(error: Error) {
   min-height: 60px;
 }
 </style>
-

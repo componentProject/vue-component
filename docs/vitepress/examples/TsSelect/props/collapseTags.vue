@@ -9,7 +9,9 @@
         value="value"
         multiple
       />
-      <div class="label">不折叠</div>
+      <div class="label">
+        不折叠
+      </div>
     </div>
     <div class="example-item">
       <TsSelect
@@ -20,7 +22,9 @@
         value="value"
         multiple
       />
-      <div class="label">折叠显示（默认）</div>
+      <div class="label">
+        折叠显示（默认）
+      </div>
     </div>
   </div>
 </template>

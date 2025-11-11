@@ -8,7 +8,9 @@
         label="label"
         value="value"
       />
-      <div class="label">间距：8px</div>
+      <div class="label">
+        间距：8px
+      </div>
     </div>
     <div class="example-item">
       <TsRadio
@@ -18,7 +20,9 @@
         label="label"
         value="value"
       />
-      <div class="label">间距：16px（默认）</div>
+      <div class="label">
+        间距：16px（默认）
+      </div>
     </div>
     <div class="example-item">
       <TsRadio
@@ -28,7 +32,9 @@
         label="label"
         value="value"
       />
-      <div class="label">间距：24px</div>
+      <div class="label">
+        间距：24px
+      </div>
     </div>
   </div>
 </template>
@@ -64,4 +70,3 @@ const options = ref([
   color: #666;
 }
 </style>
-

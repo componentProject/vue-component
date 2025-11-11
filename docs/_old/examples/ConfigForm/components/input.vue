@@ -1,12 +1,14 @@
 <template>
   <div style="padding: 16px;">
     <ConfigForm
-      :formOptions="formOptions"
+      :form-options="formOptions"
       :rows="rows"
     />
 
     <div style="margin-top: 16px; padding: 12px; background-color: #f5f5f5; border-radius: 4px;">
-      <h4 style="margin: 0 0 8px 0;">表单数据：</h4>
+      <h4 style="margin: 0 0 8px 0;">
+        表单数据：
+      </h4>
       <pre style="margin: 0; font-size: 12px;">{{ JSON.stringify(formOptions.model, null, 2) }}</pre>
     </div>
   </div>
@@ -20,9 +22,9 @@ const formOptions = reactive({
     text: '',
     textarea: '',
     password: '',
-    number: ''
+    number: '',
   },
-  labelWidth: '120px'
+  labelWidth: '120px',
 })
 
 const rows = reactive([
@@ -35,8 +37,8 @@ const rows = reactive([
         colConfig: { span: 24 },
         config: {
           placeholder: '请输入文本',
-          clearable: true
-        }
+          clearable: true,
+        },
       },
       {
         prop: 'textarea',
@@ -46,8 +48,8 @@ const rows = reactive([
         config: {
           type: 'textarea',
           placeholder: '请输入多行文本',
-          rows: 4
-        }
+          rows: 4,
+        },
       },
       {
         prop: 'password',
@@ -57,8 +59,8 @@ const rows = reactive([
         config: {
           type: 'password',
           placeholder: '请输入密码',
-          showPassword: true
-        }
+          showPassword: true,
+        },
       },
       {
         prop: 'number',
@@ -67,10 +69,10 @@ const rows = reactive([
         colConfig: { span: 24 },
         config: {
           type: 'number',
-          placeholder: '请输入数字'
-        }
-      }
-    ]
-  }
+          placeholder: '请输入数字',
+        },
+      },
+    ],
+  },
 ])
 </script>

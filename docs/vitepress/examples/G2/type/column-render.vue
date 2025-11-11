@@ -38,4 +38,3 @@ function render(chart: Chart) {
   background-color: #fff;
 }
 </style>
-

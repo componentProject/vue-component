@@ -9,4 +9,3 @@ export interface emitsType {
   /** 收起时触发 */
   collapse: []
 }
-

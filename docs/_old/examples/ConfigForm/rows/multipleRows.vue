@@ -1,7 +1,7 @@
 <template>
   <div style="padding: 16px;">
     <ConfigForm
-      :formOptions="formOptions"
+      :form-options="formOptions"
       :rows="rows"
     />
   </div>
@@ -17,9 +17,9 @@ const formOptions = reactive({
     phone: '',
     address: '',
     city: '',
-    zipCode: ''
+    zipCode: '',
   },
-  labelWidth: '100px'
+  labelWidth: '100px',
 })
 
 const rows = reactive([
@@ -31,8 +31,8 @@ const rows = reactive([
         type: 'input',
         colConfig: { span: 8 },
         config: {
-          placeholder: '请输入姓名'
-        }
+          placeholder: '请输入姓名',
+        },
       },
       {
         prop: 'email',
@@ -40,8 +40,8 @@ const rows = reactive([
         type: 'input',
         colConfig: { span: 8 },
         config: {
-          placeholder: '请输入邮箱'
-        }
+          placeholder: '请输入邮箱',
+        },
       },
       {
         prop: 'phone',
@@ -49,10 +49,10 @@ const rows = reactive([
         type: 'input',
         colConfig: { span: 8 },
         config: {
-          placeholder: '请输入电话'
-        }
-      }
-    ]
+          placeholder: '请输入电话',
+        },
+      },
+    ],
   },
   {
     formItems: [
@@ -62,8 +62,8 @@ const rows = reactive([
         type: 'input',
         colConfig: { span: 12 },
         config: {
-          placeholder: '请输入详细地址'
-        }
+          placeholder: '请输入详细地址',
+        },
       },
       {
         prop: 'city',
@@ -71,8 +71,8 @@ const rows = reactive([
         type: 'input',
         colConfig: { span: 6 },
         config: {
-          placeholder: '请输入城市'
-        }
+          placeholder: '请输入城市',
+        },
       },
       {
         prop: 'zipCode',
@@ -80,10 +80,10 @@ const rows = reactive([
         type: 'input',
         colConfig: { span: 6 },
         config: {
-          placeholder: '请输入邮编'
-        }
-      }
-    ]
-  }
+          placeholder: '请输入邮编',
+        },
+      },
+    ],
+  },
 ])
 </script>

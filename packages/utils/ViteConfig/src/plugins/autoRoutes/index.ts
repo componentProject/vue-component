@@ -13,7 +13,7 @@ interface RouteModule {
 
 interface objRouteConfig {
   glob: string | string[]
-  baseRoute?: RouteModule
+  baseRoute?: RouteModule | string
 }
 
 interface RouteConfig {

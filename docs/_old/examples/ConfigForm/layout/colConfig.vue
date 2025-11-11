@@ -1,7 +1,7 @@
 <template>
   <div style="padding: 16px;">
     <ConfigForm
-      :formOptions="formOptions"
+      :form-options="formOptions"
       :rows="rows"
     />
   </div>
@@ -17,9 +17,9 @@ const formOptions = reactive({
     halfWidth2: '',
     thirdWidth1: '',
     thirdWidth2: '',
-    thirdWidth3: ''
+    thirdWidth3: '',
   },
-  labelWidth: '120px'
+  labelWidth: '120px',
 })
 
 const rows = reactive([
@@ -31,10 +31,10 @@ const rows = reactive([
         type: 'input',
         colConfig: { span: 24 },
         config: {
-          placeholder: '占用全部宽度（24列）'
-        }
-      }
-    ]
+          placeholder: '占用全部宽度（24列）',
+        },
+      },
+    ],
   },
   {
     formItems: [
@@ -44,8 +44,8 @@ const rows = reactive([
         type: 'input',
         colConfig: { span: 12 },
         config: {
-          placeholder: '占用一半宽度（12列）'
-        }
+          placeholder: '占用一半宽度（12列）',
+        },
       },
       {
         prop: 'halfWidth2',
@@ -53,10 +53,10 @@ const rows = reactive([
         type: 'input',
         colConfig: { span: 12 },
         config: {
-          placeholder: '占用一半宽度（12列）'
-        }
-      }
-    ]
+          placeholder: '占用一半宽度（12列）',
+        },
+      },
+    ],
   },
   {
     formItems: [
@@ -66,8 +66,8 @@ const rows = reactive([
         type: 'input',
         colConfig: { span: 8 },
         config: {
-          placeholder: '占用1/3宽度（8列）'
-        }
+          placeholder: '占用1/3宽度（8列）',
+        },
       },
       {
         prop: 'thirdWidth2',
@@ -75,8 +75,8 @@ const rows = reactive([
         type: 'input',
         colConfig: { span: 8 },
         config: {
-          placeholder: '占用1/3宽度（8列）'
-        }
+          placeholder: '占用1/3宽度（8列）',
+        },
       },
       {
         prop: 'thirdWidth3',
@@ -84,10 +84,10 @@ const rows = reactive([
         type: 'input',
         colConfig: { span: 8 },
         config: {
-          placeholder: '占用1/3宽度（8列）'
-        }
-      }
-    ]
-  }
+          placeholder: '占用1/3宽度（8列）',
+        },
+      },
+    ],
+  },
 ])
 </script>

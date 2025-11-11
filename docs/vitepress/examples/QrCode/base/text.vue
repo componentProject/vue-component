@@ -2,15 +2,21 @@
   <div class="container">
     <div class="example-item">
       <QrCode :text="text1" :size="150" />
-      <div class="label">URL地址</div>
+      <div class="label">
+        URL地址
+      </div>
     </div>
     <div class="example-item">
       <QrCode :text="text2" :size="150" />
-      <div class="label">普通文本</div>
+      <div class="label">
+        普通文本
+      </div>
     </div>
     <div class="example-item">
       <QrCode :text="text3" :size="150" />
-      <div class="label">电话号码</div>
+      <div class="label">
+        电话号码
+      </div>
     </div>
   </div>
 </template>
@@ -42,4 +48,3 @@ const text3 = ref('tel:+8613800138000')
   color: #666;
 }
 </style>
-

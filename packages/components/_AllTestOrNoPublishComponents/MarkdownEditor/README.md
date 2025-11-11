@@ -1,6 +1,7 @@
 # MarkdownEditor Markdown编辑器组件
 
 ## 组件简介
+
 MarkdownEditor 是一个支持实时预览、语法高亮、扩展插件的 Markdown 编辑器组件，集成了 IndexedDB 本地存储功能。
 
 ## 功能特性
@@ -22,6 +23,7 @@ MarkdownEditor 是一个支持实时预览、语法高亮、扩展插件的 Mark
 ## 用法
 
 ### 基础用法
+
 ```vue
 <template>
   <MarkdownEditor v-model="content" />
@@ -36,6 +38,7 @@ const content = ref('# 你好，Markdown！')
 ```
 
 ### 使用自定义方法（文档管理）
+
 ```vue
 <template>
   <MarkdownEditor
@@ -56,7 +59,7 @@ const editorRef = ref()
 const content = ref('# 我的文档')
 
 // 自定义保存方法
-const customSave = async (content, title) => {
+async function customSave(content, title) {
   // 保存到服务器
   const response = await fetch('/api/save', {
     method: 'POST',
@@ -67,20 +70,20 @@ const customSave = async (content, title) => {
 }
 
 // 自定义加载方法
-const customLoad = async () => {
+async function customLoad() {
   const response = await fetch('/api/load')
   const data = await response.json()
   return data
 }
 
 // 自定义获取文档列表方法
-const customGetDocuments = async () => {
+async function customGetDocuments() {
   const response = await fetch('/api/documents')
   return await response.json()
 }
 
 // 自定义删除文档方法
-const customDeleteDocument = async (key) => {
+async function customDeleteDocument(key) {
   const response = await fetch(`/api/delete/${key}`, { method: 'DELETE' })
   return response.ok
 }
@@ -88,20 +91,21 @@ const customDeleteDocument = async (key) => {
 ```
 
 ### 代码折叠功能
+
 ```vue
 <template>
   <!-- 启用代码折叠功能 -->
   <MarkdownEditor
     v-model="content"
-    :enableFold="true"
-    :showNum="true"
+    :enable-fold="true"
+    :show-num="true"
   />
-  
+
   <!-- 同时启用行号和折叠功能 -->
   <MarkdownEditor
     v-model="content"
-    :enableFold="true"
-    :showNum="true"
+    :enable-fold="true"
+    :show-num="true"
     theme="dark"
   />
 </template>
@@ -125,7 +129,7 @@ function example() {
       country: 'USA'
     }
   }
-  
+
   // 更多代码...
   return data
 }
@@ -148,6 +152,7 @@ for i in range(10):
 ```
 
 ### 只读模式
+
 ```vue
 <template>
   <!-- 完全禁用模式 -->
@@ -156,33 +161,33 @@ for i in range(10):
     :disabled="true"
     title="完全禁用模式"
   />
-  
+
   <!-- 只读模式（工具栏可见） -->
   <MarkdownEditor
     v-model="content"
-    :readOnly="true"
+    :read-only="true"
     title="只读模式"
   />
-  
+
   <!-- 预览模式（使用 MdPreview） -->
   <MarkdownEditor
     v-model="content"
     :preview="true"
     title="预览模式"
   />
-  
+
   <!-- 动态切换只读模式 -->
   <MarkdownEditor
     v-model="content"
-    :readOnly="isReadOnly"
+    :read-only="isReadOnly"
     :disabled="isDisabled"
     :preview="isPreviewMode"
   />
-  
+
   <!-- 只读模式 + 隐藏工具栏 -->
   <MarkdownEditor
     v-model="content"
-    :readOnly="true"
+    :read-only="true"
     :toolbars="[]"
   />
 </template>
@@ -224,6 +229,7 @@ function togglePreviewMode() {
 ```
 
 ### 使用自定义方法（图片管理）
+
 ```vue
 <template>
   <MarkdownEditor
@@ -243,27 +249,27 @@ const editorRef = ref()
 const content = ref('# 我的文档')
 
 // 自定义图片上传方法
-const customUploadImage = async (files) => {
+async function customUploadImage(files) {
   const formData = new FormData()
   files.forEach(file => formData.append('images', file))
-  
+
   const response = await fetch('/api/upload-images', {
     method: 'POST',
     body: formData
   })
-  
+
   const data = await response.json()
   return data.urls // 返回图片 URL 数组
 }
 
 // 自定义获取图片列表方法
-const customGetImages = async () => {
+async function customGetImages() {
   const response = await fetch('/api/images')
   return await response.json()
 }
 
 // 自定义删除图片方法
-const customDeleteImage = async (imageId) => {
+async function customDeleteImage(imageId) {
   const response = await fetch(`/api/images/${imageId}`, { method: 'DELETE' })
   return response.ok
 }
@@ -272,54 +278,55 @@ const customDeleteImage = async (imageId) => {
 
 ## Props
 
-| 属性名 | 类型 | 默认值 | 说明 |
-| ------ | ---- | ------ | ---- |
-| id | String | 'editor' | 编辑器唯一标识 |
-| modelValue | String | '' | Markdown 内容，支持 v-model |
-| theme | String | 'light' | 编辑器主题：'light' \| 'dark' |
-| previewTheme | String | 'cyanosis' | 预览主题 |
-| codeTheme | String | 'github' | 代码高亮主题 |
-| height | String/Number | - | 编辑器高度 |
-| showNum | Boolean | false | 是否显示行号 |
-| enableFold | Boolean | false | 是否启用代码折叠功能 |
-| preview | Boolean | true | 是否显示实时预览 |
-| **disabled** | Boolean | false | **完全禁用编辑器（只读模式）** |
-| **readOnly** | Boolean | false | **只读模式（内容不可编辑）** |
-| **preview** | Boolean | false | **预览模式（使用 MdPreview 组件）** |
-| config | Object | - | 自定义配置 |
-| saveMethod | Function | - | 自定义保存方法 |
-| loadMethod | Function | - | 自定义加载方法 |
-| getDocumentsMethod | Function | - | 自定义获取文档列表方法 |
-| deleteDocumentMethod | Function | - | 自定义删除文档方法 |
-| uploadImageMethod | Function | - | 自定义图片上传方法 |
-| getImagesMethod | Function | - | 自定义获取图片列表方法 |
-| deleteImageMethod | Function | - | 自定义删除图片方法 |
+| 属性名               | 类型          | 默认值     | 说明                                |
+| -------------------- | ------------- | ---------- | ----------------------------------- |
+| id                   | String        | 'editor'   | 编辑器唯一标识                      |
+| modelValue           | String        | ''         | Markdown 内容，支持 v-model         |
+| theme                | String        | 'light'    | 编辑器主题：'light' \| 'dark'       |
+| previewTheme         | String        | 'cyanosis' | 预览主题                            |
+| codeTheme            | String        | 'github'   | 代码高亮主题                        |
+| height               | String/Number | -          | 编辑器高度                          |
+| showNum              | Boolean       | false      | 是否显示行号                        |
+| enableFold           | Boolean       | false      | 是否启用代码折叠功能                |
+| preview              | Boolean       | true       | 是否显示实时预览                    |
+| **disabled**         | Boolean       | false      | **完全禁用编辑器（只读模式）**      |
+| **readOnly**         | Boolean       | false      | **只读模式（内容不可编辑）**        |
+| **preview**          | Boolean       | false      | **预览模式（使用 MdPreview 组件）** |
+| config               | Object        | -          | 自定义配置                          |
+| saveMethod           | Function      | -          | 自定义保存方法                      |
+| loadMethod           | Function      | -          | 自定义加载方法                      |
+| getDocumentsMethod   | Function      | -          | 自定义获取文档列表方法              |
+| deleteDocumentMethod | Function      | -          | 自定义删除文档方法                  |
+| uploadImageMethod    | Function      | -          | 自定义图片上传方法                  |
+| getImagesMethod      | Function      | -          | 自定义获取图片列表方法              |
+| deleteImageMethod    | Function      | -          | 自定义删除图片方法                  |
 
 ## Events
 
-| 事件名 | 参数 | 说明 |
-| ------ | ---- | ---- |
-| save-success | data: { value: string, html: string } | 保存成功时触发 |
-| save-error | error: Error | 保存失败时触发 |
-| save | value: string, html: string | 原始保存事件 |
-| change | value: string | 内容变化时触发 |
-| html-changed | html: string | HTML 变化时触发 |
+| 事件名       | 参数                                  | 说明            |
+| ------------ | ------------------------------------- | --------------- |
+| save-success | data: { value: string, html: string } | 保存成功时触发  |
+| save-error   | error: Error                          | 保存失败时触发  |
+| save         | value: string, html: string           | 原始保存事件    |
+| change       | value: string                         | 内容变化时触发  |
+| html-changed | html: string                          | HTML 变化时触发 |
 
 ## Methods
 
-| 方法名 | 参数 | 返回值 | 说明 |
-| ------ | ---- | ------ | ---- |
-| save | content: string, title?: string | Promise<boolean> | 保存内容 |
-| load | - | Promise<any> | 加载内容 |
-| getDocuments | - | Promise<Array> | 获取文档列表 |
-| deleteDocument | key: string | Promise<boolean> | 删除文档 |
-| uploadImages | files: File[] | Promise<string[]> | 上传图片，返回图片 URL 数组 |
-| getImages | - | Promise<ImageData[]> | 获取图片列表 |
-| deleteImage | imageId: string | Promise<boolean> | 删除图片 |
+| 方法名         | 参数                            | 返回值               | 说明                        |
+| -------------- | ------------------------------- | -------------------- | --------------------------- |
+| save           | content: string, title?: string | Promise<boolean>     | 保存内容                    |
+| load           | -                               | Promise<any>         | 加载内容                    |
+| getDocuments   | -                               | Promise<Array>       | 获取文档列表                |
+| deleteDocument | key: string                     | Promise<boolean>     | 删除文档                    |
+| uploadImages   | files: File[]                   | Promise<string[]>    | 上传图片，返回图片 URL 数组 |
+| getImages      | -                               | Promise<ImageData[]> | 获取图片列表                |
+| deleteImage    | imageId: string                 | Promise<boolean>     | 删除图片                    |
 
 ## 示例文件
 
 查看 `src/Example.vue` 文件获取完整的使用示例，包括：
+
 - 保存和加载功能演示
 - 文档列表管理
 - 图片上传和管理
@@ -346,12 +353,14 @@ const customDeleteImage = async (imageId) => {
 ## 图片上传功能
 
 ### 默认行为
+
 - 点击编辑器工具栏的图片按钮上传图片
 - 图片自动转换为 base64 并保存到 IndexedDB
 - 支持多种图片格式（jpg、png、gif、webp 等）
 - 图片可通过图片管理对话框查看和删除
 
 ### 自定义图片上传
+
 如果需要将图片上传到服务器，可以通过 `uploadImageMethod` prop 自定义上传逻辑：
 
 ```vue
@@ -366,17 +375,18 @@ const customDeleteImage = async (imageId) => {
 
 ### disabled vs readOnly vs readonly 的区别
 
-| 属性 | 效果 | 工具栏 | 交互 | 组件 | 适用场景 |
-|------|------|--------|------|------|----------|
-| `disabled="true"` | 完全禁用编辑器 | 隐藏 | 无任何交互 | MdEditor | 临时禁用、权限控制 |
-| `readOnly="true"` | 内容只读 | 可见 | 可查看、复制 | MdEditor | 文档展示、预览模式 |
-| `preview="true"` | 纯预览模式 | 无 | 可查看、复制 | MdPreview | 文章展示、文档阅读 |
+| 属性              | 效果           | 工具栏 | 交互         | 组件      | 适用场景           |
+| ----------------- | -------------- | ------ | ------------ | --------- | ------------------ |
+| `disabled="true"` | 完全禁用编辑器 | 隐藏   | 无任何交互   | MdEditor  | 临时禁用、权限控制 |
+| `readOnly="true"` | 内容只读       | 可见   | 可查看、复制 | MdEditor  | 文档展示、预览模式 |
+| `preview="true"`  | 纯预览模式     | 无     | 可查看、复制 | MdPreview | 文章展示、文档阅读 |
 
 **注意**: `MdCatalog` 目录组件只在 `preview` 预览模式下显示，采用左右布局（目录在左侧，预览内容在右侧）。
 
 ### 布局说明
 
 #### 预览模式布局
+
 当 `preview="true"` 时，组件采用 Tailwind CSS flex 左右布局：
 
 ```vue
@@ -385,6 +395,7 @@ const customDeleteImage = async (imageId) => {
   <div class="flex-shrink-0 w-64 pr-4">
     <MdCatalog />
   </div>
+
   <!-- 右侧：预览组件 (自适应宽度) -->
   <div class="flex-1 min-w-0">
     <MdPreview />
@@ -393,17 +404,20 @@ const customDeleteImage = async (imageId) => {
 ```
 
 **布局特点**：
+
 - 左侧目录固定宽度 `w-64` (256px)
 - 右侧预览内容自适应宽度 `flex-1`
 - 使用 `min-w-0` 防止内容溢出
 - 目录与预览之间有 `pr-4` 间距
 
 #### 编辑模式布局
+
 当 `preview="false"` 时，直接使用 `MdEditor` 组件的默认布局。
 
 ### 使用场景
 
 #### 1. 文档展示页面
+
 ```vue
 <MarkdownEditor
   v-model="articleContent"
@@ -413,6 +427,7 @@ const customDeleteImage = async (imageId) => {
 ```
 
 #### 2. 权限控制
+
 ```vue
 <MarkdownEditor
   v-model="content"
@@ -423,6 +438,7 @@ const customDeleteImage = async (imageId) => {
 ```
 
 #### 3. 编辑/预览切换
+
 ```vue
 <template>
   <div>
@@ -432,7 +448,7 @@ const customDeleteImage = async (imageId) => {
     <MarkdownEditor
       v-model="content"
       :preview="mode === 'preview'"
-      :readOnly="mode === 'readonly'"
+      :read-only="mode === 'readonly'"
     />
   </div>
 </template>
@@ -443,7 +459,8 @@ const mode = ref('edit') // 'edit' | 'readonly' | 'preview'
 function toggleMode() {
   if (mode.value === 'edit') {
     mode.value = 'preview'
-  } else {
+  }
+  else {
     mode.value = 'edit'
   }
 }
@@ -451,6 +468,7 @@ function toggleMode() {
 ```
 
 #### 4. 条件性只读
+
 ```vue
 <MarkdownEditor
   v-model="content"
@@ -473,10 +491,11 @@ function toggleMode() {
 ### 完整示例
 
 查看 `src/Example.vue` 文件获取完整的只读模式使用示例，包括：
+
 - 不同只读模式的对比
 - 动态切换只读状态
 - 主题切换
 - 工具栏控制
 - IndexedDB 保存功能
 - 文档管理
-- 图片上传和管理 
+- 图片上传和管理

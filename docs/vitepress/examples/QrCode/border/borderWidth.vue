@@ -7,7 +7,9 @@
         :show-border="true"
         :border-width="1"
       />
-      <div class="label">边框宽度：1px</div>
+      <div class="label">
+        边框宽度：1px
+      </div>
     </div>
     <div class="example-item">
       <QrCode
@@ -16,7 +18,9 @@
         :show-border="true"
         :border-width="2"
       />
-      <div class="label">边框宽度：2px</div>
+      <div class="label">
+        边框宽度：2px
+      </div>
     </div>
     <div class="example-item">
       <QrCode
@@ -25,7 +29,9 @@
         :show-border="true"
         :border-width="4"
       />
-      <div class="label">边框宽度：4px</div>
+      <div class="label">
+        边框宽度：4px
+      </div>
     </div>
   </div>
 </template>
@@ -55,4 +61,3 @@ const text = ref('https://www.example.com')
   color: #666;
 }
 </style>
-

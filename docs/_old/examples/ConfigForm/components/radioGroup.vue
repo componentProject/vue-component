@@ -1,12 +1,14 @@
 <template>
   <div style="padding: 16px;">
     <ConfigForm
-      :formOptions="formOptions"
+      :form-options="formOptions"
       :rows="rows"
     />
 
     <div style="margin-top: 16px; padding: 12px; background-color: #f5f5f5; border-radius: 4px;">
-      <h4 style="margin: 0 0 8px 0;">表单数据：</h4>
+      <h4 style="margin: 0 0 8px 0;">
+        表单数据：
+      </h4>
       <pre style="margin: 0; font-size: 12px;">{{ JSON.stringify(formOptions.model, null, 2) }}</pre>
     </div>
   </div>
@@ -19,9 +21,9 @@ const formOptions = reactive({
   model: {
     gender: '',
     level: '',
-    type: ''
+    type: '',
   },
-  labelWidth: '120px'
+  labelWidth: '120px',
 })
 
 const rows = reactive([
@@ -35,9 +37,9 @@ const rows = reactive([
         config: {
           radios: [
             { label: '男', value: 'male' },
-            { label: '女', value: 'female' }
-          ]
-        }
+            { label: '女', value: 'female' },
+          ],
+        },
       },
       {
         prop: 'level',
@@ -49,9 +51,9 @@ const rows = reactive([
             { label: '初级', value: 'junior' },
             { label: '中级', value: 'intermediate' },
             { label: '高级', value: 'senior' },
-            { label: '专家', value: 'expert' }
-          ]
-        }
+            { label: '专家', value: 'expert' },
+          ],
+        },
       },
       {
         prop: 'type',
@@ -62,11 +64,11 @@ const rows = reactive([
           radios: [
             { label: '个人用户', value: 'personal' },
             { label: '企业用户', value: 'enterprise' },
-            { label: '政府用户', value: 'government' }
-          ]
-        }
-      }
-    ]
-  }
+            { label: '政府用户', value: 'government' },
+          ],
+        },
+      },
+    ],
+  },
 ])
 </script>

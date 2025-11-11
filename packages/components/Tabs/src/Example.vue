@@ -2,51 +2,73 @@
   <div class="space-y-6">
     <!-- 旧版本 tabList 模式示例 -->
     <div>
-      <h3 class="text-lg font-semibold mb-4">旧版本 tabList 模式</h3>
+      <h3 class="text-lg font-semibold mb-4">
+        旧版本 tabList 模式
+      </h3>
       <Tabs v-model="activeTab" :tab-list="tabList">
         <template #用户管理>
-          <div class="p-4">用户管理内容</div>
+          <div class="p-4">
+            用户管理内容
+          </div>
         </template>
 
         <template #配置管理>
-          <div class="p-4">配置管理内容</div>
+          <div class="p-4">
+            配置管理内容
+          </div>
         </template>
 
         <template #角色管理>
-          <div class="p-4">角色管理内容</div>
+          <div class="p-4">
+            角色管理内容
+          </div>
         </template>
 
         <template #任务调度>
-          <div class="p-4">任务调度内容</div>
+          <div class="p-4">
+            任务调度内容
+          </div>
         </template>
       </Tabs>
     </div>
 
     <!-- 新版本 options 模式示例 -->
     <div>
-      <h3 class="text-lg font-semibold mb-4">新版本 options 模式</h3>
+      <h3 class="text-lg font-semibold mb-4">
+        新版本 options 模式
+      </h3>
       <Tabs v-model="activeTab2" :options="optionsData" label="title" value="id">
         <template #首页>
-          <div class="p-4">首页内容</div>
+          <div class="p-4">
+            首页内容
+          </div>
         </template>
 
         <template #产品>
-          <div class="p-4">产品内容</div>
+          <div class="p-4">
+            产品内容
+          </div>
         </template>
 
         <template #关于我们>
-          <div class="p-4">关于我们内容</div>
+          <div class="p-4">
+            关于我们内容
+          </div>
         </template>
 
         <template #联系我们>
-          <div class="p-4">联系我们内容</div>
+          <div class="p-4">
+            联系我们内容
+          </div>
         </template>
       </Tabs>
     </div>
 
     <!-- 带禁用功能的 options 模式示例 -->
     <div>
-      <h3 class="text-lg font-semibold mb-4">带禁用功能的 options 模式</h3>
+      <h3 class="text-lg font-semibold mb-4">
+        带禁用功能的 options 模式
+      </h3>
       <Tabs
         v-model="activeTab3"
         :options="optionsWithDisabled"
@@ -55,22 +77,30 @@
         :disabled-values="['disabled-tab']"
       >
         <template #正常标签页>
-          <div class="p-4">这是正常的标签页</div>
+          <div class="p-4">
+            这是正常的标签页
+          </div>
         </template>
 
         <template #禁用标签页>
-          <div class="p-4">这个标签页被禁用了</div>
+          <div class="p-4">
+            这个标签页被禁用了
+          </div>
         </template>
 
         <template #另一个正常标签页>
-          <div class="p-4">这是另一个正常的标签页</div>
+          <div class="p-4">
+            这是另一个正常的标签页
+          </div>
         </template>
       </Tabs>
     </div>
 
     <!-- 自定义字段名的 options 模式示例 -->
     <div>
-      <h3 class="text-lg font-semibold mb-4">自定义字段名的 options 模式</h3>
+      <h3 class="text-lg font-semibold mb-4">
+        自定义字段名的 options 模式
+      </h3>
       <Tabs
         v-model="activeTab4"
         :options="customFieldOptions"
@@ -78,22 +108,30 @@
         value-key="tabId"
       >
         <template #标签页A>
-          <div class="p-4">标签页A的内容</div>
+          <div class="p-4">
+            标签页A的内容
+          </div>
         </template>
 
         <template #标签页B>
-          <div class="p-4">标签页B的内容</div>
+          <div class="p-4">
+            标签页B的内容
+          </div>
         </template>
 
         <template #标签页C>
-          <div class="p-4">标签页C的内容</div>
+          <div class="p-4">
+            标签页C的内容
+          </div>
         </template>
       </Tabs>
     </div>
 
     <!-- 直接绑定item属性的示例 -->
     <div>
-      <h3 class="text-lg font-semibold mb-4">直接绑定item属性的示例</h3>
+      <h3 class="text-lg font-semibold mb-4">
+        直接绑定item属性的示例
+      </h3>
       <Tabs
         v-model="activeTab5"
         :options="advancedOptions"
@@ -101,15 +139,21 @@
         value="id"
       >
         <template #懒加载标签页>
-          <div class="p-4">这是懒加载的标签页内容</div>
+          <div class="p-4">
+            这是懒加载的标签页内容
+          </div>
         </template>
 
         <template #可关闭标签页>
-          <div class="p-4">这是可关闭的标签页内容</div>
+          <div class="p-4">
+            这是可关闭的标签页内容
+          </div>
         </template>
 
         <template #普通标签页>
-          <div class="p-4">这是普通的标签页内容</div>
+          <div class="p-4">
+            这是普通的标签页内容
+          </div>
         </template>
       </Tabs>
     </div>
@@ -160,12 +204,12 @@ const advancedOptions = [
   {
     id: 'lazy-tab',
     title: '懒加载标签页',
-    lazy: true,  // 懒加载
+    lazy: true, // 懒加载
   },
   {
     id: 'closable-tab',
     title: '可关闭标签页',
-    closable: true,  // 可关闭（如果ElTabPane支持）
+    closable: true, // 可关闭（如果ElTabPane支持）
   },
   {
     id: 'normal-tab',

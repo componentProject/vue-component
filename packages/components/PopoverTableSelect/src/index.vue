@@ -70,11 +70,16 @@ const popoverModel = defineModel({
   type: Boolean,
   default: false,
 })
+
+const inputValue = defineModel('inputValue', {
+  type: String,
+  default: '',
+})
 const currentInputValue = ref('')
 const cacheInputValue = ref('')
 
 watch(
-  () => props.inputValue,
+  () => inputValue.value,
   (val) => {
     currentInputValue.value = val
     cacheInputValue.value = val
@@ -128,6 +133,7 @@ function handleClear() {
   currentInputValue.value = ''
   popoverModel.value = false
   emit('clear')
+  inputValue.value = ''
 }
 
 const computedOptions = computed<ThrottleOrDebounceOptions>(() => {

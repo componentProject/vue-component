@@ -35,7 +35,7 @@ function render(chart: Chart) {
       text: 'item',
       position: 'outside',
     })
-    .tooltip((data) => ({
+    .tooltip(data => ({
       name: data.item,
       value: `${data.count}`,
     }))
@@ -52,4 +52,3 @@ function render(chart: Chart) {
   background-color: #fff;
 }
 </style>
-

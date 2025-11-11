@@ -31,4 +31,3 @@ const text = ref('https://www.example.com')
   text-align: center;
 }
 </style>
-

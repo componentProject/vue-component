@@ -29,7 +29,7 @@ const lastDownloadTime = ref('')
 function handleDownload(url: string) {
   downloadCount.value++
   lastDownloadTime.value = new Date().toLocaleTimeString()
-  console.log('二维码下载:', url.substring(0, 50) + '...')
+  console.log('二维码下载:', `${url.substring(0, 50)}...`)
 }
 </script>
 
@@ -48,4 +48,3 @@ function handleDownload(url: string) {
   min-height: 60px;
 }
 </style>
-

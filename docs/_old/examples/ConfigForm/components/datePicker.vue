@@ -1,12 +1,14 @@
 <template>
   <div style="padding: 16px;">
     <ConfigForm
-      :formOptions="formOptions"
+      :form-options="formOptions"
       :rows="rows"
     />
 
     <div style="margin-top: 16px; padding: 12px; background-color: #f5f5f5; border-radius: 4px;">
-      <h4 style="margin: 0 0 8px 0;">表单数据：</h4>
+      <h4 style="margin: 0 0 8px 0;">
+        表单数据：
+      </h4>
       <pre style="margin: 0; font-size: 12px;">{{ JSON.stringify(formOptions.model, null, 2) }}</pre>
     </div>
   </div>
@@ -19,9 +21,9 @@ const formOptions = reactive({
   model: {
     birthday: '',
     startDate: '',
-    dateRange: []
+    dateRange: [],
   },
-  labelWidth: '120px'
+  labelWidth: '120px',
 })
 
 const rows = reactive([
@@ -36,8 +38,8 @@ const rows = reactive([
           type: 'date',
           placeholder: '请选择出生日期',
           format: 'YYYY-MM-DD',
-          valueFormat: 'YYYY-MM-DD'
-        }
+          valueFormat: 'YYYY-MM-DD',
+        },
       },
       {
         prop: 'startDate',
@@ -48,8 +50,8 @@ const rows = reactive([
           type: 'datetime',
           placeholder: '请选择开始时间',
           format: 'YYYY-MM-DD HH:mm:ss',
-          valueFormat: 'YYYY-MM-DD HH:mm:ss'
-        }
+          valueFormat: 'YYYY-MM-DD HH:mm:ss',
+        },
       },
       {
         prop: 'dateRange',
@@ -61,10 +63,10 @@ const rows = reactive([
           startPlaceholder: '开始日期',
           endPlaceholder: '结束日期',
           format: 'YYYY-MM-DD',
-          valueFormat: 'YYYY-MM-DD'
-        }
-      }
-    ]
-  }
+          valueFormat: 'YYYY-MM-DD',
+        },
+      },
+    ],
+  },
 ])
 </script>

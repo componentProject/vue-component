@@ -28,7 +28,8 @@
     "lint:eslint": "eslint . --fix",
     "lint": "run-s lint:*",
     "lint-staged": "lint-staged",
-    "commit": "git-cz"
+    "commit": "git-cz",
+    "remove-comments": "tsx scripts/removeComments.mts && eslint --fix"
   },
   "lint-staged": {
     "*.{vue,jsx,tsx}": [

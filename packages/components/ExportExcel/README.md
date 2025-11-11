@@ -1,4 +1,5 @@
 # ExportExcel 导出Excel组件
+
 一个用于从el-table数据导出Excel的Vue 3组件。
 
 ## 基础示例
@@ -39,7 +40,7 @@ npm install xlsx file-saver
 
 ### 基本用法
 
-```vue
+````vue
 <template>
   <div>
     <el-table :data="tableData" border>
@@ -86,7 +87,7 @@ const columns = ref([
 >
   导出用户数据
 </export-excel>
-```
+````
 
 ### 使用列格式化函数
 
@@ -220,8 +221,8 @@ const columns = ref([
 
 ## Slots
 
-| 名称 | 说明 |
-| --- | --- |
+| 名称    | 说明           |
+| ------- | -------------- |
 | default | 自定义按钮内容 |
 
 ## Expose

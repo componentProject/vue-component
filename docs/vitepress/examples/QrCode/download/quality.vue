@@ -8,7 +8,9 @@
         image-type="image/jpeg"
         :quality="0.5"
       />
-      <div class="label">JPEG质量：0.5（较低）</div>
+      <div class="label">
+        JPEG质量：0.5（较低）
+      </div>
     </div>
     <div class="example-item">
       <QrCode
@@ -18,7 +20,9 @@
         image-type="image/jpeg"
         :quality="0.92"
       />
-      <div class="label">JPEG质量：0.92（默认）</div>
+      <div class="label">
+        JPEG质量：0.92（默认）
+      </div>
     </div>
     <div class="example-item">
       <QrCode
@@ -28,7 +32,9 @@
         image-type="image/jpeg"
         :quality="1.0"
       />
-      <div class="label">JPEG质量：1.0（最高）</div>
+      <div class="label">
+        JPEG质量：1.0（最高）
+      </div>
     </div>
   </div>
 </template>
@@ -58,4 +64,3 @@ const text = ref('https://www.example.com')
   color: #666;
 }
 </style>
-

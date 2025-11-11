@@ -5,6 +5,7 @@
 ## 组件列表
 
 ### 表单组件
+
 - **TsSelect** - 选择器组件，支持静态数据和动态请求
 - **TsCheckbox** - 多选框组件，支持静态数据和动态请求
 - **TsRadio** - 单选框组件，支持静态数据和动态请求
@@ -12,12 +13,14 @@
 - **ConfigFrom** - 配置表单组件
 
 ### 数据展示组件
+
 - **DraggableTable** - 可拖拽表格组件
 - **PopoverTableSelect** - 弹出表格选择器
 - **Tree** - 树形组件
 - **Tabs** - 标签页组件
 
 ### 业务组件
+
 - **DateRangePicker** - 日期范围选择器
 - **ExportExcel** - Excel 导出组件
 - **ImportExcel** - Excel 导入组件
@@ -27,6 +30,7 @@
 - **TsFooter** - 页脚组件
 
 ### 工具组件
+
 - **KeepAllAlive** - 保持所有组件活跃状态
 - **Splitter** - 分割器组件
 - **Title** - 标题组件
@@ -49,7 +53,7 @@ app.use(Components)
 ## 按需引入
 
 ```typescript
-import { TsSelect, TsCheckbox, TsRadio } from '@moluoxixi/components'
+import { TsCheckbox, TsRadio, TsSelect } from '@moluoxixi/components'
 
 // 在组件中使用
 export default {
@@ -102,6 +106,7 @@ packages/components/
 ## 更新日志
 
 ### v1.0.0
+
 - 新增 TsSelect 选择器组件
 - 新增 TsCheckbox 多选框组件
 - 新增 TsRadio 单选框组件

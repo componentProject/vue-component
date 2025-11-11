@@ -7,7 +7,9 @@
         :downloadable="true"
         image-type="image/png"
       />
-      <div class="label">PNG格式</div>
+      <div class="label">
+        PNG格式
+      </div>
     </div>
     <div class="example-item">
       <QrCode
@@ -16,7 +18,9 @@
         :downloadable="true"
         image-type="image/jpeg"
       />
-      <div class="label">JPEG格式</div>
+      <div class="label">
+        JPEG格式
+      </div>
     </div>
     <div class="example-item">
       <QrCode
@@ -25,7 +29,9 @@
         :downloadable="true"
         image-type="image/webp"
       />
-      <div class="label">WebP格式</div>
+      <div class="label">
+        WebP格式
+      </div>
     </div>
   </div>
 </template>
@@ -55,4 +61,3 @@ const text = ref('https://www.example.com')
   color: #666;
 }
 </style>
-

@@ -6,7 +6,9 @@
         :size="200"
         :downloadable="false"
       />
-      <div class="label">不可下载（点击无效果）</div>
+      <div class="label">
+        不可下载（点击无效果）
+      </div>
     </div>
     <div class="example-item">
       <QrCode
@@ -14,7 +16,9 @@
         :size="200"
         :downloadable="true"
       />
-      <div class="label">可下载（点击二维码下载）</div>
+      <div class="label">
+        可下载（点击二维码下载）
+      </div>
     </div>
   </div>
 </template>
@@ -44,4 +48,3 @@ const text = ref('https://www.example.com')
   color: #666;
 }
 </style>
-

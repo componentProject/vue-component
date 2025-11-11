@@ -9,7 +9,9 @@
         label="label"
         value="value"
       />
-      <div class="label">不显示提示</div>
+      <div class="label">
+        不显示提示
+      </div>
     </div>
     <div class="example-item">
       <TsSelect
@@ -20,7 +22,9 @@
         label="label"
         value="value"
       />
-      <div class="label">显示提示（默认）</div>
+      <div class="label">
+        显示提示（默认）
+      </div>
     </div>
   </div>
 </template>
@@ -58,4 +62,3 @@ const options = ref([
   color: #666;
 }
 </style>
-

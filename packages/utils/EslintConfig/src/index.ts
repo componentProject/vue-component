@@ -1,11 +1,12 @@
 import antfu from '@antfu/eslint-config'
 
 import type { optionsType, userConfigType } from './_types/index.ts'
+import { deepMerge } from '@moluoxixi/utils/_utils'
 
 export default function createEslintConfig(config: optionsType, ...userConfigs: userConfigType[]) {
-  const { ignores, rules, ...otherOptions } = config
+  const { ignores, ...otherOptions } = config
   return antfu(
-    {
+    deepMerge({
       typescript: true,
       vue: true,
       yaml: true,
@@ -39,10 +40,12 @@ export default function createEslintConfig(config: optionsType, ...userConfigs: 
         'unused-imports/no-unused-vars': 'off',
         // 全局process
         'node/prefer-global/process': 'off',
-        ...rules,
+        //#region yaml
+        'yaml/sort-keys': 'off',
+        'yaml/spaced-comment': 'off',
+        //#endregion
       },
-      ...otherOptions,
-    },
+    }, otherOptions),
     ...userConfigs,
   )
 }

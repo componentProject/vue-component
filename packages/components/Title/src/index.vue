@@ -21,6 +21,7 @@
 import type { emitsType, propsType, slotsType } from './_types'
 
 defineOptions({
+  // eslint-disable-next-line vue/no-reserved-component-names
   name: 'Title',
 })
 

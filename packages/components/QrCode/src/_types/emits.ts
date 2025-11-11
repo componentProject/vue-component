@@ -9,5 +9,3 @@ export interface emitsType {
   /** 下载时触发 */
   download: [url: string]
 }
-
-

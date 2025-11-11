@@ -16,7 +16,8 @@
   color: #29354f;
   font-size: 14px;
 
-  .el-table__body-wrapper, .el-table__fixed-body-wrapper {
+  .el-table__body-wrapper,
+  .el-table__fixed-body-wrapper {
     user-select: none;
 
     tr {
@@ -42,7 +43,8 @@
     }
   }
 
-  .el-table__header-wrapper, .el-table__fixed-header-wrapper {
+  .el-table__header-wrapper,
+  .el-table__fixed-header-wrapper {
     thead {
       color: #29354f;
       font-size: 12px;

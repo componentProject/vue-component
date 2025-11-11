@@ -1,12 +1,14 @@
 <template>
   <div style="padding: 16px;">
     <ConfigForm
-      :formOptions="formOptions"
+      :form-options="formOptions"
       :rows="rows"
     />
 
     <div style="margin-top: 16px; padding: 12px; background-color: #f5f5f5; border-radius: 4px;">
-      <h4 style="margin: 0 0 8px 0;">表单数据：</h4>
+      <h4 style="margin: 0 0 8px 0;">
+        表单数据：
+      </h4>
       <pre style="margin: 0; font-size: 12px;">{{ JSON.stringify(formOptions.model, null, 2) }}</pre>
     </div>
   </div>
@@ -19,9 +21,9 @@ const formOptions = reactive({
   model: {
     satisfaction: 0,
     quality: 3,
-    service: 0
+    service: 0,
   },
-  labelWidth: '120px'
+  labelWidth: '120px',
 })
 
 const rows = reactive([
@@ -36,8 +38,8 @@ const rows = reactive([
           max: 5,
           allowHalf: true,
           showText: true,
-          texts: ['极差', '失望', '一般', '满意', '惊喜']
-        }
+          texts: ['极差', '失望', '一般', '满意', '惊喜'],
+        },
       },
       {
         prop: 'quality',
@@ -48,8 +50,8 @@ const rows = reactive([
           max: 5,
           colors: ['#99A9BF', '#F7BA2A', '#FF9900'],
           voidColor: '#F7BA2A',
-          disabledVoidColor: '#EFF2F7'
-        }
+          disabledVoidColor: '#EFF2F7',
+        },
       },
       {
         prop: 'service',
@@ -60,10 +62,10 @@ const rows = reactive([
           max: 5,
           iconClasses: ['icon-rate-face-1', 'icon-rate-face-2', 'icon-rate-face-3'],
           voidIconClass: 'icon-rate-face-off',
-          colors: ['#99A9BF', '#F7BA2A', '#FF9900']
-        }
-      }
-    ]
-  }
+          colors: ['#99A9BF', '#F7BA2A', '#FF9900'],
+        },
+      },
+    ],
+  },
 ])
 </script>

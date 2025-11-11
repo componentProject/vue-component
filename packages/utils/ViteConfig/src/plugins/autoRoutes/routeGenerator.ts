@@ -67,9 +67,11 @@ export function findParentRouteHandle(
 export function generateRoutes(
   files: FilesMap,
   prefix: string = '',
-  baseRoute?: RouteModule | string,
+  // baseRoute?: RouteModule | string,
+  baseRoute?: string,
 ): RouteModule[] {
-  const newBaseRoute: RouteModule | undefined = typeof baseRoute === 'string' ? { name: baseRoute } : baseRoute
+  // const newBaseRoute: RouteModule | undefined = typeof baseRoute === 'string' ? { name: baseRoute } : baseRoute
+  const newBaseRoute: RouteModule | undefined = baseRoute ? { name: baseRoute } : baseRoute
   const modules: RouteModule[] = newBaseRoute ? [newBaseRoute] : []
   return Object.keys(files)
     .sort((a, b) => {
@@ -91,12 +93,16 @@ export function generateRoutes(
 
       const path = `/${pathArr.join('/')}`
       const parentPath = `/${pathArr.slice(0, -1).join('/')}`
+      let parentRoute
       if (newBaseRoute) {
         newBaseRoute.children = newBaseRoute.children || []
         newBaseRoute.name = newBaseRoute.name || prefix
         newBaseRoute.path = `/${(newBaseRoute.path || parentPath).split('/').filter((item: string) => item && !item.includes('.')).join('/')}`
+        parentRoute = newBaseRoute
       }
-      const parentRoute = findParentRouteHandle(modules, parentPath)
+      else {
+        parentRoute = findParentRouteHandle(modules, parentPath)
+      }
       if (parentRoute) {
         if (!parentRoute.children)
           parentRoute.children = []

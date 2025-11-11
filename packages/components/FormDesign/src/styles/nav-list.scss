@@ -1,0 +1,68 @@
+.starfish-editor {
+  .nav_list {
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: $editor-nav-background-color;
+    box-sizing: border-box;
+    border-bottom: 2px solid #d8dee8;
+    padding: 0 15px;
+    .detailBtn {
+      .nav-icon {
+        padding: 0 5px;
+        font-size: 18px;
+        cursor: pointer;
+        &:hover {
+          color: var(--el-color-primary);
+        }
+      }
+      .noactive {
+        color: #a1a7b0;
+        cursor: no-drop;
+        &:hover {
+          color: #a1a7b0;
+        }
+      }
+    }
+    .pageBtn {
+      white-space: nowrap;
+      > div {
+        margin: 0 5px;
+      }
+      .el-button-group {
+        .nav-icon {
+          margin-right: 5px;
+          font-size: 18px;
+          cursor: pointer;
+          &:hover {
+            color: var(--el-color-primary);
+          }
+        }
+        .info {
+          color: var(--el-color-primary);
+        }
+      }
+    }
+    :deep(.demo-drawer) {
+      width: 20% !important;
+    }
+  }
+}
+.codeDialog {
+  height: auto;
+  .custom_code {
+    height: 100%;
+    flex: 1;
+    .upload-demo {
+      margin-top: 20px;
+    }
+  }
+}
+.custom-tree-node {
+  display: flex;
+  align-items: center;
+  span:last-child {
+    justify-content: flex-end;
+  }
+}

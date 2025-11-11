@@ -50,14 +50,14 @@ export interface PendingOperation {
   reject: (error: Error) => void
 }
 
-export type IndexDBOperation =
-  | 'init'
-  | 'setItem'
-  | 'getItem'
-  | 'setItems'
-  | 'getItems'
-  | 'removeItem'
-  | 'clear'
-  | 'keys'
-  | 'length'
-  | 'close'
+export type IndexDBOperation
+  = | 'init'
+    | 'setItem'
+    | 'getItem'
+    | 'setItems'
+    | 'getItems'
+    | 'removeItem'
+    | 'clear'
+    | 'keys'
+    | 'length'
+    | 'close'

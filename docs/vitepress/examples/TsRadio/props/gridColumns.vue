@@ -9,7 +9,9 @@
         label="label"
         value="value"
       />
-      <div class="label">2列</div>
+      <div class="label">
+        2列
+      </div>
     </div>
     <div class="example-item">
       <TsRadio
@@ -20,7 +22,9 @@
         label="label"
         value="value"
       />
-      <div class="label">4列（默认）</div>
+      <div class="label">
+        4列（默认）
+      </div>
     </div>
     <div class="example-item">
       <TsRadio
@@ -31,7 +35,9 @@
         label="label"
         value="value"
       />
-      <div class="label">6列</div>
+      <div class="label">
+        6列
+      </div>
     </div>
   </div>
 </template>
@@ -70,4 +76,3 @@ const options = ref([
   color: #666;
 }
 </style>
-

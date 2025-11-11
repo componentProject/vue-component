@@ -7,7 +7,9 @@
         color-dark="#007bff"
         color-light="#f0f8ff"
       />
-      <div class="label">蓝色 + 浅蓝背景</div>
+      <div class="label">
+        蓝色 + 浅蓝背景
+      </div>
     </div>
     <div class="example-item">
       <QrCode
@@ -16,7 +18,9 @@
         color-dark="#28a745"
         color-light="#f0fff0"
       />
-      <div class="label">绿色 + 浅绿背景</div>
+      <div class="label">
+        绿色 + 浅绿背景
+      </div>
     </div>
     <div class="example-item">
       <QrCode
@@ -25,7 +29,9 @@
         color-dark="#dc3545"
         color-light="#fff5f5"
       />
-      <div class="label">红色 + 浅红背景</div>
+      <div class="label">
+        红色 + 浅红背景
+      </div>
     </div>
   </div>
 </template>
@@ -55,4 +61,3 @@ const text = ref('https://www.example.com')
   color: #666;
 }
 </style>
-

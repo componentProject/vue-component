@@ -36,4 +36,3 @@ const text = ref('https://www.example.com')
   pointer-events: none;
 }
 </style>
-

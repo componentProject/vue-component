@@ -2,19 +2,27 @@
   <div class="container">
     <div class="example-item">
       <QrCode :text="text" :size="150" color-dark="#000000" />
-      <div class="label">黑色 (#000000)</div>
+      <div class="label">
+        黑色 (#000000)
+      </div>
     </div>
     <div class="example-item">
       <QrCode :text="text" :size="150" color-dark="#007bff" />
-      <div class="label">蓝色 (#007bff)</div>
+      <div class="label">
+        蓝色 (#007bff)
+      </div>
     </div>
     <div class="example-item">
       <QrCode :text="text" :size="150" color-dark="#28a745" />
-      <div class="label">绿色 (#28a745)</div>
+      <div class="label">
+        绿色 (#28a745)
+      </div>
     </div>
     <div class="example-item">
       <QrCode :text="text" :size="150" color-dark="#dc3545" />
-      <div class="label">红色 (#dc3545)</div>
+      <div class="label">
+        红色 (#dc3545)
+      </div>
     </div>
   </div>
 </template>
@@ -44,4 +52,3 @@ const text = ref('https://www.example.com')
   color: #666;
 }
 </style>
-

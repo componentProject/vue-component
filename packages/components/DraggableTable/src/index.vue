@@ -11,6 +11,8 @@
       :columns="computedColumns"
       :header-cell-style="computedHeaderCellStyle"
       :pager-config="computedPagerConfig"
+      :scroll-y="computedVirtualYConfig"
+      :scroll-x="computedVirtualXConfig"
       :virtual-y-config="computedVirtualYConfig"
       :virtual-x-config="computedVirtualXConfig"
       :sort-config="computedSortConfig"

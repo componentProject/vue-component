@@ -2,7 +2,7 @@
   <div style="padding: 16px;">
     <ConfigForm
       ref="formRef"
-      :formOptions="formOptions"
+      :form-options="formOptions"
       :rows="rows"
     />
 
@@ -30,8 +30,12 @@
     </div>
 
     <div v-if="refInfo" style="margin-top: 16px; padding: 12px; background-color: #f0f9ff; border: 1px solid #b3e5fc; border-radius: 4px;">
-      <h4 style="margin: 0 0 8px 0; color: #1976d2;">引用信息：</h4>
-      <p style="margin: 0; color: #1976d2;">{{ refInfo }}</p>
+      <h4 style="margin: 0 0 8px 0; color: #1976d2;">
+        引用信息：
+      </h4>
+      <p style="margin: 0; color: #1976d2;">
+        {{ refInfo }}
+      </p>
     </div>
   </div>
 </template>
@@ -45,18 +49,18 @@ const refInfo = ref('')
 const formOptions = reactive({
   model: {
     name: '',
-    email: ''
+    email: '',
   },
   labelWidth: '100px',
   rules: {
     name: [
-      { required: true, message: '姓名不能为空', trigger: 'blur' }
+      { required: true, message: '姓名不能为空', trigger: 'blur' },
     ],
     email: [
       { required: true, message: '邮箱不能为空', trigger: 'blur' },
-      { type: 'email', message: '请输入正确的邮箱格式', trigger: 'blur' }
-    ]
-  }
+      { type: 'email', message: '请输入正确的邮箱格式', trigger: 'blur' },
+    ],
+  },
 })
 
 const rows = reactive([
@@ -69,8 +73,8 @@ const rows = reactive([
         colConfig: { span: 24 },
         config: {
           ref: 'nameInput',
-          placeholder: '请输入姓名'
-        }
+          placeholder: '请输入姓名',
+        },
       },
       {
         prop: 'email',
@@ -78,19 +82,20 @@ const rows = reactive([
         type: 'input',
         colConfig: { span: 24 },
         config: {
-          placeholder: '请输入邮箱'
-        }
-      }
-    ]
-  }
+          placeholder: '请输入邮箱',
+        },
+      },
+    ],
+  },
 ])
 
-const focusNameInput = () => {
+function focusNameInput() {
   const nameInputRef = formRef.value.getRef('nameInput')
   if (nameInputRef && nameInputRef.focus) {
     nameInputRef.focus()
     refInfo.value = '已聚焦到姓名输入框'
-  } else {
+  }
+  else {
     refInfo.value = '无法获取姓名输入框引用'
   }
 }
@@ -98,7 +103,7 @@ const focusNameInput = () => {
 function getFormRef() {
   const elFormRef = formRef.value.getRef('form')
   if (elFormRef) {
-    refInfo.value = `成功获取到 el-form 引用，类型：${  elFormRef.$el?.tagName}`
+    refInfo.value = `成功获取到 el-form 引用，类型：${elFormRef.$el?.tagName}`
   }
   else {
     refInfo.value = '无法获取表单引用'

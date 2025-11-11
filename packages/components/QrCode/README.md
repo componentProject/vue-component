@@ -38,6 +38,7 @@ const url2 = ref('www.example.com') // 会自动变成 https://www.example.com
 ```
 
 **扫码跳转说明：**
+
 - 当二维码内容是URL时（以 `http://` 或 `https://` 开头），扫描器会自动识别并打开该URL
 - 如果设置了 `autoCompleteUrl="true"`（默认开启），即使URL没有协议，组件也会自动添加 `https://`
 - 扫码后，手机扫描器会自动在浏览器中打开该地址
@@ -157,42 +158,42 @@ const qrText = ref('高错误纠正级别')
 
 ### Props
 
-| 参数 | 说明 | 类型 | 默认值 |
-|------|------|------|--------|
-| text | 要编码的文本内容 | `string` | `''` |
-| size | 二维码尺寸（像素） | `number` | `200` |
-| errorCorrectionLevel | 错误纠正级别 | `'L' \| 'M' \| 'Q' \| 'H'` | `'H'` |
-| colorDark | 二维码颜色 | `string` | `'#000000'` |
-| colorLight | 背景颜色 | `string` | `'#ffffff'` |
-| margin | 二维码边距（模块数） | `number` | `4` |
-| showBorder | 是否显示边框 | `boolean` | `false` |
-| borderWidth | 边框宽度（像素） | `number` | `1` |
-| borderColor | 边框颜色 | `string` | `'#000000'` |
-| showLogo | 是否显示Logo | `boolean` | `false` |
-| logoUrl | Logo图片地址 | `string` | `''` |
-| logoSize | Logo尺寸（像素） | `number` | `40` |
-| logoMargin | Logo边距（像素） | `number` | `4` |
-| logoBackgroundColor | Logo背景颜色 | `string` | `'#ffffff'` |
-| downloadable | 是否支持下载 | `boolean` | `false` |
-| downloadFileName | 下载文件名 | `string` | `'qrcode'` |
-| imageType | 图片类型 | `'image/png' \| 'image/jpeg' \| 'image/webp'` | `'image/png'` |
-| quality | 图片质量（仅对JPEG有效，0-1） | `number` | `0.92` |
-| autoCompleteUrl | 是否自动补全URL（如果text是URL但没有协议，自动添加https://） | `boolean` | `true` |
+| 参数                 | 说明                                                         | 类型                                          | 默认值        |
+| -------------------- | ------------------------------------------------------------ | --------------------------------------------- | ------------- |
+| text                 | 要编码的文本内容                                             | `string`                                      | `''`          |
+| size                 | 二维码尺寸（像素）                                           | `number`                                      | `200`         |
+| errorCorrectionLevel | 错误纠正级别                                                 | `'L' \| 'M' \| 'Q' \| 'H'`                    | `'H'`         |
+| colorDark            | 二维码颜色                                                   | `string`                                      | `'#000000'`   |
+| colorLight           | 背景颜色                                                     | `string`                                      | `'#ffffff'`   |
+| margin               | 二维码边距（模块数）                                         | `number`                                      | `4`           |
+| showBorder           | 是否显示边框                                                 | `boolean`                                     | `false`       |
+| borderWidth          | 边框宽度（像素）                                             | `number`                                      | `1`           |
+| borderColor          | 边框颜色                                                     | `string`                                      | `'#000000'`   |
+| showLogo             | 是否显示Logo                                                 | `boolean`                                     | `false`       |
+| logoUrl              | Logo图片地址                                                 | `string`                                      | `''`          |
+| logoSize             | Logo尺寸（像素）                                             | `number`                                      | `40`          |
+| logoMargin           | Logo边距（像素）                                             | `number`                                      | `4`           |
+| logoBackgroundColor  | Logo背景颜色                                                 | `string`                                      | `'#ffffff'`   |
+| downloadable         | 是否支持下载                                                 | `boolean`                                     | `false`       |
+| downloadFileName     | 下载文件名                                                   | `string`                                      | `'qrcode'`    |
+| imageType            | 图片类型                                                     | `'image/png' \| 'image/jpeg' \| 'image/webp'` | `'image/png'` |
+| quality              | 图片质量（仅对JPEG有效，0-1）                                | `number`                                      | `0.92`        |
+| autoCompleteUrl      | 是否自动补全URL（如果text是URL但没有协议，自动添加https://） | `boolean`                                     | `true`        |
 
 ### Events
 
-| 事件名 | 说明 | 回调参数 |
-|--------|------|----------|
-| ready | 二维码生成完成时触发 | `(url: string)` |
-| error | 二维码生成失败时触发 | `(error: Error)` |
-| download | 下载时触发 | `(url: string)` |
+| 事件名   | 说明                 | 回调参数         |
+| -------- | -------------------- | ---------------- |
+| ready    | 二维码生成完成时触发 | `(url: string)`  |
+| error    | 二维码生成失败时触发 | `(error: Error)` |
+| download | 下载时触发           | `(url: string)`  |
 
 ### Slots
 
-| 插槽名 | 说明 |
-|--------|------|
+| 插槽名  | 说明                               |
+| ------- | ---------------------------------- |
 | default | 默认插槽，用于自定义二维码显示区域 |
-| logo | Logo插槽，用于自定义Logo显示 |
+| logo    | Logo插槽，用于自定义Logo显示       |
 
 ## 错误纠正级别说明
 
@@ -208,17 +209,20 @@ const qrText = ref('高错误纠正级别')
 ### 如何生成扫码跳转的二维码
 
 1. **直接使用完整URL**（推荐）：
+
 ```vue
 <QrCode text="https://www.example.com" />
 ```
 
 2. **自动补全URL协议**：
+
 ```vue
 <!-- 组件会自动将 www.example.com 转换为 https://www.example.com -->
 <QrCode text="www.example.com" :auto-complete-url="true" />
 ```
 
 3. **自定义跳转地址**：
+
 ```vue
 <template>
   <QrCode :text="jumpUrl" :size="200" />
@@ -233,6 +237,7 @@ const jumpUrl = ref('https://www.your-website.com/page?id=123')
 ```
 
 **扫码后的行为：**
+
 - 手机扫描二维码后，扫描器会读取二维码中的URL
 - 如果URL以 `http://` 或 `https://` 开头，扫描器会自动在浏览器中打开该地址
 - 这是二维码扫描器的标准行为，无需额外配置
@@ -245,5 +250,3 @@ const jumpUrl = ref('https://www.your-website.com/page?id=123')
 4. 二维码尺寸建议不小于 100px，以确保扫描识别率
 5. 当 `showLogo` 为 `true` 时，建议使用较高的错误纠正级别（如 `'H'`），以提高容错能力
 6. **URL跳转**：确保URL格式正确，建议使用完整的 `https://` 开头的URL，以确保所有扫描器都能正确识别
-
-

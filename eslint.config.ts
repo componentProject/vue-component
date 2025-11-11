@@ -4,9 +4,7 @@ export default EslintConfig(
   {
     ignores: [
       'docs/vitepress/.vitepress/theme/components/DocsCodeDemo/**',
-      'packages/components/ConfigForm/**',
-      '.husky/**',
-      '**/*.md',
+      'packages/components/AIAgent/**',
     ],
   },
 )

@@ -34,7 +34,7 @@ function render(chart: Chart) {
     .transform({
       type: 'stackY',
     })
-    .tooltip((data) => ({
+    .tooltip(data => ({
       name: data.item,
       value: `${data.count}`,
     }))
@@ -54,4 +54,3 @@ function render(chart: Chart) {
   background-color: #fff;
 }
 </style>
-

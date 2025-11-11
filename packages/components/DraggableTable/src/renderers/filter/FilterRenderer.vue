@@ -45,11 +45,11 @@
               全选
             </ElCheckbox>
             <ElCheckbox
-              v-for="item in columnValList"
-              :key="item.value"
-              v-model="item.checked"
+              v-for="_item in columnValList"
+              :key="_item.value"
+              v-model="_item.checked"
             >
-              {{ item.formattedValue || item.value }}
+              {{ _item.formattedValue || _item.value }}
             </ElCheckbox>
           </div>
           <div

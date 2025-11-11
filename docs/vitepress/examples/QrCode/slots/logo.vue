@@ -8,7 +8,9 @@
     >
       <template #logo>
         <div class="custom-logo">
-          <div class="logo-text">LOGO</div>
+          <div class="logo-text">
+            LOGO
+          </div>
         </div>
       </template>
     </QrCode>
@@ -54,4 +56,3 @@ const text = ref('https://www.example.com')
   text-align: center;
 }
 </style>
-

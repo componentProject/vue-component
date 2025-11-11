@@ -72,4 +72,3 @@ function handleLoadMore() {
   min-height: 80px;
 }
 </style>
-

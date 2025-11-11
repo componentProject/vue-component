@@ -2,7 +2,7 @@
   <div style="padding: 16px;">
     <ConfigForm
       ref="formRef"
-      :formOptions="formOptions"
+      :form-options="formOptions"
       :rows="rows"
       @update:rows="updateRows"
     />
@@ -31,12 +31,18 @@
     </div>
 
     <div v-if="validationResult" style="margin-top: 16px; padding: 12px; border-radius: 4px;" :style="{ backgroundColor: validationResult.success ? '#f0f9ff' : '#fef0f0', border: validationResult.success ? '1px solid #b3e5fc' : '1px solid #fbc4c4' }">
-      <h4 style="margin: 0 0 8px 0;" :style="{ color: validationResult.success ? '#1976d2' : '#f56c6c' }">{{ validationResult.title }}</h4>
-      <p style="margin: 0;" :style="{ color: validationResult.success ? '#1976d2' : '#f56c6c' }">{{ validationResult.message }}</p>
+      <h4 style="margin: 0 0 8px 0;" :style="{ color: validationResult.success ? '#1976d2' : '#f56c6c' }">
+        {{ validationResult.title }}
+      </h4>
+      <p style="margin: 0;" :style="{ color: validationResult.success ? '#1976d2' : '#f56c6c' }">
+        {{ validationResult.message }}
+      </p>
     </div>
 
     <div style="margin-top: 16px; padding: 12px; background-color: #f5f5f5; border-radius: 4px;">
-      <h4 style="margin: 0 0 8px 0;">表单数据：</h4>
+      <h4 style="margin: 0 0 8px 0;">
+        表单数据：
+      </h4>
       <pre style="margin: 0; font-size: 12px; max-height: 300px; overflow: auto;">{{ JSON.stringify(formOptions.model, null, 2) }}</pre>
     </div>
   </div>
@@ -46,7 +52,7 @@
 import { reactive, ref } from 'vue'
 
 const formRef = ref()
-const validationResult = ref<{ success: boolean; title: string; message: string } | null>(null)
+const validationResult = ref<{ success: boolean, title: string, message: string } | null>(null)
 
 const formOptions = reactive({
   model: {
@@ -69,38 +75,39 @@ const formOptions = reactive({
 
     // 其他
     description: '',
-    agree: false
+    agree: false,
   },
   labelWidth: '120px',
   rules: {
     name: [
       { required: true, message: '姓名不能为空', trigger: 'blur' },
-      { min: 2, max: 20, message: '姓名长度在2-20个字符', trigger: 'blur' }
+      { min: 2, max: 20, message: '姓名长度在2-20个字符', trigger: 'blur' },
     ],
     email: [
       { required: true, message: '邮箱不能为空', trigger: 'blur' },
-      { type: 'email', message: '请输入正确的邮箱格式', trigger: 'blur' }
+      { type: 'email', message: '请输入正确的邮箱格式', trigger: 'blur' },
     ],
     phone: [
       { required: true, message: '电话不能为空', trigger: 'blur' },
-      { pattern: /^1[3-9]\d{9}$/, message: '请输入正确的手机号码', trigger: 'blur' }
+      { pattern: /^1[3-9]\d{9}$/, message: '请输入正确的手机号码', trigger: 'blur' },
     ],
     gender: [
-      { required: true, message: '请选择性别', trigger: 'change' }
+      { required: true, message: '请选择性别', trigger: 'change' },
     ],
     agree: [
       {
-        validator: (rule: any, value: boolean, callback: Function) => {
+        validator: (rule: any, value: boolean, callback: (...items: any[]) => any) => {
           if (!value) {
             callback(new Error('请同意用户协议'))
-          } else {
+          }
+          else {
             callback()
           }
         },
-        trigger: 'change'
-      }
-    ]
-  }
+        trigger: 'change',
+      },
+    ],
+  },
 })
 
 const rows = reactive([
@@ -113,8 +120,8 @@ const rows = reactive([
         colConfig: { span: 8 },
         config: {
           placeholder: '请输入姓名',
-          clearable: true
-        }
+          clearable: true,
+        },
       },
       {
         prop: 'email',
@@ -123,8 +130,8 @@ const rows = reactive([
         colConfig: { span: 8 },
         config: {
           placeholder: '请输入邮箱',
-          clearable: true
-        }
+          clearable: true,
+        },
       },
       {
         prop: 'phone',
@@ -133,10 +140,10 @@ const rows = reactive([
         colConfig: { span: 8 },
         config: {
           placeholder: '请输入手机号码',
-          clearable: true
-        }
-      }
-    ]
+          clearable: true,
+        },
+      },
+    ],
   },
   {
     formItems: [
@@ -148,9 +155,9 @@ const rows = reactive([
         config: {
           radios: [
             { label: '男', value: 'male' },
-            { label: '女', value: 'female' }
-          ]
-        }
+            { label: '女', value: 'female' },
+          ],
+        },
       },
       {
         prop: 'birthday',
@@ -161,8 +168,8 @@ const rows = reactive([
           type: 'date',
           placeholder: '请选择出生日期',
           format: 'YYYY-MM-DD',
-          valueFormat: 'YYYY-MM-DD'
-        }
+          valueFormat: 'YYYY-MM-DD',
+        },
       },
       {
         prop: 'level',
@@ -173,10 +180,10 @@ const rows = reactive([
           min: 1,
           max: 5,
           showStops: true,
-          showTooltip: true
-        }
-      }
-    ]
+          showTooltip: true,
+        },
+      },
+    ],
   },
   {
     formItems: [
@@ -192,9 +199,9 @@ const rows = reactive([
             { label: '中国', value: 'china' },
             { label: '美国', value: 'usa' },
             { label: '日本', value: 'japan' },
-            { label: '韩国', value: 'korea' }
-          ]
-        }
+            { label: '韩国', value: 'korea' },
+          ],
+        },
       },
       {
         prop: 'city',
@@ -208,9 +215,9 @@ const rows = reactive([
             { label: '北京', value: 'beijing' },
             { label: '上海', value: 'shanghai' },
             { label: '广州', value: 'guangzhou' },
-            { label: '深圳', value: 'shenzhen' }
-          ]
-        }
+            { label: '深圳', value: 'shenzhen' },
+          ],
+        },
       },
       {
         prop: 'notifications',
@@ -219,10 +226,10 @@ const rows = reactive([
         colConfig: { span: 8 },
         config: {
           activeText: '开启',
-          inactiveText: '关闭'
-        }
-      }
-    ]
+          inactiveText: '关闭',
+        },
+      },
+    ],
   },
   {
     formItems: [
@@ -233,10 +240,10 @@ const rows = reactive([
         colConfig: { span: 24 },
         config: {
           placeholder: '请输入详细地址',
-          clearable: true
-        }
-      }
-    ]
+          clearable: true,
+        },
+      },
+    ],
   },
   {
     formItems: [
@@ -252,11 +259,11 @@ const rows = reactive([
             { label: '音乐', value: 'music' },
             { label: '旅行', value: 'travel' },
             { label: '电影', value: 'movies' },
-            { label: '游戏', value: 'gaming' }
-          ]
-        }
-      }
-    ]
+            { label: '游戏', value: 'gaming' },
+          ],
+        },
+      },
+    ],
   },
   {
     formItems: [
@@ -270,10 +277,10 @@ const rows = reactive([
           placeholder: '请输入个人描述',
           rows: 4,
           maxlength: 200,
-          showWordLimit: true
-        }
-      }
-    ]
+          showWordLimit: true,
+        },
+      },
+    ],
   },
   {
     formItems: [
@@ -283,35 +290,36 @@ const rows = reactive([
         type: 'checkbox',
         colConfig: { span: 24 },
         config: {
-          label: '我已阅读并同意用户协议和隐私政策'
-        }
-      }
-    ]
-  }
+          label: '我已阅读并同意用户协议和隐私政策',
+        },
+      },
+    ],
+  },
 ])
 
-const updateRows = (newRows: any) => {
+function updateRows(newRows: any) {
   Object.assign(rows, newRows)
 }
 
-const validateForm = async () => {
+async function validateForm() {
   try {
     const valid = await formRef.value.validate()
     validationResult.value = {
       success: valid,
       title: valid ? '验证成功' : '验证失败',
-      message: valid ? '所有字段验证通过！' : '请检查表单中的错误信息。'
+      message: valid ? '所有字段验证通过！' : '请检查表单中的错误信息。',
     }
-  } catch (error) {
+  }
+  catch (error) {
     validationResult.value = {
       success: false,
       title: '验证失败',
-      message: '表单验证过程中出现错误。'
+      message: '表单验证过程中出现错误。',
     }
   }
 }
 
-const resetForm = () => {
+function resetForm() {
   const elFormRef = formRef.value.getRef('form')
   if (elFormRef && elFormRef.resetFields) {
     elFormRef.resetFields()
@@ -319,7 +327,7 @@ const resetForm = () => {
   }
 }
 
-const fillSampleData = () => {
+function fillSampleData() {
   Object.assign(formOptions.model, {
     name: '张三',
     email: 'zhangsan@example.com',
@@ -333,7 +341,7 @@ const fillSampleData = () => {
     notifications: true,
     level: 4,
     description: '这是一个示例用户的个人描述信息。',
-    agree: true
+    agree: true,
   })
   validationResult.value = null
 }

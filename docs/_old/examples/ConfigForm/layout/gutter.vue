@@ -1,7 +1,7 @@
 <template>
   <div style="padding: 16px;">
     <ConfigForm
-      :formOptions="formOptions"
+      :form-options="formOptions"
       :rows="rows"
     />
   </div>
@@ -15,9 +15,9 @@ const formOptions = reactive({
     field1: '',
     field2: '',
     field3: '',
-    field4: ''
+    field4: '',
   },
-  labelWidth: '100px'
+  labelWidth: '100px',
 })
 
 const rows = reactive([
@@ -30,8 +30,8 @@ const rows = reactive([
         type: 'input',
         colConfig: { span: 12 },
         config: {
-          placeholder: '带间距的字段1'
-        }
+          placeholder: '带间距的字段1',
+        },
       },
       {
         prop: 'field2',
@@ -39,10 +39,10 @@ const rows = reactive([
         type: 'input',
         colConfig: { span: 12 },
         config: {
-          placeholder: '带间距的字段2'
-        }
-      }
-    ]
+          placeholder: '带间距的字段2',
+        },
+      },
+    ],
   },
   {
     gutter: 20,
@@ -53,8 +53,8 @@ const rows = reactive([
         type: 'input',
         colConfig: { span: 12 },
         config: {
-          placeholder: '带间距的字段3'
-        }
+          placeholder: '带间距的字段3',
+        },
       },
       {
         prop: 'field4',
@@ -62,10 +62,10 @@ const rows = reactive([
         type: 'input',
         colConfig: { span: 12 },
         config: {
-          placeholder: '带间距的字段4'
-        }
-      }
-    ]
-  }
+          placeholder: '带间距的字段4',
+        },
+      },
+    ],
+  },
 ])
 </script>

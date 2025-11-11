@@ -54,6 +54,10 @@ import { computed, reactive } from 'vue'
 import { RouterView, useRouter } from 'vue-router'
 import subMenu from '@moluoxixi/components/subMenu.vue'
 import { useSystemStore } from '@/stores/modules/system.ts'
+import 'element-plus/theme-chalk/el-header.css'
+import 'element-plus/theme-chalk/el-menu.css'
+import 'element-plus/theme-chalk/el-main.css'
+import 'element-plus/theme-chalk/el-container.css'
 
 const router = useRouter()
 const routes = reactive(router.options.routes[0].children!)
@@ -66,11 +70,7 @@ const defaultTab = computed(() => router.currentRoute.value.path)
 </script>
 
 <style lang="scss" scoped>
-//@forward '@/assets/styles/tailwind.scss';
-//@forward 'element-plus/theme-chalk/el-header.css';
-//@forward 'element-plus/theme-chalk/el-menu.css';
-//@forward 'element-plus/theme-chalk/el-main.css';
-//@forward 'element-plus/theme-chalk/el-container.css';
+@forward '@/assets/styles/tailwind.scss';
 
 :deep(.el-main) {
   --el-main-padding: 12px !important;

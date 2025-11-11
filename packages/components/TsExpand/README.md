@@ -87,7 +87,9 @@ import { TsExpandable } from '@moluoxixi/components'
     :line-height="32"
   >
     <div>
-      <p style="line-height: 32px;">内容...</p>
+      <p style="line-height: 32px;">
+        内容...
+      </p>
     </div>
   </TsExpandable>
 </template>
@@ -98,6 +100,7 @@ import { TsExpandable } from '@moluoxixi/components'
 **组件要求内容区域的每一行高度必须是固定的**（由 `lineHeight` 参数指定）。
 
 如果传入的内容不是文本，请确保：
+
 - 每个子元素的高度与 `lineHeight` 保持一致
 - 或者每个子元素的高度是 `lineHeight` 的整数倍
 
@@ -106,8 +109,8 @@ import { TsExpandable } from '@moluoxixi/components'
   <!-- 示例1：列表项，每个项高度为 24px（与 lineHeight 一致） -->
   <TsExpandable :rows="3" :line-height="24">
     <ul>
-      <li 
-        v-for="i in 10" 
+      <li
+        v-for="i in 10"
         :key="i"
         style="height: 24px; line-height: 24px;"
       >
@@ -119,8 +122,8 @@ import { TsExpandable } from '@moluoxixi/components'
   <!-- 示例2：卡片列表，每个卡片高度为 48px（lineHeight 的 2 倍） -->
   <TsExpandable :rows="2" :line-height="24">
     <div>
-      <div 
-        v-for="i in 5" 
+      <div
+        v-for="i in 5"
         :key="i"
         style="height: 48px; margin-bottom: 0;"
       >
@@ -209,32 +212,32 @@ function handleCollapse() {
 
 ### Props
 
-| 参数 | 说明 | 类型 | 默认值 |
-|------|------|------|--------|
-| rows | 默认展示的行数 | `number` | `3` |
-| defaultExpanded | 是否默认展开 | `boolean` | `false` |
-| expandText | 展开按钮的文本 | `string` | `'展开'` |
-| collapseText | 收起按钮的文本 | `string` | `'收起'` |
-| lineHeight | 行高（px），用于计算高度。**重要：内容区域的每一行高度必须是固定的，每个子元素的高度应与 lineHeight 保持一致或是其整数倍** | `number` | `24` |
-| showToggle | 是否显示展开/收起按钮 | `boolean` | `true` |
-| togglePosition | 展开/收起按钮的位置 | `'left' \| 'right'` | `'right'` |
-| class | 自定义样式类名 | `string` | `''` |
-| style | 自定义样式 | `Record<string, any>` | `{}` |
+| 参数            | 说明                                                                                                                       | 类型                  | 默认值    |
+| --------------- | -------------------------------------------------------------------------------------------------------------------------- | --------------------- | --------- |
+| rows            | 默认展示的行数                                                                                                             | `number`              | `3`       |
+| defaultExpanded | 是否默认展开                                                                                                               | `boolean`             | `false`   |
+| expandText      | 展开按钮的文本                                                                                                             | `string`              | `'展开'`  |
+| collapseText    | 收起按钮的文本                                                                                                             | `string`              | `'收起'`  |
+| lineHeight      | 行高（px），用于计算高度。**重要：内容区域的每一行高度必须是固定的，每个子元素的高度应与 lineHeight 保持一致或是其整数倍** | `number`              | `24`      |
+| showToggle      | 是否显示展开/收起按钮                                                                                                      | `boolean`             | `true`    |
+| togglePosition  | 展开/收起按钮的位置                                                                                                        | `'left' \| 'right'`   | `'right'` |
+| class           | 自定义样式类名                                                                                                             | `string`              | `''`      |
+| style           | 自定义样式                                                                                                                 | `Record<string, any>` | `{}`      |
 
 ### Events
 
-| 事件名 | 说明 | 回调参数 |
-|--------|------|----------|
-| change | 展开/收起状态改变时触发 | `(expanded: boolean)` |
-| expand | 展开时触发 | - |
-| collapse | 收起时触发 | - |
+| 事件名   | 说明                    | 回调参数              |
+| -------- | ----------------------- | --------------------- |
+| change   | 展开/收起状态改变时触发 | `(expanded: boolean)` |
+| expand   | 展开时触发              | -                     |
+| collapse | 收起时触发              | -                     |
 
 ### 插槽
 
-| 插槽名 | 说明 | 作用域参数 |
-|--------|------|-----------|
-| default | 默认插槽，用于放置需要折叠的内容 | - |
-| toggle | 自定义展开/收起按钮插槽 | `{ expanded: boolean, toggle: () => void }` |
+| 插槽名  | 说明                             | 作用域参数                                  |
+| ------- | -------------------------------- | ------------------------------------------- |
+| default | 默认插槽，用于放置需要折叠的内容 | -                                           |
+| toggle  | 自定义展开/收起按钮插槽          | `{ expanded: boolean, toggle: () => void }` |
 
 ## 注意事项
 
@@ -252,4 +255,3 @@ function handleCollapse() {
 5. 组件会自动监听内容变化，动态更新是否需要显示展开按钮
 
 6. 内容区域的 `line-height` 会被自动设置为与 `lineHeight` 一致，确保每行高度固定
-

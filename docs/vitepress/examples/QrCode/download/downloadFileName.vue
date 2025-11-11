@@ -7,7 +7,9 @@
         :downloadable="true"
         download-file-name="my-qrcode"
       />
-      <div class="label">文件名：my-qrcode</div>
+      <div class="label">
+        文件名：my-qrcode
+      </div>
     </div>
     <div class="example-item">
       <QrCode
@@ -16,7 +18,9 @@
         :downloadable="true"
         download-file-name="custom-name"
       />
-      <div class="label">文件名：custom-name</div>
+      <div class="label">
+        文件名：custom-name
+      </div>
     </div>
   </div>
 </template>
@@ -46,4 +50,3 @@ const text = ref('https://www.example.com')
   color: #666;
 }
 </style>
-

@@ -7,5 +7,3 @@ export interface slotsType {
   /** Logo插槽，用于自定义Logo显示 */
   logo?: () => any
 }
-
-

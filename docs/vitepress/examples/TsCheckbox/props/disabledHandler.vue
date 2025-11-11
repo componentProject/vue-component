@@ -41,4 +41,3 @@ function customDisabled({ value: val }: { label: string, value: any, data: any }
   color: #666;
 }
 </style>
-

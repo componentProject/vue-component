@@ -2,19 +2,27 @@
   <div class="container">
     <div class="example-item">
       <QrCode :text="text" :size="200" :margin="0" />
-      <div class="label">边距：0</div>
+      <div class="label">
+        边距：0
+      </div>
     </div>
     <div class="example-item">
       <QrCode :text="text" :size="200" :margin="2" />
-      <div class="label">边距：2</div>
+      <div class="label">
+        边距：2
+      </div>
     </div>
     <div class="example-item">
       <QrCode :text="text" :size="200" :margin="4" />
-      <div class="label">边距：4（默认）</div>
+      <div class="label">
+        边距：4（默认）
+      </div>
     </div>
     <div class="example-item">
       <QrCode :text="text" :size="200" :margin="8" />
-      <div class="label">边距：8</div>
+      <div class="label">
+        边距：8
+      </div>
     </div>
   </div>
 </template>
@@ -44,4 +52,3 @@ const text = ref('https://www.example.com')
   color: #666;
 }
 </style>
-

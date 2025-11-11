@@ -35,7 +35,7 @@ class HttpRequest {
   async post(url, params = {}, config = {}, addSign) {
     try {
     // 创建一个新的配置对象，避免修改原始配置
-      let requestConfig = { ...config }
+      const requestConfig = { ...config }
       // 如果提供了addSign参数，在请求前应用签名
       if (typeof addSign === 'function') {
         try {

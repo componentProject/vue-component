@@ -27,19 +27,19 @@ function createMessageWrapper() {
     return ElMessage
   }
   return {
-    success: (options: string | { message?: string; [key: string]: any }) => {
+    success: (options: string | { message?: string, [key: string]: any }) => {
       const message = typeof options === 'string' ? options : options?.message || ''
       console.log(`[Message Success] ${message}`)
     },
-    error: (options: string | { message?: string; [key: string]: any }) => {
+    error: (options: string | { message?: string, [key: string]: any }) => {
       const message = typeof options === 'string' ? options : options?.message || ''
       console.error(`[Message Error] ${message}`)
     },
-    warning: (options: string | { message?: string; [key: string]: any }) => {
+    warning: (options: string | { message?: string, [key: string]: any }) => {
       const message = typeof options === 'string' ? options : options?.message || ''
       console.warn(`[Message Warning] ${message}`)
     },
-    info: (options: string | { message?: string; [key: string]: any }) => {
+    info: (options: string | { message?: string, [key: string]: any }) => {
       const message = typeof options === 'string' ? options : options?.message || ''
       console.info(`[Message Info] ${message}`)
     },
@@ -274,13 +274,8 @@ export default class BaseApi {
    * @returns Promise<AxiosResponse['data'][]>
    */
   public async all<R>(requests: AxiosRequestConfig[]): Promise<AxiosResponse['data'][]> {
-    try {
-      const promises = requests.map(config => this.request<R>(config))
-      return await Promise.all(promises)
-    }
-    catch (error) {
-      throw error
-    }
+    const promises = requests.map(config => this.request<R>(config))
+    return await Promise.all(promises)
   }
 
   /**

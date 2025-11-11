@@ -5,7 +5,7 @@ import { ElMessage, ElNotification } from 'element-plus'
 const hasDocument = typeof document !== 'undefined'
 
 // 创建消息实例的包装函数
-const createMessageWrapper = () => {
+function createMessageWrapper() {
   if (hasDocument) {
     return ElMessage
   }
@@ -30,7 +30,7 @@ const createMessageWrapper = () => {
 }
 
 // 创建通知实例的包装函数
-const createNotificationWrapper = () => {
+function createNotificationWrapper() {
   if (hasDocument) {
     return ElNotification
   }
@@ -61,10 +61,10 @@ const createNotificationWrapper = () => {
     consoleNotification(options, type)
   }
 
-  wrapper.success = (options) => consoleNotification(options, 'success')
-  wrapper.error = (options) => consoleNotification(options, 'error')
-  wrapper.warning = (options) => consoleNotification(options, 'warning')
-  wrapper.info = (options) => consoleNotification(options, 'info')
+  wrapper.success = options => consoleNotification(options, 'success')
+  wrapper.error = options => consoleNotification(options, 'error')
+  wrapper.warning = options => consoleNotification(options, 'warning')
+  wrapper.info = options => consoleNotification(options, 'info')
 
   return wrapper
 }
@@ -79,7 +79,6 @@ const NotificationWrapper = createNotificationWrapper()
  * @param {object} options - 额外配置选项
  * @param {Function} options.getToken - 获取token的函数
  * @param {Function} options.onLoginRequired - 需要登录回调
- * @returns {import('axios').AxiosInstance}
  */
 export function createAxiosInstance(baseURL, timeout = 5000, options = {}) {
   const {

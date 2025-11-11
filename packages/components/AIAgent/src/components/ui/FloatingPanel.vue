@@ -48,7 +48,9 @@
     <div class="floating-panel-header" @mousedown="handleHeaderMouseDown($event)">
       <slot v-if="$slots.header" name="header" />
       <template v-else>
-        <div class="floating-panel-header-title">标题</div>
+        <div class="floating-panel-header-title">
+          标题
+        </div>
         <div v-if="drag" class="floating-panel-header-close" @click="handleClose" @mousedown.stop>
           <i class="ai-iconfont icon-times" />
         </div>
@@ -62,7 +64,7 @@
 
 <script>
 export default {
-  name: "FloatingPanel",
+  name: 'FloatingPanel',
   props: {
     visible: {
       type: Boolean,
@@ -70,7 +72,7 @@ export default {
     },
     title: {
       type: String,
-      default: "标题",
+      default: '标题',
     },
     width: {
       type: Number,
@@ -104,7 +106,7 @@ export default {
   data() {
     return {
       resizing: false, // 是否正在调整大小
-      resizeDirection: "", // 调整方向
+      resizeDirection: '', // 调整方向
       dragging: false, // 是否正在拖拽
       containerWidth: this.width, // 容器宽度
       containerHeight: this.height, // 容器高度
@@ -116,290 +118,294 @@ export default {
       initialHeight: 0, // 初始高度
       initialTop: 0,
       initialLeft: 0,
-    };
+    }
   },
   created() {
     // 从localStorage中获取宽度、高度和位置
-    const storedWidth = localStorage.getItem("agentContainerWidth");
-    const storedHeight = localStorage.getItem("agentContainerHeight");
-    const storedTop = localStorage.getItem("agentContainerTop");
-    const storedLeft = localStorage.getItem("agentContainerLeft");
+    const storedWidth = localStorage.getItem('agentContainerWidth')
+    const storedHeight = localStorage.getItem('agentContainerHeight')
+    const storedTop = localStorage.getItem('agentContainerTop')
+    const storedLeft = localStorage.getItem('agentContainerLeft')
 
     if (storedWidth) {
-      this.containerWidth = Number(storedWidth);
+      this.containerWidth = Number(storedWidth)
     }
     if (storedHeight) {
-      this.containerHeight = Number(storedHeight);
+      this.containerHeight = Number(storedHeight)
     }
     if (storedTop) {
-      this.containerTop = Number(storedTop);
+      this.containerTop = Number(storedTop)
     }
     if (storedLeft) {
-      this.containerLeft = Number(storedLeft);
+      this.containerLeft = Number(storedLeft)
     }
   },
   mounted() {
-    document.addEventListener("mousemove", this.handleMouseMove);
-    document.addEventListener("mouseup", this.handleMouseUp);
-    window.addEventListener("resize", this.handleWindowResize);
+    document.addEventListener('mousemove', this.handleMouseMove)
+    document.addEventListener('mouseup', this.handleMouseUp)
+    window.addEventListener('resize', this.handleWindowResize)
   },
   beforeUnmount() {
-    document.removeEventListener("mousemove", this.handleMouseMove);
-    document.removeEventListener("mouseup", this.handleMouseUp);
-    window.removeEventListener("resize", this.handleWindowResize);
+    document.removeEventListener('mousemove', this.handleMouseMove)
+    document.removeEventListener('mouseup', this.handleMouseUp)
+    window.removeEventListener('resize', this.handleWindowResize)
   },
   methods: {
     handleClose() {
-      this.$emit("close");
+      this.$emit('close')
     },
     handleHeaderMouseDown(e) {
-      this.panelMove(e);
+      this.panelMove(e)
     },
     panelMove(e) {
-      this.dragging = true;
-      this.initialMouseX = e.pageX;
-      this.initialMouseY = e.pageY;
-      this.initialTop = this.containerTop;
-      this.initialLeft = this.containerLeft;
+      this.dragging = true
+      this.initialMouseX = e.pageX
+      this.initialMouseY = e.pageY
+      this.initialTop = this.containerTop
+      this.initialLeft = this.containerLeft
 
       // 通知父组件开始拖拽
-      this.$emit("drag-start");
+      this.$emit('drag-start')
 
-      e.preventDefault();
+      e.preventDefault()
     },
     handleMouseDown(e, direction) {
-      this.resizing = true;
-      this.resizeDirection = direction;
-      this.initialMouseX = e.pageX;
-      this.initialMouseY = e.pageY;
-      this.initialWidth = this.containerWidth;
-      this.initialHeight = this.containerHeight;
-      this.initialTop = this.containerTop;
-      this.initialLeft = this.containerLeft;
+      this.resizing = true
+      this.resizeDirection = direction
+      this.initialMouseX = e.pageX
+      this.initialMouseY = e.pageY
+      this.initialWidth = this.containerWidth
+      this.initialHeight = this.containerHeight
+      this.initialTop = this.containerTop
+      this.initialLeft = this.containerLeft
 
       // 通知父组件开始调整大小
-      this.$emit("resize-start");
+      this.$emit('resize-start')
 
-      e.preventDefault();
+      e.preventDefault()
     },
     handleMouseMove(e) {
       if (this.resizing) {
-        this.handleResize(e);
-      } else if (this.dragging) {
-        this.handleDrag(e);
+        this.handleResize(e)
+      }
+      else if (this.dragging) {
+        this.handleDrag(e)
       }
     },
     handleResize(e) {
       // 限制鼠标位置在屏幕范围内
-      const mouseX = Math.max(0, Math.min(window.innerWidth, e.pageX));
-      const mouseY = Math.max(0, Math.min(window.innerHeight, e.pageY));
+      const mouseX = Math.max(0, Math.min(window.innerWidth, e.pageX))
+      const mouseY = Math.max(0, Math.min(window.innerHeight, e.pageY))
 
-      const deltaX = mouseX - this.initialMouseX;
-      const deltaY = mouseY - this.initialMouseY;
+      const deltaX = mouseX - this.initialMouseX
+      const deltaY = mouseY - this.initialMouseY
 
-      let newWidth = this.initialWidth;
-      let newHeight = this.initialHeight;
-      let newTop = this.initialTop;
-      let newLeft = this.initialLeft;
+      let newWidth = this.initialWidth
+      let newHeight = this.initialHeight
+      let newTop = this.initialTop
+      let newLeft = this.initialLeft
 
       // 根据调整方向计算新的宽度、高度和位置
       switch (this.resizeDirection) {
-        case "left":
-          newWidth = this.initialWidth - deltaX;
-          newLeft = this.initialLeft + deltaX;
-          break;
-        case "right":
-          newWidth = this.initialWidth + deltaX;
-          break;
-        case "top":
-          newHeight = this.initialHeight - deltaY;
-          newTop = this.initialTop + deltaY;
-          break;
-        case "bottom":
-          newHeight = this.initialHeight + deltaY;
-          break;
-        case "top-left":
-          newWidth = this.initialWidth - deltaX;
-          newHeight = this.initialHeight - deltaY;
-          newLeft = this.initialLeft + deltaX;
-          newTop = this.initialTop + deltaY;
-          break;
-        case "top-right":
-          newWidth = this.initialWidth + deltaX;
-          newHeight = this.initialHeight - deltaY;
-          newTop = this.initialTop + deltaY;
-          break;
-        case "bottom-left":
-          newWidth = this.initialWidth - deltaX;
-          newHeight = this.initialHeight + deltaY;
-          newLeft = this.initialLeft + deltaX;
-          break;
-        case "bottom-right":
-          newWidth = this.initialWidth + deltaX;
-          newHeight = this.initialHeight + deltaY;
-          break;
+        case 'left':
+          newWidth = this.initialWidth - deltaX
+          newLeft = this.initialLeft + deltaX
+          break
+        case 'right':
+          newWidth = this.initialWidth + deltaX
+          break
+        case 'top':
+          newHeight = this.initialHeight - deltaY
+          newTop = this.initialTop + deltaY
+          break
+        case 'bottom':
+          newHeight = this.initialHeight + deltaY
+          break
+        case 'top-left':
+          newWidth = this.initialWidth - deltaX
+          newHeight = this.initialHeight - deltaY
+          newLeft = this.initialLeft + deltaX
+          newTop = this.initialTop + deltaY
+          break
+        case 'top-right':
+          newWidth = this.initialWidth + deltaX
+          newHeight = this.initialHeight - deltaY
+          newTop = this.initialTop + deltaY
+          break
+        case 'bottom-left':
+          newWidth = this.initialWidth - deltaX
+          newHeight = this.initialHeight + deltaY
+          newLeft = this.initialLeft + deltaX
+          break
+        case 'bottom-right':
+          newWidth = this.initialWidth + deltaX
+          newHeight = this.initialHeight + deltaY
+          break
       }
 
       // 限制最小和最大尺寸
-      const minWidth = this.minWidth;
-      const minHeight = this.minHeight;
-      const maxWidth = window.innerWidth - 20; // 留出边距
-      const maxHeight = window.innerHeight - 20; // 留出边距
+      const minWidth = this.minWidth
+      const minHeight = this.minHeight
+      const maxWidth = window.innerWidth - 20 // 留出边距
+      const maxHeight = window.innerHeight - 20 // 留出边距
 
       // 应用尺寸限制
-      newWidth = Math.max(minWidth, Math.min(maxWidth, newWidth));
-      newHeight = Math.max(minHeight, Math.min(maxHeight, newHeight));
+      newWidth = Math.max(minWidth, Math.min(maxWidth, newWidth))
+      newHeight = Math.max(minHeight, Math.min(maxHeight, newHeight))
 
       // 根据新尺寸调整位置，确保元素完全在屏幕内
-      if (this.resizeDirection.includes("left")) {
+      if (this.resizeDirection.includes('left')) {
         // 左边调整时，确保左边界不超出屏幕
-        const maxLeft = this.initialLeft + this.initialWidth - minWidth;
-        const minLeft = 10;
-        newLeft = Math.max(minLeft, Math.min(maxLeft, newLeft));
+        const maxLeft = this.initialLeft + this.initialWidth - minWidth
+        const minLeft = 10
+        newLeft = Math.max(minLeft, Math.min(maxLeft, newLeft))
 
         // 根据实际left位置重新计算宽度
-        newWidth = this.initialLeft + this.initialWidth - newLeft;
+        newWidth = this.initialLeft + this.initialWidth - newLeft
       }
 
-      if (this.resizeDirection.includes("top")) {
+      if (this.resizeDirection.includes('top')) {
         // 上边调整时，确保上边界不超出屏幕
-        const maxTop = this.initialTop + this.initialHeight - minHeight;
-        const minTop = 10;
-        newTop = Math.max(minTop, Math.min(maxTop, newTop));
+        const maxTop = this.initialTop + this.initialHeight - minHeight
+        const minTop = 10
+        newTop = Math.max(minTop, Math.min(maxTop, newTop))
 
         // 根据实际top位置重新计算高度
-        newHeight = this.initialTop + this.initialHeight - newTop;
+        newHeight = this.initialTop + this.initialHeight - newTop
       }
 
       // 确保右边和下边不超出屏幕
       if (newLeft + newWidth > window.innerWidth - 10) {
-        if (this.resizeDirection.includes("left")) {
-          newLeft = window.innerWidth - newWidth - 10;
-        } else {
-          newWidth = window.innerWidth - newLeft - 10;
+        if (this.resizeDirection.includes('left')) {
+          newLeft = window.innerWidth - newWidth - 10
+        }
+        else {
+          newWidth = window.innerWidth - newLeft - 10
         }
       }
 
       if (newTop + newHeight > window.innerHeight - 10) {
-        if (this.resizeDirection.includes("top")) {
-          newTop = window.innerHeight - newHeight - 10;
-        } else {
-          newHeight = window.innerHeight - newTop - 10;
+        if (this.resizeDirection.includes('top')) {
+          newTop = window.innerHeight - newHeight - 10
+        }
+        else {
+          newHeight = window.innerHeight - newTop - 10
         }
       }
 
       // 最终边界检查
-      newTop = Math.max(10, newTop);
-      newLeft = Math.max(10, newLeft);
+      newTop = Math.max(10, newTop)
+      newLeft = Math.max(10, newLeft)
 
-      this.containerWidth = newWidth;
-      this.containerHeight = newHeight;
-      this.containerTop = newTop;
-      this.containerLeft = newLeft;
+      this.containerWidth = newWidth
+      this.containerHeight = newHeight
+      this.containerTop = newTop
+      this.containerLeft = newLeft
     },
     handleDrag(e) {
       // 限制鼠标位置在屏幕范围内
-      const mouseX = Math.max(0, Math.min(window.innerWidth, e.pageX));
-      const mouseY = Math.max(0, Math.min(window.innerHeight, e.pageY));
+      const mouseX = Math.max(0, Math.min(window.innerWidth, e.pageX))
+      const mouseY = Math.max(0, Math.min(window.innerHeight, e.pageY))
 
-      const deltaX = mouseX - this.initialMouseX;
-      const deltaY = mouseY - this.initialMouseY;
+      const deltaX = mouseX - this.initialMouseX
+      const deltaY = mouseY - this.initialMouseY
 
-      let newTop = this.initialTop + deltaY;
-      let newLeft = this.initialLeft + deltaX;
+      let newTop = this.initialTop + deltaY
+      let newLeft = this.initialLeft + deltaX
 
       // 限制位置边界，确保窗口不会移出屏幕
-      newTop = Math.max(10, newTop);
-      newLeft = Math.max(10, newLeft);
+      newTop = Math.max(10, newTop)
+      newLeft = Math.max(10, newLeft)
 
       // 确保窗口不会超出屏幕右边和底部
       if (newLeft + this.containerWidth > window.innerWidth - 10) {
-        newLeft = window.innerWidth - this.containerWidth - 10;
+        newLeft = window.innerWidth - this.containerWidth - 10
       }
       if (newTop + this.containerHeight > window.innerHeight - 10) {
-        newTop = window.innerHeight - this.containerHeight - 10;
+        newTop = window.innerHeight - this.containerHeight - 10
       }
 
-      this.containerTop = newTop;
-      this.containerLeft = newLeft;
+      this.containerTop = newTop
+      this.containerLeft = newLeft
     },
     handleMouseUp() {
-      const wasResizing = this.resizing;
-      const wasDragging = this.dragging;
+      const wasResizing = this.resizing
+      const wasDragging = this.dragging
 
-      this.resizing = false;
-      this.dragging = false;
-      this.resizeDirection = "";
+      this.resizing = false
+      this.dragging = false
+      this.resizeDirection = ''
 
       // 通知父组件操作结束
       if (wasResizing) {
-        this.$emit("resize-end");
-      } else if (wasDragging) {
-        this.$emit("drag-end");
+        this.$emit('resize-end')
+      }
+      else if (wasDragging) {
+        this.$emit('drag-end')
       }
 
       // 将宽度、高度和位置存储到localStorage
-      localStorage.setItem("agentContainerWidth", this.containerWidth);
-      localStorage.setItem("agentContainerHeight", this.containerHeight);
-      localStorage.setItem("agentContainerTop", this.containerTop);
-      localStorage.setItem("agentContainerLeft", this.containerLeft);
+      localStorage.setItem('agentContainerWidth', this.containerWidth)
+      localStorage.setItem('agentContainerHeight', this.containerHeight)
+      localStorage.setItem('agentContainerTop', this.containerTop)
+      localStorage.setItem('agentContainerLeft', this.containerLeft)
     },
 
     // 新增：处理窗口大小改变
     handleWindowResize() {
       // 获取新的窗口尺寸
-      const windowWidth = window.innerWidth;
-      const windowHeight = window.innerHeight;
+      const windowWidth = window.innerWidth
+      const windowHeight = window.innerHeight
 
-      let newWidth = this.containerWidth;
-      let newHeight = this.containerHeight;
-      let newTop = this.containerTop;
-      let newLeft = this.containerLeft;
+      let newWidth = this.containerWidth
+      let newHeight = this.containerHeight
+      let newTop = this.containerTop
+      let newLeft = this.containerLeft
 
       // 调整面板尺寸，确保不超出新的窗口大小
-      const maxWidth = windowWidth - 20;
-      const maxHeight = windowHeight - 20;
+      const maxWidth = windowWidth - 20
+      const maxHeight = windowHeight - 20
 
       if (newWidth > maxWidth) {
-        newWidth = maxWidth;
+        newWidth = maxWidth
       }
       if (newHeight > maxHeight) {
-        newHeight = maxHeight;
+        newHeight = maxHeight
       }
 
       // 调整面板位置，确保完全在屏幕内
       if (newLeft + newWidth > windowWidth - 10) {
-        newLeft = windowWidth - newWidth - 10;
+        newLeft = windowWidth - newWidth - 10
       }
       if (newTop + newHeight > windowHeight - 10) {
-        newTop = windowHeight - newHeight - 10;
+        newTop = windowHeight - newHeight - 10
       }
 
       // 确保最小边距
-      newLeft = Math.max(10, newLeft);
-      newTop = Math.max(10, newTop);
+      newLeft = Math.max(10, newLeft)
+      newTop = Math.max(10, newTop)
 
       // 只有发生变化时才更新
       if (
-        newWidth !== this.containerWidth ||
-        newHeight !== this.containerHeight ||
-        newTop !== this.containerTop ||
-        newLeft !== this.containerLeft
+        newWidth !== this.containerWidth
+        || newHeight !== this.containerHeight
+        || newTop !== this.containerTop
+        || newLeft !== this.containerLeft
       ) {
-        this.containerWidth = newWidth;
-        this.containerHeight = newHeight;
-        this.containerTop = newTop;
-        this.containerLeft = newLeft;
+        this.containerWidth = newWidth
+        this.containerHeight = newHeight
+        this.containerTop = newTop
+        this.containerLeft = newLeft
 
         // 更新存储的位置信息
-        localStorage.setItem("agentContainerWidth", this.containerWidth);
-        localStorage.setItem("agentContainerHeight", this.containerHeight);
-        localStorage.setItem("agentContainerTop", this.containerTop);
-        localStorage.setItem("agentContainerLeft", this.containerLeft);
+        localStorage.setItem('agentContainerWidth', this.containerWidth)
+        localStorage.setItem('agentContainerHeight', this.containerHeight)
+        localStorage.setItem('agentContainerTop', this.containerTop)
+        localStorage.setItem('agentContainerLeft', this.containerLeft)
       }
     },
   },
-};
+}
 </script>
 
 <style lang="scss" scoped>
