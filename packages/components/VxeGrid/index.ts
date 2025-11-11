@@ -1,6 +1,6 @@
 // import * as VxeTableExport from './components'
-import { VxeGrid } from './components'
+import { VxeGrid } from './src/components'
 
-export * from './components'
+export * from './src/components'
 // export default VxeTableExport
 export default VxeGrid

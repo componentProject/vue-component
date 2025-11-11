@@ -76,6 +76,9 @@ function install(app: App) {
 }
 export const Dynamicform = defineAsyncComponent(() => import('./index.vue'))
 
+export {
+  install,
+}
 export default {
   install,
 }

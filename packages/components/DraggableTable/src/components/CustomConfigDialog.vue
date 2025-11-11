@@ -87,7 +87,6 @@ import { getTypeName } from '@moluoxixi/components/DraggableTable/src/_utils'
 import type { CustomConfigDialogEmitsType, CustomConfigDialogPropsType } from '@moluoxixi/components/DraggableTable/src/_types'
 import { flattenTree, getClass } from '@moluoxixi/utils/_utils'
 import { cloneDeep } from 'lodash'
-import { VxeGrid } from 'vxe-table'
 import type { VxeGridInstance } from 'vxe-table'
 import Sortable from 'sortablejs'
 

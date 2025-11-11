@@ -2,6 +2,7 @@ import type { App } from 'vue'
 import FormDesign from './src/index.vue'
 import { defineAsyncComponent } from 'vue'
 import Loading from './src/common/Loading.vue'
+import ConfigForm from '@moluoxixi/components/ConfigForm'
 
 // 导出组件
 export default FormDesign
@@ -60,16 +61,7 @@ export function install(app: App) {
     }
   })
 
-  // 注册 ConfigForm 组件（如果还没有注册）
-  import('@moluoxixi/components/ConfigForm/src/main').then((ConfigFormModule) => {
-    if (ConfigFormModule.default && typeof ConfigFormModule.default.install === 'function') {
-      // 注意：ConfigForm 的 install 已经包含了 Element Plus 组件注册
-      // 但由于我们已经注册过了，不会重复注册
-      ConfigFormModule.default.install(app)
-    }
-  }).catch((error) => {
-    console.warn('FormDesign: 无法加载 ConfigForm 模块', error)
-  })
+  app.use(ConfigForm)
 }
 
 // 为组件添加 install 方法，以便可以作为插件使用

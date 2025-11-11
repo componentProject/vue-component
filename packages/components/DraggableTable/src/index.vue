@@ -92,8 +92,6 @@ import { diff, isEmpty } from 'radash'
 import Sortable from 'sortablejs'
 import VxeUI, { VxePager, VxeTooltip } from 'vxe-pc-ui'
 import './variable.scss'
-// import { VxeGrid } from 'vxe-table'
-import VxeGrid from '@moluoxixi/components/VxeTable'
 
 import {
   getClass,
@@ -584,6 +582,7 @@ function handleTableRendered(params: VxeTableDefines.ToggleRowExpandEventParams)
 const collectColumn = computed<ColumnType[]>(() => {
   if (!xTable.value)
     return []
+  console.log('xTable.value', xTable.value)
   const { collectColumn } = xTable.value.getTableColumn()
   return collectColumn as any[]
 })

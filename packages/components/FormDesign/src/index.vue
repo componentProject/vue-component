@@ -55,6 +55,7 @@ import type { emitsType, propsType } from './_types'
 import type KeyController from 'keycon'
 import { FormDesignStore, FormDesignStoreKey } from './store'
 import Loading from './common/Loading.vue'
+import ConfigForm from '@moluoxixi/components/ConfigForm'
 import './styles/index.scss'
 
 // 初始化表单组件（同步导入 ConfigForm 组件）
@@ -147,31 +148,7 @@ if (instance) {
     }
   }
 
-  import('@moluoxixi/components/ConfigForm/src/main').then((ConfigFormModule) => {
-    if (ConfigFormModule.default && typeof ConfigFormModule.default.install === 'function') {
-      // 直接调用 install 注册组件到 Vue 应用
-      ConfigFormModule.default.install(app)
-
-      // 从模块导出获取 formComponents
-      if (ConfigFormModule.formComponents) {
-        formDesignStore.registerFormComponents(ConfigFormModule.formComponents)
-
-        // 确保所有组件都已注册到 Vue 应用
-        for (const key in ConfigFormModule.formComponents) {
-          if (ConfigFormModule.formComponents[key] && !app._context.components?.[key]) {
-            try {
-              app.component(key, ConfigFormModule.formComponents[key])
-            }
-            catch (error) {
-              console.warn(`FormDesign: 无法注册表单组件 ${key}`, error)
-            }
-          }
-        }
-      }
-    }
-  }).catch((error) => {
-    console.warn('FormDesign: 无法加载 ConfigForm 模块', error)
-  })
+  app.use(ConfigForm)
 }
 
 // 通过 provide 提供 Store 给子组件

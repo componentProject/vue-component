@@ -9,7 +9,7 @@ import { VxeToolbar } from './toolbar'
 
 import zhCN from './locale/lang/zh-CN'
 
-import type { VxeGlobalConfig } from '../types'
+import type { VxeGlobalConfig } from './_types'
 
 const components = [
   VxeColumn,
