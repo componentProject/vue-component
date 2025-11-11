@@ -832,8 +832,6 @@ defineExpose({
 </script>
 
 <style scoped lang="scss">
-@forward '@moluoxixi/components/_assets/styles/tailwind.scss';
-
 .md-editor {
   height: 100%;
   overflow: auto;

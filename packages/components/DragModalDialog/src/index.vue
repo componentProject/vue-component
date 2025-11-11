@@ -801,7 +801,6 @@ defineExpose({
 </script>
 
 <style scoped lang="scss">
-@forward '@moluoxixi/components/_assets/styles/tailwind.scss';
 .modal-overlay {
   position: fixed;
   top: 0;

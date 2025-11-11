@@ -104,7 +104,6 @@ function handleTabChange(val: any) {
 </style>
 
 <style scoped lang="scss">
-@forward '@moluoxixi/components/_assets/styles/tailwind.scss';
 .el-tabs {
   height: 100%;
 }

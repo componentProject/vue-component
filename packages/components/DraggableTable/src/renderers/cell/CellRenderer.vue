@@ -139,5 +139,5 @@ const TagRender = computed(() => {
 </script>
 
 <style scoped lang="scss">
-@forward '@moluoxixi/components/_assets/styles/tailwind.scss';
+
 </style>

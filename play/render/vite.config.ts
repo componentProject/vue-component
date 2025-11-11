@@ -113,7 +113,15 @@ export default viteConfig(
           preprocessorOptions: {
             scss: {
               api: 'modern-compiler',
-              additionalData: `@forward '@moluoxixi/components/_assets/styles/main.scss';`,
+              additionalData: (source: string, filename: string) => {
+                if (filename.includes('.vue') && !filename.includes('AIAgent')) {
+                  return `@forward '@moluoxixi/components/_assets/styles/main.scss';
+                ${source}`
+                }
+                else {
+                  return source
+                }
+              },
             },
           },
         },

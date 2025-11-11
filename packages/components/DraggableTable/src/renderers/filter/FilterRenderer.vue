@@ -216,5 +216,5 @@ watch(() => [props.renderParams, props.renderOpts], load, {
 </script>
 
 <style scoped lang="scss">
-@forward '@moluoxixi/components/_assets/styles/tailwind.scss';
+
 </style>
