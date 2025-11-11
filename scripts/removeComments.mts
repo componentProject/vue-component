@@ -4,11 +4,8 @@
  * 支持的文件类型：.js, .ts, .jsx, .tsx, .vue, .css, .scss, .less
  */
 
-// @ts-expect-error - Node.js built-in modules
 import { readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs'
-// @ts-expect-error - Node.js built-in modules
 import { dirname, extname, join, relative } from 'node:path'
-// @ts-expect-error - Node.js built-in modules
 import { fileURLToPath } from 'node:url'
 
 const __filename = fileURLToPath(import.meta.url)
@@ -22,29 +19,36 @@ const IGNORE_PATTERNS = [
   'AIAgent',
   'moluoxixi',
   //#region 通用配置
-  'removeComments.mts',
+  //#region 忽略的文件类型
   '*.md',
   '*.sh',
   '*.d.',
-  'commitlint.config.*',
-  '.cz-config.*',
-  'node_modules',
-  '.git',
-  'dist',
-  'build',
+  '*.lock',
+  '*.min',
+  '*.mdx',
+  //#endregion
+  //#region 其他通用配置
+  'removeComments.mts',
   'typings',
   '_typings',
   '.cache',
   'cache',
+  //#endregion
+  //#region 需要忽略的项目文件
+  'commitlint.config.*',
+  '.cz-config.*',
+  'stylelint.config.*',
+  'vite.config.*',
+  //#endregion
+  '.husky',
+  'node_modules',
+  '.git',
+  'dist',
+  'build',
   'coverage',
   '.idea',
   '.vscode',
   '.DS_Store',
-  'vite.config.*',
-  '*.yaml',
-  '*.json',
-  '*.lock',
-  '*.min',
   //#endregion
 ]
 
@@ -65,17 +69,31 @@ const SUPPORTED_EXTENSIONS = [
 ]
 
 /**
- * 检查文件是否应该被忽略
+ * 检查文件或目录是否应该被忽略
  */
-function shouldIgnore(filePath: string): boolean {
+function shouldIgnore(filePath: string, isDirectory: boolean = false): boolean {
   const relativePath = relative(projectRoot, filePath)
+  const pathParts = relativePath.split(/[/\\]/)
 
   return IGNORE_PATTERNS.some((pattern) => {
     if (pattern.includes('*')) {
-      const regex = new RegExp(pattern.replace(/\*/g, '.*'))
-      return regex.test(relativePath)
+      // 对于通配符模式，检查路径的任何部分是否匹配
+      const regex = new RegExp(`^${pattern.replace(/\*/g, '.*')}$`)
+      // 检查路径的每个部分（目录名或文件名）是否匹配
+      return pathParts.some(part => regex.test(part))
     }
-    return relativePath.includes(pattern)
+    else {
+      // 对于非通配符模式，检查路径的任何部分是否完全匹配
+      // 如果是目录，检查目录名；如果是文件，检查文件名或任何路径部分
+      if (isDirectory) {
+        // 目录：检查目录名是否完全匹配
+        return pathParts.includes(pattern)
+      }
+      else {
+        // 文件：检查文件名或路径的任何部分是否匹配
+        return pathParts.includes(pattern)
+      }
+    }
   })
 }
 
@@ -155,15 +173,19 @@ function walkDirectory(dirPath: string, stats: Stats): void {
 
     for (const file of files) {
       const filePath = join(dirPath, file)
-
-      if (shouldIgnore(filePath)) {
-        continue
+      if (filePath.includes('DraggableTable')) {
+        console.log('filePath', filePath)
       }
 
       try {
         const stat = statSync(filePath)
+        const isDirectory = stat.isDirectory()
 
-        if (stat.isDirectory()) {
+        if (shouldIgnore(filePath, isDirectory)) {
+          continue
+        }
+
+        if (isDirectory) {
           walkDirectory(filePath, stats)
         }
         else if (stat.isFile()) {
@@ -216,7 +238,6 @@ function main() {
   console.log('='.repeat(50))
 
   if (stats.errors > 0) {
-    // @ts-expect-error - process is available in Node.js runtime
     process.exit(1)
   }
 }
