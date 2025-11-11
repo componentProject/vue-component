@@ -49,6 +49,8 @@ catalogs:
     # vue的npm包
     vuedraggable: ^4.1.0
     vxe-table: 4.7.94
+    '@vxe-ui/core': 4.2.13
+    dom-zindex: 1.0.6
   dev:
     '@antfu/eslint-config': 6.2.0
     '@moluoxixi/ajaxpackage': ^0.0.2

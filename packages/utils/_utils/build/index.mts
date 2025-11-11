@@ -293,6 +293,13 @@ function createBaseConfig(ctx: BuildContext, comp: string, internalDeps: string[
       extensions: ['.js', '.jsx', '.ts', '.tsx', '.vue'],
       alias: ctx.alias,
     },
+    define: {
+      process: {
+        env: {
+          VUE_APP_VXE_ENV: 'production',
+        },
+      },
+    },
     css: {
       postcss: {
         plugins: [

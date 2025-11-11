@@ -85,6 +85,8 @@
     "vuedraggable": "^4.1.0",
     "vxe-pc-ui": "^4.9.17",
     "vxe-table": "catalog:build",
+    "@vxe-ui/core": "catalog:build",
+    "dom-zindex": "catalog:build",
     "wangeditor": "^4.7.15",
     "xe-utils": "3",
     "xlsx": "^0.18.5"

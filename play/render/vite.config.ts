@@ -17,16 +17,19 @@ export default viteConfig(
           port: 3301,
           open: false,
           pwa: {
-            // 桌面设备安装界面所需的屏幕截图
-            screenshots: [
-              {
-                src: '/images/img.png',
-                sizes: '1280x720',
-                type: 'image/png',
-                form_factor: 'wide' as const,
-                label: '桌面端应用截图',
-              },
-            ],
+            manifest: {
+              // 桌面设备安装界面所需的屏幕截图
+              screenshots: [
+                {
+                  src: '/images/img.png',
+                  sizes: '1280x720',
+                  type: 'image/png',
+                  form_factor: 'wide' as const,
+                  label: '桌面端应用截图',
+                },
+              ],
+            },
+
           },
           autoRoutes: {
             routeConfig: {

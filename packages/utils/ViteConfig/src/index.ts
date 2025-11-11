@@ -28,9 +28,9 @@ import scopedCssPrefixPlugin from './plugins/addScopedAndReplacePrefix.ts'
 
 // 自动路由
 import autoRoutesPlugin from './plugins/autoRoutes/index.ts'
+import type { UserOptions as PagesOptions } from 'vite-plugin-pages'
 // 页面路由
 import Pages from 'vite-plugin-pages'
-import type { UserOptions as PagesOptions } from 'vite-plugin-pages'
 
 import type {
   CompressionOptions,
@@ -41,10 +41,16 @@ import type {
 } from './_types/index.ts'
 import { deepMerge } from '../../_utils/object.ts'
 
+import type { ConfigEnv, PluginOption, UserConfig } from 'vite'
 // 其余vite插件与配置
 import { defineConfig, mergeConfig } from 'vite'
-import type { ConfigEnv, PluginOption, UserConfig } from 'vite'
 import { createHtmlPlugin } from 'vite-plugin-html'
+
+// workbox urlPattern 参数类型
+interface UrlPatternContext {
+  request: Request
+  url: URL
+}
 
 export default function createViteConfig(Config: ViteConfigType) {
   return defineConfig((params: ConfigEnv) => {
@@ -213,26 +219,6 @@ export default function createViteConfig(Config: ViteConfigType) {
               enabled: true,
             },
             includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg'],
-            icons: [
-              {
-                src: 'pwa-192x192.png',
-                sizes: '192x192',
-                type: 'image/png',
-                purpose: 'any' as const,
-              },
-              {
-                src: 'pwa-512x512.png',
-                sizes: '512x512',
-                type: 'image/png',
-                purpose: 'any' as const,
-              },
-              {
-                src: 'pwa-180x180.png',
-                sizes: '180x180',
-                type: 'image/png',
-                purpose: 'apple-touch-icon' as const,
-              },
-            ],
             manifest: {
               id: `/${appCode}/`,
               start_url: `/${appCode}/`,
@@ -241,51 +227,112 @@ export default function createViteConfig(Config: ViteConfigType) {
               description: '渐进式 Web 应用',
               display: 'standalone' as const,
               background_color: '#ffffff',
-              theme_color: '#2c3e50',
+              theme_color: '#BA42BF',
+              icons: [
+                {
+                  src: `/${appCode}/pwa-192x192.png`,
+                  sizes: '192x192',
+                  type: 'image/png',
+                  purpose: 'any' as const,
+                },
+                {
+                  src: `/${appCode}/pwa-512x512.png`,
+                  sizes: '512x512',
+                  type: 'image/png',
+                  purpose: 'any' as const,
+                },
+              ],
             },
             workbox: {
-              globPatterns: ['**/*.{html,js,css,ico,png,svg,jpg,jpeg,webp,woff2,woff,eot,ttf}'],
+              // 预缓存所有静态资源
+              globPatterns: ['**/*.{html,js,css,ico,png,svg,jpg,jpeg,webp,woff2,woff,eot,ttf,json,xml}'],
               maximumFileSizeToCacheInBytes: 8 * 1024 * 1024, // 最大缓存文件 8MB（适配大图/字体文件）
               runtimeCaching: [
-                // 1. 接口缓存：优先网络，无网用缓存（适合需要实时更新的接口）
+                // 注意：workbox 按顺序匹配规则，第一个匹配的规则会被使用
+                // 1. 静态资源缓存：优先缓存，后台更新（JS、CSS、图片、字体等）
                 {
-                  urlPattern: ({ url }: { url: URL }) => {
-                    // 匹配所有接口（排除 CDN 等静态资源域名）
-                    return url.pathname.startsWith('/api/') || url.host.includes('api.')
+                  urlPattern: ({ request, url }: UrlPatternContext) => {
+                    const accept = request.headers.get('accept') || ''
+                    const contentType = request.headers.get('content-type') || ''
+                    // 通过请求头判断是否为静态资源
+                    return request.destination === 'script'
+                      || request.destination === 'style'
+                      || request.destination === 'image'
+                      || request.destination === 'font'
+                      || accept.includes('text/css')
+                      || accept.includes('application/javascript')
+                      || accept.includes('text/javascript')
+                      || accept.includes('image/')
+                      || accept.includes('font/')
+                      || accept.includes('application/font')
+                      || contentType.includes('text/css')
+                      || contentType.includes('application/javascript')
+                      || contentType.includes('image/')
+                      || contentType.includes('font/')
+                      // 通过文件扩展名判断
+                      || url.pathname.match(/\.(js|css|mjs|png|jpg|jpeg|gif|svg|webp|ico|woff|woff2|eot|ttf|otf|json|xml)$/i) !== null
+                  },
+                  handler: 'StaleWhileRevalidate' as const,
+                  options: {
+                    cacheName: 'static-resource-cache',
+                    expiration: {
+                      maxEntries: 500,
+                      maxAgeSeconds: 30 * 24 * 60 * 60, // 静态资源缓存30天
+                    },
+                    // 缓存 200（完整响应）和 206（部分内容，用于大文件、视频等）
+                    // 304 不需要缓存：workbox 会自动处理，如果网络返回 304，会使用已缓存的资源
+                    cacheableResponse: { statuses: [200, 206] },
+                  },
+                },
+                // 2. 页面缓存：优先网络，无网用缓存（HTML页面）
+                {
+                  urlPattern: ({ request, url }: UrlPatternContext) => {
+                    const accept = request.headers.get('accept') || ''
+                    // 通过请求头判断是否为页面请求
+                    return request.destination === 'document'
+                      || accept.includes('text/html')
+                      || url.pathname.match(/\.html?$/i) !== null
+                  },
+                  handler: 'NetworkFirst' as const,
+                  options: {
+                    cacheName: 'page-cache',
+                    networkTimeoutSeconds: 3, // 3秒无网络则用缓存
+                    expiration: {
+                      maxEntries: 50, // 最多缓存50个页面
+                      maxAgeSeconds: 24 * 60 * 60, // 页面缓存有效期24小时
+                    },
+                    // 缓存 200（完整响应）
+                    // 304 不需要缓存：workbox 的 NetworkFirst 策略会自动处理 304，使用已缓存的页面
+                    cacheableResponse: { statuses: [200] },
+                  },
+                },
+                // 3. 接口缓存：优先网络，无网用缓存（所有接口请求）
+                {
+                  urlPattern: ({ request }: UrlPatternContext) => {
+                    const accept = request.headers.get('accept') || ''
+                    const contentType = request.headers.get('content-type') || ''
+                    // 通过请求头判断是否为接口请求
+                    return accept.includes('application/json')
+                      || accept.includes('text/json')
+                      || accept.includes('application/xml')
+                      || contentType.includes('application/json')
+                      || contentType.includes('application/xml')
+                      || contentType.includes('application/x-www-form-urlencoded')
+                      || contentType.includes('multipart/form-data')
+                      // 或者请求方法不是 GET（POST、PUT、DELETE 等通常是接口）
+                      || (request.method !== 'GET' && request.method !== 'HEAD')
                   },
                   handler: 'NetworkFirst' as const,
                   options: {
                     cacheName: 'api-cache',
                     networkTimeoutSeconds: 5, // 5秒无网络则用缓存
                     expiration: {
-                      maxEntries: 100, // 最多缓存100个接口请求
-                      maxAgeSeconds: 6 * 60 * 60, // 接口缓存有效期6小时（避免缓存过期）
+                      maxEntries: 200, // 最多缓存200个接口请求
+                      maxAgeSeconds: 6 * 60 * 60, // 接口缓存有效期6小时
                     },
-                    cacheableResponse: { statuses: [200] }, // 只缓存200成功响应
-                  },
-                },
-                // 2. CDN 静态资源：优先缓存，更新同步（适合不变的CDN资源）
-                {
-                  urlPattern: ({ url }: { url: URL }) => url.host.includes('cdn.') || url.host.includes('static.'),
-                  handler: 'CacheFirst' as const,
-                  options: {
-                    cacheName: 'cdn-cache',
-                    expiration: { maxAgeSeconds: 30 * 24 * 60 * 60 }, // 缓存30天
-                  },
-                },
-                // 3. 图片资源：混合策略（快速响应+后台更新）
-                {
-                  urlPattern: ({ url }: { url: URL }) => {
-                    const ext = url.pathname.split('.').pop()
-                    return ['png', 'jpg', 'jpeg', 'webp', 'svg'].includes(ext || '')
-                  },
-                  handler: 'StaleWhileRevalidate' as const,
-                  options: {
-                    cacheName: 'image-cache',
-                    expiration: {
-                      maxEntries: 200,
-                      maxAgeSeconds: 7 * 24 * 60 * 60,
-                    }, // 缓存7天，最多200张图
+                    // 缓存 200（成功响应）
+                    // 304 在接口中不常见，且 workbox 会自动处理
+                    cacheableResponse: { statuses: [200] },
                   },
                 },
               ],
@@ -379,6 +426,11 @@ export default function createViteConfig(Config: ViteConfigType) {
       },
       define: {
         __SYSTEM_CODE__: JSON.stringify(envSystemCode),
+        process: deepMerge({
+          env: {
+            VUE_APP_VXE_ENV: 'production',
+          },
+        }, process),
       },
       css: {
         postcss: {

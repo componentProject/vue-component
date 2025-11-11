@@ -34,11 +34,11 @@ export function invalidateVirtualModuleInDev(
       ;(server as any).reloadModule(mod)
     }
     else {
-      server.ws.send({ type: 'full-reload' })
+      server?.ws.send({ type: 'full-reload' })
     }
   }
   else {
-    server.ws.send({ type: 'full-reload' })
+    server?.ws.send({ type: 'full-reload' })
   }
 }
 
@@ -303,7 +303,7 @@ export function createVirtualPlugin(
         }
 
         if (ids.length === 0)
-          server.ws.send({ type: 'full-reload' })
+          server?.ws.send({ type: 'full-reload' })
       }
 
       setupDevAllWatcher(
@@ -387,7 +387,7 @@ export function createVirtualPlugin(
               catch {}
             }
             // 发送 HMR 更新消息
-            server.ws.send({
+            server?.ws.send({
               type: 'update',
               updates: mods.map(mod => ({
                 type: 'js-update' as const,
@@ -399,12 +399,12 @@ export function createVirtualPlugin(
           }
           catch {
             // 如果发送失败，回退到全量刷新
-            server.ws.send({ type: 'full-reload' })
+            server?.ws.send({ type: 'full-reload' })
           }
         }
         else {
           // 没有找到模块，执行全量刷新
-          server.ws.send({ type: 'full-reload' })
+          server?.ws.send({ type: 'full-reload' })
         }
 
         hmrDebounceTimer = undefined
