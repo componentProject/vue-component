@@ -2,6 +2,7 @@ import type { App } from 'vue'
 import FormDesign from './src/index.vue'
 import { defineAsyncComponent } from 'vue'
 import Loading from './src/common/Loading.vue'
+// 静态导入外部组件 ConfigForm
 import ConfigForm from '@moluoxixi/components/ConfigForm'
 
 // 导出组件
@@ -19,7 +20,7 @@ export function install(app: App) {
   // 注册 FormDesign 组件
   app.component('FormDesign', FormDesign)
 
-  // 注册必要的内部组件
+  // 注册必要的内部组件（使用动态导入）
   const componentsToRegister = [
     {
       name: 'draggable',
@@ -61,7 +62,8 @@ export function install(app: App) {
     }
   })
 
-  app.use(ConfigForm)
+  // 静态导入的 ConfigForm 组件注册到应用
+  app.use(ConfigForm as any)
 }
 
 // 为组件添加 install 方法，以便可以作为插件使用

@@ -85,6 +85,7 @@ import {
   watch,
 } from 'vue'
 import formStore from '../controller/form'
+// 静态导入外部组件 ConfigForm
 import ConfigForm from '@moluoxixi/components/ConfigForm'
 import uiControl from '../controller/ui'
 import Clipboard from 'clipboard'

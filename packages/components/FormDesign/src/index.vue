@@ -55,11 +55,11 @@ import type { emitsType, propsType } from './_types'
 import type KeyController from 'keycon'
 import { FormDesignStore, FormDesignStoreKey } from './store'
 import Loading from './common/Loading.vue'
+// 静态导入外部组件 ConfigForm
 import ConfigForm from '@moluoxixi/components/ConfigForm'
 import './styles/index.scss'
 
-// 初始化表单组件（同步导入 ConfigForm 组件）
-// 直接导入 formComponents，确保组件列表立即可用
+// 静态导入 formComponents，确保组件列表立即可用
 import { formComponents } from '@moluoxixi/components/ConfigForm/src/main'
 
 defineOptions({
@@ -83,16 +83,18 @@ const formDesignStore = new FormDesignStore()
 
 // 注意：不再设置 window.VueContext，应该使用 Store 模式
 // controller 中的代码应该通过 inject('control') 获取 formStore，然后使用 formStore 的方法
+
+// 初始化表单组件（静态导入 ConfigForm 组件）
 if (formComponents) {
   formDesignStore.registerFormComponents(formComponents)
 }
 
-// 同时异步加载并注册 ConfigForm 组件到 Vue 应用（用于向后兼容）
+// 注册 ConfigForm 组件到 Vue 应用
 const instance = getCurrentInstance()
 if (instance) {
   const app = instance.appContext.app
 
-  // 注册必要的组件到 Vue 应用
+  // 注册必要的内部组件（使用动态导入）
   const componentsToRegister = [
     {
       name: 'draggable',
@@ -134,21 +136,9 @@ if (instance) {
     }
   })
 
-  // 注册所有表单组件到 Vue 应用，以便 <component :is> 可以解析
-  if (formComponents) {
-    for (const key in formComponents) {
-      if (formComponents[key] && !app._context.components?.[key]) {
-        try {
-          app.component(key, formComponents[key])
-        }
-        catch (error) {
-          console.warn(`FormDesign: 无法注册表单组件 ${key}`, error)
-        }
-      }
-    }
-  }
-
-  app.use(ConfigForm)
+  // 静态导入的 ConfigForm 组件注册到应用
+  // app.use(ConfigForm) 会自动调用 install 方法，注册所有 formComponents
+  app.use(ConfigForm as any)
 }
 
 // 通过 provide 提供 Store 给子组件
