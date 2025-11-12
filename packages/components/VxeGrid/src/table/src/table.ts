@@ -6843,7 +6843,9 @@ export default defineComponent({
       return h('div', {
         class: cssModules.root,
         style: {
-          display: 'contents',
+          // display: 'contents',
+          width: '100%',
+          height: '100%',
         },
       }, [
         // 原有的组件 div，保持所有原有属性

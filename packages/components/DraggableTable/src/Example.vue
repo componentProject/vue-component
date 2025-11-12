@@ -333,7 +333,7 @@ function handleValidate() {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .draggable-table-demo {
   padding: 20px;
   background-color: #f5f7fa;

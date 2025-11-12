@@ -45,18 +45,10 @@ export default defineComponent({
     })
 
     const renderVN = () => {
-      // 外层使用 display: contents 的 div，应用 CSS Module，不影响布局
       return h('div', {
         class: cssModules.root,
-        style: {
-          display: 'contents',
-        },
-      }, [
-        // 原有的组件 div，保持所有原有属性
-        h('div', {
-          ref: refElem,
-        }, slots.default ? slots.default() : []),
-      ])
+        ref: refElem,
+      }, slots.default ? slots.default() : [])
     }
 
     const $xeColgroup = { columnConfig } as XEColumnInstance

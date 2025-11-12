@@ -92,7 +92,7 @@ import { diff, isEmpty } from 'radash'
 import Sortable from 'sortablejs'
 import VxeUI, { VxePager, VxeTooltip } from 'vxe-pc-ui'
 import cssModules from './styles/modules/all.module.scss'
-import VxeGrid from '@moluoxixi/components/VxeGrid'
+// import VxeGrid from '@moluoxixi/components/VxeGrid'
 
 import {
   getClass,
