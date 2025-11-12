@@ -26,22 +26,18 @@
         >
           <!-- 拖拽句柄 - 可拖拽整个头部 -->
           <div
-            v-if="draggable"
-            class="modal-header modal-draggable-header"
+            class="modal-header"
+            :class="{ 'modal-draggable-header': draggable }"
             @mousedown="startDrag"
           >
             <!-- 完全自定义头部插槽 -->
-            <slot v-if="$slots.header" name="header" :close="handleClose" :title="title">
+            <slot name="header" :close="handleClose" :title="props.title">
               <!-- 默认内容 -->
-            </slot>
-
-            <!-- 默认头部内容（没有header插槽时） -->
-            <template v-else>
               <!-- 自定义左侧内容 -->
               <div class="modal-header-left">
-                <slot name="header-left" :title="title">
+                <slot name="header-left" :title="props.title">
                   <h3 class="modal-title">
-                    {{ title }}
+                    {{ props.title }}
                   </h3>
                 </slot>
               </div>
@@ -61,57 +57,18 @@
                   </button>
                 </slot>
               </div>
-            </template>
-          </div>
-
-          <!-- 头部 - 不可拖拽版本 -->
-          <div
-            v-else
-            class="modal-header"
-          >
-            <!-- 完全自定义头部插槽 -->
-            <slot v-if="$slots.header" name="header" :close="handleClose" :title="title">
-              <!-- 默认内容 -->
             </slot>
-
-            <!-- 默认头部内容（没有header插槽时） -->
-            <template v-else>
-              <!-- 自定义左侧内容 -->
-              <div class="modal-header-left">
-                <slot name="header-left" :title="title">
-                  <h3 class="modal-title">
-                    {{ title }}
-                  </h3>
-                </slot>
-              </div>
-
-              <!-- 自定义右侧内容 -->
-              <div class="modal-header-right">
-                <slot name="header-right" :close="handleClose">
-                  <button
-                    v-if="showClose"
-                    class="modal-close"
-                    aria-label="关闭"
-                    @click="handleClose"
-                  >
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                      <path d="M12.5 3.5L3.5 12.5M3.5 3.5L12.5 12.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
-                    </svg>
-                  </button>
-                </slot>
-              </div>
-            </template>
           </div>
 
           <!-- 内容区域 -->
           <div class="modal-body">
-            <div class="modal-body-content">
-              <slot>{{ content }}</slot>
+            <div class="modal-body-content" :style="props.contentStyle">
+              <slot>{{ props.content }}</slot>
             </div>
           </div>
 
           <!-- 底部操作区 -->
-          <div v-if="$slots.footer || showFooter" class="modal-footer">
+          <div v-if="props.showFooter" class="modal-footer">
             <slot name="footer">
               <Buttons v-if="props.buttons" :buttons="props.buttons" />
               <template v-else>
@@ -120,7 +77,7 @@
                   class="modal-btn modal-btn-secondary"
                   @click="handleCancel"
                 >
-                  {{ cancelText }}
+                  {{ props.cancelText }}
                 </button>
                 <button
                   v-if="showConfirm"
@@ -128,14 +85,14 @@
                   :disabled="confirmDisabled"
                   @click="handleConfirm"
                 >
-                  {{ confirmText }}
+                  {{ props.confirmText }}
                 </button>
               </template>
             </slot>
           </div>
 
           <!-- 8方向调整大小句柄 -->
-          <template v-if="resizable">
+          <template v-if="props.resizable">
             <!-- 四个角 -->
             <div class="resize-handle resize-handle-nw" data-direction="nw" @mousedown="startResize($event, 'nw')" />
             <div class="resize-handle resize-handle-ne" data-direction="ne" @mousedown="startResize($event, 'ne')" />
@@ -189,6 +146,7 @@ const props = withDefaults(defineProps<propsType>(), {
   penetrate: false,
   teleportTo: 'body',
   destroyOnClose: false,
+  contentStyle: {},
 })
 
 const emit = defineEmits<emitsType>()

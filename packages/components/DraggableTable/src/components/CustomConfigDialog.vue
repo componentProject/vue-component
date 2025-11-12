@@ -66,10 +66,10 @@
             size="large"
           />
           <ElPopover :visible="configPopoverVisible" placement="top" :width="180">
-            <p v-if="isCommon">
+            <p v-if="isCommon" style="white-space: pre-wrap;">
               恢复默认将清除【公共及个人自定义】样式恢复到系统默认样式，请您确定是否继续？
             </p>
-            <p v-else>
+            <p v-else style="white-space: pre-wrap;">
               恢复默认将清除您【个人自定义】样式恢复到系统默认样式，请您确定是否继续？
             </p>
             <div style="text-align: right; margin: 0">
@@ -89,7 +89,7 @@
           <ElButton type="primary" @click="handleEvent('confirm')">
             确认
           </ElButton>
-          <ElButton type="info" @click="handleEvent('cancel')">
+          <ElButton @click="handleEvent('cancel')">
             取消
           </ElButton>
         </div>
@@ -107,6 +107,7 @@ import { flattenTree, getClass } from '@moluoxixi/utils/_utils'
 import { cloneDeep } from 'lodash'
 import type { VxeGridInstance } from 'vxe-table'
 import Sortable from 'sortablejs'
+// import DragModalDialog from '@moluoxixi/components/DragModalDialog'
 
 const props = withDefaults(defineProps<CustomConfigDialogPropsType>(), {
   columns: () => [],
@@ -130,6 +131,9 @@ const computedDialogProps = computed(() => {
     width: '800px',
     height: '60%',
     teleportTo: '.containerMain',
+    contentStyle: {
+      padding: '8px',
+    },
     ...props.dialogProps,
   }
 })

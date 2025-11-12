@@ -8,7 +8,7 @@ export interface ButtonsItem {
   event?: (data?: any, node?: any) => void
   tooltip?: string
 }
-
+type styleFn = () => StyleSheet
 /**
  * DragModalDialog 组件的 Props 类型定义
  */
@@ -66,4 +66,6 @@ export interface propsType {
   teleportTo?: string
   /** 关闭时销毁 */
   destroyOnClose?: boolean
+  /** 内容区域的样式 */
+  contentStyle?: StyleSheet | styleFn
 }
