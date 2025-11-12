@@ -56,7 +56,14 @@
         class="p-[8px]!"
         page-id="page1"
         user-id="shabi"
+        :editable="editable"
+        :sortable="sortable"
+        :filterable="filterable"
         :columns="columns"
+        :expand-config=" {
+          padding: true,
+          mode: 'inside',
+        }"
         :loading="loading"
         is-configuration
         :header-cell-config="{ height: 60 }"
@@ -68,6 +75,12 @@
         @page-change="pageChange"
         @data-change="handleDataChange"
       >
+        <template #expand_content="{ row }">
+          <div class="expand-wrapper">
+            <aDraggableTable v-bind="childGridOptions" :data="row.childList" />
+          </div>
+        </template>
+
         <!-- 自定义操作列插槽 -->
         <template #aaa>
           <TsButton show-type="disabled" content="你好" disabled type="danger" size="small">
@@ -115,10 +128,25 @@ const data = Array.from({ length: 10000 }).map(() => ({
   email: 'zhangsan@example.com',
   status: 1,
   createTime: '2023-01-01 12:30',
+  childList: [
+    { id: 10031, name: 'Test366 366 366 366366366366', role: 'Test', sex: 'Man', age: 76, address: 'test rtyty' },
+    { id: 10032, name: 'Test345', role: 'Develop', sex: 'Women', age: 56, address: 'Guangzhou' },
+    { id: 10032, name: 'Test361 361 361361361361361361361361361361361361', role: 'Test', sex: 'Women', age: 21, address: 'Guangzhou' },
+    { id: 10033, name: 'Test367', role: 'Develop', sex: 'Women', age: 28, address: 'Guangzhou' },
+    { id: 10034, name: 'Test3213', role: 'Test', sex: 'Man', age: 35, address: 'Guangzhou' },
+  ],
 }))
 // 表格数据
 const tableData = ref([])
-
+const childGridOptions = reactive<VxeGridProps<RowVO>>({
+  border: true,
+  height: 200,
+  columns: [
+    { field: 'name', title: 'Name' },
+    { field: 'sex', title: 'Sex' },
+    { field: 'age', title: 'Age' },
+  ],
+})
 const pagerConfig = ref({
   enable: true,
   total: 0,
@@ -159,11 +187,13 @@ onMounted(() => {
 
 // 列配置
 const columns = ref([
-  { field: 'sql', type: 'seq', width: 70 },
-  { dragSort: true, field: 'createTime', title: '日期', width: 150 },
+  { field: 'sql', type: 'seq', width: 200 },
+  { type: 'expand', width: 200, fixed: 'left', slots: { content: 'expand_content' } },
+  { dragSort: true, field: 'createTime', title: '日期', width: 600 },
   {
     field: 'sex',
     title: 'Sex1',
+    width: 200,
     slots: {
       default: 'sex',
     },
@@ -191,6 +221,7 @@ const columns = ref([
   {
     field: 'name1',
     title: 'Name1',
+    width: 200,
     min: 3,
     max: 10,
     required: true,
@@ -209,92 +240,84 @@ const columns = ref([
       {
         field: 'baaa',
         title: 'baaa',
-        width: 120,
         children: [
-          { field: 'dddd', title: 'dddd', width: 120 },
+          { field: 'dddd', title: 'dddd', width: 900 },
           { field: 'gggg', title: 'gggg', width: 220 },
         ],
       },
 
     ],
   },
-  { field: 'aaa', title: '操作', slots: {
-    default: 'aaa',
-  } },
+  {
+    field: 'aaa',
+    title: '操作',
+    width: 400,
+    slots: {
+      default: 'aaa',
+    },
+  },
 ])
 
-const cellType = ref({})
+const cellType = ref('')
 const cellTypeList = ref([
   {
     label: '输入框',
-    value: {
-      type: 'input',
-    },
+    value: 'input',
   },
   {
     label: '下拉框',
-    value: {
-      type: 'select',
-      options: [
-        {
-          label: '男',
-          value: '1',
-        },
-        {
-          label: '女',
-          value: '2',
-        },
-      ],
-    },
+    value: 'select',
+    options: [
+      {
+        label: '男',
+        value: '1',
+      },
+      {
+        label: '女',
+        value: '2',
+      },
+    ],
   },
   {
     label: '开关',
-    value: {
-      type: 'switch',
-    },
+    value: 'switch',
   },
   {
     label: '日期',
-    value: {
-      type: 'date',
-    },
+    value: 'date',
   },
   {
     label: '日期时间',
-    value: {
-      type: 'datetime',
-    },
+    value: 'datetime',
   },
   {
     label: '进度条',
-    value: {
-      type: 'progress',
-    },
+    value: 'progress',
   },
   {
     label: '多标签',
-    value: {
-      type: 'tag',
-      options: [
-        {
-          label: '男',
-          value: '1',
-        },
-        {
-          label: '女',
-          value: '2',
-        },
-      ],
-    },
+    value: 'tag',
+    options: [
+      {
+        label: '男',
+        value: '1',
+      },
+      {
+        label: '女',
+        value: '2',
+      },
+    ],
   },
 ])
 
 function changeCellType(type: any) {
-  const item = columns.value.at(-3)
-  columns.value[columns.value.length - 3] = {
-    ...item,
-    ...type,
-  }
+  console.log('type', type)
+  // const item = columns.value.at(-3)
+  // columns.value[columns.value.length - 3] = {
+  //   ...item,
+  //   type,
+  //
+  // }
 }
 
 // 组件挂载时的初始化

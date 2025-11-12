@@ -1,5 +1,5 @@
 <template>
-  <div class="h-full flex items-center">
+  <div class="h-full flex items-center" style="align-items: center">
     <DateRangePicker
       v-if="dateType && DateRender"
       size="small"
@@ -139,5 +139,5 @@ const TagRender = computed(() => {
 </script>
 
 <style scoped lang="scss">
-
+@forward '@moluoxixi/components/_assets/styles/tailwind.scss';
 </style>

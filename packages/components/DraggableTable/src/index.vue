@@ -90,10 +90,9 @@ import { ElMessage } from 'element-plus'
 import { cloneDeep, groupBy } from 'lodash'
 import { diff, isEmpty } from 'radash'
 import Sortable from 'sortablejs'
-import VxeUI, { VxePager, VxeTooltip } from 'vxe-pc-ui'
+import { VxePager, VxeTooltip } from 'vxe-pc-ui'
 import cssModules from './styles/modules/all.module.scss'
-// import VxeGrid from '@moluoxixi/components/VxeGrid'
-
+import VxeGrid from '@moluoxixi/components/VxeGrid'
 import {
   getClass,
   getType,
@@ -117,6 +116,7 @@ defineOptions({
   name: 'DraggableTable',
   inheritAttrs: false,
 })
+
 // 定义组件属性
 const props = withDefaults(defineProps<propsType>(), {
   resizable: true,
@@ -259,10 +259,15 @@ const props = withDefaults(defineProps<propsType>(), {
   dialogProps: () => ({ zIndex: 1000 }),
   //#endregion
 })
+
 // 组件事件
 const emit = defineEmits<emitsType>()
+
 // 获取插槽
 const slots = defineSlots<slotsType>()
+
+const VxeUI = VxeGrid.VxeUI
+
 // 注册 VxeUI 组件
 VxeUI.component(VxePager)
 VxeUI.component(VxeTooltip)
