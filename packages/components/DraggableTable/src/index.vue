@@ -111,7 +111,7 @@ import { getCustomType, handleGetRequiredFields } from './_utils'
 import './renderers'
 import type { slotsType } from '@moluoxixi/components/_types'
 import CustomConfigDialog from './components/CustomConfigDialog.vue'
-import { getMemoryQuery, setMemoryUpload } from '@moluoxixi/utils/_api/cache'
+import { deleteMemoryUpload, getMemoryQuery, setMemoryUpload } from '@moluoxixi/utils/_api/cache'
 
 defineOptions({
   name: 'DraggableTable',
@@ -932,17 +932,31 @@ async function handleGetStoredColumns(): Promise<ColumnType[]> {
 async function handleSaveColumnsToServer(key: string, columns: string) {
   const { isCommon, isReset } = customRestConfig.value || {}
   const callbacks = []
-  // if (isReset) {
-  // //   执行删除逻辑
-  // }
-  // else {
-  callbacks.push(setMemoryUpload({
-    pageId: props.pageId,
-    widgetId: key,
-    userId: !isCommon ? props.userId : '',
-    data: columns,
-  }))
-  // }
+  if (isReset) {
+  //   执行删除逻辑
+    if (isCommon) {
+      callbacks.push(deleteMemoryUpload({
+        pageId: props.pageId,
+        widgetId: key,
+        userId: '',
+        data: columns,
+      }))
+    }
+    callbacks.push(deleteMemoryUpload({
+      pageId: props.pageId,
+      widgetId: key,
+      userId: props.userId,
+      data: columns,
+    }))
+  }
+  else {
+    callbacks.push(setMemoryUpload({
+      pageId: props.pageId,
+      widgetId: key,
+      userId: !isCommon ? props.userId : '',
+      data: columns,
+    }))
+  }
 
   await Promise.all(callbacks)
 }

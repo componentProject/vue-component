@@ -65,9 +65,27 @@
             v-model="isCommon" style="margin-right: 40px;" label="作为统一配置"
             size="large"
           />
-          <ElButton @click="handleEvent('reset')">
-            恢复默认
-          </ElButton>
+          <ElPopover :visible="configPopoverVisible" placement="top" :width="180">
+            <p v-if="isCommon">
+              恢复默认将清除【公共及个人自定义】样式恢复到系统默认样式，请您确定是否继续？
+            </p>
+            <p v-else>
+              恢复默认将清除您【个人自定义】样式恢复到系统默认样式，请您确定是否继续？
+            </p>
+            <div style="text-align: right; margin: 0">
+              <ElButton size="small" @click="configPopoverVisible = false">
+                取消
+              </ElButton>
+              <ElButton size="small" type="primary" @click="handleEvent('reset')">
+                确定
+              </ElButton>
+            </div>
+            <template #reference>
+              <ElButton @click="configPopoverVisible = true">
+                恢复默认
+              </ElButton>
+            </template>
+          </ElPopover>
           <ElButton type="primary" @click="handleEvent('confirm')">
             确认
           </ElButton>
@@ -82,7 +100,7 @@
 
 <script lang="ts" setup>
 import { computed, ref, useTemplateRef, watch } from 'vue'
-import { ElButton, ElCheckbox, ElInput, ElSwitch } from 'element-plus'
+import { ElButton, ElCheckbox, ElInput, ElPopover, ElSwitch } from 'element-plus'
 import { getTypeName } from '@moluoxixi/components/DraggableTable/src/_utils'
 import type { CustomConfigDialogEmitsType, CustomConfigDialogPropsType } from '@moluoxixi/components/DraggableTable/src/_types'
 import { flattenTree, getClass } from '@moluoxixi/utils/_utils'
@@ -130,6 +148,8 @@ const computedPopperStyle = computed(() => {
 })
 
 const visible = defineModel<boolean>({ default: false })
+
+const configPopoverVisible = ref(false)
 
 // 处理正整数输入
 function handlePositiveNumberInput(row: any, field: string, value: string) {

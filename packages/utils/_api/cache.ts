@@ -21,3 +21,8 @@ export function getMemoryQuery(data: any) {
 export function setMemoryUpload(data: any) {
   return memoryApi.post('/memory/upload', data)
 }
+
+//删除表格自定义列
+export function deleteMemoryUpload(data: any) {
+  return memoryApi.post('/memory/delete', data)
+}
