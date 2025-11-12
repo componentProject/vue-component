@@ -44,20 +44,25 @@ class Flex {
     return nanoid(size)
   }
 
+  /**
+   * 生成表单验证规则
+   * @param controlItems - 表单配置项列表
+   * @returns 验证规则对象
+   */
   public controlFormRule(controlItems: any[]): any {
     const rules: any = {}
-    controlItems.forEach((item: any) => {
+    controlItems.forEach((controlItem: any) => {
       const rule: any[] = []
-      if (item.data.required) {
+      if (controlItem.data?.required) {
         rule.push({
           required: true,
-          message: `请输入${item.data.label}`,
+          message: `请输入${controlItem.data.label || controlItem.data.fieldName || ''}`,
           trigger: 'blur',
         })
-        rules[item.data.fieldName] = rule
+        rules[controlItem.data.fieldName] = rule
       }
-      if (item.ControlType === 'JsonEditor') {
-        rules[item.data.fieldName] = this.getJsonValidate()
+      if (controlItem.ControlType === 'JsonEditor') {
+        rules[controlItem.data.fieldName] = this.getJsonValidate()
       }
     })
     return rules

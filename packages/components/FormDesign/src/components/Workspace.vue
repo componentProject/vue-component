@@ -62,6 +62,7 @@ import {
   inject,
   nextTick,
   ref,
+  watch,
 } from 'vue'
 import { paste } from '../utils/formKeycon'
 import type { AllFormItem, BaseFormConfig, Controls } from '../type'
@@ -77,7 +78,8 @@ export default defineComponent({
   setup() {
     const { uiControl, store, formStore } = inject<Controls>('control') || {}
     const formDesignStore = useFormDesignStore()
-    const formcomponents = formDesignStore.$formcomponents.value
+    // 使用 computed 来监听 formcomponents 的变化，确保组件加载完成后能获取到
+    const formcomponents = computed(() => formDesignStore.$formcomponents.value)
     // 画布dom
     const canvasBox = ref()
     // 页面默认大小
@@ -117,10 +119,27 @@ export default defineComponent({
         // 防止引用类型污染
         const $Flex = formDesignStore.$Flex
         value = value.map((item: AllFormItem) => {
-          console.log(formcomponents[item.ControlType as any])
-          if (!item.data && !item.controlItems) {
+          // 如果组件已经有数据，直接返回，避免重复处理
+          if (item.data && item.controlItems) {
+            return item
+          }
+
+          // 检查组件是否存在，如果不存在则跳过处理
+          const currentComponent = formcomponents.value[item.ControlType as any]
+          if (!currentComponent) {
+            console.error(`FormDesign: 组件 ${item.ControlType} 尚未加载，跳过处理`)
+            // 返回原 item，等待组件加载完成后再处理（通过 watch 监听）
+            return item
+          }
+
+          // 检查组件是否有 formConfig
+          if (!currentComponent.formConfig) {
+            console.error(`FormDesign: 组件 ${item.ControlType} 缺少 formConfig，跳过处理`)
+            return item
+          }
+
+          try {
             item = $Flex.deepClone(item)
-            const currentComponent = formcomponents[item.ControlType as any]
             item.formConfig = currentComponent.formConfig
             item.data = item.formConfig.data()
             if (!item.data.fieldName) {
@@ -138,7 +157,6 @@ export default defineComponent({
               currentComponent.actionType
               && currentComponent.actionType.length > 0
             ) {
-              console.log(controlItems)
               controlItems.forEach((item) => {
                 if (item.ControlType == 'Action') {
                   item.data.formConfig = {
@@ -167,14 +185,21 @@ export default defineComponent({
                 }
               })
             }
-            item.rules = $Flex.controlFormRule(controlItems, item)
+            item.rules = $Flex.controlFormRule(controlItems)
             item.controlItems = controlItems
+          }
+          catch (error) {
+            console.error(`FormDesign: 处理组件 ${item.ControlType} 时出错:`, error)
+            // 返回原 item，避免崩溃
+            return item
           }
           // delete item.formConfig;
           // delete item.icon;
           return item
         })
-        formStore?.updateAllFormList(value)
+        if (formStore) {
+          formStore.updateAllFormList(value)
+        }
       },
     })
     const currentId = computed(() => {
@@ -213,9 +238,22 @@ export default defineComponent({
       store?.set('curList', allmainList.value)
     }
     const addControl = (e: any) => {
-      formStore?.setFormCurrentId(allmainList.value[e.newIndex]?.id)
-      formStore?.setFormCurrentIndex(e.newIndex)
+      const newIndex = e.newIndex !== undefined ? e.newIndex : e
+      formStore?.setFormCurrentId(allmainList.value[newIndex]?.id)
+      formStore?.setFormCurrentIndex(newIndex)
       store?.set('curList', allmainList.value)
+
+      // 检查是否有未初始化的组件，如果有则尝试重新初始化
+      nextTick(() => {
+        const currentList = formStore?.get('allFormList') || []
+        const hasUninitialized = currentList.some((item: AllFormItem) => {
+          return !item.data || !item.controlItems
+        })
+        if (hasUninitialized) {
+          // 重新设置列表，触发 setter 来初始化未完成的组件
+          formStore?.updateAllFormList([...currentList])
+        }
+      })
     }
     const handlePaste = () => {
       pasteShow.value = false
@@ -244,6 +282,31 @@ export default defineComponent({
         pasteShow.value = true
       })
     }
+
+    // 监听 formcomponents 的变化，当组件加载完成后自动重新初始化未完成的项
+    watch(
+      formcomponents,
+      () => {
+        // 当组件注册后，检查是否有未初始化的项
+        nextTick(() => {
+          const currentList = formStore?.get('allFormList') || []
+          const hasUninitialized = currentList.some((item: AllFormItem) => {
+            if (item.data && item.controlItems) {
+              return false
+            }
+            // 检查组件是否已经加载
+            const component = formcomponents.value[item.ControlType as any]
+            return component && component.formConfig
+          })
+          if (hasUninitialized) {
+            // 重新设置列表，触发 setter 来初始化未完成的组件
+            formStore?.updateAllFormList([...currentList])
+          }
+        })
+      },
+      { deep: true },
+    )
+
     return {
       scale: computed(() => uiControl?.get<number>('scale')),
       globalDatas,
