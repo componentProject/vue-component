@@ -230,6 +230,7 @@ function handleEvent(type: 'confirm' | 'reset' | 'cancel') {
       })
       break
   }
+  configPopoverVisible.value = false
   visible.value = false
 }
 

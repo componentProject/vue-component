@@ -18,6 +18,7 @@ import viteImagemin from 'vite-plugin-imagemin'
 import { obfuscator } from 'rollup-obfuscator'
 import transformAliasPlugin from './plugins/transformAliasPlugin/index.mts'
 import cssInjectedByJsPlugin from './plugins/cssInjectedByJsPlugin/index.mts'
+import cssModuleGlobalRootPlugin from './plugins/cssModuleGlobalRootPlugin/index.mts'
 // import { lazyImport, VxeResolver } from 'vite-plugin-lazy-import'
 import { UploadEvent } from './utils/UploadComponent.ts'
 
@@ -198,6 +199,8 @@ export interface BuildContext {
   uploadType?: string
   /** 是否启用 npm 发布 */
   npmPublish?: boolean
+  /** 样式类型，用于控制 CSS Module 相关插件 */
+  styleType?: string
   viteConfig?: ViteConfigType
 }
 
@@ -300,6 +303,7 @@ function createBaseConfig(ctx: BuildContext, comp: string, internalDeps: string[
         plugins: [
           tailwindcss(),
           autoprefixer(),
+          cssModuleGlobalRootPlugin(),
         ],
       },
       preprocessorOptions: {
@@ -1334,6 +1338,8 @@ export interface BuildOptions {
   uploadType?: string
   /** 是否启用 npm 发布 */
   npmPublish?: boolean
+  /** 样式类型 */
+  styleType?: string
   /** Vite 配置（可选） */
   viteConfig?: ViteConfigType
 }
@@ -1360,6 +1366,7 @@ export async function buildComponentsWithOptions(options: BuildOptions): Promise
     presetGlobals: _presetGlobals,
     uploadType,
     npmPublish,
+    styleType,
     ...rest
   } = options || ({} as BuildOptions)
 
@@ -1402,6 +1409,7 @@ export async function buildComponentsWithOptions(options: BuildOptions): Promise
     aliasPacks: [],
     uploadType,
     npmPublish,
+    styleType,
     ...rest,
   }
   ctx.aliasPacks = Object.keys(ctx.alias).filter((i: string) => !i.endsWith('*'))
