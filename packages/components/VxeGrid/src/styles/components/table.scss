@@ -75,11 +75,11 @@
     height: var(--vxe-ui-input-height-default);
   }
   .vxe-default-input {
-    &[type="date"]::-webkit-inner-spin-button {
+    &[type='date']::-webkit-inner-spin-button {
       margin-top: 4px;
     }
-    &[type="date"]::-webkit-inner-spin-button,
-    &[type="number"]::-webkit-inner-spin-button {
+    &[type='date']::-webkit-inner-spin-button,
+    &[type='number']::-webkit-inner-spin-button {
       height: 24px;
     }
     &::placeholder {
@@ -177,13 +177,17 @@
   .vxe-table--cell-main-area,
   .vxe-table--cell-extend-area,
   .vxe-table--cell-active-area {
-    &[half="1"] {
+    &[half='1'] {
       border-right: 0;
     }
   }
   .vxe-table--cell-copy-area {
-    &[half="1"] {
-      background-size: var(--vxe-ui-table-cell-copy-area-border-width) 12px, 0 12px, 12px var(--vxe-ui-table-cell-copy-area-border-width), 12px var(--vxe-ui-table-cell-copy-area-border-width);
+    &[half='1'] {
+      background-size:
+        var(--vxe-ui-table-cell-copy-area-border-width) 12px,
+        0 12px,
+        12px var(--vxe-ui-table-cell-copy-area-border-width),
+        12px var(--vxe-ui-table-cell-copy-area-border-width);
     }
   }
 }
@@ -192,13 +196,17 @@
   .vxe-table--cell-main-area,
   .vxe-table--cell-extend-area,
   .vxe-table--cell-active-area {
-    &[half="1"] {
+    &[half='1'] {
       border-left: 0;
     }
   }
   .vxe-table--cell-copy-area {
-    &[half="1"] {
-      background-size: 0 12px, var(--vxe-ui-table-cell-copy-area-border-width) 12px, 12px var(--vxe-ui-table-cell-copy-area-border-width), 12px var(--vxe-ui-table-cell-copy-area-border-width);
+    &[half='1'] {
+      background-size:
+        0 12px,
+        var(--vxe-ui-table-cell-copy-area-border-width) 12px,
+        12px var(--vxe-ui-table-cell-copy-area-border-width),
+        12px var(--vxe-ui-table-cell-copy-area-border-width);
     }
   }
 }
@@ -240,22 +248,35 @@
   from {
   }
   to {
-    background-position: 0 -12px, 100% 12px, 12px 0, -12px 100%;
+    background-position:
+      0 -12px,
+      100% 12px,
+      12px 0,
+      -12px 100%;
   }
 }
 
 .vxe-table--cell-copy-area {
-  background: linear-gradient(0deg, transparent 6px, var(--vxe-ui-table-cell-copy-area-border-color) 6px) repeat-y,
-              linear-gradient(0deg, transparent 50%, var(--vxe-ui-table-cell-copy-area-border-color) 0) repeat-y,
-              linear-gradient(90deg, transparent 50%, var(--vxe-ui-table-cell-copy-area-border-color) 0) repeat-x,
-              linear-gradient(90deg, transparent 50%, var(--vxe-ui-table-cell-copy-area-border-color) 0) repeat-x;
-  background-size: var(--vxe-ui-table-cell-copy-area-border-width) 12px, var(--vxe-ui-table-cell-copy-area-border-width) 12px, 12px var(--vxe-ui-table-cell-copy-area-border-width), 12px var(--vxe-ui-table-cell-copy-area-border-width);
-  background-position: 0 0, 100% 0, 0 0, 0 100%;
-  animation: moveCopyCellBorder .5s infinite linear;
+  background:
+    linear-gradient(0deg, transparent 6px, var(--vxe-ui-table-cell-copy-area-border-color) 6px) repeat-y,
+    linear-gradient(0deg, transparent 50%, var(--vxe-ui-table-cell-copy-area-border-color) 0) repeat-y,
+    linear-gradient(90deg, transparent 50%, var(--vxe-ui-table-cell-copy-area-border-color) 0) repeat-x,
+    linear-gradient(90deg, transparent 50%, var(--vxe-ui-table-cell-copy-area-border-color) 0) repeat-x;
+  background-size:
+    var(--vxe-ui-table-cell-copy-area-border-width) 12px,
+    var(--vxe-ui-table-cell-copy-area-border-width) 12px,
+    12px var(--vxe-ui-table-cell-copy-area-border-width),
+    12px var(--vxe-ui-table-cell-copy-area-border-width);
+  background-position:
+    0 0,
+    100% 0,
+    0 0,
+    0 100%;
+  animation: moveCopyCellBorder 0.5s infinite linear;
 }
 
 .vxe-table--cell-active-area {
-  border-color: var(--vxe-ui-table-cell-active-area-border-color); 
+  border-color: var(--vxe-ui-table-cell-active-area-border-color);
   border-style: solid;
   border-width: var(--vxe-ui-table-cell-active-area-border-width);
   background-color: var(--vxe-ui-table-cell-active-area-background-color);
@@ -458,11 +479,11 @@
     width: 0.8em;
     height: 1em;
     line-height: 1em;
-    font-family: Verdana,Arial,Tahoma;
+    font-family: Verdana, Arial, Tahoma;
     font-weight: normal;
     position: relative;
     &:before {
-      content: "*";
+      content: '*';
       position: absolute;
       left: 0;
       top: 0.2em;
@@ -499,7 +520,7 @@
     &.is--line {
       &:before,
       &:after {
-        content: "";
+        content: '';
         display: inline-block;
         vertical-align: middle;
       }
@@ -745,18 +766,18 @@
   .vxe-footer--column {
     &.col--ellipsis {
       &.col--center {
-        .vxe-cell{
+        .vxe-cell {
           justify-content: center;
         }
       }
       &.col--right {
-        .vxe-cell{
+        .vxe-cell {
           justify-content: flex-end;
         }
       }
     }
   }
-  
+
   /*边框*/
   .vxe-table--footer-wrapper {
     border-top: var(--vxe-ui-table-border-width) solid var(--vxe-ui-table-border-color);
@@ -804,14 +825,20 @@
     .vxe-header--column,
     .vxe-body--column,
     .vxe-footer--column {
-      background-image: linear-gradient(var(--vxe-ui-table-border-color), var(--vxe-ui-table-border-color)), linear-gradient(var(--vxe-ui-table-border-color), var(--vxe-ui-table-border-color));
+      background-image:
+        linear-gradient(var(--vxe-ui-table-border-color), var(--vxe-ui-table-border-color)),
+        linear-gradient(var(--vxe-ui-table-border-color), var(--vxe-ui-table-border-color));
       background-repeat: no-repeat;
-      background-size: var(--vxe-ui-table-border-width) 100%, 100% var(--vxe-ui-table-border-width);
-      background-position: right top, right bottom;
+      background-size:
+        var(--vxe-ui-table-border-width) 100%,
+        100% var(--vxe-ui-table-border-width);
+      background-position:
+        right top,
+        right bottom;
     }
     .vxe-table--fixed-left-wrapper {
       // border-right: 1px solid var(--vxe-ui-table-border-color);
-      .vxe-body--column{
+      .vxe-body--column {
         border-right-color: var(--vxe-ui-table-border-color);
       }
     }
@@ -855,7 +882,7 @@
       display: none;
     }
   }
-  
+
   &.size--medium {
     font-size: var(--vxe-ui-font-size-medium);
     .vxe-table--empty-placeholder,
@@ -876,7 +903,7 @@
         height: var(--vxe-ui-input-height-medium);
       }
       .vxe-default-input {
-        &[type="date"]::-webkit-inner-spin-button {
+        &[type='date']::-webkit-inner-spin-button {
           margin-top: 3px;
         }
       }
@@ -902,7 +929,7 @@
         height: var(--vxe-ui-input-height-small);
       }
       .vxe-default-input {
-        &[type="date"]::-webkit-inner-spin-button {
+        &[type='date']::-webkit-inner-spin-button {
           margin-top: 2px;
         }
       }
@@ -928,7 +955,7 @@
         height: var(--vxe-ui-input-height-mini);
       }
       .vxe-default-input {
-        &[type="date"]::-webkit-inner-spin-button {
+        &[type='date']::-webkit-inner-spin-button {
           margin-top: 1px;
         }
       }
@@ -990,7 +1017,7 @@
           display: none;
         }
       }
-   }
+    }
   }
   .vxe-table--fixed-left-wrapper {
     left: 0;
@@ -1044,7 +1071,7 @@
     z-index: 9;
     cursor: col-resize;
     &:before {
-      content: "";
+      content: '';
       display: block;
       height: 100%;
       background-color: var(--vxe-ui-table-resizable-drag-line-color);
@@ -1084,7 +1111,7 @@
     height: 0;
   }
   .vxe-tree--line {
-    content: "";
+    content: '';
     position: absolute;
     bottom: -0.9em;
     width: 0.8em;
@@ -1147,7 +1174,7 @@
         color: var(--vxe-ui-font-color);
       }
     }
-    &+.vxe-table--expand-label {
+    & + .vxe-table--expand-label {
       padding-left: 0.5em;
     }
   }
@@ -1201,7 +1228,6 @@
       }
     }
   }
-
 
   /*溢出列*/
   .vxe-header--column,
@@ -1437,7 +1463,7 @@
       .vxe-body--column {
         position: relative;
         &:after {
-          content: "";
+          content: '';
           position: absolute;
           top: 50%;
           left: 0;
@@ -1456,7 +1482,7 @@
       & > .vxe-body--column {
         position: relative;
         &:before {
-          content: "";
+          content: '';
           top: calc(var(--vxe-ui-table-cell-dirty-width) * -1);
           left: calc(var(--vxe-ui-table-cell-dirty-width) * -1);
           position: absolute;
@@ -1472,7 +1498,7 @@
     &.col--dirty {
       position: relative;
       &:before {
-        content: "";
+        content: '';
         top: calc(var(--vxe-ui-table-cell-dirty-width) * -1);
         left: calc(var(--vxe-ui-table-cell-dirty-width) * -1);
         position: absolute;
@@ -1536,7 +1562,7 @@ div.vxe-table--tooltip-wrapper {
 .vxe-table--footer-wrapper {
   color: var(--vxe-ui-table-footer-font-color);
   margin-top: -1px;
-  &.body--wrapper{
+  &.body--wrapper {
     overflow-x: auto;
     outline: 0;
   }

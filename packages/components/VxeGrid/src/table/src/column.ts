@@ -3,6 +3,8 @@ import { createCommentVNode, defineComponent, h, inject, onMounted, onUnmounted,
 import type { XEColumnInstance } from './util'
 import { assembleColumn, destroyColumn, watchColumn } from './util'
 import Cell from './cell'
+// 导入 CSS Modules 样式文件
+import cssModules from '../../styles/modules/column.module.scss'
 
 import type { VxeColumnProps, VxeColumnPropTypes, VxeTableConstructor, VxeTablePrivateMethods } from '../../../types'
 
@@ -128,9 +130,18 @@ export default defineComponent({
     columnConfig.slots = slots
 
     const renderVN = () => {
+      // 外层使用 display: contents 的 div，应用 CSS Module，不影响布局
       return h('div', {
-        ref: refElem,
-      })
+        class: cssModules.root,
+        style: {
+          display: 'contents',
+        },
+      }, [
+        // 原有的组件 div，保持所有原有属性
+        h('div', {
+          ref: refElem,
+        }),
+      ])
     }
 
     const $xeColumn = {

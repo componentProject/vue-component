@@ -2,7 +2,7 @@
   position: relative;
   &.is--loading {
     &:before {
-      content: "";
+      content: '';
       position: absolute;
       top: 0;
       left: 0;
@@ -29,7 +29,7 @@
   }
   .vxe-grid--form-wrapper,
   .vxe-grid--top-wrapper,
-  .vxe-grid--bottom-wrapper  {
+  .vxe-grid--bottom-wrapper {
     position: relative;
   }
   .vxe-grid--table-container {

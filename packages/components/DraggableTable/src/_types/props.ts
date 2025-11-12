@@ -57,7 +57,7 @@ export interface propsType {
    */
   dragType: string
   /** 需要禁用拖拽的行class */
-  rowDisabledClass: string
+  rowDisabledClass?: string
   /** 行拖拽禁用方法 */
   rowDragDisabledMethod?: (...args: any[]) => any
   /** 行拖拽结束回调方法 */
@@ -159,7 +159,7 @@ export interface CustomConfigDialogPropsType {
   rowdragable?: boolean
   columndragable?: boolean
   /** 需要禁用拖拽的行class */
-  rowDisabledClass: string
+  rowDisabledClass?: string
   /** 行拖拽结束回调方法 */
   rowDragEndMethod?: (...args: any[]) => any
   /** 列拖拽结束回调方法 */

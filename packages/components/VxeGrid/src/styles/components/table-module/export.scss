@@ -53,7 +53,7 @@
         padding: 0.2em 1em 0.2em 1em;
         @for $i from 2 through 8 {
           $interval: $i - 1 + 0.2;
-          &.level--#{$i}{
+          &.level--#{$i} {
             padding-left: #{$interval + 2.3}em;
             .vxe-checkbox--icon {
               left: #{$interval + 0.6}em;

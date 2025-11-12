@@ -1,5 +1,5 @@
 <template>
-  <div ref="container" class="h-full w-full flex-1 overflow-hidden outline-0 table-box containerMain">
+  <div ref="container" :class="cssModules.root" class="h-full w-full flex-1 overflow-hidden outline-0 table-box containerMain">
     <VxeGrid
       ref="xTable"
       border
@@ -91,6 +91,8 @@ import { cloneDeep, groupBy } from 'lodash'
 import { diff, isEmpty } from 'radash'
 import Sortable from 'sortablejs'
 import VxeUI, { VxePager, VxeTooltip } from 'vxe-pc-ui'
+import cssModules from './styles/modules/all.module.scss'
+import VxeGrid from '@moluoxixi/components/VxeGrid'
 
 import {
   getClass,

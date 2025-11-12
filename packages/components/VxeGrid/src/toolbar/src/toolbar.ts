@@ -4,6 +4,8 @@ import XEUtils from 'xe-utils'
 import { VxeUI } from '../../ui'
 import { getSlotVNs } from '../../ui/src/vn'
 import { errLog, warnLog } from '../../ui/src/log'
+// 导入 CSS Modules 样式文件
+import cssModules from '../../styles/modules/toolbar.module.scss'
 
 import type { ValueOf, VxeButtonComponent, VxeButtonEvents } from 'vxe-pc-ui'
 import type { GridPrivateMethods, ToolbarInternalData, ToolbarMethods, ToolbarPrivateRef, ToolbarReactData, VxeGridConstructor, VxeToolbarConstructor, VxeToolbarEmits, VxeToolbarPropTypes } from '../../../types'
@@ -556,29 +558,38 @@ export default defineComponent({
       const buttonsSlot = slots.buttons
       const $table = connectTable
 
+      // 外层使用 display: contents 的 div，应用 CSS Module，不影响布局
       return h('div', {
-        ref: refElem,
-        class: ['vxe-toolbar', className ? (XEUtils.isFunction(className) ? className({ $toolbar: $xeToolbar }) : className) : '', {
-          [`size--${vSize}`]: vSize,
-          'is--perfect': perfect,
-          'is--loading': loading,
-        }],
+        class: cssModules.root,
+        style: {
+          display: 'contents',
+        },
       }, [
+        // 原有的组件 div，保持所有原有属性
         h('div', {
-          class: 'vxe-buttons--wrapper',
-        }, buttonsSlot ? buttonsSlot({ $grid: $xeGrid, $table }) : renderBtns()),
-        h('div', {
-          class: 'vxe-tools--wrapper',
-        }, toolsSlot ? toolsSlot({ $grid: $xeGrid, $table }) : renderRightTools()),
-        h('div', {
-          class: 'vxe-tools--operate',
+          ref: refElem,
+          class: ['vxe-toolbar', className ? (XEUtils.isFunction(className) ? className({ $toolbar: $xeToolbar }) : className) : '', {
+            [`size--${vSize}`]: vSize,
+            'is--perfect': perfect,
+            'is--loading': loading,
+          }],
         }, [
-          props.import ? renderToolImport() : createCommentVNode(),
-          props.export ? renderToolExport() : createCommentVNode(),
-          props.print ? renderToolPrint() : createCommentVNode(),
-          refresh ? renderToolRefresh() : createCommentVNode(),
-          zoom && $xeGrid ? renderToolZoom() : createCommentVNode(),
-          custom ? renderToolCustom() : createCommentVNode(),
+          h('div', {
+            class: 'vxe-buttons--wrapper',
+          }, buttonsSlot ? buttonsSlot({ $grid: $xeGrid, $table }) : renderBtns()),
+          h('div', {
+            class: 'vxe-tools--wrapper',
+          }, toolsSlot ? toolsSlot({ $grid: $xeGrid, $table }) : renderRightTools()),
+          h('div', {
+            class: 'vxe-tools--operate',
+          }, [
+            props.import ? renderToolImport() : createCommentVNode(),
+            props.export ? renderToolExport() : createCommentVNode(),
+            props.print ? renderToolPrint() : createCommentVNode(),
+            refresh ? renderToolRefresh() : createCommentVNode(),
+            zoom && $xeGrid ? renderToolZoom() : createCommentVNode(),
+            custom ? renderToolCustom() : createCommentVNode(),
+          ]),
         ]),
       ])
     }

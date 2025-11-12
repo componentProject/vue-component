@@ -12,7 +12,7 @@ import { getSlotVNs } from '../../ui/src/vn'
 import { errLog } from '../../ui/src/log'
 // 导入 CSS Modules 样式文件
 // 注意：grid 组件中已经有 styles 变量（来自 computeStyles），所以使用 cssModules 作为变量名
-import cssModules from '../../styles/modules/all.module.scss'
+import cssModules from '../../styles/modules/grid.module.scss'
 import type { ValueOf, VxeFormComponent, VxeFormEvents, VxeFormInstance, VxeFormItemProps, VxePagerComponent, VxePagerEvents, VxePagerInstance } from 'vxe-pc-ui'
 import type { GridMethods, GridPrivateMethods, GridPrivateRef, GridReactData, VxeGridConstructor, VxeGridEmits, VxeGridPrivateComputed, VxeGridPrivateMethods, VxeGridProps, VxeGridPropTypes, VxeTableConstructor, VxeTableDefines, VxeTableEventProps, VxeTableEvents, VxeTableMethods, VxeTablePrivateMethods, VxeTableProps, VxeToolbarInstance, VxeToolbarPropTypes } from '../../../types'
 
@@ -1331,23 +1331,30 @@ export default defineComponent({
     const renderVN = () => {
       const vSize = computeSize.value
       const styles = computeStyles.value
+      // 外层使用 display: contents 的 div，应用 CSS Module，不影响布局
       return h('div', {
-        ref: refElem,
-        class: [
-          // 使用 CSS Modules 的 root 类名（会被转换为 hash 值，如 .root_abc123）
-          cssModules.root,
-          // 其他全局类名
-          'vxe-grid',
-          {
-            [`size--${vSize}`]: vSize,
-            'is--animat': !!props.animat,
-            'is--round': props.round,
-            'is--maximize': reactData.isZMax,
-            'is--loading': props.loading || reactData.tableLoading,
-          },
-        ],
-        style: styles,
-      }, renderLayout())
+        class: cssModules.root,
+        style: {
+          display: 'contents',
+        },
+      }, [
+        // 原有的组件 div，保持所有原有属性
+        h('div', {
+          ref: refElem,
+          class: [
+            // 其他全局类名
+            'vxe-grid',
+            {
+              [`size--${vSize}`]: vSize,
+              'is--animat': !!props.animat,
+              'is--round': props.round,
+              'is--maximize': reactData.isZMax,
+              'is--loading': props.loading || reactData.tableLoading,
+            },
+          ],
+          style: styles,
+        }, renderLayout()),
+      ])
     }
 
     $xeGrid.renderVN = renderVN

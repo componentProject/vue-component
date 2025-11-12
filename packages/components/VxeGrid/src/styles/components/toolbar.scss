@@ -11,7 +11,7 @@
   font-family: var(--vxe-ui-font-family);
   background-color: var(--vxe-ui-layout-background-color);
   &:after {
-    content: "";
+    content: '';
     display: block;
     clear: both;
     height: 0;
@@ -25,7 +25,7 @@
   }
   &.is--loading {
     &:before {
-      content: "";
+      content: '';
       position: absolute;
       top: 0;
       left: 0;
@@ -38,9 +38,9 @@
   }
   .vxe-buttons--wrapper {
     flex-grow: 1;
-    & > .vxe-button+.vxe-button--item,
-    & > .vxe-button--item+.vxe-button,
-    & > .vxe-button--item+.vxe-button--item {
+    & > .vxe-button + .vxe-button--item,
+    & > .vxe-button--item + .vxe-button,
+    & > .vxe-button--item + .vxe-button--item {
       margin-left: 0.8em;
     }
     & > .vxe-button--item {
@@ -48,9 +48,9 @@
     }
   }
   .vxe-tools--wrapper {
-    & > .vxe-button+.vxe-tool--item,
-    & > .vxe-tool--item+.vxe-button,
-    & > .vxe-tool--item+.vxe-tool--item {
+    & > .vxe-button + .vxe-tool--item,
+    & > .vxe-tool--item + .vxe-button,
+    & > .vxe-tool--item + .vxe-tool--item {
       margin-left: 0.8em;
     }
     & > .vxe-tool--item {
