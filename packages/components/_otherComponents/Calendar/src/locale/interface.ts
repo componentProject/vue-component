@@ -1,3 +1,4 @@
+// _otherComponents的interface组件
 export interface CalendarType {
   formatYear: string
   formatMonth: string

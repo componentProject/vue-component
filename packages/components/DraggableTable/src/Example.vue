@@ -1,3 +1,4 @@
+<!-- DraggableTable的示例文件 -->
 <template>
   <div class="h-full flex flex-col">
     <h2>可拖拽表格演示</h2>

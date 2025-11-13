@@ -1,3 +1,4 @@
+// VxeGrid的components组件
 import type { App } from 'vue'
 import type { VxeGlobalConfig } from './_types'
 

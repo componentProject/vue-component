@@ -1,3 +1,4 @@
+<!-- AIAgent的ParamsPanel组件 -->
 <template>
   <div
     v-if="visible"

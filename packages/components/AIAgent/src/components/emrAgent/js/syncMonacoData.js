@@ -1,3 +1,4 @@
+// AIAgent的syncMonacoData组件
 const emrObject = {
   trasenEditor: null,
   emrReadOnlyTemplate: null,

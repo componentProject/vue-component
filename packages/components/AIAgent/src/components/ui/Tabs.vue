@@ -1,3 +1,4 @@
+<!-- AIAgent的Tabs组件 -->
 <template>
   <div class="tabs-container">
     <div id="tsAiAgent-find-agent-tabs" class="tabs">

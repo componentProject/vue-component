@@ -1,3 +1,4 @@
+<!-- _old的示例文件 -->
 <template>
   <div class="config-table-example">
     <h2>配置化表格示例</h2>

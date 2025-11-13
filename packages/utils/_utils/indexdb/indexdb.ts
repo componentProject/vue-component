@@ -1,3 +1,4 @@
+// indexdb.ts文件
 import type {
   IndexDBOperation,
   MinimalOptions,

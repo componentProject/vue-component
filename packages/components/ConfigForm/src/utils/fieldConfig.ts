@@ -1,3 +1,4 @@
+// ConfigForm的配置组件
 import type { AllFormItem } from '../../FormDesign/src/type'
 
 export interface fields {

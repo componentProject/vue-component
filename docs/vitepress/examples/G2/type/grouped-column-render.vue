@@ -1,3 +1,4 @@
+<!-- grouped-column-render.vue文件 -->
 <template>
   <div class="container">
     <G2 :render="render" />

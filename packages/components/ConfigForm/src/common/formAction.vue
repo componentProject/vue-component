@@ -1,3 +1,4 @@
+<!-- ConfigForm的formAction组件 -->
 <template>
   <div
     class="starfish-formitem"

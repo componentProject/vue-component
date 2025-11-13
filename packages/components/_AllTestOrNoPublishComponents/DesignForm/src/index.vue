@@ -1,3 +1,4 @@
+<!-- _AllTestOrNoPublishComponents组件主文件 -->
 <template>
   <div class="design-form-container">
     <div class="design-form-left">

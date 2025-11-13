@@ -1,3 +1,4 @@
+// his6.0.ts文件
 import CryptoJS from 'crypto-js'
 import { v4 } from 'uuid'
 

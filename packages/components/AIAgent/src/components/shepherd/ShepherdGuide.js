@@ -1,3 +1,4 @@
+// AIAgent的ShepherdGuide组件
 import { shepherd } from './index'
 
 // 配置常量

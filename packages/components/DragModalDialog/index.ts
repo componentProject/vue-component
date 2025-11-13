@@ -1,3 +1,4 @@
+// DragModalDialog入口文件
 import { withInstall } from '@moluoxixi/utils/_utils'
 import ModalDialog from './src/index.vue'
 

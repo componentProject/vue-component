@@ -1,3 +1,4 @@
+<!-- _AllTestOrNoPublishComponents的示例文件 -->
 <template>
   <ReForm :items="items" />
 </template>

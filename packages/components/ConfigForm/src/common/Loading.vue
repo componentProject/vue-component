@@ -1,3 +1,4 @@
+<!-- ConfigForm的Loading组件 -->
 <template>
   <div v-loading="true" class="loading" />
 </template>

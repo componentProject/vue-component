@@ -1,4 +1,4 @@
-#!/usr/bin/env tsx
+// normalizeSingleLineComments.mts文件
 import { readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs'
 import { extname, join, resolve } from 'node:path'
 

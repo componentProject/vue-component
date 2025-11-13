@@ -1,3 +1,4 @@
+// AIAgent的ghostText组件
 import MedicalLanguage from './language'
 
 export function getGhostTextCompletion(model, position) {

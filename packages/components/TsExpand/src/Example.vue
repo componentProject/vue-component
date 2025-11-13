@@ -1,3 +1,4 @@
+<!-- TsExpand的示例文件 -->
 <template>
   <div>
     <h3>基础用法</h3>

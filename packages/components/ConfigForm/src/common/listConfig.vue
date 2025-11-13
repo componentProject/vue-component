@@ -1,3 +1,4 @@
+<!-- ConfigForm的配置组件 -->
 <template>
   <div class="starfish-formitem starfish-formitem-nomiddle" :class="{ 'formCover': drag, 'starfish-vertical': labelalign != 'top', [item.data.csslist?.join(' ')]: !!item.data.csslist }">
     <div class="label" :class="`label_${labelalign}`" :style="{ width: `${labelWidth}px` }">

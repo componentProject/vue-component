@@ -1,3 +1,4 @@
+<!-- DraggableTable的对话框组件 -->
 <template>
   <div v-if="visible">
     <DragModalDialog

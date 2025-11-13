@@ -1,3 +1,4 @@
+// config入口文件
 import { defineConfig } from 'vitepress'
 import { baseUrl } from '../../contants/web.ts'
 import head from './head.ts'

@@ -1,3 +1,4 @@
+<!-- TsRadio组件主文件 -->
 <template>
   <ElRadioGroup
     :id="radioId"

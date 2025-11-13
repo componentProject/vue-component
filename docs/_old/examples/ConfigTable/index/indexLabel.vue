@@ -1,3 +1,4 @@
+<!-- indexLabel.vue文件 -->
 <template>
   <ConfigTable :data="tableData" :columns="columns" :show-index="true" index-label="序号编号" />
 </template>

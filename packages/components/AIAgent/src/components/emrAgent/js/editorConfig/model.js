@@ -1,3 +1,4 @@
+// AIAgent的model组件
 import { getDeCodeByName } from '../deCodeDict'
 
 export const modelName = 'OutpatientEmrModel'

@@ -1,3 +1,4 @@
+// VxeGrid的vn组件
 import type { VxeComponentSlotType } from '../../../types'
 
 import XEUtils from 'xe-utils'

@@ -1,3 +1,4 @@
+// AIAgent的theme组件
 export const themeRules = [
   { token: 'reserved', foreground: 'a21515', fontStyle: 'bold' },
   { token: 'symptom', foreground: '1976d2', fontStyle: 'bold' },

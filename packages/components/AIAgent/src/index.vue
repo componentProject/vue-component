@@ -1,3 +1,4 @@
+<!-- AIAgent组件主文件 -->
 <template>
   <div
     v-if="configOption.token"

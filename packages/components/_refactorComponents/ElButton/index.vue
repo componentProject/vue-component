@@ -1,3 +1,4 @@
+<!-- _refactorComponents入口文件 -->
 <template>
   <OldElButton v-bind="$attrs" @click="throttleClick">
     <template v-for="name in slotNames" #[name]="slotParams" :key="name">

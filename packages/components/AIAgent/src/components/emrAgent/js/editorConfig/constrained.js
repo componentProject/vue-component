@@ -1,3 +1,4 @@
+// AIAgent的constrained组件
 import constrainedEditor from 'constrained-editor-plugin'
 import * as monaco from 'monaco-editor'
 

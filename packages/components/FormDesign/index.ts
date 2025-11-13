@@ -1,3 +1,4 @@
+// FormDesign入口文件
 import type { App } from 'vue'
 // 静态导入外部组件 ConfigForm
 import ConfigForm from '@moluoxixi/components/ConfigForm'

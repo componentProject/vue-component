@@ -1,3 +1,4 @@
+// zh.ts文件
 const msg = {
   language: '中文',
 }

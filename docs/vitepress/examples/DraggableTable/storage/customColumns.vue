@@ -1,3 +1,4 @@
+<!-- customColumns.vue文件 -->
 <template>
   <p class="tip">
     自定义个性化弹窗的列字段集合 `customColumns`。

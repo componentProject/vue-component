@@ -1,3 +1,4 @@
+<!-- FormDesign的ConditionModule组件 -->
 <template>
   <CustomDialog ref="maxJsonDialog" dialogclass="conditionModule">
     <ElMain style="padding: 0">

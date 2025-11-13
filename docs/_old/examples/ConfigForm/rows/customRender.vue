@@ -1,3 +1,4 @@
+<!-- customRender.vue文件 -->
 <template>
   <div style="padding: 16px;">
     <ConfigForm

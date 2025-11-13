@@ -1,3 +1,4 @@
+<!-- AIAgent的UserNotice组件 -->
 <template>
   <div class="user-notice-container">
     <div class="notice-content">

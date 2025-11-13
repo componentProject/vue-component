@@ -1,3 +1,4 @@
+// VxeGrid的import-panel组件
 import type { Ref } from 'vue'
 import type { VxeButtonComponent, VxeModalComponent, VxeSelectComponent } from 'vxe-pc-ui'
 import type { VxeTableConstructor, VxeTableMethods, VxeTablePrivateMethods } from '../../../../types'

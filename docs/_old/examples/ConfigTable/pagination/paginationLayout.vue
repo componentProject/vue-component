@@ -1,3 +1,4 @@
+<!-- paginationLayout.vue文件 -->
 <template>
   <ConfigTable :data="tableData" :columns="columns" :pagination="pagination" pagination-layout="prev, pager, next" />
 </template>

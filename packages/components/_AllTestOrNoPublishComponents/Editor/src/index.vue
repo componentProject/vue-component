@@ -1,3 +1,4 @@
+<!-- _AllTestOrNoPublishComponents组件主文件 -->
 <template>
   <div ref="editorEl" class="m-editor" style="width: 100%; height: 100%" />
   <!-- 容器高度由父元素控制，组件本身默认占满父容器 -->

@@ -1,3 +1,4 @@
+<!-- ConfigForm的collapse组件 -->
 <template>
   <div class="collapse_box">
     <div class="control">

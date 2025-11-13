@@ -1,3 +1,4 @@
+<!-- AIAgent的BubbleAction组件 -->
 <template>
   <div class="bubble-action">
     <button class="bubble-action__button" @click="handleOperation($event, 'replay')">

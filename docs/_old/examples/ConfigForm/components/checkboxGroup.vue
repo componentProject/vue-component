@@ -1,3 +1,4 @@
+<!-- checkboxGroup.vue的checkboxGroup组件 -->
 <template>
   <div style="padding: 16px;">
     <ConfigForm

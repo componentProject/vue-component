@@ -1,3 +1,4 @@
+// VxeGrid的toolbar组件
 import type { PropType, Ref, VNode } from 'vue'
 import type { ValueOf, VxeButtonComponent, VxeButtonEvents } from 'vxe-pc-ui'
 import type { GridPrivateMethods, ToolbarInternalData, ToolbarMethods, ToolbarPrivateRef, ToolbarReactData, VxeGridConstructor, VxeToolbarConstructor, VxeToolbarEmits, VxeToolbarPropTypes } from '../../../types'

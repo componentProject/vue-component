@@ -1,3 +1,4 @@
+// _otherComponents的useWatermark.d组件
 import type { ComputedRef } from 'vue'
 import type { propsType } from '../types'
 

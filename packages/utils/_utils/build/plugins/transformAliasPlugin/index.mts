@@ -1,3 +1,4 @@
+// transformAliasPlugin入口文件
 import { dirname, relative, resolve } from 'node:path'
 
 export interface BuildContext {

@@ -1,3 +1,4 @@
+<!-- FormDesign的starfish-editor组件 -->
 <template>
   <Framework :header-show="headerShow">
     <template v-if="headerShow" #nav>

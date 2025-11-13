@@ -1,3 +1,4 @@
+// Splitter组件主文件
 export interface SplitterProps {
   /**
    * 分割方向，水平或垂直

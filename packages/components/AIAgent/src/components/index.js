@@ -1,3 +1,4 @@
+// AIAgent组件主文件
 import 'highlight.js/styles/atom-one-light.css'
 import '../assets/iconfont/iconfont.css'
 import './markdown-it-vue/markdown-it.css'

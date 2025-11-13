@@ -1,3 +1,4 @@
+<!-- AIAgent的TipsPopover组件 -->
 <template>
   <div class="tips-popover">
     <div class="tips-popover-container">

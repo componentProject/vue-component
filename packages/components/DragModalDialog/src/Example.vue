@@ -1,3 +1,4 @@
+<!-- DragModalDialog的示例文件 -->
 <template>
   <ElButton @click="visible = true">
     打开

@@ -1,3 +1,4 @@
+<!-- FormDesign组件主文件 -->
 <template>
   <Framework :header-show="headerShow">
     <template v-if="headerShow" #nav>

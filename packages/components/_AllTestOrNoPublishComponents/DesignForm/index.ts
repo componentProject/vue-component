@@ -1,3 +1,4 @@
+// _AllTestOrNoPublishComponents入口文件
 import { withInstall } from '@moluoxixi/utils/_utils'
 import DesignFormC from './src/index.vue'
 

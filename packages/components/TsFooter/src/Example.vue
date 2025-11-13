@@ -1,3 +1,4 @@
+<!-- TsFooter的示例文件 -->
 <template>
   <div class="bg-primary p-[16px]">
     <TsFooter :items="base" align="center" />

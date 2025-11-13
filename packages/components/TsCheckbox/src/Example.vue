@@ -1,3 +1,4 @@
+<!-- TsCheckbox的示例文件 -->
 <template>
   <div class="example-container">
     <h3>本地数据源</h3>

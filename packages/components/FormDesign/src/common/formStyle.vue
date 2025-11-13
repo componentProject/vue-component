@@ -1,3 +1,4 @@
+<!-- FormDesign的formStyle组件 -->
 <template>
   <div class="starfish-formitem">
     <div class="label">

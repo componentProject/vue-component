@@ -1,3 +1,4 @@
+<!-- row-parent.vue文件 -->
 <template>
   <Tree :data="list" row-field="id" parent-field="pid" label-field="name" />
 </template>

@@ -1,3 +1,4 @@
+// _AllTestOrNoPublishComponents的editor组件
 import type * as monaco from 'monaco-editor/esm/vs/editor/editor.api'
 import { buildMonacoOptions } from './common'
 

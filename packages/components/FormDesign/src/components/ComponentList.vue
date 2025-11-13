@@ -1,3 +1,4 @@
+<!-- FormDesign的ComponentList组件 -->
 <template>
   <ElScrollbar class="editor_pages_left">
     <div class="filter">

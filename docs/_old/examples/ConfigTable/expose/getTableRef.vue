@@ -1,3 +1,4 @@
+<!-- getTableRef.vue文件 -->
 <template>
   <button class="btn" @click="log()">
     打印表格实例

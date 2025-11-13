@@ -1,3 +1,4 @@
+// vite入口文件
 import type { Plugin } from 'postcss'
 import path from 'node:path'
 import tailwindcss from '@tailwindcss/postcss'

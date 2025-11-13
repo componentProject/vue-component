@@ -1,3 +1,4 @@
+// VxeGrid的hu-HU组件
 export default {
   vxe: {
     base: {

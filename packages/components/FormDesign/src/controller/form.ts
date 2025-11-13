@@ -1,3 +1,4 @@
+// FormDesign的form组件
 import type { fieldsTrs, fieldTds } from '@moluoxixi/components/ConfigForm/src/utils/fieldConfig'
 import type { AllFormItem, BaseFormConfig, FormState } from '../type'
 import { reactive } from 'vue'

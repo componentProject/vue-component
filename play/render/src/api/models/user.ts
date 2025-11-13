@@ -1,3 +1,4 @@
+// user.ts文件
 export interface User {
   id: number
   name: string

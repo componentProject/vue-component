@@ -1,3 +1,4 @@
+// base.ts文件
 import type { App, Component } from 'vue'
 import { Fragment } from 'vue'
 /** 简单延迟函数，用于缓冲时间 */

@@ -1,3 +1,4 @@
+<!-- type-datetimerange.vue文件 -->
 <template>
   <ElConfigProvider :locale="zhCn" :empty-values="[undefined, [], '']">
     <DateRangePicker v-model="val" type="datetimerange" start-placeholder="开始时间" end-placeholder="结束时间" />

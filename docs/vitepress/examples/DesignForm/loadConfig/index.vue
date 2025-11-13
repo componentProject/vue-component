@@ -1,3 +1,4 @@
+<!-- loadConfig入口文件 -->
 <template>
   <div class="demo-container" style="height: 350px">
     <DesignForm :initial-form-config="myFormConfig" />

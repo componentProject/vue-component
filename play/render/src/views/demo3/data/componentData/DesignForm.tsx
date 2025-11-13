@@ -1,3 +1,4 @@
+// DesignForm.tsx文件
 export default {
   initialFormConfig: {
     formName: '',

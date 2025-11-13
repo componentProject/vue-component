@@ -1,3 +1,4 @@
+// VxeGrid的ru-RU组件
 export default {
   vxe: {
     base: {

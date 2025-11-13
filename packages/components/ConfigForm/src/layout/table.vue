@@ -1,3 +1,4 @@
+<!-- ConfigForm的table组件 -->
 <template>
   <div class="starfish-table_box">
     <table class="table_layout" :class="item.data.borderShow ? 'table_layout_border' : ''">

@@ -1,3 +1,4 @@
+<!-- FormDesign的Workspace组件 -->
 <template>
   <div class="editor_pages_center" tabindex="1" @click="onEditorCenter">
     <div

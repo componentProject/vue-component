@@ -1,3 +1,4 @@
+// _otherComponents的useWatermark组件
 import type { ComputedRef } from 'vue'
 import type { propsType } from '../types'
 import { assign } from 'radash'

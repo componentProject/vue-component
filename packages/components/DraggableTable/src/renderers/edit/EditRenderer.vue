@@ -1,3 +1,4 @@
+<!-- DraggableTable的渲染器组件 -->
 <template>
   <div class="h-full flex items-center" style="align-items: center">
     <DateRangePicker

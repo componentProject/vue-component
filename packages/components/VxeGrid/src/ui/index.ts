@@ -1,3 +1,4 @@
+// VxeGrid组件主文件
 import type { VxeGlobalConfig, VxePrintDefines, VxeUploadDefines } from 'vxe-pc-ui'
 import { VxeUI } from '@vxe-ui/core'
 

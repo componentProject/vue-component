@@ -1,3 +1,4 @@
+<!-- dynamic.vue文件 -->
 <template>
   <div class="container">
     <Tabs

@@ -1,3 +1,4 @@
+// socialLinks.ts文件
 import type { DefaultTheme } from 'vitepress'
 import { repoInfo } from '../../../contants/index.ts'
 

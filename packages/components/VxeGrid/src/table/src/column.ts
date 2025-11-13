@@ -1,3 +1,4 @@
+// VxeGrid的column组件
 import type { PropType } from 'vue'
 import type { VxeColumnProps, VxeColumnPropTypes, VxeTableConstructor, VxeTablePrivateMethods } from '../../../types'
 import type { XEColumnInstance } from './util'

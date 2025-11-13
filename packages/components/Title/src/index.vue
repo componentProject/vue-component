@@ -1,3 +1,4 @@
+<!-- Title组件主文件 -->
 <template>
   <div class="w-full basic-flex justify-between items-center">
     <div v-if="type === 'line'" class="basic-flex items-center custom-title">

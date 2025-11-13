@@ -1,3 +1,4 @@
+<!-- QrCode组件主文件 -->
 <template>
   <div
     class="qr-code-container"

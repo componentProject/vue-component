@@ -1,3 +1,4 @@
+// VxeGrid的vi-VN组件
 export default {
   vxe: {
     base: {

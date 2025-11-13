@@ -1,3 +1,4 @@
+<!-- EnterNextContainer组件主文件 -->
 <template>
   <div v-if="!props.virtualRef" ref="containerRef" class="w-full">
     <slot />

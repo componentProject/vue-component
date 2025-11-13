@@ -1,3 +1,4 @@
+<!-- _AllTestOrNoPublishComponents组件主文件 -->
 <template>
   <!-- 预览模式：MdCatalog + MdPreview -->
   <div class="flex h-full">

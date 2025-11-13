@@ -1,3 +1,4 @@
+<!-- _AllTestOrNoPublishComponents的示例文件 -->
 <template>
   <DesignForm v-bind="initialFormConfig" />
 </template>

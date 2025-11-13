@@ -1,3 +1,4 @@
+// _AllTestOrNoPublishComponents的language组件
 import type { languageType } from '../_types'
 
 export function toMonacoLanguage(

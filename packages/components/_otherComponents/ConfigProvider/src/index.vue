@@ -1,3 +1,4 @@
+<!-- _otherComponents组件主文件 -->
 <template>
   <div>
     <slot />

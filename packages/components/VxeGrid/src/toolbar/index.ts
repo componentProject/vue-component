@@ -1,3 +1,4 @@
+// VxeGrid组件主文件
 import type { App } from 'vue'
 import { VxeUI } from '../ui'
 import VxeToolbarComponent from './src/toolbar'

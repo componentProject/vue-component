@@ -1,3 +1,4 @@
+// AIAgent的deCodeDict组件
 const DECODE_DICT = [
   {
     deCode: 'DE04.01.119.00',

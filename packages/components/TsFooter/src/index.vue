@@ -1,3 +1,4 @@
+<!-- TsFooter组件主文件 -->
 <template>
   <footer class="w-full bg-white flex flex-wrap" :style="computedStyle">
     <template v-for="(item, index) in normalizedItems" :key="index">

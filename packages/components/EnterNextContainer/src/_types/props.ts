@@ -1,3 +1,4 @@
+// EnterNextContainer的props组件
 import type { ComponentInternalInstance, ComponentPublicInstance } from 'vue'
 
 /**

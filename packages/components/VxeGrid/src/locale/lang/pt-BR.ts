@@ -1,3 +1,4 @@
+// VxeGrid的pt-BR组件
 export default {
   vxe: {
     base: {

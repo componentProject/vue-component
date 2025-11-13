@@ -1,3 +1,4 @@
+// autoRoutes入口文件
 import type { Plugin } from 'vite'
 import { createVirtualPlugin } from '../utils/virtual.ts'
 // autoRoutes/index.ts

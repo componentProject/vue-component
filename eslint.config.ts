@@ -1,3 +1,4 @@
+// 配置文件
 import EslintConfig from './packages/utils/EslintConfig/index.ts'
 
 export default EslintConfig(

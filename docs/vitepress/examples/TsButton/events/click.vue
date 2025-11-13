@@ -1,3 +1,4 @@
+<!-- click.vue文件 -->
 <template>
   <div class="container">
     <TsButton @click="onClick">

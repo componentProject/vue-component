@@ -1,3 +1,4 @@
+<!-- ConfigForm的示例文件 -->
 <template>
   <div class="config-form-example">
     <h3>配置表单示例</h3>

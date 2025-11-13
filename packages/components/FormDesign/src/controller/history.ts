@@ -1,3 +1,4 @@
+// FormDesign的history组件
 import type { HistoryItem, HistoryState } from '../type'
 import { reactive } from 'vue'
 import formStore from './form'

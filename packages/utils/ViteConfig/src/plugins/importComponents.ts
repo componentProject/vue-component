@@ -1,3 +1,4 @@
+// importComponents.ts文件
 import type { Plugin } from 'vite'
 import { getList } from '../../../_api'
 import { createVirtualPlugin } from './utils/virtual'

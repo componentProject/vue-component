@@ -1,3 +1,4 @@
+// theme入口文件
 import type { Theme } from 'vitepress'
 import type { App as VueApp } from 'vue'
 

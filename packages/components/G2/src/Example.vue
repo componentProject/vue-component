@@ -1,3 +1,4 @@
+<!-- G2的示例文件 -->
 <template>
   <div style="height: 20%;width: 30%">
     <G2 :render="render" :options="options" />

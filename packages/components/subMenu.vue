@@ -1,3 +1,4 @@
+<!-- subMenu.vue的subMenu组件 -->
 <template>
   <template v-for="(route, index) in routes" :key="index">
     <ElMenuItem v-if="!route.children?.length" :index="route.path">

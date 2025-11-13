@@ -1,3 +1,4 @@
+// src入口文件
 import type { Plugin } from 'postcss'
 import type { ConfigEnv, PluginOption, UserConfig } from 'vite'
 

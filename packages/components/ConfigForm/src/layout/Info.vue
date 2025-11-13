@@ -1,3 +1,4 @@
+<!-- ConfigForm的Info组件 -->
 <template>
   <div class="starfish-formitem" :class="{ formCover: drag }">
     <div v-if="!item.data.labelShow" class="label">

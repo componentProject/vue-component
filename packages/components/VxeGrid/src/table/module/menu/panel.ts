@@ -1,3 +1,4 @@
+// VxeGrid的panel组件
 import type { Ref } from 'vue'
 import type { VxeTableConstructor, VxeTableMethods, VxeTablePrivateMethods } from '../../../../types'
 import { createCommentVNode, defineComponent, h, inject, ref, Teleport } from 'vue'

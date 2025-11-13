@@ -1,3 +1,4 @@
+// _AllTestOrNoPublishComponents的format组件
 import type { languageType } from '../_types'
 import { toMonacoLanguage } from './language'
 

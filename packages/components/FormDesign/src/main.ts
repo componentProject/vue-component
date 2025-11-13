@@ -1,3 +1,4 @@
+// FormDesign的main组件
 import type { App } from 'vue'
 import StarfishForm from 'starfish-form'
 import { defineAsyncComponent } from 'vue'

@@ -1,3 +1,4 @@
+<!-- HisFooter组件主文件 -->
 <template>
   <TsFooter v-if="items.length" :items="items" v-bind="$attrs" />
 </template>

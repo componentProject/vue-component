@@ -1,3 +1,4 @@
+<!-- clearSelection.vue文件 -->
 <template>
   <button class="btn" @click="clear()">
     清空选择

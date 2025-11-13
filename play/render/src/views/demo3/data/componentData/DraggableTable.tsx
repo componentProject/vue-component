@@ -1,3 +1,4 @@
+// DraggableTable.tsx文件
 import { reactive } from 'vue'
 
 const props = reactive({

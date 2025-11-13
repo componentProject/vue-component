@@ -1,3 +1,4 @@
+// src入口文件
 import type { optionsType, userConfigType } from './_types/index.ts'
 
 import antfu from '@antfu/eslint-config'

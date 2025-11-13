@@ -1,3 +1,4 @@
+// hisComponents.ts文件
 import { getHttpService } from '../../utils/AjaxPackage/netseriver.js'
 
 const httpApi: any = getHttpService({

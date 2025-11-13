@@ -1,3 +1,4 @@
+// AIAgent的language组件
 import { keywords } from './keyword'
 import { themeName, themeRules } from './theme'
 // 按需引入 Monaco Editor 模块

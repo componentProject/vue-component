@@ -1,3 +1,4 @@
+// _AllTestOrNoPublishComponents组件主文件
 export type languageType
   = | 'js'
     | 'javascript'

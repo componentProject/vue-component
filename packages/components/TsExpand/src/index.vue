@@ -1,3 +1,4 @@
+<!-- TsExpand组件主文件 -->
 <template>
   <div
     class="ts-expandable" :class="[props.class]"

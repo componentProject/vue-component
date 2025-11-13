@@ -1,3 +1,4 @@
+<!-- TsCheckbox组件主文件 -->
 <template>
   <ElCheckboxGroup
     :id="checkboxId"

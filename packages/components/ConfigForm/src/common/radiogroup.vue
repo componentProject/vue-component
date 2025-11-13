@@ -1,3 +1,4 @@
+<!-- ConfigForm的radiogroup组件 -->
 <template>
   <div class="starfish-formitem" :class="drag ? 'formCover' : ''">
     <div class="label">

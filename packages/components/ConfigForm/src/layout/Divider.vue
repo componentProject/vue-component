@@ -1,3 +1,4 @@
+<!-- ConfigForm的Divider组件 -->
 <template>
   <div class="starfish-formitem starfish-form-divider" :class="drag ? 'formCover' : ''">
     <div class="control">

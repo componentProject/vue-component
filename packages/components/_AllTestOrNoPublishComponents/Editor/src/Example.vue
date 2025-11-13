@@ -1,3 +1,4 @@
+<!-- _AllTestOrNoPublishComponents的示例文件 -->
 <template>
   <div>
     <ElSelect v-model="language" style="width: 100px;margin-right: 8px" placeholder="请选择">

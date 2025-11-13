@@ -1,3 +1,4 @@
+// system.ts文件
 import { defineStore } from 'pinia'
 import { store } from '../index.ts'
 

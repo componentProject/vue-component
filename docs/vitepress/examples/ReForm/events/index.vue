@@ -1,3 +1,4 @@
+<!-- events入口文件 -->
 <template>
   <div class="container">
     <ReForm v-bind="formData" @change="handleChange" @submit="handleSubmit" @cancel="handleCancel" />

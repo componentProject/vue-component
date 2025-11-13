@@ -1,3 +1,4 @@
+<!-- FormDesign的Shape组件 -->
 <template>
   <div
     class="shape"

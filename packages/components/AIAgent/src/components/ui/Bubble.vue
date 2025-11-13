@@ -1,3 +1,4 @@
+<!-- AIAgent的Bubble组件 -->
 <template>
   <div class="bubble" :class="role">
     <div class="bubble-container">

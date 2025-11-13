@@ -1,3 +1,4 @@
+// plugins入口文件
 import type MarkdownIt from 'markdown-it'
 import demoPlugin from './demo.ts'
 import repositoryPlugin from './repository.ts'

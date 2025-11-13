@@ -1,3 +1,4 @@
+// TsFooter.tsx文件
 export default {
   items: [
     '© 2025 Trasen',

@@ -1,3 +1,4 @@
+// AIAgent的EmrManager组件
 import { formatTemplate } from './js/editorConfig/formatTemplate'
 import { buildAIData } from './js/buildAIData'
 import { needCallCreateEmr } from './js/editorConfig/model'

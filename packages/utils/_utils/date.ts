@@ -1,3 +1,4 @@
+// date.ts文件
 import type { functionType } from '@moluoxixi/components/_types'
 import type { DateType, StartOf } from '_types/date'
 import moment from 'moment'

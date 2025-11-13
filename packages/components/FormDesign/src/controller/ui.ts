@@ -1,3 +1,4 @@
+// FormDesign的ui组件
 import type { GetColumnWidth, setColumnWidth, UiState } from '../type'
 import { reactive, toRaw } from 'vue'
 

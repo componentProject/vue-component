@@ -1,3 +1,4 @@
+<!-- resizable.vue文件 -->
 <template>
   <div class="container" style="height: 100px;">
     <ElButton @click="visible = true">

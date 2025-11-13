@@ -1,3 +1,4 @@
+// ConfigForm的main组件
 import type { App } from 'vue'
 // 直接导入 FormDesign 的 Flex 类
 import _ from '@moluoxixi/components/FormDesign/src/utils/_'

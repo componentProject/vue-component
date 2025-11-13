@@ -1,3 +1,4 @@
+<!-- AIAgent的AgentCard组件 -->
 <template>
   <div class="agent-card">
     <div class="item-icon">

@@ -1,3 +1,4 @@
+// FormDesign的shortcut组件
 import type { AllFormItem, ShortCutState } from '../type'
 // import { createStore } from "vuex";
 import { reactive } from 'vue'

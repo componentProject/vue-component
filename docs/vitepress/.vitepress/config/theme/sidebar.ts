@@ -1,3 +1,4 @@
+// sidebar.ts文件
 import type { DefaultTheme } from 'vitepress'
 import { generateSidebar } from './utils/generateSidebar.ts'
 

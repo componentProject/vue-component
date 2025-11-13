@@ -1,3 +1,4 @@
+// cssModuleGlobalRootPlugin入口文件
 import type { Plugin } from 'postcss'
 
 /**

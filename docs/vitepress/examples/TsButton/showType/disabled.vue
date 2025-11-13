@@ -1,3 +1,4 @@
+<!-- disabled.vue文件 -->
 <template>
   <div class="container">
     <TsButton show-type="disabled" disabled content="按钮已禁用，原因说明">

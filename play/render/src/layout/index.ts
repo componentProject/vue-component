@@ -1,3 +1,4 @@
+// layout入口文件
 import type { App, Component } from 'vue'
 
 const layoutFiles = import.meta.glob('./*.vue', { eager: true, import: 'default' })

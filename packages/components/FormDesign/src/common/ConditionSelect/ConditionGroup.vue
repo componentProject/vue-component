@@ -1,3 +1,4 @@
+<!-- FormDesign的ConditionGroup组件 -->
 <template>
   <div class="conditionSelect" :class="result.type">
     <!-- {{ result.type }} -->

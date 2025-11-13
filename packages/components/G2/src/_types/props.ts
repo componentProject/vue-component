@@ -1,3 +1,4 @@
+// G2的props组件
 import type { Chart } from '@antv/g2'
 
 /**

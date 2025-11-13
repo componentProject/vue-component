@@ -1,3 +1,4 @@
+// loadComponent入口文件
 import { COMPONENT_SETTING_TYPE, COMPONENT_VUE2_SETTING_TYPE } from '@moluoxixi/constant'
 import { getDownLoadByIds } from '@moluoxixi/utils/_api'
 import { idbStorage } from '@moluoxixi/utils/_utils/indexdb'

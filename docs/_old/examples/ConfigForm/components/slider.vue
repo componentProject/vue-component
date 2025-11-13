@@ -1,3 +1,4 @@
+<!-- slider.vue的slider组件 -->
 <template>
   <div style="padding: 16px;">
     <ConfigForm

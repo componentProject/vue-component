@@ -1,3 +1,4 @@
+<!-- ConfigForm组件主文件 -->
 <template>
   <div class="starfish-formitem starfish-editor-showrule" :class="{ 'formCover': drag, 'starfish-vertical': labelalign != 'top' }">
     <div class="label" :class="`label_${labelalign}`" :style="{ width: `${labelWidth}px` }">

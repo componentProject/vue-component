@@ -1,3 +1,4 @@
+<!-- FormDesign的PropsPanel组件 -->
 <template>
   <div ref="editRight" class="editor_pages_right editor_pages_right_visible">
     <!-- 交互 -->

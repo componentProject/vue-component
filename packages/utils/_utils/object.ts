@@ -1,3 +1,4 @@
+// object.ts文件
 type PlainObject = Record<PropertyKey, any>
 
 function isObject(value: unknown): value is PlainObject {

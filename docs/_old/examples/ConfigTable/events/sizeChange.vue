@@ -1,3 +1,4 @@
+<!-- sizeChange.vue文件 -->
 <template>
   <ConfigTable :data="tableData" :columns="columns" :pagination="pagination" @size-change="onSizeChange" />
   <div class="result">

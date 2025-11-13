@@ -1,3 +1,4 @@
+// main.ts文件
 import type { QiankunProps } from 'vite-plugin-qiankun/dist/helper'
 import { COMPONENT_SETTING_TYPE } from '@moluoxixi/constant'
 import { idbStorage } from '@moluoxixi/utils/_utils/indexdb'

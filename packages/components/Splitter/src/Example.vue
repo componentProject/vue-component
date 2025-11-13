@@ -1,3 +1,4 @@
+<!-- Splitter的示例文件 -->
 <template>
   <div class="example-container">
     <h3>水平分割（默认）</h3>

@@ -1,3 +1,4 @@
+<!-- setCurrentRow.vue文件 -->
 <template>
   <button class="btn" @click="setRow()">
     选中第一行

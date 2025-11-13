@@ -1,3 +1,4 @@
+// _otherComponents的en-US组件
 import type { CalendarType } from './interface.ts'
 
 const CalendarLocale: CalendarType = {

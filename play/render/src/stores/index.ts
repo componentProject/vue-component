@@ -1,3 +1,4 @@
+// stores入口文件
 import { createPinia } from 'pinia'
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 

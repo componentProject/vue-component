@@ -1,3 +1,4 @@
+<!-- Splitter组件主文件 -->
 <template>
   <ElSplitter v-bind="$attrs">
     <template v-for="(slotName, index) in slotNames" :key="slotName">

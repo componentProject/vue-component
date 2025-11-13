@@ -1,3 +1,4 @@
+// VxeGrid的util组件
 import type { VxeTableConstructor, VxeTableDefines, VxeTablePrivateMethods } from '../../../types'
 import { reactive, watch } from 'vue'
 import XEUtils from 'xe-utils'

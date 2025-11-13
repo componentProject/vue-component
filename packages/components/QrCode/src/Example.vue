@@ -1,3 +1,4 @@
+<!-- QrCode的示例文件 -->
 <template>
   <div class="example-container">
     <h3>基础用法 - URL跳转</h3>

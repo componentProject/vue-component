@@ -1,3 +1,4 @@
+// AIAgent的markdown-it-plugin-mermaid组件
 import mermaid from 'mermaid'
 
 function mermaidChart(code) {

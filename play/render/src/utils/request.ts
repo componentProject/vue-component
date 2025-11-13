@@ -1,3 +1,4 @@
+// request.ts文件
 export default {
   async post(url: string, params: any) {
     return {

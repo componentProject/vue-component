@@ -1,3 +1,4 @@
+// event.ts文件
 import type { DebounceSettings, ThrottleSettings } from 'lodash'
 import { debounce as lodashDebounce, throttle as lodashThrottle } from 'lodash'
 

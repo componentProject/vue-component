@@ -1,3 +1,4 @@
+<!-- base.vue文件 -->
 <template>
   <div class="container">
     <EnterNextContainer @no-next-input="handleNoNextInput">

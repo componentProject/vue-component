@@ -1,3 +1,4 @@
+<!-- sortable.vue文件 -->
 <template>
   <div class="container" style="height: 350px;">
     <DraggableTable id="dt-sort-sortable" v-model="tableData" :columns="columns" :sortable="true" />

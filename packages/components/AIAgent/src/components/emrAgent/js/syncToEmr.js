@@ -1,3 +1,4 @@
+// AIAgent的syncToEmr组件
 export function syncSelectedData(selectedLineNum, emrData, emrEditor) {
   if (selectedLineNum.length === 0 || !emrData || !emrEditor) {
     return

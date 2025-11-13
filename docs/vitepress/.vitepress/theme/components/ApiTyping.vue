@@ -1,3 +1,4 @@
+<!-- ApiTyping.vue的ApiTyping组件 -->
 <template>
   <span class="inline-flex items-center">
     <code class="api-typing mr-1">

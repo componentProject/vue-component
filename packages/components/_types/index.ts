@@ -1,3 +1,4 @@
+// _types入口文件
 export interface objType {
   [key: string]: any
 }

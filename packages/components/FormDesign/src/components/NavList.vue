@@ -1,3 +1,4 @@
+<!-- FormDesign的NavList组件 -->
 <template>
   <div class="nav_list">
     <div class="detailBtn">

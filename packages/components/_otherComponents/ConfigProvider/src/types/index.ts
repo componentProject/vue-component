@@ -1,3 +1,4 @@
+// _otherComponents组件主文件
 export interface propsType {
   /**
    * 组件的语言

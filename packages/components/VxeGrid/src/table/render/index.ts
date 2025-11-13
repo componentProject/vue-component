@@ -1,3 +1,4 @@
+// VxeGrid组件主文件
 import type { ComponentOptions } from 'vue'
 import type { VxeButtonComponent } from 'vxe-pc-ui'
 import type { VxeColumnPropTypes, VxeGlobalRendererHandles } from '../../../types'

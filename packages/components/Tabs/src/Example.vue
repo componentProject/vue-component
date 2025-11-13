@@ -1,3 +1,4 @@
+<!-- Tabs的示例文件 -->
 <template>
   <div class="space-y-6">
     <!-- 旧版本 tabList 模式示例 -->

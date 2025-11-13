@@ -1,3 +1,4 @@
+<!-- _AllTestOrNoPublishComponents的示例文件 -->
 <template>
   <div class="w-full h-full flex flex-col">
     <div class="example-header">

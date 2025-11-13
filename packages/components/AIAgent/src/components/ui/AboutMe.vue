@@ -1,3 +1,4 @@
+<!-- AIAgent的AboutMe组件 -->
 <template>
   <div v-if="visible" class="about-me-overlay">
     <div class="about-me">

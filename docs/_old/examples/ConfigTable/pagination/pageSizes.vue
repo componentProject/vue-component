@@ -1,3 +1,4 @@
+<!-- pageSizes.vue文件 -->
 <template>
   <ConfigTable :data="tableData" :columns="columns" :pagination="pagination" :page-sizes="[5, 10, 20]" />
 </template>

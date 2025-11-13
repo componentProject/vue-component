@@ -1,3 +1,4 @@
+<!-- AIAgent的FloatingButton组件 -->
 <template>
   <div
     ref="floatingButton"

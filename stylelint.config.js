@@ -1,3 +1,4 @@
+// 配置文件
 export default {
   extends: [
     'stylelint-config-standard',

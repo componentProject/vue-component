@@ -1,3 +1,4 @@
+<!-- rate.vue的rate组件 -->
 <template>
   <div style="padding: 16px;">
     <ConfigForm

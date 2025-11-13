@@ -1,3 +1,4 @@
+// VxeGrid的cell组件
 import type { VNode } from 'vue'
 import type { VxeColumnPropTypes, VxeComponentSlotType, VxeTableConstructor, VxeTableDefines, VxeTablePrivateMethods } from '../../../types'
 import { h } from 'vue'

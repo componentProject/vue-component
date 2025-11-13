@@ -1,3 +1,4 @@
+// AIAgent的utils组件
 const isServer = false
 /* istanbul ignore next */
 export const on = (function () {

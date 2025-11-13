@@ -1,3 +1,4 @@
+// _scripts的buildComponent组件
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { COMPONENT_SETTING_TYPE } from '@moluoxixi/constant'

@@ -1,3 +1,4 @@
+// DragModalDialog的props组件
 import type { Component } from 'vue'
 
 type ButtonType = 'confirm' | 'cancel'

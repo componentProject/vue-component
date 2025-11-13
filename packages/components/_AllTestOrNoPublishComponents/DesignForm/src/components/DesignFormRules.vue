@@ -1,3 +1,4 @@
+<!-- _AllTestOrNoPublishComponents的表单组件 -->
 <template>
   <div class="design-form-rules">
     <Tabs v-model="activeTab" :tab-list="tabList">

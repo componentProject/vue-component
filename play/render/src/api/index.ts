@@ -1,3 +1,4 @@
+// api入口文件
 import { COMPONENT_SETTING_TYPE } from '@moluoxixi/constant'
 import { getHttpService } from '../../../../packages/utils/AjaxPackage'
 

@@ -1,3 +1,4 @@
+<!-- FormDesign的Framework组件 -->
 <template>
   <div class="starfish-editor">
     <div class="starfish-editor-nav">

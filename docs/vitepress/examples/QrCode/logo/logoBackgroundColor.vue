@@ -1,3 +1,4 @@
+<!-- logoBackgroundColor.vue文件 -->
 <template>
   <div class="container">
     <div class="example-item">

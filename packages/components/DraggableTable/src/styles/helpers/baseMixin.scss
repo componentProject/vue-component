@@ -1,3 +1,4 @@
+/* DraggableTable的baseMixin组件 */
 @mixin createAnimationTransition($property, $duration: 0.1s, $func: ease-in-out) {
   transition: $property $duration $func;
 }

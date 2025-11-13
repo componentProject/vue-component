@@ -1,3 +1,4 @@
+// VxeGrid的panel组件
 import type { VxeTableConstructor, VxeTableMethods, VxeTablePrivateMethods } from '../../../../types'
 import { computed, defineComponent, h, inject } from 'vue'
 import { VxeUI } from '../../../ui'

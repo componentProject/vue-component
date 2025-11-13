@@ -1,3 +1,4 @@
+// demo.ts文件
 import type Renderer from 'markdown-it/lib/renderer.d.ts'
 import type Token from 'markdown-it/lib/token.d.ts'
 import fs from 'node:fs'

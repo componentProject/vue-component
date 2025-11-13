@@ -1,3 +1,4 @@
+<!-- trigger-select-dblclick.vue文件 -->
 <template>
   <div class="container">
     <ElInput

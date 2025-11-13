@@ -1,3 +1,4 @@
+<!-- DraggableTable组件主文件 -->
 <template>
   <div ref="container" :class="cssModules.root" class="h-full w-full flex-1 overflow-hidden outline-0 table-box containerMain">
     <VxeGrid

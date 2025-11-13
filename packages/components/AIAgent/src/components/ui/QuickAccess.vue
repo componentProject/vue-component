@@ -1,3 +1,4 @@
+<!-- AIAgent的QuickAccess组件 -->
 <template>
   <div v-if="tabList.length > 0" class="tabs-container">
     <div class="tabs">

@@ -1,3 +1,4 @@
+<!-- showPagination.vue文件 -->
 <template>
   <ConfigTable :data="tableData" :columns="columns" :show-pagination="false" />
 </template>

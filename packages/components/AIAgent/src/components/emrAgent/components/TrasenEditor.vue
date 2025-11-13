@@ -1,3 +1,4 @@
+<!-- AIAgent的TrasenEditor组件 -->
 <template>
   <div class="editor-container">
     <div class="readonly-info-container">

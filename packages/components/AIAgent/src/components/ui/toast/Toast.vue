@@ -1,3 +1,4 @@
+<!-- AIAgent的Toast组件 -->
 <template>
   <transition name="fade">
     <div v-if="visible" class="toast" :class="[`toast-${type}`]" :style="{ top: position }">

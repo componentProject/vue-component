@@ -1,3 +1,4 @@
+// Tree的props组件
 import type { TreeNode, TreeNodeData } from 'element-plus'
 import type { Component } from 'vue'
 

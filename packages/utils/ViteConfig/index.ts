@@ -1,3 +1,4 @@
+// ViteConfig入口文件
 import createViteConfig from './src/index.ts'
 
 export default createViteConfig

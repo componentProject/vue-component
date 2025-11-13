@@ -1,3 +1,4 @@
+<!-- App.vue文件 -->
 <template>
   <RouterView />
 </template>

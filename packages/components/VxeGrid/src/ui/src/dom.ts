@@ -1,3 +1,4 @@
+// VxeGrid的dom组件
 import XEUtils from 'xe-utils'
 
 const reClsMap: { [key: string]: any } = {}

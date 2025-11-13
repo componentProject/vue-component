@@ -1,3 +1,4 @@
+// VxeGrid的en-US组件
 export default {
   vxe: {
     base: {

@@ -1,3 +1,4 @@
+<!-- ConfigForm的Tabs组件 -->
 <template>
   <div class="starfish-tabs_box">
     <ElTabs v-model="activeName">

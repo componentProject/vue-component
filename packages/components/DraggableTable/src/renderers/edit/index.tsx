@@ -1,3 +1,4 @@
+// DraggableTable组件主文件
 import { VxeUI } from 'vxe-pc-ui'
 import EditRenderer from './EditRenderer.vue'
 

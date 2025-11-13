@@ -1,3 +1,4 @@
+// AIAgent的tsAiChat组件
 class TsAiAgent {
   constructor() {
     this.controller = new AbortController()

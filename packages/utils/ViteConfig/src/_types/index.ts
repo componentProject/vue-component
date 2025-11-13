@@ -1,3 +1,4 @@
+// _types入口文件
 import type { visualizer } from 'rollup-plugin-visualizer'
 import type { Options as unpluginAutoImportOptions } from 'unplugin-auto-import/types'
 import type { Options as unpluginVueComponentsOptions } from 'unplugin-vue-components/types'

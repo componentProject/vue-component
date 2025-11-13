@@ -1,3 +1,4 @@
+// ConfigForm的customHooks组件
 import type { FormDesignStore } from '@moluoxixi/components/FormDesign/src/store'
 import type { ComponentInternalInstance } from 'vue'
 import { FormDesignStoreKey } from '@moluoxixi/components/FormDesign/src/store'

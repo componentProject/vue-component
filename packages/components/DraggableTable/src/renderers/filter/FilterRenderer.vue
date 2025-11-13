@@ -1,3 +1,4 @@
+<!-- DraggableTable的渲染器组件 -->
 <template>
   <div
     v-if="currOption"

@@ -1,3 +1,4 @@
+// esmodule.ts文件
 export async function getesComponent(Vue: any, vueShared: any, orginComponentCode: string, componentName: string, componentMapping: Record<string, any> = {}) {
   componentMapping.$_Vue = Vue
   componentMapping.vueShared = vueShared

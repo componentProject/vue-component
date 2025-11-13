@@ -1,3 +1,4 @@
+// directives入口文件
 import type { App } from 'vue'
 import { ElMessage } from 'element-plus'
 

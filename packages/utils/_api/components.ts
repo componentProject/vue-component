@@ -1,3 +1,4 @@
+// _api的components组件
 import { COMPONENT_SETTING_TYPE } from '@moluoxixi/constant'
 import FormData from 'form-data'
 import { BaseApi } from '../../utils/AjaxPackage'

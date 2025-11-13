@@ -1,3 +1,4 @@
+<!-- FormDesign的ControlEditSize组件 -->
 <template>
   <div ref="controllerSize" class="controller_edit_size">
     <ElIcon class="size-icon" @click="handleCanvasSize(0.1)">

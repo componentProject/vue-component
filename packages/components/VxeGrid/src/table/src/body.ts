@@ -1,3 +1,4 @@
+// VxeGrid的body组件
 import type { ComputedRef, PropType, Ref } from 'vue'
 import type { VxeColumnPropTypes, VxeComponentSizeType, VxeComponentSlotType, VxeTableConstructor, VxeTableDefines, VxeTableMethods, VxeTablePrivateMethods } from '../../../types'
 import type { XEBodyScrollElement } from './util'

@@ -1,3 +1,4 @@
+// DraggableTable组件主文件
 import type { VxeTablePropTypes } from 'vxe-table'
 
 export * from './emit'

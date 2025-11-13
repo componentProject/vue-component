@@ -1,3 +1,4 @@
+<!-- sortChange.vue文件 -->
 <template>
   <ConfigTable :data="tableData" :columns="columns" @sort-change="onSort" />
   <div class="result">

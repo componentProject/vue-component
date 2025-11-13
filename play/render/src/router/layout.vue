@@ -1,3 +1,4 @@
+<!-- layout.vue文件 -->
 <template>
   <component :is="layout" />
 </template>

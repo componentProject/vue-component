@@ -1,3 +1,4 @@
+// src入口文件
 import type { App } from 'vue'
 import components from './components'
 

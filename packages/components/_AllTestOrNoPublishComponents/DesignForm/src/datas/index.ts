@@ -1,3 +1,4 @@
+// _AllTestOrNoPublishComponents组件主文件
 import { ElInput, ElInputNumber } from 'element-plus'
 
 export const componentMap = {

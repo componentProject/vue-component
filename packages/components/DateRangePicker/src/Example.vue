@@ -1,3 +1,4 @@
+<!-- DateRangePicker的示例文件 -->
 <template>
   <div class="date-range-picker-example">
     <h2>日期范围选择器示例</h2>

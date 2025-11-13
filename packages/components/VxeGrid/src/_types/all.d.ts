@@ -1,3 +1,4 @@
+// VxeGrid的all.d组件
 import type { App } from 'vue'
 import type { VxeGlobalConfig, VxeUIExport } from 'vxe-pc-ui'
 

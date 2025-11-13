@@ -1,3 +1,4 @@
+// contants入口文件
 import path from 'node:path'
 import { getRepoInfoWithFallback } from './utils/getRepoInfo.ts'
 

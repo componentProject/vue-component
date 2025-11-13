@@ -1,3 +1,4 @@
+// VxeGrid的uk-UA组件
 export default {
   vxe: {
     base: {

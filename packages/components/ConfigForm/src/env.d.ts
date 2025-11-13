@@ -1,3 +1,4 @@
+// ConfigForm的env.d组件
 declare module '*.vue' {
   import type { DefineComponent } from 'vue'
 

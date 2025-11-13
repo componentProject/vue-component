@@ -1,3 +1,4 @@
+// VxeGrid的table组件
 import type { ComponentPublicInstance, ComputedRef, Ref } from 'vue'
 import type { VxeLoadingComponent, VxeTabsConstructor, VxeTabsPrivateMethods, VxeTooltipComponent, VxeTooltipInstance } from 'vxe-pc-ui'
 import type { TableInternalData, TableMethods, TablePrivateMethods, TableReactData, VxeColumnPropTypes, VxeGridConstructor, VxeGridPrivateMethods, VxeTableConstructor, VxeTableDefines, VxeTableMethods, VxeTablePrivateComputed, VxeTablePrivateMethods, VxeTablePrivateRef, VxeTableProps, VxeTablePropTypes, VxeToolbarConstructor } from '../../../types'

@@ -1,3 +1,4 @@
+// build入口文件
 import type { ICruiseOptions, ICruiseResult } from 'dependency-cruiser'
 import type { ConfigEnv, InlineConfig, UserConfig } from 'vite'
 import { execSync } from 'node:child_process'

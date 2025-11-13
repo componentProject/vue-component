@@ -1,3 +1,4 @@
+<!-- G2组件主文件 -->
 <template>
   <div ref="container" class="w-full h-full" v-bind="$attrs" />
 </template>

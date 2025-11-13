@@ -1,3 +1,4 @@
+<!-- FormDesign的Resizer组件 -->
 <template>
   <div ref="target" class="starfish-editor-resizer" />
 </template>

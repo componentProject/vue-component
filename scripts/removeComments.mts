@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 /**
  * 一键去除整个项目的注释
  * 支持的文件类型：.js, .ts, .jsx, .tsx, .vue, .css, .scss, .less

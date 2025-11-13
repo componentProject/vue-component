@@ -1,3 +1,4 @@
+<!-- input.vue的input组件 -->
 <template>
   <div style="padding: 16px;">
     <ConfigForm

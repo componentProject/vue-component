@@ -1,3 +1,4 @@
+// classDemo.ts文件
 import type { AxiosResponse } from 'axios'
 import type { User } from '../../api/models/user'
 import BaseApi from '../../api/utils'

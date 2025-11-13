@@ -1,3 +1,4 @@
+<!-- KeepAllAlive组件主文件 -->
 <template>
   <router-view v-slot="{ Component, route }">
     <keep-alive :include="include">

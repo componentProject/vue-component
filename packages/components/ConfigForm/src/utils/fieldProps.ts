@@ -1,3 +1,4 @@
+// ConfigForm的fieldProps组件
 import type { PropType } from 'vue'
 
 interface FormConfig {

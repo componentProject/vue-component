@@ -1,3 +1,4 @@
+// VxeGrid的ja-JP组件
 export default {
   vxe: {
     base: {

@@ -1,3 +1,4 @@
+// KeepAllAlive的props组件
 import type { RouteLocationNormalized } from 'vue-router'
 
 /**

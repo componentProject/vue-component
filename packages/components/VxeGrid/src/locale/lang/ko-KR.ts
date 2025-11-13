@@ -1,3 +1,4 @@
+// VxeGrid的ko-KR组件
 export default {
   vxe: {
     base: {

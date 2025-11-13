@@ -1,3 +1,4 @@
+<!-- EnterNextContainer的示例文件 -->
 <template>
   <div class="example-container">
     <h2>EnterNextContainer 示例</h2>

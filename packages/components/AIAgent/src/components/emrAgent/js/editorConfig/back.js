@@ -1,3 +1,4 @@
+// AIAgent的back组件
 export function formatTemplate(template) {
   const templateData = JSON.parse(template)
   const result = {

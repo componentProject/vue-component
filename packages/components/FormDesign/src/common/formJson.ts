@@ -1,3 +1,4 @@
+// FormDesign的formJson组件
 const globalFormList = [
   {
     ControlType: 'RadioGroup',

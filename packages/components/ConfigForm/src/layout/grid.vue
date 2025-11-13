@@ -1,3 +1,4 @@
+<!-- ConfigForm的grid组件 -->
 <template>
   <div class="starfish-grid_box">
     <ElRow :gutter="item.data.gutter">

@@ -1,3 +1,4 @@
+<!-- base入口文件 -->
 <template>
   <div class="container" style="height: 100px;">
     <ElButton type="primary" @click="visible = true">

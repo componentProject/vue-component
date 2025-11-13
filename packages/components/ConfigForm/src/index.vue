@@ -1,3 +1,4 @@
+<!-- ConfigForm组件主文件 -->
 <template>
   <div class="starfish-dynamicform">
     <ElForm ref="ruleForm" :model="formResult" :rules="rules" label-width="120px" class="demo-ruleForm" :size="globalConfig.size || 'large'" :validate-on-rule-change="false">

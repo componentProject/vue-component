@@ -1,3 +1,4 @@
+<!-- AIAgent的PatientCard组件 -->
 <template>
   <div
     class="patient-card"

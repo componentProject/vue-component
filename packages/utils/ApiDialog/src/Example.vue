@@ -1,3 +1,4 @@
+<!-- src的示例文件 -->
 <template>
   <div class="api-dialog-demo">
     <h2>ApiDialog 对话框演示</h2>

@@ -1,3 +1,4 @@
+// virtual.ts文件
 import type { HmrContext, ModuleNode, Plugin, ResolvedConfig, ViteDevServer } from 'vite'
 import fs from 'node:fs'
 import path from 'node:path'

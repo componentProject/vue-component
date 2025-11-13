@@ -1,3 +1,4 @@
+<!-- DocsCodeDemo入口文件 -->
 <template>
   <ClientOnly>
     <p text="sm" v-html="decodedDescription" />

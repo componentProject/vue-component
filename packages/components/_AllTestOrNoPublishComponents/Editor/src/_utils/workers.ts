@@ -1,3 +1,4 @@
+// _AllTestOrNoPublishComponents的workers组件
 'use client'
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.main'
 import EditorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker'

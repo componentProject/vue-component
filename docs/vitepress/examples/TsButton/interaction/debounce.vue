@@ -1,3 +1,4 @@
+<!-- debounce.vue文件 -->
 <template>
   <div class="container">
     <TsButton :debounce="600" :options="{ trailing: true }" @click="onClick">

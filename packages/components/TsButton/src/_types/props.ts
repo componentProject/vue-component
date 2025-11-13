@@ -1,3 +1,4 @@
+// TsButton的props组件
 import type { DebounceSettings, ThrottleSettings } from 'lodash'
 
 export type ShowType = 'content' | 'disabled'

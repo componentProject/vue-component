@@ -1,3 +1,4 @@
+// VxeGrid的grid组件
 import type { ComponentPublicInstance, PropType, Ref, VNode } from 'vue'
 import type { ValueOf, VxeFormComponent, VxeFormEvents, VxeFormInstance, VxeFormItemProps, VxePagerComponent, VxePagerEvents, VxePagerInstance } from 'vxe-pc-ui'
 import type { GridMethods, GridPrivateMethods, GridPrivateRef, GridReactData, VxeGridConstructor, VxeGridEmits, VxeGridPrivateComputed, VxeGridPrivateMethods, VxeGridProps, VxeGridPropTypes, VxeTableConstructor, VxeTableDefines, VxeTableEventProps, VxeTableEvents, VxeTableMethods, VxeTablePrivateMethods, VxeTableProps, VxeToolbarInstance, VxeToolbarPropTypes } from '../../../types'

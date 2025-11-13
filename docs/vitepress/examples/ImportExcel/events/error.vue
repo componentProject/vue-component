@@ -1,3 +1,4 @@
+<!-- error.vue文件 -->
 <template>
   <div>
     <ImportExcel :columns="columns" @error="onError" @success="rows = $event.data" />

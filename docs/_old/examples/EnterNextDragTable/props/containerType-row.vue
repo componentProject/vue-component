@@ -1,3 +1,4 @@
+<!-- containerType-row.vue文件 -->
 <template>
   <div class="container">
     <EnterNextDragTable

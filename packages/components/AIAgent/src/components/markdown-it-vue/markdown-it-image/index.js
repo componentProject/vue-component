@@ -1,3 +1,4 @@
+// AIAgent组件主文件
 function parseNextNumber(str, pos, max) {
   let code
   const start = pos

@@ -1,3 +1,4 @@
+<!-- headerSlot.vue文件 -->
 <template>
   <div class="container" style="height: 350px;">
     <DraggableTable id="dt-slots-headerSlot" v-model="tableData" :columns="columns" save-type="local">

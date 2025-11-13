@@ -1,3 +1,4 @@
+// ConfigForm入口文件
 import type { App } from 'vue'
 import ConfigForm from './src/index.vue'
 import { install as init } from './src/main'

@@ -1,3 +1,4 @@
+<!-- AIAgent的ChatInput组件 -->
 <template>
   <div id="tsAiAgent-chat-input" class="chat-input">
     <div class="chat-textarea">

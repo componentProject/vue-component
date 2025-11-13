@@ -1,3 +1,4 @@
+// AIAgent的markdown-it-highlight组件
 import 'highlight.js/styles/atom-one-light.css'
 import hljs from 'highlight.js/lib/core'
 import Htmlbars from 'highlight.js/lib/languages/htmlbars'

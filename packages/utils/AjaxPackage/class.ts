@@ -1,3 +1,4 @@
+// class.ts文件
 import type {
   AxiosError,
   AxiosRequestConfig,

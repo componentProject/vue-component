@@ -1,3 +1,4 @@
+<!-- FormDesign的jsonEditor组件 -->
 <template>
   <div ref="jsonCenter" />
 </template>

@@ -1,3 +1,4 @@
+// cssInjectedByJsPlugin入口文件
 import type { OutputAsset } from 'rollup'
 import type { Plugin, ResolvedConfig } from 'vite'
 import type { DevOptions, PluginConfiguration } from './interface'

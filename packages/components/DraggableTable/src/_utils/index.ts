@@ -1,3 +1,4 @@
+// DraggableTable组件主文件
 import type { ColumnType, types } from '@moluoxixi/components/DraggableTable/src/_types'
 
 /** 自定义的列模板 */

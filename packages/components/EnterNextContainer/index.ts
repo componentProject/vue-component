@@ -1,3 +1,4 @@
+// EnterNextContainer入口文件
 import { withInstall } from '@moluoxixi/utils/_utils'
 import EnterNextContainer from './src/index.vue'
 

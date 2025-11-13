@@ -1,3 +1,4 @@
+<!-- AIAgent的EditPrompt组件 -->
 <template>
   <div id="tsAiAgent-edit-prompt" class="edit-prompt">
     <div class="edit-prompt-textarea">

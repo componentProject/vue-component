@@ -1,3 +1,4 @@
+// Tree入口文件
 import { withInstall } from '@moluoxixi/utils/_utils'
 import Tree from './src/index.vue'
 

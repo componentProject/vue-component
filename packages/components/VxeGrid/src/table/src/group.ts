@@ -1,3 +1,4 @@
+// VxeGrid的group组件
 import type { Slot } from 'vue'
 import type { VxeTableConstructor, VxeTablePrivateMethods } from '../../../types'
 import type { XEColumnInstance } from './util'

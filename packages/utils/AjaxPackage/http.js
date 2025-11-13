@@ -1,3 +1,4 @@
+// http.js文件
 import { defaultAxiosInstance } from './axios.js'
 /**
  * HTTP请求封装类，提供常用的HTTP方法

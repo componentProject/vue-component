@@ -1,3 +1,4 @@
+<!-- AIAgent的ChatAgent组件 -->
 <template>
   <div class="chat-agent">
     <div class="chat-agent-container">

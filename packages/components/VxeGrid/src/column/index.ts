@@ -1,3 +1,4 @@
+// VxeGrid组件主文件
 import type { App } from 'vue'
 import VxeColumnComponent from '../table/src/column'
 import { VxeUI } from '../ui'

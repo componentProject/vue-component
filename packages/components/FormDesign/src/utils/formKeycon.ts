@@ -1,3 +1,4 @@
+// FormDesign的formKeycon组件
 import store from '../controller/shortcut'
 
 export function clearCanvas() {

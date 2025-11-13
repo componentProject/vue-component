@@ -1,3 +1,4 @@
+// Tree的emits组件
 import type { TreeNode, TreeNodeData } from 'element-plus'
 
 /**

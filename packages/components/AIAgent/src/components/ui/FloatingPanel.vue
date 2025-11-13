@@ -1,3 +1,4 @@
+<!-- AIAgent的FloatingPanel组件 -->
 <template>
   <div
     v-show="visible"

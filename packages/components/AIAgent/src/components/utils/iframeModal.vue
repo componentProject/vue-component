@@ -1,3 +1,4 @@
+<!-- AIAgent的iframeModal组件 -->
 <template>
   <div v-if="show" class="modal-mask" @click="$emit('close')">
     <div class="modal-content">

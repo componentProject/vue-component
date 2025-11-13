@@ -1,3 +1,4 @@
+// VxeGrid的props组件
 import type { PropType } from 'vue'
 import type { VxeTablePropTypes } from '../../../types'
 

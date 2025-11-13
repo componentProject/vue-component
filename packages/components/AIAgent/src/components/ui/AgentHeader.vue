@@ -1,3 +1,4 @@
+<!-- AIAgent的AgentHeader组件 -->
 <template>
   <div class="chat-agent-header">
     <div v-if="showBack" class="back-btn" @click="back">

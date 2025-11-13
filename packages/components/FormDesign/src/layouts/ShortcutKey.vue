@@ -1,3 +1,4 @@
+<!-- FormDesign的ShortcutKey组件 -->
 <template>
   <div class="shortCutKey">
     <div class="title">

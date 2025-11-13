@@ -1,3 +1,4 @@
+// FormDesign的shortcutKey组件
 import type { shortCutType } from './formKeycon'
 import KeyController from 'keycon'
 import history from '../controller/history'

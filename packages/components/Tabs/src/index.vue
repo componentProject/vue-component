@@ -1,3 +1,4 @@
+<!-- Tabs组件主文件 -->
 <template>
   <div class="h-full bg-white">
     <ElTabs

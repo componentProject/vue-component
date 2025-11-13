@@ -1,3 +1,4 @@
+// addScopedAndReplacePrefix.ts文件
 function changeHtmlClassPrefix(htmlString = '', oldPrefix = '', newPrefix = '') {
   const regex = new RegExp(
     `(class|style)\\s*:\\s*((["']((${oldPrefix}\\b)-).*["'])|((_normalizeClass|_normalizeStyle)\\(.*(${oldPrefix}\\b)-.*\\)))`,

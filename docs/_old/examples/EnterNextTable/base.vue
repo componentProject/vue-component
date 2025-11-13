@@ -1,3 +1,4 @@
+<!-- base.vue文件 -->
 <template>
   <EnterNextTable
     border

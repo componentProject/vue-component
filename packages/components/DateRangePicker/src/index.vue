@@ -1,3 +1,4 @@
+<!-- DateRangePicker组件主文件 -->
 <template>
   <div class="w-full inline-block flex-1-hidden date-range-picker">
     <ElConfigProvider :locale="zhCn">

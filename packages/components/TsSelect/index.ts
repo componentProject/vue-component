@@ -1,3 +1,4 @@
+// TsSelect入口文件
 import { withInstall } from '@moluoxixi/utils/_utils'
 import Select from './src/index.vue'
 

@@ -1,3 +1,4 @@
+// TsFooter入口文件
 import { withInstall } from '@moluoxixi/utils/_utils'
 import TsFooter from './src/index.vue'
 

@@ -1,3 +1,4 @@
+<!-- AIAgent的image-viewer组件 -->
 <template>
   <transition name="viewer-fade">
     <div class="el-image-viewer__wrapper" :style="{ 'z-index': zIndex }">

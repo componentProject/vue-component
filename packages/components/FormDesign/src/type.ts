@@ -1,3 +1,4 @@
+// FormDesign的type组件
 import type { fields, FormConfig } from '@moluoxixi/components/ConfigForm/src/utils/fieldConfig'
 import type { ActionForm } from './controller/action'
 import type { formContrl } from './controller/form'

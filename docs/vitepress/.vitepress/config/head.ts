@@ -1,3 +1,4 @@
+// head.ts文件
 import type { HeadConfig } from 'vitepress'
 import { baseUrl } from '../../contants/web.ts'
 /**

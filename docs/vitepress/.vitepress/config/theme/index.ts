@@ -1,3 +1,4 @@
+// theme入口文件
 import type { DefaultTheme } from 'vitepress'
 import { baseUrl } from '../../../contants/web.ts'
 import { nav } from './nav.ts'

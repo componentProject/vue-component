@@ -1,3 +1,4 @@
+<!-- AIAgent的Select组件 -->
 <template>
   <div class="ts-select" :class="{ 'is-active': isOpen, 'is-disabled': disabled }">
     <div class="ts-select__input" @click.stop="toggleDropdown">

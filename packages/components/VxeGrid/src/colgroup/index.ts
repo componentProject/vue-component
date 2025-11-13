@@ -1,3 +1,4 @@
+// VxeGrid组件主文件
 import type { App } from 'vue'
 import VxeColgroupComponent from '../table/src/group'
 import { VxeUI } from '../ui'

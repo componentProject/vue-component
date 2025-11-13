@@ -1,3 +1,4 @@
+<!-- noNextInput.vue文件 -->
 <template>
   <div class="container">
     <EnterNextTable :data="tableData" border @no-next-input="last = $event">

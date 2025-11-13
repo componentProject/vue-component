@@ -1,3 +1,4 @@
+// _otherComponents组件主文件
 import type { CSSProperties } from 'vue'
 
 export interface propsType {

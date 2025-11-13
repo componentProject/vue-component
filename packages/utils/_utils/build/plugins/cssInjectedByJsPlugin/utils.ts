@@ -1,3 +1,4 @@
+// utils.ts文件
 import type { OutputAsset, OutputBundle, OutputChunk } from 'rollup'
 import type { Plugin } from 'vite'
 import type { BuildCSSInjectionConfiguration, CSSInjectionConfiguration, PluginConfiguration } from './interface'

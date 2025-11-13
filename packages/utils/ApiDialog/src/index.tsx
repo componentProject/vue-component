@@ -1,3 +1,4 @@
+// src入口文件
 import type { AppContext, Component, VNode } from 'vue'
 import { ElButton, ElDialog } from 'element-plus'
 import { createVNode, defineComponent, render } from 'vue'

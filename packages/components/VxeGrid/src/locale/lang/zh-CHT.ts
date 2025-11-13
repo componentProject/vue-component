@@ -1,3 +1,4 @@
+// VxeGrid的zh-CHT组件
 export default {
   vxe: {
     base: {

@@ -1,3 +1,4 @@
+// index.ts入口文件
 import type { App, Component } from 'vue'
 
 import ConfigForm from '@moluoxixi/components/ConfigForm'

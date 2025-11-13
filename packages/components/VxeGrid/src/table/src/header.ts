@@ -1,3 +1,4 @@
+// VxeGrid的header组件
 import type { PropType, Ref } from 'vue'
 import type { VxeColumnPropTypes, VxeTableConstructor, VxeTableDefines, VxeTableMethods, VxeTablePrivateMethods } from '../../../types'
 import { createCommentVNode, defineComponent, h, inject, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'

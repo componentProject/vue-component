@@ -1,3 +1,4 @@
+<!-- AIAgent的Loading组件 -->
 <template>
   <div v-if="visible" class="loading-mask" :style="{ backgroundColor: background }">
     <div class="loading-wrapper">

@@ -1,3 +1,4 @@
+<!-- currentChange.vue文件 -->
 <template>
   <ConfigTable :data="tableData" :columns="columns" :pagination="pagination" @current-change="onCurrentChange" />
   <div class="result">
