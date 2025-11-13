@@ -95,7 +95,7 @@ const viteConfig = {
         api: 'modern-compiler',
         additionalData: (source: string, filename: string) => {
           if (filename.includes('.vue') && !filename.includes('AIAgent')) {
-            return `@forward '@moluoxixi/components/_assets/styles/main.scss';
+            return `@forward '@moluoxixi/components/_assets/styles/tailwind.scss';
                 ${source}`
           }
           else {

@@ -89,20 +89,33 @@ export default function cssModuleGlobalRootPlugin(options: CssModuleGlobalRootPl
         return
       }
 
+      // 特殊规则数组：这些规则的选择器应该被跳过，不处理
+      const specialRules = [
+        /^\s*:global\s+:root/, // 以 :global :root 开头
+        // 未来可以在这里添加更多特殊规则
+      ]
+
+      /**
+       * 判断选择器是否以特殊规则开头
+       * @param selector 选择器字符串
+       * @returns 如果是特殊规则开头返回 true，否则返回 false
+       */
+      function isSpecialRule(selector: string): boolean {
+        const trimmed = selector.trim()
+        for (const pattern of specialRules) {
+          if (pattern.test(trimmed)) {
+            return true
+          }
+        }
+        return false
+      }
+
       /**
        * 遍历所有规则节点
        * 只处理 CSS Module 处理后的组合选择器中的 :root
        * 例如：.root :root -> .root *
        */
       root.walkRules((rule) => {
-        // 跳过 @keyframes、@media 等特殊规则（这些规则的选择器不需要处理）
-        if (rule.parent?.type === 'atrule') {
-          const atRule = rule.parent
-          if (['keyframes', 'media', 'supports', 'page'].includes(atRule.name)) {
-            return
-          }
-        }
-
         /**
          * 处理选择器
          */
@@ -113,11 +126,9 @@ export default function cssModuleGlobalRootPlugin(options: CssModuleGlobalRootPl
           return
         }
 
-        const trimmedSelector = originalSelector.trim()
-
-        // 先判断是不是 :global :root 开头，如果是，则不处理
-        if (trimmedSelector === ':global :root' || /^:global\s+:root/.test(trimmedSelector)) {
-          return // 全局 :global :root，不处理
+        // 判断是不是特殊规则开头，如果是，则不处理
+        if (isSpecialRule(originalSelector)) {
+          return // 特殊规则，不处理
         }
 
         let newSelector = originalSelector

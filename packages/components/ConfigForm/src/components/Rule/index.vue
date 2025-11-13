@@ -373,7 +373,7 @@ export default defineComponent({
 })
 </script>
 
-<style lang="scss">
+<style scoped lang="scss">
 .el-collapse-item {
   border: 1px solid #ebeef5;
   border-bottom-color: #e1e1e1;

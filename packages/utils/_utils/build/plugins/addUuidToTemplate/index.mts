@@ -140,7 +140,6 @@ export default function addUuidToTemplatePlugin(): Plugin {
         }
 
         if (hasChanges) {
-          console.log(`✓ 已为Vue组件template添加UUID属性: ${id} (uuid: ${uuid})`)
           return {
             code: transformedCode,
             map: null,
@@ -150,24 +149,20 @@ export default function addUuidToTemplatePlugin(): Plugin {
         return null
       }
       catch (error) {
-        console.error(`[UUID Plugin] 处理Vue文件失败: ${id}`, error)
+        console.error(`uuIdToTemplate: 处理Vue文件失败: ${id}`, error)
         return null
       }
     },
 
     // 通过config钩子添加PostCSS插件
     config(config) {
-      console.log('🔧 配置PostCSS插件...')
-
       // 获取现有的PostCSS插件
       const existingPostCSSPlugins = (config.css?.postcss as any)?.plugins || []
-      console.log(`📦 现有PostCSS插件数量: ${existingPostCSSPlugins.length}`)
 
       // 检查是否已经添加了我们的插件
       const hasOurPlugin = existingPostCSSPlugins.some((plugin: any) => plugin.postcssPlugin === 'vite-uuid-prefix')
 
       if (hasOurPlugin) {
-        console.log('⏭️ UUID插件已存在，跳过添加')
         return
       }
 
@@ -180,8 +175,6 @@ export default function addUuidToTemplatePlugin(): Plugin {
           Once(root: any, { result }: any) {
             const filePath = result.opts.from || root.source?.input?.file
             try {
-              console.log(`🎨 PostCSS处理文件: ${filePath}`)
-
               // 检查是否是Vue文件的样式部分
               const isVueStyle = filePath && (
                 filePath.includes('.vue')
@@ -214,29 +207,87 @@ export default function addUuidToTemplatePlugin(): Plugin {
                 }
               }
 
+              // 特殊规则数组：这些规则的选择器应该被跳过，不添加UUID前缀
+              const specialRules = [
+                /^\s*\*/, // 以 * 开头
+                new RegExp(`^\\s*\\[data-t-${uuid}\\]`), // 已经包含UUID前缀
+                // 未来可以在这里添加更多特殊规则
+              ]
+
+              /**
+               * 判断选择器是否以特殊规则开头
+               * @param selector 选择器字符串
+               * @returns 如果是特殊规则开头返回 true，否则返回 false
+               */
+              function isSpecialRule(selector: string): boolean {
+                const trimmed = selector.trim()
+                for (const pattern of specialRules) {
+                  if (pattern.test(trimmed)) {
+                    return true
+                  }
+                }
+                return false
+              }
+
+              // 需要添加空格的选择器开头模式数组
+              const spaceRequiredPatterns = [
+                /^[a-z]/i, // 以字母开头（如 body, div 等标签选择器）
+                /^\*/, // 以 * 开头
+                /^:deep/, // 以 :deep 开头（Vue 深度选择器）
+                // 未来可以在这里添加更多需要空格的选择器模式
+              ]
+
+              /**
+               * 判断选择器是否需要添加空格
+               * @param selector 选择器字符串
+               * @returns 如果需要添加空格返回 true，否则返回 false
+               */
+              function needsSpaceBeforeSelector(selector: string): boolean {
+                const trimmed = selector.trim()
+                for (const pattern of spaceRequiredPatterns) {
+                  if (pattern.test(trimmed)) {
+                    return true
+                  }
+                }
+                return false
+              }
+
               // 为每个CSS规则添加UUID前缀
-              let ruleCount = 0
               root.walkRules((rule: any) => {
                 try {
-                  ruleCount++
+                  const originalSelector = rule.selector
 
-                  // 跳过已经包含UUID前缀的规则
-                  if (rule.selector.includes(`[data-t-${uuid}]`)) {
+                  // 跳过以特殊规则开头的选择器
+                  if (isSpecialRule(originalSelector)) {
                     return
                   }
 
-                  // 为选择器添加UUID前缀
-                  rule.selector = `[data-t-${uuid}] ${rule.selector}`
+                  // 如果 originalSelector 以 :root 开头，删除开头的 :root
+                  let finalSelector = originalSelector
+                  if (/^\s*:root/.test(finalSelector)) {
+                    // 删除 :root 及其后面的空格（如果有）
+                    finalSelector = finalSelector.replace(/^\s*:root\s*/, '')
+                  }
+
+                  // 根据选择器开头决定是否添加空格
+                  // 如果匹配需要空格的选择器模式，使用空格分隔；否则紧贴（如 .class, #id, [attr] 等）
+                  const needsSpace = needsSpaceBeforeSelector(finalSelector)
+                  const newSelector = needsSpace
+                    ? `[data-t-${uuid}] ${finalSelector}`
+                    : `[data-t-${uuid}]${finalSelector}`
+
+                  // 添加UUID前缀
+                  rule.selector = newSelector
+
+                  console.log(`[addUuidToTemplate]  "${originalSelector}" -> "${newSelector}"`)
                 }
                 catch (ruleError) {
-                  console.warn(`⚠️ 处理CSS规则失败: ${rule.selector}`, ruleError)
+                  console.warn(`uuIdToTemplate: 处理CSS规则失败: ${rule.selector}`, ruleError)
                 }
               })
-
-              console.log(`✓ 已为Vue CSS样式添加UUID前缀: ${filePath} (uuid: ${uuid}, 处理了${ruleCount}个规则)`)
             }
             catch (error) {
-              console.error(`❌ PostCSS处理失败: ${filePath || 'unknown'}`, error)
+              console.error(`uuIdToTemplate: PostCSS处理失败: ${filePath || 'unknown'}`, error)
             }
           },
         },
@@ -246,7 +297,6 @@ export default function addUuidToTemplatePlugin(): Plugin {
       if (config.css) {
         config.css.postcss = config.css.postcss || {}
         ;(config.css.postcss as any).plugins = newPostCSSPlugins
-        console.log(`✅ PostCSS插件配置完成，总共${newPostCSSPlugins.length}个插件`)
       }
     },
   }
