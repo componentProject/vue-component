@@ -35,7 +35,7 @@ export default function cssInjectedByJsPlugin({
 }: PluginConfiguration | undefined = {}): Plugin[] {
   let config: ResolvedConfig
 
-  const topExecutionPriorityFlag = typeof topExecutionPriority == 'boolean' ? topExecutionPriority : true
+  const topExecutionPriorityFlag = typeof topExecutionPriority === 'boolean' ? topExecutionPriority : true
 
   const plugins: Plugin[] = [
     {
@@ -48,7 +48,7 @@ export default function cssInjectedByJsPlugin({
             config.build = {}
           }
 
-          if (relativeCSSInjection == true) {
+          if (relativeCSSInjection === true) {
             if (!config.build.cssCodeSplit) {
               config.build.cssCodeSplit = true
               warnLog(
@@ -70,7 +70,7 @@ export default function cssInjectedByJsPlugin({
           buildCSSInjectionCode({
             buildOptions: config.build,
             cssToInject:
-                            typeof preRenderCSSCode == 'function' ? preRenderCSSCode(cssToInject) : cssToInject,
+                            typeof preRenderCSSCode === 'function' ? preRenderCSSCode(cssToInject) : cssToInject,
             injectCode,
             injectCodeFunction,
             injectionCodeFormat,
@@ -79,12 +79,12 @@ export default function cssInjectedByJsPlugin({
           })
 
         const cssAssetsFilter = (asset: OutputAsset): boolean => {
-          return typeof cssAssetsFilterFunction == 'function' ? cssAssetsFilterFunction(asset) : true
+          return typeof cssAssetsFilterFunction === 'function' ? cssAssetsFilterFunction(asset) : true
         }
 
         const cssAssets = Object.keys(bundle).filter(
           i =>
-            bundle[i].type == 'asset'
+            bundle[i].type === 'asset'
             && bundle[i].fileName.endsWith('.css')
             && cssAssetsFilter(bundle[i] as OutputAsset),
         )
@@ -107,7 +107,7 @@ export default function cssInjectedByJsPlugin({
         else {
           const allCssAssets = Object.keys(bundle).filter(
             i =>
-              bundle[i].type == 'asset'
+              bundle[i].type === 'asset'
               && bundle[i].fileName.endsWith('.css'),
           )
 

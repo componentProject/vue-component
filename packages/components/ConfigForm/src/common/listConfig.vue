@@ -1,10 +1,10 @@
 <!-- ConfigForm的配置组件 -->
 <template>
-  <div class="starfish-formitem starfish-formitem-nomiddle" :class="{ 'formCover': drag, 'starfish-vertical': labelalign != 'top', [item.data.csslist?.join(' ')]: !!item.data.csslist }">
+  <div class="starfish-formitem starfish-formitem-nomiddle" :class="{ 'formCover': drag, 'starfish-vertical': labelalign !== 'top', [item.data.csslist?.join(' ')]: !!item.data.csslist }">
     <div class="label" :class="`label_${labelalign}`" :style="{ width: `${labelWidth}px` }">
       <label>{{ item.data.label }}{{ suffix }}</label>
     </div>
-    <div class="control" :style="{ marginLeft: labelalign != 'top' ? `${labelWidth}px` : '' }">
+    <div class="control" :style="{ marginLeft: labelalign !== 'top' ? `${labelWidth}px` : '' }">
       <ElRow v-for="(items, index) in data[item.data.fieldName]" :key="index" :gutter="10" style="margin-bottom: 10px;">
         <ElInputNumber v-model="items.span" :min="0" size="small" controls-position="right" />
         <ElButton type="danger" circle size="small" style="margin-left: 5px;" @click="onDelete(index)">

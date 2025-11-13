@@ -181,7 +181,7 @@ export default defineComponent({
           && item.nameCn.includes(filterContent.value)
           && !item.layout
         ) {
-          if ((props.basicFields as any[]).length == 0) {
+          if ((props.basicFields as any[]).length === 0) {
             return true
           }
           else if ((props.basicFields as any[]).length > 0) {
@@ -189,7 +189,7 @@ export default defineComponent({
             (props.basicFields as any[]).forEach((fieldItem: any) => {
               if (
                 fieldItem.toLocaleLowerCase()
-                == (item.ControlType as string).toLocaleLowerCase()
+                === (item.ControlType as string).toLocaleLowerCase()
               ) {
                 isHave = true
                 return fieldItem
@@ -209,14 +209,14 @@ export default defineComponent({
           && item.nameCn.includes(filterContent.value)
           && item.layout
         ) {
-          if ((props.layoutFields as any[]).length == 0) {
+          if ((props.layoutFields as any[]).length === 0) {
             return true
           }
           else if ((props.layoutFields as any[]).length > 0) {
             let isHave = false;
             (props.layoutFields as any[]).forEach((fieldItem: any) => {
               if (
-                fieldItem.toLocaleLowerCase() == item.ControlType.toLocaleLowerCase()
+                fieldItem.toLocaleLowerCase() === item.ControlType.toLocaleLowerCase()
               ) {
                 isHave = true
                 return fieldItem

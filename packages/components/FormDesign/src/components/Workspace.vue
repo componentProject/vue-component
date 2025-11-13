@@ -32,7 +32,7 @@
         >
           <template #item="{ element, index }">
             <Shape
-              :active="currentId == element.id"
+              :active="currentId === element.id"
               :current-index="index"
               :current-id="element.id"
               :item="element"
@@ -48,7 +48,7 @@
             </Shape>
           </template>
         </Draggable>
-        <div v-if="allmainList.length == 0" class="form-empty">
+        <div v-if="allmainList.length === 0" class="form-empty">
           从左侧拖拽来添加字段
         </div>
       </div>
@@ -159,7 +159,7 @@ export default defineComponent({
               && currentComponent.actionType.length > 0
             ) {
               controlItems.forEach((item) => {
-                if (item.ControlType == 'Action') {
+                if (item.ControlType === 'Action') {
                   item.data.formConfig = {
                     value: {},
                     items: [],
@@ -327,7 +327,7 @@ export default defineComponent({
       pasteShow,
       fullScreen,
       onEditorCenter: (e: any) => {
-        if (e && e.path && e.path[0].className == 'editor_pages_center') {
+        if (e && e.path && e.path[0].className === 'editor_pages_center') {
           formStore?.setFormCurrentId('')
           pasteShow.value = false
         }

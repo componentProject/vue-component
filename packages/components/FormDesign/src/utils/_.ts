@@ -176,7 +176,7 @@ class Flex {
         item.data.fieldName = `${item.ControlType}_${this.generateMixed()}`
       }
       if (item.layout) {
-        if (item.ControlType == 'Grid' && item.data.columns && item.data.columns.length > 0) {
+        if (item.ControlType === 'Grid' && item.data.columns && item.data.columns.length > 0) {
           item.data.columns = item.data.columns.map((colItem: any) => {
             if (colItem.list && colItem.list.length > 0) {
               colItem.list = this.jsonToForm(colItem.list, formcomponents)
@@ -184,7 +184,7 @@ class Flex {
             return colItem
           })
         }
-        else if (item.ControlType == 'TableLayout' && item.data.trs && item.data.trs.length > 0) {
+        else if (item.ControlType === 'TableLayout' && item.data.trs && item.data.trs.length > 0) {
           /**
            * 需要自测一下
            */
@@ -198,7 +198,7 @@ class Flex {
             return trItem
           })
         }
-        else if ((item.ControlType == 'Collapse' || item.ControlType == 'Tabs') && item.data.items && item.data.items.length > 0) {
+        else if ((item.ControlType === 'Collapse' || item.ControlType === 'Tabs') && item.data.items && item.data.items.length > 0) {
           item.data.items = item.data.items.map((colItem: any) => {
             if (colItem.list && colItem.list.length > 0) {
               colItem.list = this.jsonToForm(colItem.list, formcomponents)
@@ -226,7 +226,7 @@ class Flex {
       if (currentComponent.actionType && currentComponent.actionType.length > 0) {
         console.log(controlItems)
         controlItems.forEach((item: any) => {
-          if (item.ControlType == 'Action') {
+          if (item.ControlType === 'Action') {
             item.data.formConfig = {
               value: {},
               items: [],
@@ -264,13 +264,13 @@ class Flex {
     const jsonData: PartialKey<BaseComponentItem, 'icon'>[] = []
     formlist.forEach((item: AllFormItem) => {
       if (item.layout) {
-        if (item.ControlType == 'Grid' && item.data.columns && item.data.columns.length > 0) {
+        if (item.ControlType === 'Grid' && item.data.columns && item.data.columns.length > 0) {
           item.data.columns = item.data.columns.map((colItem: any) => {
             colItem.list = this.initFormToJson(colItem.list)
             return colItem
           })
         }
-        else if (item.ControlType == 'TableLayout' && item.data.trs && item.data.trs.length > 0) {
+        else if (item.ControlType === 'TableLayout' && item.data.trs && item.data.trs.length > 0) {
           item.data.trs = item.data.trs.map((trItem: any) => {
             trItem.tds.forEach((tdItem: any) => {
               if (tdItem.list && tdItem.list.length > 0) {
@@ -281,7 +281,7 @@ class Flex {
             return trItem
           })
         }
-        else if ((item.ControlType == 'Collapse' || item.ControlType == 'Tabs') && item.data.items && item.data.items.length > 0) {
+        else if ((item.ControlType === 'Collapse' || item.ControlType === 'Tabs') && item.data.items && item.data.items.length > 0) {
           item.data.items = item.data.items.map((colItem: any) => {
             colItem.list = this.initFormToJson(colItem.list)
             return colItem
@@ -308,7 +308,7 @@ class Flex {
   }
 
   public getField(methods: string) {
-    if (methods == 'onChange') {
+    if (methods === 'onChange') {
       return 'value, oldValue, subFormData'
     }
     else if (['onForce', 'onBlur', 'onClick'].includes(methods)) {
@@ -327,8 +327,8 @@ class Flex {
    */
   public getFormDataList(item: AllFormItem, result: any = [], fieldName: string) {
     if (!item.layout) {
-      if (item.data.fieldName != fieldName) {
-        if (item.nameCn == '开关') {
+      if (item.data.fieldName !== fieldName) {
+        if (item.nameCn === '开关') {
           result.push({
             value: item?.data?.fieldName,
             label: `${item?.data?.label}-${item?.data?.fieldName}`,
@@ -357,20 +357,20 @@ class Flex {
       }
     }
     else {
-      if (item.data.fieldName != fieldName) {
+      if (item.data.fieldName !== fieldName) {
         // 容器组件整个部分也可以作为显示条件的一部分
         result.push({
           value: item?.data?.fieldName,
           label: `${item?.data?.label}-${item?.data?.fieldName}`,
         })
-        if (item.ControlType == 'Grid' && item.data.columns) {
+        if (item.ControlType === 'Grid' && item.data.columns) {
           item.data.columns.forEach((colItem: any) => {
             colItem.list.forEach((listItem: AllFormItem) => {
               this.getFormDataList(listItem, result, fieldName)
             })
           })
         }
-        else if (item.ControlType == 'TableLayout' && item.data.trs) {
+        else if (item.ControlType === 'TableLayout' && item.data.trs) {
           item.data.trs.forEach((trItem: any) => {
             trItem.tds.forEach((tdItem: any) => {
               tdItem.list.forEach((listItem: AllFormItem) => {
@@ -379,7 +379,7 @@ class Flex {
             })
           })
         }
-        else if ((item.ControlType == 'Collapse' || item.ControlType == 'Tabs') && item.data.items) {
+        else if ((item.ControlType === 'Collapse' || item.ControlType === 'Tabs') && item.data.items) {
           item.data.items.forEach((colItem: any) => {
             colItem.list.forEach((listItem: AllFormItem) => {
               this.getFormDataList(listItem, result, fieldName)

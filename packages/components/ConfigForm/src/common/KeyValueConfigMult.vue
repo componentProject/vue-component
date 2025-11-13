@@ -1,6 +1,6 @@
 <!-- ConfigForm的配置组件 -->
 <template>
-  <div class="starfish-formitem" :class="{ 'formCover': drag, 'starfish-vertical': labelalign != 'top', [item.data.csslist?.join(' ')]: !!item.data.csslist }">
+  <div class="starfish-formitem" :class="{ 'formCover': drag, 'starfish-vertical': labelalign !== 'top', [item.data.csslist?.join(' ')]: !!item.data.csslist }">
     <div class="label" :class="`label_${labelalign}`" :style="{ width: `${labelWidth}px` }">
       <label>{{ item.data.label }}{{ suffix }}</label>
       <span v-if="item.data.required" class="item_require">*</span>
@@ -10,7 +10,7 @@
         </ElIcon>
       </ElTooltip>
     </div>
-    <div class="control" :style="{ marginLeft: labelalign != 'top' ? `${labelWidth}px` : '' }">
+    <div class="control" :style="{ marginLeft: labelalign !== 'top' ? `${labelWidth}px` : '' }">
       <div v-for="(items, index) in data[item.data.fieldName].items" :key="index" class="starfish-keyValueItem">
         <div class="keyValueSelect">
           <ElCheckbox v-model="items.select" @change="getChangeSelect(items)" />

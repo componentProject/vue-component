@@ -4,7 +4,7 @@
     class="starfish-formitem"
     :class="{
       'formCover': drag,
-      'starfish-vertical': labelalign != 'top',
+      'starfish-vertical': labelalign !== 'top',
       [item.data.csslist?.join(' ')]: !!item.data.csslist,
     }"
   >
@@ -29,7 +29,7 @@
     </div>
     <div
       class="control"
-      :style="{ marginLeft: labelalign != 'top' ? `${labelWidth}px` : '' }"
+      :style="{ marginLeft: labelalign !== 'top' ? `${labelWidth}px` : '' }"
     >
       <div id="jsoneditor" ref="jsoneditor">
         <div class="fullScreen" @click="showCustomDialog">

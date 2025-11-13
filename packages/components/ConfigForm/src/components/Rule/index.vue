@@ -2,7 +2,7 @@
 <template>
   <div
     class="starfish-formitem starfish-formitem-rule"
-    :class="{ 'formCover': drag, 'starfish-vertical': labelalign != 'top' }"
+    :class="{ 'formCover': drag, 'starfish-vertical': labelalign !== 'top' }"
   >
     <div
       class="label"
@@ -25,7 +25,7 @@
     </div>
     <div
       class="control"
-      :style="{ marginLeft: labelalign != 'top' ? `${labelWidth}px` : '' }"
+      :style="{ marginLeft: labelalign !== 'top' ? `${labelWidth}px` : '' }"
     >
       <ElCollapse
         v-if="
@@ -39,7 +39,7 @@
           :title="itemList.title"
           :name="itemList.title"
         >
-          <div v-if="itemList.type == 'enum'" class="collapse_enums">
+          <div v-if="itemList.type === 'enum'" class="collapse_enums">
             <ElSelect
               v-model="itemList.value"
               placeholder="请选择"
@@ -54,7 +54,7 @@
               />
             </ElSelect>
           </div>
-          <div v-if="itemList.type == 'func'">
+          <div v-if="itemList.type === 'func'">
             <ElButton
               type="primary"
               size="small"
@@ -63,7 +63,7 @@
               函数编辑
             </ElButton>
           </div>
-          <div v-if="itemList.type == 'high'">
+          <div v-if="itemList.type === 'high'">
             <ElButton
               type="primary"
               size="small"
@@ -235,13 +235,13 @@ export default defineComponent({
       formdragger,
       handleDropdown(type: string) {
         let title = ''
-        if (type == 'enum') {
+        if (type === 'enum') {
           title = '自定义枚举'
         }
-        else if (type == 'func') {
+        else if (type === 'func') {
           title = '自定义函数规则'
         }
-        else if (type == 'high') {
+        else if (type === 'high') {
           title = '高级模式'
         }
         if (Array.isArray(props.data[props.item.data.fieldName])) {
@@ -269,7 +269,7 @@ export default defineComponent({
           ? JSON.parse(JSON.stringify(item.value))
           : {
               trigger: 'blur',
-              func: `/** if (value === "" || value == null) {
+              func: `/** if (value === "" || value === null) {
 *  callback(new Error("请输入"));
 *} else if (!/^[0-9]*$/.test(value)) {
 *  callback(new Error("必须为数字"));
@@ -312,7 +312,7 @@ export default defineComponent({
             maindata[item.data.fieldName] = item.data.itemConfig.value
           }
           maindata[item.data.fieldName]
-            = maindata[item.data.fieldName] != undefined
+            = maindata[item.data.fieldName] !== undefined
               ? JSON.parse(JSON.stringify(maindata[item.data.fieldName]))
               : undefined
         })
@@ -342,14 +342,14 @@ export default defineComponent({
             newFormValue[key] = formValue.value[key]
           }
         }
-        if (formValue.value.ruleType == 2) {
+        if (formValue.value.ruleType === 2) {
           newFormValue.min = Number.parseInt(newFormValue.min)
           newFormValue.max = Number.parseInt(newFormValue.max)
         }
-        else if (formValue.value.ruleType == 4) {
+        else if (formValue.value.ruleType === 4) {
           newFormValue.pattern = new RegExp(newFormValue.patternTemp)
         }
-        else if (formValue.value.ruleType == 5) {
+        else if (formValue.value.ruleType === 5) {
           newFormValue.validor = `(rule, value, callback) => {
             if (!/(^[1-9]*$)/.test(value)) {
               callback(new Error("请输入数字值"))

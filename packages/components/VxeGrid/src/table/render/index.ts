@@ -367,7 +367,7 @@ function renderNativeOptions(options: any, renderOpts: any, params: any) {
       value: option[valueProp],
       disabled: option[disabledProp],
 
-      selected: option[valueProp] == cellValue,
+      selected: option[valueProp] === cellValue,
     }, option[labelProp])
   })
 }
@@ -419,7 +419,7 @@ function handleFilterMethod({ option, row, column }: any) {
   const { data } = option
   const cellValue = XEUtils.get(row, column.field)
 
-  return cellValue == data
+  return cellValue === data
 }
 
 function handleInputFilterMethod({ option, row, column }: any) {
@@ -490,7 +490,7 @@ function getSelectCellValue(renderOpts: any, { row, column }: any) {
       ? (value) => {
           const groupOptions = optionGroupProps.options || 'options'
           for (let index = 0; index < optionGroups.length; index++) {
-            selectItem = XEUtils.find(optionGroups[index][groupOptions], item => item[valueProp] == value)
+            selectItem = XEUtils.find(optionGroups[index][groupOptions], item => item[valueProp] === value)
             if (selectItem) {
               break
             }
@@ -498,7 +498,7 @@ function getSelectCellValue(renderOpts: any, { row, column }: any) {
           return selectItem ? selectItem[labelProp] : value
         }
       : (value) => {
-          selectItem = XEUtils.find(options, item => item[valueProp] == value)
+          selectItem = XEUtils.find(options, item => item[valueProp] === value)
           return selectItem ? selectItem[labelProp] : value
         }).join(', ')
   }

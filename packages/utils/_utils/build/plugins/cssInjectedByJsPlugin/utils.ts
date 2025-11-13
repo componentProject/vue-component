@@ -20,7 +20,7 @@ const cssInjectedByJsId = '\0vite/all-css'
 function createStyle(cssCode: string, normalizedStyleId: string, injections: string[] = []) {
   const postCreationInjection = injections.filter(Boolean).join('')
   return `try{
-    if(typeof document != 'undefined'){
+    if(typeof document !== 'undefined'){
       if(!document.getElementById(${normalizedStyleId})){
         var elementStyle = document.createElement('style');
         ${postCreationInjection}
@@ -123,12 +123,12 @@ function injectionCSSCodePlugin({
   return {
     name: 'vite:injection-css-code-plugin',
     resolveId(id: string) {
-      if (id == cssInjectedByJsId) {
+      if (id === cssInjectedByJsId) {
         return id
       }
     },
     load(id: string) {
-      if (id == cssInjectedByJsId) {
+      if (id === cssInjectedByJsId) {
         const cssCode = JSON.stringify(cssToInject.trim())
         return resolveInjectionCode(cssCode, injectCode, injectCodeFunction, { styleId: ensuredStyleId, useStrictCSP })
       }
@@ -152,7 +152,7 @@ export function debugLog(msg: string) {
 }
 
 function isJsOutputChunk(chunk: OutputAsset | OutputChunk): chunk is OutputChunk {
-  return chunk.type == 'chunk' && chunk.fileName.match(/.[cm]?js(?:\?.+)?$/) != null
+  return chunk.type === 'chunk' && chunk.fileName.match(/.[cm]?js(?:\?.+)?$/) !== null
 }
 
 function defaultJsAssetsFilter(chunk: OutputChunk): boolean {
@@ -192,7 +192,7 @@ export function buildJsCssMap(
 
   const bundleKeys = getJsTargetBundleKeys(
     bundle,
-    typeof jsAssetsFilterFunction == 'function' ? jsAssetsFilterFunction : () => true,
+    typeof jsAssetsFilterFunction === 'function' ? jsAssetsFilterFunction : () => true,
   )
   if (bundleKeys.length === 0) {
     throw new Error(
@@ -218,13 +218,13 @@ export function getJsTargetBundleKeys(
   bundle: OutputBundle,
   jsAssetsFilterFunction?: PluginConfiguration['jsAssetsFilterFunction'],
 ): string[] {
-  if (typeof jsAssetsFilterFunction != 'function') {
+  if (typeof jsAssetsFilterFunction !== 'function') {
     const jsAssets = Object.keys(bundle).filter((i) => {
       const asset = bundle[i]
       return isJsOutputChunk(asset) && defaultJsAssetsFilter(asset)
     })
 
-    if (jsAssets.length == 0) {
+    if (jsAssets.length === 0) {
       return []
     }
 
@@ -289,7 +289,7 @@ export async function globalCssInjection(
   topExecutionPriorityFlag: boolean,
 ) {
   const jsTargetBundleKeys = getJsTargetBundleKeys(bundle, jsAssetsFilterFunction)
-  if (jsTargetBundleKeys.length == 0) {
+  if (jsTargetBundleKeys.length === 0) {
     throw new Error(
       'Unable to locate the JavaScript asset for adding the CSS injection code. It is recommended to review your configurations.',
     )
@@ -302,7 +302,7 @@ export async function globalCssInjection(
 
   if (allCssCode.length > 0) {
     const cssCode = (await buildCssCode(allCssCode))?.code
-    if (typeof cssCode == 'string') {
+    if (typeof cssCode === 'string') {
       cssInjectionCode = cssCode
     }
   }
@@ -315,18 +315,18 @@ export async function globalCssInjection(
      * (for example when multiple formats of same entry point are built),
      * we need to reuse the same CSS created the first time.
      */
-    if (jsAsset.facadeModuleId != null && jsAsset.isEntry && cssInjectionCode != '') {
-      if (jsAsset.facadeModuleId != previousFacadeModuleId) {
+    if (jsAsset.facadeModuleId !== null && jsAsset.isEntry && cssInjectionCode !== '') {
+      if (jsAsset.facadeModuleId !== previousFacadeModuleId) {
         globalCSSCodeEntryCache.clear()
       }
       previousFacadeModuleId = jsAsset.facadeModuleId
       globalCSSCodeEntryCache.set(jsAsset.facadeModuleId, cssInjectionCode)
     }
     if (
-      cssInjectionCode == ''
+      cssInjectionCode === ''
       && jsAsset.isEntry
-      && jsAsset.facadeModuleId != null
-      && typeof globalCSSCodeEntryCache.get(jsAsset.facadeModuleId) == 'string'
+      && jsAsset.facadeModuleId !== null
+      && typeof globalCSSCodeEntryCache.get(jsAsset.facadeModuleId) === 'string'
     ) {
       cssInjectionCode = globalCSSCodeEntryCache.get(jsAsset.facadeModuleId)
     }

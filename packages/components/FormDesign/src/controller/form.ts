@@ -28,7 +28,7 @@ class Form {
     console.log('allForm', allFormList)
     state.allFormList = allFormList
     // 解决属性面板表单和jsontab切换后,数据不同步问题
-    if (state.currentIndex != -1) {
+    if (state.currentIndex !== -1) {
       state.curControl = allFormList[state.currentIndex]
     }
   }
@@ -60,7 +60,7 @@ class Form {
   getCurrentItem(id: string) {
     let result
     state.allFormList.forEach((item) => {
-      if (item.id == id) {
+      if (item.id === id) {
         result = item
         return item
       }
@@ -77,14 +77,14 @@ class Form {
 
   getLayoutCurCtrol(item: AllFormItem, id: string): AllFormItem | undefined {
     let result
-    if (item.ControlType == 'TableLayout') {
+    if (item.ControlType === 'TableLayout') {
       const trs = item.data.trs
       if (trs && trs.length > 0) {
         trs.find((trItem: fieldsTrs) => {
           return trItem.tds.find((tdItem: fieldTds) => {
             return tdItem.list.forEach((listItem: AllFormItem) => {
               if (listItem.layout) {
-                if (listItem.id == id) {
+                if (listItem.id === id) {
                   result = listItem
                 }
                 else {
@@ -92,7 +92,7 @@ class Form {
                 }
                 return result
               }
-              else if (listItem.id == id) {
+              else if (listItem.id === id) {
                 result = listItem
                 return result
               }
@@ -101,13 +101,13 @@ class Form {
         })
       }
     }
-    else if (item.ControlType == 'Grid') {
+    else if (item.ControlType === 'Grid') {
       const columns = item.data.columns
       if (columns && columns.length > 0) {
         columns.find((colItem: any) => {
           return colItem.list.forEach((listItem: any) => {
             if (listItem.layout) {
-              if (listItem.id == id) {
+              if (listItem.id === id) {
                 result = listItem
               }
               else {
@@ -115,7 +115,7 @@ class Form {
               }
               return result
             }
-            else if (listItem.id == id) {
+            else if (listItem.id === id) {
               result = listItem
               return result
             }
@@ -123,13 +123,13 @@ class Form {
         })
       }
     }
-    else if (item.ControlType == 'Collapse' || item.ControlType == 'Tabs') {
+    else if (item.ControlType === 'Collapse' || item.ControlType === 'Tabs') {
       const items = item.data.items
       if (items && items.length > 0) {
         items.find((colItem: any) => {
           return colItem.list.forEach((listItem: any) => {
             if (listItem.layout) {
-              if (listItem.id == id) {
+              if (listItem.id === id) {
                 result = listItem
               }
               else {
@@ -137,7 +137,7 @@ class Form {
               }
               return result
             }
-            else if (listItem.id == id) {
+            else if (listItem.id === id) {
               result = listItem
               return result
             }
@@ -158,12 +158,12 @@ class Form {
     const data: Record<string, any> = {}
     list.forEach((item: BaseFormConfig) => {
       if (item.layout) {
-        if (item.ControlType == 'Grid' && item.data.columns) {
+        if (item.ControlType === 'Grid' && item.data.columns) {
           item.data.columns.forEach((colItem: { list: any }) => {
             Object.assign(data, this.getDynamicForm(colItem.list))
           })
         }
-        else if (item.ControlType == 'TableLayout') {
+        else if (item.ControlType === 'TableLayout') {
           const trs = item.data.trs
           if (trs && trs.length > 0) {
             trs.forEach((trItem: any) => {
@@ -173,7 +173,7 @@ class Form {
             })
           }
         }
-        else if (item.ControlType == 'Collapse' || item.ControlType == 'Tabs') {
+        else if (item.ControlType === 'Collapse' || item.ControlType === 'Tabs') {
           const items = item.data.items
           if (items) {
             items.forEach((colItem: { list: any }) => {
@@ -184,7 +184,7 @@ class Form {
       }
       else if (!item.layout) {
         if (item.data.itemConfig) {
-          if (typeof item.data.itemConfig.value == 'string') {
+          if (typeof item.data.itemConfig.value === 'string') {
             data[item.data.fieldName] = item.data.itemConfig.value
           }
           else {

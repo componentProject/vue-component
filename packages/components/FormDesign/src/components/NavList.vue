@@ -92,7 +92,7 @@
         placement="top"
       >
         <ElIcon
-          :class="historyIndex == -1 ? 'noactive' : ''"
+          :class="historyIndex === -1 ? 'noactive' : ''"
           class="nav-icon"
           @click="handleBack()"
         >
@@ -107,7 +107,7 @@
         placement="top"
       >
         <ElIcon
-          :class="historyIndex == historyLen - 1 ? 'noactive' : ''"
+          :class="historyIndex === historyLen - 1 ? 'noactive' : ''"
           class="nav-icon"
           @click="handleForward()"
         >
@@ -118,8 +118,8 @@
       <el-button text @click="handleFormPre()" size="small" :disabled="clearIsDisable">预览</el-button>
       <el-button text @click="handleFullScreen()" size="small">全屏/非全屏</el-button>
       <el-button text @click="handleClear()" size="small" :disabled="clearIsDisable">清空</el-button>
-      <el-button text @click="handleBack()" size="small" :disabled="historyIndex == -1">后退</el-button>
-      <el-button text @click="handleForward()" size="small" :disabled="historyIndex == historyLen - 1">前进</el-button> -->
+      <el-button text @click="handleBack()" size="small" :disabled="historyIndex === -1">后退</el-button>
+      <el-button text @click="handleForward()" size="small" :disabled="historyIndex === historyLen - 1">前进</el-button> -->
     </div>
     <div class="pageBtn">
       <div v-if="btnIsShow('right', 'viewport')" class="el-button-group">
@@ -131,7 +131,7 @@
           placement="top"
         >
           <ElIcon
-            :class="pageType == 'PC' ? 'info' : ''"
+            :class="pageType === 'PC' ? 'info' : ''"
             class="nav-icon"
             @click="updatePageType('PC')"
           >
@@ -146,7 +146,7 @@
           placement="top"
         >
           <ElIcon
-            :class="pageType == 'Pad' ? 'info' : ''"
+            :class="pageType === 'Pad' ? 'info' : ''"
             class="nav-icon"
             @click="updatePageType('Pad')"
           >
@@ -161,7 +161,7 @@
           placement="top"
         >
           <ElIcon
-            :class="pageType == 'H5' ? 'info' : ''"
+            :class="pageType === 'H5' ? 'info' : ''"
             class="nav-icon"
             @click="updatePageType('H5')"
           >
@@ -391,7 +391,7 @@ export default defineComponent({
     }
 
     const clearIsDisable = computed(
-      () => formStore?.get('allFormList')?.length == 0,
+      () => formStore?.get('allFormList')?.length === 0,
     )
     const historyIndex = computed(() => hisContrl?.get('index'))
     const historyLen = computed(
@@ -438,7 +438,7 @@ export default defineComponent({
       }
       else {
         let children
-        if (item.ControlType == 'Grid') {
+        if (item.ControlType === 'Grid') {
           children = item.data.columns.map(
             (colItem: { list: AllFormItem[] }) => {
               const children = colItem.list.map((listItem: AllFormItem) => {
@@ -452,7 +452,7 @@ export default defineComponent({
             },
           )
         }
-        else if (item.ControlType == 'TableLayout') {
+        else if (item.ControlType === 'TableLayout') {
           children = item.data.trs.map((trItem: any) => {
             const children = trItem.tds.map((tdItem: any) => {
               const children = tdItem.list.map((listItem: AllFormItem) => {
@@ -472,8 +472,8 @@ export default defineComponent({
           })
         }
         else if (
-          item.ControlType == 'Collapse'
-          || item.ControlType == 'Tabs'
+          item.ControlType === 'Collapse'
+          || item.ControlType === 'Tabs'
         ) {
           children = item.data.items.map((colItem: any) => {
             const children = colItem.list.map((listItem: AllFormItem) => {
@@ -563,7 +563,7 @@ export default defineComponent({
       treeRef,
       filterNode,
       btnIsShow(type: 'left' | 'right', btn: any) {
-        if (props.menu[type].length == 0) {
+        if (props.menu[type].length === 0) {
           return true
         }
         return props.menu[type].includes(btn)

@@ -106,7 +106,7 @@ export default defineComponent({
     const icon = ref<string>('')
     const isFullScreen = ref<boolean>(false)
     const newWidth = computed(() => {
-      if (typeof props.width == 'number') {
+      if (typeof props.width === 'number') {
         return `${props.width}px`
       }
       else {

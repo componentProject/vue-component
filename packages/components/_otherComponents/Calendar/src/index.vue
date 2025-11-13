@@ -76,7 +76,7 @@ function dateChange(date: Dayjs) {
 
 //  monthChange  change month
 function monthChange(type = 'subtract') {
-  if (type == 'today') {
+  if (type === 'today') {
     curDate.value = dayjs(Date.now())
   }
   else {

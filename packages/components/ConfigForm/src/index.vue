@@ -91,7 +91,7 @@ function getFormListRules(rulesList: any[]) {
   const result: any[] = []
   if (Array.isArray(rulesList) && rulesList && rulesList.length > 0) {
     rulesList.forEach((item) => {
-      if (item.type == 'enum') {
+      if (item.type === 'enum') {
         // eslint-disable-next-line no-eval
         const func = eval(`(${item.value})`)
         result.push({
@@ -99,7 +99,7 @@ function getFormListRules(rulesList: any[]) {
           trigger: 'blur',
         })
       }
-      else if (item.type == 'func') {
+      else if (item.type === 'func') {
         // eslint-disable-next-line no-eval
         const func = eval(`(() => {${item.value.func}})`)
         result.push({
@@ -107,8 +107,8 @@ function getFormListRules(rulesList: any[]) {
           trigger: 'blur',
         })
       }
-      else if (item.type == 'high') {
-        if (item.value.ruleType == 5) {
+      else if (item.type === 'high') {
+        if (item.value.ruleType === 5) {
           result.push({
             // eslint-disable-next-line no-eval
             validator: eval(item.value.validor),
@@ -133,7 +133,7 @@ function getRules(item: any) {
         trigger: 'blur',
       })
     }
-    if (typeof item.data.rule == 'string') {
+    if (typeof item.data.rule === 'string') {
       if ($Flex) {
         rule = rule.concat($Flex.tryParseJson(item.data.rule))
       }
@@ -148,14 +148,14 @@ function getRules(item: any) {
     rules.value[item.data.fieldName] = rule
   }
   else if (item.layout) {
-    if (item.ControlType == 'Grid') {
+    if (item.ControlType === 'Grid') {
       item.data.columns.forEach((colItem: any) => {
         colItem.list.forEach((listItem: any) => {
           getRules(listItem)
         })
       })
     }
-    else if (item.ControlType == 'TableLayout') {
+    else if (item.ControlType === 'TableLayout') {
       const trs = item.data.trs
       trs.forEach((trItem: any) => {
         trItem.tds.forEach((tdItem: any) => {
@@ -165,7 +165,7 @@ function getRules(item: any) {
         })
       })
     }
-    else if (item.ControlType == 'Collapse' || item.ControlType == 'Tabs') {
+    else if (item.ControlType === 'Collapse' || item.ControlType === 'Tabs') {
       const items = item.data.items
       items.forEach((colItem: any) => {
         colItem.list.forEach((listItem: any) => {
@@ -221,37 +221,37 @@ function transformData(data: any) {
 }
 
 function conditionChange(data: any) {
-  if (data.type == 'andgroup') {
+  if (data.type === 'andgroup') {
     const result = data.result
       .map((item: any) => {
         return conditionChange(item)
       })
       .find((item: boolean) => {
-        return item == false
+        return item === false
       })
     return result === undefined ? true : result
   }
-  else if (data.type == 'orgroup') {
+  else if (data.type === 'orgroup') {
     const result = data.result
       .map((item: any) => {
         return conditionChange(item)
       })
       .find((item: boolean) => {
-        return item == true
+        return item === true
       })
     return result === undefined ? false : result
   }
-  else if (data.type == 'data') {
+  else if (data.type === 'data') {
     const result = data.data
     const formResults: any = props.formResult
     const value = formResults[result.field]
     let isShow = false
     switch (result.logic) {
       case '=':
-        isShow = value == result.value
+        isShow = value === result.value
         break
       case '!=':
-        isShow = value != result.value
+        isShow = value !== result.value
         break
       case 'in':
         if (Array.isArray(value)) {
@@ -303,7 +303,7 @@ onMounted(() => {
 
 function executeFunc(funcName: string) {
   const mountedAction = props.globalConfig.action?.forEach((item: any) => {
-    if (item.type == funcName) {
+    if (item.type === funcName) {
       return item
     }
   })

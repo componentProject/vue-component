@@ -14,13 +14,13 @@
     <ElSelect v-model="result.type" placeholder="请选择" @change="onChange">
       <ElOption v-for="item in groupSelect" :key="item.value" :label="item.label" :value="item.value" />
     </ElSelect>
-    <ElButton type="primary" size="small" :disabled="!result.type || result.type == 'data'" @click="onAddItem">
+    <ElButton type="primary" size="small" :disabled="!result.type || result.type === 'data'" @click="onAddItem">
       增加条件
     </ElButton>
     <ElButton type="danger" size="small" @click="onDeleteItem">
       删除
     </ElButton>
-    <ElButton v-if="result.type == 'data'" type="primary" size="small" @click="onEditData">
+    <ElButton v-if="result.type === 'data'" type="primary" size="small" @click="onEditData">
       编辑
     </ElButton>
     <Transition>
@@ -31,7 +31,7 @@
         <div v-if="result.result && result.result.length >= 2" class="line" :class="result.type" />
       </div>
     </Transition>
-    <div v-show="result.type && result.type == 'data'">
+    <div v-show="result.type && result.type === 'data'">
       <ConditionTanc ref="ConditionTanc" :data="result.data" :field-list="fieldList" @end="handleUpdateForce" />
     </div>
   </div>
@@ -115,11 +115,11 @@ export default {
     onAddItem() {
       if (!this.result.type)
         return
-      if (!this.result.result && this.result.type != 'data') {
+      if (!this.result.result && this.result.type !== 'data') {
         // eslint-disable-next-line vue/no-mutating-props
         this.result.result = []
       }
-      if (this.result.type == 'data' && !this.result.data) {
+      if (this.result.type === 'data' && !this.result.data) {
         // eslint-disable-next-line vue/no-mutating-props
         this.result.data = {}
       }
@@ -148,7 +148,7 @@ export default {
       this.handleUpdateForce()
     },
     onDeleteItem() {
-      if (this.index == 0) {
+      if (this.index === 0) {
         // eslint-disable-next-line vue/no-mutating-props
         delete this.result.data
         // eslint-disable-next-line vue/no-mutating-props
@@ -169,7 +169,7 @@ export default {
     onChange(a) {
       // eslint-disable-next-line vue/no-mutating-props
       this.result.type = a
-      if (a == 'andgroup') {
+      if (a === 'andgroup') {
         // eslint-disable-next-line vue/no-mutating-props
         this.result.result = []
         if (this.result.data) {
@@ -177,7 +177,7 @@ export default {
           delete this.result.data
         }
       }
-      else if (a == 'orgroup') {
+      else if (a === 'orgroup') {
         // eslint-disable-next-line vue/no-mutating-props
         this.result.result = []
         if (this.result.data) {

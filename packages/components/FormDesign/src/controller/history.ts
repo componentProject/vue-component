@@ -20,7 +20,7 @@ class History {
   }
 
   public back() {
-    if (state.index == -1)
+    if (state.index === -1)
       return
     state.index -= 1
     if (state.index > -1) {

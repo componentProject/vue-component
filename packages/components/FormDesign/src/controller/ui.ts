@@ -42,11 +42,11 @@ class Ui {
     else if (name === 'scale') {
       this.setScale(Number(value))
     }
-    else if (name == 'isFullscreen') {
+    else if (name === 'isFullscreen') {
       (state as any)[name] = value
       state.pageType = ''
     }
-    else if (name == 'pageType') {
+    else if (name === 'pageType') {
       (state as any)[name] = value
       state.isFullscreen = true
     }
@@ -72,14 +72,14 @@ class Ui {
     else {
       columnWidth.left = defaultColumnWidth.left
     }
-    if (right != undefined && right >= 0) {
+    if (right !== undefined && right >= 0) {
       columnWidth.right = right
     }
     else {
       columnWidth.right = defaultColumnWidth.right
     }
 
-    if (!center || center == 'auto') {
+    if (!center || center === 'auto') {
       const bodyWidth = window.document.body.clientWidth
       columnWidth.center = bodyWidth - (columnWidth?.left || 0) - (columnWidth?.right || 0)
       if (columnWidth.center <= 0) {

@@ -1,6 +1,6 @@
 <!-- ConfigForm的panel组件 -->
 <template>
-  <div class="starfish-formitem starfish-formitem-nomiddle" :class="{ 'formCover': drag, 'starfish-vertical': labelalign != 'top', [item.data.csslist?.join(' ')]: !!item.data.csslist }">
+  <div class="starfish-formitem starfish-formitem-nomiddle" :class="{ 'formCover': drag, 'starfish-vertical': labelalign !== 'top', [item.data.csslist?.join(' ')]: !!item.data.csslist }">
     <div class="label" :class="`label_${labelalign}`" :style="{ width: `${labelWidth}px` }">
       <label>{{ item.data.label }}{{ suffix }}</label>
       <ElTooltip class="item" effect="dark" content="可拖拽调整顺序" placement="top">
@@ -9,7 +9,7 @@
         </ElIcon>
       </ElTooltip>
     </div>
-    <div class="control" :style="{ marginLeft: labelalign != 'top' ? `${labelWidth}px` : '' }">
+    <div class="control" :style="{ marginLeft: labelalign !== 'top' ? `${labelWidth}px` : '' }">
       <ElRow>
         <ElCol :span="24">
           <Draggable :list="data[item.data.fieldName]" class="list-group" handle=".handle" item-key="name" ghost-class="itemGhost">

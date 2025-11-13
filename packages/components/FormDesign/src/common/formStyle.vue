@@ -154,7 +154,7 @@ export default defineComponent({
           })
         }
         props.controlItems.forEach((item: any) => {
-          if (item.data.fieldName == 'csslist') {
+          if (item.data.fieldName === 'csslist') {
             item.data.itemConfig.items = []
             cssNameArray.forEach((cssName: string, index: number) => {
               item.data.itemConfig.items.push({

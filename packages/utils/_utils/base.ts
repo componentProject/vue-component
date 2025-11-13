@@ -42,7 +42,7 @@ export function getType(obj: any, type?: string) {
  * @return
  */
 export function isType(str: string, type: string) {
-  return Object.prototype.toString.call(str).slice(8, -1).toLowerCase() == type
+  return Object.prototype.toString.call(str).slice(8, -1).toLowerCase() === type
 }
 
 type types

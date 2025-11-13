@@ -7,7 +7,7 @@
           <template v-if="drag">
             <draggable v-model="tdItem.list" class="draggable-box" animation="300" ghost-class="itemGhost" group="starfish-form" item-key="id" @add="addControl($event, tdItem.list, index, tdIndex)" @choose="chooseClick($event, tdItem.list)" @update="changePos($event, tdItem.list)">
               <template #item="{ element, index: _index }">
-                <Shape v-if="element.data" :active="currentId == element.id" :current-index="_index" :current-id="element.id" :len="tdItem.list.length" :item="element">
+                <Shape v-if="element.data" :active="currentId === element.id" :current-index="_index" :current-id="element.id" :len="tdItem.list.length" :item="element">
                   <component :is="element.ControlType" :drag="true" :item="element" :data="{}" />
                 </Shape>
               </template>

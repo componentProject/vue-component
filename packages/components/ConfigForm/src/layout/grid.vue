@@ -6,7 +6,7 @@
         <ElCol v-for="(colItem, index) in gridList" :key="index" class="grid-col" :span="colItem.span">
           <draggable v-model="colItem.list" class="draggable-box" animation="300" ghost-class="itemGhost" group="starfish-form" item-key="id" @add="addControl($event, index)" @choose="chooseClick($event, index)" @update="changePos($event, index)">
             <template #item="{ element, index: _index }">
-              <Shape v-if="element.data" :active="currentId == element.id" :current-id="element.id" :current-index="_index" :list="colItem.list">
+              <Shape v-if="element.data" :active="currentId === element.id" :current-id="element.id" :current-index="_index" :list="colItem.list">
                 <component :is="element.ControlType" :drag="true" :item="element" :data="{}" />
               </Shape>
             </template>

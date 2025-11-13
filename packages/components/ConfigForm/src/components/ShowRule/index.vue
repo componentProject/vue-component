@@ -1,6 +1,6 @@
 <!-- ConfigForm组件主文件 -->
 <template>
-  <div class="starfish-formitem starfish-editor-showrule" :class="{ 'formCover': drag, 'starfish-vertical': labelalign != 'top' }">
+  <div class="starfish-formitem starfish-editor-showrule" :class="{ 'formCover': drag, 'starfish-vertical': labelalign !== 'top' }">
     <div class="label" :class="`label_${labelalign}`" :style="{ width: `${labelWidth}px` }">
       <label>{{ item.data.label }}</label>
       <span v-if="item.data.required" class="item_require">*</span>
@@ -10,8 +10,8 @@
         </ElIcon>
       </ElTooltip>
     </div>
-    <div class="control" :style="{ marginLeft: labelalign != 'top' ? `${labelWidth}px` : '' }">
-      <ElButton v-if="data.showRule != '{}'" text type="primary" :size="size">
+    <div class="control" :style="{ marginLeft: labelalign !== 'top' ? `${labelWidth}px` : '' }">
+      <ElButton v-if="data.showRule !== '{}'" text type="primary" :size="size">
         已设置
       </ElButton>
       <ElButton v-else text type="primary" :size="size">

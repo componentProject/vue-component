@@ -59,7 +59,7 @@
                     </ElFormItem>
                   </ElForm>
                   <ElSelect
-                    v-if="scope.row.type == '选项'"
+                    v-if="scope.row.type === '选项'"
                     v-model="scope.row.value"
                     filterable
                     placeholder="请选择"
@@ -74,7 +74,7 @@
                     />
                   </ElSelect>
                   <ElSwitch
-                    v-if="scope.row.type == '布尔'"
+                    v-if="scope.row.type === '布尔'"
                     v-model="scope.row.value"
                     :active-icon="Check"
                     :inactive-icon="Close"
@@ -94,7 +94,7 @@
               </ElTableColumn>
             </ElTable>
             <ElButton
-              v-if="table.length == 0"
+              v-if="table.length === 0"
               class="mt-4"
               text
               style="width: 100%"
@@ -199,7 +199,7 @@ export default {
     newtypeList() {
       const item = this.fieldList.forEach((item) => {
         if (this.table && this.table.length > 0) {
-          if (item.value == this.table[0].field) {
+          if (item.value === this.table[0].field) {
             return item
           }
         }
@@ -228,7 +228,7 @@ export default {
     Check,
     Close,
     handleType(type) {
-      if (type == '布尔') {
+      if (type === '布尔') {
         this.table[0].value = true
       }
     },
@@ -237,7 +237,7 @@ export default {
         return []
       const item = this.fieldList.forEach((item) => {
         if (this.table && this.table.length > 0) {
-          if (item.value == this.table[0].field) {
+          if (item.value === this.table[0].field) {
             return item
           }
         }
@@ -247,7 +247,7 @@ export default {
     getMultiple() {
       const item = this.fieldList.forEach((item) => {
         if (this.table && this.table.length > 0) {
-          if (item.value == this.table[0].field) {
+          if (item.value === this.table[0].field) {
             return item
           }
         }
@@ -257,7 +257,7 @@ export default {
     getLogic() {
       const item = this.fieldList.forEach((item) => {
         if (this.table && this.table.length > 0) {
-          if (item.value == this.table[0].field) {
+          if (item.value === this.table[0].field) {
             return item
           }
         }
@@ -295,12 +295,12 @@ export default {
     },
     getTypeIsChange(index) {
       const nowRow = this.table[index]
-      return !!nowRow.type && nowRow.type == '常量'
+      return !!nowRow.type && nowRow.type === '常量'
     },
     getRules(value) {
       return {
         value: this.typeList.find((item) => {
-          return item.value == value
+          return item.value === value
         })?.rule,
       }
     },
@@ -327,7 +327,7 @@ export default {
           })
           return
         }
-        if (data.type && data.type == '选项' && !data.value) {
+        if (data.type && data.type === '选项' && !data.value) {
           ElMessage({
             type: 'error',
             message: '值类型为字段时值不能为空!',

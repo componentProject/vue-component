@@ -2,7 +2,7 @@
 <template>
   <div
     class="starfish-formitem"
-    :class="{ 'formCover': drag, 'starfish-vertical': labelalign != 'top', [item.data.csslist?.join(' ')]: !!item.data.csslist }"
+    :class="{ 'formCover': drag, 'starfish-vertical': labelalign !== 'top', [item.data.csslist?.join(' ')]: !!item.data.csslist }"
   >
     <div class="label" :class="`label_${labelalign}`" :style="{ width: `${labelWidth}px` }">
       <label>{{ item.data.label }}{{ suffix }}</label>
@@ -16,7 +16,7 @@
         </ElIcon>
       </ElTooltip>
     </div>
-    <div class="control" :style="{ marginLeft: labelalign != 'top' ? `${labelWidth}px` : '' }">
+    <div class="control" :style="{ marginLeft: labelalign !== 'top' ? `${labelWidth}px` : '' }">
       <ElCheckboxGroup
         v-if="!drag && data[item.data.fieldName]"
         v-model="data[item.data.fieldName]" :size="size"

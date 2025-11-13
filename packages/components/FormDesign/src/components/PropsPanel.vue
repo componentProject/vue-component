@@ -49,7 +49,7 @@
         </ElScrollbar>
       </ElTabPane>
       <ElTabPane v-if="panel.includes('json')" label="JSON配置" name="json">
-        <div v-if="activeName == 'json'" class="json">
+        <div v-if="activeName === 'json'" class="json">
           <!-- <div ref="jsonCenter"></div> -->
           <JsonEnter ref="jsonCenter" @editor="onEditor" />
         </div>
@@ -59,7 +59,7 @@
         label="表单配置"
         name="global"
       >
-        <ElScrollbar v-if="activeName == 'global'" class="form_tab3">
+        <ElScrollbar v-if="activeName === 'global'" class="form_tab3">
           <GlobalFormComponent />
         </ElScrollbar>
       </ElTabPane>
@@ -215,7 +215,7 @@ export default defineComponent({
     }
 
     async function checkLayoutForm(curControl: AllFormItem): Promise<boolean> {
-      if (curControl.ControlType == 'TableLayout') {
+      if (curControl.ControlType === 'TableLayout') {
         const trs = curControl.data.trs || []
         for (let i = 0; i < trs.length; i++) {
           const tds = trs[i].tds
@@ -227,7 +227,7 @@ export default defineComponent({
           }
         }
       }
-      else if (curControl.ControlType == 'Grid') {
+      else if (curControl.ControlType === 'Grid') {
         const columns = curControl.data.columns || []
         for (let i = 0; i < columns.length; i++) {
           const list = columns[i].list
@@ -331,10 +331,10 @@ export default defineComponent({
 
     function handleClick(tab: any) {
       const tabName = tab.props?.name || tab.paneName || tab.name
-      if (tabName == 'json' && jsonCenter.value) {
+      if (tabName === 'json' && jsonCenter.value) {
         jsonEditor = jsonCenter.value.initJsonCenter()
       }
-      else if (tabName == 'form' && jsonEditor) {
+      else if (tabName === 'form' && jsonEditor) {
         try {
           const $Flex = formDesignStore.$Flex
           const list = $Flex.tryParseJson(jsonEditor.getText())
@@ -365,7 +365,7 @@ export default defineComponent({
     watch(
       () => [newAllmainlist.value, newCurControl.value?.data],
       ([, b], [, d]) => {
-        if (activeName.value == 'json' && jsonCenter.value) {
+        if (activeName.value === 'json' && jsonCenter.value) {
           jsonCenter.value.initJsonCenter()
         }
         if (historyFlag.value) {

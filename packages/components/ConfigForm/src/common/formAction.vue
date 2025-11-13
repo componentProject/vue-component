@@ -4,7 +4,7 @@
     class="starfish-formitem"
     :class="{
       'formCover': drag,
-      'starfish-vertical': labelalign != 'top',
+      'starfish-vertical': labelalign !== 'top',
       [item.data.csslist?.join(' ')]: !!item.data.csslist,
     }"
   >
@@ -30,7 +30,7 @@
     </div>
     <div
       class="control"
-      :style="{ marginLeft: labelalign != 'top' ? `${labelWidth}px` : '' }"
+      :style="{ marginLeft: labelalign !== 'top' ? `${labelWidth}px` : '' }"
     >
       <ElButton v-if="!isForm" style="width: 100%" @click="onAction">
         设置
@@ -56,7 +56,7 @@
                           :key="index"
                           class="action"
                           :class="
-                            currentAction && _item.type == currentAction.type
+                            currentAction && _item.type === currentAction.type
                               ? 'selectAction'
                               : ''
                           "
@@ -253,7 +253,7 @@ export default defineComponent({
         if (type) {
           actionType = type
           const item = action.value.find((item: any) => {
-            if (item.type == type) {
+            if (item.type === type) {
               return item
             }
             else {
@@ -274,7 +274,7 @@ export default defineComponent({
         actionRef.value.init('动作设置', 'icon-icon-bianji')
         actionRef.value.show()
         const item = action.value.find((item: any) => {
-          if (item.type == type) {
+          if (item.type === type) {
             return item
           }
           else {
@@ -311,7 +311,7 @@ export default defineComponent({
             return null
           }
         })
-        if (currentAction.value && item.type == currentAction.value.type) {
+        if (currentAction.value && item.type === currentAction.value.type) {
           currentAction.value = null
         }
       },

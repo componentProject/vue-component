@@ -91,7 +91,7 @@ export default {
       toRaw(allFormList)?.forEach((item) => {
         formDesignStore.$Flex.getFormDataList(item, fieldResult, this.data.fieldName)
       })
-      this.result = typeof this.data[this.item.data.fieldName] == 'string' ? JSON.parse(this.data[this.item.data.fieldName]) : this.data[this.item.data.fieldName]
+      this.result = typeof this.data[this.item.data.fieldName] === 'string' ? JSON.parse(this.data[this.item.data.fieldName]) : this.data[this.item.data.fieldName]
       console.log(fieldResult)
       this.leftField = fieldResult
     },
@@ -100,12 +100,12 @@ export default {
       this.stringLink = this.filterCondition(this.result)
     },
     filterCondition(result) {
-      if (result.type == 'andgroup' || result.type == 'orgroup') {
-        const b = result.result.map(item => this.filterCondition(item)).join(result.type == 'andgroup' ? '<span class="and">and</span>' : '<span class="or">or</span>')
+      if (result.type === 'andgroup' || result.type === 'orgroup') {
+        const b = result.result.map(item => this.filterCondition(item)).join(result.type === 'andgroup' ? '<span class="and">and</span>' : '<span class="or">or</span>')
         const a = `<span class='kh ${result.type}'>(${b})</span>`
         return a
       }
-      else if (result.type == 'data') {
+      else if (result.type === 'data') {
         return `<span class='data kh'>${this.getDataConditionRelate(result)}</span>`
       }
       else {
@@ -113,16 +113,16 @@ export default {
       }
     },
     getDataConditionRelate(data) {
-      if (Object.keys(data.data).length == 0)
+      if (Object.keys(data.data).length === 0)
         return '空'
       const fieldData = data.data
       const field = fieldData.field
       let value
-      if (fieldData.type == '选项') {
+      if (fieldData.type === '选项') {
         const rightField = fieldData.value
         value = `${JSON.stringify(rightField)}`
       }
-      else if (fieldData.type == '常量' || fieldData.type == '布尔') {
+      else if (fieldData.type === '常量' || fieldData.type === '布尔') {
         value = fieldData.value
       }
       return `${field} ${fieldData.logic} ${value}`

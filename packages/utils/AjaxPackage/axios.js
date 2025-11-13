@@ -161,7 +161,7 @@ export function createAxiosInstance(baseURL, timeout = 5000, options = {}) {
       }
 
       // 处理其他错误码
-      if (code != 200) {
+      if (code !== 200) {
         MessageWrapper.error({
           message,
           duration: 100 * 1000,

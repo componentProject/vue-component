@@ -33,16 +33,16 @@
                 </ElTableColumn>
                 <ElTableColumn prop="value" label="值">
                   <template #default="scope">
-                    <ElForm v-if="getTypeIsChange(scope.$index, index) && scope.row.type == '常量'" ref="formList" :model="scope.row" :rules="getRules(scope.row.type)">
+                    <ElForm v-if="getTypeIsChange(scope.$index, index) && scope.row.type === '常量'" ref="formList" :model="scope.row" :rules="getRules(scope.row.type)">
                       <ElFormItem prop="value">
                         <ElInput v-model="scope.row.value" text />
                       </ElFormItem>
                     </ElForm>
-                    <ElSelect v-if="scope.row.type == '选项'" v-model="scope.row.value" filterable placeholder="请选择" :multiple="getMultiple(scope.$index, index)">
+                    <ElSelect v-if="scope.row.type === '选项'" v-model="scope.row.value" filterable placeholder="请选择" :multiple="getMultiple(scope.$index, index)">
                       <ElOption label="未选择" value="" />
                       <ElOption v-for="(_item, rightIndex) in getFiled(scope.$index, index)" :key="rightIndex" :label="_item.label" :value="_item.value" />
                     </ElSelect>
-                    <ElSwitch v-if="scope.row.type == '布尔'" v-model="scope.row.value" />
+                    <ElSwitch v-if="scope.row.type === '布尔'" v-model="scope.row.value" />
                   </template>
                 </ElTableColumn>
                 <ElTableColumn fixed="right" label="操作" width="100">
@@ -167,14 +167,14 @@ export default defineComponent({
       maxJsonDialog,
       formList,
       handleType(index: number, tableIndex: number, type: string) {
-        if (type == '布尔') {
+        if (type === '布尔') {
           data.andData[tableIndex][index].value = true
         }
       },
       getLogic(index: number, tableIndex: number) {
         const item = fieldList.value.forEach((item: any) => {
           if (data.andData[tableIndex][index]) {
-            if (item.value == data.andData[tableIndex][index].field) {
+            if (item.value === data.andData[tableIndex][index].field) {
               return item
             }
           }
@@ -200,7 +200,7 @@ export default defineComponent({
           return []
         const item = fieldList.value.forEach((item: any) => {
           if (data.andData[tableIndex][index]) {
-            if (item.value == data.andData[tableIndex][index].field) {
+            if (item.value === data.andData[tableIndex][index].field) {
               return item
             }
           }
@@ -211,7 +211,7 @@ export default defineComponent({
         maxJsonDialog.value.init('可用条件', 'icon-icon-bianji')
         maxJsonDialog.value.show()
         console.log(props.data)
-        if (typeof props.data.showRule != 'string' && Array.isArray(props.data.showRule)) {
+        if (typeof props.data.showRule !== 'string' && Array.isArray(props.data.showRule)) {
           data.andData = props.data.showRule
         }
         else {
@@ -222,7 +222,7 @@ export default defineComponent({
       getMultiple(index: number, tableIndex: number) {
         const item = fieldList.value.forEach((item: any) => {
           if (data.andData[tableIndex][index]) {
-            if (item.value == data.andData[tableIndex][index].field) {
+            if (item.value === data.andData[tableIndex][index].field) {
               return item
             }
           }
@@ -232,7 +232,7 @@ export default defineComponent({
       getNewTypeList(index: number, tableIndex: number) {
         const item = fieldList.value.forEach((item: any) => {
           if (data.andData[tableIndex][index]) {
-            if (item.value == data.andData[tableIndex][index].field) {
+            if (item.value === data.andData[tableIndex][index].field) {
               return item
             }
           }
@@ -266,7 +266,7 @@ export default defineComponent({
       getRules(value: any) {
         return {
           value: data.typeList.find((item) => {
-            return item.value == value
+            return item.value === value
           })?.rule,
         }
       },

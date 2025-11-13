@@ -752,7 +752,7 @@ function getMoren(fieldName: string, component: string, label?: string): FormCon
       },
     },
   }
-  if (map[fieldName] && map[fieldName].ControlType == component) {
+  if (map[fieldName] && map[fieldName].ControlType === component) {
     return map[fieldName]
   }
   else if (!map[fieldName]) {

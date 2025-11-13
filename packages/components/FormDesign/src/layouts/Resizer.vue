@@ -37,7 +37,7 @@ export default defineComponent({
         let { right, left } = {
           ...toRaw(uiControl?.get('columnWidth') as Required<setColumnWidth>),
         }
-        if (props.type == 'right') {
+        if (props.type === 'right') {
           right -= e.deltaX
         }
         else {

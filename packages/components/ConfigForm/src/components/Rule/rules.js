@@ -2,7 +2,7 @@
 const validateNumber = `(rule, value, callback) => {
   console.log(rule);
 
-  if (value === "" || value == null) {
+  if (value === "" || value === null) {
     callback(new Error("请输入"));
   } else if (!/^[0-9]*$/.test(value)) {
     callback(new Error("必须为数字"));
@@ -11,7 +11,7 @@ const validateNumber = `(rule, value, callback) => {
 }`
 // 数字校验规则（小数点保留两位）
 const validateNumberD2 = `(rule, value, callback) => {
-    if (value === "" || value == null) {
+    if (value === "" || value === null) {
       callback(new Error("请输入"));
     } else if (!/^([1-9]+[\d]*(.[0-9]{1,2})?)$/.test(value)) {
       callback(new Error("必须为数字,且小数点最多两位"));
@@ -21,7 +21,7 @@ const validateNumberD2 = `(rule, value, callback) => {
 
 // 电话号码校验规则
 const validatePhone = `(rule, value, callback) => {
-    if (value === "" || value == null) {
+    if (value === "" || value === null) {
       callback(new Error("请输入"));
     } else if (!/^1(?:3\d|4[4-9]|5[0-35-9]|6[67]|7[013-8]|8\d|9\d)\d{8}$/.test(value)) {
       callback(new Error("请输入正确的值"));
@@ -31,7 +31,7 @@ const validatePhone = `(rule, value, callback) => {
 
 // 身份证校验规则
 const validateIdCard = `(rule, value, callback) => {
-    if (value === "" || value == null) {
+    if (value === "" || value === null) {
       callback(new Error("请输入"));
     } else if (!/^[1-9]\d{5}(18|19|20)\d{2}((0[1-9])|(1[0-2]))(([0-2][1-9])|10|20|30|31)\d{3}[0-9Xx]$/.test(value)) {
       callback(new Error("请输入正确的"));
@@ -42,7 +42,7 @@ const validateIdCard = `(rule, value, callback) => {
 // 邮箱校验规则
 const validateEmail = `
   (rule, value, callback) => {
-    if (value === "" || value == null) {
+    if (value === "" || value === null) {
       callback(new Error("请输入"));
     } else if (!/^[A-Za-z0-9\u4E00-\u9FA5]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/.test(value)) {
       callback(new Error("请输入正确的值"));
@@ -53,7 +53,7 @@ const validateEmail = `
 // 大写字母单个校验
 const validateBigEn = `
   (rule, value, callback) => {
-    if (value === "" || value == null) {
+    if (value === "" || value === null) {
       callback(new Error("请输入"));
     } else if (!/^[A-Z]$/.test(value)) {
       callback(new Error("只能是大写字母"));

@@ -21,32 +21,32 @@
         <span @click="handleActive('cut')">剪切</span>
         <span @click="handleActive('delete')">删除</span>
         <span v-if="copyContent" @click="handleActive('paste')">粘贴</span>
-        <span v-if="currentIndex != 0" @click="handleActive('top')">上移</span>
-        <span v-if="currentIndex != len - 1" @click="handleActive('bottom')">下移</span>
+        <span v-if="currentIndex !== 0" @click="handleActive('top')">上移</span>
+        <span v-if="currentIndex !== len - 1" @click="handleActive('bottom')">下移</span>
       </div>
     </transition>
     <slot />
     <div v-if="active" class="editbar">
       <ElIcon
-        v-if="currentIndex != 0"
+        v-if="currentIndex !== 0"
         @click.stop="handleActive('top')"
       >
         <ArrowUp />
       </ElIcon>
       <ElIcon
-        v-if="currentIndex != len - 1"
+        v-if="currentIndex !== len - 1"
         @click.stop="handleActive('bottom')"
       >
         <ArrowDown />
       </ElIcon>
       <ElIcon
-        v-if="item && item.ControlType == 'TableLayout'"
+        v-if="item && item.ControlType === 'TableLayout'"
         @click="handleRow"
       >
         <Plus />
       </ElIcon>
       <ElIcon
-        v-if="item && item.ControlType == 'TableLayout'"
+        v-if="item && item.ControlType === 'TableLayout'"
         @click="handleColumn"
       >
         <Plus />
