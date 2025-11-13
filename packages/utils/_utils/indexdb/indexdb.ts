@@ -14,14 +14,14 @@ import { IndexDBManager } from './IndexDBManager'
  * 存储后端接口
  */
 interface StorageBackend {
-  setItem: (key: string, value: any, useCache?: boolean) => Promise<void>
-  getItem: (key: string) => Promise<any | { result: any, cacheHit: boolean }>
+  setItem: (key: string, value: any, useCache?: boolean) => Promise<{ extraInfo?: string } | void>
+  getItem: (key: string) => Promise<any | { result: any, cacheHit: boolean, extraInfo?: string }>
   removeItem: (key: string) => Promise<void>
   clear: () => Promise<void>
   keys: () => Promise<string[]>
   length: () => Promise<number>
-  setItems: (items: Array<{ key: string, value: any }> | Record<string, any>, useCache?: boolean) => Promise<void>
-  getItems: (keys: string[]) => Promise<Record<string, any> | { result: Record<string, any>, cacheHitCount: number, totalCount: number }>
+  setItems: (items: Array<{ key: string, value: any }> | Record<string, any>, useCache?: boolean) => Promise<{ extraInfo?: string } | void>
+  getItems: (keys: string[]) => Promise<Record<string, any> | { result: Record<string, any>, cacheHitCount: number, totalCount: number, extraInfo?: string }>
   close: () => Promise<void>
 }
 
@@ -43,20 +43,21 @@ export class IndexDBStorage {
   // 当前所使用的存储后端：worker > indexdb > localStorage
   private backend: StorageBackend | null = null
   private initPromise: Promise<void> | null = null
-  // 性能监控开关
-  private readonly performanceEnabled: boolean
+  // 保存原始配置，用于传递给 Worker
+  private readonly options: MinimalOptions
 
   constructor(options: MinimalOptions = {}) {
     const dbName = options.dbName || 'IndexDBStorage'
     const storeName = options.storeName || 'storage'
 
+    this.options = options
     this.dbManager = new IndexDBManager({
       dbName,
       storeName,
       cache: options.cache,
+      performance: options.performance,
     })
     this.useWorker = options.useWorker
-    this.performanceEnabled = options.performance?.enabled ?? true
 
     // 初始化环境，按优先级选择后端
     this.initPromise = this.initEnvironment()
@@ -75,66 +76,34 @@ export class IndexDBStorage {
   }
 
   /**
-   * 性能监控：打印操作耗时
-   * @param operation - 操作名称
-   * @param startTime - 开始时间戳
-   * @param key - 操作的键名（可选）
-   * @param extraInfo - 额外信息（如缓存状态）
-   */
-  private logPerformance(operation: string, startTime: number, key?: string, extraInfo?: string): void {
-    if (!this.performanceEnabled) {
-      return
-    }
-    const duration = performance.now() - startTime
-    const keyInfo = key ? ` [key: ${key}]` : ''
-    const extra = extraInfo ? ` [${extraInfo}]` : ''
-    console.log(`[IndexDBStorage] ${operation}${keyInfo}${extra} 耗时: ${duration.toFixed(2)}ms`)
-  }
-
-  /**
-   * 执行存储操作，带错误处理和性能监控
+   * 执行存储操作，带错误处理
    * @param operation - 要执行的操作函数，可以返回结果和额外信息
-   * @param operationName - 操作名称（用于性能监控）
-   * @param key - 操作的键名（可选，用于性能监控）
-   * @param extraInfo - 额外的缓存状态信息（可选，用于写入操作）
+   * @param operationName - 操作名称（用于错误处理）
+   * @param key - 操作的键名（可选，用于错误处理）
    * @returns 操作结果
    */
   private async executeWithRetry<T>(
     operation: () => Promise<T> | Promise<{ result: T, cacheHit?: boolean, extraInfo?: string }>,
     operationName: string,
     key?: string,
-    extraInfo?: string,
   ): Promise<T> {
-    const startTime = this.performanceEnabled ? performance.now() : 0
     await this.ensureInitialized()
     try {
       const operationResult = await operation()
 
       // 检查返回结果是否包含额外信息（如缓存状态）
       let result: T
-      let logExtraInfo: string | undefined = extraInfo
       if (operationResult && typeof operationResult === 'object' && 'result' in operationResult) {
         const wrapped = operationResult as { result: T, cacheHit?: boolean, extraInfo?: string }
         result = wrapped.result
-        if (wrapped.cacheHit !== undefined) {
-          logExtraInfo = wrapped.cacheHit ? '缓存命中' : '数据库读取'
-        }
-        else if (wrapped.extraInfo) {
-          logExtraInfo = wrapped.extraInfo
-        }
-        else if (!logExtraInfo) {
-          logExtraInfo = wrapped.extraInfo
-        }
       }
       else {
         result = operationResult as T
       }
 
-      this.logPerformance(operationName, startTime, key, logExtraInfo)
       return result
     }
     catch (error) {
-      this.logPerformance(`${operationName} (失败)`, startTime, key)
       console.warn('存储操作失败，正在重新初始化环境:', error)
       // Worker 失败时，清理 Worker
       if (this.worker) {
@@ -162,7 +131,7 @@ export class IndexDBStorage {
    * Vite 会在开发时按需服务 TS 文件，在生产构建时生成正确的产物 URL
    */
   private getWorker(): Worker {
-    const workerUrl = new URL('./indexdb-worker.ts', import.meta.url)
+    const workerUrl = new URL('./indexdbWorker.ts', import.meta.url)
     return new Worker(workerUrl, { type: 'module', name: 'IndexDBStorageWorker' })
   }
 
@@ -217,7 +186,7 @@ export class IndexDBStorage {
   private createIndexDBBackend(): StorageBackend {
     return {
       setItem: async (key: string, value: any, useCache?: boolean) => {
-        await this.dbManager.setItem(key, value, useCache)
+        return await this.dbManager.setItem(key, value, useCache)
       },
       getItem: async (key: string) => {
         return await this.dbManager.getItem(key)
@@ -238,10 +207,10 @@ export class IndexDBStorage {
         const itemsArray = Array.isArray(items)
           ? items
           : Object.entries(items).map(([key, value]) => ({ key, value }))
-        await this.dbManager.setItems(itemsArray, useCache)
+        return await this.dbManager.setItems(itemsArray, useCache)
       },
       getItems: async (keys: string[]) => {
-        // IndexDBManager.getItems 已经返回 { result, cacheHitCount, totalCount } 格式
+        // IndexDBManager.getItems 已经返回 { result, cacheHitCount, totalCount, extraInfo } 格式
         return await this.dbManager.getItems(keys)
       },
       close: async () => {
@@ -251,9 +220,9 @@ export class IndexDBStorage {
   }
 
   /**
-   * 初始化 localStorage 后端，成功返回后端实例
+   * 创建 localStorage 后端，成功返回后端实例
    */
-  private initLocalStorage(): StorageBackend {
+  private createLocalStorage(): StorageBackend {
     return {
       setItem: async (key: string, value: any, useCache?: boolean) => {
         // localStorage 不支持缓存参数，直接忽略
@@ -302,9 +271,9 @@ export class IndexDBStorage {
   }
 
   /**
-   * 初始化 Web Worker，成功返回后端实例
+   * 创建 Web Worker 后端，成功返回后端实例
    */
-  private async initWorker(): Promise<StorageBackend | null> {
+  private async createWorker(): Promise<StorageBackend | null> {
     if (typeof Worker === 'undefined') {
       return null
     }
@@ -313,15 +282,18 @@ export class IndexDBStorage {
       this.worker = this.getWorker()
       this.setupWorkerHandlers()
 
-      // 初始化 Worker（传递缓存配置）
+      // 初始化 Worker（传递缓存配置和性能监控配置）
       // 通过反射获取缓存配置状态
       const cacheConfig = (this.dbManager as any).cacheEnabled
         ? { enabled: true }
         : undefined
+      // 获取性能监控配置
+      const performanceConfig = this.options.performance
       await this.sendToWorker('init', {
         dbName: this.dbManager.getDbName(),
         storeName: this.dbManager.getStoreName(),
         cache: cacheConfig,
+        performance: performanceConfig,
       })
       return this.createWorkerBackend()
     }
@@ -395,9 +367,9 @@ export class IndexDBStorage {
   }
 
   /**
-   * 初始化 IndexDB，成功返回后端实例
+   * 创建 IndexDB 后端，成功返回后端实例
    */
-  private async initIndexDB(): Promise<StorageBackend | null> {
+  private async createIndexDB(): Promise<StorageBackend | null> {
     if (!this.isSupported()) {
       return null
     }
@@ -417,7 +389,7 @@ export class IndexDBStorage {
   private async initEnvironment(): Promise<void> {
     // 优先尝试使用 Worker
     if (this.useWorker !== false) {
-      const backend = await this.initWorker()
+      const backend = await this.createWorker()
       if (backend) {
         this.backend = backend
         return
@@ -425,14 +397,14 @@ export class IndexDBStorage {
     }
 
     // Worker 不可用，尝试 IndexDB
-    const backendDb = await this.initIndexDB()
+    const backendDb = await this.createIndexDB()
     if (backendDb) {
       this.backend = backendDb
       return
     }
 
     // 都不可用，使用 localStorage（localStorage 总是可用）
-    this.backend = this.initLocalStorage()
+    this.backend = this.createLocalStorage()
   }
 
   // 直接以 { key, value } 的形式写入对象仓库
@@ -444,30 +416,17 @@ export class IndexDBStorage {
    * @param useCache - 是否使用缓存（默认使用类配置的缓存开关），启用后会将数据写入缓存
    */
   async setItem(key: string, value: any, useCache?: boolean): Promise<void> {
-    // 确定是否使用缓存：useCache 参数优先，否则尝试从类配置获取
-    let shouldCache = false
-    if (useCache !== undefined) {
-      shouldCache = useCache
-    }
-    else {
-      // 尝试从 dbManager 获取缓存配置（仅当使用 IndexDB 后端时可用）
-      // 如果使用 Worker 后端，缓存配置在 Worker 中，无法直接获取
-      try {
-        shouldCache = (this.dbManager as any)?.cacheEnabled ?? false
-      }
-      catch {
-        shouldCache = false
-      }
-    }
-    const cacheInfo = shouldCache ? '缓存+数据库' : '数据库'
-
     await this.executeWithRetry(
       async () => {
-        await this.backend!.setItem(key, value, useCache)
+        const result = await this.backend!.setItem(key, value, useCache)
+        // 如果后端返回了额外信息，传递给日志系统
+        if (result && typeof result === 'object' && 'extraInfo' in result) {
+          return { result: undefined, extraInfo: result.extraInfo } as any
+        }
+        return undefined
       },
       'setItem',
       key,
-      cacheInfo,
     )
   }
 
@@ -531,30 +490,17 @@ export class IndexDBStorage {
    */
   async setItems(items: Array<{ key: string, value: any }> | Record<string, any>, useCache?: boolean): Promise<void> {
     const itemCount = Array.isArray(items) ? items.length : Object.keys(items).length
-    // 确定是否使用缓存：useCache 参数优先，否则尝试从类配置获取
-    let shouldCache = false
-    if (useCache !== undefined) {
-      shouldCache = useCache
-    }
-    else {
-      // 尝试从 dbManager 获取缓存配置（仅当使用 IndexDB 后端时可用）
-      // 如果使用 Worker 后端，缓存配置在 Worker 中，无法直接获取
-      try {
-        shouldCache = (this.dbManager as any)?.cacheEnabled ?? false
-      }
-      catch {
-        shouldCache = false
-      }
-    }
-    const cacheInfo = shouldCache ? '缓存+数据库' : '数据库'
-
     await this.executeWithRetry(
       async () => {
-        await this.backend!.setItems(items, useCache)
+        const result = await this.backend!.setItems(items, useCache)
+        // 如果后端返回了额外信息，传递给日志系统
+        if (result && typeof result === 'object' && 'extraInfo' in result) {
+          return { result: undefined, extraInfo: result.extraInfo } as any
+        }
+        return undefined
       },
       'setItems',
       `批量(${itemCount}项)`,
-      cacheInfo,
     )
   }
 
@@ -569,11 +515,8 @@ export class IndexDBStorage {
         const backendResult = await this.backend!.getItems(keys)
         // 检查后端返回的是否包含缓存状态信息
         if (backendResult && typeof backendResult === 'object' && 'result' in backendResult) {
-          const wrapped = backendResult as { result: Record<string, any>, cacheHitCount: number, totalCount: number }
-          const cacheInfo = wrapped.cacheHitCount > 0
-            ? `缓存命中 ${wrapped.cacheHitCount}/${wrapped.totalCount}`
-            : '数据库读取'
-          return { result: wrapped.result, extraInfo: cacheInfo } as any
+          const wrapped = backendResult as { result: Record<string, any>, cacheHitCount: number, totalCount: number, extraInfo?: string }
+          return { result: wrapped.result, extraInfo: wrapped.extraInfo } as any
         }
         // 如果没有缓存状态信息，默认为数据库读取
         return { result: backendResult as Record<string, any>, extraInfo: '数据库读取' } as any

@@ -18,6 +18,15 @@ export interface IndexDBManagerOptions {
      */
     enabled?: boolean
   }
+  /**
+   * 性能监控配置
+   */
+  performance?: {
+    /**
+     * 是否启用性能监控（耗时打印），默认 false
+     */
+    enabled?: boolean
+  }
 }
 
 /**
@@ -52,11 +61,31 @@ export class IndexDBManager {
   private readonly cacheEnabled: boolean
   // 内存缓存：存储最近写入的数据，用于快速读取
   private readonly cache = new Map<string, any>()
+  // 性能监控配置
+  private readonly performanceEnabled: boolean
 
   constructor(options: IndexDBManagerOptions = {}) {
     this.dbName = options.dbName || 'IndexDBStorage'
     this.storeName = options.storeName || 'storage'
     this.cacheEnabled = options.cache?.enabled ?? false
+    this.performanceEnabled = options.performance?.enabled ?? false
+  }
+
+  /**
+   * 性能监控：打印操作耗时
+   * @param operation - 操作名称
+   * @param startTime - 开始时间戳
+   * @param key - 操作的键名（可选）
+   * @param extraInfo - 额外信息（如缓存状态）
+   */
+  private logPerformance(operation: string, startTime: number, key?: string, extraInfo?: string): void {
+    if (!this.performanceEnabled) {
+      return
+    }
+    const duration = performance.now() - startTime
+    const keyInfo = key ? ` [key: ${key}]` : ''
+    const extra = extraInfo ? ` [${extraInfo}]` : ''
+    console.log(`[IndexDBManager] ${operation}${keyInfo}${extra} 耗时: ${duration.toFixed(2)}ms`)
   }
 
   /**
@@ -147,6 +176,51 @@ export class IndexDBManager {
     if (key === '') {
       throw new TypeError('键名不能为空')
     }
+  }
+
+  /**
+   * 包装 Promise，统一处理性能监控日志打印
+   * @param promise - 原始 Promise
+   * @param operation - 操作名称
+   * @param key - 操作的键名（可选）
+   * @param startTime - 操作开始时间戳（用于性能监控）
+   * @param defaultExtraInfo - 默认的额外信息（如果结果中没有 extraInfo，使用此值）
+   * @returns 包装后的 Promise
+   */
+  private async withLogging<T>(
+    promise: Promise<T>,
+    operation: string,
+    key?: string,
+    startTime?: number,
+    defaultExtraInfo?: string,
+  ): Promise<T> {
+    const shouldLog = this.performanceEnabled && startTime !== undefined
+    const logStartTime = shouldLog ? startTime! : 0
+
+    try {
+      const result = await promise
+      if (shouldLog) {
+        const extraInfo = this.extractExtraInfo(result, defaultExtraInfo)
+        this.logPerformance(operation, logStartTime, key, extraInfo)
+      }
+      return result
+    }
+    catch (error) {
+      if (shouldLog) {
+        this.logPerformance(`${operation} (失败)`, logStartTime, key)
+      }
+      throw error
+    }
+  }
+
+  /**
+   * 从结果中提取 extraInfo
+   */
+  private extractExtraInfo<T>(result: T, defaultExtraInfo?: string): string | undefined {
+    if (result && typeof result === 'object' && 'extraInfo' in result) {
+      return (result as any).extraInfo || defaultExtraInfo
+    }
+    return defaultExtraInfo
   }
 
   /**
@@ -250,25 +324,28 @@ export class IndexDBManager {
    * @param key - 键名
    * @param value - 值
    * @param useCache - 是否使用缓存（默认使用类配置的缓存开关），启用后会将数据写入缓存
+   * @returns 返回对象，包含缓存状态信息
    */
-  public async setItem(key: string, value: any, useCache?: boolean): Promise<void> {
+  public async setItem(key: string, value: any, useCache?: boolean): Promise<{ extraInfo?: string }> {
+    const startTime = this.performanceEnabled ? performance.now() : 0
     this.validateKey(key)
     await this.ensureInitialized()
 
     // 如果启用缓存，先写入缓存（useCache 参数优先，否则使用类配置）
     const shouldCache = useCache ?? this.cacheEnabled
+    const cacheInfo = shouldCache ? '缓存+数据库' : '数据库'
     if (shouldCache) {
       this.cache.set(key, value)
     }
 
-    return new Promise((resolve, reject) => {
+    const promise = new Promise<{ extraInfo?: string }>((resolve, reject) => {
       try {
         const { tx, store } = this.getOrCreateTransaction('readwrite')
         const req = store.put({ key, value } as StorageRecord)
 
         req.onsuccess = () => {
           this.completeTransactionRequest('readwrite')
-          resolve()
+          resolve({ extraInfo: cacheInfo })
         }
         req.onerror = () => {
           // 如果写入失败，从缓存中移除（如果启用了缓存）
@@ -295,6 +372,8 @@ export class IndexDBManager {
         reject(error instanceof Error ? error : new Error('设置数据项失败'))
       }
     })
+
+    return this.withLogging(promise, 'setItem', key, startTime, cacheInfo)
   }
 
   /**
@@ -304,18 +383,24 @@ export class IndexDBManager {
    * @param key - 键名
    * @returns 返回对象，包含结果和缓存命中状态
    */
-  public async getItem(key: string): Promise<{ result: any, cacheHit: boolean }> {
+  public async getItem(key: string): Promise<{ result: any, cacheHit: boolean, extraInfo?: string }> {
+    const startTime = this.performanceEnabled ? performance.now() : 0
     this.validateKey(key)
 
     // 优先从缓存读取（无论是否启用类级别的缓存，只要缓存中有数据就可以读取）
     // 这样可以支持单次操作级别的缓存（useCache=true）
     if (this.cache.has(key)) {
-      return { result: this.cache.get(key), cacheHit: true }
+      const result = { result: this.cache.get(key), cacheHit: true, extraInfo: '缓存命中' }
+      // 如果启用了性能监控，立即打印（因为不会经过 withTimeout）
+      if (this.performanceEnabled && startTime) {
+        this.logPerformance('getItem', startTime, key, '缓存命中')
+      }
+      return result
     }
 
     await this.ensureInitialized()
 
-    return new Promise((resolve, reject) => {
+    const promise = new Promise<{ result: any, cacheHit: boolean, extraInfo?: string }>((resolve, reject) => {
       try {
         const { tx, store } = this.getOrCreateTransaction('readonly')
         const req = store.get(key)
@@ -330,7 +415,7 @@ export class IndexDBManager {
             this.cache.set(key, value)
           }
 
-          resolve({ result: value, cacheHit: false })
+          resolve({ result: value, cacheHit: false, extraInfo: '数据库读取' })
         }
         req.onerror = () => {
           this.completeTransactionRequest('readonly')
@@ -345,6 +430,8 @@ export class IndexDBManager {
         reject(error instanceof Error ? error : new Error('获取数据项失败'))
       }
     })
+
+    return this.withLogging(promise, 'getItem', key, startTime, '数据库读取')
   }
 
   /**
@@ -354,10 +441,11 @@ export class IndexDBManager {
    * @param key - 键名
    */
   public async removeItem(key: string): Promise<void> {
+    const startTime = this.performanceEnabled ? performance.now() : 0
     this.validateKey(key)
     await this.ensureInitialized()
 
-    return new Promise((resolve, reject) => {
+    const promise = new Promise<void>((resolve, reject) => {
       try {
         const { tx, store } = this.getOrCreateTransaction('readwrite')
         const req = store.delete(key)
@@ -383,6 +471,8 @@ export class IndexDBManager {
         reject(error instanceof Error ? error : new Error('删除数据项失败'))
       }
     })
+
+    return this.withLogging(promise, 'removeItem', key, startTime)
   }
 
   /**
@@ -391,9 +481,10 @@ export class IndexDBManager {
    * 如果启用了缓存，会同步清空缓存
    */
   public async clear(): Promise<void> {
+    const startTime = this.performanceEnabled ? performance.now() : 0
     await this.ensureInitialized()
 
-    return new Promise((resolve, reject) => {
+    const promise = new Promise<void>((resolve, reject) => {
       if (!this.db) {
         reject(new Error('数据库未初始化'))
         return
@@ -419,6 +510,8 @@ export class IndexDBManager {
         reject(error instanceof Error ? error : new Error('清空数据失败'))
       }
     })
+
+    return this.withLogging(promise, 'clear', undefined, startTime)
   }
 
   /**
@@ -426,9 +519,10 @@ export class IndexDBManager {
    * 支持事务复用，短时间内相同模式的操作会复用同一事务
    */
   public async keys(): Promise<string[]> {
+    const startTime = this.performanceEnabled ? performance.now() : 0
     await this.ensureInitialized()
 
-    return new Promise((resolve, reject) => {
+    const promise = new Promise<string[]>((resolve, reject) => {
       try {
         const { tx, store } = this.getOrCreateTransaction('readonly')
         const req = store.getAllKeys()
@@ -450,6 +544,8 @@ export class IndexDBManager {
         reject(error instanceof Error ? error : new Error('获取所有键失败'))
       }
     })
+
+    return this.withLogging(promise, 'keys', undefined, startTime)
   }
 
   /**
@@ -465,13 +561,15 @@ export class IndexDBManager {
    * 注意：批量操作不使用事务复用，总是创建新事务，因为批量操作本身就在一个事务中完成
    * @param items - 数据项数组
    * @param useCache - 是否使用缓存（默认使用类配置的缓存开关），启用后会将数据写入缓存
+   * @returns 返回对象，包含缓存状态信息
    */
-  public async setItems(items: Array<{ key: string, value: any }>, useCache?: boolean): Promise<void> {
+  public async setItems(items: Array<{ key: string, value: any }>, useCache?: boolean): Promise<{ extraInfo?: string }> {
+    const startTime = this.performanceEnabled ? performance.now() : 0
     if (!Array.isArray(items)) {
       throw new TypeError('数据项必须是数组类型')
     }
     if (items.length === 0) {
-      return // 空数组直接返回，无需操作
+      return { extraInfo: '数据库' } // 空数组直接返回，无需操作
     }
 
     // 验证所有 key
@@ -487,13 +585,14 @@ export class IndexDBManager {
 
     // 如果启用缓存，先批量写入缓存（useCache 参数优先，否则使用类配置）
     const shouldCache = useCache ?? this.cacheEnabled
+    const cacheInfo = shouldCache ? '缓存+数据库' : '数据库'
     if (shouldCache) {
       for (const item of items) {
         this.cache.set(item.key, item.value)
       }
     }
 
-    return new Promise((resolve, reject) => {
+    const promise = new Promise<{ extraInfo?: string }>((resolve, reject) => {
       try {
         // 批量操作不使用事务复用，因为批量操作本身就在一个事务中完成
         const tx = this.db!.transaction(this.storeName, 'readwrite')
@@ -503,7 +602,9 @@ export class IndexDBManager {
           store.put({ key: item.key, value: item.value } as StorageRecord)
         }
 
-        tx.oncomplete = () => resolve()
+        tx.oncomplete = () => {
+          resolve({ extraInfo: cacheInfo })
+        }
         tx.onerror = () => {
           // 如果写入失败，从缓存中移除已写入的数据（如果启用了缓存）
           if (shouldCache) {
@@ -533,6 +634,9 @@ export class IndexDBManager {
         reject(error instanceof Error ? error : new Error('批量设置数据项失败'))
       }
     })
+
+    // 批量操作使用批量信息作为标识
+    return this.withLogging(promise, 'setItems', `批量(${items.length}项)`, startTime, cacheInfo)
   }
 
   /**
@@ -542,12 +646,13 @@ export class IndexDBManager {
    * 如果启用了缓存，会优先从缓存读取
    * @param keys - 键名数组
    */
-  public async getItems(keys: string[]): Promise<Record<string, any>> {
+  public async getItems(keys: string[]): Promise<{ result: Record<string, any>, cacheHitCount: number, totalCount: number, extraInfo?: string }> {
+    const startTime = this.performanceEnabled ? performance.now() : 0
     if (!Array.isArray(keys)) {
       throw new TypeError('键名必须是数组类型')
     }
     if (keys.length === 0) {
-      return {} // 空数组直接返回空对象
+      return { result: {}, cacheHitCount: 0, totalCount: 0, extraInfo: '数据库读取' } // 空数组直接返回空对象
     }
 
     // 验证所有 key
@@ -571,17 +676,27 @@ export class IndexDBManager {
       }
     }
 
-    // 如果有未缓存的 key，从数据库读取
-    if (uncachedKeys.length > 0) {
-      const promises = uncachedKeys.map(key => this.getItem(key))
-      const itemResults = await Promise.all(promises)
-      for (let i = 0; i < uncachedKeys.length; i++) {
-        const itemResult = itemResults[i]
-        result[uncachedKeys[i]] = itemResult.result || itemResult
+    // 如果有未缓存的 key，从数据库读取（带超时控制）
+    // 将整个操作包装在 Promise 中，以便应用超时控制
+    const promise = (async () => {
+      if (uncachedKeys.length > 0) {
+        const promises = uncachedKeys.map(key => this.getItem(key))
+        const itemResults = await Promise.all(promises)
+        for (let i = 0; i < uncachedKeys.length; i++) {
+          const itemResult = itemResults[i]
+          result[uncachedKeys[i]] = itemResult.result || itemResult
+        }
       }
-    }
+      const extraInfo = cacheHitCount > 0
+        ? `缓存命中 ${cacheHitCount}/${keys.length}`
+        : '数据库读取'
+      return { result, cacheHitCount, totalCount: keys.length, extraInfo }
+    })()
 
-    return { result, cacheHitCount, totalCount: keys.length } as any
+    const defaultExtraInfo = keys.length > 0
+      ? `缓存命中 0/${keys.length}`
+      : '数据库读取'
+    return this.withLogging(promise, 'getItems', `批量(${keys.length}项)`, startTime, defaultExtraInfo)
   }
 
   /**

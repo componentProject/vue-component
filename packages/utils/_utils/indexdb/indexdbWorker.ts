@@ -19,6 +19,15 @@ interface DBConfig {
      */
     enabled?: boolean
   }
+  /**
+   * 性能监控配置
+   */
+  performance?: {
+    /**
+     * 是否启用性能监控（耗时打印），默认 false
+     */
+    enabled?: boolean
+  }
 }
 
 /**
@@ -46,21 +55,22 @@ class IndexDBWorker {
       dbName: config.dbName || 'IndexDBStorage',
       storeName: config.storeName || 'storage',
       cache: config.cache,
+      performance: config.performance,
     })
   }
 
   /**
    * 执行 setItem 操作
    */
-  public async setItem(key: string, value: any, useCache?: boolean): Promise<void> {
+  public async setItem(key: string, value: any, useCache?: boolean): Promise<{ extraInfo?: string }> {
     this.ensureInitialized()
-    await this.dbManager!.setItem(key, value, useCache)
+    return await this.dbManager!.setItem(key, value, useCache)
   }
 
   /**
    * 执行 getItem 操作
    */
-  public async getItem(key: string): Promise<{ result: any, cacheHit: boolean }> {
+  public async getItem(key: string): Promise<{ result: any, cacheHit: boolean, extraInfo?: string }> {
     this.ensureInitialized()
     return await this.dbManager!.getItem(key)
   }
@@ -100,17 +110,17 @@ class IndexDBWorker {
   /**
    * 执行 setItems 操作（批量设置）
    */
-  public async setItems(items: Array<{ key: string, value: any }>, useCache?: boolean): Promise<void> {
+  public async setItems(items: Array<{ key: string, value: any }>, useCache?: boolean): Promise<{ extraInfo?: string }> {
     this.ensureInitialized()
-    await this.dbManager!.setItems(items, useCache)
+    return await this.dbManager!.setItems(items, useCache)
   }
 
   /**
    * 执行 getItems 操作（批量获取）
    */
-  public async getItems(keys: string[]): Promise<{ result: Record<string, any>, cacheHitCount: number, totalCount: number }> {
+  public async getItems(keys: string[]): Promise<{ result: Record<string, any>, cacheHitCount: number, totalCount: number, extraInfo?: string }> {
     this.ensureInitialized()
-    return await this.dbManager!.getItems(keys) as any
+    return await this.dbManager!.getItems(keys)
   }
 
   /**
@@ -256,3 +266,4 @@ globalThis.onerror = function (event: ErrorEvent | Event | string) {
 globalThis.onunhandledrejection = function (event: PromiseRejectionEvent) {
   console.error('IndexDB Worker 未处理的 Promise 拒绝:', event.reason)
 }
+
