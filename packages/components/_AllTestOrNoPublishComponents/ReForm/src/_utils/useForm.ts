@@ -1,23 +1,5 @@
-/** 导入 Vue 组合式 API */
-import {
-  computed,
-  nextTick,
-  ref,
-  shallowRef,
-  triggerRef,
-  unref,
-  watch,
-} from 'vue'
 /** 导入 Vue 类型定义 */
 import type { ComputedRef, MaybeRef, Ref, ShallowRef } from 'vue'
-/** 导入工具函数 */
-import {
-  normalizeCollapsed,
-  normalizeFormItems,
-  normalizeFormRules,
-  normalizeFormValueAndRules,
-  normalizeVisible,
-} from './index.ts'
 /** 导入类型定义 */
 import type {
   ReFormEmits,
@@ -29,6 +11,24 @@ import type {
 } from '../_types'
 /** 导入 lodash 工具函数 */
 import { cloneDeep, isUndefined } from 'lodash'
+/** 导入 Vue 组合式 API */
+import {
+  computed,
+  nextTick,
+  ref,
+  shallowRef,
+  triggerRef,
+  unref,
+  watch,
+} from 'vue'
+/** 导入工具函数 */
+import {
+  normalizeCollapsed,
+  normalizeFormItems,
+  normalizeFormRules,
+  normalizeFormValueAndRules,
+  normalizeVisible,
+} from './index.ts'
 
 /** useForm 返回值类型 */
 export interface UseFormResult {

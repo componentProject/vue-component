@@ -82,8 +82,8 @@
 </template>
 
 <script setup>
-import { h, onMounted, reactive, ref } from 'vue'
 import { ElMessage, ElTag } from 'element-plus'
+import { h, onMounted, reactive, ref } from 'vue'
 import ConfigTable from './index.vue'
 
 // 表格加载状态

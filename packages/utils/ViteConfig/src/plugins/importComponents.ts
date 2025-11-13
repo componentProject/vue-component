@@ -1,6 +1,6 @@
 import type { Plugin } from 'vite'
-import { createVirtualPlugin } from './utils/virtual'
 import { getList } from '../../../_api'
+import { createVirtualPlugin } from './utils/virtual'
 
 export interface ImportComponentsOrUtilsOptions {
   /** 虚拟模块 id，默认 'virtual:remote' */

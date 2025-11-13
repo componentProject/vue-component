@@ -10,11 +10,11 @@
 </template>
 
 <script lang="ts">
+import { ElDivider } from 'element-plus'
 import { defineComponent } from 'vue'
+import { useWatch } from '../utils/customHooks'
 import { getFormConfig } from '../utils/fieldConfig'
 import fieldProps from '../utils/fieldProps'
-import { useWatch } from '../utils/customHooks'
-import { ElDivider } from 'element-plus'
 
 export default defineComponent({
   components: {

@@ -38,11 +38,11 @@
 </template>
 
 <script lang="ts" setup>
-import { computed } from 'vue'
-import dayjs from 'dayjs'
 import type { Dayjs } from 'dayjs'
-import allLocales from '../locale'
 import type { CalendarHeaderPropsType } from '../types'
+import dayjs from 'dayjs'
+import { computed } from 'vue'
+import allLocales from '../locale'
 
 const props = withDefaults(defineProps<CalendarHeaderPropsType>(), {
   localeContext: () => ({

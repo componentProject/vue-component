@@ -48,16 +48,16 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
-import { getFormConfig } from '../utils/fieldConfig'
-import fieldProps from '../utils/fieldProps'
+import { ArrowDown, ArrowUp, Delete, Plus, QuestionFilled } from '@element-plus/icons-vue'
 import {
   ElCheckbox,
   ElIcon,
   ElInput,
   ElTooltip,
 } from 'element-plus'
-import { ArrowDown, ArrowUp, Delete, Plus, QuestionFilled } from '@element-plus/icons-vue'
+import { defineComponent } from 'vue'
+import { getFormConfig } from '../utils/fieldConfig'
+import fieldProps from '../utils/fieldProps'
 
 export default defineComponent({
   ControlType: 'KeyValueConfigMult', // 必须与文件名匹配

@@ -1,37 +1,7 @@
 import type { Plugin } from 'postcss'
-import path from 'node:path'
+import type { ConfigEnv, PluginOption, UserConfig } from 'vite'
 
-// vite vue插件
-import pluginVue from '@vitejs/plugin-vue'
-import vueJsx from '@vitejs/plugin-vue-jsx'
-import vueDevTools from 'vite-plugin-vue-devtools'
-
-// tailwind
-import autoprefixer from 'autoprefixer'
-import tailwindcss from '@tailwindcss/postcss'
-
-// 性能优化模块
-import { visualizer as visualizerPlugin } from 'rollup-plugin-visualizer'
-import AutoImport from 'unplugin-auto-import/vite'
-import Components from 'unplugin-vue-components/vite'
-import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
-import importToCDN from 'vite-plugin-cdn-import'
-import viteCompression from 'vite-plugin-compression'
-import viteImagemin from 'vite-plugin-imagemin'
-import { VitePWA } from 'vite-plugin-pwa'
-import { codeInspectorPlugin } from 'code-inspector-plugin'
-import { modules } from './constants/index.ts'
-
-// qiankun
-import qiankunPlugin from 'vite-plugin-qiankun'
-import scopedCssPrefixPlugin from './plugins/addScopedAndReplacePrefix.ts'
-
-// 自动路由
-import autoRoutesPlugin from './plugins/autoRoutes/index.ts'
 import type { UserOptions as PagesOptions } from 'vite-plugin-pages'
-// 页面路由
-import Pages from 'vite-plugin-pages'
-
 import type {
   CompressionOptions,
   ImageminOptions,
@@ -39,12 +9,42 @@ import type {
   PluginType,
   ViteConfigType,
 } from './_types/index.ts'
-import { deepMerge } from '../../_utils/object.ts'
+import path from 'node:path'
 
-import type { ConfigEnv, PluginOption, UserConfig } from 'vite'
+import tailwindcss from '@tailwindcss/postcss'
+// vite vue插件
+import pluginVue from '@vitejs/plugin-vue'
+
+import vueJsx from '@vitejs/plugin-vue-jsx'
+// tailwind
+import autoprefixer from 'autoprefixer'
+import { codeInspectorPlugin } from 'code-inspector-plugin'
+// 性能优化模块
+import { visualizer as visualizerPlugin } from 'rollup-plugin-visualizer'
+import AutoImport from 'unplugin-auto-import/vite'
+import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
+import Components from 'unplugin-vue-components/vite'
 // 其余vite插件与配置
 import { defineConfig, mergeConfig } from 'vite'
+import importToCDN from 'vite-plugin-cdn-import'
+import viteCompression from 'vite-plugin-compression'
+
 import { createHtmlPlugin } from 'vite-plugin-html'
+import viteImagemin from 'vite-plugin-imagemin'
+
+// 页面路由
+import Pages from 'vite-plugin-pages'
+import { VitePWA } from 'vite-plugin-pwa'
+// qiankun
+import qiankunPlugin from 'vite-plugin-qiankun'
+
+import vueDevTools from 'vite-plugin-vue-devtools'
+import { deepMerge } from '../../_utils/object.ts'
+
+import { modules } from './constants/index.ts'
+import scopedCssPrefixPlugin from './plugins/addScopedAndReplacePrefix.ts'
+// 自动路由
+import autoRoutesPlugin from './plugins/autoRoutes/index.ts'
 
 // workbox urlPattern 参数类型
 interface UrlPatternContext {
@@ -73,14 +73,14 @@ export default function createViteConfig(Config: ViteConfigType) {
       autoComponent = true,
       compression = true,
       imagemin = true,
-      cdn = true,
-      visualizer = true,
-      autoRoutes = true,
-      pageRoutes = false,
-      pwa = true,
       codeInspector = true,
+      port = 3000,
+      visualizer = false,
+      autoRoutes = false,
+      cdn = false,
+      pageRoutes = false,
+      pwa = false,
       devtools,
-      port,
       open,
       qiankunDevMode,
       qiankun,
@@ -121,14 +121,7 @@ export default function createViteConfig(Config: ViteConfigType) {
         deepMerge(
           {
             resolvers: [ElementPlusResolver()],
-            globs: [
-              'src/components/**/index.vue',
-              'src/components/**/index.ts',
-              '!src/components/**/base/**/*',
-              '!src/components/**/components/**/*',
-              '!src/components/**/src/**/*',
-              '!src/components/**/_*/**/*',
-            ],
+            globs: [],
             dts: path.resolve(rootPath, './src/typings/components.d.ts'),
           },
           autoComponent,

@@ -77,6 +77,23 @@
 import type {
   ComputedRef,
 } from 'vue'
+import type {
+  AllFormItem,
+  BaseComponentItem,
+  BaseFormConfig,
+  Controls,
+} from '../type'
+import { ArrowLeft, ArrowRight } from '@element-plus/icons-vue'
+import {
+  ElEmpty,
+  ElForm,
+  ElFormItem,
+  ElIcon,
+  ElNotification,
+  ElScrollbar,
+  ElTabPane,
+  ElTabs,
+} from 'element-plus'
 import {
   computed,
   defineAsyncComponent,
@@ -88,27 +105,10 @@ import {
   toRaw,
   watch,
 } from 'vue'
-import ControllEditSize from '../layouts/ControlEditSize.vue'
 import { globalFormList } from '../common/formJson'
-import type {
-  AllFormItem,
-  BaseComponentItem,
-  BaseFormConfig,
-  Controls,
-} from '../type'
 import Loading from '../common/Loading.vue'
 import { useFormDesignStore } from '../composables/useFormDesignStore'
-import {
-  ElEmpty,
-  ElForm,
-  ElFormItem,
-  ElIcon,
-  ElNotification,
-  ElScrollbar,
-  ElTabPane,
-  ElTabs,
-} from 'element-plus'
-import { ArrowLeft, ArrowRight } from '@element-plus/icons-vue'
+import ControllEditSize from '../layouts/ControlEditSize.vue'
 
 export default defineComponent({
   components: {

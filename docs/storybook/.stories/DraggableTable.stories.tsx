@@ -1,9 +1,9 @@
 // noinspection JSUnusedGlobalSymbols
 
+import type { TableRowData } from '@moluoxixi/components/DraggableTable/src/_types'
 import type { Meta, StoryFn, StoryObj } from '@storybook/vue3'
 import DraggableTable from '@moluoxixi/components/DraggableTable'
 import { ref } from 'vue'
-import type { TableRowData } from '@moluoxixi/components/DraggableTable/src/_types'
 
 /**
  * 可拖拽表格组件

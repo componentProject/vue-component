@@ -1,12 +1,12 @@
 import type { App } from 'vue'
+import StarfishForm from 'starfish-form'
 import { defineAsyncComponent } from 'vue'
+import Loading from './common/Loading.vue'
+import StarfishEditor from './starfish-editor.vue'
 import 'element-plus/dist/index.css'
 import './styles/index.scss'
 import 'jsoneditor/dist/jsoneditor.min.css'
-import StarfishForm from 'starfish-form'
 import 'starfish-form/dist/style.css'
-import StarfishEditor from './starfish-editor.vue'
-import Loading from './common/Loading.vue'
 
 export default {
   install: (app: App) => {

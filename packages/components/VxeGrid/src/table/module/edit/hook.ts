@@ -1,12 +1,12 @@
+import type { TableEditMethods, TableEditPrivateMethods } from '../../../../types'
 import { nextTick, reactive } from 'vue'
 import XEUtils from 'xe-utils'
 import { VxeUI } from '../../../ui'
-import { isEnableConf } from '../../../ui/src/utils'
-import { getCellValue, getRowid, setCellValue } from '../../src/util'
 import { addClass, browse, removeClass } from '../../../ui/src/dom'
 import { errLog, warnLog } from '../../../ui/src/log'
+import { isEnableConf } from '../../../ui/src/utils'
 
-import type { TableEditMethods, TableEditPrivateMethods } from '../../../../types'
+import { getCellValue, getRowid, setCellValue } from '../../src/util'
 
 const { getConfig, renderer, hooks, getI18n } = VxeUI
 

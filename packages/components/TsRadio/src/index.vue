@@ -28,10 +28,10 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
-import { ElRadio, ElRadioGroup } from 'element-plus'
-import { useOptions } from '../../_hooks'
 import type { emitsType, propsType, slotsType } from './_types'
+import { ElRadio, ElRadioGroup } from 'element-plus'
+import { computed } from 'vue'
+import { useOptions } from '../../_hooks'
 
 defineOptions({
   name: 'TsRadio',

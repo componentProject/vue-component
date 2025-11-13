@@ -168,10 +168,10 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
-import { ElButton, ElCard, ElMessage } from 'element-plus'
-import MarkdownEditor from './index.vue'
 import type { DocumentListItem, ImageData, MessageType, SaveSuccessDataType } from './_types'
+import { ElButton, ElCard, ElMessage } from 'element-plus'
+import { computed, onMounted, ref } from 'vue'
+import MarkdownEditor from './index.vue'
 
 // 响应式数据
 const content = ref(`# 欢迎使用 MarkdownEditor

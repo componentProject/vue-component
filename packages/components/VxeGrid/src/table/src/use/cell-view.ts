@@ -1,7 +1,7 @@
-import { computed } from 'vue'
-import XEUtils from 'xe-utils'
-
 import type { VxeGlobalRendererHandles, VxeTableDefines } from '../../../../types'
+import { computed } from 'vue'
+
+import XEUtils from 'xe-utils'
 
 export function useCellView<D = any, P = Record<string, any>>(props: {
   renderOpts: VxeGlobalRendererHandles.RenderTableCellOptions | VxeGlobalRendererHandles.RenderTableEditOptions

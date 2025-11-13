@@ -10,10 +10,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import zhCn from 'element-plus/dist/locale/zh-cn.mjs'
 import { ElConfigProvider } from 'element-plus'
+import zhCn from 'element-plus/dist/locale/zh-cn.mjs'
 import moment from 'moment'
+import { ref } from 'vue'
 
 const val = ref<string[]>([])
 const today = moment().format('YYYY-MM-DD')

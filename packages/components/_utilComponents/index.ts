@@ -1,5 +1,5 @@
-import Render from './Render'
 import Buttons from './Buttons'
+import Render from './Render'
 
 export {
   Buttons,

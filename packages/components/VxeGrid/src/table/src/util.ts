@@ -1,9 +1,9 @@
+import type { VxeTableConstructor, VxeTableDefines, VxeTablePrivateMethods } from '../../../types'
 import { reactive, watch } from 'vue'
 import XEUtils from 'xe-utils'
-import { ColumnInfo } from './columnInfo'
 import { isPx, isScale } from '../../ui/src/dom'
 
-import type { VxeTableConstructor, VxeTableDefines, VxeTablePrivateMethods } from '../../../types'
+import { ColumnInfo } from './columnInfo'
 
 function getAllConvertColumns(columns: any, parentColumn?: any) {
   const result: any[] = []

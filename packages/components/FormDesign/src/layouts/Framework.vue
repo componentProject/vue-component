@@ -38,9 +38,9 @@
 </template>
 
 <script lang="ts">
+import type { Controls } from '../type'
 import { computed, defineComponent, inject } from 'vue'
 import Resizer from './Resizer.vue'
-import type { Controls } from '../type'
 
 export default defineComponent({
   components: {

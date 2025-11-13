@@ -17,9 +17,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import zhCn from 'element-plus/dist/locale/zh-cn.mjs'
 import { ElButton, ElConfigProvider } from 'element-plus'
+import zhCn from 'element-plus/dist/locale/zh-cn.mjs'
+import { ref } from 'vue'
 
 const val = ref<string[]>([])
 const picker = ref<{ focus: () => void, blur: () => void } | null>(null)

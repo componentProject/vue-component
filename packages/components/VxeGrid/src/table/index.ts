@@ -1,4 +1,5 @@
 import type { App } from 'vue'
+import type { TableHandleExport } from '../../types'
 import { VxeUI } from '../ui'
 import VxeTableComponent from './src/table'
 import { useCellView } from './src/use'
@@ -9,9 +10,8 @@ import './module/export/hook'
 import './module/keyboard/hook'
 import './module/validator/hook'
 import './module/custom/hook'
-import './render'
 
-import type { TableHandleExport } from '../../types'
+import './render'
 
 export const VxeTable = Object.assign({}, VxeTableComponent, {
   install(app: App) {

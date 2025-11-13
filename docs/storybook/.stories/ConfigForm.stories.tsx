@@ -1,7 +1,7 @@
 // noinspection JSUnusedGlobalSymbols
 
-import ConfigForm from '@moluoxixi/components/ConfigForm'
 import type { Meta, StoryFn } from '@storybook/vue3'
+import ConfigForm from '@moluoxixi/components/ConfigForm'
 // import type { ConfigFormProps } from '@moluoxixi/components/ConfigForm/types'
 
 /**

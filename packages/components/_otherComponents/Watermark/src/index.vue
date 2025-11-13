@@ -5,8 +5,8 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
 import type { propsType } from './types'
+import { computed, ref, watch } from 'vue'
 import useWatermark from './hooks/useWatermark.ts'
 
 const props = withDefaults(defineProps<propsType>(), {})

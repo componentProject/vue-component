@@ -1,8 +1,8 @@
-import { getHttpService } from '../../utils/AjaxPackage/netseriver.js'
-import FormData from 'form-data'
 import { COMPONENT_SETTING_TYPE } from '@moluoxixi/constant'
+import FormData from 'form-data'
+import { BaseApi } from '../../utils/AjaxPackage'
 
-const httpApi: any = getHttpService({
+const httpApi: any = new BaseApi({
   baseURL: 'http://192.168.209.103:10019/ts-fm',
   timeout: 3000,
   getToken: () => null,
@@ -14,7 +14,7 @@ const httpApi: any = getHttpService({
   },
 })
 
-//上传组件
+// 上传组件
 export function setWebUpload(data: any) {
   const formData = new FormData()
 
@@ -37,7 +37,7 @@ export function setWebUpload(data: any) {
     },
   })
 }
-//获取组件列表
+// 获取组件列表
 export async function getList(data?: any) {
   const res = await httpApi.post('file/getList', {
     productCode: 'webFile_his',
@@ -47,12 +47,12 @@ export async function getList(data?: any) {
   return res[COMPONENT_SETTING_TYPE]
 }
 
-//获取组件实例
+// 获取组件实例
 export function getDownLoadByIds(data: any) {
   return httpApi.post('/file/downLoadByIds', data)
 }
 
-//删除组件库组件
+// 删除组件库组件
 export function setDeleteByPathAndCode(componentCode: string, code: string = 'webfile') {
   return httpApi.post('/file/deleteByPathAndCode', {
     code,

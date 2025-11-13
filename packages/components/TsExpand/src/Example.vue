@@ -188,8 +188,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
 import { ElButton, ElTag } from 'element-plus'
+import { ref } from 'vue'
 import TsExpand from './index.vue'
 
 const eventLogs = ref<string[]>([])

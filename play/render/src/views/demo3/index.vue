@@ -25,11 +25,11 @@
 </template>
 
 <script setup lang="ts">
-import { onBeforeMount, ref } from 'vue'
 // 虚拟模块由 Vite 插件在运行时提供
 import { getList, setDeleteByPathAndCode } from '@moluoxixi/utils/_api'
-import componentData from './data'
 import { ElButton, ElMessage } from 'element-plus'
+import { onBeforeMount, ref } from 'vue'
+import componentData from './data'
 // import Tabs from '@moluoxixi/components/Tabs'
 
 defineOptions({ name: '调试与演示iife和umd' })

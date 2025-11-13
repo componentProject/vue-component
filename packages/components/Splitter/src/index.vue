@@ -19,10 +19,10 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
-import { ElSplitter, ElSplitterPanel } from 'element-plus'
 import type { slotsType } from '@moluoxixi/components/_types'
 import type { emitsType, propsType } from './_types'
+import { ElSplitter, ElSplitterPanel } from 'element-plus'
+import { computed } from 'vue'
 
 // 面板配置接口
 interface PanelConfig {

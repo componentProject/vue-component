@@ -24,10 +24,10 @@
 <script setup lang="ts">
 /** 导入 Element Plus 图标 */
 import { ArrowDown } from '@element-plus/icons-vue'
-/** 导入 Vue 组合式 API */
-import { computed } from 'vue'
 /** 导入 Element Plus 组件 */
 import { ElButton } from 'element-plus'
+/** 导入 Vue 组合式 API */
+import { computed } from 'vue'
 /** 导入工具函数 */
 import { normalizeCollapsedText } from '../_utils'
 

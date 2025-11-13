@@ -40,15 +40,15 @@
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, ref, watch } from 'vue'
-import { config, editorExtensionsAttrs, MdCatalog, MdEditor, XSSPlugin } from 'md-editor-v3'
-import 'md-editor-v3/lib/style.css'
-import screenfull from 'screenfull'
-import { lineNumbers } from '@codemirror/view'
-import { foldGutter } from '@codemirror/language'
-import ancher from 'markdown-it-anchor'
-import { idbStorage } from '@moluoxixi/utils/_utils/indexdb'
 import type { DocumentListItem, emitsType, ImageData, propsType, SavedDocumentData, slotsType } from './_types'
+import { foldGutter } from '@codemirror/language'
+import { lineNumbers } from '@codemirror/view'
+import { idbStorage } from '@moluoxixi/utils/_utils/indexdb'
+import ancher from 'markdown-it-anchor'
+import { config, editorExtensionsAttrs, MdCatalog, MdEditor, XSSPlugin } from 'md-editor-v3'
+import screenfull from 'screenfull'
+import { computed, nextTick, ref, watch } from 'vue'
+import 'md-editor-v3/lib/style.css'
 
 defineOptions({
   name: 'MarkdownEditor',

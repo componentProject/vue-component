@@ -1,12 +1,12 @@
 import type { PropType } from 'vue'
-import { createCommentVNode, defineComponent, h, inject, onMounted, onUnmounted, provide, ref } from 'vue'
+import type { VxeColumnProps, VxeColumnPropTypes, VxeTableConstructor, VxeTablePrivateMethods } from '../../../types'
 import type { XEColumnInstance } from './util'
-import { assembleColumn, destroyColumn, watchColumn } from './util'
-import Cell from './cell'
+import { createCommentVNode, defineComponent, h, inject, onMounted, onUnmounted, provide, ref } from 'vue'
 // 导入 CSS Modules 样式文件
 import cssModules from '../../styles/modules/column.module.scss'
+import Cell from './cell'
 
-import type { VxeColumnProps, VxeColumnPropTypes, VxeTableConstructor, VxeTablePrivateMethods } from '../../../types'
+import { assembleColumn, destroyColumn, watchColumn } from './util'
 
 export const columnProps = {
   // 列唯一主键

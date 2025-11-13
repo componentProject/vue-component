@@ -1,13 +1,13 @@
 import type { VNode } from 'vue'
+import type { VxeColumnPropTypes, VxeComponentSlotType, VxeTableConstructor, VxeTableDefines, VxeTablePrivateMethods } from '../../../types'
 import { h } from 'vue'
 import XEUtils from 'xe-utils'
 import { VxeUI } from '../../ui'
-import { eqEmptyValue, formatText, getFuncText, isEnableConf } from '../../ui/src/utils'
 import { updateCellTitle } from '../../ui/src/dom'
-import { createColumn, getRowid } from './util'
+import { eqEmptyValue, formatText, getFuncText, isEnableConf } from '../../ui/src/utils'
 import { getSlotVNs } from '../../ui/src/vn'
 
-import type { VxeColumnPropTypes, VxeComponentSlotType, VxeTableConstructor, VxeTableDefines, VxeTablePrivateMethods } from '../../../types'
+import { createColumn, getRowid } from './util'
 
 const { getI18n, getIcon, renderer, formats } = VxeUI
 

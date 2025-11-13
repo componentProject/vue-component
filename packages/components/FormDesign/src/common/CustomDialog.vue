@@ -54,8 +54,6 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, ref } from 'vue'
-import { ElButton, ElContainer, ElHeader, ElIcon } from 'element-plus'
 import type { Component } from 'vue'
 import {
   Brush,
@@ -72,6 +70,8 @@ import {
   SwitchButton,
   Warning,
 } from '@element-plus/icons-vue'
+import { ElButton, ElContainer, ElHeader, ElIcon } from 'element-plus'
+import { computed, defineComponent, ref } from 'vue'
 
 export default defineComponent({
   components: {

@@ -31,12 +31,12 @@
 </template>
 
 <script lang="ts" setup>
-import type { ComponentPublicInstance } from 'vue'
-import { computed, nextTick, onUnmounted, ref, useTemplateRef, watch } from 'vue'
-import type { VxeTableDefines, VxeTablePropTypes } from 'vxe-table'
-import { ElPopover } from 'element-plus'
 import type { slotsType } from '@moluoxixi/components/_types'
+import type { ComponentPublicInstance } from 'vue'
+import type { VxeTableDefines, VxeTablePropTypes } from 'vxe-table'
 import type { baseEmitsType, basePropsType } from '../_types'
+import { ElPopover } from 'element-plus'
+import { computed, nextTick, onUnmounted, ref, useTemplateRef, watch } from 'vue'
 
 defineOptions({
   name: 'PopoverTableSelectBase',

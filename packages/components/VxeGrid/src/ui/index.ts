@@ -1,7 +1,7 @@
-import { VxeUI } from '@vxe-ui/core'
-import { getFuncText } from './src/utils'
-
 import type { VxeGlobalConfig, VxePrintDefines, VxeUploadDefines } from 'vxe-pc-ui'
+import { VxeUI } from '@vxe-ui/core'
+
+import { getFuncText } from './src/utils'
 
 export const version = '4.7.94' as string
 

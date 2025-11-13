@@ -68,6 +68,7 @@
 </template>
 
 <script lang="ts" setup>
+import type { slotsType } from '@moluoxixi/components/_types'
 import type {
   VxeGridInstance,
   VxeGridProps,
@@ -75,24 +76,9 @@ import type {
   VxeTableDefines,
   VxeTablePropTypes,
 } from 'vxe-table'
-import {
-  computed,
-  nextTick,
-  onBeforeUnmount,
-  onMounted,
-  ref,
-  useAttrs,
-  useTemplateRef,
-  watch,
-} from 'vue'
 import type { ColumnType, emitsType, propsType } from './_types'
-import { ElMessage } from 'element-plus'
-import { cloneDeep, groupBy } from 'lodash'
-import { diff, isEmpty } from 'radash'
-import Sortable from 'sortablejs'
-import { VxePager, VxeTooltip } from 'vxe-pc-ui'
-import cssModules from './styles/modules/all.module.scss'
 import VxeGrid from '@moluoxixi/components/VxeGrid'
+import { deleteMemoryUpload, getMemoryQuery, setMemoryUpload } from '@moluoxixi/utils/_api/cache'
 import {
   getClass,
   getType,
@@ -103,14 +89,28 @@ import {
   dispatchEvents,
   onHotkeys,
 } from '@moluoxixi/utils/_utils/event'
+import { ElMessage } from 'element-plus'
+import { cloneDeep, groupBy } from 'lodash'
+import { diff, isEmpty } from 'radash'
+import Sortable from 'sortablejs'
+import {
+  computed,
+  nextTick,
+  onBeforeUnmount,
+  onMounted,
+  ref,
+  useAttrs,
+  useTemplateRef,
+  watch,
+} from 'vue'
+
+import { VxePager, VxeTooltip } from 'vxe-pc-ui'
 
 import { getCustomType, handleGetRequiredFields } from './_utils'
-
+import CustomConfigDialog from './components/CustomConfigDialog.vue'
+import cssModules from './styles/modules/all.module.scss'
 // 导入自定义渲染器
 import './renderers'
-import type { slotsType } from '@moluoxixi/components/_types'
-import CustomConfigDialog from './components/CustomConfigDialog.vue'
-import { deleteMemoryUpload, getMemoryQuery, setMemoryUpload } from '@moluoxixi/utils/_api/cache'
 
 defineOptions({
   name: 'DraggableTable',
@@ -254,7 +254,7 @@ const props = withDefaults(defineProps<propsType>(), {
     }, slots: { default: 'select' } },
     { field: 'resizable', width: 70, title: '可调整', align: 'center', editable: true, slots: { default: 'switch' } },
   ],
-  //是否有权限统一配置（个性话化列配置）
+  // 是否有权限统一配置（个性话化列配置）
   isConfiguration: false,
   dialogProps: () => ({ zIndex: 1000 }),
   //#endregion

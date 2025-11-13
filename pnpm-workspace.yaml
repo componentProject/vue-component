@@ -24,18 +24,20 @@ catalogs:
     '@moluoxixi/classnames': latest
     '@vue/runtime-core': ^3.5.21
     '@vue/runtime-dom': ^3.5.21
+    '@vxe-ui/core': 4.2.13
     axios: ^1.9.0
     # utils
     classnames: latest
     crypto-js: ^4.2.0
 
     dayjs: ^1.11.13
-    #element-plus
+    dom-zindex: 1.0.6
+    # e lement-plus
     element-plus: ^2.11.0
+    lodash: npm:lodash-es@4.17.21
     # markdown
     markdown-it: ^13.0.1
     markdown-it-container: ^3.0.0
-    lodash: npm:lodash-es@4.17.21
     moment: ^2.30.1
     pinia: 2.3.0
     pinia-plugin-persistedstate: ^4.2.0
@@ -49,8 +51,6 @@ catalogs:
     # vue的npm包
     vuedraggable: ^4.1.0
     vxe-table: 4.7.94
-    '@vxe-ui/core': 4.2.13
-    dom-zindex: 1.0.6
   dev:
     '@antfu/eslint-config': 6.2.0
     '@moluoxixi/ajaxpackage': ^0.0.2

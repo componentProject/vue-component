@@ -4,14 +4,14 @@
 </template>
 
 <script setup lang="ts">
-import { onBeforeUnmount, onMounted, useTemplateRef, watch } from 'vue'
 import type { languageType, themeType } from './_types'
-import * as monaco from 'monaco-editor/esm/vs/editor/editor.api'
-import { createMonacoDiffEditor, createMonacoEditor } from './_utils/editor'
-import { toMonacoLanguage } from './_utils/language'
-import { formatWithPrettier } from './_utils/format'
-import './_utils/workers'
 import type { CommonMonacoOptions } from './_utils/editor/common'
+import * as monaco from 'monaco-editor/esm/vs/editor/editor.api'
+import { onBeforeUnmount, onMounted, useTemplateRef, watch } from 'vue'
+import { createMonacoDiffEditor, createMonacoEditor } from './_utils/editor'
+import { formatWithPrettier } from './_utils/format'
+import { toMonacoLanguage } from './_utils/language'
+import './_utils/workers'
 
 defineOptions({
   name: 'Editor',

@@ -5,6 +5,7 @@ export default EslintConfig(
     ignores: [
       'docs/vitepress/.vitepress/theme/components/DocsCodeDemo/**',
       'packages/components/AIAgent/**',
+      'play/render/src/main.ts',
     ],
     rules: {
       // 未使用的变量

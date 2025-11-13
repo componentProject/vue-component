@@ -1,12 +1,12 @@
-import type { ConfigEnv, PluginOption, UserConfig } from 'vite'
-import type { Options as unpluginVueComponentsOptions } from 'unplugin-vue-components/types'
+import type { visualizer } from 'rollup-plugin-visualizer'
 import type { Options as unpluginAutoImportOptions } from 'unplugin-auto-import/types'
+import type { Options as unpluginVueComponentsOptions } from 'unplugin-vue-components/types'
+import type { ConfigEnv, PluginOption, UserConfig } from 'vite'
+import type importToCDN from 'vite-plugin-cdn-import'
 import type viteCompression from 'vite-plugin-compression'
 import type viteImagemin from 'vite-plugin-imagemin'
-import type importToCDN from 'vite-plugin-cdn-import'
-import type { visualizer } from 'rollup-plugin-visualizer'
-import type { Options as VitePWAOptions } from 'vite-plugin-pwa'
 import type { Options as PagesOptions } from 'vite-plugin-pages'
+import type { Options as VitePWAOptions } from 'vite-plugin-pwa'
 
 export type CompressionOptions = Parameters<typeof viteCompression>[0]
 export type ImageminOptions = Parameters<typeof viteImagemin>[0]

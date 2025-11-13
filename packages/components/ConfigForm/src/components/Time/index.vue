@@ -17,12 +17,12 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
-import fieldProps from '../../utils/fieldProps'
-import { getFormConfig } from '../../utils/fieldConfig'
-import { useWatch } from '../../utils/customHooks'
-import { ElIcon, ElTimePicker, ElTooltip } from 'element-plus'
 import { QuestionFilled } from '@element-plus/icons-vue'
+import { ElIcon, ElTimePicker, ElTooltip } from 'element-plus'
+import { defineComponent } from 'vue'
+import { useWatch } from '../../utils/customHooks'
+import { getFormConfig } from '../../utils/fieldConfig'
+import fieldProps from '../../utils/fieldProps'
 
 export default defineComponent({
   components: {

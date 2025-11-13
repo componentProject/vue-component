@@ -68,13 +68,13 @@
 </template>
 
 <script setup lang="ts">
-import type { Component as VueComponent } from 'vue'
-import { computed, nextTick, onMounted, onUnmounted, ref, useTemplateRef } from 'vue'
 import type { TreeNode, TreeNodeData } from 'element-plus'
-import { ElIcon, ElTreeV2 } from 'element-plus'
+import type { Component as VueComponent } from 'vue'
 import type { ButtonsItem, emitsType, propsType, slotsType } from './_types'
-import { Buttons } from '@moluoxixi/components/_utilComponents'
 import { Delete, Edit, Plus } from '@element-plus/icons-vue'
+import { Buttons } from '@moluoxixi/components/_utilComponents'
+import { ElIcon, ElTreeV2 } from 'element-plus'
+import { computed, nextTick, onMounted, onUnmounted, ref, useTemplateRef } from 'vue'
 
 defineOptions({
   name: 'Tree',

@@ -1,10 +1,10 @@
 import type { Ref } from 'vue'
-import { createCommentVNode, defineComponent, h, inject, ref, Teleport } from 'vue'
-import { VxeUI } from '../../../ui'
-import { getFuncText } from '../../../ui/src/utils'
-import XEUtils from 'xe-utils'
-
 import type { VxeTableConstructor, VxeTableMethods, VxeTablePrivateMethods } from '../../../../types'
+import { createCommentVNode, defineComponent, h, inject, ref, Teleport } from 'vue'
+import XEUtils from 'xe-utils'
+import { VxeUI } from '../../../ui'
+
+import { getFuncText } from '../../../ui/src/utils'
 
 const { getIcon } = VxeUI
 

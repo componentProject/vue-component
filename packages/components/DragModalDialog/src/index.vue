@@ -112,9 +112,9 @@
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, onMounted, ref, watch } from 'vue'
-import { Buttons } from '@moluoxixi/components/_utilComponents'
 import type { emitsType, propsType } from './_types'
+import { Buttons } from '@moluoxixi/components/_utilComponents'
+import { computed, nextTick, onMounted, ref, watch } from 'vue'
 
 defineOptions({
   name: 'DragModalDialog',

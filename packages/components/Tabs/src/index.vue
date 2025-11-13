@@ -29,10 +29,10 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
-import { ElTabPane, ElTabs } from 'element-plus'
-import { useOptions } from '../../_hooks'
 import type { emitsType, propsType, slotsType } from './_types'
+import { ElTabPane, ElTabs } from 'element-plus'
+import { computed } from 'vue'
+import { useOptions } from '../../_hooks'
 
 defineOptions({
   name: 'Tabs',

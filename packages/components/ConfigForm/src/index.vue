@@ -14,13 +14,13 @@
 </template>
 
 <script setup lang="ts">
-import { getCurrentInstance, inject, onMounted, ref, resolveComponent, toRaw } from 'vue'
+import type { FormDesignStore } from '@moluoxixi/components/FormDesign/src/store'
 import type { emitsType, propsType } from './_types'
+import { FormDesignStoreKey } from '@moluoxixi/components/FormDesign/src/store'
 import { ElForm, ElFormItem } from 'element-plus'
+import { getCurrentInstance, inject, onMounted, ref, resolveComponent, toRaw } from 'vue'
 // 直接从 main.ts 导入 formComponents，这样即使不调用 install 也能使用
 import { formComponents } from './main'
-import { FormDesignStoreKey } from '@moluoxixi/components/FormDesign/src/store'
-import type { FormDesignStore } from '@moluoxixi/components/FormDesign/src/store'
 import './styles/index.scss'
 
 defineOptions({
@@ -200,7 +200,7 @@ function handleControlChange() {
 }
 
 function transformData(data: any) {
-  /**普通模式转为高级模式的数据结构,方便复用 */
+  /** 普通模式转为高级模式的数据结构,方便复用 */
   const r: any = []
   data.forEach((item: any) => {
     r.push({

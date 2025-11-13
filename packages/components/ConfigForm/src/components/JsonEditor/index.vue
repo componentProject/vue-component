@@ -63,14 +63,14 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, nextTick, onMounted, ref, watch } from 'vue'
-import { getFormConfig } from '../../utils/fieldConfig'
-import fieldProps from '../../utils/fieldProps'
-import { useWatch } from '../../utils/customHooks'
-import JSONEditor from 'jsoneditor'
+import { FullScreen, QuestionFilled } from '@element-plus/icons-vue'
 import _ from '@moluoxixi/components/FormDesign/src/utils/_'
 import { ElButton, ElIcon, ElTooltip } from 'element-plus'
-import { FullScreen, QuestionFilled } from '@element-plus/icons-vue'
+import JSONEditor from 'jsoneditor'
+import { defineComponent, nextTick, onMounted, ref, watch } from 'vue'
+import { useWatch } from '../../utils/customHooks'
+import { getFormConfig } from '../../utils/fieldConfig'
+import fieldProps from '../../utils/fieldProps'
 
 interface jsonEditor {
   [key: string]: any

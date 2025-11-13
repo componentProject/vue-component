@@ -22,8 +22,8 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
 import { ElButton } from 'element-plus'
+import { computed, ref } from 'vue'
 
 const active = ref('A')
 const visible = ref(false)

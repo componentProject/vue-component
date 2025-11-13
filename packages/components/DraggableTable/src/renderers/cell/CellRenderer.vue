@@ -58,13 +58,13 @@
 </template>
 
 <script setup lang="ts">
-import type { VxeTableDefines } from 'vxe-table'
 import type { objType } from '@moluoxixi/components/_types'
+import type { VxeTableDefines } from 'vxe-table'
 import type { customCustomTypes } from '../../_types'
 import type { cellRendererPropsType } from './_types'
+import { detectDateFormatByReplace } from '@moluoxixi/utils/_utils/date'
 import { ElInput, ElProgress, ElSwitch, ElTag } from 'element-plus'
 import { computed, onMounted, ref, watch } from 'vue'
-import { detectDateFormatByReplace } from '@moluoxixi/utils/_utils/date'
 
 const props = defineProps<cellRendererPropsType>()
 

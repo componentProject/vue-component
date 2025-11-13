@@ -1,9 +1,9 @@
-import type { UiControl } from './controller/ui'
-import type { hisContrl } from './controller/history'
-import type { formContrl } from './controller/form'
-import type { ActionForm } from './controller/action'
-import type { shortCut } from './controller/shortcut'
 import type { fields, FormConfig } from '@moluoxixi/components/ConfigForm/src/utils/fieldConfig'
+import type { ActionForm } from './controller/action'
+import type { formContrl } from './controller/form'
+import type { hisContrl } from './controller/history'
+import type { shortCut } from './controller/shortcut'
+import type { UiControl } from './controller/ui'
 
 /**
  * 组件名称枚举

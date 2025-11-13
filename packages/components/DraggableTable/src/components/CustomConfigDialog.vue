@@ -115,14 +115,14 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, ref, useTemplateRef, watch } from 'vue'
-import { ElButton, ElCheckbox, ElInput, ElPopover, ElSwitch } from 'element-plus'
-import { getTypeName } from '@moluoxixi/components/DraggableTable/src/_utils'
 import type { CustomConfigDialogEmitsType, CustomConfigDialogPropsType } from '@moluoxixi/components/DraggableTable/src/_types'
-import { flattenTree, getClass } from '@moluoxixi/utils/_utils'
-import { cloneDeep } from 'lodash'
 import type { VxeGridInstance } from 'vxe-table'
+import { getTypeName } from '@moluoxixi/components/DraggableTable/src/_utils'
+import { flattenTree, getClass } from '@moluoxixi/utils/_utils'
+import { ElButton, ElCheckbox, ElInput, ElPopover, ElSwitch } from 'element-plus'
+import { cloneDeep } from 'lodash'
 import Sortable from 'sortablejs'
+import { computed, ref, useTemplateRef, watch } from 'vue'
 // import DragModalDialog from '@moluoxixi/components/DragModalDialog'
 
 const props = withDefaults(defineProps<CustomConfigDialogPropsType>(), {

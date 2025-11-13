@@ -13,9 +13,9 @@
 </template>
 
 <script setup lang="ts">
-import DragModalDialog from './index.vue'
-import { ref } from 'vue'
 import { ElButton } from 'element-plus'
+import { ref } from 'vue'
+import DragModalDialog from './index.vue'
 
 const visible = ref(false)
 </script>

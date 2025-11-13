@@ -1,6 +1,6 @@
+import type { shortCutType } from './formKeycon'
 import KeyController from 'keycon'
 import history from '../controller/history'
-import type { shortCutType } from './formKeycon'
 
 export function listenGlobalKeyDown(list: shortCutType, dom: HTMLDivElement | any) {
   const keycons: KeyController = new KeyController(dom)

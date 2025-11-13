@@ -1,11 +1,11 @@
+import type { TableFilterMethods, TableFilterPrivateMethods } from '../../../../types'
 import { nextTick } from 'vue'
 import XEUtils from 'xe-utils'
 import { VxeUI } from '../../../ui'
-import { handleFieldOrColumn, toFilters } from '../../src/util'
 import { getDomNode, triggerEvent } from '../../../ui/src/dom'
 import { isEnableConf } from '../../../ui/src/utils'
 
-import type { TableFilterMethods, TableFilterPrivateMethods } from '../../../../types'
+import { handleFieldOrColumn, toFilters } from '../../src/util'
 
 const { renderer, hooks } = VxeUI
 

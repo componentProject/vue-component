@@ -1,7 +1,7 @@
 // noinspection JSUnusedGlobalSymbols
 
-import MarkdownEditor from '@moluoxixi/components/MarkdownEditor'
 import type { Meta } from '@storybook/vue3'
+import MarkdownEditor from '@moluoxixi/components/MarkdownEditor'
 
 const meta: Meta = {
   title: 'markdown编辑器',

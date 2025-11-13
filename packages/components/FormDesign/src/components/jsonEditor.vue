@@ -3,8 +3,8 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, inject, onMounted, ref, toRaw } from 'vue'
 import JSONEditor from 'jsoneditor'
+import { computed, defineComponent, inject, onMounted, ref, toRaw } from 'vue'
 import { useFormDesignStore } from '../composables/useFormDesignStore'
 
 export default defineComponent({

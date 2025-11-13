@@ -1,5 +1,5 @@
-import { reactive, toRaw } from 'vue'
 import type { GetColumnWidth, setColumnWidth, UiState } from '../type'
+import { reactive, toRaw } from 'vue'
 
 const DEFAUTL_LEFT_COLUMN_WIDTH = 300
 const DEFAUTL_RIGHT_COLUMN_WIDTH = 400

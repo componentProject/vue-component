@@ -16,11 +16,11 @@
 </template>
 
 <script setup lang="ts">
+import type { emitsType, propsType, slotsType } from './_types'
+import { getTypeDefault } from '@moluoxixi/utils/_utils'
 import { ElButton } from 'element-plus'
 import { computed } from 'vue'
 import { read, utils } from 'xlsx'
-import { getTypeDefault } from '@moluoxixi/utils/_utils'
-import type { emitsType, propsType, slotsType } from './_types'
 
 defineOptions({
   name: 'ImportExcel',

@@ -1,13 +1,13 @@
-import type { Plugin } from 'vite'
-import { build } from 'vite'
-import { v4 } from 'uuid'
 import type { OutputAsset, OutputBundle, OutputChunk } from 'rollup'
+import type { Plugin } from 'vite'
 import type { BuildCSSInjectionConfiguration, CSSInjectionConfiguration, PluginConfiguration } from './interface'
+import { v4 } from 'uuid'
+import { build } from 'vite'
 
 interface InjectCodeOptions {
   styleId?: string | (() => string)
   useStrictCSP?: boolean
-  //TODO: (BC) Migrate styleId into attributes.
+  // TODO: (BC) Migrate styleId into attributes.
   attributes?: { [key: string]: string } | undefined
 }
 

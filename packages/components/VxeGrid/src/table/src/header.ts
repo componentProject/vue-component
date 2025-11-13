@@ -1,11 +1,11 @@
 import type { PropType, Ref } from 'vue'
+import type { VxeColumnPropTypes, VxeTableConstructor, VxeTableDefines, VxeTableMethods, VxeTablePrivateMethods } from '../../../types'
 import { createCommentVNode, defineComponent, h, inject, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import XEUtils from 'xe-utils'
 import { VxeUI } from '../../ui'
-import { convertHeaderColumnToRows, getColReMinWidth } from './util'
 import { addClass, getOffsetPos, hasClass, removeClass } from '../../ui/src/dom'
 
-import type { VxeColumnPropTypes, VxeTableConstructor, VxeTableDefines, VxeTableMethods, VxeTablePrivateMethods } from '../../../types'
+import { convertHeaderColumnToRows, getColReMinWidth } from './util'
 
 const { renderer } = VxeUI
 

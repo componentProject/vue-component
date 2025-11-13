@@ -14,11 +14,11 @@
 </template>
 
 <script lang="ts">
-import type { PropType } from 'vue'
-import { defineComponent, getCurrentInstance, inject, onMounted, ref, toRaw } from 'vue'
-import { ElForm, ElFormItem } from 'element-plus'
-import { FormDesignStoreKey } from '@moluoxixi/components/FormDesign/src/store'
 import type { FormDesignStore } from '@moluoxixi/components/FormDesign/src/store'
+import type { PropType } from 'vue'
+import { FormDesignStoreKey } from '@moluoxixi/components/FormDesign/src/store'
+import { ElForm, ElFormItem } from 'element-plus'
+import { defineComponent, getCurrentInstance, inject, onMounted, ref, toRaw } from 'vue'
 
 export default defineComponent({
   name: 'Dynamicform',
@@ -176,7 +176,7 @@ export default defineComponent({
       emit('change')
     }
     function transformData(data: any) {
-      /**普通模式转为高级模式的数据结构,方便复用 */
+      /** 普通模式转为高级模式的数据结构,方便复用 */
       const r: any = []
       data.forEach((item: any) => {
         r.push({

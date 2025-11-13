@@ -19,13 +19,13 @@
 </template>
 
 <script lang="ts" setup>
+import type { propsType as ConfigProviderPropsType } from '@moluoxixi/components/components/_otherComponents/ConfigProvider/src/types'
+import type { Dayjs } from 'dayjs'
+import type { propsType, slotsType } from './types'
+import dayjs from 'dayjs'
+import { computed, inject, ref, watch } from 'vue'
 import CalendarHeader from './components/CalendarHeader.vue'
 import CalendarMonth from './components/CalendarMonth.vue'
-import dayjs from 'dayjs'
-import type { Dayjs } from 'dayjs'
-import { computed, inject, ref, watch } from 'vue'
-import type { propsType, slotsType } from './types'
-import type { propsType as ConfigProviderPropsType } from '@moluoxixi/components/components/_otherComponents/ConfigProvider/src/types'
 
 //  defineOptions  VUE 3.x  defineComponent
 defineOptions({

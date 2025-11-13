@@ -12,8 +12,8 @@
 </template>
 
 <script>
-import { defineComponent, ref } from 'vue'
 import { json } from '@codemirror/lang-json'
+import { defineComponent, ref } from 'vue'
 import { Codemirror } from 'vue-codemirror'
 
 export default defineComponent({

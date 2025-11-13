@@ -1,8 +1,8 @@
+import type { TableCustomMethods, TableCustomPrivateMethods, VxeColumnPropTypes, VxeTableDefines } from '../../../../types'
 import { nextTick } from 'vue'
-import { VxeUI } from '../../../ui'
 import XEUtils from 'xe-utils'
 
-import type { TableCustomMethods, TableCustomPrivateMethods, VxeColumnPropTypes, VxeTableDefines } from '../../../../types'
+import { VxeUI } from '../../../ui'
 
 const tableCustomMethodKeys: (keyof TableCustomMethods)[] = ['openCustom', 'closeCustom']
 

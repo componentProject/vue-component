@@ -1,4 +1,4 @@
-import G2 from './src/index.vue'
 import { withInstall } from '@moluoxixi/utils/_utils'
+import G2 from './src/index.vue'
 
 export default withInstall(G2)

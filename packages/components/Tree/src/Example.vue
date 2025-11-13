@@ -45,8 +45,8 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
 import { Tree } from '@moluoxixi/components'
+import { computed, onMounted, ref } from 'vue'
 
 const containerRef = ref<HTMLElement>()
 const treeRef = ref()

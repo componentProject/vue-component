@@ -1,6 +1,6 @@
+import type { App } from 'vue'
 import ConfigForm from './src/index.vue'
 import { install as init } from './src/main'
-import type { App } from 'vue'
 
 function configFormInstall(app: App) {
   init(app)

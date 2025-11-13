@@ -1,12 +1,12 @@
 import type { Ref } from 'vue'
-import { computed, createCommentVNode, defineComponent, h, inject, nextTick, reactive, ref } from 'vue'
-import { VxeUI } from '../../../ui'
-import XEUtils from 'xe-utils'
-import { formatText } from '../../../ui/src/utils'
-import { errLog } from '../../../ui/src/log'
-
 import type { VxeButtonComponent, VxeCheckboxComponent, VxeInputComponent, VxeModalComponent, VxeSelectComponent } from 'vxe-pc-ui'
 import type { VxeTableConstructor, VxeTableMethods, VxeTablePrivateMethods } from '../../../../types'
+import { computed, createCommentVNode, defineComponent, h, inject, nextTick, reactive, ref } from 'vue'
+import XEUtils from 'xe-utils'
+import { VxeUI } from '../../../ui'
+
+import { errLog } from '../../../ui/src/log'
+import { formatText } from '../../../ui/src/utils'
 
 const { getI18n, getIcon } = VxeUI
 const process = {

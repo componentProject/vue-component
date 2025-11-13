@@ -1,14 +1,14 @@
 import type { PropType, Ref, VNode } from 'vue'
-import { computed, createCommentVNode, defineComponent, h, inject, nextTick, reactive, ref } from 'vue'
-import XEUtils from 'xe-utils'
-import { VxeUI } from '../../ui'
-import { getSlotVNs } from '../../ui/src/vn'
-import { errLog, warnLog } from '../../ui/src/log'
-// 导入 CSS Modules 样式文件
-import cssModules from '../../styles/modules/toolbar.module.scss'
-
 import type { ValueOf, VxeButtonComponent, VxeButtonEvents } from 'vxe-pc-ui'
 import type { GridPrivateMethods, ToolbarInternalData, ToolbarMethods, ToolbarPrivateRef, ToolbarReactData, VxeGridConstructor, VxeToolbarConstructor, VxeToolbarEmits, VxeToolbarPropTypes } from '../../../types'
+import { computed, createCommentVNode, defineComponent, h, inject, nextTick, reactive, ref } from 'vue'
+import XEUtils from 'xe-utils'
+// 导入 CSS Modules 样式文件
+import cssModules from '../../styles/modules/toolbar.module.scss'
+import { VxeUI } from '../../ui'
+
+import { errLog, warnLog } from '../../ui/src/log'
+import { getSlotVNs } from '../../ui/src/vn'
 
 const { getConfig, getIcon, getI18n, renderer, commands, createEvent, useFns } = VxeUI
 

@@ -31,14 +31,6 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, watch } from 'vue'
-import DesignFormRules from './components/DesignFormRules.vue'
-import DesignFormList from './components/DesignFormList.vue'
-import { componentMap, formItemObj } from './datas'
-import { defaultFormConfig } from './datas/formData'
-import { deepClone, deserializeWithFunctions, serializeWithFunctions } from './utils/formSerializer'
-import { ElMessage } from 'element-plus'
-import { isObject } from 'lodash'
 import type {
   DesignFormRulesInstance,
   FormConfig,
@@ -46,6 +38,14 @@ import type {
   FormItem,
   FormItemClickEvent,
 } from './types'
+import { ElMessage } from 'element-plus'
+import { isObject } from 'lodash'
+import { onMounted, ref, watch } from 'vue'
+import DesignFormList from './components/DesignFormList.vue'
+import DesignFormRules from './components/DesignFormRules.vue'
+import { componentMap, formItemObj } from './datas'
+import { defaultFormConfig } from './datas/formData'
+import { deepClone, deserializeWithFunctions, serializeWithFunctions } from './utils/formSerializer'
 
 defineOptions({ name: 'DesignForm' })
 

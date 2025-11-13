@@ -1,5 +1,3 @@
-/** 移除未使用的类型导入 */
-import { unref } from 'vue'
 /** 导入 Vue 的 MaybeRef 类型 */
 import type { MaybeRef } from 'vue'
 /** 导入表单相关类型定义 */
@@ -13,6 +11,8 @@ import type {
 } from '../_types'
 /** 导入 lodash 工具函数 */
 import { cloneDeep, isArray, isString, isUndefined } from 'lodash'
+/** 移除未使用的类型导入 */
+import { unref } from 'vue'
 /** 导入常量定义 */
 import {
   DEFAULT_COLLAPSED_TEXT,

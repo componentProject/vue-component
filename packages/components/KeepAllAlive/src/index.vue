@@ -7,9 +7,9 @@
 </template>
 
 <script lang="ts" setup>
+import type { emitsType, propsType, slotsType } from './_types'
 import { h, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import type { emitsType, propsType, slotsType } from './_types'
 
 defineOptions({
   name: 'KeepAllAlive',

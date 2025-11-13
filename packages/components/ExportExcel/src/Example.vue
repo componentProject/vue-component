@@ -106,9 +106,9 @@
 </template>
 
 <script setup>
+import { ElTable, ElTableColumn } from 'element-plus'
 import { ref } from 'vue'
 import ExportExcel from './index.vue'
-import { ElTable, ElTableColumn } from 'element-plus'
 
 // 基本数据
 const tableData = ref([

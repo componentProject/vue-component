@@ -1,6 +1,6 @@
 import type { App } from 'vue'
-import { VxeUI } from '../ui'
 import VxeColgroupComponent from '../table/src/group'
+import { VxeUI } from '../ui'
 
 export const VxeColgroup = Object.assign({}, VxeColgroupComponent, {
   install(app: App) {

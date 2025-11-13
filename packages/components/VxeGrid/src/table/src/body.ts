@@ -1,14 +1,14 @@
 import type { ComputedRef, PropType, Ref } from 'vue'
+import type { VxeColumnPropTypes, VxeComponentSizeType, VxeComponentSlotType, VxeTableConstructor, VxeTableDefines, VxeTableMethods, VxeTablePrivateMethods } from '../../../types'
+import type { XEBodyScrollElement } from './util'
 import { createCommentVNode, defineComponent, h, inject, nextTick, onBeforeUnmount, onMounted, onUnmounted, ref } from 'vue'
 import XEUtils from 'xe-utils'
 import { VxeUI } from '../../ui'
-import type { XEBodyScrollElement } from './util'
-import { getRowid, mergeBodyMethod, removeScrollListener, restoreScrollListener } from './util'
 import { getPropClass, updateCellTitle } from '../../ui/src/dom'
 import { isEnableConf } from '../../ui/src/utils'
 import { getSlotVNs } from '../../ui/src/vn'
 
-import type { VxeColumnPropTypes, VxeComponentSizeType, VxeComponentSlotType, VxeTableConstructor, VxeTableDefines, VxeTableMethods, VxeTablePrivateMethods } from '../../../types'
+import { getRowid, mergeBodyMethod, removeScrollListener, restoreScrollListener } from './util'
 
 const { getI18n, renderer } = VxeUI
 

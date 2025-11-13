@@ -5,8 +5,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
 import type { Chart } from '@antv/g2'
+import { ref } from 'vue'
 
 const chartRef = ref<{ getChart: () => Chart } | null>(null)
 

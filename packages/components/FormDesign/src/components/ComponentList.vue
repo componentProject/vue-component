@@ -64,18 +64,8 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, ref } from 'vue'
-import formStore from '../controller/form'
-import type { BaseComponentItem } from '../type'
-import { useFormDesignStore } from '../composables/useFormDesignStore'
-import {
-  ElButton,
-  ElIcon,
-  ElInput,
-  ElScrollbar,
-} from 'element-plus'
 import type { Component } from 'vue'
-
+import type { BaseComponentItem } from '../type'
 import {
   Brush,
   Calendar,
@@ -89,7 +79,17 @@ import {
   SwitchButton,
   Warning,
 } from '@element-plus/icons-vue'
+import {
+  ElButton,
+  ElIcon,
+  ElInput,
+  ElScrollbar,
+} from 'element-plus'
+import { computed, defineComponent, ref } from 'vue'
 import Draggable from 'vuedraggable'
+
+import { useFormDesignStore } from '../composables/useFormDesignStore'
+import formStore from '../controller/form'
 
 export default defineComponent({
   components: {

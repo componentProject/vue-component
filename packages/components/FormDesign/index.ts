@@ -1,9 +1,9 @@
 import type { App } from 'vue'
-import FormDesign from './src/index.vue'
-import { defineAsyncComponent } from 'vue'
-import Loading from './src/common/Loading.vue'
 // 静态导入外部组件 ConfigForm
 import ConfigForm from '@moluoxixi/components/ConfigForm'
+import { defineAsyncComponent } from 'vue'
+import Loading from './src/common/Loading.vue'
+import FormDesign from './src/index.vue'
 
 // 导出组件
 export default FormDesign

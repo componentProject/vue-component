@@ -1,7 +1,7 @@
-import viteConfig, { wrapperEnv } from '../../packages/utils/ViteConfig/index.ts'
 import path from 'node:path'
 import process from 'node:process'
 import { loadEnv } from 'vite'
+import viteConfig, { wrapperEnv } from '../../packages/utils/ViteConfig/index.ts'
 
 export default viteConfig(
   ({ mode }) => {
@@ -15,7 +15,7 @@ export default viteConfig(
           appTitle: viteEnv.VITE_GLOB_APP_TITLE,
           appCode: viteEnv.VITE_GLOB_APP_CODE,
           port: 3301,
-          open: false,
+          autoComponent: false,
           // pwa: {
           //   manifest: {
           //     // 桌面设备安装界面所需的屏幕截图

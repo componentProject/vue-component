@@ -1,10 +1,10 @@
+import type { TableMenuMethods, TableMenuPrivateMethods } from '../../../../types'
 import { nextTick } from 'vue'
 import XEUtils from 'xe-utils'
 import { VxeUI } from '../../../ui'
 import { getAbsolutePos, getDomNode, getEventTargetNode } from '../../../ui/src/dom'
-import { hasChildrenList, isEnableConf } from '../../../ui/src/utils'
 
-import type { TableMenuMethods, TableMenuPrivateMethods } from '../../../../types'
+import { hasChildrenList, isEnableConf } from '../../../ui/src/utils'
 
 const { menus, hooks, globalEvents, GLOBAL_EVENT_KEYS } = VxeUI
 

@@ -1,12 +1,12 @@
+import type { TableValidatorMethods, TableValidatorPrivateMethods, VxeTableDefines } from '../../../../types'
 import { nextTick } from 'vue'
 import XEUtils from 'xe-utils'
 import { VxeUI } from '../../../ui'
-import { eqEmptyValue, getFuncText } from '../../../ui/src/utils'
 import { scrollToView } from '../../../ui/src/dom'
-import { getRowid, handleFieldOrColumn } from '../../src/util'
 import { errLog, warnLog } from '../../../ui/src/log'
+import { eqEmptyValue, getFuncText } from '../../../ui/src/utils'
 
-import type { TableValidatorMethods, TableValidatorPrivateMethods, VxeTableDefines } from '../../../../types'
+import { getRowid, handleFieldOrColumn } from '../../src/util'
 
 const { getConfig, validators, hooks } = VxeUI
 

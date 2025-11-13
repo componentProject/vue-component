@@ -30,14 +30,14 @@
 </template>
 
 <script setup lang="ts">
+import type { slotsType } from '@moluoxixi/components/_types'
 import type { InputInstance } from 'element-plus'
 import type { ComponentInternalInstance, ComponentPublicInstance } from 'vue'
-import { ElInput } from 'element-plus'
-import { debounce as wlDebounce, throttle as wlThrottle } from '@moluoxixi/utils/_utils/event'
-import { computed, ref, useTemplateRef, watch } from 'vue'
-import PopoverTableSelect from '@moluoxixi/components/PopoverTableSelect/src/base/index.vue'
-import type { slotsType } from '@moluoxixi/components/_types'
 import type { emitsType, propsType, ThrottleOrDebounceOptions } from './_types'
+import PopoverTableSelect from '@moluoxixi/components/PopoverTableSelect/src/base/index.vue'
+import { debounce as wlDebounce, throttle as wlThrottle } from '@moluoxixi/utils/_utils/event'
+import { ElInput } from 'element-plus'
+import { computed, ref, useTemplateRef, watch } from 'vue'
 
 defineOptions({
   name: 'PopoverTableSelect',

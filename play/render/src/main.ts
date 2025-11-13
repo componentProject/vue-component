@@ -1,7 +1,9 @@
 import type { QiankunProps } from 'vite-plugin-qiankun/dist/helper'
-import { createApp } from 'vue'
-import * as Vue from 'vue'
+import { COMPONENT_SETTING_TYPE } from '@moluoxixi/constant'
 import { idbStorage } from '@moluoxixi/utils/_utils/indexdb'
+import * as Vue from 'vue'
+import { getList } from '@moluoxixi/utils/_api'
+import { registerAllComponent } from '@moluoxixi/utils/_utils/loadComponent'
 import {
   browserTracingIntegration,
   init,
@@ -10,23 +12,21 @@ import {
   vueIntegration,
 } from '@sentry/vue'
 import { ElDialog, ElDrawer } from 'element-plus'
-
 import moment from 'moment'
+
 import { qiankunWindow, renderWithQiankun } from 'vite-plugin-qiankun/dist/helper'
+import { createApp } from 'vue'
 import directives from '@/directives'
 import i18n from '@/locales'
 import { store } from '@/stores'
 import { modifyComponents } from '@/utils'
+
 import App from './App.vue'
+
 import getRouter from './router'
 import { useSystemStore } from './stores/modules/system.ts'
-
 import '@/assets/styles/main.css'
-
 import 'moment/dist/locale/zh-cn' // 中文化
-import { registerAllComponent } from '@moluoxixi/utils/_utils/loadComponent'
-import { getList } from '@moluoxixi/utils/_api'
-import { COMPONENT_SETTING_TYPE } from '@moluoxixi/constant'
 
 moment.locale('zh-cn')
 

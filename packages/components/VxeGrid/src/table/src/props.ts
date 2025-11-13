@@ -1,7 +1,7 @@
 import type { PropType } from 'vue'
-import { VxeUI } from '../../ui'
-
 import type { VxeTablePropTypes } from '../../../types'
+
+import { VxeUI } from '../../ui'
 
 const { getConfig } = VxeUI
 

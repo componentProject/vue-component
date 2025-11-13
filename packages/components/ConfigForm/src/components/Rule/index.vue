@@ -165,6 +165,9 @@
 </template>
 
 <script lang="ts">
+import { Delete, QuestionFilled } from '@element-plus/icons-vue'
+import _ from '@moluoxixi/components/FormDesign/src/utils/_'
+import { ElAlert, ElButton, ElCollapse, ElCollapseItem, ElDropdown, ElDropdownItem, ElDropdownMenu, ElIcon, ElOption, ElSelect, ElTooltip } from 'element-plus'
 import {
   computed,
   defineComponent,
@@ -172,14 +175,11 @@ import {
   inject,
   ref,
 } from 'vue'
-import fieldProps from '../../utils/fieldProps'
-import _ from '@moluoxixi/components/FormDesign/src/utils/_'
-import ruleListData from './rules'
-import ruleJsonData from './ruleform.json'
-import { Delete, QuestionFilled } from '@element-plus/icons-vue'
-import { ElAlert, ElButton, ElCollapse, ElCollapseItem, ElDropdown, ElDropdownItem, ElDropdownMenu, ElIcon, ElOption, ElSelect, ElTooltip } from 'element-plus'
 // import Dynamicform from "../index.vue"; // 避免循环引用
 import { Codemirror } from 'vue-codemirror'
+import fieldProps from '../../utils/fieldProps'
+import ruleJsonData from './ruleform.json'
+import ruleListData from './rules'
 
 export default defineComponent({
   ControlType: 'Rule', // 必须与文件名匹配

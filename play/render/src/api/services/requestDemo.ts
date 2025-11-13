@@ -1,6 +1,6 @@
-import BaseApi from '../../api/utils'
 import type { AxiosResponse } from 'axios'
 import type { User } from '../../api'
+import BaseApi from '../../api/utils'
 
 const request = new BaseApi('/api/users')
 

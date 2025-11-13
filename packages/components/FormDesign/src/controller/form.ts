@@ -1,8 +1,8 @@
-import { reactive } from 'vue'
-import history from './history'
-import type { AllFormItem, BaseFormConfig, FormState } from '../type'
 import type { fieldsTrs, fieldTds } from '@moluoxixi/components/ConfigForm/src/utils/fieldConfig'
+import type { AllFormItem, BaseFormConfig, FormState } from '../type'
+import { reactive } from 'vue'
 import flex from '../utils/_'
+import history from './history'
 
 const state = reactive<FormState>({
   allFormList: [], // 存储所有选择的表单控件

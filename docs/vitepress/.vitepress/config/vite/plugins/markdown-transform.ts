@@ -1,3 +1,4 @@
+import type { Plugin } from 'vite'
 /**
  * Vite 插件：Markdown 文档转换
  *
@@ -10,9 +11,8 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import glob from 'fast-glob'
-import { docsPath, REPO_BRANCH, repoInfo, rootPath } from '../../../../contants/index.ts'
 
-import type { Plugin } from 'vite'
+import { docsPath, REPO_BRANCH, repoInfo, rootPath } from '../../../../contants/index.ts'
 
 // GitHub 链接常量
 const GITHUB_BLOB_URL = `${repoInfo.url}/blob/${REPO_BRANCH}`

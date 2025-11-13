@@ -3,11 +3,11 @@
 </template>
 
 <script setup lang="ts">
+import type { propsType } from './_types'
 // 等同extend(Runtime, stdlib())
 // import { Chart } from '@antv/g2'
 import { corelib, extend, Runtime } from '@antv/g2'
 import { onMounted, onUnmounted, useTemplateRef } from 'vue'
-import type { propsType } from './_types'
 
 defineOptions({
   name: 'G2',

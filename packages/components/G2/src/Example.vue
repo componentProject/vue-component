@@ -5,9 +5,9 @@
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue'
 // import { Chart } from '../index'
 import G2 from './index.vue'
-import { ref } from 'vue'
 
 //#region options
 const options = ref({

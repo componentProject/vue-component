@@ -1,10 +1,10 @@
+import type { VxeTableConstructor, VxeTableMethods, VxeTablePrivateMethods } from '../../../../types'
 import { computed, defineComponent, h, inject } from 'vue'
 import { VxeUI } from '../../../ui'
-import { formatText, isEnableConf } from '../../../ui/src/utils'
 import { getPropClass } from '../../../ui/src/dom'
-import { getSlotVNs } from '../../../ui/src/vn'
+import { formatText, isEnableConf } from '../../../ui/src/utils'
 
-import type { VxeTableConstructor, VxeTableMethods, VxeTablePrivateMethods } from '../../../../types'
+import { getSlotVNs } from '../../../ui/src/vn'
 
 const { getI18n, getIcon, renderer } = VxeUI
 
@@ -34,9 +34,11 @@ export default defineComponent({
       filterStore.isIndeterminate = false
     }
 
-    /*************************
+    /**
+     * ***********************
      * Publish methods
-     *************************/
+     ************************
+     */
     // 确认筛选
     const confirmFilter = (evnt: Event) => {
       $xeTable.handleFilterConfirmFilter(evnt)
@@ -75,9 +77,11 @@ export default defineComponent({
         resetFilter(evnt)
       }
     }
-    /*************************
+    /**
+     * ***********************
      * Publish methods
-     *************************/
+     ************************
+     */
 
     const $panel = {
       changeRadioOption,

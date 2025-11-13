@@ -10,8 +10,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
 import { ElButton } from 'element-plus'
+import { ref } from 'vue'
 
 const refTable = ref<any>(null)
 const tableData = ref([{ id: 1, name: 'A' }])

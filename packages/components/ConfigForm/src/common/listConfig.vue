@@ -18,10 +18,10 @@
 </template>
 
 <script lang="ts">
+import { Delete } from '@element-plus/icons-vue'
+import { ElButton, ElIcon, ElInputNumber, ElRow } from 'element-plus'
 import { defineComponent } from 'vue'
 import fieldProps from '../utils/fieldProps'
-import { ElButton, ElIcon, ElInputNumber, ElRow } from 'element-plus'
-import { Delete } from '@element-plus/icons-vue'
 
 export default defineComponent({
   ControlType: 'ListConfig', // 必须与文件名匹配

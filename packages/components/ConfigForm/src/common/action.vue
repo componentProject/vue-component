@@ -47,7 +47,6 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, inject, ref } from 'vue'
 import { Delete, Edit, QuestionFilled } from '@element-plus/icons-vue'
 import {
   ElButton,
@@ -63,6 +62,7 @@ import {
   ElSelect,
   ElTooltip,
 } from 'element-plus'
+import { computed, defineComponent, inject, ref } from 'vue'
 import fieldProps from '../utils/fieldProps'
 
 export default defineComponent({

@@ -1,6 +1,6 @@
+import type { AllFormItem, BaseComponentItem, PartialKey } from '../type'
 import { ElNotification } from 'element-plus'
 import { nanoid } from 'nanoid'
-import type { AllFormItem, BaseComponentItem, PartialKey } from '../type'
 
 import formStore from '../controller/form'
 

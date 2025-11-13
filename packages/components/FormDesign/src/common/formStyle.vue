@@ -49,12 +49,12 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, getCurrentInstance, ref } from 'vue'
 import { css } from '@codemirror/lang-css'
-
-import { Codemirror } from 'vue-codemirror'
-import { ElButton, ElFooter, ElIcon, ElTooltip } from 'element-plus'
 import { QuestionFilled } from '@element-plus/icons-vue'
+
+import { ElButton, ElFooter, ElIcon, ElTooltip } from 'element-plus'
+import { defineComponent, getCurrentInstance, ref } from 'vue'
+import { Codemirror } from 'vue-codemirror'
 
 export default defineComponent({
   ControlType: 'FormStyle', // 必须与文件名匹配
@@ -110,33 +110,33 @@ export default defineComponent({
         const cssNameArray: any[] = []
         if (!!result && result.length > 0) {
           result.forEach((rItem: any) => {
-            const classArray = rItem.split(',') //切分逗号分割的多个class
+            const classArray = rItem.split(',') // 切分逗号分割的多个class
             if (classArray.length > 0) {
               classArray.forEach((cItem: any) => {
                 const caItem = cItem.trim()
                 if (caItem.includes('.', 1)) {
-                  //查找第二个.位置
+                  // 查找第二个.位置
                   const newClass = caItem.substring(
                     caItem.indexOf('.') + 1,
                     caItem.indexOf('.', 1),
-                  ) //仅截取第一、二个.号之间的class
+                  ) // 仅截取第一、二个.号之间的class
                   if (newClass) {
                     cssNameArray.push(newClass.trim())
                   }
                 }
                 else if (caItem.includes(' ')) {
-                  //查找第一个空格位置
+                  // 查找第一个空格位置
                   const newClass = caItem.substring(
                     caItem.indexOf('.') + 1,
                     caItem.indexOf(' '),
-                  ) //仅截取第一、二个.号之间的class
+                  ) // 仅截取第一、二个.号之间的class
                   if (newClass) {
                     cssNameArray.push(newClass.trim())
                   }
                 }
                 else {
                   if (caItem.includes('{')) {
-                    //查找第一个{位置
+                    // 查找第一个{位置
                     const newClass = caItem.substring(
                       caItem.indexOf('.') + 1,
                       caItem.indexOf('{'),
@@ -171,7 +171,7 @@ export default defineComponent({
         const head = document.getElementsByTagName('head')[0]
         const oldStyle = document.getElementById('starfish-custom-css')
         if (oldStyle) {
-          head.removeChild(oldStyle) //先清除后插入！！
+          head.removeChild(oldStyle) // 先清除后插入！！
         }
         const newStyle: any = document.createElement('style')
         newStyle.type = 'text/css'

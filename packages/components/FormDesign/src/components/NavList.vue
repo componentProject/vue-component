@@ -267,30 +267,7 @@
 
 <script lang="ts">
 import type { Component, PropType } from 'vue'
-import {
-  computed,
-  defineAsyncComponent,
-  defineComponent,
-  inject,
-  onMounted,
-  onUnmounted,
-  ref,
-  toRaw,
-  watch,
-} from 'vue'
 import type { AllFormItem, BaseComponentItem, Controls, MenuBarData } from '../type'
-import { clearCanvas } from '../utils/formKeycon'
-import { useFormDesignStore } from '../composables/useFormDesignStore'
-import {
-  ElButton,
-  ElDrawer,
-  ElIcon,
-  ElInput,
-  ElMessage,
-  ElTooltip,
-  ElTree,
-  ElUpload,
-} from 'element-plus'
 import {
   Brush,
   Calendar,
@@ -313,6 +290,29 @@ import {
   View,
   Warning,
 } from '@element-plus/icons-vue'
+import {
+  ElButton,
+  ElDrawer,
+  ElIcon,
+  ElInput,
+  ElMessage,
+  ElTooltip,
+  ElTree,
+  ElUpload,
+} from 'element-plus'
+import {
+  computed,
+  defineAsyncComponent,
+  defineComponent,
+  inject,
+  onMounted,
+  onUnmounted,
+  ref,
+  toRaw,
+  watch,
+} from 'vue'
+import { useFormDesignStore } from '../composables/useFormDesignStore'
+import { clearCanvas } from '../utils/formKeycon'
 
 export default defineComponent({
   components: {

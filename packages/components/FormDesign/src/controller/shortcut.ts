@@ -1,8 +1,8 @@
+import type { AllFormItem, ShortCutState } from '../type'
 // import { createStore } from "vuex";
 import { reactive } from 'vue'
-import { state as form } from './form'
-import type { AllFormItem, ShortCutState } from '../type'
 import flex from '../utils/_'
+import { state as form } from './form'
 
 const state = reactive<ShortCutState>({
   form,

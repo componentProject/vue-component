@@ -1,7 +1,7 @@
+import type { DefaultTheme } from 'vitepress'
 import fs from 'node:fs'
 import path from 'node:path'
 import { docsPath } from '../../../../contants/index.ts'
-import type { DefaultTheme } from 'vitepress'
 
 interface SidebarItem {
   text: string

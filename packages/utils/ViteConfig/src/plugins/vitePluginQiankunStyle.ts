@@ -1,16 +1,16 @@
+import type { IncomingMessage, ServerResponse } from 'node:http'
+import type { AtRule as PostcssAtRule, Root as PostcssRoot, Rule as PostcssRule } from 'postcss'
+import type { Plugin, ViteDevServer } from 'vite'
+import process from 'node:process'
+import postcss from 'postcss'
+// 没有类型定义也可使用，若缺失类型请安装 @types 或用自定义声明
+// 这里直接导入运行时函数
+import selectorParser from 'postcss-selector-parser'
 // qiankun-css-inject-plugin.js
 // 说明：
 // - 开发环境下给 CSS 选择器增加 data-qiankun="appId" 前缀，实现子应用样式隔离
 // - 在 dev server 中注入脚本，将含标识的 <style> 节点移动到子应用容器中，避免样式污染
 import { createFilter } from 'vite'
-import type { Plugin, ViteDevServer } from 'vite'
-import postcss from 'postcss'
-import type { AtRule as PostcssAtRule, Root as PostcssRoot, Rule as PostcssRule } from 'postcss'
-import process from 'node:process'
-import type { IncomingMessage, ServerResponse } from 'node:http'
-// 没有类型定义也可使用，若缺失类型请安装 @types 或用自定义声明
-// 这里直接导入运行时函数
-import selectorParser from 'postcss-selector-parser'
 
 export interface QiankunCssInjectOptions {
   target?: string

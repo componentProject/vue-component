@@ -139,16 +139,7 @@
 </template>
 
 <script lang="ts">
-import {
-  defineComponent,
-  getCurrentInstance,
-  inject,
-  onMounted,
-  reactive,
-  ref,
-} from 'vue'
-// import { javascript } from "@codemirror/lang-javascript";
-import { Codemirror } from 'vue-codemirror'
+import { CopyDocument, Delete, QuestionFilled } from '@element-plus/icons-vue'
 import {
   ElAside,
   ElButton,
@@ -161,7 +152,16 @@ import {
   ElScrollbar,
   ElTooltip,
 } from 'element-plus'
-import { CopyDocument, Delete, QuestionFilled } from '@element-plus/icons-vue'
+import {
+  defineComponent,
+  getCurrentInstance,
+  inject,
+  onMounted,
+  reactive,
+  ref,
+} from 'vue'
+// import { javascript } from "@codemirror/lang-javascript";
+import { Codemirror } from 'vue-codemirror'
 import { getFlex } from '../utils/customHooks'
 
 export default defineComponent({

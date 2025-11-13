@@ -31,11 +31,11 @@
 </template>
 
 <script>
-import ConditionGroup from './ConditionGroup.vue'
-import formStore from '../../controller/form'
+import { ElButton, ElContainer, ElFooter, ElMain } from 'element-plus'
 import { toRaw } from 'vue'
 import { useFormDesignStore } from '../../composables/useFormDesignStore'
-import { ElButton, ElContainer, ElFooter, ElMain } from 'element-plus'
+import formStore from '../../controller/form'
+import ConditionGroup from './ConditionGroup.vue'
 
 export default {
   components: {

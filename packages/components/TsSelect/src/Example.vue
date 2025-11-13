@@ -41,8 +41,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
 import TsSelect from '@moluoxixi/components/TsSelect'
+import { ref } from 'vue'
 
 const requestParams = ref({})
 function setParams() {

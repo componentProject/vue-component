@@ -3,9 +3,9 @@
 </template>
 
 <script setup lang="ts">
+import type { emitsType, propsType, slotsType } from './_types'
 import { getQueryMedicaIInsuranceInfoApi } from '@moluoxixi/utils/_api'
 import { onMounted, ref, useAttrs } from 'vue'
-import type { emitsType, propsType, slotsType } from './_types'
 
 defineOptions({ name: 'HisFooter', inheritAttrs: false })
 

@@ -1,7 +1,7 @@
-import type { ComponentInternalInstance } from 'vue'
-import { getCurrentInstance, inject, watch } from 'vue'
-import { FormDesignStoreKey } from '@moluoxixi/components/FormDesign/src/store'
 import type { FormDesignStore } from '@moluoxixi/components/FormDesign/src/store'
+import type { ComponentInternalInstance } from 'vue'
+import { FormDesignStoreKey } from '@moluoxixi/components/FormDesign/src/store'
+import { getCurrentInstance, inject, watch } from 'vue'
 
 /**
  * 获取 $Flex 工具函数

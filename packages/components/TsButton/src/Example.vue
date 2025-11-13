@@ -57,9 +57,9 @@
 </template>
 
 <script setup lang="ts">
-import TsButton from './index.vue'
 import { ElButton, ElDrawer, ElTable, ElTableColumn } from 'element-plus'
 import { ref } from 'vue'
+import TsButton from './index.vue'
 
 const drawerVisible = ref(false)
 

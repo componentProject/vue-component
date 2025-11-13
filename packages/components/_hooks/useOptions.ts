@@ -1,7 +1,7 @@
-import { computed, ref, watch } from 'vue'
 import type { ComputedRef } from 'vue'
 import BaseApi from '@moluoxixi/utils/AjaxPackage/class'
 import { isEqual } from 'lodash'
+import { computed, ref, watch } from 'vue'
 
 // 定义请求类型
 type RequestMethod = 'GET' | 'POST' | 'PUT' | 'DELETE'

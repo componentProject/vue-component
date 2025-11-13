@@ -27,12 +27,12 @@
 </template>
 
 <script lang="ts">
+import { ElFormItem, ElTabPane, ElTabs } from 'element-plus'
 import { computed, defineComponent, getCurrentInstance, inject, ref } from 'vue'
+import Draggable from 'vuedraggable'
+import { getFlex, useWatch } from '../utils/customHooks'
 import { getFormConfig } from '../utils/fieldConfig'
 import fieldProps from '../utils/fieldProps'
-import { getFlex, useWatch } from '../utils/customHooks'
-import { ElFormItem, ElTabPane, ElTabs } from 'element-plus'
-import Draggable from 'vuedraggable'
 
 export default defineComponent({
   components: {

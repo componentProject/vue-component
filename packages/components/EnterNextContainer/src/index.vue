@@ -6,8 +6,8 @@
 
 <script setup lang="ts">
 import type { ComponentPublicInstance } from 'vue'
-import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import type { emitsType, propsType, slotsType } from './_types'
+import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 
 defineOptions({
   name: 'EnterNextContainer',

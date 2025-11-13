@@ -14,7 +14,7 @@ export default {
   labelPosition: 'right',
   layout: 'flex', // grid、flex
   // editable: false, // 表单是否可编辑 可以用作详情使用
-  //disabled: true, // 表单是否禁止编辑
+  // disabled: true, // 表单是否禁止编辑
   items: [
     {
       label: 'Name',

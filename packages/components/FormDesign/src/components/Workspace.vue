@@ -56,6 +56,7 @@
 </template>
 
 <script lang="ts">
+import type { AllFormItem, BaseFormConfig, Controls } from '../type'
 import {
   computed,
   defineComponent,
@@ -64,11 +65,10 @@ import {
   ref,
   watch,
 } from 'vue'
-import { paste } from '../utils/formKeycon'
-import type { AllFormItem, BaseFormConfig, Controls } from '../type'
-import { useFormDesignStore } from '../composables/useFormDesignStore'
-import Shape from './Shape.vue'
 import Draggable from 'vuedraggable'
+import { useFormDesignStore } from '../composables/useFormDesignStore'
+import { paste } from '../utils/formKeycon'
+import Shape from './Shape.vue'
 
 export default defineComponent({
   components: {

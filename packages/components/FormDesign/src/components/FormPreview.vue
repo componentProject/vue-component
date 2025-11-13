@@ -77,6 +77,10 @@
 </template>
 
 <script lang="ts">
+// 静态导入外部组件 ConfigForm
+import ConfigForm from '@moluoxixi/components/ConfigForm'
+import Clipboard from 'clipboard'
+import { ElButton, ElFooter } from 'element-plus'
 import {
   computed,
   defineAsyncComponent,
@@ -85,11 +89,7 @@ import {
   watch,
 } from 'vue'
 import formStore from '../controller/form'
-// 静态导入外部组件 ConfigForm
-import ConfigForm from '@moluoxixi/components/ConfigForm'
 import uiControl from '../controller/ui'
-import Clipboard from 'clipboard'
-import { ElButton, ElFooter } from 'element-plus'
 // import { json } from "@codemirror/lang-json";
 // import Codemirror from 'vue-codemirror'
 export default defineComponent({

@@ -12,53 +12,53 @@ import type { ReGridResponsive } from '../_utils/useGridResponsive/types'
 export { ReGridResponsive }
 /** ReForm 组件属性接口定义 */
 export interface ReFormProps {
-  /**获取ElForm的ref方法 */
+  /** 获取ElForm的ref方法 */
   formRef?: (form: InstanceType<typeof ElForm> | null) => void
-  /**表单项配置内容 */
+  /** 表单项配置内容 */
   items: ReFormItem[]
-  /**绑定表单数据-用于数据同步 */
+  /** 绑定表单数据-用于数据同步 */
   modelValue?: ReFormModelValue
-  /**表单栅格列数 */
+  /** 表单栅格列数 */
   cols?: number | ReGridResponsive
-  /**表单栅格列间距 */
+  /** 表单栅格列间距 */
   colGap?: number
-  /**表单尺寸 */
+  /** 表单尺寸 */
   size?: 'large' | 'default' | 'small'
-  /**表单是否禁用 */
+  /** 表单是否禁用 */
   disabled?: boolean
-  /**表单是否可编辑/只读 */
+  /** 表单是否可编辑/只读 */
   editable?: boolean
-  /**表单校验失败是否自动滚动到第一个error字段位置 */
+  /** 表单校验失败是否自动滚动到第一个error字段位置 */
   scrollToError?: boolean
-  /**是否忽略表单按钮组标签宽度 */
+  /** 是否忽略表单按钮组标签宽度 */
   ignoreBtnLabel?: boolean
-  /**表单按钮组栅格占比 */
+  /** 表单按钮组栅格占比 */
   btnSpan?: number | ReGridResponsive
-  /**表单按钮组内联样式 */
+  /** 表单按钮组内联样式 */
   btnSpanStyle?: string
-  /**表单布局类型：grid或flex */
+  /** 表单布局类型：grid或flex */
   layout?: 'grid' | 'flex'
-  /**全局表单项宽度（在flex布局下生效） */
+  /** 全局表单项宽度（在flex布局下生效） */
   itemWidth?: number | string
-  /**表单按钮组-提交按钮文字 */
+  /** 表单按钮组-提交按钮文字 */
   submitBtnText?: string
-  /**表单按钮组-取消按钮文字 */
+  /** 表单按钮组-取消按钮文字 */
   cancelBtnText?: string
-  /**表单按钮组-提交按钮自定义属性 */
+  /** 表单按钮组-提交按钮自定义属性 */
   submitBtnProps?: ButtonProps
-  /**表单按钮组-取消按钮自定义属性 */
+  /** 表单按钮组-取消按钮自定义属性 */
   cancelBtnProps?: ButtonProps
-  /**表单默认提示语自定义样式 */
+  /** 表单默认提示语自定义样式 */
   tooltipProps?: ElTooltipProps
-  /**分组表单校验失败是否自动展开分组 */
+  /** 分组表单校验失败是否自动展开分组 */
   autoCollapseInValidate?: boolean
-  /**隐藏表单按钮组 */
+  /** 隐藏表单按钮组 */
   hideBtns?: boolean
-  /**只读情况下空内容展示占位 */
+  /** 只读情况下空内容展示占位 */
   emptyText?: string
-  /**表单提交远程请求方法 */
+  /** 表单提交远程请求方法 */
   request?: (model: Record<string, any>) => Promise<any>
-  /**新增拖拽排序功能开关 */
+  /** 新增拖拽排序功能开关 */
   draggable?: boolean
 }
 
@@ -102,7 +102,7 @@ export interface ReFormItem extends ReFormGroupItem {
   controlClass?: string
   /** 表单字段栅格占比 */
   span?: number | ReGridResponsive
-  /**表单项目宽度，在flex布局下生效 */
+  /** 表单项目宽度，在flex布局下生效 */
   itemWidth?: number | string
   /** 表单字段默认值 */
   defaultValue?: any

@@ -76,9 +76,6 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, ref, toRaw, toRefs } from 'vue'
-import formStore from '../controller/form'
-import { useFormDesignStore } from '../composables/useFormDesignStore'
 import {
   ElButton,
   ElContainer,
@@ -93,6 +90,9 @@ import {
   ElTable,
   ElTableColumn,
 } from 'element-plus'
+import { defineComponent, reactive, ref, toRaw, toRefs } from 'vue'
+import { useFormDesignStore } from '../composables/useFormDesignStore'
+import formStore from '../controller/form'
 
 export default defineComponent({
   components: {

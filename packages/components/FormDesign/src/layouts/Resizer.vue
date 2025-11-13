@@ -3,6 +3,8 @@
 </template>
 
 <script lang="ts">
+import type { Controls, setColumnWidth } from '../type'
+import Gesto from 'gesto'
 import {
   defineComponent,
   inject,
@@ -11,8 +13,6 @@ import {
   ref,
   toRaw,
 } from 'vue'
-import type { Controls, setColumnWidth } from '../type'
-import Gesto from 'gesto'
 
 export default defineComponent({
   props: {

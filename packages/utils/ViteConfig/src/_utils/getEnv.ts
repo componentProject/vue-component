@@ -1,8 +1,8 @@
+import type { objType } from '../../../_types/index.ts'
 import fs from 'node:fs'
 import path from 'node:path'
 import process from 'node:process'
 import dotenv from 'dotenv'
-import type { objType } from '../../../_types/index.ts'
 
 export function isDevFn(mode: string): boolean {
   return mode === 'development'

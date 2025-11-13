@@ -1,7 +1,7 @@
 import type { Plugin } from 'vite'
+import { createVirtualPlugin } from '../utils/virtual.ts'
 // autoRoutes/index.ts
 import { findDefaultRouteHandle, findParentRouteHandle, generateRoutes } from './routeGenerator.ts'
-import { createVirtualPlugin } from '../utils/virtual.ts'
 
 interface RouteModule {
   path: string

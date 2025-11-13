@@ -7,11 +7,11 @@
 </template>
 
 <script setup lang="ts">
+import type { slotsType } from '@moluoxixi/components/_types'
 import { ElButton as OldElButton } from 'element-plus'
 // 获取插槽
 import { throttle as _throttle } from 'lodash'
 import { computed } from 'vue'
-import type { slotsType } from '@moluoxixi/components/_types'
 
 defineOptions({
   name: 'ElButton',

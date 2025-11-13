@@ -29,8 +29,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
 import { ElButton, ElMessage } from 'element-plus'
+import { ref } from 'vue'
 import ConfigForm from './index.vue'
 
 const configFormRef = ref()

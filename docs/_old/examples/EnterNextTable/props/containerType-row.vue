@@ -17,8 +17,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
 import { ElInput, ElTableColumn } from 'element-plus'
+import { ref } from 'vue'
 
 const tableData = ref([
   { id: 1, name: '张三', age: 25 },

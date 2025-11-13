@@ -48,11 +48,11 @@
 </template>
 
 <script lang="ts" setup>
+import subMenu from '@moluoxixi/components/subMenu.vue'
 import { ElConfigProvider, ElContainer, ElHeader, ElMain, ElMenu } from 'element-plus'
 import { qiankunWindow } from 'vite-plugin-qiankun/dist/helper'
 import { computed, reactive } from 'vue'
 import { RouterView, useRouter } from 'vue-router'
-import subMenu from '@moluoxixi/components/subMenu.vue'
 import { useSystemStore } from '@/stores/modules/system.ts'
 import 'element-plus/theme-chalk/el-header.css'
 import 'element-plus/theme-chalk/el-menu.css'

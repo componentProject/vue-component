@@ -1,12 +1,12 @@
+import type { TableExportMethods, VxeGridConstructor, VxeGridPrivateMethods, VxeGridPropTypes } from '../../../../types'
 import { inject, nextTick } from 'vue'
 import XEUtils from 'xe-utils'
 import { VxeUI } from '../../../ui'
-import { getCellValue, isColumnInfo, mergeBodyMethod } from '../../src/util'
-import { formatText, parseFile } from '../../../ui/src/utils'
-import { createHtmlPage, getExportBlobByContent } from './util'
 import { errLog, warnLog } from '../../../ui/src/log'
+import { formatText, parseFile } from '../../../ui/src/utils'
+import { getCellValue, isColumnInfo, mergeBodyMethod } from '../../src/util'
 
-import type { TableExportMethods, VxeGridConstructor, VxeGridPrivateMethods, VxeGridPropTypes } from '../../../../types'
+import { createHtmlPage, getExportBlobByContent } from './util'
 
 const { getI18n, hooks, renderer } = VxeUI
 

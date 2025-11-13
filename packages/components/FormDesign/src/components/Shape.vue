@@ -61,6 +61,9 @@
 </template>
 
 <script lang="ts">
+import type { Controls } from '../type'
+import { ArrowDown, ArrowUp, CopyDocument, Delete, Plus } from '@element-plus/icons-vue'
+import { ElIcon } from 'element-plus'
 import { computed, defineComponent, inject, nextTick, ref, watch } from 'vue'
 import {
   copy,
@@ -70,9 +73,6 @@ import {
   onTop,
   paste,
 } from '../utils/formKeycon'
-import type { Controls } from '../type'
-import { ElIcon } from 'element-plus'
-import { ArrowDown, ArrowUp, CopyDocument, Delete, Plus } from '@element-plus/icons-vue'
 
 export default defineComponent({
   components: {

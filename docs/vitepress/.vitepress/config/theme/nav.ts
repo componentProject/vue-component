@@ -1,9 +1,9 @@
 import type { DefaultTheme } from 'vitepress'
-import { generateComponentNav } from './utils/generateSidebar.ts'
-
-import { docsPath, repoInfo } from '../../../contants/index.ts'
-import path from 'node:path'
 import fs from 'node:fs'
+
+import path from 'node:path'
+import { docsPath, repoInfo } from '../../../contants/index.ts'
+import { generateComponentNav } from './utils/generateSidebar.ts'
 
 // 读取 package.json 获取版本信息
 const pkgPath = path.resolve(docsPath, './package.json')

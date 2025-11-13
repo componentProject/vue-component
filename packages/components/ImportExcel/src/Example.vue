@@ -54,9 +54,9 @@
 </template>
 
 <script setup>
+import { ElTable, ElTableColumn } from 'element-plus'
 import { computed, ref } from 'vue'
 import ImportExcel from './index.vue'
-import { ElTable, ElTableColumn } from 'element-plus'
 
 const basicRows = ref([])
 const titleFieldRows = ref([])

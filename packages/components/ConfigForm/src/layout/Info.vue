@@ -31,12 +31,12 @@
 
 <script lang="ts">
 import type { ComponentInternalInstance } from 'vue'
+import { QuestionFilled } from '@element-plus/icons-vue'
+import { ElAlert, ElIcon, ElTooltip } from 'element-plus'
 import { defineComponent, getCurrentInstance } from 'vue'
+import { getFlex, useWatch } from '../utils/customHooks'
 import { getFormConfig } from '../utils/fieldConfig'
 import fieldProps from '../utils/fieldProps'
-import { getFlex, useWatch } from '../utils/customHooks'
-import { ElAlert, ElIcon, ElTooltip } from 'element-plus'
-import { QuestionFilled } from '@element-plus/icons-vue'
 
 export default defineComponent({
   components: {

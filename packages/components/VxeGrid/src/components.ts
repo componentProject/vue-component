@@ -1,15 +1,15 @@
 import type { App } from 'vue'
+import type { VxeGlobalConfig } from './_types'
+
 import { VxeUI } from '@vxe-ui/core'
-
-import { VxeColumn } from './column'
 import { VxeColgroup } from './colgroup'
+import { VxeColumn } from './column'
 import { VxeGrid } from './grid'
-import { VxeTable } from './table'
-import { VxeToolbar } from './toolbar'
-
 import zhCN from './locale/lang/zh-CN'
 
-import type { VxeGlobalConfig } from './_types'
+import { VxeTable } from './table'
+
+import { VxeToolbar } from './toolbar'
 
 const components = [
   VxeColumn,

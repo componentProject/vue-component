@@ -1,8 +1,8 @@
+import { COMPONENT_SETTING_TYPE, COMPONENT_VUE2_SETTING_TYPE } from '@moluoxixi/constant'
 import { getDownLoadByIds } from '@moluoxixi/utils/_api'
 import { idbStorage } from '@moluoxixi/utils/_utils/indexdb'
-import { COMPONENT_SETTING_TYPE, COMPONENT_VUE2_SETTING_TYPE } from '@moluoxixi/constant'
-import { getesComponent } from './esmodule.ts'
 import * as vueShared from '@vue/shared'
+import { getesComponent } from './esmodule.ts'
 
 async function getComponentByFile(allComponentList: any[], componentName: string, moduleType: string = 'umd') {
   // 使用 Promise.all 来正确处理异步操作

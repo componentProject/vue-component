@@ -1,13 +1,13 @@
 import type { Slot } from 'vue'
-import { createCommentVNode, defineComponent, h, inject, onMounted, onUnmounted, provide, ref } from 'vue'
-import { columnProps } from './column'
+import type { VxeTableConstructor, VxeTablePrivateMethods } from '../../../types'
 import type { XEColumnInstance } from './util'
-import { assembleColumn, destroyColumn, watchColumn } from './util'
-import Cell from './cell'
+import { createCommentVNode, defineComponent, h, inject, onMounted, onUnmounted, provide, ref } from 'vue'
 // 导入 CSS Modules 样式文件
 import cssModules from '../../styles/modules/colgroup.module.scss'
+import Cell from './cell'
+import { columnProps } from './column'
 
-import type { VxeTableConstructor, VxeTablePrivateMethods } from '../../../types'
+import { assembleColumn, destroyColumn, watchColumn } from './util'
 
 export default defineComponent({
   name: 'VxeColgroup',

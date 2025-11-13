@@ -1,10 +1,10 @@
+import type { VxeTableConstructor, VxeTablePrivateMethods } from '../../../types'
 import XEUtils from 'xe-utils'
 import { VxeUI } from '../../ui'
-import { toFilters } from './util'
-import { getFuncText } from '../../ui/src/utils'
 import { errLog, warnLog } from '../../ui/src/log'
+import { getFuncText } from '../../ui/src/utils'
 
-import type { VxeTableConstructor, VxeTablePrivateMethods } from '../../../types'
+import { toFilters } from './util'
 
 const { getI18n, formats } = VxeUI
 export class ColumnInfo {

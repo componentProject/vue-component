@@ -39,10 +39,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import { ElCheckbox, ElOption, ElSelect, ElTabPane, ElTabs } from 'element-plus'
-import Editor from './index.vue'
 import type { languageType, themeType } from './_types'
+import { ElCheckbox, ElOption, ElSelect, ElTabPane, ElTabs } from 'element-plus'
+import { ref } from 'vue'
+import Editor from './index.vue'
 
 const options = ref({
   readOnly: true,

@@ -1,8 +1,8 @@
 import type { DefaultTheme } from 'vitepress'
-import { sidebar } from './sidebar.ts'
-import { nav } from './nav.ts'
-import { socialLinks } from './socialLinks.ts'
 import { baseUrl } from '../../../contants/web.ts'
+import { nav } from './nav.ts'
+import { sidebar } from './sidebar.ts'
+import { socialLinks } from './socialLinks.ts'
 
 /**
  * 主题配置

@@ -1,5 +1,5 @@
-import { reactive } from 'vue'
 import type { HistoryItem, HistoryState } from '../type'
+import { reactive } from 'vue'
 import formStore from './form'
 
 const state = reactive<HistoryState>({

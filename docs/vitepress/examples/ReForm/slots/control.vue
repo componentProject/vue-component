@@ -26,7 +26,7 @@ const formData = ref({
     {
       label: 'Name',
       field: 'name',
-      slot: 'name-control', //默认字段标签名插槽命名规则 [field]-control，也可以自定义
+      slot: 'name-control', // 默认字段标签名插槽命名规则 [field]-control，也可以自定义
       defaultValue: '测试数据',
       component: ElInput,
       tooltip: '这是tooltip',

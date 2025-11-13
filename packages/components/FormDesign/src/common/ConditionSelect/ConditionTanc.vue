@@ -117,6 +117,7 @@
 </template>
 
 <script>
+import { Check, Close } from '@element-plus/icons-vue'
 import {
   ElButton,
   ElContainer,
@@ -132,7 +133,6 @@ import {
   ElTable,
   ElTableColumn,
 } from 'element-plus'
-import { Check, Close } from '@element-plus/icons-vue'
 
 export default {
   components: {

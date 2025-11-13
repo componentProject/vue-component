@@ -10,12 +10,12 @@
 </template>
 
 <script setup lang="ts">
+import type { emitsType, propsType, slotsType } from './_types'
+import { getTypeDefault } from '@moluoxixi/utils/_utils'
 import { ElButton } from 'element-plus'
 import fileSaver from 'file-saver'
 import { computed } from 'vue'
 import { utils, write } from 'xlsx'
-import { getTypeDefault } from '@moluoxixi/utils/_utils'
-import type { emitsType, propsType, slotsType } from './_types'
 
 // 设置组件不继承属性到根元素，而是手动通过$attrs绑定
 defineOptions({

@@ -40,11 +40,11 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
-import fieldProps from '../utils/fieldProps'
 import { Delete, Operation, QuestionFilled } from '@element-plus/icons-vue'
 import { ElButton, ElCol, ElIcon, ElInput, ElRow, ElTooltip } from 'element-plus'
+import { defineComponent } from 'vue'
 import Draggable from 'vuedraggable'
+import fieldProps from '../utils/fieldProps'
 
 export default defineComponent({
   ControlType: 'Panel', // 必须与文件名匹配

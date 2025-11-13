@@ -29,11 +29,11 @@
 </template>
 
 <script lang="ts">
+import { ElFormItem } from 'element-plus'
 import { computed, defineComponent, getCurrentInstance, inject } from 'vue'
+import { getFlex, useWatch } from '../utils/customHooks'
 import { getFormConfig } from '../utils/fieldConfig'
 import fieldProps from '../utils/fieldProps'
-import { getFlex, useWatch } from '../utils/customHooks'
-import { ElFormItem } from 'element-plus'
 
 export default defineComponent({
   components: {

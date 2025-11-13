@@ -37,9 +37,9 @@
 </template>
 
 <script lang="ts">
-import ConditionTanc from './ConditionTanc.vue'
-import { ElButton, ElIcon, ElOption, ElSelect } from 'element-plus'
 import { Minus, Plus } from '@element-plus/icons-vue'
+import { ElButton, ElIcon, ElOption, ElSelect } from 'element-plus'
+import ConditionTanc from './ConditionTanc.vue'
 
 export default {
   name: 'ConditionGroup',

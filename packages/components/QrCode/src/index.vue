@@ -26,12 +26,12 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
+import type { QRCodeRenderersOptions } from 'qrcode'
+import type { emitsType, propsType, slotsType } from './_types'
+import { downloadImage } from '@moluoxixi/utils/_utils'
 // @ts-expect-error - qrcode没有默认导出但实际可以这样使用
 import QRCode from 'qrcode'
-import type { QRCodeRenderersOptions } from 'qrcode'
-import { downloadImage } from '@moluoxixi/utils/_utils'
-import type { emitsType, propsType, slotsType } from './_types'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 
 defineOptions({
   name: 'QrCode',

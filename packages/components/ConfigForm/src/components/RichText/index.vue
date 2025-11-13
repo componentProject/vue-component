@@ -17,13 +17,13 @@
 </template>
 
 <script lang="ts">
+import { QuestionFilled } from '@element-plus/icons-vue'
+import { ElIcon, ElTooltip } from 'element-plus'
 import { defineComponent, onMounted, onUnmounted, ref } from 'vue'
 import E from 'wangeditor'
+import { useWatch } from '../../utils/customHooks'
 import { getFormConfig } from '../../utils/fieldConfig'
 import fieldProps from '../../utils/fieldProps'
-import { useWatch } from '../../utils/customHooks'
-import { ElIcon, ElTooltip } from 'element-plus'
-import { QuestionFilled } from '@element-plus/icons-vue'
 
 export default defineComponent({
   components: {

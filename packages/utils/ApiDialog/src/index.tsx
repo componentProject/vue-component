@@ -1,6 +1,6 @@
 import type { AppContext, Component, VNode } from 'vue'
-import { createVNode, defineComponent, render } from 'vue'
 import { ElButton, ElDialog } from 'element-plus'
+import { createVNode, defineComponent, render } from 'vue'
 
 // 插槽类型定义
 export type SlotType = VNode[] | VNode | Component | string | (() => VNode[])

@@ -33,8 +33,8 @@
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue'
 import type { emitsType, propsType, slotsType } from './_types'
+import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue'
 
 defineOptions({
   name: 'TsExpand',

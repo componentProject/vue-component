@@ -1,13 +1,13 @@
 import type { PropType, Ref, VNode } from 'vue'
-import { createCommentVNode, defineComponent, h, inject, nextTick, ref, TransitionGroup } from 'vue'
-import { VxeUI } from '../../../ui'
-import { formatText } from '../../../ui/src/utils'
-import { addClass, removeClass } from '../../../ui/src/dom'
-import { errLog } from '../../../ui/src/log'
-import XEUtils from 'xe-utils'
-
 import type { VxeButtonComponent, VxeButtonEvents, VxeDrawerComponent, VxeInputComponent, VxeModalComponent, VxeRadioGroupComponent, VxeTooltipComponent } from 'vxe-pc-ui'
 import type { VxeColumnPropTypes, VxeTableConstructor, VxeTableDefines, VxeTableMethods, VxeTablePrivateMethods } from '../../../../types'
+import { createCommentVNode, defineComponent, h, inject, nextTick, ref, TransitionGroup } from 'vue'
+import XEUtils from 'xe-utils'
+import { VxeUI } from '../../../ui'
+import { addClass, removeClass } from '../../../ui/src/dom'
+
+import { errLog } from '../../../ui/src/log'
+import { formatText } from '../../../ui/src/utils'
 
 const { getI18n, getIcon } = VxeUI
 

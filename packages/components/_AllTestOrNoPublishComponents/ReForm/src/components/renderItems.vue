@@ -81,16 +81,16 @@
 
 <!-- 表单项列表渲染组件脚本 -->
 <script setup lang="ts">
-/** 导入折叠按钮组件 */
-import ReCollapsedBtn from './ReCollapsedBtn.vue'
-/** 导入 Vue 组合式 API */
-import { computed, inject, unref } from 'vue'
 /** 导入类型定义 */
 import type { ReFormItem } from '../_types'
-/** 导入表单项渲染组件 */
-import ReFormRenderItem from './renderItem.vue'
 /** 导入 Element Plus 组件 */
 import { ElCollapseTransition } from 'element-plus'
+/** 导入 Vue 组合式 API */
+import { computed, inject, unref } from 'vue'
+/** 导入折叠按钮组件 */
+import ReCollapsedBtn from './ReCollapsedBtn.vue'
+/** 导入表单项渲染组件 */
+import ReFormRenderItem from './renderItem.vue'
 
 /** 组件选项配置 */
 defineOptions({

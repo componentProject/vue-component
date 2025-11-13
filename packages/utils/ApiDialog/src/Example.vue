@@ -20,9 +20,9 @@
 
 <script lang="tsx" setup>
 import { ElButton, ElInput, ElMessage } from 'element-plus'
-import { createApiDialog } from './index.tsx'
 import CustomDialog from './components/CustomDialog.vue'
 import FormDialog from './components/FormDialog.vue'
+import { createApiDialog } from './index.tsx'
 
 // 1. 使用默认对话框
 const { show: showDefault } = createApiDialog()

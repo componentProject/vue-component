@@ -444,7 +444,7 @@ function replaceImportsAndExports(componentCode: string, componentName: string) 
     const processResult = processExports(componentCode, allExports)
     componentCode = processResult.processedCode + processResult.returnCode
 
-    //在执行前完全清理所有可能残留的import语句
+    // 在执行前完全清理所有可能残留的import语句
     componentCode = cleanImports(componentCode)
   }
   catch (error) {

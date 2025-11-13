@@ -36,8 +36,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
 import { ElInput } from 'element-plus'
+import { ref } from 'vue'
 
 const val = ref('')
 const ipt = ref()

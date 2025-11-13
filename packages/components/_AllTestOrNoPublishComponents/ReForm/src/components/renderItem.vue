@@ -124,20 +124,20 @@
 
 <!-- 表单项渲染组件脚本 -->
 <script setup lang="ts">
-/** 导入 Element Plus 图标 */
-import { QuestionFilled } from '@element-plus/icons-vue'
-/** 导入 Vue 组合式 API */
-import { inject } from 'vue'
-/** 导入 lodash 工具函数 */
-import { isArray, isUndefined } from 'lodash'
-/** 导入常量定义 */
-import { HAS_CHILD_COMPONENT_MAP } from '../_utils/constants'
 /** 导入类型定义 */
 import type { ReFormItem } from '../_types'
-/** 导入工具函数 */
-import { getComponentName } from '../_utils'
+/** 导入 Element Plus 图标 */
+import { QuestionFilled } from '@element-plus/icons-vue'
 /** 导入 Element Plus 组件 */
 import { ElFormItem, ElIcon, ElInput, ElTooltip } from 'element-plus'
+/** 导入 lodash 工具函数 */
+import { isArray, isUndefined } from 'lodash'
+/** 导入 Vue 组合式 API */
+import { inject } from 'vue'
+/** 导入工具函数 */
+import { getComponentName } from '../_utils'
+/** 导入常量定义 */
+import { HAS_CHILD_COMPONENT_MAP } from '../_utils/constants'
 
 /** 组件选项配置 */
 defineOptions({

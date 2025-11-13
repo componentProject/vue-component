@@ -1,9 +1,9 @@
-import { setWebUpload } from '../../../_api/index.js'
 import fs from 'node:fs/promises'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { setWebUpload } from '../../../_api/index.js'
 
-//上传组件至服务器
+// 上传组件至服务器
 export async function UploadEvent(outputDir: string, buildName: string, type: string = 'vue3Test') {
   const url = path.resolve(`${outputDir}/umd/index.js`)
   console.log('UploadEvent: 开始上传操作')

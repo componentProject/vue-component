@@ -22,11 +22,11 @@
 </template>
 
 <script lang="ts">
+import type { Controls } from '../type'
+import { InfoFilled, Minus, Plus, RefreshLeft } from '@element-plus/icons-vue'
+import { ElIcon } from 'element-plus'
 import { computed, defineComponent, inject, ref } from 'vue'
 import shortcutKey from './ShortcutKey.vue'
-import type { Controls } from '../type'
-import { ElIcon } from 'element-plus'
-import { InfoFilled, Minus, Plus, RefreshLeft } from '@element-plus/icons-vue'
 
 export default defineComponent({
   components: {

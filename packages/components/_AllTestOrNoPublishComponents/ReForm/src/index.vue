@@ -69,31 +69,31 @@
 
 <!-- ReForm 表单组件脚本 -->
 <script setup lang="ts">
-/** 导入 Vue 组合式 API */
-import { computed, nextTick, onMounted, onUnmounted, provide, ref, unref, useAttrs } from 'vue'
-/** 导入类型定义 */
-import type { ReFormEmits, ReFormProps, ReGridResponsive } from './_types'
-/** 导入表单组合式函数 */
-import useForm, { useSyncFormData } from './_utils/useForm'
-/** 导入 lodash 工具函数 */
-import { cloneDeep, isUndefined } from 'lodash'
-/** 导入工具函数 */
-import { getSlotsNames, unwrapperShadowRef } from './_utils'
-/** 导入栅格列数组合式函数 */
-import useGridCols from './_utils/useGridCols'
-/** 导入 Vue 类型定义 */
-import type { CSSProperties, Ref } from 'vue'
 /** 导入 VueUse 类型 */
 import type { Arrayable } from '@vueuse/core'
 /** 导入 Element Plus 类型 */
 import type { FormValidateCallback } from 'element-plus'
+/** 导入 Vue 类型定义 */
+import type { CSSProperties, Ref } from 'vue'
+/** 导入类型定义 */
+import type { ReFormEmits, ReFormProps, ReGridResponsive } from './_types'
+import { throttle } from '@moluoxixi/utils/_utils/event'
 /** 导入 Element Plus 组件 */
 import { ElButton, ElForm, ElFormItem } from 'element-plus'
-/** 导入表单项列表渲染组件 */
-import ReFormRenderItems from './components/renderItems.vue'
+/** 导入 lodash 工具函数 */
+import { cloneDeep, isUndefined } from 'lodash'
 /** 导入拖拽排序库 */
 import Sortable from 'sortablejs'
-import { throttle } from '@moluoxixi/utils/_utils/event'
+/** 导入 Vue 组合式 API */
+import { computed, nextTick, onMounted, onUnmounted, provide, ref, unref, useAttrs } from 'vue'
+/** 导入工具函数 */
+import { getSlotsNames, unwrapperShadowRef } from './_utils'
+/** 导入表单组合式函数 */
+import useForm, { useSyncFormData } from './_utils/useForm'
+/** 导入栅格列数组合式函数 */
+import useGridCols from './_utils/useGridCols'
+/** 导入表单项列表渲染组件 */
+import ReFormRenderItems from './components/renderItems.vue'
 
 /** 组件选项配置 */
 defineOptions({

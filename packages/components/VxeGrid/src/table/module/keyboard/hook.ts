@@ -1,8 +1,8 @@
+import type { TableKeyboardPrivateMethods } from '../../../../types'
 import XEUtils from 'xe-utils'
 import { VxeUI } from '../../../ui'
-import { addClass, browse, getAbsolutePos, getEventTargetNode, hasClass, removeClass } from '../../../ui/src/dom'
 
-import type { TableKeyboardPrivateMethods } from '../../../../types'
+import { addClass, browse, getAbsolutePos, getEventTargetNode, hasClass, removeClass } from '../../../ui/src/dom'
 
 const { hooks } = VxeUI
 

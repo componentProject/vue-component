@@ -30,10 +30,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
 import { ElInput, ElTableColumn } from 'element-plus'
+import { ref } from 'vue'
 
-//分页配置
+// 分页配置
 const paginationConfig = ref({
   currentPage: 1,
   pageSize: 10,

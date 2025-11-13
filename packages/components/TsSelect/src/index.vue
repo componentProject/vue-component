@@ -38,11 +38,11 @@
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, onUnmounted, ref } from 'vue'
-import { ElOption, ElSelect } from 'element-plus'
-import { getType, getTypeDefault } from '@moluoxixi/utils/_utils'
-import { useOptions } from '../../_hooks'
 import type { emitsType, propsType, slotsType } from './_types'
+import { getType, getTypeDefault } from '@moluoxixi/utils/_utils'
+import { ElOption, ElSelect } from 'element-plus'
+import { computed, nextTick, onUnmounted, ref } from 'vue'
+import { useOptions } from '../../_hooks'
 
 defineOptions({
   name: 'TsSelect',

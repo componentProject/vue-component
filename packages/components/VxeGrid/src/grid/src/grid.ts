@@ -1,20 +1,20 @@
 import type { ComponentPublicInstance, PropType, Ref, VNode } from 'vue'
+import type { ValueOf, VxeFormComponent, VxeFormEvents, VxeFormInstance, VxeFormItemProps, VxePagerComponent, VxePagerEvents, VxePagerInstance } from 'vxe-pc-ui'
+import type { GridMethods, GridPrivateMethods, GridPrivateRef, GridReactData, VxeGridConstructor, VxeGridEmits, VxeGridPrivateComputed, VxeGridPrivateMethods, VxeGridProps, VxeGridPropTypes, VxeTableConstructor, VxeTableDefines, VxeTableEventProps, VxeTableEvents, VxeTableMethods, VxeTablePrivateMethods, VxeTableProps, VxeToolbarInstance, VxeToolbarPropTypes } from '../../../types'
 import { computed, createCommentVNode, defineComponent, h, nextTick, onMounted, onUnmounted, provide, reactive, ref, watch } from 'vue'
 import XEUtils from 'xe-utils'
-import { getLastZIndex, isEnableConf, nextZIndex } from '../../ui/src/utils'
-import { getDomNode, getOffsetHeight, getPaddingTopBottomSize } from '../../ui/src/dom'
-import { VxeUI } from '../../ui'
-import VxeTableComponent from '../../table'
-import VxeToolbarComponent from '../../toolbar'
-import tableComponentProps from '../../table/src/props'
-import tableComponentEmits from '../../table/src/emits'
-import { getSlotVNs } from '../../ui/src/vn'
-import { errLog } from '../../ui/src/log'
 // 导入 CSS Modules 样式文件
 // 注意：grid 组件中已经有 styles 变量（来自 computeStyles），所以使用 cssModules 作为变量名
 import cssModules from '../../styles/modules/grid.module.scss'
-import type { ValueOf, VxeFormComponent, VxeFormEvents, VxeFormInstance, VxeFormItemProps, VxePagerComponent, VxePagerEvents, VxePagerInstance } from 'vxe-pc-ui'
-import type { GridMethods, GridPrivateMethods, GridPrivateRef, GridReactData, VxeGridConstructor, VxeGridEmits, VxeGridPrivateComputed, VxeGridPrivateMethods, VxeGridProps, VxeGridPropTypes, VxeTableConstructor, VxeTableDefines, VxeTableEventProps, VxeTableEvents, VxeTableMethods, VxeTablePrivateMethods, VxeTableProps, VxeToolbarInstance, VxeToolbarPropTypes } from '../../../types'
+import VxeTableComponent from '../../table'
+import tableComponentEmits from '../../table/src/emits'
+import tableComponentProps from '../../table/src/props'
+import VxeToolbarComponent from '../../toolbar'
+import { VxeUI } from '../../ui'
+import { getDomNode, getOffsetHeight, getPaddingTopBottomSize } from '../../ui/src/dom'
+import { errLog } from '../../ui/src/log'
+import { getLastZIndex, isEnableConf, nextZIndex } from '../../ui/src/utils'
+import { getSlotVNs } from '../../ui/src/vn'
 
 const { getConfig, getI18n, commands, hooks, useFns, createEvent, globalEvents, GLOBAL_EVENT_KEYS } = VxeUI
 

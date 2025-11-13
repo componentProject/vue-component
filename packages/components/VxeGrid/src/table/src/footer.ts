@@ -1,10 +1,10 @@
 import type { PropType, Ref } from 'vue'
+import type { VxeColumnPropTypes, VxeTableConstructor, VxeTableDefines, VxeTableMethods, VxeTablePrivateMethods } from '../../../types'
 import { createCommentVNode, defineComponent, h, inject, nextTick, onMounted, onUnmounted, ref } from 'vue'
 import XEUtils from 'xe-utils'
 import { VxeUI } from '../../ui'
-import { getPropClass, updateCellTitle } from '../../ui/src/dom'
 
-import type { VxeColumnPropTypes, VxeTableConstructor, VxeTableDefines, VxeTableMethods, VxeTablePrivateMethods } from '../../../types'
+import { getPropClass, updateCellTitle } from '../../ui/src/dom'
 
 const { renderer } = VxeUI
 

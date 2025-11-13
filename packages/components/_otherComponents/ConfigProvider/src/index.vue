@@ -5,9 +5,9 @@
 </template>
 
 <script setup lang="ts">
-import { provide } from 'vue'
 import type { Component } from 'vue'
 import type { propsType } from './types'
+import { provide } from 'vue'
 
 const props = withDefaults(defineProps<propsType>(), {})
 defineSlots<{

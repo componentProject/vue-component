@@ -1,27 +1,27 @@
+import type { Theme } from 'vitepress'
 import type { App as VueApp } from 'vue'
-import './styles/index.scss'
 
-import Layout from './components/layout.vue'
+import hljsVuePlugin from '@highlightjs/vue-plugin/dist/highlightjs-vue.esm.min.js'
 
 // 引入vue-component组件库
 import VueComponent from '@moluoxixi/components'
 
-import 'highlight.js/lib/common'
-import hljsVuePlugin from '@highlightjs/vue-plugin/dist/highlightjs-vue.esm.min.js'
-
-import DocsCodeDemo from './components/DocsCodeDemo/index.vue'
-import Overview from './components/Overview.vue'
-import ApiTyping from './components/ApiTyping.vue'
-
-import directive from './directives/index.ts'
-import type { Theme } from 'vitepress'
-import DefaultTheme from 'vitepress/theme'
+import { COMPONENT_SETTING_TYPE } from '@moluoxixi/constant'
 import { getList } from '@moluoxixi/utils/_api'
+
 import { idbStorage } from '@moluoxixi/utils/_utils/indexdb'
 import { registerAllComponent } from '@moluoxixi/utils/_utils/loadComponent'
-import { COMPONENT_SETTING_TYPE } from '@moluoxixi/constant'
+import DefaultTheme from 'vitepress/theme'
 
 import * as Vue from 'vue'
+import ApiTyping from './components/ApiTyping.vue'
+import DocsCodeDemo from './components/DocsCodeDemo/index.vue'
+import Layout from './components/layout.vue'
+import Overview from './components/Overview.vue'
+import directive from './directives/index.ts'
+import './styles/index.scss'
+
+import 'highlight.js/lib/common'
 
 const define = <T>(value: T): T => value
 

@@ -13,8 +13,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
 import { ElInput, ElOption, ElSelect } from 'element-plus'
+import { ref } from 'vue'
 
 const outer = ref<HTMLElement | null>(null)
 const form = ref({ a: '', b: '', c: '', sel: '' })

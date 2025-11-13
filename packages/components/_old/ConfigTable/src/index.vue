@@ -89,9 +89,9 @@
 </template>
 
 <script setup>
-import { computed, ref } from 'vue'
 import { ElConfigProvider, ElPagination, ElTable, ElTableColumn } from 'element-plus'
 import ZhCn from 'element-plus/dist/locale/zh-cn.mjs'
+import { computed, ref } from 'vue'
 
 defineOptions({
   name: 'ConfigTable',

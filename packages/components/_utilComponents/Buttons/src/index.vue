@@ -27,9 +27,9 @@
 </template>
 
 <script setup lang="ts">
+import type { propsType } from './_types'
 import { Render } from '@moluoxixi/components/_utilComponents'
 import { ElButton, ElIcon, ElTooltip } from 'element-plus'
-import type { propsType } from './_types'
 
 const props = withDefaults(defineProps<propsType>(), {
   buttons: () => [],

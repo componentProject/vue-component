@@ -34,11 +34,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue'
-import { ElButton, ElMessageBox } from 'element-plus'
-import { formItemConfig as defaultFormItemConfig } from '../datas/formData'
-import { deepClone } from '../utils/formSerializer'
-import { debounce } from 'lodash'
 import type {
   ComponentInstance,
   FormConfig,
@@ -49,6 +44,11 @@ import type {
   SelectedItem,
   TabItem,
 } from '../types'
+import { ElButton, ElMessageBox } from 'element-plus'
+import { debounce } from 'lodash'
+import { ref, watch } from 'vue'
+import { formItemConfig as defaultFormItemConfig } from '../datas/formData'
+import { deepClone } from '../utils/formSerializer'
 
 // 定义组件属性
 const props = defineProps<{

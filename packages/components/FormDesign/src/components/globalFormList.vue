@@ -16,8 +16,8 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, inject } from 'vue'
 import type { Controls } from '../type'
+import { computed, defineComponent, inject } from 'vue'
 
 export default defineComponent({
   setup() {

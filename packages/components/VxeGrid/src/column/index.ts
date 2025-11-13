@@ -1,6 +1,6 @@
 import type { App } from 'vue'
-import { VxeUI } from '../ui'
 import VxeColumnComponent from '../table/src/column'
+import { VxeUI } from '../ui'
 
 export const VxeColumn = Object.assign({}, VxeColumnComponent, {
   install(app: App) {

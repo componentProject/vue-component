@@ -12,7 +12,7 @@ const httpApi: any = getHttpService({
   },
 })
 
-//HIS6.0 获取HisFooter（医保信息）
+// HIS6.0 获取HisFooter（医保信息）
 export function getQueryMedicaIInsuranceInfoApi(headers: any, addSign, params = {}) {
   // 前端服务
   // return httpApi.post('/ts-pfs-bas/queryMedicalInsuranceInfo', {}, headers, addSign)

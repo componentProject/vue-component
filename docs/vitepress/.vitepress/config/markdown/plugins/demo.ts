@@ -1,9 +1,9 @@
-import mdContainer from 'markdown-it-container'
+import type Renderer from 'markdown-it/lib/renderer.d.ts'
+import type Token from 'markdown-it/lib/token.d.ts'
 import fs from 'node:fs'
 import path from 'node:path'
-import type Token from 'markdown-it/lib/token.d.ts'
-import type Renderer from 'markdown-it/lib/renderer.d.ts'
 import MarkdownIt from 'markdown-it'
+import mdContainer from 'markdown-it-container'
 import { docsPath } from '../../../../contants/index.ts'
 
 interface ContainerOpts {

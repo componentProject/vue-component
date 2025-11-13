@@ -1,7 +1,7 @@
-import './assets/styles/index.scss'
+import type { Preview } from '@storybook/vue3'
 
 import { setup } from '@storybook/vue3'
-import type { Preview } from '@storybook/vue3'
+import './assets/styles/index.scss'
 
 const preview: Preview = {
   parameters: {

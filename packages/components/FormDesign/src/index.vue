@@ -29,6 +29,13 @@
 </template>
 
 <script setup lang="ts">
+import type KeyController from 'keycon'
+import type { emitsType, propsType } from './_types'
+import type { Controls } from './type'
+// 静态导入外部组件 ConfigForm
+import ConfigForm from '@moluoxixi/components/ConfigForm'
+// 静态导入 formComponents，确保组件列表立即可用
+import { formComponents } from '@moluoxixi/components/ConfigForm/src/main'
 import {
   defineAsyncComponent,
   getCurrentInstance,
@@ -37,30 +44,23 @@ import {
   provide,
   ref,
 } from 'vue'
-import Framework from './layouts/Framework.vue'
-import NavList from './components/NavList.vue'
-import Nav from './components/Nav.vue'
-import ComponentList from './components/ComponentList.vue'
-import Workspace from './components/Workspace.vue'
-import PropsPanel from './components/PropsPanel.vue'
-import uiControl from './controller/ui'
-import hisContrl from './controller/history'
-import formStore from './controller/form'
-import actionContrl from './controller/action'
-import store from './controller/shortcut'
-import { listenGlobalKeyDown } from './utils/shortcutKey'
-import formKeyconList from './utils/formKeycon'
-import type { Controls } from './type'
-import type { emitsType, propsType } from './_types'
-import type KeyController from 'keycon'
-import { FormDesignStore, FormDesignStoreKey } from './store'
 import Loading from './common/Loading.vue'
-// 静态导入外部组件 ConfigForm
-import ConfigForm from '@moluoxixi/components/ConfigForm'
-import './styles/index.scss'
+import ComponentList from './components/ComponentList.vue'
+import Nav from './components/Nav.vue'
+import NavList from './components/NavList.vue'
+import PropsPanel from './components/PropsPanel.vue'
+import Workspace from './components/Workspace.vue'
+import actionContrl from './controller/action'
+import formStore from './controller/form'
+import hisContrl from './controller/history'
+import store from './controller/shortcut'
+import uiControl from './controller/ui'
+import Framework from './layouts/Framework.vue'
+import { FormDesignStore, FormDesignStoreKey } from './store'
+import formKeyconList from './utils/formKeycon'
+import { listenGlobalKeyDown } from './utils/shortcutKey'
 
-// 静态导入 formComponents，确保组件列表立即可用
-import { formComponents } from '@moluoxixi/components/ConfigForm/src/main'
+import './styles/index.scss'
 
 defineOptions({
   name: 'FormDesign',

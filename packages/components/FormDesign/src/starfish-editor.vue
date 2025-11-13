@@ -29,9 +29,14 @@
 </template>
 
 <script lang="ts">
+import type KeyController from 'keycon'
 import type {
   PropType,
 } from 'vue'
+import type { Controls, MenuBarData } from './type'
+// 静态导入外部组件 ConfigForm
+import ConfigForm from '@moluoxixi/components/ConfigForm'
+import { formComponents } from '@moluoxixi/components/ConfigForm/src/main'
 import {
   defineAsyncComponent,
   defineComponent,
@@ -41,27 +46,22 @@ import {
   provide,
   ref,
 } from 'vue'
-import Framework from './layouts/Framework.vue'
-import NavList from './components/NavList.vue'
-import Nav from './components/Nav.vue'
+import Loading from './common/Loading.vue'
 import ComponentList from './components/ComponentList.vue'
-import Workspace from './components/Workspace.vue'
+import Nav from './components/Nav.vue'
+import NavList from './components/NavList.vue'
 import PropsPanel from './components/PropsPanel.vue'
-import uiControl from './controller/ui'
-import hisContrl from './controller/history'
-import formStore from './controller/form'
+import Workspace from './components/Workspace.vue'
 import actionContrl from './controller/action'
+import formStore from './controller/form'
+import hisContrl from './controller/history'
 import store from './controller/shortcut'
-import { listenGlobalKeyDown } from './utils/shortcutKey'
+import uiControl from './controller/ui'
+import Framework from './layouts/Framework.vue'
+import { FormDesignStore, FormDesignStoreKey } from './store'
 // 根据编辑器判断,走不同的快捷键逻辑
 import formKeyconList from './utils/formKeycon'
-import type { Controls, MenuBarData } from './type'
-import type KeyController from 'keycon'
-import { FormDesignStore, FormDesignStoreKey } from './store'
-// 静态导入外部组件 ConfigForm
-import ConfigForm from '@moluoxixi/components/ConfigForm'
-import { formComponents } from '@moluoxixi/components/ConfigForm/src/main'
-import Loading from './common/Loading.vue'
+import { listenGlobalKeyDown } from './utils/shortcutKey'
 
 export default defineComponent({
   name: 'StarfishEditor',

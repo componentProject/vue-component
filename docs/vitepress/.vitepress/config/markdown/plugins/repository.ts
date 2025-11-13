@@ -1,7 +1,7 @@
-import mdContainer from 'markdown-it-container'
-import type Token from 'markdown-it/lib/token.d.ts'
-import type Renderer from 'markdown-it/lib/renderer.d.ts'
 import type MarkdownIt from 'markdown-it'
+import type Renderer from 'markdown-it/lib/renderer.d.ts'
+import type Token from 'markdown-it/lib/token.d.ts'
+import mdContainer from 'markdown-it-container'
 import { repoInfo } from '../../../../contants/index.ts'
 
 interface ContainerOpts {

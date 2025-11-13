@@ -2,8 +2,8 @@
 
 import type { Meta, StoryFn, StoryObj } from '@storybook/vue3'
 import EnterNextTable from '@moluoxixi/components/EnterNextTable'
-import { ref } from 'vue'
 import { ElInput, ElMessage, ElOption, ElSelect, ElTableColumn } from 'element-plus'
+import { ref } from 'vue'
 
 // 定义元数据
 const meta: Meta<typeof EnterNextTable> = {

@@ -18,11 +18,11 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
-import fieldProps from '../utils/fieldProps'
-import { useWatch } from '../utils/customHooks'
-import { ElIcon, ElRadioButton, ElRadioGroup, ElTooltip } from 'element-plus'
 import { QuestionFilled } from '@element-plus/icons-vue'
+import { ElIcon, ElRadioButton, ElRadioGroup, ElTooltip } from 'element-plus'
+import { defineComponent } from 'vue'
+import { useWatch } from '../utils/customHooks'
+import fieldProps from '../utils/fieldProps'
 
 export default defineComponent({
   ControlType: 'RadioGroup', // 必须与文件名匹配
