@@ -65,7 +65,7 @@
             v-model="isCommon" style="margin-right: 40px;" label="作为统一配置"
             size="large"
           />
-          <ElPopover :visible="configPopoverVisible" placement="top" :width="180">
+          <ElPopover :visible="resetPopoverVisible" placement="top" :width="180">
             <p v-if="isCommon" style="white-space: pre-wrap;">
               恢复默认将清除【公共及个人自定义】样式恢复到系统默认样式，请您确定是否继续？
             </p>
@@ -73,7 +73,7 @@
               恢复默认将清除您【个人自定义】样式恢复到系统默认样式，请您确定是否继续？
             </p>
             <div style="text-align: right; margin: 0">
-              <ElButton size="small" @click="configPopoverVisible = false">
+              <ElButton size="small" @click="resetPopoverVisible = false">
                 取消
               </ElButton>
               <ElButton size="small" type="primary" @click="handleEvent('reset')">
@@ -81,11 +81,27 @@
               </ElButton>
             </div>
             <template #reference>
-              <ElButton @click="configPopoverVisible = true">
+              <ElButton @click="resetPopoverVisible = true">
                 恢复默认
               </ElButton>
             </template>
           </ElPopover>
+          <!--          <ElPopover :visible="confirmPopoverVisible" placement="top" :width="180"> -->
+          <!--            <p style="white-space: pre-wrap;"> -->
+          <!--              是否同步删除个人配置？ -->
+          <!--            </p> -->
+          <!--            <div style="text-align: right; margin: 0"> -->
+          <!--              <ElButton size="small" @click="confirmPopoverVisible = false"> -->
+          <!--                否 -->
+          <!--              </ElButton> -->
+          <!--              <ElButton size="small" type="primary" @click="handleEvent('confirm')"> -->
+          <!--                是 -->
+          <!--              </ElButton> -->
+          <!--            </div> -->
+          <!--            <template #reference> -->
+          <!--              -->
+          <!--            </template> -->
+          <!--          </ElPopover> -->
           <ElButton type="primary" @click="handleEvent('confirm')">
             确认
           </ElButton>
@@ -153,7 +169,8 @@ const computedPopperStyle = computed(() => {
 
 const visible = defineModel<boolean>({ default: false })
 
-const configPopoverVisible = ref(false)
+const resetPopoverVisible = ref(false)
+const confirmPopoverVisible = ref(false)
 
 // 处理正整数输入
 function handlePositiveNumberInput(row: any, field: string, value: string) {
@@ -230,7 +247,8 @@ function handleEvent(type: 'confirm' | 'reset' | 'cancel') {
       })
       break
   }
-  configPopoverVisible.value = false
+  confirmPopoverVisible.value = false
+  resetPopoverVisible.value = false
   visible.value = false
 }
 

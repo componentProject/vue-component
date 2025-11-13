@@ -937,8 +937,16 @@ async function handleGetStoredColumns(): Promise<ColumnType[]> {
 async function handleSaveColumnsToServer(key: string, columns: string) {
   const { isCommon, isReset } = customRestConfig.value || {}
   const callbacks = []
+
   if (isReset) {
-  //   执行删除逻辑
+    // 不管是公共还是个人，都需要删除个人配置，因为个人>公共
+    callbacks.push(deleteMemoryUpload({
+      pageId: props.pageId,
+      widgetId: key,
+      userId: props.userId,
+      data: columns,
+    }))
+    // 如果是公共的，则删除公共配置
     if (isCommon) {
       callbacks.push(deleteMemoryUpload({
         pageId: props.pageId,
@@ -947,14 +955,18 @@ async function handleSaveColumnsToServer(key: string, columns: string) {
         data: columns,
       }))
     }
-    callbacks.push(deleteMemoryUpload({
-      pageId: props.pageId,
-      widgetId: key,
-      userId: props.userId,
-      data: columns,
-    }))
   }
+  // 如果不是重置，执行保存逻辑
   else {
+    // 如果是公共，则所有操作都需要删除个人配置，因为个人>公共
+    if (isCommon) {
+      callbacks.push(deleteMemoryUpload({
+        pageId: props.pageId,
+        widgetId: key,
+        userId: props.userId,
+        data: columns,
+      }))
+    }
     callbacks.push(setMemoryUpload({
       pageId: props.pageId,
       widgetId: key,

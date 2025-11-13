@@ -1,15 +1,15 @@
 <template>
-  <Teleport :to="teleportTo">
+  <Teleport :to="props.teleportTo">
     <Transition
       name="modal-fade"
       @after-leave="handleAfterLeave"
     >
       <div
-        v-if="renderModal && visible"
+        v-if="renderModal && props.visible"
         class="modal-overlay"
         :class="[
-          { 'modal-overlay-draggable': draggable },
-          { 'modal-overlay-penetrate': penetrate },
+          { 'modal-overlay-draggable': props.draggable },
+          { 'modal-overlay-penetrate': props.penetrate },
         ]"
         :style="overlayStyle"
         @click="handleOverlayClick"
@@ -18,8 +18,8 @@
           ref="modalRef"
           class="modal-dialog"
           :class="[
-            { [`modal-${size}`]: !props.width },
-            { 'modal-draggable': draggable },
+            { [`modal-${props.size}`]: !props.width },
+            { 'modal-draggable': props.draggable },
           ]"
           :style="modalStyle"
           @click.stop
@@ -27,7 +27,7 @@
           <!-- 拖拽句柄 - 可拖拽整个头部 -->
           <div
             class="modal-header"
-            :class="{ 'modal-draggable-header': draggable }"
+            :class="{ 'modal-draggable-header': props.draggable }"
             @mousedown="startDrag"
           >
             <!-- 完全自定义头部插槽 -->
@@ -46,7 +46,7 @@
               <div class="modal-header-right">
                 <slot name="header-right" :close="handleClose">
                   <button
-                    v-if="showClose"
+                    v-if="props.showClose"
                     class="modal-close"
                     aria-label="关闭"
                     @click="handleClose"
@@ -73,14 +73,14 @@
               <Buttons v-if="props.buttons" :buttons="props.buttons" />
               <template v-else>
                 <button
-                  v-if="showCancel"
+                  v-if="props.showCancel"
                   class="modal-btn modal-btn-secondary"
                   @click="handleCancel"
                 >
                   {{ props.cancelText }}
                 </button>
                 <button
-                  v-if="showConfirm"
+                  v-if="props.showConfirm"
                   class="modal-btn modal-btn-primary"
                   :disabled="confirmDisabled"
                   @click="handleConfirm"
