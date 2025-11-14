@@ -104,12 +104,12 @@ import {
   watch,
 } from 'vue'
 
+import { VxePager, VxeTooltip } from 'vxe-pc-ui'
 import { getCustomType, handleGetRequiredFields } from './_utils'
 import CustomConfigDialog from './components/CustomConfigDialog.vue'
+// 导入自定义渲染器，改造了VxeGrid，直接用Grid的VxeUI
 import installFn from './renderers'
 import cssModules from './styles/modules/all.module.scss'
-// 导入自定义渲染器.已挪入VxeGrid，后续这里不再维护
-// import './renderers'
 
 defineOptions({
   name: 'DraggableTable',
@@ -265,11 +265,11 @@ const emit = defineEmits<emitsType>()
 // 获取插槽
 const slots = defineSlots<slotsType>()
 
-// const VxeUI = VxeGrid.VxeUI
-//
-// // 注册 VxeUI 组件
-// VxeUI.component(VxePager)
-// VxeUI.component(VxeTooltip)
+// 注册 VxeUI 组件
+function installVxeUIComponent(VxeUI: any) {
+  VxeUI.component(VxePager)
+  VxeUI.component(VxeTooltip)
+}
 
 //#region 根据props动态计算的vxeGrid属性
 function getHeight(height?: number | string): number {
@@ -590,6 +590,7 @@ const collectColumn = computed<ColumnType[]>(() => {
   if (!VxeUI) {
     VxeUI = xTable.value.VxeUI
     installFn(VxeUI)
+    installVxeUIComponent(VxeUI)
   }
   const { collectColumn } = xTable.value.getTableColumn()
   return collectColumn as any[]
