@@ -78,7 +78,6 @@ import type {
   VxeTablePropTypes,
 } from 'vxe-table'
 import type { ColumnType, emitsType, propsType } from './_types'
-import VxeGrid from '@moluoxixi/components/VxeGrid'
 import { deleteMemoryUpload, getMemoryQuery, setMemoryUpload } from '@moluoxixi/utils/_api/cache'
 import {
   getClass,
@@ -105,13 +104,12 @@ import {
   watch,
 } from 'vue'
 
-import { VxePager, VxeTooltip } from 'vxe-pc-ui'
-
 import { getCustomType, handleGetRequiredFields } from './_utils'
 import CustomConfigDialog from './components/CustomConfigDialog.vue'
+import installFn from './renderers'
 import cssModules from './styles/modules/all.module.scss'
-// 导入自定义渲染器
-import './renderers'
+// 导入自定义渲染器.已挪入VxeGrid，后续这里不再维护
+// import './renderers'
 
 defineOptions({
   name: 'DraggableTable',
@@ -267,11 +265,11 @@ const emit = defineEmits<emitsType>()
 // 获取插槽
 const slots = defineSlots<slotsType>()
 
-const VxeUI = VxeGrid.VxeUI
-
-// 注册 VxeUI 组件
-VxeUI.component(VxePager)
-VxeUI.component(VxeTooltip)
+// const VxeUI = VxeGrid.VxeUI
+//
+// // 注册 VxeUI 组件
+// VxeUI.component(VxePager)
+// VxeUI.component(VxeTooltip)
 
 //#region 根据props动态计算的vxeGrid属性
 function getHeight(height?: number | string): number {
@@ -584,11 +582,15 @@ function handleTableRendered(params: VxeTableDefines.ToggleRowExpandEventParams)
   emit('toggleTreeExpand', params)
 }
 //#endregion
-
-//#region 表头配置弹窗功能
+let VxeUI: any
+//#region 表头配置弹窗功能，同时收集VxeUI用于处理渲染器等
 const collectColumn = computed<ColumnType[]>(() => {
   if (!xTable.value)
     return []
+  if (!VxeUI) {
+    VxeUI = xTable.value.VxeUI
+    installFn(VxeUI)
+  }
   const { collectColumn } = xTable.value.getTableColumn()
   return collectColumn as any[]
 })

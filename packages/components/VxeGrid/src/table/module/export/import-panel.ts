@@ -1,11 +1,10 @@
 // VxeGrid的import-panel组件
 import type { Ref } from 'vue'
-import type { VxeButtonComponent, VxeModalComponent, VxeSelectComponent } from 'vxe-pc-ui'
 import type { VxeTableConstructor, VxeTableMethods, VxeTablePrivateMethods } from '../../../../types'
 import { computed, createCommentVNode, defineComponent, h, inject, nextTick, reactive, ref } from 'vue'
+import { VxeButton, VxeModal, VxeSelect } from 'vxe-pc-ui'
 import XEUtils from 'xe-utils'
 import { VxeUI } from '../../../ui'
-
 import { errLog } from '../../../ui/src/log'
 import { parseFile } from '../../../ui/src/utils'
 
@@ -22,9 +21,12 @@ export default defineComponent({
     storeData: Object as any,
   },
   setup(props) {
-    const VxeUIModalComponent = VxeUI.getComponent<VxeModalComponent>('VxeModal')
-    const VxeUIButtonComponent = VxeUI.getComponent<VxeButtonComponent>('VxeButton')
-    const VxeUISelectComponent = VxeUI.getComponent<VxeSelectComponent>('VxeSelect')
+    // const VxeUIModalComponent = VxeUI.getComponent<VxeModalComponent>('VxeModal')
+    // const VxeUIButtonComponent = VxeUI.getComponent<VxeButtonComponent>('VxeButton')
+    // const VxeUISelectComponent = VxeUI.getComponent<VxeSelectComponent>('VxeSelect')
+    const VxeUIModalComponent = VxeModal
+    const VxeUIButtonComponent = VxeButton
+    const VxeUISelectComponent = VxeSelect
 
     const $xeTable = inject('$xeTable', {} as VxeTableConstructor & VxeTableMethods & VxeTablePrivateMethods)
     const { computeImportOpts } = $xeTable.getComputeMaps()

@@ -1,9 +1,10 @@
 // VxeGrid的table组件
 import type { ComponentPublicInstance, ComputedRef, Ref } from 'vue'
-import type { VxeLoadingComponent, VxeTabsConstructor, VxeTabsPrivateMethods, VxeTooltipComponent, VxeTooltipInstance } from 'vxe-pc-ui'
+import type { VxeTabsConstructor, VxeTabsPrivateMethods, VxeTooltipInstance } from 'vxe-pc-ui'
 import type { TableInternalData, TableMethods, TablePrivateMethods, TableReactData, VxeColumnPropTypes, VxeGridConstructor, VxeGridPrivateMethods, VxeTableConstructor, VxeTableDefines, VxeTableMethods, VxeTablePrivateComputed, VxeTablePrivateMethods, VxeTablePrivateRef, VxeTableProps, VxeTablePropTypes, VxeToolbarConstructor } from '../../../types'
 import type { XEBodyScrollElement } from './util'
 import { computed, createCommentVNode, defineComponent, h, inject, nextTick, onActivated, onBeforeUnmount, onDeactivated, onMounted, onUnmounted, provide, reactive, ref, watch } from 'vue'
+import { VxeLoading, VxeTooltip } from 'vxe-pc-ui'
 import XEUtils from 'xe-utils'
 // 导入 CSS Modules 样式文件
 import cssModules from '../../styles/modules/table.module.scss'
@@ -21,8 +22,8 @@ import TableBodyComponent from './body'
 import Cell from './cell'
 import tableEmits from './emits'
 import TableFooterComponent from './footer'
-import TableHeaderComponent from './header'
 
+import TableHeaderComponent from './header'
 import tableProps from './props'
 import { clearTableAllStatus, colToVisible, getCellValue, getRootColumn, getRowid, getRowkey, getRowUniqueId, handleFieldOrColumn, restoreScrollListener, restoreScrollLocation, rowToVisible, setCellValue, toTreePathSeq } from './util'
 
@@ -42,8 +43,10 @@ export default defineComponent({
     const xID = XEUtils.uniqueId()
 
     // 使用已安装的组件，如果未安装则不渲染
-    const VxeUILoadingComponent = VxeUI.getComponent<VxeLoadingComponent>('VxeLoading')
-    const VxeUITooltipComponent = VxeUI.getComponent<VxeTooltipComponent>('VxeTooltip')
+    // const VxeUILoadingComponent = VxeUI.getComponent<VxeLoadingComponent>('VxeLoading')
+    // const VxeUITooltipComponent = VxeUI.getComponent<VxeTooltipComponent>('VxeTooltip')
+    const VxeUILoadingComponent = VxeLoading
+    const VxeUITooltipComponent = VxeTooltip
 
     const $xeTabs = inject<(VxeTabsConstructor & VxeTabsPrivateMethods) | null>('$xeTabs', null)
 

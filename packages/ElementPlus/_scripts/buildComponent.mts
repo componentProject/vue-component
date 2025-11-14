@@ -9,7 +9,7 @@ const LIB_NAMESPACE = 'moluoxixi'
 /**
  * 别名或者外部包的路径
  */
-const aliasComponentPath = '@moluoxixi/components'
+const aliasComponentPath = '@moluoxixi/element-plus'
 /**
  * 必须要排除依赖的工具包
  */

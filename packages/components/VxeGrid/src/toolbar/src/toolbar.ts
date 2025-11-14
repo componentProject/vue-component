@@ -1,13 +1,14 @@
 // VxeGrid的toolbar组件
 import type { PropType, Ref, VNode } from 'vue'
-import type { ValueOf, VxeButtonComponent, VxeButtonEvents } from 'vxe-pc-ui'
+import type { ValueOf, VxeButtonEvents } from 'vxe-pc-ui'
 import type { GridPrivateMethods, ToolbarInternalData, ToolbarMethods, ToolbarPrivateRef, ToolbarReactData, VxeGridConstructor, VxeToolbarConstructor, VxeToolbarEmits, VxeToolbarPropTypes } from '../../../types'
 import { computed, createCommentVNode, defineComponent, h, inject, nextTick, reactive, ref } from 'vue'
+import { VxeButton } from 'vxe-pc-ui'
 import XEUtils from 'xe-utils'
 // 导入 CSS Modules 样式文件
 import cssModules from '../../styles/modules/toolbar.module.scss'
-import { VxeUI } from '../../ui'
 
+import { VxeUI } from '../../ui'
 import { errLog, warnLog } from '../../ui/src/log'
 import { getSlotVNs } from '../../ui/src/vn'
 
@@ -51,7 +52,8 @@ export default defineComponent({
     const xID = XEUtils.uniqueId()
 
     // 使用已安装的组件，如果未安装则不渲染
-    const VxeUIButtonComponent = VxeUI.getComponent<VxeButtonComponent>('VxeButton')
+    // const VxeUIButtonComponent = VxeUI.getComponent<VxeButtonComponent>('VxeButton')
+    const VxeUIButtonComponent = VxeButton
 
     const { computeSize } = useFns.useSize(props)
 

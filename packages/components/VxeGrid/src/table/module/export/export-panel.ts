@@ -1,11 +1,10 @@
 // VxeGrid的export-panel组件
 import type { Ref } from 'vue'
-import type { VxeButtonComponent, VxeCheckboxComponent, VxeInputComponent, VxeModalComponent, VxeSelectComponent } from 'vxe-pc-ui'
 import type { VxeTableConstructor, VxeTableMethods, VxeTablePrivateMethods } from '../../../../types'
 import { computed, createCommentVNode, defineComponent, h, inject, nextTick, reactive, ref } from 'vue'
+import { VxeButton, VxeCheckbox, VxeInput, VxeModal, VxeSelect } from 'vxe-pc-ui'
 import XEUtils from 'xe-utils'
 import { VxeUI } from '../../../ui'
-
 import { errLog } from '../../../ui/src/log'
 import { formatText } from '../../../ui/src/utils'
 
@@ -22,11 +21,16 @@ export default defineComponent({
     storeData: Object as any,
   },
   setup(props) {
-    const VxeUIModalComponent = VxeUI.getComponent<VxeModalComponent>('VxeModal')
-    const VxeUIButtonComponent = VxeUI.getComponent<VxeButtonComponent>('VxeButton')
-    const VxeUISelectComponent = VxeUI.getComponent<VxeSelectComponent>('VxeSelect')
-    const VxeUIInputComponent = VxeUI.getComponent<VxeInputComponent>('VxeInput')
-    const VxeUICheckboxComponent = VxeUI.getComponent<VxeCheckboxComponent>('VxeCheckbox')
+    // const VxeUIModalComponent = VxeUI.getComponent<VxeModalComponent>('VxeModal')
+    // const VxeUIButtonComponent = VxeUI.getComponent<VxeButtonComponent>('VxeButton')
+    // const VxeUISelectComponent = VxeUI.getComponent<VxeSelectComponent>('VxeSelect')
+    // const VxeUIInputComponent = VxeUI.getComponent<VxeInputComponent>('VxeInput')
+    // const VxeUICheckboxComponent = VxeUI.getComponent<VxeCheckboxComponent>('VxeCheckbox')
+    const VxeUIModalComponent = VxeModal
+    const VxeUIButtonComponent = VxeButton
+    const VxeUISelectComponent = VxeSelect
+    const VxeUIInputComponent = VxeInput
+    const VxeUICheckboxComponent = VxeCheckbox
 
     const $xeTable = inject('$xeTable', {} as VxeTableConstructor & VxeTableMethods & VxeTablePrivateMethods)
     const { computeExportOpts, computePrintOpts } = $xeTable.getComputeMaps()

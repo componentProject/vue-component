@@ -1,9 +1,9 @@
 // _api的components组件
 import { COMPONENT_SETTING_TYPE } from '@moluoxixi/constant'
 import FormData from 'form-data'
-import { BaseApi } from '../../utils/AjaxPackage'
+import { getHttpService } from '../../utils/AjaxPackage'
 
-const httpApi: any = new BaseApi({
+const httpApi: any = getHttpService({
   baseURL: 'http://192.168.209.103:10019/ts-fm',
   timeout: 3000,
   getToken: () => null,

@@ -1,12 +1,14 @@
 // VxeGrid的grid组件
 import type { ComponentPublicInstance, PropType, Ref, VNode } from 'vue'
-import type { ValueOf, VxeFormComponent, VxeFormEvents, VxeFormInstance, VxeFormItemProps, VxePagerComponent, VxePagerEvents, VxePagerInstance } from 'vxe-pc-ui'
+import type { ValueOf, VxeFormEvents, VxeFormInstance, VxeFormItemProps, VxePagerEvents, VxePagerInstance } from 'vxe-pc-ui'
 import type { GridMethods, GridPrivateMethods, GridPrivateRef, GridReactData, VxeGridConstructor, VxeGridEmits, VxeGridPrivateComputed, VxeGridPrivateMethods, VxeGridProps, VxeGridPropTypes, VxeTableConstructor, VxeTableDefines, VxeTableEventProps, VxeTableEvents, VxeTableMethods, VxeTablePrivateMethods, VxeTableProps, VxeToolbarInstance, VxeToolbarPropTypes } from '../../../types'
 import { computed, createCommentVNode, defineComponent, h, nextTick, onMounted, onUnmounted, provide, reactive, ref, watch } from 'vue'
+import { VxeForm, VxePager } from 'vxe-pc-ui'
 import XEUtils from 'xe-utils'
 // 导入 CSS Modules 样式文件
 // 注意：grid 组件中已经有 styles 变量（来自 computeStyles），所以使用 cssModules 作为变量名
 import cssModules from '../../styles/modules/grid.module.scss'
+import pcCssModules from '../../styles/pc-ui/modules/all.module.scss'
 import VxeTableComponent from '../../table'
 import tableComponentEmits from '../../table/src/emits'
 import tableComponentProps from '../../table/src/props'
@@ -58,12 +60,13 @@ export default defineComponent({
   emits: gridComponentEmits,
   setup(props, context) {
     const { slots, emit } = context
-
     const xID = XEUtils.uniqueId()
 
     // 使用已安装的组件，如果未安装则不渲染
-    const VxeUIFormComponent = VxeUI.getComponent<VxeFormComponent>('VxeForm')
-    const VxeUIPagerComponent = VxeUI.getComponent<VxePagerComponent>('VxePager')
+    // const VxeUIFormComponent = VxeUI.getComponent<VxeFormComponent>('VxeForm')
+    // const VxeUIPagerComponent = VxeUI.getComponent<VxePagerComponent>('VxePager')
+    const VxeUIFormComponent = VxeForm
+    const VxeUIPagerComponent = VxePager
 
     const { computeSize } = useFns.useSize(props)
 
@@ -1334,7 +1337,7 @@ export default defineComponent({
       const styles = computeStyles.value
       // 外层使用 display: contents 的 div，应用 CSS Module，不影响布局
       return h('div', {
-        class: cssModules.root,
+        class: [cssModules.root, pcCssModules.root],
         style: {
           // display: 'contents',
           width: '100%',
@@ -1361,7 +1364,7 @@ export default defineComponent({
     }
 
     $xeGrid.renderVN = renderVN
-
+    $xeGrid.VxeUI = VxeUI
     provide('$xeGrid', $xeGrid)
 
     return $xeGrid

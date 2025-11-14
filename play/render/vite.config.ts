@@ -54,10 +54,18 @@ export default viteConfig(
                   '/../../packages/components/**/Example.vue',
                   '!/../../packages/components/**/components/*',
                   '!/../../packages/components/**/_*/*',
+                  '!/**/node_modules/**/*',
                 ],
-                baseRoute: {
-                  name: '组件示例',
-                },
+                baseRoute: '组件示例',
+              },
+              elementComponentExamples: {
+                glob: [
+                  '/../../packages/ElementPlus/**/Example.vue',
+                  '!/../../packages/ElementPlus/**/components/*',
+                  '!/../../packages/ElementPlus/**/_*/*',
+                  '!/**/node_modules/**/*',
+                ],
+                baseRoute: 'element-plus组件示例',
               },
               AllTestComponentExamples: {
                 glob: [
