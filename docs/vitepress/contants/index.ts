@@ -17,3 +17,4 @@ export const repoInfo = getRepoInfoWithFallback({
   contributorsUrl: 'http://192.168.18.106/middle-tec/front-web/vue-component/graphs/contributors',
   licenseUrl: 'http://192.168.18.106/middle-tec/front-web/vue-component/blob/main/LICENSE',
 })
+export * from './web'

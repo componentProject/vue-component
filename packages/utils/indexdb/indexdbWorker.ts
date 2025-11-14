@@ -3,8 +3,8 @@
  * 在后台线程中处理 IndexDB 操作，避免阻塞主线程
  */
 
-import type { IndexDBOperation, WorkerMessage, WorkerResponse } from '../_types/indexdb'
-import { IndexDBManager } from './IndexDBManager'
+import type { IndexDBOperation, WorkerMessage, WorkerResponse } from './_types'
+import { IndexDBManager } from './IndexDBManager.ts'
 
 interface DBConfig {
   dbName?: string

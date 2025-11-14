@@ -1,118 +1,56 @@
-// vite入口文件
-import type { Plugin } from 'postcss'
-import path from 'node:path'
-import tailwindcss from '@tailwindcss/postcss'
-import vueJsx from '@vitejs/plugin-vue-jsx'
-import autoprefixer from 'autoprefixer'
-import AutoImport from 'unplugin-auto-import/vite'
-import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
-import Components from 'unplugin-vue-components/vite'
-import viteCompression from 'vite-plugin-compression'
-import viteImagemin from 'vite-plugin-imagemin'
 import cssModuleGlobalRootPlugin from '../../../../../packages/utils/cssModuleGlobalRootPlugin'
-import { docsPath, rootPath } from '../../../contants/index.ts'
+import { getViteConfig } from '../../../../../packages/utils/ViteConfig/index.ts'
+import { appCode, docsPath } from '../../../contants/index.ts'
 import { MarkdownTransform } from './plugins/markdown-transform.ts'
 
-/**
- * Vue 相关插件配置
- */
-export const vuePlugins = [
-  vueJsx(),
-  // 自动引入
-  AutoImport({
-    imports: ['vue'],
-    resolvers: [ElementPlusResolver()],
-    dts: path.resolve(docsPath, './typings/auto-imports.d.ts'),
-  }),
-  // 与自定义element组件冲突
-  Components({
-    resolvers: [
-      ElementPlusResolver(),
+const viteConfig = getViteConfig({
+  rootPath: docsPath,
+  appCode,
+  vitepress: true,
+  port: 3004,
+  codeInspector: false,
+  viteConfig: {
+    ssr: {
+      noExternal: ['element-plus'],
+    },
+    plugins: [
+      MarkdownTransform() as any,
     ],
-    globs: [],
-    dts: path.resolve(docsPath, './typings/components.d.ts'),
-  }),
-].filter(i => !!i)
-
-/**
- * 性能优化插件配置
- */
-export const performancePlugins = [
-  // 代码压缩
-  viteCompression({
-    algorithm: 'gzip',
-    verbose: true,
-    disable: false,
-    ext: '.gz',
-    threshold: 10240,
-    deleteOriginFile: false,
-  }),
-  // 图片压缩
-  viteImagemin({
-    gifsicle: { optimizationLevel: 7, interlaced: false },
-    optipng: { optimizationLevel: 7 },
-    mozjpeg: { quality: 20 },
-    pngquant: { quality: [0.8, 0.9], speed: 4 },
-    svgo: {
-      plugins: [{ name: 'removeViewBox' }, { name: 'removeEmptyAttrs', active: false }],
-    },
-  }),
-].filter(i => !!i)
-
-/**
- * Vite 配置
- */
-const viteConfig = {
-  ssr: {
-    noExternal: ['element-plus'],
-  },
-  plugins: [
-    ...vuePlugins,
-    ...performancePlugins,
-    MarkdownTransform() as any,
-  ],
-  resolve: {
-    alias: {
-      '@moluoxixi/components': path.resolve(rootPath, './packages/components'),
-      '@moluoxixi/utils': path.resolve(rootPath, './packages/utils'),
-    },
-  },
-  server: {
-    proxy: {
-      '/ts-cache': {
-        changeOrigin: true,
-        target: 'http://192.168.209.103:84',
-      },
-      '/ts-fm': {
-        changeOrigin: true,
-        target: 'http://192.168.209.103:84',
-      },
-    },
-  },
-  css: {
-    preprocessorOptions: {
-      scss: {
-        silenceDeprecations: ['legacy-js-api'],
-        api: 'modern-compiler',
-        additionalData: (source: string, filename: string) => {
-          if (filename.includes('.vue') && !filename.includes('AIAgent')) {
-            return `@forward '@moluoxixi/components/_assets/styles/tailwind.scss';
-                ${source}`
-          }
-          else {
-            return source
-          }
+    server: {
+      proxy: {
+        '/ts-cache': {
+          changeOrigin: true,
+          target: 'http://192.168.209.103:84',
+        },
+        '/ts-fm': {
+          changeOrigin: true,
+          target: 'http://192.168.209.103:84',
         },
       },
     },
-    postcss: {
-      plugins: [
-        tailwindcss() as Plugin,
-        autoprefixer() as Plugin,
-        cssModuleGlobalRootPlugin() as Plugin,
-      ],
+    css: {
+      postcss: {
+        plugins: [
+          cssModuleGlobalRootPlugin(),
+        ],
+      },
+      preprocessorOptions: {
+        scss: {
+          silenceDeprecations: ['legacy-js-api'],
+          api: 'modern-compiler',
+          additionalData: (source: string, filename: string) => {
+            if (filename.includes('.vue') && !filename.includes('AIAgent')) {
+              return `@forward '@moluoxixi/components/_assets/styles/tailwind.scss';
+                ${source}`
+            }
+            else {
+              return source
+            }
+          },
+        },
+      },
     },
   },
-}
+})
 
 export default viteConfig

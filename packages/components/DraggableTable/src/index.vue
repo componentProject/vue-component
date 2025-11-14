@@ -589,7 +589,6 @@ function handleTableRendered(params: VxeTableDefines.ToggleRowExpandEventParams)
 const collectColumn = computed<ColumnType[]>(() => {
   if (!xTable.value)
     return []
-  console.log('xTable.value', xTable.value)
   const { collectColumn } = xTable.value.getTableColumn()
   return collectColumn as any[]
 })

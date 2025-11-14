@@ -44,7 +44,7 @@
 import type { DocumentListItem, emitsType, ImageData, propsType, SavedDocumentData, slotsType } from './_types'
 import { foldGutter } from '@codemirror/language'
 import { lineNumbers } from '@codemirror/view'
-import { idbStorage } from '@moluoxixi/utils/_utils/indexdb'
+import { idbStorage } from '@moluoxixi/utils/indexdb'
 import ancher from 'markdown-it-anchor'
 import { config, editorExtensionsAttrs, MdCatalog, MdEditor, XSSPlugin } from 'md-editor-v3'
 import screenfull from 'screenfull'

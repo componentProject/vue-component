@@ -10,16 +10,31 @@ export default viteConfig(
     const env = loadEnv(mode!, process.cwd())
     const viteEnv = wrapperEnv(env)
     const rootPath = path.resolve()
+    const appCode = viteEnv.VITE_GLOB_APP_CODE
     return {
       rootPath,
       mode: {
         base: {
           appTitle: viteEnv.VITE_GLOB_APP_TITLE,
-          appCode: viteEnv.VITE_GLOB_APP_CODE,
+          appCode,
           port: 3301,
           autoComponent: false,
           // pwa: {
           //   manifest: {
+          //     icons: [
+          //       {
+          //         src: `/${appCode}/pwa-192x192.png`,
+          //         sizes: '192x192',
+          //         type: 'image/png',
+          //         purpose: 'any' as const,
+          //       },
+          //       {
+          //         src: `/${appCode}/pwa-512x512.png`,
+          //         sizes: '512x512',
+          //         type: 'image/png',
+          //         purpose: 'any' as const,
+          //       },
+          //     ],
           //     // 桌面设备安装界面所需的屏幕截图
           //     screenshots: [
           //       {
@@ -31,7 +46,6 @@ export default viteConfig(
           //       },
           //     ],
           //   },
-          //
           // },
           autoRoutes: {
             routeConfig: {

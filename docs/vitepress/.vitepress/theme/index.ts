@@ -10,8 +10,8 @@ import VueComponent from '@moluoxixi/components'
 import { COMPONENT_SETTING_TYPE } from '@moluoxixi/constant'
 import { getList } from '@moluoxixi/utils/_api'
 
-import { idbStorage } from '@moluoxixi/utils/_utils/indexdb'
 import { registerAllComponent } from '@moluoxixi/utils/_utils/loadComponent'
+import { idbStorage } from '@moluoxixi/utils/indexdb'
 import DefaultTheme from 'vitepress/theme'
 
 import * as Vue from 'vue'

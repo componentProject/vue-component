@@ -6,7 +6,7 @@ import type { ConfigEnv, PluginOption, UserConfig } from 'vite'
 import type importToCDN from 'vite-plugin-cdn-import'
 import type viteCompression from 'vite-plugin-compression'
 import type viteImagemin from 'vite-plugin-imagemin'
-import type { Options as PagesOptions } from 'vite-plugin-pages'
+import type { UserOptions as PagesOptions } from 'vite-plugin-pages'
 import type { Options as VitePWAOptions } from 'vite-plugin-pwa'
 
 export type CompressionOptions = Parameters<typeof viteCompression>[0]
@@ -104,9 +104,18 @@ export interface PluginConfig {
    * Code Inspector配置，true表示使用默认配置，对象表示覆盖默认配置
    */
   codeInspector?: boolean | Parameters<typeof import('code-inspector-plugin').codeInspectorPlugin>[0]
-}
-
-export interface ModeConfig extends PluginConfig {
+  /**
+   * 是否是vitepress
+   */
+  vitepress?: boolean
+  /**
+   * 是否是vue
+   */
+  vue?: boolean
+  /**
+   * 是否是react
+   */
+  react?: boolean
   /**
    * 项目标题
    */
@@ -115,6 +124,10 @@ export interface ModeConfig extends PluginConfig {
    * 项目code
    */
   appCode?: string
+}
+
+export interface ModeConfig extends PluginConfig {
+
 }
 
 export interface objRouteConfig {
@@ -151,7 +164,7 @@ export interface AutoRoutesConfig {
   root?: string
 }
 
-export interface Config {
+export interface Config extends PluginConfig {
   /**
    * 根目录
    */
@@ -160,7 +173,9 @@ export interface Config {
    * 环境配置
    */
   mode: {
-    [key: string]: ModeConfig
+    base?: ModeConfig
+    development?: ModeConfig
+    production?: ModeConfig
   }
   viteConfig?: UserConfig | ((mode: ConfigEnv) => UserConfig)
 }

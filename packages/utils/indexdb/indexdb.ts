@@ -5,8 +5,8 @@ import type {
   PendingOperation,
   WorkerMessage,
   WorkerResponse,
-} from '../_types/indexdb'
-import { IndexDBManager } from './IndexDBManager'
+} from './_types'
+import { IndexDBManager } from './IndexDBManager.ts'
 
 // 使用主键 'key'，不再附加时间戳，结构更轻量
 

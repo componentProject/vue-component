@@ -3,7 +3,7 @@
  * 封装所有 IndexDB 操作的核心逻辑，供主线程和 Worker 线程共享使用
  */
 
-import type { StorageRecord } from '../_types/indexdb'
+import type { StorageRecord } from './_types'
 
 export interface IndexDBManagerOptions {
   dbName?: string
@@ -68,7 +68,7 @@ export class IndexDBManager {
     this.dbName = options.dbName || 'IndexDBStorage'
     this.storeName = options.storeName || 'storage'
     this.cacheEnabled = options.cache?.enabled ?? false
-    this.performanceEnabled = options.performance?.enabled ?? false
+    this.performanceEnabled = options.performance?.enabled ?? true
   }
 
   /**
