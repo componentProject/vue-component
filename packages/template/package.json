@@ -1,0 +1,43 @@
+{
+  "name": "@moluoxixi/template",
+  "version": "0.0.1",
+  "description": "组件相关模板项目",
+  "main": "index.ts",
+  "module": "index.ts",
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
+  },
+  "scripts": {
+    "publish": "tsx _scripts/buildComponent.mts build-publish",
+    "build": "tsx _scripts/buildComponent.mts build",
+    "eslint": "eslint . --ext .vue,.js,.jsx,.ts,.tsx --fix"
+  },
+  "dependencies": {
+    "@moluoxixi/template": "workspace:*",
+    "@element-plus/icons-vue": "catalog:build",
+    "@moluoxixi/constant": "workspace:*",
+    "@moluoxixi/utils": "workspace:*",
+    "@vueuse/core": "^11.0.0",
+    "axios": "catalog:build",
+    "element-plus": "catalog:build",
+    "lodash": "catalog:build",
+    "vue": "catalog:build",
+    "vue-router": "catalog:build"
+  },
+  "devDependencies": {
+    "@types/lodash": "catalog:type",
+    "sass": "catalog:dev",
+    "sass-embedded": "catalog:dev",
+    "sass-loader": "catalog:dev",
+    "tailwindcss": "catalog:dev",
+    "tsx": "^4.20.5",
+    "typescript": "catalog:dev",
+    "vite": "catalog:dev"
+  },
+  "postcss": {
+    "plugins": {
+      "@tailwindcss/postcss": {},
+      "autoprefixer": {}
+    }
+  }
+}

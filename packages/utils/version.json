@@ -1,7 +1,12 @@
 {
   "ViteConfig": "0.0.19",
-  "EslintConfig": "0.0.6",
-  "AjaxPackage": "0.0.6",
-  "ClassNames": "0.0.2",
-  "GoogleModel": "0.0.4"
+  "EslintConfig": "0.0.7-beta.0",
+  "AjaxPackage": "0.0.7-beta.0",
+  "ClassNames": "0.0.3-beta.0",
+  "GoogleModel": "0.0.4",
+  "addUuidToTemplatePlugin": "0.0.2-beta.0",
+  "ApiDialog": "0.0.2-beta.0",
+  "autoRoutes": "0.0.2-beta.0",
+  "cssInjectedByJsPlugin": "0.0.2-beta.0",
+  "cssModuleGlobalRootPlugin": "0.0.2-beta.0"
 }

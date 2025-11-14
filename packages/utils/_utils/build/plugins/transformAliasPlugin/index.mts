@@ -6,34 +6,10 @@ export interface BuildContext {
   LIB_NAMESPACE: string
   /** 别名或者外部包的路径 */
   aliasComponentPath: string
-  /** 是否分包，与preserveModules冲突，如果preserveModules开启，则需按preserveModules的目录结构分包 */
-  isChunck: boolean
-  /** 是否严格按照目录分组 */
-  preserveModules: boolean
-  /** 是否启用混淆 */
-  useObfuscator: boolean
-  /** 是否启用依赖排除,不启用时，仅排除核心依赖（vue模块，node模块） */
-  useExternal: boolean
-  /** 控制是否排除重型插件（由 options.excludeHeavyPlugins 决定） */
-  excludeHeavyPlugins: boolean
-  /** 必须要排除依赖的工具包 */
-  requireExternalPacks: string[]
-  /** 需要项目预设的依赖（可选） */
-  presetGlobals: Record<string, string>
-  /** Peer 依赖列表（可选） */
-  peerDepList: string[]
-  /** 项目根目录，用于获取依赖版本信息（可选，仅用于扫描依赖） */
-  rootDir?: string
-  /** 组件仓库所在路径 */
+  /** 路径别名（无 * 的包前缀集合） */
   packDir: string
   /** 组件的入口文件路径,需要以/开头，/结尾，相对于packDir */
   entryBaseUrl: string
-  /** 路径别名 */
-  alias: Record<string, string>
-  /** 路径别名（无 * 的包前缀集合） */
-  aliasPacks: string[]
-  /** 上传类型（用于 UploadEvent），默认 'Vue3' */
-  uploadType?: string
 }
 /**
  * 自定义插件：将相对路径转换为@/components路径引用，并处理组件内部自引用

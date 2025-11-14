@@ -1,6 +1,6 @@
 // autoRoutes入口文件
 import type { Plugin } from 'vite'
-import { createVirtualPlugin } from '../utils/virtual.ts'
+import { createVirtualPlugin } from '../_utils/virtual.ts'
 // autoRoutes/index.ts
 import { findDefaultRouteHandle, findParentRouteHandle, generateRoutes } from './routeGenerator.ts'
 

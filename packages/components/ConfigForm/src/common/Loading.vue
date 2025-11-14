@@ -8,9 +8,11 @@
   width: 100%;
   height: 100%;
   min-height: 40px;
-  ::v-deep .el-loading-spinner .circular {
-    width: 30px;
-    height: 30px;
+  :deep(.el-loading-spinner) {
+    .circular {
+      width: 30px;
+      height: 30px;
+    }
   }
 }
 </style>

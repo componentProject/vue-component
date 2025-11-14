@@ -266,4 +266,3 @@ globalThis.onerror = function (event: ErrorEvent | Event | string) {
 globalThis.onunhandledrejection = function (event: PromiseRejectionEvent) {
   console.error('IndexDB Worker 未处理的 Promise 拒绝:', event.reason)
 }
-

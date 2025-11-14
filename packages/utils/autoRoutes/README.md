@@ -23,7 +23,7 @@
 ### 1. 在vite.config.ts中引入插件
 
 ```ts
-import autoRoutes from './plugins/autoRoutes'
+import autoRoutes from '@moluoxixi/utils/autoRoutes/index.ts'
 
 export default defineConfig({
   plugins: [
@@ -104,3 +104,4 @@ export default router
 - 虚拟模块导出的是JS，不包含TS类型声明
 - 路径处理逻辑：从src后面一位到倒数第二位作为路径
 - 组件名称取自组件的name属性或路径的最后一部分
+

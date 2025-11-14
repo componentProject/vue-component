@@ -9,6 +9,7 @@ import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
 import Components from 'unplugin-vue-components/vite'
 import viteCompression from 'vite-plugin-compression'
 import viteImagemin from 'vite-plugin-imagemin'
+import cssModuleGlobalRootPlugin from '../../../../../packages/utils/cssModuleGlobalRootPlugin'
 import { docsPath, rootPath } from '../../../contants/index.ts'
 import { MarkdownTransform } from './plugins/markdown-transform.ts'
 
@@ -105,7 +106,11 @@ const viteConfig = {
       },
     },
     postcss: {
-      plugins: [tailwindcss() as Plugin, autoprefixer() as Plugin],
+      plugins: [
+        tailwindcss() as Plugin,
+        autoprefixer() as Plugin,
+        cssModuleGlobalRootPlugin() as Plugin,
+      ],
     },
   },
 }

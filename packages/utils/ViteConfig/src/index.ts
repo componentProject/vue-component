@@ -42,10 +42,10 @@ import qiankunPlugin from 'vite-plugin-qiankun'
 import vueDevTools from 'vite-plugin-vue-devtools'
 import { deepMerge } from '../../_utils/object.ts'
 
+// 自动路由
+import autoRoutesPlugin from '../../autoRoutes'
 import { modules } from './constants/index.ts'
 import scopedCssPrefixPlugin from './plugins/addScopedAndReplacePrefix.ts'
-// 自动路由
-import autoRoutesPlugin from './plugins/autoRoutes/index.ts'
 
 // workbox urlPattern 参数类型
 interface UrlPatternContext {
@@ -240,96 +240,9 @@ export default function createViteConfig(Config: ViteConfigType) {
             workbox: {
               // 预缓存所有静态资源
               globPatterns: ['**/*.{html,js,css,ico,png,svg,jpg,jpeg,webp,woff2,woff,eot,ttf,json,xml}'],
+              // 强制所有导航请求都通过 Service Worker 处理, 这是实现 App Shell 离线访问的关键
+              navigateFallback: 'index.html',
               maximumFileSizeToCacheInBytes: 8 * 1024 * 1024, // 最大缓存文件 8MB（适配大图/字体文件）
-              runtimeCaching: [
-                // 注意：workbox 按顺序匹配规则，第一个匹配的规则会被使用
-                // 1. 静态资源缓存：优先缓存，后台更新（JS、CSS、图片、字体等）
-                {
-                  urlPattern: ({ request, url }: UrlPatternContext) => {
-                    const accept = request.headers.get('accept') || ''
-                    const contentType = request.headers.get('content-type') || ''
-                    // 通过请求头判断是否为静态资源
-                    return request.destination === 'script'
-                      || request.destination === 'style'
-                      || request.destination === 'image'
-                      || request.destination === 'font'
-                      || accept.includes('text/css')
-                      || accept.includes('application/javascript')
-                      || accept.includes('text/javascript')
-                      || accept.includes('image/')
-                      || accept.includes('font/')
-                      || accept.includes('application/font')
-                      || contentType.includes('text/css')
-                      || contentType.includes('application/javascript')
-                      || contentType.includes('image/')
-                      || contentType.includes('font/')
-                      // 通过文件扩展名判断
-                      || url.pathname.match(/\.(js|css|mjs|png|jpg|jpeg|gif|svg|webp|ico|woff|woff2|eot|ttf|otf|json|xml)$/i) !== null
-                  },
-                  handler: 'StaleWhileRevalidate' as const,
-                  options: {
-                    cacheName: 'static-resource-cache',
-                    expiration: {
-                      maxEntries: 500,
-                      maxAgeSeconds: 30 * 24 * 60 * 60, // 静态资源缓存30天
-                    },
-                    // 缓存 200（完整响应）和 206（部分内容，用于大文件、视频等）
-                    // 304 不需要缓存：workbox 会自动处理，如果网络返回 304，会使用已缓存的资源
-                    cacheableResponse: { statuses: [200, 206] },
-                  },
-                },
-                // 2. 页面缓存：优先网络，无网用缓存（HTML页面）
-                {
-                  urlPattern: ({ request, url }: UrlPatternContext) => {
-                    const accept = request.headers.get('accept') || ''
-                    // 通过请求头判断是否为页面请求
-                    return request.destination === 'document'
-                      || accept.includes('text/html')
-                      || url.pathname.match(/\.html?$/i) !== null
-                  },
-                  handler: 'NetworkFirst' as const,
-                  options: {
-                    cacheName: 'page-cache',
-                    networkTimeoutSeconds: 3, // 3秒无网络则用缓存
-                    expiration: {
-                      maxEntries: 50, // 最多缓存50个页面
-                      maxAgeSeconds: 24 * 60 * 60, // 页面缓存有效期24小时
-                    },
-                    // 缓存 200（完整响应）
-                    // 304 不需要缓存：workbox 的 NetworkFirst 策略会自动处理 304，使用已缓存的页面
-                    cacheableResponse: { statuses: [200] },
-                  },
-                },
-                // 3. 接口缓存：优先网络，无网用缓存（所有接口请求）
-                {
-                  urlPattern: ({ request }: UrlPatternContext) => {
-                    const accept = request.headers.get('accept') || ''
-                    const contentType = request.headers.get('content-type') || ''
-                    // 通过请求头判断是否为接口请求
-                    return accept.includes('application/json')
-                      || accept.includes('text/json')
-                      || accept.includes('application/xml')
-                      || contentType.includes('application/json')
-                      || contentType.includes('application/xml')
-                      || contentType.includes('application/x-www-form-urlencoded')
-                      || contentType.includes('multipart/form-data')
-                      // 或者请求方法不是 GET（POST、PUT、DELETE 等通常是接口）
-                      || (request.method !== 'GET' && request.method !== 'HEAD')
-                  },
-                  handler: 'NetworkFirst' as const,
-                  options: {
-                    cacheName: 'api-cache',
-                    networkTimeoutSeconds: 5, // 5秒无网络则用缓存
-                    expiration: {
-                      maxEntries: 200, // 最多缓存200个接口请求
-                      maxAgeSeconds: 6 * 60 * 60, // 接口缓存有效期6小时
-                    },
-                    // 缓存 200（成功响应）
-                    // 304 在接口中不常见，且 workbox 会自动处理
-                    cacheableResponse: { statuses: [200] },
-                  },
-                },
-              ],
               // 清理旧缓存（避免用户积累过多无效缓存）
               cleanupOutdatedCaches: true,
             },

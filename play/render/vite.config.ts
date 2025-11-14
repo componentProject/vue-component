@@ -2,6 +2,7 @@
 import path from 'node:path'
 import process from 'node:process'
 import { loadEnv } from 'vite'
+import cssModuleGlobalRootPlugin from '../../packages/utils/cssModuleGlobalRootPlugin/index.ts'
 import viteConfig, { wrapperEnv } from '../../packages/utils/ViteConfig/index.ts'
 
 export default viteConfig(
@@ -61,13 +62,6 @@ export default viteConfig(
         build: {
           outDir: '../../dist',
         },
-        resolve: {
-          extensions: ['.js', '.jsx', '.ts', '.tsx', '.vue'],
-          alias: {
-            '@moluoxixi/components': path.resolve(rootPath, '../../packages/components'),
-            '@moluoxixi/utils': path.resolve(rootPath, '../../packages/utils'),
-          },
-        },
         plugins: [],
         server: {
           proxy: {
@@ -114,6 +108,11 @@ export default viteConfig(
           },
         },
         css: {
+          postcss: {
+            plugins: [
+              cssModuleGlobalRootPlugin(),
+            ],
+          },
           preprocessorOptions: {
             scss: {
               api: 'modern-compiler',

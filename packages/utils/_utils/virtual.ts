@@ -4,7 +4,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import process from 'node:process'
 import { normalizePath } from 'vite'
-import { getType } from '../../../../_utils/index.ts'
+import { getType } from './base.ts'
 
 export type PathMatcher = (absPath: string) => boolean
 

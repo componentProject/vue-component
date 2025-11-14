@@ -1,7 +1,7 @@
 // importComponents.ts文件
 import type { Plugin } from 'vite'
-import { getList } from '../../../_api'
-import { createVirtualPlugin } from './utils/virtual'
+import { getList } from '@moluoxixi/utils/_api'
+import { createVirtualPlugin } from '@moluoxixi/utils/_utils/virtual.ts'
 
 export interface ImportComponentsOrUtilsOptions {
   /** 虚拟模块 id，默认 'virtual:remote' */

@@ -6,6 +6,9 @@ import fs from 'node:fs'
 import fsp from 'node:fs/promises'
 import { dirname, resolve } from 'node:path'
 
+import addUuidToTemplatePlugin from '@moluoxixi/utils/addUuidToTemplatePlugin'
+import cssInjectedByJsPlugin from '@moluoxixi/utils/cssInjectedByJsPlugin'
+import cssModuleGlobalRootPlugin from '@moluoxixi/utils/cssModuleGlobalRootPlugin'
 import tailwindcss from '@tailwindcss/postcss'
 import pluginVue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
@@ -17,14 +20,12 @@ import AutoImport from 'unplugin-auto-import/vite'
 import { build, mergeConfig } from 'vite'
 import dts from 'vite-plugin-dts'
 import viteImagemin from 'vite-plugin-imagemin'
-import addUuidToTemplatePlugin from './plugins/addUuidToTemplate/index.mts'
-import cssInjectedByJsPlugin from './plugins/cssInjectedByJsPlugin/index.mts'
-import cssModuleGlobalRootPlugin from './plugins/cssModuleGlobalRootPlugin/index.mts'
 import transformAliasPlugin from './plugins/transformAliasPlugin/index.mts'
 // import { lazyImport, VxeResolver } from 'vite-plugin-lazy-import'
 import { UploadEvent } from './utils/UploadComponent.ts'
 
 export type ViteConfigType = UserConfig | ((mode: ConfigEnv) => UserConfig)
+
 //#region CLI 辅助函数
 /**
  * 将字符串形式的布尔开关解析为布尔值。
@@ -203,6 +204,8 @@ export interface BuildContext {
   npmPublish?: boolean
   /** 样式类型，用于控制 CSS Module 相关插件 */
   styleType?: string
+  /** 是否为 Node.js 环境 */
+  isNode?: boolean
   viteConfig?: ViteConfigType
 }
 
@@ -535,11 +538,13 @@ async function analyzeComponentDeps(ctx: BuildContext, comp: string) {
     // 获取所有组件列表作为内部组件参考，用于内部依赖排除,库模式置空，避免内部依赖排除
     const allComponents = comp ? await getComponentNames(ctx) : []
 
-    // 组件目录和入口文件
+    // 组件目录和入口文件（支持任意后缀名的 index 文件）
     const componentDir = resolve(ctx.packDir, `.${ctx.entryBaseUrl}${comp}`)
-    const entryPoint = fs.existsSync(resolve(componentDir, 'index.ts'))
-      ? resolve(componentDir, 'index.ts')
-      : resolve(componentDir, 'index.vue')
+    const entryPoint = await findComponentEntry(componentDir)
+
+    if (!entryPoint) {
+      throw new Error(`组件 ${comp} 没有找到入口文件（在 ${componentDir} 目录下未找到任何 index.* 文件）`)
+    }
 
     console.log(`分析入口文件: ${entryPoint}`)
 
@@ -818,6 +823,42 @@ async function analyzeComponentDeps(ctx: BuildContext, comp: string) {
   }
 }
 
+/**
+ * 查找组件的入口文件（支持任意后缀名的 index 文件）
+ * @param componentDir 组件目录路径
+ * @returns 入口文件路径，如果未找到则返回 null
+ */
+async function findComponentEntry(componentDir: string): Promise<string | null> {
+  // 使用 glob 查找所有 index.* 文件
+  const indexFiles = await glob(['index.*'], {
+    cwd: componentDir,
+    absolute: true,
+    onlyFiles: true,
+  })
+
+  if (indexFiles.length > 0) {
+    // 按优先级排序：优先选择 .ts, .tsx, .vue, .js, .jsx
+    const priority = ['.ts', '.tsx', '.vue', '.js', '.jsx']
+    const sortedFiles = indexFiles.sort((a, b) => {
+      const extA = a.substring(a.lastIndexOf('.'))
+      const extB = b.substring(b.lastIndexOf('.'))
+      const indexA = priority.indexOf(extA)
+      const indexB = priority.indexOf(extB)
+      // 如果都在优先级列表中，按优先级排序；否则保持原顺序
+      if (indexA !== -1 && indexB !== -1)
+        return indexA - indexB
+      if (indexA !== -1)
+        return -1
+      if (indexB !== -1)
+        return 1
+      return 0
+    })
+    return sortedFiles[0]
+  }
+
+  return null
+}
+
 //#endregion
 
 //#region 组件打包
@@ -870,6 +911,31 @@ async function bundleComponentModule(ctx: BuildContext, {
           ctx.useObfuscator && obfuscator(),
         ],
         external: (id: string) => {
+          // 全部交给presetGlobals
+          // // 检查Vue相关依赖
+          // const isVueDep = ['@vue/runtime-core', '@vue/runtime-dom'].includes(id)
+          // // Node.js核心模块，标记为外部依赖
+          const isNodeBuiltin = id.startsWith('node:')
+            || ['path', 'module', 'fs', 'os', 'events', 'stream', 'buffer', 'crypto', 'zlib', 'http', 'https', 'url', 'querystring', 'child_process'].includes(id)
+
+          // if (isVueDep || isNodeBuiltin || ctx.peerDepList.includes(id)) {
+          //   return true
+          // }
+
+          if (isNodeBuiltin) {
+            return true
+          }
+          // if (ctx.isNode) {
+          // return ['__vite-browser-external'].includes(id)
+          // }
+          if (ctx.peerDepList.includes(id)) {
+            return true
+          }
+          const isExternal = ctx.useExternal || ctx.requireExternalPacks.includes(comp)
+          if (isExternal) {
+            return Object.keys(dependencies.external).includes(id)
+          }
+
           // 仅单组件打包，检查@${LIB_NAMESPACE}/xxx路径（转换后的内部组件依赖）
           if (currentComponent && id.startsWith(`@${ctx.LIB_NAMESPACE}`)) {
             const item = ctx.aliasPacks.find((i: string) => id.startsWith(`${i}`))
@@ -885,23 +951,7 @@ async function bundleComponentModule(ctx: BuildContext, {
               return !(componentMatch && componentMatch[1] === currentComponent.toLowerCase())
             }
           }
-          // 全部交给presetGlobals
-          // // 检查Vue相关依赖
-          // const isVueDep = ['@vue/runtime-core', '@vue/runtime-dom'].includes(id)
-          // // Node.js核心模块，标记为外部依赖
-          // const isNodeBuiltin = id.startsWith('node:')
-          //   || ['path', 'module', 'fs', 'os', 'events', 'stream', 'buffer', 'crypto', 'zlib', 'http', 'https', 'url', 'querystring', 'child_process'].includes(id)
 
-          // if (isVueDep || isNodeBuiltin || ctx.peerDepList.includes(id)) {
-          //   return true
-          // }
-          if (ctx.peerDepList.includes(id)) {
-            return true
-          }
-          const isExternal = ctx.useExternal || ctx.requireExternalPacks.includes(comp)
-          if (isExternal) {
-            return Object.keys(dependencies.external).includes(id)
-          }
           return false
         },
         output: {
@@ -949,16 +999,12 @@ export interface ComponentConfigResult {
 async function getComponentConfig(ctx: BuildContext, comp: string): Promise<ComponentConfigResult> {
   const componentName = comp
 
-  // 获取入口文件
-  let entry: string | null = null
-  if (fs.existsSync(resolve(ctx.packDir, `.${ctx.entryBaseUrl}${componentName}/index.ts`))) {
-    entry = resolve(ctx.packDir, `.${ctx.entryBaseUrl}${componentName}/index.ts`)
-  }
-  else if (fs.existsSync(resolve(ctx.packDir, `.${ctx.entryBaseUrl}${componentName}/index.vue`))) {
-    entry = resolve(ctx.packDir, `.${ctx.entryBaseUrl}${componentName}/index.vue`)
-  }
-  else {
-    throw new Error(`组件 ${comp} 没有找到入口文件`)
+  // 获取入口文件（支持任意后缀名的 index 文件）
+  const componentDir = resolve(ctx.packDir, `.${ctx.entryBaseUrl}${componentName}`)
+  const entry = await findComponentEntry(componentDir)
+
+  if (!entry) {
+    throw new Error(`组件 ${comp} 没有找到入口文件（在 ${componentDir} 目录下未找到任何 index.* 文件）`)
   }
 
   // 获取输出目录
@@ -1022,15 +1068,8 @@ async function buildComponent(
   const currentVersion = versions[componentKey] || '0.0.1'
 
   console.log(`\n========== 开始打包: ${buildName}，版本：${currentVersion} ==========`)
-  const esOutputDir = resolve(outputDir, 'es')
-  // const libOutputDir = resolve(outputDir, 'lib')
-  const umdOutputDir = resolve(outputDir, 'umd')
-  // const iifeOutputDir = resolve(outputDir, 'iife')
+
   try {
-    await clearDir(esOutputDir)
-    // await clearDir(libOutputDir)
-    await clearDir(umdOutputDir)
-    // await clearDir(iifeOutputDir)
     // 使用传入的依赖分析结果
     const deps = dependencies
 
@@ -1050,6 +1089,8 @@ async function buildComponent(
 
     const callbacks = []
     // // 打包iife模块
+    // const iifeOutputDir = resolve(outputDir, 'iife')
+    // await clearDir(iifeOutputDir)
     // callbacks.push(bundleComponentModule(ctx, {
     //   comp,
     //   entry,
@@ -1064,6 +1105,8 @@ async function buildComponent(
     // }))
 
     // 打包UMD模块
+    const umdOutputDir = resolve(outputDir, 'umd')
+    await clearDir(umdOutputDir)
     callbacks.push(bundleComponentModule(ctx, {
       comp,
       entry,
@@ -1078,6 +1121,8 @@ async function buildComponent(
     }))
 
     // 打包ES模块
+    const esOutputDir = resolve(outputDir, 'es')
+    await clearDir(esOutputDir)
     callbacks.push(bundleComponentModule(ctx, {
       comp,
       entry,
@@ -1091,6 +1136,8 @@ async function buildComponent(
     }))
 
     // // 打包CJS模块
+    // const libOutputDir = resolve(outputDir, 'lib')
+    // await clearDir(libOutputDir)
     // callbacks.push(bundleComponentModule(ctx, {
     //   comp,
     //   entry,
@@ -1187,6 +1234,7 @@ async function buildComponent(
     // 如果需要发布，执行发布
     if (shouldPublish) {
       // 如果启用了 npm publish，执行 npm 发布
+      console.log('npmPublish', ctx.npmPublish)
       if (ctx.npmPublish) {
         console.log(`准备发布 ${buildName}，版本：${currentVersion} -> ${newVersion}`)
         await writeComponentVersions(ctx, {
@@ -1207,7 +1255,7 @@ async function buildComponent(
         }
       }
       // 有 uploadType，使用 UploadEvent 上传
-      if (ctx.uploadType) {
+      else if (ctx.uploadType) {
         const res = await UploadEvent(outputDir, buildName, ctx.uploadType)
         console.log('res', res)
       }
@@ -1344,6 +1392,8 @@ export interface BuildOptions {
   npmPublish?: boolean
   /** 样式类型 */
   styleType?: string
+  /** 是否为 Node.js 环境 */
+  isNode?: boolean
   /** Vite 配置（可选） */
   viteConfig?: ViteConfigType
 }
@@ -1368,9 +1418,6 @@ export async function buildComponentsWithOptions(options: BuildOptions): Promise
     requireExternalPacks: reqExternal = [],
     entryBaseUrl: ebu = '/',
     presetGlobals: _presetGlobals,
-    uploadType,
-    npmPublish,
-    styleType,
     ...rest
   } = options || ({} as BuildOptions)
 
@@ -1411,9 +1458,6 @@ export async function buildComponentsWithOptions(options: BuildOptions): Promise
       ...aliasMap,
     },
     aliasPacks: [],
-    uploadType,
-    npmPublish,
-    styleType,
     ...rest,
   }
   ctx.aliasPacks = Object.keys(ctx.alias).filter((i: string) => !i.endsWith('*'))
