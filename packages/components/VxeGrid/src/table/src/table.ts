@@ -612,9 +612,6 @@ export default defineComponent({
       if (strict) {
         if (tableData.length || tableFullData.length) {
           if (checkMethod) {
-            if (treeConfig) {
-              // 暂时不支持树形结构
-            }
             // 如果所有行都被禁用
             return tableFullData.every(row => !checkMethod({ row }))
           }
@@ -4895,47 +4892,30 @@ export default defineComponent({
      * 全局按下事件处理
      */
     const handleGlobalMousedownEvent = (evnt: MouseEvent) => {
-      const { editStore, ctxMenuStore, filterStore, customStore } = reactData
+      const { editStore, ctxMenuStore, filterStore } = reactData
       const { mouseConfig, editRules } = props
       const el = refElem.value
       const editOpts = computeEditOpts.value
       const validOpts = computeValidOpts.value
       const areaOpts = computeAreaOpts.value
       const { actived } = editStore
-      const $validTooltip = refValidTooltip.value
       const tableFilter = refTableFilter.value
       const tableCustom = refTableCustom.value
       const tableMenu = refTableMenu.value
       // 筛选
       if (tableFilter) {
-        if (getEventTargetNode(evnt, el, 'vxe-cell--filter').flag) {
-          // 如果点击了筛选按钮
-        }
-        else if (getEventTargetNode(evnt, tableFilter.$el as HTMLDivElement).flag) {
-          // 如果点击筛选容器
-        }
-        else {
-          if (!getEventTargetNode(evnt, document.body, 'vxe-table--ignore-clear').flag) {
-            tablePrivateMethods.preventEvent(evnt, 'event.clearFilter', filterStore.args, tableMethods.closeFilter)
-          }
+        if (!getEventTargetNode(evnt, document.body, 'vxe-table--ignore-clear').flag) {
+          tablePrivateMethods.preventEvent(evnt, 'event.clearFilter', filterStore.args, tableMethods.closeFilter)
         }
       }
       // 自定义列
       if (tableCustom) {
-        if (customStore.btnEl === evnt.target || getEventTargetNode(evnt, document.body, 'vxe-toolbar-custom-target').flag) {
-          // 如果点击了自定义列按钮
-        }
-        else if (getEventTargetNode(evnt, tableCustom.$el as HTMLDivElement).flag) {
-          // 如果点击自定义列容器
-        }
-        else {
-          if (!getEventTargetNode(evnt, document.body, 'vxe-table--ignore-clear').flag) {
-            tablePrivateMethods.preventEvent(evnt, 'event.clearCustom', {}, () => {
-              if ($xeTable.closeCustom) {
-                $xeTable.closeCustom()
-              }
-            })
-          }
+        if (!getEventTargetNode(evnt, document.body, 'vxe-table--ignore-clear').flag) {
+          tablePrivateMethods.preventEvent(evnt, 'event.clearCustom', {}, () => {
+            if ($xeTable.closeCustom) {
+              $xeTable.closeCustom()
+            }
+          })
         }
       }
 
@@ -4945,10 +4925,7 @@ export default defineComponent({
           // 如果是激活状态，点击了单元格之外
           const cell = actived.args.cell
           if ((!cell || !getEventTargetNode(evnt, cell).flag)) {
-            if ($validTooltip && getEventTargetNode(evnt, $validTooltip.$el as HTMLDivElement).flag) {
-              // 如果是激活状态，且点击了校验提示框
-            }
-            else if (!internalData._lastCallTime || internalData._lastCallTime + 50 < Date.now()) {
+            if (!internalData._lastCallTime || internalData._lastCallTime + 50 < Date.now()) {
               // 如果是激活状态，点击了单元格之外
               if (!getEventTargetNode(evnt, document.body, 'vxe-table--ignore-clear').flag) {
                 // 如果手动调用了激活单元格，避免触发源被移除后导致重复关闭

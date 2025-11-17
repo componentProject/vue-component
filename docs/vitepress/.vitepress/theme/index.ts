@@ -11,7 +11,7 @@ import { COMPONENT_SETTING_TYPE } from '@moluoxixi/constant'
 import { getList } from '@moluoxixi/utils/_api'
 
 import { registerAllComponent } from '@moluoxixi/utils/_utils/loadComponent'
-import { idbStorage } from '@moluoxixi/utils/indexdb'
+import { idbStorage } from '@moluoxixi/utils/IndexedDB'
 import DefaultTheme from 'vitepress/theme'
 
 import * as Vue from 'vue'
@@ -20,9 +20,8 @@ import DocsCodeDemo from './components/DocsCodeDemo/index.vue'
 import Layout from './components/layout.vue'
 import Overview from './components/Overview.vue'
 import directive from './directives/index.ts'
-import './styles/index.scss'
-
 import 'highlight.js/lib/common'
+import './styles/index.scss'
 
 const define = <T>(value: T): T => value
 

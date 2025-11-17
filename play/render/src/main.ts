@@ -1,7 +1,7 @@
 // main.ts文件
 import type { QiankunProps } from 'vite-plugin-qiankun/dist/helper'
 import { COMPONENT_SETTING_TYPE } from '@moluoxixi/constant'
-import { idbStorage } from '@moluoxixi/utils/indexdb'
+import { idbStorage } from '@moluoxixi/utils/IndexedDB'
 import * as Vue from 'vue'
 import { getList } from '@moluoxixi/utils/_api'
 import { registerAllComponent } from '@moluoxixi/utils/_utils/loadComponent'

@@ -1,0 +1,8 @@
+.root {
+  :global {
+    @import 'element-plus/dist/index.css';
+    @import '../index.scss';
+    @import 'jsoneditor/dist/jsoneditor.min.css';
+    @import 'starfish-form/dist/style.css';
+  }
+}

@@ -5,7 +5,6 @@ import _ from '@moluoxixi/components/FormDesign/src/utils/_'
 import { defineAsyncComponent } from 'vue'
 import Loading from './common/Loading.vue'
 import { getFormConfig } from './utils/fieldConfig'
-import './styles/index.scss'
 // 注意：Element Plus 组件现在在组件内部直接从 'element-plus' 导入，不再全局注册
 // 如果需要全局注册 Element Plus 组件，可以在应用入口使用：
 // import ElementPlus from 'element-plus'

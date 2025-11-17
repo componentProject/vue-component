@@ -73,7 +73,7 @@ function getViteConfig(Config: ViteConfigType, params?: ConfigEnv = {}) {
     compression = config?.compression ?? true,
     imagemin = config?.imagemin ?? true,
     codeInspector = config?.codeInspector ?? true,
-    port = config?.port ?? 3000,
+    port = config?.port,
     visualizer = config?.visualizer ?? false,
     autoRoutes = config?.autoRoutes ?? false,
     cdn = config?.cdn ?? false,
@@ -105,7 +105,7 @@ function getViteConfig(Config: ViteConfigType, params?: ConfigEnv = {}) {
       deepMerge(
         {
           dirs: 'src/pages',
-          extensions: ['vue'],
+          extensions: [isOnlyVue && 'vue'].filter(Boolean),
           exclude: [
             '**/components/**',
             '**/__tests__/**',
@@ -246,7 +246,6 @@ function getViteConfig(Config: ViteConfigType, params?: ConfigEnv = {}) {
   ].filter(Boolean)
 
   const defaultConfig: UserConfig = {
-    base: appCode ?? `/${appCode}/`,
     plugins: [
       ...plugins,
       qiankun && qiankunPlugin(envSystemCode!, { useDevMode: qiankunDevMode }),
@@ -337,6 +336,9 @@ function getViteConfig(Config: ViteConfigType, params?: ConfigEnv = {}) {
       cors: true,
       proxy: {},
     },
+  }
+  if (!vitepress && appCode) {
+    defaultConfig.base = `/${appCode}`
   }
   const viteConfig = typeof config.viteConfig === 'function'
     ? config.viteConfig(params)

@@ -50,7 +50,7 @@ export interface IndexDBManagerStats {
  * IndexDB 管理器类
  * 提供统一的 IndexDB 操作接口
  */
-export class IndexDBManager {
+export class IndexedDBManager {
   private db: IDBDatabase | null = null
   private readonly dbName: string
   private readonly storeName: string

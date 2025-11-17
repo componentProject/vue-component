@@ -187,9 +187,6 @@ function setupDivObserver() {
         // console.log('✅ 元素进入视口', entry.target)
         collectInputElements('mounted')
       }
-      else {
-        // console.log('❌ 元素离开视口', entry.target)
-      }
     })
   }, {
     root: null,

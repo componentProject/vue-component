@@ -4,7 +4,7 @@
  */
 
 import type { IndexDBOperation, WorkerMessage, WorkerResponse } from './_types'
-import { IndexDBManager } from './IndexDBManager.ts'
+import { IndexedDBManager } from './IndexedDBManager.ts'
 
 interface DBConfig {
   dbName?: string
@@ -34,8 +34,8 @@ interface DBConfig {
  * IndexDB Worker 类
  * 使用共享的 IndexDBManager 处理所有操作
  */
-class IndexDBWorker {
-  private dbManager: IndexDBManager | null = null
+class IndexedDBWorker {
+  private dbManager: IndexedDBManager | null = null
 
   /**
    * 初始化 IndexDB 数据库
@@ -51,7 +51,7 @@ class IndexDBWorker {
    * 设置数据库配置
    */
   public setConfig(config: DBConfig): void {
-    this.dbManager = new IndexDBManager({
+    this.dbManager = new IndexedDBManager({
       dbName: config.dbName || 'IndexDBStorage',
       storeName: config.storeName || 'storage',
       cache: config.cache,
@@ -144,7 +144,7 @@ class IndexDBWorker {
 }
 
 // 创建全局 Worker 实例
-const workerInstance = new IndexDBWorker()
+const workerInstance = new IndexedDBWorker()
 
 /**
  * 处理主线程消息

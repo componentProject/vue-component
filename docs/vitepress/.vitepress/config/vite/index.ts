@@ -7,7 +7,6 @@ const viteConfig = getViteConfig({
   rootPath: docsPath,
   appCode,
   vitepress: true,
-  port: 3004,
   codeInspector: false,
   viteConfig: {
     ssr: {

@@ -6,7 +6,7 @@ import type {
   WorkerMessage,
   WorkerResponse,
 } from './_types'
-import { IndexDBManager } from './IndexDBManager.ts'
+import { IndexedDBManager } from './IndexedDBManager.ts'
 
 // 使用主键 'key'，不再附加时间戳，结构更轻量
 
@@ -33,7 +33,7 @@ interface StorageBackend {
  * - 支持 Web Worker 模式，避免主线程阻塞
  */
 export class IndexDBStorage {
-  private readonly dbManager: IndexDBManager
+  private readonly dbManager: IndexedDBManager
 
   // Web Worker 相关属性
   private worker: Worker | null = null
@@ -51,7 +51,7 @@ export class IndexDBStorage {
     const storeName = options.storeName || 'storage'
 
     this.options = options
-    this.dbManager = new IndexDBManager({
+    this.dbManager = new IndexedDBManager({
       dbName,
       storeName,
       cache: options.cache,
@@ -122,7 +122,7 @@ export class IndexDBStorage {
   }
 
   private isSupported(): boolean {
-    return IndexDBManager.isSupported()
+    return IndexedDBManager.isSupported()
   }
 
   /**

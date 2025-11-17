@@ -20,12 +20,6 @@ const config: StorybookConfig = {
   },
   async viteFinal(config, { configType }) {
     const { mergeConfig } = await import('vite')
-    if (configType === 'DEVELOPMENT') {
-      // 开发环境
-    }
-    if (configType === 'PRODUCTION') {
-      // 生产环境
-    }
     const excludePlugins = ['vite-plugin-cdn-import']
     const filterPluginsRecursive = (plugins: any[]): any[] => {
       return plugins.filter(Boolean).filter((item) => {

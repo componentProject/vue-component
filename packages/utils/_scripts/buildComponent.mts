@@ -2,7 +2,7 @@
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { UTIL_SETTING_TYPE } from '@moluoxixi/constant'
-import { runBuildCliAndExit } from '@moluoxixi/utils/_utils/build/index.mts'
+import { runBuildCliAndExit } from '@moluoxixi/utils/ViteBuild'
 
 // === 组件库命名空间配置 ===
 const LIB_NAMESPACE = 'moluoxixi'
@@ -14,7 +14,7 @@ const aliasComponentPath = '@moluoxixi/utils'
 /**
  * node环境下运行的必须要排除依赖，不可打包成单文件
  */
-const requireExternalPacks = ['ViteConfig', 'EslintConfig']
+const requireExternalPacks = ['ViteConfig', 'EslintConfig', 'ViteBuild']
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)

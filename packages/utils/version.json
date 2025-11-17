@@ -8,5 +8,6 @@
   "ApiDialog": "0.0.2-beta.0",
   "autoRoutes": "0.0.2-beta.0",
   "cssInjectedByJsPlugin": "0.0.2-beta.0",
-  "cssModuleGlobalRootPlugin": "0.0.2-beta.0"
+  "cssModuleGlobalRootPlugin": "0.0.2-beta.0",
+  "ViteBuild": "0.0.2"
 }

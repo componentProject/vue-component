@@ -528,10 +528,7 @@ export default defineComponent({
         onMouseenter?: typeof handleMouseenterSettingEvent
         onMouseleave?: typeof handleMouseleaveSettingEvent
       } = {}
-      if (btnTrigger === 'manual') {
-        // 手动触发
-      }
-      else if (btnTrigger === 'hover') {
+      if (btnTrigger === 'hover') {
         // hover 触发
         customBtnOns.onMouseenter = handleMouseenterSettingEvent
         customBtnOns.onMouseleave = handleMouseleaveSettingEvent

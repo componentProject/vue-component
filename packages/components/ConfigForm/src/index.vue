@@ -1,6 +1,6 @@
 <!-- ConfigForm组件主文件 -->
 <template>
-  <div class="starfish-dynamicform">
+  <div class="starfish-dynamicform" :class="cssModules.root">
     <ElForm ref="ruleForm" :model="formResult" :rules="rules" label-width="120px" class="demo-ruleForm" :size="globalConfig.size || 'large'" :validate-on-rule-change="false">
       <template v-for="item in allFormList" :key="item.id">
         <ElFormItem v-if="!item.layout && item.show" :prop="item.data.fieldName">
@@ -22,7 +22,7 @@ import { ElForm, ElFormItem } from 'element-plus'
 import { getCurrentInstance, inject, onMounted, ref, resolveComponent, toRaw } from 'vue'
 // 直接从 main.ts 导入 formComponents，这样即使不调用 install 也能使用
 import { formComponents } from './main'
-import './styles/index.scss'
+import cssModules from './styles/modules/index.module.scss'
 
 defineOptions({
   name: 'ConfigForm',

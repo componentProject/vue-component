@@ -1,6 +1,6 @@
 <!-- FormDesign组件主文件 -->
 <template>
-  <Framework :header-show="headerShow">
+  <Framework :class="cssModules.root" :header-show="headerShow">
     <template v-if="headerShow" #nav>
       <Nav />
     </template>
@@ -58,10 +58,9 @@ import store from './controller/shortcut'
 import uiControl from './controller/ui'
 import Framework from './layouts/Framework.vue'
 import { FormDesignStore, FormDesignStoreKey } from './store'
+import cssModules from './styles/modules/index.module.scss'
 import formKeyconList from './utils/formKeycon'
 import { listenGlobalKeyDown } from './utils/shortcutKey'
-
-import './styles/index.scss'
 
 defineOptions({
   name: 'FormDesign',

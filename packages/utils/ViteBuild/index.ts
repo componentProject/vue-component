@@ -6,9 +6,6 @@ import fs from 'node:fs'
 import fsp from 'node:fs/promises'
 import { dirname, resolve } from 'node:path'
 
-import addUuidToTemplatePlugin from '@moluoxixi/utils/addUuidToTemplatePlugin'
-import cssInjectedByJsPlugin from '@moluoxixi/utils/cssInjectedByJsPlugin'
-import cssModuleGlobalRootPlugin from '@moluoxixi/utils/cssModuleGlobalRootPlugin'
 import tailwindcss from '@tailwindcss/postcss'
 import pluginVue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
@@ -20,7 +17,10 @@ import AutoImport from 'unplugin-auto-import/vite'
 import { build, mergeConfig } from 'vite'
 import dts from 'vite-plugin-dts'
 import viteImagemin from 'vite-plugin-imagemin'
-import transformAliasPlugin from './plugins/transformAliasPlugin/index.mts'
+import addUuidToTemplatePlugin from '../addUuidToTemplatePlugin'
+import cssInjectedByJsPlugin from '../cssInjectedByJsPlugin'
+import cssModuleGlobalRootPlugin from '../cssModuleGlobalRootPlugin'
+import transformAliasPlugin from './plugins/transformAliasPlugin'
 // import { lazyImport, VxeResolver } from 'vite-plugin-lazy-import'
 import { UploadEvent } from './utils/UploadComponent.ts'
 
@@ -911,34 +911,10 @@ async function bundleComponentModule(ctx: BuildContext, {
           ctx.useObfuscator && obfuscator(),
         ],
         external: (id: string) => {
-          // 全部交给presetGlobals
-          // // 检查Vue相关依赖
-          // const isVueDep = ['@vue/runtime-core', '@vue/runtime-dom'].includes(id)
-          // // Node.js核心模块，标记为外部依赖
-          const isNodeBuiltin = id.startsWith('node:')
-            || ['path', 'module', 'fs', 'os', 'events', 'stream', 'buffer', 'crypto', 'zlib', 'http', 'https', 'url', 'querystring', 'child_process'].includes(id)
-
-          // if (isVueDep || isNodeBuiltin || ctx.peerDepList.includes(id)) {
-          //   return true
-          // }
-
-          if (isNodeBuiltin) {
-            return true
-          }
-          // if (ctx.isNode) {
-          // return ['__vite-browser-external'].includes(id)
-          // }
-          if (ctx.peerDepList.includes(id)) {
-            return true
-          }
-          const isExternal = ctx.useExternal || ctx.requireExternalPacks.includes(comp)
-          if (isExternal) {
-            return Object.keys(dependencies.external).includes(id)
-          }
-
-          // 仅单组件打包，检查@${LIB_NAMESPACE}/xxx路径（转换后的内部组件依赖）
-          if (currentComponent && id.startsWith(`@${ctx.LIB_NAMESPACE}`)) {
+          // 排除内部依赖，检查@${LIB_NAMESPACE}/xxx路径（转换后的内部组件依赖）
+          if (id.startsWith(`@${ctx.LIB_NAMESPACE}`)) {
             const item = ctx.aliasPacks.find((i: string) => id.startsWith(`${i}`))
+
             if (item) {
               const pathParts = id.split('/')
               const componentName = pathParts[2] // ${item}/ComponentName/...
@@ -948,11 +924,30 @@ async function bundleComponentModule(ctx: BuildContext, {
             }
             else {
               const componentMatch = id.match(new RegExp(`@${ctx.LIB_NAMESPACE}/([a-z][a-zA-Z0-9]+)`))
-              return !(componentMatch && componentMatch[1] === currentComponent.toLowerCase())
+              const match = !(componentMatch && componentMatch[1] === currentComponent.toLowerCase())
+              console.log('currentComponentcurrentComponentcurrentComponent', id, match)
+              return match
             }
           }
 
-          return false
+          // 排除全局预设依赖
+          if (ctx.peerDepList.includes(id)) {
+            return true
+          }
+
+          // 排除node依赖
+          const isNodeBuiltin = id.startsWith('node:')
+            || ['path', 'module', 'fs', 'fsevents', 'os', 'events', 'stream', 'buffer', 'crypto', 'zlib', 'http', 'https', 'url', 'querystring', 'child_process'].includes(id)
+
+          if (isNodeBuiltin) {
+            return true
+          }
+
+          // 其他依赖根据依赖排除决定是否需要排除依赖
+          const isExternal = ctx.useExternal || ctx.requireExternalPacks.includes(comp)
+          if (isExternal) {
+            return Object.keys(dependencies.external).includes(id)
+          }
         },
         output: {
           preserveModules: ctx.preserveModules,
