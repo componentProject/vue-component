@@ -4,10 +4,10 @@
   "AjaxPackage": "0.0.7-beta.0",
   "ClassNames": "0.0.3-beta.0",
   "GoogleModel": "0.0.4",
-  "addUuidToTemplatePlugin": "0.0.2-beta.0",
+  "AddUuidToTemplatePlugin": "0.0.2-beta.0",
   "ApiDialog": "0.0.2-beta.0",
   "autoRoutes": "0.0.2-beta.0",
-  "cssInjectedByJsPlugin": "0.0.2-beta.0",
+  "CssInjectedByJsPlugin": "0.0.2-beta.0",
   "cssModuleGlobalRootPlugin": "0.0.2-beta.0",
   "ViteBuild": "0.0.2"
 }

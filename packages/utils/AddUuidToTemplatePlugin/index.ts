@@ -87,7 +87,7 @@ function addUuidToTemplate(templateContent: string, uuid: string): string {
  *
  * @returns Vite插件
  */
-export default function addUuidToTemplatePlugin(): Plugin {
+export default function AddUuidToTemplatePlugin(): Plugin {
   // 存储每个文件的UUID（每次构建时重新生成）
   const fileUuidMap = new Map<string, string>()
 

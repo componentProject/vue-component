@@ -17,8 +17,8 @@ import AutoImport from 'unplugin-auto-import/vite'
 import { build, mergeConfig } from 'vite'
 import dts from 'vite-plugin-dts'
 import viteImagemin from 'vite-plugin-imagemin'
-import addUuidToTemplatePlugin from '../addUuidToTemplatePlugin'
-import cssInjectedByJsPlugin from '../cssInjectedByJsPlugin'
+import AddUuidToTemplatePlugin from '../AddUuidToTemplatePlugin'
+import CssInjectedByJsPlugin from '../CssInjectedByJsPlugin'
 import cssModuleGlobalRootPlugin from '../cssModuleGlobalRootPlugin'
 import transformAliasPlugin from './plugins/transformAliasPlugin'
 // import { lazyImport, VxeResolver } from 'vite-plugin-lazy-import'
@@ -249,7 +249,7 @@ function createBaseConfig(ctx: BuildContext, comp: string, internalDeps: string[
     // 添加路径替换插件，将内部组件引用转换为外部包引用
     transformAliasPlugin(ctx, internalDeps, comp),
     // 当styleType为scoped时，添加UUID插件用于样式隔离
-    ctx.styleType === 'scoped' && addUuidToTemplatePlugin(),
+    ctx.styleType === 'scoped' && AddUuidToTemplatePlugin(),
     pluginVue(),
     vueJsx(),
     // lazyImport({
@@ -285,7 +285,7 @@ function createBaseConfig(ctx: BuildContext, comp: string, internalDeps: string[
       tsconfigPath: './tsconfig.build.json',
       declarationOnly: false,
     }),
-    cssInjectedByJsPlugin(),
+    CssInjectedByJsPlugin(),
   ].filter(Boolean) // 过滤掉false值
   return mergeConfig({
     root: ctx.packDir,

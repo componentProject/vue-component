@@ -1,4 +1,4 @@
-# addUuidToTemplatePlugin
+# AddUuidToTemplatePlugin
 
 Vite 插件：为 Vue 组件添加 UUID 样式隔离。
 
@@ -23,12 +23,12 @@ Vite 插件：为 Vue 组件添加 UUID 样式隔离。
 
 ```typescript
 import { defineConfig } from 'vite'
-import addUuidToTemplatePlugin from '@moluoxixi/utils/addUuidToTemplatePlugin/index.mts'
+import AddUuidToTemplatePlugin from '@moluoxixi/utils/AddUuidToTemplatePlugin/index.mts'
 
 export default defineConfig({
   plugins: [
     // 仅在 styleType === 'scoped' 时使用
-    addUuidToTemplatePlugin(),
+    AddUuidToTemplatePlugin(),
   ],
 })
 ```
@@ -37,12 +37,12 @@ export default defineConfig({
 
 ```typescript
 import { defineConfig } from 'vite'
-import addUuidToTemplatePlugin from '@moluoxixi/utils/addUuidToTemplatePlugin/index.mts'
+import AddUuidToTemplatePlugin from '@moluoxixi/utils/AddUuidToTemplatePlugin/index.mts'
 
 export default defineConfig({
   plugins: [
     // 根据条件决定是否使用
-    ctx.styleType === 'scoped' && addUuidToTemplatePlugin(),
+    ctx.styleType === 'scoped' && AddUuidToTemplatePlugin(),
   ].filter(Boolean),
 })
 ```

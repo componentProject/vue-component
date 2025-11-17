@@ -1,8 +1,3 @@
-// 导出AjaxPackage
-import * as AjaxPackage from './AjaxPackage'
-
-export * as GoogleModel from './GoogleModel'
-
-export {
-  AjaxPackage,
-}
+export * from './_utils'
+// 导出工具包
+export * from './utils.ts'

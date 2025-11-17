@@ -43,7 +43,7 @@ import vueDevTools from 'vite-plugin-vue-devtools'
 import { deepMerge } from '../../_utils/object.ts'
 
 // 自动路由
-import autoRoutesPlugin from '../../autoRoutes'
+import AutoRoutesPlugin from '../../AutoRoutesPlugin'
 import { modules } from './constants/index.ts'
 import scopedCssPrefixPlugin from './plugins/addScopedAndReplacePrefix.ts'
 
@@ -255,7 +255,7 @@ function getViteConfig(Config: ViteConfigType, params?: ConfigEnv = {}) {
         newPrefix: appCode,
         useDevMode: qiankunDevMode,
       }),
-      autoRoutes && autoRoutesPlugin(
+      autoRoutes && AutoRoutesPlugin(
         deepMerge(
           {
             root: rootPath,

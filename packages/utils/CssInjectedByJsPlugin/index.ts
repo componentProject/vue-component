@@ -19,7 +19,7 @@ import {
  *
  * @return {Plugin}
  */
-export default function cssInjectedByJsPlugin({
+export default function CssInjectedByJsPlugin({
   cssAssetsFilterFunction,
   dev: { enableDev, removeStyleCode, removeStyleCodeFunction } = {} as DevOptions,
   injectCode,
@@ -41,7 +41,7 @@ export default function cssInjectedByJsPlugin({
     {
       apply: 'build',
       enforce: 'post',
-      name: 'cssInjectedByJsPlugin',
+      name: 'CssInjectedByJsPlugin',
       config(config, env) {
         if (env.command === 'build') {
           if (!config.build) {

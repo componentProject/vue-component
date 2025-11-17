@@ -23,12 +23,12 @@
 ### 1. 在vite.config.ts中引入插件
 
 ```ts
-import autoRoutes from '@moluoxixi/utils/autoRoutes/index.ts'
+import AutoRoutes from '@moluoxixi/autoroutesplugin'
 
 export default defineConfig({
   plugins: [
     // 其他插件...
-    autoRoutes({
+    AutoRoutes({
       routeConfig: {
         views: 'src/views/**/index.vue',
         examples: 'src/examples/**/index.vue',

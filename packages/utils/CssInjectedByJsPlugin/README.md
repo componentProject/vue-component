@@ -1,4 +1,4 @@
-# cssInjectedByJsPlugin
+# CssInjectedByJsPlugin
 
 Vite 插件：将编译后的 CSS 注入到 JavaScript 中，而不是生成独立的 CSS 文件。
 
@@ -35,11 +35,11 @@ pnpm add @moluoxixi/utils
 
 ```typescript
 import { defineConfig } from 'vite'
-import cssInjectedByJsPlugin from '@moluoxixi/cssinjectedbyjsplugin'
+import CssInjectedByJsPlugin from '@moluoxixi/cssinjectedbyjsplugin'
 
 export default defineConfig({
   plugins: [
-    cssInjectedByJsPlugin(),
+    CssInjectedByJsPlugin(),
   ],
 })
 ```
@@ -48,11 +48,11 @@ export default defineConfig({
 
 ```typescript
 import { defineConfig } from 'vite'
-import cssInjectedByJsPlugin from '@moluoxixi/cssinjectedbyjsplugin'
+import CssInjectedByJsPlugin from '@moluoxixi/cssinjectedbyjsplugin'
 
 export default defineConfig({
   plugins: [
-    cssInjectedByJsPlugin({
+    CssInjectedByJsPlugin({
       // CSS 资源过滤函数
       cssAssetsFilterFunction: (asset) => {
         // 返回 true 表示处理该 CSS 资源
@@ -115,7 +115,7 @@ export default defineConfig({
 将所有 CSS 注入到入口 JavaScript 文件中：
 
 ```typescript
-cssInjectedByJsPlugin({
+CssInjectedByJsPlugin({
   relativeCSSInjection: false, // 默认值
 })
 ```
@@ -130,7 +130,7 @@ cssInjectedByJsPlugin({
 将 CSS 注入到对应的 JavaScript 文件中：
 
 ```typescript
-cssInjectedByJsPlugin({
+CssInjectedByJsPlugin({
   relativeCSSInjection: true,
 })
 ```
@@ -147,11 +147,11 @@ cssInjectedByJsPlugin({
 
 ```typescript
 import { defineConfig } from 'vite'
-import cssInjectedByJsPlugin from '@moluoxixi/cssinjectedbyjsplugin'
+import CssInjectedByJsPlugin from '@moluoxixi/cssinjectedbyjsplugin'
 
 export default defineConfig({
   plugins: [
-    cssInjectedByJsPlugin(),
+    CssInjectedByJsPlugin(),
   ],
 })
 ```
@@ -160,14 +160,14 @@ export default defineConfig({
 
 ```typescript
 import { defineConfig } from 'vite'
-import cssInjectedByJsPlugin from '@moluoxixi/cssinjectedbyjsplugin'
+import CssInjectedByJsPlugin from '@moluoxixi/cssinjectedbyjsplugin'
 
 export default defineConfig({
   build: {
     cssCodeSplit: true, // 必须启用
   },
   plugins: [
-    cssInjectedByJsPlugin({
+    CssInjectedByJsPlugin({
       relativeCSSInjection: true,
     }),
   ],
@@ -178,11 +178,11 @@ export default defineConfig({
 
 ```typescript
 import { defineConfig } from 'vite'
-import cssInjectedByJsPlugin from '@moluoxixi/cssinjectedbyjsplugin'
+import CssInjectedByJsPlugin from '@moluoxixi/cssinjectedbyjsplugin'
 
 export default defineConfig({
   plugins: [
-    cssInjectedByJsPlugin({
+    CssInjectedByJsPlugin({
       styleId: 'my-app-styles',
     }),
   ],
@@ -193,11 +193,11 @@ export default defineConfig({
 
 ```typescript
 import { defineConfig } from 'vite'
-import cssInjectedByJsPlugin from '@moluoxixi/cssinjectedbyjsplugin'
+import CssInjectedByJsPlugin from '@moluoxixi/cssinjectedbyjsplugin'
 
 export default defineConfig({
   plugins: [
-    cssInjectedByJsPlugin({
+    CssInjectedByJsPlugin({
       cssAssetsFilterFunction: (asset) => {
         // 只处理 main.css
         return asset.fileName === 'main.css'
@@ -211,11 +211,11 @@ export default defineConfig({
 
 ```typescript
 import { defineConfig } from 'vite'
-import cssInjectedByJsPlugin from '@moluoxixi/cssinjectedbyjsplugin'
+import CssInjectedByJsPlugin from '@moluoxixi/cssinjectedbyjsplugin'
 
 export default defineConfig({
   plugins: [
-    cssInjectedByJsPlugin({
+    CssInjectedByJsPlugin({
       dev: {
         enableDev: true,
       },
@@ -228,11 +228,11 @@ export default defineConfig({
 
 ```typescript
 import { defineConfig } from 'vite'
-import cssInjectedByJsPlugin from '@moluoxixi/cssinjectedbyjsplugin'
+import CssInjectedByJsPlugin from '@moluoxixi/cssinjectedbyjsplugin'
 
 export default defineConfig({
   plugins: [
-    cssInjectedByJsPlugin({
+    CssInjectedByJsPlugin({
       useStrictCSP: true,
     }),
   ],
@@ -263,7 +263,7 @@ export default defineConfig({
 ### 自定义注入代码
 
 ```typescript
-cssInjectedByJsPlugin({
+CssInjectedByJsPlugin({
   injectCode: (cssCode, options) => {
     return `
       const style = document.createElement('style');
