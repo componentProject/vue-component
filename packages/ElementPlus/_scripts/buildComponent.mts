@@ -3,7 +3,7 @@ import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { COMPONENT_SETTING_TYPE } from '@moluoxixi/constant'
 
-import { runBuildCliAndExit } from 'packages/utils/ViteBuild'
+import { runBuildCliAndExit } from '@moluoxixi/utils/ViteBuild'
 // === 组件库命名空间配置 ===
 const LIB_NAMESPACE = 'moluoxixi'
 /**
@@ -32,7 +32,7 @@ runBuildCliAndExit(
     alias,
     rootDir,
     packDir,
-    // styleType: 'scoped',
+    styleType: 'scoped',
     presetGlobals: {
     },
     viteConfig: {

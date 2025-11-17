@@ -50,5 +50,9 @@
     "dist",
     "node_modules",
     "_scripts/**/*"
+  ],
+  "include": [
+    "env.d.ts",
+    "**/*"
   ]
 }

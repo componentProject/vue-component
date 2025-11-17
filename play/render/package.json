@@ -40,6 +40,7 @@
   "devDependencies": {
     "@moluoxixi/ajaxpackage": "catalog:dev",
     "@moluoxixi/components": "workspace:*",
+    "@moluoxixi/element-plus": "workspace:*",
     "@moluoxixi/eslintconfig": "catalog:dev",
     "@moluoxixi/utils": "workspace:*",
     "@moluoxixi/viteconfig": "catalog:dev",

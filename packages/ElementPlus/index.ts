@@ -3,8 +3,6 @@ import type { App, Component } from 'vue'
 
 import * as Components from './components'
 
-// 导出 hooks
-export * from './_hooks'
 // 导出组件
 export * from './components'
 

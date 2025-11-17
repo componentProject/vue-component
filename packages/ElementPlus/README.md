@@ -35,6 +35,14 @@
 - **Splitter** - 分割器组件
 - **Title** - 标题组件
 
+### Element Plus 包装组件
+
+- **ElContainer** - 对原生 ElContainer 进行统一样式和插槽增强，便于在组件库中复用
+- **ElHeader** - 继承 Element Plus Header 行为，支持命名插槽传入自定义内容
+- **ElMenu** - 包裹原生菜单组件，可组合自定义插槽内容
+- **ElMenuItem** - 菜单项包装组件，自动注入主题样式
+- **ElSubMenu** - 子菜单包装组件，兼容 `#title` 等插槽
+
 ## 安装使用
 
 ```bash

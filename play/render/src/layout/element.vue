@@ -24,7 +24,7 @@
         >
           <div class="w-full h-full bg-primary flex justify-center">
             <ElMenu :default-active="defaultTab" :ellipsis="false" mode="horizontal" router>
-              <subMenu :routes="routes" />
+              <SubMenu :routes="routes" />
             </ElMenu>
           </div>
         </ElHeader>
@@ -48,7 +48,7 @@
 </template>
 
 <script lang="ts" setup>
-import subMenu from '@moluoxixi/components/subMenu.vue'
+import SubMenu from '@moluoxixi/components/SubMenu'
 import { ElConfigProvider, ElContainer, ElHeader, ElMain, ElMenu } from 'element-plus'
 import { qiankunWindow } from 'vite-plugin-qiankun/dist/helper'
 import { computed, reactive } from 'vue'
@@ -70,8 +70,6 @@ const defaultTab = computed(() => router.currentRoute.value.path)
 </script>
 
 <style lang="scss" scoped>
-@forward '@/assets/styles/tailwind.scss';
-
 :deep(.el-main) {
   --el-main-padding: 12px !important;
 }

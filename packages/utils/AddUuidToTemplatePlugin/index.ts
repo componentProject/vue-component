@@ -14,7 +14,8 @@ function addUuidToTemplate(templateContent: string, uuid: string): string {
     return comment // 保持注释不变
   })
 
-  // 匹配HTML标签（使用更安全的正则）
+  // 匹配HTML标签和组件标签（使用更安全的正则）
+  // 注意：使用 i 标志（不区分大小写），可以匹配首字母大写的组件标签如 ElMenu
   return processedContent.replace(
     /<([a-z][\w-]*)(\s[^>]*)?>/gi,
     (match, tagName, attributes) => {
@@ -30,27 +31,6 @@ function addUuidToTemplate(templateContent: string, uuid: string): string {
         return match
       }
 
-      // 检查是否包含复杂的JavaScript表达式（如事件处理器）
-      // 如果属性中包含 => 或复杂的JavaScript语法，跳过处理
-      if (attrs.includes('=>') || attrs.includes('@') || attrs.includes(':')) {
-        return match
-      }
-
-      // 检查是否包含Vue指令（v-if, v-for, v-model等）
-      if (attrs.includes('v-') || attrs.includes('@') || attrs.includes(':')) {
-        return match
-      }
-
-      // 检查是否包含复杂的属性值（包含引号、括号等）
-      if (attrs.includes('(') || attrs.includes(')') || attrs.includes('[') || attrs.includes(']')) {
-        return match
-      }
-
-      // 检查是否包含模板字符串或复杂表达式
-      if (attrs.includes('`') || attrs.includes('${') || attrs.includes('{{')) {
-        return match
-      }
-
       // 检查是否包含未闭合的引号（可能导致语法错误）
       const singleQuotes = (attrs.match(/'/g) || []).length
       const doubleQuotes = (attrs.match(/"/g) || []).length
@@ -58,8 +38,20 @@ function addUuidToTemplate(templateContent: string, uuid: string): string {
         return match
       }
 
-      // 检查是否包含转义字符
+      // 检查是否包含转义字符（可能导致解析错误）
       if (attrs.includes('\\')) {
+        return match
+      }
+
+      // 检查是否包含非常复杂的表达式（可能导致解析错误）
+      // 注意：我们已经移除了对 Vue 指令（v-, @, :）的检查
+      // 因为添加 data-u-uuid 属性不会影响 Vue 指令的解析
+      // 只检查可能导致标签结构破坏的情况
+      if (attrs.includes('=>') || attrs.includes('${') || attrs.includes('{{')) {
+        // 箭头函数、模板字符串和模板插值可能导致属性解析错误
+        // 但在大多数情况下，Vue 指令是安全的
+        // 如果属性值包含这些复杂表达式，需要更谨慎的处理
+        // 暂时跳过，避免破坏标签结构
         return match
       }
 

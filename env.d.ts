@@ -75,3 +75,8 @@ declare const __SYSTEM_CODE__ = string
 declare global {}
 
 declare module 'sortablejs'
+
+declare module '*.module.scss' {
+  const classes: Record<string, string>
+  export default classes
+}
