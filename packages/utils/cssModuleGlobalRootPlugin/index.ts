@@ -126,22 +126,27 @@ export default function cssModuleGlobalRootPlugin(options: CssModuleGlobalRootPl
           return
         }
 
-        // 判断是不是特殊规则开头，如果是，则不处理
-        if (isSpecialRule(originalSelector)) {
-          return // 特殊规则，不处理
-        }
+        const selectors = Array.isArray(rule.selectors) && rule.selectors.length > 0
+          ? rule.selectors
+          : [originalSelector]
 
-        let newSelector = originalSelector
+        const transformedSelectors = selectors.map((selector) => {
+          if (!selector.includes(':root')) {
+            return selector
+          }
 
-        if (removeRoot) {
-          // 如果是 removeRoot，执行正则，查找选择器中的 :global :root，替换为 :global（移除 :root）
-          // 例如：.root :global :root -> .root :global
-          newSelector = originalSelector.replace(/(\S+)\s+:global\s+:root/g, '$1 :global')
-        }
-        else {
-          // 如果不是 removeRoot，直接替换 :root 为 *
-          newSelector = originalSelector.replace(/:root/g, '*')
-        }
+          if (isSpecialRule(selector)) {
+            return selector
+          }
+
+          if (removeRoot) {
+            return selector.replace(/(\S+)\s+:global\s+:root/g, '$1 :global')
+          }
+
+          return selector.replace(/:root/g, '*')
+        })
+
+        const newSelector = transformedSelectors.join(', ')
 
         // 如果选择器被修改，更新规则的选择器
         if (newSelector !== originalSelector) {

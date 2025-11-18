@@ -138,7 +138,7 @@ export interface objRouteConfig {
     name: string
     meta?: any
     children?: any[]
-  }
+  } | string
 }
 
 export interface RouteConfig {
@@ -176,6 +176,7 @@ export interface Config extends PluginConfig {
     base?: ModeConfig
     development?: ModeConfig
     production?: ModeConfig
+    [key: string]: ModeConfig
   }
   viteConfig?: UserConfig | ((mode: ConfigEnv) => UserConfig)
 }

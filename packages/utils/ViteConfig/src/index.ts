@@ -53,11 +53,11 @@ import scopedCssPrefixPlugin from './plugins/addScopedAndReplacePrefix.ts'
 //   url: URL
 // }
 
-function getViteConfig(Config: ViteConfigType, params?: ConfigEnv = {}) {
+function getViteConfig(Config: ViteConfigType, params?: ConfigEnv) {
   const config = typeof Config === 'function'
-    ? Config(params)
+    ? Config(params!)
     : Config
-  const { mode = 'base' } = params
+  const { mode = 'base' } = params || {}
   const rootPath = config?.rootPath
 
   const modeConfig = config?.mode || {}
@@ -93,8 +93,8 @@ function getViteConfig(Config: ViteConfigType, params?: ConfigEnv = {}) {
   } = viteEnv
 
   const isOnlyVue = !vitepress && !react && vue
-  const isOnlyReact = !vitepress && !vue && react
-  const isOnlyVitepress = !vue && !react && vitepress
+  // const isOnlyReact = !vitepress && !vue && react
+  // const isOnlyVitepress = !vue && !react && vitepress
   const isVueOrVitepress = vue || vitepress
   const envSystemCode = isDev && !qiankunDevMode ? 'el' : (namespace ?? appCode)
 
@@ -341,7 +341,7 @@ function getViteConfig(Config: ViteConfigType, params?: ConfigEnv = {}) {
     defaultConfig.base = `/${appCode}`
   }
   const viteConfig = typeof config.viteConfig === 'function'
-    ? config.viteConfig(params)
+    ? config.viteConfig(params!)
     : config.viteConfig
   const viteConfigPluginNames = (viteConfig?.plugins || []).map((i: any) => {
     return Array.isArray(i) ? (i[0] as PluginType)?.name : (i as PluginType)?.name
@@ -366,7 +366,7 @@ function getViteConfig(Config: ViteConfigType, params?: ConfigEnv = {}) {
 }
 
 function createViteConfig(Config: ViteConfigType) {
-  return defineConfig((params: ConfigEnv = {}) => getViteConfig(Config, params))
+  return defineConfig((params: ConfigEnv) => getViteConfig(Config, params))
 }
 export {
   createViteConfig,

@@ -18,7 +18,6 @@
     "@codemirror/view": "^6.36.5",
     "@element-plus/icons-vue": "catalog:build",
     "@moluoxixi/components": "workspace:*",
-    "@moluoxixi/element-plus": "workspace:*",
     "@moluoxixi/constant": "workspace:*",
     "@moluoxixi/utils": "workspace:*",
     "@vueuse/core": "^11.0.0",

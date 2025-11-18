@@ -244,34 +244,38 @@ export default function AddUuidToTemplatePlugin(): Plugin {
                 return false
               }
 
+              /**
+               * 处理单个选择器，添加UUID前缀
+               * @param selector 单个CSS选择器
+               */
+              const transformSelector = (selector: string): string => {
+                if (isSpecialRule(selector)) {
+                  return selector
+                }
+                let finalSelector = selector
+                if (/^\s*:root/.test(finalSelector)) {
+                  finalSelector = finalSelector.replace(/^\s*:root\s*/, '')
+                }
+                const needsSpace = needsSpaceBeforeSelector(finalSelector)
+                return needsSpace
+                  ? `[data-t-${uuid}] ${finalSelector}`
+                  : `[data-t-${uuid}]${finalSelector}`
+              }
+
               // 为每个CSS规则添加UUID前缀
               root.walkRules((rule: any) => {
                 try {
-                  const originalSelector = rule.selector
+                  const selectors = Array.isArray(rule.selectors) && rule.selectors.length > 0
+                    ? rule.selectors
+                    : [rule.selector]
 
-                  // 跳过以特殊规则开头的选择器
-                  if (isSpecialRule(originalSelector)) {
-                    return
+                  const transformedSelectors = selectors.map((selector: string) => transformSelector(selector))
+                  const newSelector = transformedSelectors.join(', ')
+
+                  if (newSelector !== rule.selector) {
+                    console.log(`[addUuidToTemplate]  "${rule.selector}" -> "${newSelector}"`)
+                    rule.selector = newSelector
                   }
-
-                  // 如果 originalSelector 以 :root 开头，删除开头的 :root
-                  let finalSelector = originalSelector
-                  if (/^\s*:root/.test(finalSelector)) {
-                    // 删除 :root 及其后面的空格（如果有）
-                    finalSelector = finalSelector.replace(/^\s*:root\s*/, '')
-                  }
-
-                  // 根据选择器开头决定是否添加空格
-                  // 如果匹配需要空格的选择器模式，使用空格分隔；否则紧贴（如 .class, #id, [attr] 等）
-                  const needsSpace = needsSpaceBeforeSelector(finalSelector)
-                  const newSelector = needsSpace
-                    ? `[data-t-${uuid}] ${finalSelector}`
-                    : `[data-t-${uuid}]${finalSelector}`
-
-                  // 添加UUID前缀
-                  rule.selector = newSelector
-
-                  console.log(`[addUuidToTemplate]  "${originalSelector}" -> "${newSelector}"`)
                 }
                 catch (ruleError) {
                   console.warn(`uuIdToTemplate: 处理CSS规则失败: ${rule.selector}`, ruleError)
