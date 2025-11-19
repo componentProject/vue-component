@@ -530,9 +530,6 @@ async function analyzeComponentDeps(ctx: BuildContext, comp: string) {
   try {
     console.log(`开始分析组件 ${comp} 的完整依赖关系...`)
 
-    // 获取所有组件列表作为内部组件参考，用于内部依赖排除,库模式置空，避免内部依赖排除
-    const allComponents = comp ? await getComponentNames(ctx) : []
-
     // 组件目录和入口文件（支持任意后缀名的 index 文件）
     const componentDir = resolve(ctx.packDir, `.${ctx.entryBaseUrl}${comp}`)
     const entryPoint = await findComponentEntry(componentDir)
@@ -544,38 +541,26 @@ async function analyzeComponentDeps(ctx: BuildContext, comp: string) {
     console.log(`分析入口文件: ${entryPoint}`)
 
     // 配置dependency-cruiser选项
-    // const cruiseOptions: ICruiseOptions = {
-    //   // 输出格式
-    //   outputType: 'json',
-    //
-    //   // 模块解析配置
-    //   moduleSystems: ['es6', 'cjs', 'tsd'],
-    //   // TypeScript配置
-    //   tsConfig: {
-    //     fileName: resolve(ctx.packDir, 'tsconfig.json'),
-    //   },
-    //   // 规则配置
-    //   ruleSet: {
-    //     forbidden: [],
-    //     allowed: [],
-    //   },
-    //
-    // }
     const cruiseOptions = {
-      // 模块解析配置
-      moduleSystems: ['es6', 'cjs', 'tsd'],
-      // TypeScript配置
-      tsConfig: {
-        fileName: resolve(ctx.packDir, 'tsconfig.json'),
-      },
       maxDepth: 1,
+      baseDir: ctx.packDir,
       outputType: 'json',
     }
+
+    const files = await glob([`./${comp}/**/*.{js,ts,jsx,tsx,vue}`], {
+      cwd: ctx.packDir,
+      absolute: true,
+      onlyFiles: true,
+    })
+    console.log('files', files)
     // 执行依赖分析
     console.log('正在使用dependency-cruiser分析依赖...')
-    const cruiseResult = await cruise([entryPoint], cruiseOptions)
-    const cruiseModules = JSON.parse(cruiseResult.output as string)?.modules || []
-
+    const cruiseModules = []
+    const callbacks = files.map(async (file) => {
+      const cruiseResult = await cruise([file], cruiseOptions)
+      cruiseModules.push(...(JSON.parse(cruiseResult.output as string)?.modules || []))
+    })
+    await Promise.all(callbacks)
     // 处理分析结果
     const internalDeps = new Set<string>()
     const externalDeps = new Map<string, string>()
@@ -599,26 +584,21 @@ async function analyzeComponentDeps(ctx: BuildContext, comp: string) {
     for (const module of cruiseModules) {
       if (module.dependencies) {
         for (const dep of module.dependencies) {
-          const depPath = (dep as any).resolved || (dep as any).module
+          const depPath = resolve(ctx.packDir, (dep as any).resolved)
+          console.log('depPath', depPath, dep)
 
-          // 1. 检查是否是内部组件依赖
-          const componentMatch = depPath.match(new RegExp(`${ctx.aliasComponentPath.replace(/\//g, '\\/')}\/([A-Z][a-zA-Z0-9]+)`))
-          if (componentMatch && allComponents.includes(componentMatch[1]) && componentMatch[1] !== comp) {
-            internalDeps.add(componentMatch[1])
-            console.log(`✓ 发现内部组件依赖: ${componentMatch[1]}`)
+          if (dep.dependencyTypes?.includes('npm')) {
+            externalDeps.set(dep.module, allProjectDeps[dep.module])
+            console.log(`✓ 发现外部依赖: ${dep.module}@${allProjectDeps[dep.module]}`)
           }
-
-          // 2. 检查是否是外部npm包依赖
-          if ((dep as any).module && !(dep as any).module.startsWith('.') && !(dep as any).module.startsWith('/') && !(dep as any).module.startsWith('@/')) {
-            // 提取包名（处理scoped packages）
-            const packageName = (dep as any).module.startsWith('@')
-              ? (dep as any).module.split('/').slice(0, 2).join('/')
-              : (dep as any).module.split('/')[0]
-
-            // 检查是否在项目依赖中
-            if (allProjectDeps[packageName]) {
-              externalDeps.set(packageName, allProjectDeps[packageName])
-              console.log(`✓ 发现外部依赖: ${packageName}@${allProjectDeps[packageName]}`)
+          else if (dep.module.startsWith('.')) {
+            // 检查目标路径是否在 entryBaseUrl 目录下
+            if (dep.resolved && !dep.resolved.includes('..')) {
+              const pathParts = dep.resolved.split('/')
+              const potentialComponentName = pathParts[0]
+              if (potentialComponentName !== comp) {
+                internalDeps.add(potentialComponentName)
+              }
             }
           }
         }
