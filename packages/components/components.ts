@@ -1,3 +1,4 @@
+import CardReader from '@moluoxixi/components/CardReader'
 import ConfigForm from '@moluoxixi/components/ConfigForm'
 import DateRangePicker from '@moluoxixi/components/DateRangePicker'
 import DraggableTable from '@moluoxixi/components/DraggableTable'
@@ -19,6 +20,7 @@ import TsRadio from '@moluoxixi/components/TsRadio'
 import TsSelect from '@moluoxixi/components/TsSelect'
 
 export {
+  CardReader,
   ConfigForm,
   DateRangePicker,
   DraggableTable,

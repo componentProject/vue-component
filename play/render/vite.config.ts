@@ -18,7 +18,7 @@ export default viteConfig(
           appTitle: viteEnv.VITE_GLOB_APP_TITLE,
           appCode,
           port: 3301,
-          autoComponent: false,
+          autoComponent: true,
           // pwa: {
           //   manifest: {
           //     icons: [
