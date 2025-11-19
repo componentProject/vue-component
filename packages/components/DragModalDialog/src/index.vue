@@ -15,97 +15,99 @@
         :style="overlayStyle"
         @click="handleOverlayClick"
       >
-        <div
-          ref="modalRef"
-          class="modal-dialog"
-          :class="[
-            { [`modal-${props.size}`]: !props.width },
-            { 'modal-draggable': props.draggable },
-          ]"
-          :style="modalStyle"
-          @click.stop
-        >
-          <!-- 拖拽句柄 - 可拖拽整个头部 -->
+        <div class="w-full h-full relative">
           <div
-            class="modal-header"
-            :class="{ 'modal-draggable-header': props.draggable }"
-            @mousedown="startDrag"
+            ref="modalRef"
+            class="modal-dialog"
+            :class="[
+              { [`modal-${props.size}`]: !props.width },
+              { 'modal-draggable': props.draggable },
+            ]"
+            :style="modalStyle"
+            @click.stop
           >
-            <!-- 完全自定义头部插槽 -->
-            <slot name="header" :close="handleClose" :title="props.title">
-              <!-- 默认内容 -->
-              <!-- 自定义左侧内容 -->
-              <div class="modal-header-left">
-                <slot name="header-left" :title="props.title">
-                  <h3 class="modal-title">
-                    {{ props.title }}
-                  </h3>
-                </slot>
-              </div>
+            <!-- 拖拽句柄 - 可拖拽整个头部 -->
+            <div
+              class="modal-header"
+              :class="{ 'modal-draggable-header': props.draggable }"
+              @mousedown="startDrag"
+            >
+              <!-- 完全自定义头部插槽 -->
+              <slot name="header" :close="handleClose" :title="props.title">
+                <!-- 默认内容 -->
+                <!-- 自定义左侧内容 -->
+                <div class="modal-header-left">
+                  <slot name="header-left" :title="props.title">
+                    <h3 class="modal-title">
+                      {{ props.title }}
+                    </h3>
+                  </slot>
+                </div>
 
-              <!-- 自定义右侧内容 -->
-              <div class="modal-header-right">
-                <slot name="header-right" :close="handleClose">
-                  <button
-                    v-if="props.showClose"
-                    class="modal-close"
-                    aria-label="关闭"
-                    @click="handleClose"
-                  >
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                      <path d="M12.5 3.5L3.5 12.5M3.5 3.5L12.5 12.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
-                    </svg>
-                  </button>
-                </slot>
-              </div>
-            </slot>
-          </div>
-
-          <!-- 内容区域 -->
-          <div class="modal-body">
-            <div class="modal-body-content" :style="props.contentStyle">
-              <slot>{{ props.content }}</slot>
+                <!-- 自定义右侧内容 -->
+                <div class="modal-header-right">
+                  <slot name="header-right" :close="handleClose">
+                    <button
+                      v-if="props.showClose"
+                      class="modal-close"
+                      aria-label="关闭"
+                      @click="handleClose"
+                    >
+                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                        <path d="M12.5 3.5L3.5 12.5M3.5 3.5L12.5 12.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                      </svg>
+                    </button>
+                  </slot>
+                </div>
+              </slot>
             </div>
+
+            <!-- 内容区域 -->
+            <div class="modal-body">
+              <div class="modal-body-content" :style="props.contentStyle">
+                <slot>{{ props.content }}</slot>
+              </div>
+            </div>
+
+            <!-- 底部操作区 -->
+            <div v-if="props.showFooter" class="modal-footer">
+              <slot name="footer">
+                <Buttons v-if="props.buttons" :buttons="props.buttons" />
+                <template v-else>
+                  <button
+                    v-if="props.showCancel"
+                    class="modal-btn modal-btn-secondary"
+                    @click="handleCancel"
+                  >
+                    {{ props.cancelText }}
+                  </button>
+                  <button
+                    v-if="props.showConfirm"
+                    class="modal-btn modal-btn-primary"
+                    :disabled="confirmDisabled"
+                    @click="handleConfirm"
+                  >
+                    {{ props.confirmText }}
+                  </button>
+                </template>
+              </slot>
+            </div>
+
+            <!-- 8方向调整大小句柄 -->
+            <template v-if="props.resizable">
+              <!-- 四个角 -->
+              <div class="resize-handle resize-handle-nw" data-direction="nw" @mousedown="startResize($event, 'nw')" />
+              <div class="resize-handle resize-handle-ne" data-direction="ne" @mousedown="startResize($event, 'ne')" />
+              <div class="resize-handle resize-handle-sw" data-direction="sw" @mousedown="startResize($event, 'sw')" />
+              <div class="resize-handle resize-handle-se" data-direction="se" @mousedown="startResize($event, 'se')" />
+
+              <!-- 四条边 -->
+              <div class="resize-handle resize-handle-n" data-direction="n" @mousedown="startResize($event, 'n')" />
+              <div class="resize-handle resize-handle-s" data-direction="s" @mousedown="startResize($event, 's')" />
+              <div class="resize-handle resize-handle-w" data-direction="w" @mousedown="startResize($event, 'w')" />
+              <div class="resize-handle resize-handle-e" data-direction="e" @mousedown="startResize($event, 'e')" />
+            </template>
           </div>
-
-          <!-- 底部操作区 -->
-          <div v-if="props.showFooter" class="modal-footer">
-            <slot name="footer">
-              <Buttons v-if="props.buttons" :buttons="props.buttons" />
-              <template v-else>
-                <button
-                  v-if="props.showCancel"
-                  class="modal-btn modal-btn-secondary"
-                  @click="handleCancel"
-                >
-                  {{ props.cancelText }}
-                </button>
-                <button
-                  v-if="props.showConfirm"
-                  class="modal-btn modal-btn-primary"
-                  :disabled="confirmDisabled"
-                  @click="handleConfirm"
-                >
-                  {{ props.confirmText }}
-                </button>
-              </template>
-            </slot>
-          </div>
-
-          <!-- 8方向调整大小句柄 -->
-          <template v-if="props.resizable">
-            <!-- 四个角 -->
-            <div class="resize-handle resize-handle-nw" data-direction="nw" @mousedown="startResize($event, 'nw')" />
-            <div class="resize-handle resize-handle-ne" data-direction="ne" @mousedown="startResize($event, 'ne')" />
-            <div class="resize-handle resize-handle-sw" data-direction="sw" @mousedown="startResize($event, 'sw')" />
-            <div class="resize-handle resize-handle-se" data-direction="se" @mousedown="startResize($event, 'se')" />
-
-            <!-- 四条边 -->
-            <div class="resize-handle resize-handle-n" data-direction="n" @mousedown="startResize($event, 'n')" />
-            <div class="resize-handle resize-handle-s" data-direction="s" @mousedown="startResize($event, 's')" />
-            <div class="resize-handle resize-handle-w" data-direction="w" @mousedown="startResize($event, 'w')" />
-            <div class="resize-handle resize-handle-e" data-direction="e" @mousedown="startResize($event, 'e')" />
-          </template>
         </div>
       </div>
     </Transition>
@@ -115,7 +117,7 @@
 <script setup lang="ts">
 import type { emitsType, propsType } from './_types'
 import { Buttons } from '@moluoxixi/components/_utilComponents'
-import { computed, nextTick, onMounted, ref, watch } from 'vue'
+import { computed, nextTick, ref, useTemplateRef, watch } from 'vue'
 
 defineOptions({
   name: 'DragModalDialog',
@@ -141,7 +143,7 @@ const props = withDefaults(defineProps<propsType>(), {
   zIndex: 1000,
   minWidth: 300,
   minHeight: 200,
-  margin: 16,
+  margin: 0,
   rememberPosition: false,
   positionKey: '',
   penetrate: false,
@@ -174,7 +176,7 @@ function handleAfterLeave() {
 }
 
 // 状态管理
-const modalRef = ref<HTMLElement>()
+const modalRef = useTemplateRef<HTMLElement>('modalRef')
 const isDragging = ref(false)
 const isResizing = ref(false)
 const dragStartPos = ref({ x: 0, y: 0, left: 0, top: 0 })
@@ -189,8 +191,10 @@ const resizeState = ref({
 })
 
 // 实际位置状态
-const currentTop = ref(0)
-const currentLeft = ref(0)
+const currentTop = ref()
+const currentLeft = ref()
+const currentBottom = ref()
+const currentRight = ref()
 const currentWidth = ref(0)
 const currentHeight = ref(0)
 
@@ -287,40 +291,44 @@ const modalStyle = computed(() => {
     zIndex: props.zIndex,
   }
 
+  const width = currentWidth.value
+  const height = currentHeight.value
+  const left = currentLeft.value
+  const top = currentTop.value
+  const right = currentRight.value
+  const bottom = currentBottom.value
+
+  style.left = `${left}px`
+  style.top = `${top}px`
+  style.right = `${right}px`
+  style.bottom = `${bottom}px`
+
   // 设置宽度
-  if (currentWidth.value > 0) {
-    style.width = `${currentWidth.value}px`
-  }
-  else if (props.width) {
-    style.width = typeof props.width === 'number' ? `${props.width}px` : props.width
-  }
+  style.width = typeof width === 'number' ? `${width}px` : width || 0
 
   // 设置高度
-  if (currentHeight.value > 0) {
-    style.height = `${currentHeight.value}px`
-  }
-  else if (props.height) {
-    style.height = typeof props.height === 'number' ? `${props.height}px` : props.height
-  }
-
-  // 设置位置
-  if (props.draggable) {
-    style.position = 'absolute'
-    style.top = `${currentTop.value}px`
-    style.left = `${currentLeft.value}px`
-    style.margin = '0'
-  }
-  else {
-    // 非拖拽模式下，支持百分比和数字
-    if (props.top !== undefined) {
-      style.top = typeof props.top === 'number' ? `${props.top}px` : props.top
-    }
-    if (props.left !== undefined) {
-      style.left = typeof props.left === 'number' ? `${props.left}px` : props.left
-    }
-  }
-
+  style.height = typeof height === 'number' ? `${height}px` : height || 0
   return style
+  // // 设置位置
+  // if (top !== undefined && bottom === undefined) {
+  //   style.top = typeof top === 'number' ? `${top}px` : top
+  // }
+  // else if (bottom !== undefined && top === undefined) {
+  //   style.bottom = typeof bottom === 'number' ? `${bottom}px` : bottom
+  // }
+  // else {
+  //   style.top = `calc(50% - ${style.height} / 2)`
+  // }
+  // if (left !== undefined && right === undefined) {
+  //   style.left = typeof left === 'number' ? `${left}px` : left
+  // }
+  // else if (right !== undefined && left === undefined) {
+  //   style.right = typeof right === 'number' ? `${right}px` : right
+  // }
+  // else {
+  //   style.right = `calc(50% - ${style.width} / 2)`
+  // }
+  // return style
 })
 
 // 事件处理
@@ -388,9 +396,10 @@ function onDrag(e: MouseEvent) {
   // 限制在内容区域内
   newLeft = Math.max(minLeft, Math.min(newLeft, maxLeft))
   newTop = Math.max(minTop, Math.min(newTop, maxTop))
-
   currentLeft.value = newLeft
   currentTop.value = newTop
+  currentRight.value = undefined
+  currentBottom.value = undefined
 
   emit('update:top', newTop)
   emit('update:left', newLeft)
@@ -604,7 +613,7 @@ function getSizeWidth(size: 'small' | 'medium' | 'large'): number {
   return sizeMap[size] || 520 // 默认为 medium
 }
 
-// 初始化位置
+// 计算初始位置
 function initPosition() {
   if (!modalRef.value)
     return
@@ -618,85 +627,94 @@ function initPosition() {
     currentLeft.value = savedPosition.left
     currentWidth.value = savedPosition.width
     currentHeight.value = savedPosition.height
-    return
-  }
-
-  // 计算可用的最大尺寸（内容区域 = 视窗 - 边距）
-  const windowWidth = window.innerWidth
-  const windowHeight = window.innerHeight
-
-  // 内容区域边界（考虑边距限制）
-  const contentArea = {
-    width: windowWidth - props.margin * 2,
-    height: windowHeight - props.margin * 2,
-    left: props.margin,
-    top: props.margin,
-  }
-
-  // 计算宽度：优先使用 width 属性，其次使用 size 属性
-  let targetWidth: number
-  if (props.width) {
-    targetWidth = typeof props.width === 'number' ? props.width : parsePositionValue(props.width, contentArea.width)
   }
   else {
-    targetWidth = getSizeWidth(props.size)
-  }
+    // 计算可用的最大尺寸（内容区域 = 视窗 - 边距）
+    const windowWidth = window.innerWidth
+    const windowHeight = window.innerHeight
 
-  // 计算高度：优先使用 height 属性
-  let targetHeight: number
-  if (props.height) {
-    targetHeight = typeof props.height === 'number' ? props.height : parsePositionValue(props.height, contentArea.height)
-  }
-  else {
-    targetHeight = 200 // 默认高度
-  }
+    // 内容区域边界（考虑边距限制）
+    const contentArea = {
+      width: windowWidth - props.margin * 2,
+      height: windowHeight - props.margin * 2,
+      left: props.margin,
+      top: props.margin,
+      right: props.margin,
+      bottom: props.margin,
+    }
 
-  // 确保尺寸在内容区域内
-  targetWidth = Math.max(props.minWidth, Math.min(targetWidth, contentArea.width))
-  targetHeight = Math.max(props.minHeight, Math.min(targetHeight, contentArea.height))
+    // 计算宽度：优先使用 width 属性，其次使用 size 属性
+    let targetWidth: number
+    if (props.width) {
+      targetWidth = typeof props.width === 'number' ? props.width : parsePositionValue(props.width, contentArea.width)
+    }
+    else {
+      targetWidth = getSizeWidth(props.size)
+    }
 
-  // 计算位置：确保在内容区域内
-  let targetLeft: number
-  let targetTop: number
+    // 计算高度：优先使用 height 属性
+    let targetHeight: number
+    if (props.height) {
+      targetHeight = typeof props.height === 'number' ? props.height : parsePositionValue(props.height, contentArea.height)
+    }
+    else {
+      targetHeight = 200 // 默认高度
+    }
 
-  // 如果传入了 left，解析并限制在内容区域内
-  if (props.left !== undefined) {
-    const requestedLeft = typeof props.left === 'number' ? props.left : parsePositionValue(props.left, windowWidth)
-    // 限制在内容区域内：确保不会超出右边界
-    targetLeft = Math.max(contentArea.left, Math.min(requestedLeft, contentArea.left + contentArea.width - targetWidth))
-  }
-  else {
-    // 默认居中在内容区域内
-    targetLeft = contentArea.left + (contentArea.width - targetWidth) / 2
-  }
+    // 确保尺寸在内容区域内
+    targetWidth = Math.max(props.minWidth, Math.min(targetWidth, contentArea.width))
+    targetHeight = Math.max(props.minHeight, Math.min(targetHeight, contentArea.height))
 
-  // 如果传入了 top，解析并限制在内容区域内
-  if (props.top !== undefined) {
-    const requestedTop = typeof props.top === 'number' ? props.top : parsePositionValue(props.top, windowHeight)
-    // 限制在内容区域内：确保不会超出下边界
-    targetTop = Math.max(contentArea.top, Math.min(requestedTop, contentArea.top + contentArea.height - targetHeight))
-  }
-  else {
-    // 默认居中在内容区域内
-    targetTop = contentArea.top + (contentArea.height - targetHeight) / 2
-  }
+    // 计算位置：确保在内容区域内
+    let targetLeft: number
+    let targetTop: number
+    let targetRight: number
+    let targetBottom: number
 
-  currentLeft.value = targetLeft
-  currentTop.value = targetTop
-  currentWidth.value = targetWidth
-  currentHeight.value = targetHeight
+    const left = props.left
+    const right = props.right
+    const top = props.top
+    const bottom = props.bottom
+
+    // 如果传入了 left，解析并限制在内容区域内
+    if (left !== undefined && right === undefined) {
+      const requestedLeft = typeof left === 'number' ? left : parsePositionValue(left, windowWidth)
+      // 限制在内容区域内：确保不会超出右边界
+      targetLeft = Math.max(contentArea.left, Math.min(requestedLeft, contentArea.left + contentArea.width - targetWidth))
+    }
+    else if (right !== undefined && left === undefined) {
+      const requestedRight = typeof right === 'number' ? right : parsePositionValue(right, windowWidth)
+      targetRight = Math.max(contentArea.right, Math.min(requestedRight, contentArea.right + contentArea.width - targetWidth))
+    }
+    else {
+      // 默认居中在内容区域内
+      targetLeft = contentArea.left + (contentArea.width - targetWidth) / 2
+    }
+
+    // 如果传入了 top，解析并限制在内容区域内
+    if (top !== undefined && bottom === undefined) {
+      const requestedTop = typeof top === 'number' ? top : parsePositionValue(top, windowHeight)
+      // 限制在内容区域内：确保不会超出下边界
+      targetTop = Math.max(contentArea.top, Math.min(requestedTop, contentArea.top + contentArea.height - targetHeight))
+    }
+    else if (bottom !== undefined && top === undefined) {
+      const requestedBottom = typeof bottom === 'number' ? bottom : parsePositionValue(bottom, windowHeight)
+      // 限制在内容区域内：确保不会超出下边界
+      targetBottom = Math.max(contentArea.bottom, Math.min(requestedBottom, contentArea.bottom + contentArea.height - targetHeight))
+    }
+    else {
+      // 默认居中在内容区域内
+      targetTop = contentArea.top + (contentArea.height - targetHeight) / 2
+    }
+
+    currentLeft.value = targetLeft
+    currentTop.value = targetTop
+    currentRight.value = targetRight
+    currentBottom.value = targetBottom
+    currentWidth.value = targetWidth
+    currentHeight.value = targetHeight
+  }
 }
-
-// 生命周期
-onMounted(() => {
-  if (props.visible) {
-    emit('open')
-    nextTick(() => {
-      initPosition()
-      emit('opened')
-    })
-  }
-})
 
 // 监听visible变化
 watch(() => props.visible, (newVal: any) => {
@@ -787,13 +805,14 @@ defineExpose({
 }
 
 .modal-dialog {
-  position: relative;
+  position: absolute;
   background: white;
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  margin: 0;
   max-height: 100vh; /* 限制最大高度为视窗高度 */
 }
 

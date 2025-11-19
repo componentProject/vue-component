@@ -69,4 +69,8 @@ export interface propsType {
   destroyOnClose?: boolean
   /** 内容区域的样式 */
   contentStyle?: StyleSheet | styleFn
+  left?: string | number
+  top?: string | number
+  right?: string | number
+  bottom?: string | number
 }

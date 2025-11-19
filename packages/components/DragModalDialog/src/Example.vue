@@ -5,6 +5,8 @@
   </ElButton>
   <DragModalDialog
     v-model:visible="visible"
+    draggable
+    :top="0"
     :buttons="[
       {
         type: 'primary',
