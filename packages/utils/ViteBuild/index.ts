@@ -1,10 +1,9 @@
 // build入口文件
-import type { ICruiseOptions, ICruiseResult } from 'dependency-cruiser'
 import type { ConfigEnv, InlineConfig, UserConfig } from 'vite'
 import { execSync } from 'node:child_process'
 import fs from 'node:fs'
 import fsp from 'node:fs/promises'
-import { dirname, resolve } from 'node:path'
+import { resolve } from 'node:path'
 
 import tailwindcss from '@tailwindcss/postcss'
 import pluginVue from '@vitejs/plugin-vue'
@@ -20,7 +19,6 @@ import viteImagemin from 'vite-plugin-imagemin'
 import AddUuidToTemplatePlugin from '../AddUuidToTemplatePlugin'
 import CssInjectedByJsPlugin from '../CssInjectedByJsPlugin'
 import cssModuleGlobalRootPlugin from '../cssModuleGlobalRootPlugin'
-import transformAliasPlugin from './plugins/transformAliasPlugin'
 // import { lazyImport, VxeResolver } from 'vite-plugin-lazy-import'
 import { UploadEvent } from './utils/UploadComponent.ts'
 
@@ -241,13 +239,10 @@ function sleep(ms: number): Promise<void> {
  * 创建基础Vite配置
  * @param ctx 构建上下文
  * @param comp 组件名
- * @param internalDeps 内部组件依赖列表
  * @returns 基础配置对象
  */
-function createBaseConfig(ctx: BuildContext, comp: string, internalDeps: string[]): InlineConfig {
+function createBaseConfig(ctx: BuildContext, comp: string): InlineConfig {
   const plugins = [
-    // 添加路径替换插件，将内部组件引用转换为外部包引用
-    transformAliasPlugin(ctx, internalDeps, comp),
     // 当styleType为scoped时，添加UUID插件用于样式隔离
     ctx.styleType === 'scoped' && AddUuidToTemplatePlugin(),
     pluginVue(),
@@ -549,27 +544,37 @@ async function analyzeComponentDeps(ctx: BuildContext, comp: string) {
     console.log(`分析入口文件: ${entryPoint}`)
 
     // 配置dependency-cruiser选项
-    const cruiseOptions: ICruiseOptions = {
-      // 输出格式
-      outputType: 'json',
-
+    // const cruiseOptions: ICruiseOptions = {
+    //   // 输出格式
+    //   outputType: 'json',
+    //
+    //   // 模块解析配置
+    //   moduleSystems: ['es6', 'cjs', 'tsd'],
+    //   // TypeScript配置
+    //   tsConfig: {
+    //     fileName: resolve(ctx.packDir, 'tsconfig.json'),
+    //   },
+    //   // 规则配置
+    //   ruleSet: {
+    //     forbidden: [],
+    //     allowed: [],
+    //   },
+    //
+    // }
+    const cruiseOptions = {
       // 模块解析配置
       moduleSystems: ['es6', 'cjs', 'tsd'],
       // TypeScript配置
       tsConfig: {
         fileName: resolve(ctx.packDir, 'tsconfig.json'),
       },
-      // 规则配置
-      ruleSet: {
-        forbidden: [],
-        allowed: [],
-      },
-
+      maxDepth: 1,
+      outputType: 'json',
     }
-
     // 执行依赖分析
     console.log('正在使用dependency-cruiser分析依赖...')
     const cruiseResult = await cruise([entryPoint], cruiseOptions)
+    const cruiseModules = JSON.parse(cruiseResult.output as string)?.modules || []
 
     // 处理分析结果
     const internalDeps = new Set<string>()
@@ -588,168 +593,38 @@ async function analyzeComponentDeps(ctx: BuildContext, comp: string) {
       ...(projectPkg?.devDependencies || {}),
       ...(projectPkg?.peerDependencies || {}),
     }
-    console.log('projectPkg', projectPkg)
+    // console.log('projectPkg', projectPkg)
 
     // 遍历所有模块和依赖
-    if ((cruiseResult.output as ICruiseResult)?.modules) {
-      for (const module of (cruiseResult.output as ICruiseResult).modules) {
-        if (module.dependencies) {
-          for (const dep of module.dependencies) {
-            const depPath = (dep as any).resolved || (dep as any).module
+    for (const module of cruiseModules) {
+      if (module.dependencies) {
+        for (const dep of module.dependencies) {
+          const depPath = (dep as any).resolved || (dep as any).module
 
-            // 1. 检查是否是内部组件依赖
-            const componentMatch = depPath.match(new RegExp(`${ctx.aliasComponentPath.replace(/\//g, '\\/')}\/([A-Z][a-zA-Z0-9]+)`))
-            if (componentMatch && allComponents.includes(componentMatch[1]) && componentMatch[1] !== comp) {
-              internalDeps.add(componentMatch[1])
-              console.log(`✓ 发现内部组件依赖: ${componentMatch[1]}`)
-            }
-
-            // 2. 检查是否是外部npm包依赖
-            if ((dep as any).module && !(dep as any).module.startsWith('.') && !(dep as any).module.startsWith('/') && !(dep as any).module.startsWith('@/')) {
-              // 提取包名（处理scoped packages）
-              const packageName = (dep as any).module.startsWith('@')
-                ? (dep as any).module.split('/').slice(0, 2).join('/')
-                : (dep as any).module.split('/')[0]
-
-              // 检查是否在项目依赖中
-              if (allProjectDeps[packageName]) {
-                externalDeps.set(packageName, allProjectDeps[packageName])
-                console.log(`✓ 发现外部依赖: ${packageName}@${allProjectDeps[packageName]}`)
-              }
-            }
-          }
-        }
-      }
-    }
-
-    // 补充：直接扫描代码中的import语句（作为backup + 扩展分析）
-    console.log(`补充扫描import语句...,${componentDir}`)
-    const files = await glob(['**/*.{vue,ts,tsx,js,jsx}', ...mustExcludeDirs.map(i => `!${i}`)], {
-      cwd: componentDir,
-      absolute: true,
-    })
-
-    // 用于追踪已扫描的文件，避免重复扫描
-    const scannedFiles = new Set<string>()
-
-    // 递归扫描函数
-    const scanFileForDeps = async (filePath: string) => {
-      if (scannedFiles.has(filePath))
-        return
-      scannedFiles.add(filePath)
-
-      try {
-        const content = await fsp.readFile(filePath, 'utf-8')
-
-        // 匹配import语句
-        const importRegex = /import\s[^'"]*from\s+['"]([^'"]+)['"]/g
-        let match: RegExpExecArray | null
-
-        // eslint-disable-next-line no-cond-assign
-        while ((match = importRegex.exec(content)) !== null) {
-          const importPath = match[1]
-
-          // 1. 检查${aliasComponentPath}引用
-          const componentMatch = importPath.match(new RegExp(`${ctx.aliasComponentPath.replace(/\//g, '\\/')}\/([A-Z][a-zA-Z0-9]+)`))
+          // 1. 检查是否是内部组件依赖
+          const componentMatch = depPath.match(new RegExp(`${ctx.aliasComponentPath.replace(/\//g, '\\/')}\/([A-Z][a-zA-Z0-9]+)`))
           if (componentMatch && allComponents.includes(componentMatch[1]) && componentMatch[1] !== comp) {
             internalDeps.add(componentMatch[1])
+            console.log(`✓ 发现内部组件依赖: ${componentMatch[1]}`)
           }
 
-          // 2. 检查${aliasComponentPath}/_utils等共享模块的引用
-          if (importPath.startsWith(`${ctx.aliasComponentPath}/_utils`)
-            || importPath.startsWith(`${ctx.aliasComponentPath}/_types`)
-            || importPath.startsWith(`${ctx.aliasComponentPath}/`)) {
-            try {
-              // 解析@路径为实际路径
-              const actualPath = importPath.replace('@/', './')
-              const sharedModulePath = resolve(ctx.packDir, actualPath)
+          // 2. 检查是否是外部npm包依赖
+          if ((dep as any).module && !(dep as any).module.startsWith('.') && !(dep as any).module.startsWith('/') && !(dep as any).module.startsWith('@/')) {
+            // 提取包名（处理scoped packages）
+            const packageName = (dep as any).module.startsWith('@')
+              ? (dep as any).module.split('/').slice(0, 2).join('/')
+              : (dep as any).module.split('/')[0]
 
-              // 如果是文件，直接扫描；如果是目录，尝试找index文件
-              let targetFile: string | null = null
-
-              // 首先检查是否是直接的文件
-              if (fs.existsSync(sharedModulePath) && fs.statSync(sharedModulePath).isFile()) {
-                targetFile = sharedModulePath
-              }
-              else {
-                // 尝试添加不同的扩展名和index文件
-                const extensions = ['.ts', '.js', '.tsx', '.jsx', '/index.ts', '/index.js']
-                for (const ext of extensions) {
-                  const testPath = sharedModulePath + ext
-                  if (fs.existsSync(testPath) && fs.statSync(testPath).isFile()) {
-                    targetFile = testPath
-                    break
-                  }
-                }
-              }
-
-              if (targetFile && !scannedFiles.has(targetFile)) {
-                console.log(`✓ 递归分析共享模块: ${importPath} -> ${targetFile}`)
-                await scanFileForDeps(targetFile)
-              }
-            }
-            catch (error) {
-              console.warn(`扫描共享模块失败: ${importPath}, 错误: ${(error as Error).message}`)
-            }
-          }
-
-          // 3. 检查相对路径组件引用 - 使用真正的路径解析
-          if (importPath.startsWith('../') || importPath.startsWith('./')) {
-            try {
-              // 解析相对路径为绝对路径
-              const currentFileDir = dirname(filePath)
-              const targetPath = resolve(currentFileDir, importPath)
-
-              // 检查目标路径是否在 entryBaseUrl 目录下
-              const componentsDir = resolve(ctx.packDir, `.${ctx.entryBaseUrl}`)
-              const relativeTocComponents = resolve(targetPath).replace(componentsDir, '').replace(/\\/g, '/')
-
-              // 如果路径以 / 开头且不包含 .. 说明在 components 目录下
-              if (relativeTocComponents.startsWith('/') && !relativeTocComponents.includes('..')) {
-                // 提取组件名：/ComponentName/xxx/xxx -> ComponentName
-                const pathParts = relativeTocComponents.substring(1).split('/')
-                const potentialComponentName = pathParts[0]
-
-                // 验证是否是有效的组件名且存在于组件列表中
-                if (potentialComponentName
-                  && allComponents.includes(potentialComponentName)
-                  && potentialComponentName !== comp) {
-                  internalDeps.add(potentialComponentName)
-                  console.log(`✓ 发现相对路径组件依赖: ${potentialComponentName} (路径: ${importPath} -> ${targetPath})`)
-                }
-              }
-            }
-            catch (error) {
-              // 路径解析失败，跳过
-              console.warn(`路径解析失败: ${importPath} 在文件 ${filePath}, 错误: ${(error as Error).message}`)
-            }
-          }
-
-          // 4. 检查外部包引用
-          if (!importPath.startsWith('.') && !importPath.startsWith('/') && !importPath.startsWith('@/')) {
-            const packageName = importPath.startsWith('@')
-              ? importPath.split('/').slice(0, 2).join('/')
-              : importPath.split('/')[0]
-
-            if ((allProjectDeps as any)[packageName]) {
-              externalDeps.set(packageName, (allProjectDeps as any)[packageName])
-              if (!scannedFiles.has(`external:${packageName}`)) {
-                scannedFiles.add(`external:${packageName}`)
-                console.log(`✓ 发现外部依赖: ${packageName}@${(allProjectDeps as any)[packageName]} (来源: ${filePath})`)
-              }
+            // 检查是否在项目依赖中
+            if (allProjectDeps[packageName]) {
+              externalDeps.set(packageName, allProjectDeps[packageName])
+              console.log(`✓ 发现外部依赖: ${packageName}@${allProjectDeps[packageName]}`)
             }
           }
         }
       }
-      catch (error) {
-        console.warn(`扫描文件失败: ${filePath}, 错误: ${(error as Error).message}`)
-      }
     }
 
-    // 扫描组件目录下的所有文件
-    for (const file of files) {
-      await scanFileForDeps(file)
-    }
     for (const externalDep of externalDeps) {
       const [dep, version] = externalDep
       if (ctx.peerDepList.includes(dep)) {
@@ -1080,7 +955,7 @@ async function buildComponent(
 
     console.log('--------------------------->globals', globals)
     // 创建基础配置
-    const baseConfig = createBaseConfig(ctx, comp, deps.internal)
+    const baseConfig = createBaseConfig(ctx, comp)
 
     const callbacks = []
     // // 打包iife模块
