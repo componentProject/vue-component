@@ -64,7 +64,10 @@
 
             <!-- 内容区域 -->
             <div class="modal-body">
-              <div class="modal-body-content" :style="props.contentStyle">
+              <div
+                class="modal-body-content"
+                :style="(props.contentStyle ? (typeof props.contentStyle === 'function' ? props.contentStyle() : props.contentStyle) : undefined) as any"
+              >
                 <slot>{{ props.content }}</slot>
               </div>
             </div>
@@ -115,9 +118,20 @@
 </template>
 
 <script setup lang="ts">
+import type { PositionData, ResizeDirection, ResizeState } from '@moluoxixi/utils/_utils'
 import type { emitsType, propsType } from './_types'
 import { Buttons } from '@moluoxixi/components/_utilComponents'
-import { computed, nextTick, ref, useTemplateRef, watch } from 'vue'
+import {
+  calculateContentArea,
+  calculateDragPosition,
+  calculateResizePosition,
+  clearPositionFromStorage,
+  getCursorByDirection,
+  loadPositionFromStorage,
+  parsePositionValue,
+  savePositionToStorage,
+} from '@moluoxixi/utils/_utils'
+import { computed, nextTick, onUnmounted, ref, useTemplateRef, watch } from 'vue'
 
 defineOptions({
   name: 'DragModalDialog',
@@ -149,7 +163,7 @@ const props = withDefaults(defineProps<propsType>(), {
   penetrate: false,
   teleportTo: 'body',
   destroyOnClose: false,
-  contentStyle: {},
+  contentStyle: undefined,
 })
 
 const emit = defineEmits<emitsType>()
@@ -180,8 +194,8 @@ const modalRef = useTemplateRef<HTMLElement>('modalRef')
 const isDragging = ref(false)
 const isResizing = ref(false)
 const dragStartPos = ref({ x: 0, y: 0, left: 0, top: 0 })
-const resizeState = ref({
-  direction: '',
+const resizeState = ref<ResizeState>({
+  direction: 'se',
   startX: 0,
   startY: 0,
   startWidth: 0,
@@ -197,15 +211,6 @@ const currentBottom = ref()
 const currentRight = ref()
 const currentWidth = ref(0)
 const currentHeight = ref(0)
-
-// 位置记忆相关
-interface PositionData {
-  top: number
-  left: number
-  width: number
-  height: number
-  timestamp: number
-}
 
 const interactionEndTime = ref(0)
 
@@ -245,12 +250,10 @@ function savePosition() {
     timestamp: Date.now(),
   }
 
-  try {
-    localStorage.setItem(getStorageKey(), JSON.stringify(positionData))
-  }
-  catch (error) {
-    console.warn('Failed to save modal position:', error)
-  }
+  savePositionToStorage({
+    key: getStorageKey(),
+    position: positionData,
+  })
 }
 
 // 从localStorage读取位置
@@ -258,31 +261,13 @@ function loadPosition(): PositionData | null {
   if (!props.rememberPosition)
     return null
 
-  try {
-    const stored = localStorage.getItem(getStorageKey())
-    if (stored) {
-      const data = JSON.parse(stored) as PositionData
-
-      // 验证数据有效性
-      const windowWidth = window.innerWidth
-      const windowHeight = window.innerHeight
-
-      if (
-        data.left >= 0
-        && data.top >= 0
-        && data.left + data.width <= windowWidth
-        && data.top + data.height <= windowHeight
-        && data.width >= props.minWidth
-        && data.height >= props.minHeight
-      ) {
-        return data
-      }
-    }
-  }
-  catch (error) {
-    console.warn('Failed to load modal position:', error)
-  }
-  return null
+  return loadPositionFromStorage({
+    key: getStorageKey(),
+    windowWidth: window.innerWidth,
+    windowHeight: window.innerHeight,
+    minWidth: props.minWidth,
+    minHeight: props.minHeight,
+  })
 }
 
 // 响应式样式
@@ -371,31 +356,25 @@ function startDrag(e: MouseEvent) {
 }
 
 function onDrag(e: MouseEvent) {
-  if (!isDragging.value)
+  if (!isDragging.value || !modalRef.value)
     return
 
-  const deltaX = e.clientX - dragStartPos.value.x
-  const deltaY = e.clientY - dragStartPos.value.y
+  const modalWidth = modalRef.value.offsetWidth
+  const modalHeight = modalRef.value.offsetHeight
 
-  // 计算新位置
-  let newLeft = dragStartPos.value.left + deltaX
-  let newTop = dragStartPos.value.top + deltaY
+  const { left: newLeft, top: newTop } = calculateDragPosition({
+    dragStartPos: dragStartPos.value,
+    currentX: e.clientX,
+    currentY: e.clientY,
+    constraints: {
+      windowWidth: window.innerWidth,
+      windowHeight: window.innerHeight,
+      elementWidth: modalWidth,
+      elementHeight: modalHeight,
+      margin: props.margin,
+    },
+  })
 
-  // 边界检查 - 限制在内容区域内（考虑边距）
-  const windowWidth = window.innerWidth
-  const windowHeight = window.innerHeight
-  const modalWidth = modalRef.value?.offsetWidth || 0
-  const modalHeight = modalRef.value?.offsetHeight || 0
-
-  // 内容区域边界
-  const maxLeft = windowWidth - props.margin - modalWidth
-  const maxTop = windowHeight - props.margin - modalHeight
-  const minLeft = props.margin
-  const minTop = props.margin
-
-  // 限制在内容区域内
-  newLeft = Math.max(minLeft, Math.min(newLeft, maxLeft))
-  newTop = Math.max(minTop, Math.min(newTop, maxTop))
   currentLeft.value = newLeft
   currentTop.value = newTop
   currentRight.value = undefined
@@ -425,8 +404,10 @@ function startResize(e: MouseEvent, direction: string) {
   isResizing.value = true
   const rect = modalRef.value.getBoundingClientRect()
 
+  const resizeDirection = direction as ResizeDirection
+
   resizeState.value = {
-    direction,
+    direction: resizeDirection,
     startX: e.clientX,
     startY: e.clientY,
     startWidth: rect.width,
@@ -440,7 +421,7 @@ function startResize(e: MouseEvent, direction: string) {
 
   document.addEventListener('mousemove', onResize)
   document.addEventListener('mouseup', stopResize)
-  document.body.style.cursor = getCursorByDirection(direction)
+  document.body.style.cursor = getCursorByDirection(resizeDirection)
   document.body.style.userSelect = 'none'
 }
 
@@ -448,107 +429,22 @@ function onResize(e: MouseEvent) {
   if (!isResizing.value || !modalRef.value)
     return
 
-  const deltaX = e.clientX - resizeState.value.startX
-  const deltaY = e.clientY - resizeState.value.startY
-  const direction = resizeState.value.direction
-
-  let newWidth = resizeState.value.startWidth
-  let newHeight = resizeState.value.startHeight
-  let newLeft = resizeState.value.startLeft
-  let newTop = resizeState.value.startTop
-
-  const windowWidth = window.innerWidth
-  const windowHeight = window.innerHeight
-
-  // 根据方向调整大小和位置
-  switch (direction) {
-    case 'n':
-      newHeight = resizeState.value.startHeight - deltaY
-      newTop = resizeState.value.startTop + deltaY
-      break
-    case 's':
-      newHeight = resizeState.value.startHeight + deltaY
-      break
-    case 'w':
-      newWidth = resizeState.value.startWidth - deltaX
-      newLeft = resizeState.value.startLeft + deltaX
-      break
-    case 'e':
-      newWidth = resizeState.value.startWidth + deltaX
-      break
-    case 'nw':
-      newWidth = resizeState.value.startWidth - deltaX
-      newHeight = resizeState.value.startHeight - deltaY
-      newLeft = resizeState.value.startLeft + deltaX
-      newTop = resizeState.value.startTop + deltaY
-      break
-    case 'ne':
-      newWidth = resizeState.value.startWidth + deltaX
-      newHeight = resizeState.value.startHeight - deltaY
-      newTop = resizeState.value.startTop + deltaY
-      break
-    case 'sw':
-      newWidth = resizeState.value.startWidth - deltaX
-      newHeight = resizeState.value.startHeight + deltaY
-      newLeft = resizeState.value.startLeft + deltaX
-      break
-    case 'se':
-      newWidth = resizeState.value.startWidth + deltaX
-      newHeight = resizeState.value.startHeight + deltaY
-      break
-  }
-
-  // 计算最大可用尺寸（容器减去边距）
-  const maxAvailableWidth = windowWidth - props.margin * 2
-  const maxAvailableHeight = windowHeight - props.margin * 2
-
-  // 应用最小尺寸和最大尺寸限制
-  let finalMaxWidth = maxAvailableWidth
-  let finalMaxHeight = maxAvailableHeight
-
-  // 如果传入了maxWidth/maxHeight，则使用较小的值
-  if (props.maxWidth !== undefined) {
-    finalMaxWidth = Math.min(props.maxWidth, maxAvailableWidth)
-  }
-  if (props.maxHeight !== undefined) {
-    finalMaxHeight = Math.min(props.maxHeight, maxAvailableHeight)
-  }
-
-  newWidth = Math.max(props.minWidth, Math.min(newWidth, finalMaxWidth))
-  newHeight = Math.max(props.minHeight, Math.min(newHeight, finalMaxHeight))
-
-  // 确保不超出视窗边界
-  if (newLeft < props.margin) {
-    if (direction.includes('w')) {
-      newWidth = newWidth - (props.margin - newLeft)
-    }
-    newLeft = props.margin
-  }
-
-  if (newTop < props.margin) {
-    if (direction.includes('n')) {
-      newHeight = newHeight - (props.margin - newTop)
-    }
-    newTop = props.margin
-  }
-
-  if (newLeft + newWidth > windowWidth - props.margin) {
-    if (direction.includes('e')) {
-      newWidth = windowWidth - props.margin - newLeft
-    }
-    else {
-      newLeft = windowWidth - props.margin - newWidth
-    }
-  }
-
-  if (newTop + newHeight > windowHeight - props.margin) {
-    if (direction.includes('s')) {
-      newHeight = windowHeight - props.margin - newTop
-    }
-    else {
-      newTop = windowHeight - props.margin - newHeight
-    }
-  }
+  const { left: newLeft, top: newTop, width: newWidth, height: newHeight } = calculateResizePosition({
+    resizeState: resizeState.value,
+    currentX: e.clientX,
+    currentY: e.clientY,
+    constraints: {
+      windowWidth: window.innerWidth,
+      windowHeight: window.innerHeight,
+      elementWidth: modalRef.value.offsetWidth,
+      elementHeight: modalRef.value.offsetHeight,
+      margin: props.margin,
+      minWidth: props.minWidth,
+      minHeight: props.minHeight,
+      maxWidth: undefined,
+      maxHeight: undefined,
+    },
+  })
 
   currentWidth.value = newWidth
   currentHeight.value = newHeight
@@ -566,41 +462,6 @@ function stopResize() {
 
   // 调整大小结束时保存位置
   savePosition()
-}
-
-// 获取方向对应的光标样式
-function getCursorByDirection(direction: string): string {
-  const cursorMap: Record<string, string> = {
-    n: 'n-resize',
-    s: 's-resize',
-    w: 'w-resize',
-    e: 'e-resize',
-    nw: 'nw-resize',
-    ne: 'ne-resize',
-    sw: 'sw-resize',
-    se: 'se-resize',
-  }
-  return cursorMap[direction] || 'default'
-}
-
-// 工具函数：将百分比或像素值转换为像素
-function parsePositionValue(value: string | number | undefined, total: number): number {
-  if (value === undefined)
-    return 0
-  if (typeof value === 'number')
-    return value
-  if (typeof value === 'string') {
-    const match = value.match(/^(\d+(?:\.\d+)?)%$/)
-    if (match) {
-      return (Number.parseFloat(match[1]) / 100) * total
-    }
-    const pxMatch = value.match(/^(\d+(?:\.\d+)?)px$/)
-    if (pxMatch) {
-      return Number.parseFloat(pxMatch[1])
-    }
-    return Number.parseFloat(value) || 0
-  }
-  return 0
 }
 
 // 工具函数：根据 size 获取对应的宽度
@@ -634,19 +495,20 @@ function initPosition() {
     const windowHeight = window.innerHeight
 
     // 内容区域边界（考虑边距限制）
-    const contentArea = {
-      width: windowWidth - props.margin * 2,
-      height: windowHeight - props.margin * 2,
-      left: props.margin,
-      top: props.margin,
-      right: props.margin,
-      bottom: props.margin,
-    }
+    const contentArea = calculateContentArea({
+      windowWidth,
+      windowHeight,
+      margin: props.margin,
+    })
 
     // 计算宽度：优先使用 width 属性，其次使用 size 属性
     let targetWidth: number
     if (props.width) {
       targetWidth = typeof props.width === 'number' ? props.width : parsePositionValue(props.width, contentArea.width)
+    }
+    else if (props.size === 'fullscreen') {
+      // fullscreen 时直接使用 100% 宽度（内容区域宽度）
+      targetWidth = contentArea.width
     }
     else {
       targetWidth = getSizeWidth(props.size)
@@ -657,11 +519,15 @@ function initPosition() {
     if (props.height) {
       targetHeight = typeof props.height === 'number' ? props.height : parsePositionValue(props.height, contentArea.height)
     }
+    else if (props.size === 'fullscreen') {
+      // fullscreen 时直接使用 100% 高度（内容区域高度）
+      targetHeight = contentArea.height
+    }
     else {
       targetHeight = 200 // 默认高度
     }
 
-    // 确保尺寸在内容区域内
+    // 确保尺寸在内容区域内（fullscreen 已经等于 contentArea，所以这里主要是限制其他尺寸）
     targetWidth = Math.max(props.minWidth, Math.min(targetWidth, contentArea.width))
     targetHeight = Math.max(props.minHeight, Math.min(targetHeight, contentArea.height))
 
@@ -671,40 +537,49 @@ function initPosition() {
     let targetRight: number
     let targetBottom: number
 
-    const left = props.left
-    const right = props.right
-    const top = props.top
-    const bottom = props.bottom
-
-    // 如果传入了 left，解析并限制在内容区域内
-    if (left !== undefined && right === undefined) {
-      const requestedLeft = typeof left === 'number' ? left : parsePositionValue(left, windowWidth)
-      // 限制在内容区域内：确保不会超出右边界
-      targetLeft = Math.max(contentArea.left, Math.min(requestedLeft, contentArea.left + contentArea.width - targetWidth))
-    }
-    else if (right !== undefined && left === undefined) {
-      const requestedRight = typeof right === 'number' ? right : parsePositionValue(right, windowWidth)
-      targetRight = Math.max(contentArea.right, Math.min(requestedRight, contentArea.right + contentArea.width - targetWidth))
+    // fullscreen 时直接贴边（考虑 margin）
+    if (props.size === 'fullscreen') {
+      targetLeft = contentArea.left
+      targetTop = contentArea.top
+      targetRight = undefined
+      targetBottom = undefined
     }
     else {
-      // 默认居中在内容区域内
-      targetLeft = contentArea.left + (contentArea.width - targetWidth) / 2
-    }
+      const left = props.left
+      const right = props.right
+      const top = props.top
+      const bottom = props.bottom
 
-    // 如果传入了 top，解析并限制在内容区域内
-    if (top !== undefined && bottom === undefined) {
-      const requestedTop = typeof top === 'number' ? top : parsePositionValue(top, windowHeight)
-      // 限制在内容区域内：确保不会超出下边界
-      targetTop = Math.max(contentArea.top, Math.min(requestedTop, contentArea.top + contentArea.height - targetHeight))
-    }
-    else if (bottom !== undefined && top === undefined) {
-      const requestedBottom = typeof bottom === 'number' ? bottom : parsePositionValue(bottom, windowHeight)
-      // 限制在内容区域内：确保不会超出下边界
-      targetBottom = Math.max(contentArea.bottom, Math.min(requestedBottom, contentArea.bottom + contentArea.height - targetHeight))
-    }
-    else {
-      // 默认居中在内容区域内
-      targetTop = contentArea.top + (contentArea.height - targetHeight) / 2
+      // 如果传入了 left，解析并限制在内容区域内
+      if (left !== undefined && right === undefined) {
+        const requestedLeft = typeof left === 'number' ? left : parsePositionValue(left, windowWidth)
+        // 限制在内容区域内：确保不会超出右边界
+        targetLeft = Math.max(contentArea.left, Math.min(requestedLeft, contentArea.left + contentArea.width - targetWidth))
+      }
+      else if (right !== undefined && left === undefined) {
+        const requestedRight = typeof right === 'number' ? right : parsePositionValue(right, windowWidth)
+        targetRight = Math.max(contentArea.right, Math.min(requestedRight, contentArea.right + contentArea.width - targetWidth))
+      }
+      else {
+        // 默认居中在内容区域内
+        targetLeft = contentArea.left + (contentArea.width - targetWidth) / 2
+      }
+
+      // 如果传入了 top，解析并限制在内容区域内
+      if (top !== undefined && bottom === undefined) {
+        const requestedTop = typeof top === 'number' ? top : parsePositionValue(top, windowHeight)
+        // 限制在内容区域内：确保不会超出下边界
+        targetTop = Math.max(contentArea.top, Math.min(requestedTop, contentArea.top + contentArea.height - targetHeight))
+      }
+      else if (bottom !== undefined && top === undefined) {
+        const requestedBottom = typeof bottom === 'number' ? bottom : parsePositionValue(bottom, windowHeight)
+        // 限制在内容区域内：确保不会超出下边界
+        targetBottom = Math.max(contentArea.bottom, Math.min(requestedBottom, contentArea.bottom + contentArea.height - targetHeight))
+      }
+      else {
+        // 默认居中在内容区域内
+        targetTop = contentArea.top + (contentArea.height - targetHeight) / 2
+      }
     }
 
     currentLeft.value = targetLeft
@@ -761,16 +636,11 @@ const overlayStyle = computed(() => {
 })
 
 function clearPosition() {
-  try {
-    localStorage.removeItem(getStorageKey())
-    // 重置为默认居中位置
-    nextTick(() => {
-      initPosition()
-    })
-  }
-  catch (error) {
-    console.warn('Failed to clear modal position from localStorage:', error)
-  }
+  clearPositionFromStorage(getStorageKey())
+  // 重置为默认居中位置
+  nextTick(() => {
+    initPosition()
+  })
 }
 defineExpose({
   clearPosition,

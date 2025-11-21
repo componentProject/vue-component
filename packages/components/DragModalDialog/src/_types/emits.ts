@@ -8,7 +8,9 @@ export interface emitsType {
   (e: 'update:width', width: string | number): void
   (e: 'update:height', height: string | number): void
   (e: 'open'): void
+  (e: 'opened'): void
   (e: 'close'): void
+  (e: 'closed'): void
   (e: 'confirm'): void
   (e: 'cancel'): void
   (e: 'beforeClose', done: () => void): void
