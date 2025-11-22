@@ -11,7 +11,6 @@
 | baseURL         | 服务地址      | String   | ‘必填’ |                                                                                                                                             |
 | timeout         | 网关超时时间    | Number   | 否    | 5000                                                                                                                                        |
 | getToken        | 获取token函数 | Function | 否    | () => null                                                                                                                                  |
-| responseHandler | 自定义响应处理器  | Function | 否    | () => null                                                                                                                                  | 
 | responseFields  | 响应字段配置    | Object   | 否    | ^[Object]`{code: 'Code', // 状态码字段名 message: 'Message',// 消息字段名 data: 'data',// 数据字段名  errors:'errors',// 错误数组字段名 tips: 'tipss' // 提示信息字段名}` |
 
 ### 使用示例

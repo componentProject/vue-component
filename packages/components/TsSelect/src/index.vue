@@ -127,18 +127,36 @@ const computedFilterMethod = computed(() => {
   return props.filterMethod || defaultFilterMethod
 })
 
+/**
+ * 默认过滤方法
+ * @param keywordStr - 关键词字符串
+ */
 function defaultFilterMethod(keywordStr: string) {
   keyword.value = keywordStr
 }
 
+/**
+ * 默认禁用处理函数
+ * @param label - 标签文本
+ * @param value - 标签值
+ * @returns 是否禁用
+ */
 function defaultDisabledHandler({ label, value }: { [label: string]: any }) {
   return props.disabledValues.includes(value) || props.disabledLabels.includes(label)
 }
 
+/**
+ * 处理选择变化事件
+ * @param value - 选中的值
+ */
 function handleSelectChange(value: any) {
   emits('change', value)
 }
 
+/**
+ * 处理下拉框显示/隐藏变化事件
+ * @param visible - 是否可见
+ */
 function handleVisibleChange(visible: boolean) {
   isDropdownVisible.value = visible
 
@@ -156,6 +174,9 @@ function handleVisibleChange(visible: boolean) {
   }
 }
 
+/**
+ * 设置 IntersectionObserver 监听加载更多触发器
+ */
 function setupIntersectionObserver() {
   if (!loadMoreTrigger.value || !props.hasMore || props.loading || hasTriggeredLoadMore.value) {
     return
@@ -227,6 +248,9 @@ function setupIntersectionObserver() {
   })
 }
 
+/**
+ * 清理 IntersectionObserver
+ */
 function cleanupObserver() {
   if (observer.value) {
     observer.value.disconnect()
@@ -234,10 +258,16 @@ function cleanupObserver() {
   }
 }
 
+/**
+ * 计算禁用处理函数
+ */
 const computedDisabledHandler = computed(() => {
   return props.disabledHandler || defaultDisabledHandler
 })
 
+/**
+ * 组件卸载时清理观察器
+ */
 onUnmounted(() => {
   cleanupObserver()
 })

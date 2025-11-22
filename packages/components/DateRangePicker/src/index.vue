@@ -110,7 +110,11 @@ const computedFormat = computed(() => {
  */
 const datePicker = useTemplateRef<typeof ElDatePicker>('datePicker')
 
-// 禁用日期函数
+/**
+ * 禁用日期函数，根据最小和最大日期限制禁用不可选日期
+ * @param date - 要检查的日期
+ * @returns 是否禁用该日期
+ */
 function disabledDateFn(date: any) {
   const time = moment(date).format('YYYY-MM-DD')
   // 优先使用disabledDateRange
@@ -127,7 +131,11 @@ type DisabledTypes = any | 'start' | 'end'
 type restParams = Array<any | DisabledTypes>
 const hours = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]
 
-// 禁用日期函数
+/**
+ * 禁用小时函数，根据日期范围限制禁用不可选的小时
+ * @param type - 类型，'start' 或 'end'
+ * @returns 禁用的小时数组
+ */
 function disabledHoursFn(type: DisabledTypes) {
   if (!props.datetimeDisableTypes.includes('hours'))
     return []
@@ -229,7 +237,12 @@ const minutesOrSeconds = [
   59,
 ]
 
-// 禁用日期函数
+/**
+ * 禁用分钟函数，根据日期范围限制禁用不可选的分钟
+ * @param _ - 当前小时（未使用）
+ * @param type - 类型，'start' 或 'end'
+ * @returns 禁用的分钟数组
+ */
 function disabledMinutesFn(_: number, type: DisabledTypes) {
   if (!props.datetimeDisableTypes.includes('minutes'))
     return []
@@ -267,7 +280,11 @@ function disabledMinutesFn(_: number, type: DisabledTypes) {
   return []
 }
 
-// 禁用日期函数
+/**
+ * 禁用秒数函数，根据日期范围限制禁用不可选的秒数
+ * @param rest - 剩余参数，第三个参数为类型 'start' 或 'end'
+ * @returns 禁用的秒数数组
+ */
 function disabledSecondsFn(...rest: restParams) {
   if (!props.datetimeDisableTypes.includes('seconds'))
     return []
@@ -306,7 +323,9 @@ function disabledSecondsFn(...rest: restParams) {
   return []
 }
 
-// 根据dateRange生成初始日期范围
+/**
+ * 根据 dateRange 配置生成初始日期范围
+ */
 function generateDateRangeByConfig() {
   if (props.dateRange !== null) {
     const baseDate = props.dateRangeBaseDate ? moment(props.dateRangeBaseDate) : moment()
@@ -381,7 +400,10 @@ const computedShortcuts = computed(() => {
  */
 const singleDateTypes: string[] = ['date', 'datetime']
 
-// 处理日期变化事件
+/**
+ * 处理日期变化事件
+ * @param val - 选中的日期值
+ */
 function handleDateChange(val: any) {
   const formattedDates = formatDateRange(
     Array.isArray(val) ? val : [val, val],
@@ -392,6 +414,11 @@ function handleDateChange(val: any) {
   emit('change', singleDateTypes.includes(props.type) ? formattedDates[0] : formattedDates)
 }
 
+/**
+ * 获取本地日期值，将外部日期格式转换为组件内部使用的格式
+ * @param date - 日期值
+ * @returns 转换后的日期值
+ */
 function getLocalDateValue(date: DateType | DateType[]) {
   return singleDateTypes.includes(props.type) ? (Array.isArray(date) ? date[0] : date) : date
 }

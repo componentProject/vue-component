@@ -1,15 +1,31 @@
-// DragModalDialog的props组件
 import type { Component } from 'vue'
 
+/**
+ * 按钮类型
+ */
 type ButtonType = 'confirm' | 'cancel'
+
+/**
+ * 按钮配置项
+ */
 export interface ButtonsItem {
+  /** 按钮类型 */
   type?: ButtonType
+  /** 按钮插槽或渲染函数 */
   slot?: string | ((...args: any[]) => any)
+  /** 按钮图标 */
   icon?: Component | string
+  /** 按钮点击事件 */
   event?: (data?: any, node?: any) => void
+  /** 按钮提示信息 */
   tooltip?: string
 }
+
+/**
+ * 样式函数类型
+ */
 type styleFn = () => StyleSheet
+
 /**
  * DragModalDialog 组件的 Props 类型定义
  */

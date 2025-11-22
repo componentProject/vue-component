@@ -91,15 +91,27 @@ const { options: serverOrLocalOptions } = useOptions(props)
 
 // 直接使用 serverOrLocalOptions
 
+/**
+ * 默认禁用处理函数
+ * @param label - 标签文本
+ * @param value - 标签值
+ * @returns 是否禁用
+ */
 function defaultDisabledHandler({ label, value }: { [label: string]: any }) {
-  console.log('aaaaaaaa', props.disabledValues.includes(value), props.disabledLabels.includes(label))
   return props.disabledValues.includes(value) || props.disabledLabels.includes(label)
 }
 
+/**
+ * 处理复选框变化事件
+ * @param value - 选中的值数组
+ */
 function handleCheckboxChange(value: any) {
   emits('change', value)
 }
 
+/**
+ * 计算禁用处理函数
+ */
 const computedDisabledHandler = computed(() => {
   return props.disabledHandler || defaultDisabledHandler
 })

@@ -1,24 +1,14 @@
 // AjaxPackage 工具包入口文件
 // 基础功能导出
-import { baseAxios, createAxiosInstance, defaultAxiosInstance } from './axios.js'
 import BaseApi from './class.ts'
-import { http, HttpRequest } from './http.js'
-import VueAxiosPlugin, { createHttpService, getHttpService } from './netseriver.js'
+import VueAxiosPlugin, { createHttpService, getHttpService } from './netseriver'
 
 // 导出所有功能
 export {
   BaseApi,
-  baseAxios,
-  // axios相关
-  createAxiosInstance,
-
   // 服务创建和插件
   createHttpService,
-  defaultAxiosInstance,
   getHttpService,
-  http,
-  // http请求类
-  HttpRequest,
   VueAxiosPlugin,
 }
 

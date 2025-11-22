@@ -39,16 +39,25 @@ const emit = defineEmits<emitsType>()
 
 // 获取插槽
 const slots = defineSlots<slotsType>()
-// 计算按钮是否禁用
+/**
+ * 计算按钮是否禁用
+ */
 const isDisabled = computed(() => {
   return !props.allowEmptyExport && (!props.tableData || props.tableData.length === 0)
 })
+
+/**
+ * 计算要导出的列
+ */
 const computedColumn = computed(() => {
   const columns = getTypeDefault(props.columns, 'array')
   const fieldKeys = getTypeDefault(props.fields, 'array')
   return columns.filter(col => fieldKeys.some(k => col && col[k] !== undefined && col[k] !== ''))
 })
 
+/**
+ * 计算表头
+ */
 const computedHeader = computed(() => {
   const titleKeys = getTypeDefault(props.titles, 'array')
   return computedColumn.value.map((col) => {
@@ -60,6 +69,10 @@ const computedHeader = computed(() => {
     return ''
   })
 })
+
+/**
+ * 计算数据字段键
+ */
 const computedKeys = computed(() => {
   const fieldKeys = getTypeDefault(props.fields, 'array')
   return computedColumn.value.map((col) => {
@@ -109,10 +122,10 @@ function handleExport() {
 }
 
 /**
- * 格式化数据
- * @param {Array} dataSource 数据源
- * @param {Array} keys 表格列的key
- * @returns {Array} 格式化后的数据
+ * 格式化数据，支持嵌套属性和列级格式化函数
+ * @param dataSource - 数据源
+ * @param keys - 表格列的 key
+ * @returns 格式化后的数据
  */
 function formatData(dataSource, keys) {
   return dataSource.map((item, rowIndex) => {
@@ -144,11 +157,11 @@ function formatData(dataSource, keys) {
 }
 
 /**
- * 导出Excel
- * @param {Array} data 导出数据
- * @param {Array} header 表头
- * @param {string} fileName 文件名
- * @param {Array} keys 可选，列key，用于空数据导出
+ * 导出 Excel 文件
+ * @param data - 导出数据
+ * @param header - 表头数组
+ * @param fileName - 文件名
+ * @param keys - 可选，列 key，用于空数据导出
  */
 function exportExcel(data, header, fileName, keys = null) {
   // 创建工作簿
@@ -243,9 +256,9 @@ function exportExcel(data, header, fileName, keys = null) {
 }
 
 /**
- * 计算单元格宽度
- * @param {string} cellValue 单元格内容
- * @returns {number} 宽度值
+ * 计算单元格宽度，中文字符宽度为 2，英文字符宽度为 1
+ * @param cellValue - 单元格内容
+ * @returns 宽度值
  */
 function calculateCellWidth(cellValue) {
   if (!cellValue)

@@ -123,6 +123,9 @@ const height = ref()
 const treeContainer = useTemplateRef('treeContainer')
 let resizeObserver: ResizeObserver | null = null
 
+/**
+ * 更新树组件高度
+ */
 function updateHeight() {
   nextTick(() => {
     if (treeContainer.value) {
@@ -131,6 +134,9 @@ function updateHeight() {
   })
 }
 
+/**
+ * 组件挂载时设置高度监听
+ */
 onMounted(() => {
   updateHeight()
 
@@ -143,6 +149,9 @@ onMounted(() => {
   }
 })
 
+/**
+ * 组件卸载时清理 ResizeObserver
+ */
 onUnmounted(() => {
   if (resizeObserver) {
     resizeObserver.disconnect()
@@ -151,11 +160,21 @@ onUnmounted(() => {
 })
 //#endregion
 
+/**
+ * 判断节点是否为叶子节点
+ * @param nodeData - 节点数据
+ * @returns 是否为叶子节点
+ */
 function isLeaf(nodeData: Record<string, any>) {
   const list = nodeData?.[props.childrenField] as any[] | undefined
   return !list || list.length === 0
 }
 
+/**
+ * 获取树节点样式类
+ * @param data - 节点数据
+ * @returns 样式类对象
+ */
 function treeClass(data: TreeNodeData) {
   return {
     'is-cascade-highlight': isHighlighted(data),
@@ -163,6 +182,11 @@ function treeClass(data: TreeNodeData) {
   }
 }
 
+/**
+ * 获取节点按钮配置
+ * @param nodeData - 节点数据
+ * @returns 按钮配置数组
+ */
 function getButtons(nodeData: Record<string, any>): ButtonsItem[] {
   return props.buttons ? props.buttons(nodeData) || [] : []
 }
@@ -190,6 +214,12 @@ const idMaps = computed(() => {
   traverse(treeData.value || [], null)
   return { idToNodeMap, idToParentIdMap }
 })
+/**
+ * 判断左侧连接线是否显示
+ * @param item - 层级索引
+ * @param node - 树节点
+ * @returns 是否显示左侧连接线
+ */
 function leftLineShow(item: number, node: TreeNode & { parent: any }) {
   if (item === 1) {
     return node.parent[props.childrenField].findIndex(i => i === node) < node.parent[props.childrenField].length - 1
@@ -199,6 +229,9 @@ function leftLineShow(item: number, node: TreeNode & { parent: any }) {
   }
 }
 
+/**
+ * 清除树当前选中节点
+ */
 function clearTreeCurrent() {
   const inst: any = treeRef.value
   if (!inst)
@@ -206,7 +239,9 @@ function clearTreeCurrent() {
   inst.setCurrentKey(null)
 }
 
-// 将扁平数据转换为树
+/**
+ * 将扁平数据转换为树形结构
+ */
 const treeData = computed<any[]>(() => {
   const data = (props.data || []) as any[]
   // 当传入 rowField 和 parentField 时，覆盖 childrenField 行为
@@ -217,6 +252,14 @@ const treeData = computed<any[]>(() => {
   return data
 })
 
+/**
+ * 构建树形结构
+ * @param list - 扁平数据列表
+ * @param rowKey - 行键字段名
+ * @param parentKey - 父级键字段名
+ * @param childrenKey - 子级键字段名
+ * @returns 树形数据
+ */
 function buildTree(list: any[], rowKey: string, parentKey: string, childrenKey: string) {
   const idToNodeMap = new Map<any, any>()
   const roots: any[] = []
@@ -240,6 +283,11 @@ function buildTree(list: any[], rowKey: string, parentKey: string, childrenKey: 
   return roots
 }
 
+/**
+ * 解析按钮图标
+ * @param btn - 按钮配置项
+ * @returns 图标组件或字符串
+ */
 function resolveButtonIcon(btn: ButtonsItem): VueComponent | string | undefined {
   if (btn.slot)
     return undefined
@@ -247,7 +295,6 @@ function resolveButtonIcon(btn: ButtonsItem): VueComponent | string | undefined 
     return btn.icon
   switch (btn.btnType) {
     case 'add':
-      console.log('add', Plus)
       return Plus
     case 'edit':
       return Edit
@@ -258,6 +305,12 @@ function resolveButtonIcon(btn: ButtonsItem): VueComponent | string | undefined 
   }
 }
 
+/**
+ * 处理行点击事件
+ * @param data - 节点数据
+ * @param node - 树节点
+ * @param e - 鼠标事件
+ */
 function onRowClick(data: TreeNodeData, node: TreeNode, e: MouseEvent) {
   // 级联选择逻辑
   if (props.levelSelect) {
@@ -275,6 +328,11 @@ function onRowClick(data: TreeNodeData, node: TreeNode, e: MouseEvent) {
   emit('nodeClick', data, node, e)
 }
 
+/**
+ * 获取所有后代节点 ID
+ * @param id - 节点 ID
+ * @returns 后代节点 ID 数组
+ */
 function getDescendantIds(id: any): any[] {
   const result: any[] = []
   const { idToNodeMap } = idMaps.value
@@ -298,11 +356,22 @@ function getDescendantIds(id: any): any[] {
 }
 //#region 级联高亮
 const highlightedKeySet = ref<Set<any>>(new Set())
+
+/**
+ * 判断节点是否被高亮
+ * @param row - 节点数据
+ * @returns 是否被高亮
+ */
 function isHighlighted(row: any) {
   const idKey = props.rowField
   return highlightedKeySet.value.has((row as any)?.[idKey])
 }
 
+/**
+ * 判断是否有祖先节点被高亮
+ * @param id - 节点 ID
+ * @returns 是否有祖先节点被高亮
+ */
 function hasAncestorHighlighted(id: any): boolean {
   const { idToParentIdMap } = idMaps.value
   let pid = idToParentIdMap.get(id)
@@ -314,6 +383,9 @@ function hasAncestorHighlighted(id: any): boolean {
   return false
 }
 
+/**
+ * 触发变化事件，发送所有高亮的节点数据
+ */
 function emitChange() {
   const { idToNodeMap } = idMaps.value
   const rows: any[] = []
@@ -324,6 +396,10 @@ function emitChange() {
   })
   emit('change', rows)
 }
+/**
+ * 切换级联选择状态
+ * @param data - 节点数据
+ */
 function toggleLevelSelect(data: TreeNodeData) {
   const id = (data as any)?.[props.rowField]
   const already = highlightedKeySet.value.has(id)
@@ -348,6 +424,11 @@ function toggleLevelSelect(data: TreeNodeData) {
 //#endregion
 
 //#region 跨级选择
+/**
+ * 获取节点及其所有子孙节点的键
+ * @param data - 节点数据
+ * @returns 节点键数组
+ */
 function getNodeKeys(data?: TreeNodeData) {
   if (!data) {
     return new Set<any>(treeData.value.reduce((p, item) => p.concat([item[props.rowField], ...getDescendantIds(item[props.rowField])]), []))
@@ -356,6 +437,11 @@ function getNodeKeys(data?: TreeNodeData) {
     return new Set<any>([data[props.rowField], ...getDescendantIds(data[props.rowField])])
   }
 }
+/**
+ * 切换节点展开/收起状态
+ * @param data - 节点数据
+ * @param node - 树节点
+ */
 function toggleExpand(data?: TreeNodeData, node?: TreeNode) {
   const nodeKeys = getNodeKeys(data)
   let expanded

@@ -34,7 +34,10 @@ const elementToObserve = computed(() => {
     : containerRef.value
 })
 
-// 获取容器内所有input和select元素，并为它们添加事件监听器
+/**
+ * 收集容器内所有 input 和 select 元素，并为它们添加事件监听器
+ * @param type - 收集类型，'mounted' 表示组件挂载时调用
+ */
 function collectInputElements(type: string = '') {
   const container = elementToObserve.value
   if (!container)
@@ -77,7 +80,13 @@ function collectInputElements(type: string = '') {
   })
 }
 
-// 检查属性是否存在且值为空
+/**
+ * 检查元素属性是否存在且值匹配
+ * @param element - 要检查的元素
+ * @param attributeName - 属性名
+ * @param value - 期望的属性值，如果未提供则只检查属性是否存在
+ * @returns 属性是否存在且值匹配
+ */
 function attributeExistsWithNoValue(element: HTMLElement, attributeName: string, value?: any) {
   const hasAttribute = element.hasAttribute(attributeName)
   if (!hasAttribute)
@@ -87,7 +96,10 @@ function attributeExistsWithNoValue(element: HTMLElement, attributeName: string,
   return !!element.getAttribute(attributeName)
 }
 
-// 处理input元素的keyup事件
+/**
+ * 处理 input 元素的 keyup 事件，实现按 Enter 键自动跳转到下一个输入框
+ * @param event - 键盘事件
+ */
 function handleInputKeyUp(event: KeyboardEvent) {
   // 只处理Enter键
   if (event.key !== 'Enter')
@@ -144,7 +156,10 @@ function handleInputKeyUp(event: KeyboardEvent) {
   }
 }
 
-// 设置MutationObserver监听DOM变化
+/**
+ * 设置 MutationObserver 监听 DOM 变化，自动更新输入元素列表
+ * @returns 清理函数
+ */
 function setupMutationObserver() {
   if (!elementToObserve.value)
     return
@@ -162,7 +177,9 @@ function setupMutationObserver() {
   return () => observer.disconnect()
 }
 
-// 监听virtualRef的变化
+/**
+ * 监听 virtualRef 的变化
+ */
 watch(
   () => props.virtualRef,
   () => {
@@ -170,7 +187,9 @@ watch(
   },
 )
 
-// 监听elementToObserve的变化
+/**
+ * 监听 elementToObserve 的变化
+ */
 watch(
   () => elementToObserve.value,
   () => {
@@ -180,6 +199,10 @@ watch(
 
 let cleanup: (() => void) | undefined
 const divObserver = ref()
+
+/**
+ * 设置 IntersectionObserver 监听元素进入视口
+ */
 function setupDivObserver() {
   divObserver.value = new IntersectionObserver((entries) => {
     entries.forEach((entry) => {
@@ -195,14 +218,24 @@ function setupDivObserver() {
   })
   divObserver.value.observe(elementToObserve.value)
 }
+/**
+ * 清除 IntersectionObserver
+ */
 function clearDivObserver() {
   divObserver.value.disconnect()
 }
+
+/**
+ * 组件挂载时设置观察器
+ */
 onMounted(() => {
   setupDivObserver()
   cleanup = setupMutationObserver()
 })
 
+/**
+ * 组件卸载时清理所有监听器
+ */
 onUnmounted(() => {
   // 移除所有事件监听器
   inputElements.value.forEach((el) => {

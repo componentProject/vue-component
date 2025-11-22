@@ -40,7 +40,11 @@ const slots = defineSlots<slotsType>()
 
 const fileInputRef = useTemplateRef('fileInputRef')
 
-// 规范化字符串或字符串数组为数组
+/**
+ * 规范化字符串或字符串数组为数组
+ * @param val - 要规范化的值
+ * @returns 规范化后的数组
+ */
 function toArray(val) {
   if (Array.isArray(val))
     return val.filter(v => v != null).map(v => String(v).trim())
@@ -49,7 +53,12 @@ function toArray(val) {
   return [String(val).trim()]
 }
 
-// 从对象中按优先级获取第一个非空值
+/**
+ * 从对象中按优先级获取第一个非空值
+ * @param obj - 对象
+ * @param keys - 键名或键名数组
+ * @returns 第一个非空值
+ */
 function getValueByKeys(obj, keys) {
   const keyList = Array.isArray(keys) ? keys : [keys]
   for (const key of keyList) {
@@ -60,7 +69,13 @@ function getValueByKeys(obj, keys) {
   return undefined
 }
 
-// 生成 [header, key] 映射对，支持 headers/keys 为字符串或字符串数组
+/**
+ * 生成 [header, key] 映射对，支持 headers/keys 为字符串或字符串数组
+ * @param columnsList - 列配置列表
+ * @param titleKeys - 标题键名数组
+ * @param fieldKeys - 字段键名数组
+ * @returns 映射对数组
+ */
 function buildPairsFromColumns(columnsList, titleKeys, fieldKeys) {
   const pairs = []
   columnsList.forEach((col) => {
@@ -100,6 +115,9 @@ const headerToKeyMap = computed(() => {
   return map
 })
 
+/**
+ * 触发文件选择
+ */
 function triggerSelect() {
   if (!fileInputRef.value)
     return
@@ -107,6 +125,10 @@ function triggerSelect() {
   fileInputRef.value.click()
 }
 
+/**
+ * 处理文件选择变化事件
+ * @param e - 文件输入事件
+ */
 function handleFileChange(e) {
   const file = e?.target?.files?.[0]
   if (!file)

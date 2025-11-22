@@ -73,6 +73,11 @@ const computedStyle = computed<CSSStyleDeclaration>(() => {
   }
 })
 
+/**
+ * 获取文本样式
+ * @param item - 规格化的项目对象
+ * @returns 文本样式对象
+ */
 function textStyle(item: NormalizedItem): CSSStyleDeclaration {
   const customStyle = props.textStyle?.(item) || {}
   return {

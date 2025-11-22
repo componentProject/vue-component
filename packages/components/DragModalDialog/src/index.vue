@@ -170,7 +170,9 @@ const emit = defineEmits<emitsType>()
 
 const renderModal = ref(false)
 
-// 监听 visible 变化，控制渲染
+/**
+ * 监听 visible 变化，控制渲染
+ */
 watch(() => props.visible, (newVal: any) => {
   if (newVal) {
     renderModal.value = true
@@ -181,7 +183,9 @@ watch(() => props.visible, (newVal: any) => {
   }
 }, { immediate: true })
 
-// 处理动画完成后的销毁
+/**
+ * 处理动画完成后的销毁
+ */
 function handleAfterLeave() {
   if (props.destroyOnClose) {
     renderModal.value = false
@@ -214,7 +218,10 @@ const currentHeight = ref(0)
 
 const interactionEndTime = ref(0)
 
-// 修改 handleOverlayClick 函数
+/**
+ * 处理遮罩层点击事件
+ * 如果正在拖拽或调整大小，或刚刚结束交互，不关闭弹窗
+ */
 function handleOverlayClick() {
   // 如果正在拖拽或调整大小，不关闭弹窗
   if (isDragging.value || isResizing.value) {
@@ -231,13 +238,18 @@ function handleOverlayClick() {
   }
 }
 
-// 生成存储键名
+/**
+ * 生成存储键名，用于 localStorage
+ * @returns 存储键名
+ */
 function getStorageKey(): string {
   const key = props.positionKey || `modal-position-${props.title || 'default'}`
   return `modal-dialog-${key}`
 }
 
-// 保存位置到localStorage
+/**
+ * 保存位置到 localStorage
+ */
 function savePosition() {
   if (!props.rememberPosition)
     return
@@ -256,7 +268,10 @@ function savePosition() {
   })
 }
 
-// 从localStorage读取位置
+/**
+ * 从 localStorage 读取位置
+ * @returns 保存的位置数据，如果不存在则返回 null
+ */
 function loadPosition(): PositionData | null {
   if (!props.rememberPosition)
     return null
@@ -270,7 +285,9 @@ function loadPosition(): PositionData | null {
   })
 }
 
-// 响应式样式
+/**
+ * 计算弹窗样式
+ */
 const modalStyle = computed(() => {
   const style: Record<string, any> = {
     zIndex: props.zIndex,
@@ -316,22 +333,33 @@ const modalStyle = computed(() => {
   // return style
 })
 
-// 事件处理
+/**
+ * 处理关闭事件
+ */
 function handleClose() {
   emit('update:visible', false)
   emit('close')
 }
 
+/**
+ * 处理取消事件
+ */
 function handleCancel() {
   emit('cancel')
   handleClose()
 }
 
+/**
+ * 处理确认事件
+ */
 function handleConfirm() {
   emit('confirm')
 }
 
-// 拖拽功能
+/**
+ * 开始拖拽
+ * @param e - 鼠标事件
+ */
 function startDrag(e: MouseEvent) {
   if (!props.draggable || !modalRef.value)
     return
@@ -355,6 +383,10 @@ function startDrag(e: MouseEvent) {
   document.body.style.userSelect = 'none'
 }
 
+/**
+ * 拖拽过程中处理鼠标移动
+ * @param e - 鼠标事件
+ */
 function onDrag(e: MouseEvent) {
   if (!isDragging.value || !modalRef.value)
     return
@@ -384,6 +416,9 @@ function onDrag(e: MouseEvent) {
   emit('update:left', newLeft)
 }
 
+/**
+ * 停止拖拽
+ */
 function stopDrag() {
   isDragging.value = false
   interactionEndTime.value = Date.now()
@@ -396,7 +431,11 @@ function stopDrag() {
   savePosition()
 }
 
-// 8方向调整大小功能
+/**
+ * 开始调整大小
+ * @param e - 鼠标事件
+ * @param direction - 调整方向（nw, ne, sw, se, n, s, w, e）
+ */
 function startResize(e: MouseEvent, direction: string) {
   if (!props.resizable || !modalRef.value)
     return
@@ -425,6 +464,10 @@ function startResize(e: MouseEvent, direction: string) {
   document.body.style.userSelect = 'none'
 }
 
+/**
+ * 调整大小过程中处理鼠标移动
+ * @param e - 鼠标事件
+ */
 function onResize(e: MouseEvent) {
   if (!isResizing.value || !modalRef.value)
     return
@@ -452,6 +495,9 @@ function onResize(e: MouseEvent) {
   currentTop.value = newTop
 }
 
+/**
+ * 停止调整大小
+ */
 function stopResize() {
   isResizing.value = false
   interactionEndTime.value = Date.now()
@@ -464,7 +510,11 @@ function stopResize() {
   savePosition()
 }
 
-// 工具函数：根据 size 获取对应的宽度
+/**
+ * 根据 size 获取对应的宽度
+ * @param size - 尺寸类型
+ * @returns 对应的宽度值
+ */
 function getSizeWidth(size: 'small' | 'medium' | 'large'): number {
   const sizeMap = {
     small: 400,
@@ -474,7 +524,10 @@ function getSizeWidth(size: 'small' | 'medium' | 'large'): number {
   return sizeMap[size] || 520 // 默认为 medium
 }
 
-// 计算初始位置
+/**
+ * 计算并初始化弹窗位置
+ * 优先从 localStorage 加载保存的位置，否则根据配置计算居中位置
+ */
 function initPosition() {
   if (!modalRef.value)
     return
@@ -591,7 +644,9 @@ function initPosition() {
   }
 }
 
-// 监听visible变化
+/**
+ * 监听 visible 变化，初始化位置并触发相应事件
+ */
 watch(() => props.visible, (newVal: any) => {
   if (newVal) {
     emit('open')
@@ -605,7 +660,9 @@ watch(() => props.visible, (newVal: any) => {
   }
 })
 
-// 清理事件监听
+/**
+ * 组件卸载时清理事件监听
+ */
 onUnmounted(() => {
   document.removeEventListener('mousemove', onDrag)
   document.removeEventListener('mouseup', stopDrag)
@@ -613,7 +670,9 @@ onUnmounted(() => {
   document.removeEventListener('mouseup', stopResize)
 })
 
-// 添加遮罩层样式计算
+/**
+ * 计算遮罩层样式
+ */
 const overlayStyle = computed(() => {
   const style: Record<string, any> = {
     zIndex: props.zIndex,
@@ -635,6 +694,9 @@ const overlayStyle = computed(() => {
   return style
 })
 
+/**
+ * 清除保存的位置，重置为默认居中位置
+ */
 function clearPosition() {
   clearPositionFromStorage(getStorageKey())
   // 重置为默认居中位置

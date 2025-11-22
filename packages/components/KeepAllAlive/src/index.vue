@@ -31,11 +31,19 @@ const wrapperMap = new Map()
 const include = ref([])
 const currentRoute = useRoute()
 
+/**
+ * 判断值的类型
+ * @param value - 要判断的值
+ * @param type - 期望的类型
+ * @returns 是否为指定类型
+ */
 function isType(value, type) {
   return Object.prototype.toString.call(value).slice(8, -1).toLowerCase() === type.toLowerCase()
 }
 
-// 监听路由变化
+/**
+ * 监听路由变化，根据配置决定是否缓存路由
+ */
 watch(
   () => currentRoute,
   (currentRoute) => {
@@ -68,7 +76,13 @@ watch(
   { immediate: true, deep: true },
 )
 
-// 为keep-alive里的component接收的组件包上一层自定义name的壳
+/**
+ * 为 keep-alive 里的 component 接收的组件包上一层自定义 name 的壳
+ * 使用完整路径作为组件名，这样不同参数的路由会被视为不同组件
+ * @param fullPath - 路由完整路径
+ * @param component - 组件实例
+ * @returns 包装后的组件
+ */
 function wrap(fullPath, component) {
   let wrapper
   // 使用完整路径(包含参数)作为组件名，这样不同参数的路由会被视为不同组件
@@ -90,7 +104,10 @@ function wrap(fullPath, component) {
   }
 }
 
-// 提供清除特定路由缓存的方法
+/**
+ * 清除特定路由的缓存
+ * @param fullPath - 路由完整路径
+ */
 function clearCache(fullPath) {
   const index = include.value.indexOf(fullPath)
   if (index !== -1) {
@@ -103,7 +120,9 @@ function clearCache(fullPath) {
   }
 }
 
-// 清除所有缓存
+/**
+ * 清除所有路由缓存
+ */
 function clearAllCache() {
   include.value = []
   wrapperMap.clear()

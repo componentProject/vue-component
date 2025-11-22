@@ -99,6 +99,9 @@ const computedVirtualRef = computed<HTMLElement | ComponentPublicInstance
   return props.virtualRef || inputRef.value
 })
 
+/**
+ * 处理输入框获得焦点事件
+ */
 function handleFocus() {
   cacheInputValue.value = currentInputValue.value
   currentInputValue.value = ''
@@ -108,18 +111,30 @@ function handleFocus() {
   }
 }
 
+/**
+ * 处理输入框失去焦点事件
+ */
 function handleBlur() {
   emit('blur')
   currentInputValue.value = cacheInputValue.value
   cacheInputValue.value = ''
 }
 
+/**
+ * 处理回车事件
+ * @param val - 选中的值
+ */
 function handleEnter(val: any) {
   emit('enter', val)
   if (props.successiveShowType === 'enter') {
     popoverModel.value = true
   }
 }
+
+/**
+ * 处理输入事件
+ * @param val - 输入的值
+ */
 function handleInput(val: string) {
   if (props.successiveShowType === 'input') {
     popoverModel.value = true
@@ -129,6 +144,9 @@ function handleInput(val: string) {
   }
 }
 
+/**
+ * 处理清空事件
+ */
 function handleClear() {
   cacheInputValue.value = ''
   currentInputValue.value = ''
@@ -146,6 +164,10 @@ const computedOptions = computed<ThrottleOrDebounceOptions>(() => {
   return { trailing: true, leading: false, ...o }
 })
 
+/**
+ * 处理选择事件
+ * @param row - 选中的行数据
+ */
 function handleSelect(row: any) {
   emit('select', row)
 }
@@ -166,6 +188,10 @@ const computedInput = computed(() => {
   return handleInput
 })
 
+/**
+ * 处理滚动边界事件，触发加载更多
+ * @param obj - 滚动边界对象，包含方向信息
+ */
 function handleScrollBoundary(obj) {
   if (props.enableLoadMore && props.hasMore && obj.direction === 'bottom') {
     emit('loadMore')

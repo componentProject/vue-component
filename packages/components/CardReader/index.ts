@@ -3,4 +3,3 @@ import { withInstall } from '@moluoxixi/utils/_utils'
 import CardReader from './src/index.vue'
 
 export default withInstall(CardReader)
-

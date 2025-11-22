@@ -1,6 +1,6 @@
 # AjaxPackage
 
-统一的 HTTP 服务封装与约定。提供 `getHttpService` 工厂函数、`BaseApi` 类、`HttpRequest` 类以及 Vue 插件等多种使用方式，内置超时、token、响应字段映射、错误处理等能力。
+统一的 HTTP 服务封装与约定。提供 `getHttpService` 工厂函数、`BaseApi` 类以及 Vue 插件等多种使用方式，内置超时、token、响应字段映射、错误处理等能力。
 
 ## 导出
 
@@ -8,20 +8,10 @@
   - 创建 HTTP 服务实例，提供快捷方法
 - 函数：`createHttpService(options: HttpServiceOptions): HttpService`
   - 与 `getHttpService` 功能相同
-- 函数：`createAxiosInstance(baseURL: string, timeout?: number, options?: AxiosInstanceOptions): AxiosInstance`
-  - 创建基础的 axios 实例
 - 类：`BaseApi`
   - 基于 axios 封装的类式 API 请求工具
-- 类：`HttpRequest`
-  - HTTP 请求封装类，提供常用的 HTTP 方法
 - 插件：`VueAxiosPlugin`
   - Vue Axios 插件，提供全局的 `$http` 方法
-- 实例：`http`
-  - 默认的 HttpRequest 实例
-- 实例：`defaultAxiosInstance`
-  - 默认的 axios 实例
-- 实例：`baseAxios`
-  - 原始的 axios 实例
 
 ## 快速开始
 
@@ -109,7 +99,6 @@ export default {
 | `getToken` | 获取 token 的函数 | ^[Function]`() => string \| null` | 否 | `() => null` |
 | `onLoginRequired` | 登录失效回调函数 | ^[Function]`() => void` | 否 | `() => { window.location.href = '/login?redirect=' + encodeURIComponent(window.location.href) }` |
 | `responseFields` | 响应字段映射 | ^[Object]`{ code?: string; message?: string; data?: string; errors?: string; tips?: string }` | 否 | `{ code: 'code', message: 'msg', data: 'data' }` |
-| `responseHandler` | 自定义响应处理器 | ^[Function]`(resp: AxiosResponse) => any` | 否 | `null` |
 
 ### responseFields 字段说明
 
@@ -169,24 +158,6 @@ const httpApi = getHttpService({
     code: 'result.code', // 支持嵌套路径解析
     message: 'result.message',
     data: 'result.data',
-  },
-})
-```
-
-### 使用示例：自定义响应处理器
-
-```ts
-import { getHttpService } from '@moluoxixi/ajaxpackage'
-import type { AxiosResponse } from 'axios'
-
-const httpApi = getHttpService({
-  baseURL: 'https://api.example.com',
-  responseHandler: (response: AxiosResponse) => {
-    // 自定义响应处理逻辑
-    if (response.data.success) {
-      return response.data.data
-    }
-    throw new Error(response.data.message)
   },
 })
 ```
@@ -539,74 +510,35 @@ async function deleteUser(id: string) {
 }
 ```
 
-#### requestWithCancel(requestId, config)
+#### upload(url, formData, config)
 
-创建可取消的请求。
+上传文件，自动携带 `multipart/form-data` 头信息。
 
 **示例：**
 
 ```ts
 import { BaseApi } from '@moluoxixi/ajaxpackage'
-import type { AxiosRequestConfig } from 'axios'
 
 const api = new BaseApi({
   baseURL: 'https://api.example.com',
 })
 
-async function searchUsers(keyword: string) {
-  const config: AxiosRequestConfig = {
-    url: '/users/search',
-    method: 'get',
-    params: { keyword },
-  }
-  const data = await api.requestWithCancel('search-users', config)
+async function uploadFile(file: File) {
+  const formData = new FormData()
+  formData.append('file', file)
+  const data = await api.upload('/upload', formData, {
+    onUploadProgress: (event) => {
+      const percent = event.total ? Math.round(event.loaded / event.total * 100) : 0
+      console.log(`上传进度：${percent}%`)
+    },
+  })
   return data
-}
-
-function cancelSearch() {
-  api.cancelRequest('search-users', '用户取消搜索')
-}
-```
-
-#### cancelRequest(requestId, reason)
-
-取消指定请求。
-
-**示例：**
-
-```ts
-import { BaseApi } from '@moluoxixi/ajaxpackage'
-
-const api = new BaseApi({
-  baseURL: 'https://api.example.com',
-})
-
-function cancelUserRequest() {
-  api.cancelRequest('get-user', '用户取消操作')
-}
-```
-
-#### cancelAllRequests(reason)
-
-取消所有请求。
-
-**示例：**
-
-```ts
-import { BaseApi } from '@moluoxixi/ajaxpackage'
-
-const api = new BaseApi({
-  baseURL: 'https://api.example.com',
-})
-
-function cancelAll() {
-  api.cancelAllRequests('页面卸载')
 }
 ```
 
 #### all(requests)
 
-批量请求。
+批量请求。`requests` 既可以是 `AxiosRequestConfig[]`，也可以是已经发起的请求 `Promise[]`。
 
 **示例：**
 
@@ -627,72 +559,16 @@ async function loadDashboardData() {
   const [users, posts, comments] = await api.all(requests)
   return { users, posts, comments }
 }
-```
 
-#### allWithCancel(requestId, requests)
-
-批量请求（可取消）。
-
-**示例：**
-
-```ts
-import { BaseApi } from '@moluoxixi/ajaxpackage'
-import type { AxiosRequestConfig } from 'axios'
-
-const api = new BaseApi({
-  baseURL: 'https://api.example.com',
-})
-
-async function loadUserData(userId: string) {
-  const requests: AxiosRequestConfig[] = [
-    { url: `/users/${userId}`, method: 'get' },
-    { url: `/users/${userId}/posts`, method: 'get' },
-    { url: `/users/${userId}/followers`, method: 'get' },
-  ]
-  const data = await api.allWithCancel(`user-${userId}`, requests)
-  return data
-}
-
-function cancelUserDataLoad(userId: string) {
-  api.cancelRequest(`user-${userId}`, '用户取消加载')
-}
-```
-
-#### getActiveRequestsCount()
-
-获取当前活跃的请求数量。
-
-**示例：**
-
-```ts
-import { BaseApi } from '@moluoxixi/ajaxpackage'
-
-const api = new BaseApi({
-  baseURL: 'https://api.example.com',
-})
-
-function checkActiveRequests() {
-  const count = api.getActiveRequestsCount()
-  console.log(`当前有 ${count} 个活跃请求`)
-}
-```
-
-#### getActiveRequestIds()
-
-获取当前活跃的请求 ID 列表。
-
-**示例：**
-
-```ts
-import { BaseApi } from '@moluoxixi/ajaxpackage'
-
-const api = new BaseApi({
-  baseURL: 'https://api.example.com',
-})
-
-function listActiveRequests() {
-  const ids = api.getActiveRequestIds()
-  console.log('活跃请求 ID:', ids)
+// 也可以传入已经发起的请求
+async function loadDashboardDataByPromises() {
+  const api = new BaseApi({ baseURL: 'https://api.example.com' })
+  const [users, posts, comments] = await api.all([
+    api.get('/users'),
+    api.get('/posts'),
+    api.get('/comments'),
+  ])
+  return { users, posts, comments }
 }
 ```
 
@@ -853,200 +729,6 @@ export default {
 }
 ```
 
-## createAxiosInstance 函数
-
-创建基础的 axios 实例，支持自定义拦截器和响应处理。
-
-### 参数
-
-| 参数 | 说明 | 类型 | 必填 | 默认值 |
-| --- | --- | --- | --- | --- |
-| `baseURL` | 基础 URL | `string` | 是 | - |
-| `timeout` | 超时时间（毫秒） | `number` | 否 | `5000` |
-| `options` | 配置选项 | `AxiosInstanceOptions` | 否 | `{}` |
-
-### AxiosInstanceOptions
-
-| 选项 | 说明 | 类型 | 必填 | 默认值 |
-| --- | --- | --- | --- | --- |
-| `getToken` | 获取 token 的函数 | ^[Function]`() => string` | 否 | `() => ''` |
-| `onLoginRequired` | 登录失效回调函数 | ^[Function]`() => void` | 否 | `() => {}` |
-| `responseFields` | 响应字段映射 | ^[Object]`{ code?: string; message?: string; data?: string; errors?: string; tips?: string }` | 否 | `{ code: 'Code', message: 'Message', data: 'data', errors: 'errors', tips: 'tipss' }` |
-| `responseHandler` | 自定义响应处理器 | ^[Function]`(resp: AxiosResponse) => any` | 否 | `null` |
-
-### 使用示例
-
-```ts
-import { createAxiosInstance } from '@moluoxixi/ajaxpackage'
-
-const axiosInstance = createAxiosInstance('https://api.example.com', 5000, {
-  getToken: () => localStorage.getItem('token'),
-  onLoginRequired: () => {
-    window.location.href = '/login'
-  },
-  responseFields: {
-    code: 'Code',
-    message: 'Message',
-    data: 'data',
-  },
-})
-
-async function getUserList() {
-  const response = await axiosInstance.get('/users')
-  return response.data
-}
-```
-
-## HttpRequest 类
-
-HTTP 请求封装类，提供常用的 HTTP 方法。
-
-### 构造函数
-
-```ts
-constructor(axiosInstance: AxiosInstance)
-```
-
-### 实例方法
-
-#### get(url, params, config)
-
-发送 GET 请求。
-
-**示例：**
-
-```ts
-import { HttpRequest } from '@moluoxixi/ajaxpackage'
-import { createAxiosInstance } from '@moluoxixi/ajaxpackage'
-
-const axiosInstance = createAxiosInstance('https://api.example.com')
-const http = new HttpRequest(axiosInstance)
-
-async function getUserList() {
-  const data = await http.get('/users', { page: 1, size: 10 })
-  return data
-}
-```
-
-#### post(url, params, config, addSign)
-
-发送 POST 请求。
-
-**示例：**
-
-```ts
-import { HttpRequest } from '@moluoxixi/ajaxpackage'
-import { createAxiosInstance } from '@moluoxixi/ajaxpackage'
-import type { AxiosRequestConfig } from 'axios'
-
-const axiosInstance = createAxiosInstance('https://api.example.com')
-const http = new HttpRequest(axiosInstance)
-
-async function createUser(userData: any) {
-  const data = await http.post('/users', userData)
-  return data
-}
-
-async function createUserWithSign(userData: any) {
-  function addSign(config: AxiosRequestConfig) {
-    const timestamp = Date.now()
-    const sign = generateSign(userData, timestamp)
-    config.headers = config.headers || {}
-    config.headers['X-Timestamp'] = timestamp.toString()
-    config.headers['X-Sign'] = sign
-  }
-
-  const data = await http.post('/users', userData, {}, addSign)
-  return data
-}
-
-function generateSign(data: any, timestamp: number): string {
-  return 'signature'
-}
-```
-
-#### put(url, params, config)
-
-发送 PUT 请求。
-
-**示例：**
-
-```ts
-import { HttpRequest } from '@moluoxixi/ajaxpackage'
-import { createAxiosInstance } from '@moluoxixi/ajaxpackage'
-
-const axiosInstance = createAxiosInstance('https://api.example.com')
-const http = new HttpRequest(axiosInstance)
-
-async function updateUser(id: string, userData: any) {
-  const data = await http.put(`/users/${id}`, userData)
-  return data
-}
-```
-
-#### delete(url, params, config)
-
-发送 DELETE 请求。
-
-**示例：**
-
-```ts
-import { HttpRequest } from '@moluoxixi/ajaxpackage'
-import { createAxiosInstance } from '@moluoxixi/ajaxpackage'
-
-const axiosInstance = createAxiosInstance('https://api.example.com')
-const http = new HttpRequest(axiosInstance)
-
-async function deleteUser(id: string) {
-  const data = await http.delete(`/users/${id}`)
-  return data
-}
-```
-
-#### upload(url, formData, config)
-
-上传文件。
-
-**示例：**
-
-```ts
-import { HttpRequest } from '@moluoxixi/ajaxpackage'
-import { createAxiosInstance } from '@moluoxixi/ajaxpackage'
-
-const axiosInstance = createAxiosInstance('https://api.example.com')
-const http = new HttpRequest(axiosInstance)
-
-async function uploadFile(file: File) {
-  const formData = new FormData()
-  formData.append('file', file)
-  const data = await http.upload('/upload', formData)
-  return data
-}
-```
-
-#### all(requests)
-
-批量请求。
-
-**示例：**
-
-```ts
-import { HttpRequest } from '@moluoxixi/ajaxpackage'
-import { createAxiosInstance } from '@moluoxixi/ajaxpackage'
-
-const axiosInstance = createAxiosInstance('https://api.example.com')
-const http = new HttpRequest(axiosInstance)
-
-async function loadDashboardData() {
-  const [users, posts, comments] = await http.all([
-    http.get('/users'),
-    http.get('/posts'),
-    http.get('/comments'),
-  ])
-  return { users, posts, comments }
-}
-```
-
 ## 错误处理
 
 ### 自动错误处理
@@ -1075,25 +757,7 @@ AjaxPackage 会自动处理以下错误：
 
 ### 自定义错误处理
 
-可以通过 `responseHandler` 自定义响应处理逻辑。
-
-**示例：**
-
-```ts
-import { getHttpService } from '@moluoxixi/ajaxpackage'
-import type { AxiosResponse } from 'axios'
-
-const httpApi = getHttpService({
-  baseURL: 'https://api.example.com',
-  responseHandler: (response: AxiosResponse) => {
-    // 自定义响应处理
-    if (response.data.success) {
-      return response.data.data
-    }
-    throw new Error(response.data.message)
-  },
-})
-```
+如果需要对响应结构进行更细粒度的处理，可以继承 `BaseApi` 并重写 `processResponseConfig` 或 `processResponseError`。在这些方法中根据业务规则解析数据、抛出错误或执行额外的副作用。
 
 ## SSR 支持
 
@@ -1118,5 +782,235 @@ AjaxPackage 支持 SSR（服务端渲染）环境。当 `document` 不存在时�
    - 建议在业务代码中处理错误情况
 
 5. **请求取消**
-   - `BaseApi` 支持请求取消功能
-   - `HttpRequest` 和 `getHttpService` 不支持请求取消，需要使用 `BaseApi`
+   - 当前版本未提供请求取消封装，若业务需要可直接使用 axios 自带的取消能力自行实现
+
+## SystemErrorDialog 组件
+
+### 概述
+
+`SystemErrorDialog` 是一个用于显示系统异常信息的对话框组件，专门用于展示请求错误时的详细信息，包括用户信息、科室信息、网络信息和错误详情。
+
+### 组件特性
+
+- 🎯 **轻量级设计**：只接收必要的字符串参数，避免大对象响应式开销
+- 📱 **响应式布局**：支持移动端和桌面端的良好显示效果
+- 🔧 **高度可配置**：支持自定义标题、宽度和各种信息字段
+- 🎨 **美观界面**：采用现代化的UI设计，信息展示清晰易读
+
+### Props 参数
+
+| 参数 | 说明 | 类型 | 默认值 | 必填 |
+|------|------|------|--------|------|
+| `title` | 对话框标题 | `string` | `'系统异常信息'` | 否 |
+| `width` | 对话框宽度 | `number \| string` | `520` | 否 |
+| `userName` | 用户名 | `string` | - | 否 |
+| `userId` | 用户ID | `string` | - | 否 |
+| `deptName` | 科室名称 | `string` | - | 否 |
+| `deptId` | 科室ID | `string` | - | 否 |
+| `clientIp` | 客户端IP地址 | `string` | - | 否 |
+| `requestUrl` | 请求URL路径 | `string` | - | 否 |
+| `traceId` | 链路追踪ID | `string` | - | 否 |
+| `errorMessage` | 错误消息 | `string` | - | 否 |
+| `errorCode` | 错误代码 | `string` | - | 否 |
+
+### Events 事件
+
+| 事件名 | 说明 | 参数 |
+|--------|------|------|
+| `close` | 关闭对话框时触发 | - |
+| `confirm` | 点击确认按钮时触发 | - |
+
+### 使用示例
+
+#### 基础用法
+
+```vue
+<template>
+  <div>
+    <ElButton @click="showErrorDialog">显示异常信息</ElButton>
+    
+    <SystemErrorDialog
+      v-model="dialogVisible"
+      :user-name="errorInfo.userName"
+      :user-id="errorInfo.userId"
+      :dept-name="errorInfo.deptName"
+      :dept-id="errorInfo.deptId"
+      :client-ip="errorInfo.clientIp"
+      :request-url="errorInfo.requestUrl"
+      :trace-id="errorInfo.traceId"
+      @close="dialogVisible = false"
+      @confirm="handleConfirm"
+    />
+  </div>
+</template>
+
+<script setup>
+import { ref } from 'vue'
+import { ElButton } from 'element-plus'
+import SystemErrorDialog from '@moluoxixi/ajaxpackage/SystemErrorDialog.vue'
+
+const dialogVisible = ref(false)
+
+const errorInfo = {
+  userName: '张三',
+  userId: '12345',
+  deptName: '信息科',
+  deptId: 'IT001',
+  clientIp: '192.168.1.100',
+  requestUrl: '/api/user/login',
+  traceId: 'trace-123456789',
+}
+
+function showErrorDialog() {
+  dialogVisible.value = true
+}
+
+function handleConfirm() {
+  console.log('用户确认了异常信息')
+  dialogVisible.value = false
+}
+</script>
+```
+
+#### 完整配置
+
+```vue
+<template>
+  <SystemErrorDialog
+    v-model="dialogVisible"
+    title="详细系统异常信息"
+    :width="600"
+    :user-name="fullErrorInfo.userName"
+    :user-id="fullErrorInfo.userId"
+    :dept-name="fullErrorInfo.deptName"
+    :dept-id="fullErrorInfo.deptId"
+    :client-ip="fullErrorInfo.clientIp"
+    :request-url="fullErrorInfo.requestUrl"
+    :trace-id="fullErrorInfo.traceId"
+    :error-code="fullErrorInfo.errorCode"
+    :error-message="fullErrorInfo.errorMessage"
+    @close="dialogVisible = false"
+    @confirm="handleConfirm"
+  />
+</template>
+
+<script setup>
+import { ref } from 'vue'
+import SystemErrorDialog from '@moluoxixi/ajaxpackage/SystemErrorDialog.vue'
+
+const dialogVisible = ref(false)
+
+const fullErrorInfo = {
+  userName: '李四',
+  userId: '67890',
+  deptName: '财务科',
+  deptId: 'FIN001',
+  clientIp: '192.168.1.200',
+  requestUrl: '/api/finance/report',
+  traceId: 'trace-987654321',
+  errorCode: 'ERR_500',
+  errorMessage: '服务器内部错误，请联系系统管理员',
+}
+
+function handleConfirm() {
+  // 处理确认逻辑
+  dialogVisible.value = false
+}
+</script>
+```
+
+#### 从响应对象提取信息
+
+```typescript
+import type { AxiosResponse } from 'axios'
+import SystemErrorDialog from '@moluoxixi/ajaxpackage/SystemErrorDialog.vue'
+
+// 工具函数：从响应对象提取异常信息
+function extractErrorInfo(response: AxiosResponse) {
+  const requestData = {
+    ...response.config?.params,
+    ...normalizePayload(response.config?.data),
+  }
+
+  return {
+    userName: requestData.userName || requestData.username,
+    userId: requestData.userId || requestData.userid,
+    deptName: requestData.deptName || requestData.departmentName,
+    deptId: requestData.deptId || requestData.departmentId,
+    clientIp: requestData.clientIp || requestData.ip,
+    requestUrl: response.config?.url,
+    traceId: resolveTraceId(response.headers),
+    errorCode: response.data?.code || response.status?.toString(),
+    errorMessage: response.data?.message || response.statusText,
+  }
+}
+
+// 在错误处理中使用
+function handleApiError(error: any) {
+  if (error.response) {
+    const errorInfo = extractErrorInfo(error.response)
+    // 显示异常对话框
+    showSystemErrorDialog(errorInfo)
+  }
+}
+```
+
+### 组件方法
+
+通过 `ref` 可以访问组件的方法：
+
+```vue
+<template>
+  <SystemErrorDialog
+    ref="errorDialogRef"
+    v-model="dialogVisible"
+    :user-name="errorInfo.userName"
+    @close="dialogVisible = false"
+  />
+</template>
+
+<script setup>
+import { ref } from 'vue'
+import SystemErrorDialog from '@moluoxixi/ajaxpackage/SystemErrorDialog.vue'
+
+const errorDialogRef = ref()
+
+// 通过方法关闭对话框
+function closeDialog() {
+  errorDialogRef.value?.close()
+}
+</script>
+```
+
+### 样式定制
+
+组件使用 scoped 样式，如需自定义样式，可以通过深度选择器：
+
+```vue
+<style>
+.custom-error-dialog :deep(.error-info-container) {
+  background-color: #f5f5f5;
+}
+
+.custom-error-dialog :deep(.error-code) {
+  color: #ff4757;
+  font-weight: bold;
+}
+</style>
+```
+
+### 设计理念
+
+#### 为什么不直接传递 response 对象？
+
+1. **性能考虑**：response 对象通常很大，包含大量不必要的信息，将其变为响应式会造成性能开销
+2. **数据安全**：避免在组件中暴露完整的请求/响应信息
+3. **接口清晰**：明确的 props 定义让组件的使用更加清晰和可控
+4. **灵活性**：调用方可以自由决定传递哪些信息，支持多种数据来源
+
+#### 信息展示逻辑
+
+- **菜单名称**：自动获取当前页面的 URL（`location.href`）
+- **未知值处理**：对于未传递的信息显示"未知"
+- **错误信息**：错误代码和错误消息会以不同颜色突出显示
+- **响应式设计**：在移动端会自动调整布局为垂直排列

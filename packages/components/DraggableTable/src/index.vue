@@ -266,12 +266,21 @@ const emit = defineEmits<emitsType>()
 const slots = defineSlots<slotsType>()
 
 // 注册 VxeUI 组件
+/**
+ * 安装 VxeUI 组件
+ * @param VxeUI - VxeUI 实例
+ */
 function installVxeUIComponent(VxeUI: any) {
   VxeUI.component(VxePager)
   VxeUI.component(VxeTooltip)
 }
 
 //#region 根据props动态计算的vxeGrid属性
+/**
+ * 获取高度数值
+ * @param height - 高度值，可以是数字或字符串
+ * @returns 高度数值
+ */
 function getHeight(height?: number | string): number {
   if (typeof height === 'string' && height.endsWith('px')) {
     return +height.replace('px', '') || 32
@@ -478,7 +487,9 @@ const xTable = useTemplateRef<VxeGridInstance>('xTable')
 const tableVirtualRefs = ref<HTMLElement[]>([])
 /** 是否符合收集回车元素的条件 */
 const needCollect = computed(() => ['row', 'table'].includes(props.containerType))
-// 获取表格中所有的行元素
+/**
+ * 收集表格虚拟引用，用于 EnterNextContainer 组件
+ */
 function collectTableVirtualRefs() {
   try {
     if (!xTable.value || !needCollect.value) {
@@ -513,7 +524,10 @@ function collectTableVirtualRefs() {
 // 创建防抖版本的collectTableVirtualRefs
 const debouncedCollectTableVirtualRefs = debounce(collectTableVirtualRefs, 200)
 
-// 当找不到下一个输入元素时的处理
+/**
+ * 处理没有下一个输入框的情况
+ * @param element - 当前元素
+ */
 function handleNoNextInput(element: HTMLElement) {
   // 查找当前行的索引
   const row = element.closest('.vxe-body--row') as HTMLElement
@@ -536,7 +550,10 @@ function handleNoNextInput(element: HTMLElement) {
   }
 }
 
-// 当找不到下拉框输入元素值时的处理
+/**
+ * 处理选择框没有值的情况
+ * @param element - 当前元素
+ */
 function handleNoSelectValue(element: HTMLElement) {
   // 查找当前行的索引
   const row = element.closest('tr')
@@ -567,6 +584,10 @@ watch(
   },
   { immediate: true },
 )
+/**
+ * 处理单元格点击事件
+ * @param params - 单元格点击事件参数
+ */
 function handleCellClick(params: VxeTableDefines.CellClickEventParams) {
   const { column } = params
   if (props.columnConfig?.isCurrent) {
@@ -574,7 +595,10 @@ function handleCellClick(params: VxeTableDefines.CellClickEventParams) {
   }
   emit('cellClick', params)
 }
-// 为了处理表格渲染完成后的场景
+/**
+ * 处理表格渲染完成事件
+ * @param params - 行展开切换事件参数
+ */
 function handleTableRendered(params: VxeTableDefines.ToggleRowExpandEventParams) {
   nextTick(() => {
     debouncedCollectTableVirtualRefs()
@@ -599,9 +623,10 @@ const collectColumn = computed<ColumnType[]>(() => {
 //#endregion
 
 //#region 多选功能
+
 /**
- * 表格复选框全选事件
- * @param params
+ * 处理全选复选框变化事件
+ * @param params - 全选复选框参数
  */
 function handleCheckboxAll(params: VxeTableDefines.CheckboxAllParams) {
   emit('checkboxChange', params)
@@ -609,8 +634,8 @@ function handleCheckboxAll(params: VxeTableDefines.CheckboxAllParams) {
 }
 
 /**
- * 表格复选框事件
- * @param params
+ * 处理复选框变化事件
+ * @param params - 复选框变化参数
  */
 function handleCheckboxChange(params: VxeTableDefines.CheckboxChangeParams) {
   emit('checkboxChange', params)
@@ -885,6 +910,12 @@ function getColumnUniqueKey(col: Record<string, any>): string {
   return ''
 }
 
+/**
+ * 处理自定义配置保存
+ * @param params - 参数对象
+ * @param params.customColumns - 自定义列配置
+ * @param params.rest - 其他配置
+ */
 function handleCustomConfigSave({
   customColumns,
   ...rest
@@ -936,7 +967,11 @@ async function handleGetStoredColumns(): Promise<ColumnType[]> {
     return [] as ColumnType[]
   }
 }
-/** 存到服务器端 */
+/**
+ * 保存列配置到服务器端
+ * @param key - 存储键
+ * @param columns - 列配置 JSON 字符串
+ */
 async function handleSaveColumnsToServer(key: string, columns: string) {
   const { isCommon, isReset } = customRestConfig.value || {}
   const callbacks = []
@@ -980,7 +1015,12 @@ async function handleSaveColumnsToServer(key: string, columns: string) {
 
   await Promise.all(callbacks)
 }
-/** 递归映射列，仅保留必要字段并保留 children */
+/**
+ * 映射列树结构，过滤必填字段
+ * @param nodes - 节点数组
+ * @param requiredFieldsList - 必填字段列表
+ * @returns 映射后的节点数组
+ */
 function mapColumnsTree(nodes: any[], requiredFieldsList: string[]): any[] {
   return (nodes || [])
     .filter(Boolean)
@@ -999,9 +1039,12 @@ function mapColumnsTree(nodes: any[], requiredFieldsList: string[]): any[] {
       return col
     })
 }
+
 /**
- * 递归合并两套列配置（同级顺序按 stored 优先，props 为底，stored 覆盖）。
- * - children 同样递归处理。
+ * 合并列层级，合并存储的列配置和 props 中的列配置（同级顺序按 stored 优先，props 为底，stored 覆盖）。
+ * @param storedLevel - 存储的列配置
+ * @param propsLevel - props 中的列配置
+ * @returns 合并后的列配置
  */
 function mergeColumnsLevel(storedLevel: any[] = [], propsLevel: any[] = []): any[] {
   const result: any[] = []
@@ -1050,11 +1093,17 @@ function mergeColumnsLevel(storedLevel: any[] = [], propsLevel: any[] = []): any
   return result
 }
 
+/**
+ * 保存列配置
+ * @param columns - 列配置数组
+ */
 function saveColumns(columns: any[]) {
   localColumns.value = columns
   handleSaveColumnsToStorage()
 }
-/** 保存列配置到存储 */
+/**
+ * 保存列配置到存储
+ */
 async function handleSaveColumnsToStorage() {
   try {
     /** nextTick无效，故只能sleep等待队列清空再执行 */
@@ -1092,8 +1141,8 @@ async function handleSaveColumnsToStorage() {
 /** 已移除旧的列对比函数，逻辑合并已在 watch 中实现 */
 
 /**
- * 监听列宽变化
- * @param params
+ * 处理列宽调整变化事件
+ * @param params - 列宽调整参数
  */
 function handleColumnResizableChange(params: VxeTableDefines.ResizableChangeParams) {
   // 保存到本地存储
@@ -1101,6 +1150,9 @@ function handleColumnResizableChange(params: VxeTableDefines.ResizableChangePara
   dispatchEvents(document, ['mousedown', 'mouseup', 'click'])
   emit('resizableChange', params)
 }
+/**
+ * 加载列配置
+ */
 async function loadColumns() {
   const newColumns = cloneDeep(props.columns)
   if (isNoSave.value) {
@@ -1140,7 +1192,9 @@ watch(() => props.columns, loadColumns, {
 const rowSortableInstance = ref<InstanceType<typeof Sortable> | null>()
 const columnSortableInstance = ref<InstanceType<typeof Sortable> | null>()
 
-// 销毁行拖拽实例
+/**
+ * 销毁行拖拽实例
+ */
 function destroyRowSortable() {
   if (rowSortableInstance.value) {
     rowSortableInstance.value.destroy()
@@ -1148,7 +1202,9 @@ function destroyRowSortable() {
   }
 }
 
-// 销毁列拖拽实例
+/**
+ * 销毁列拖拽实例
+ */
 function destroyColumnSortable() {
   if (columnSortableInstance.value) {
     columnSortableInstance.value.destroy()
@@ -1156,7 +1212,9 @@ function destroyColumnSortable() {
   }
 }
 
-// 初始化行拖拽
+/**
+ * 初始化行拖拽功能
+ */
 function initRowDraggable() {
   // 先销毁旧实例
   destroyRowSortable()
@@ -1226,7 +1284,9 @@ function initRowDraggable() {
   })
 }
 
-// 初始化列拖拽
+/**
+ * 初始化列拖拽功能
+ */
 function initColumnDraggable() {
   // 先销毁旧实例
   destroyColumnSortable()

@@ -122,7 +122,7 @@ export function calculateDragPosition(options: {
   currentX: number
   currentY: number
   constraints: BoundaryConstraints
-}): { left: number; top: number } {
+}): { left: number, top: number } {
   const { dragStartPos, currentX, currentY, constraints } = options
   const { windowWidth, windowHeight, elementWidth, elementHeight, margin } = constraints
 
@@ -367,4 +367,3 @@ export function clearPositionFromStorage(key: string): void {
     console.warn('Failed to clear position from localStorage:', error)
   }
 }
-

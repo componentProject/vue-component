@@ -29,6 +29,7 @@ catalogs:
     # utils
     classnames: latest
     crypto-js: ^4.2.0
+    date-fns: ^4.1.0
 
     dayjs: ^1.11.13
     dom-zindex: 1.0.6

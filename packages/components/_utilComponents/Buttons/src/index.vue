@@ -36,6 +36,12 @@ const props = withDefaults(defineProps<propsType>(), {
   buttons: () => [],
 })
 const attrs = useAttrs()
+
+/**
+ * 获取按钮属性，过滤掉内部使用的属性
+ * @param btn - 按钮配置对象
+ * @returns 按钮属性对象
+ */
 function btnProps(btn: propsType['buttons'][number]) {
   const { btnType, slot, icon, event, tooltip, ...rest } = btn
   return { ...attrs, ...rest }

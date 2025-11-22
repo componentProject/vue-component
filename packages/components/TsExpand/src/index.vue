@@ -100,6 +100,9 @@ const contentStyle = computed(() => {
   }
 })
 
+/**
+ * 切换展开/收起状态
+ */
 function toggle() {
   isExpanded.value = !isExpanded.value
   emits('change', isExpanded.value)
@@ -127,6 +130,9 @@ function checkNeedToggle() {
   })
 }
 
+/**
+ * 组件挂载时检查是否需要显示展开按钮，并设置内容变化监听
+ */
 onMounted(() => {
   checkNeedToggle()
 
@@ -139,6 +145,9 @@ onMounted(() => {
   }
 })
 
+/**
+ * 组件卸载时清理 ResizeObserver
+ */
 onUnmounted(() => {
   // 组件卸载时清理
   if (resizeObserver) {

@@ -82,15 +82,27 @@ const filteredOptions = computed(() => {
   }
 })
 
-// 默认禁用处理函数
+/**
+ * 默认禁用处理函数
+ * @param label - 标签文本
+ * @param value - 标签值
+ * @returns 是否禁用
+ */
 function defaultDisabledHandler({ label, value }: { [label: string]: any }) {
   return props.disabledValues.includes(value) || props.disabledLabels.includes(label)
 }
 
+/**
+ * 计算禁用处理函数
+ */
 const computedDisabledHandler = computed(() => {
   return props.disabledHandler || defaultDisabledHandler
 })
 
+/**
+ * 处理标签页切换事件
+ * @param val - 选中的标签页值
+ */
 function handleTabChange(val: any) {
   emit('tabChange', val)
 }

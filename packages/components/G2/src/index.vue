@@ -23,6 +23,9 @@ const Chart = extend(Runtime, corelib())
 const container = useTemplateRef('container')
 let chart
 
+/**
+ * 渲染图表
+ */
 async function renderChart() {
   if (!chart) {
     chart = new Chart({
@@ -38,18 +41,29 @@ async function renderChart() {
   chart.render()
 }
 
+/**
+ * 组件挂载时创建并渲染图表
+ */
 onMounted(() => {
   chart = new Chart({
     container: container.value,
   })
   renderChart()
 })
+
+/**
+ * 组件卸载时销毁图表
+ */
 onUnmounted(() => {
   chart.destroy()
   chart = null
 })
 
 defineExpose({
+  /**
+   * 获取图表实例
+   * @returns 图表实例
+   */
   getChart() {
     return chart
   },

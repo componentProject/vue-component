@@ -25,7 +25,9 @@ import type { emitsType, propsType } from './_types'
 import { ElSplitter, ElSplitterPanel } from 'element-plus'
 import { computed } from 'vue'
 
-// 面板配置接口
+/**
+ * 面板配置接口
+ */
 interface PanelConfig {
   slot?: string
   size?: string | number
@@ -35,13 +37,11 @@ interface PanelConfig {
   collapsible?: boolean
 }
 
-// 定义组件选项
 defineOptions({
   name: 'Splitter',
   inheritAttrs: false,
 })
 
-// 定义属性和事件
 const props = withDefaults(defineProps<propsType>(), {
   direction: 'horizontal',
   splitWidth: 8,
@@ -50,12 +50,20 @@ const props = withDefaults(defineProps<propsType>(), {
 
 const emit = defineEmits<emitsType>()
 
-// 获取可用的插槽名称
 const slots = defineSlots<slotsType>()
 
-// 获取插槽名称
+/**
+ * 获取插槽名称列表
+ */
 const slotNames = computed<string[]>(() => Object.keys(slots) as string[])
-// 获取指定面板的属性值
+
+/**
+ * 获取指定面板的属性值
+ * @param slotName - 插槽名称或索引
+ * @param prop - 属性名
+ * @param defaultValue - 默认值
+ * @returns 属性值
+ */
 function getPanelProp<T>(slotName: string | number | undefined, prop: keyof PanelConfig, defaultValue?: T): T | undefined {
   const item = props.panels.find(item => item.slot === slotName)
   if (item) {

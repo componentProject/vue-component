@@ -1,13 +1,13 @@
 # BaseApi
 
-基于 axios 封装的类式 API 请求工具，支持请求拦截、响应处理、请求取消、批量请求等功能。
+基于 axios 封装的类式 API 请求工具，支持请求拦截、响应处理、批量请求等功能。
 
 ## 特性
 
 - ✅ 基于类的封装，易于扩展
 - ✅ 支持自定义响应字段映射
 - ✅ 自动处理错误码和错误提示
-- ✅ 支持请求取消和批量请求
+- ✅ 支持批量请求
 - ✅ 支持 SSR 环境（document 不存在时使用 console）
 - ✅ 可继承扩展自定义 API 类
 
@@ -46,6 +46,27 @@ export async function updateUser(id: string, data: any) {
 // DELETE 请求
 export async function deleteUser(id: string) {
   return api.delete(`/users/${id}`)
+}
+```
+
+### 文件上传
+
+```ts
+import { BaseApi } from '@moluoxixi/AjaxPackage'
+
+const api = new BaseApi({
+  baseURL: 'https://api.example.com',
+})
+
+export async function uploadAvatar(file: File) {
+  const formData = new FormData()
+  formData.append('file', file)
+  return api.upload('/upload/avatar', formData, {
+    onUploadProgress: (event) => {
+      const percent = event.total ? Math.round(event.loaded / event.total * 100) : 0
+      console.log(`上传进度：${percent}%`)
+    },
+  })
 }
 ```
 
@@ -142,70 +163,11 @@ export async function fetchUser(id: string) {
 }
 ```
 
-## 请求取消
-
-### 可取消的请求
-
-使用 `requestWithCancel` 方法创建可取消的请求。
-
-```ts
-import { BaseApi } from '@moluoxixi/AjaxPackage'
-import axios from 'axios'
-
-const api = new BaseApi({
-  baseURL: 'https://api.example.com',
-  timeout: 5000,
-})
-
-// 使用可取消的请求
-export async function fetchDataWithCancel() {
-  try {
-    const data = await api.requestWithCancel('fetch-data', {
-      url: '/data',
-      method: 'get',
-    })
-    return data
-  }
-  catch (error) {
-    if (axios.isCancel(error)) {
-      console.log('请求已被取消')
-    }
-    else {
-      console.error('请求失败:', error)
-    }
-  }
-}
-
-// 取消指定请求
-export function cancelFetchData() {
-  api.cancelRequest('fetch-data', '用户主动取消')
-}
-
-// 取消所有请求
-export function cancelAllRequests() {
-  api.cancelAllRequests('页面卸载，取消所有请求')
-}
-
-// 获取活跃请求信息
-export function getActiveRequests() {
-  const count = api.getActiveRequestsCount()
-  const ids = api.getActiveRequestIds()
-  console.log(`当前有 ${count} 个活跃请求:`, ids)
-}
-```
-
-### 取消请求的方法
-
-- `cancelRequest(requestId, reason?)` - 取消指定请求
-- `cancelAllRequests(reason?)` - 取消所有请求
-- `getActiveRequestsCount()` - 获取活跃请求数量
-- `getActiveRequestIds()` - 获取活跃请求ID列表
-
 ## 批量请求
 
 ### 基础批量请求
 
-使用 `all` 方法同时发起多个请求。
+使用 `all` 方法同时发起多个请求。入参既可以是 `AxiosRequestConfig[]`，也可以是已经发起的请求 `Promise[]`。
 
 ```ts
 import { BaseApi } from '@moluoxixi/AjaxPackage'
@@ -231,6 +193,21 @@ export async function fetchMultipleData() {
       posts,
       comments,
     }
+  }
+  catch (error) {
+    console.error('批量请求失败:', error)
+    throw error
+  }
+}
+
+export async function fetchMultipleDataByPromises() {
+  try {
+    const [users, posts, comments] = await api.all([
+      api.get('/users'),
+      api.get('/posts'),
+      api.get('/comments'),
+    ])
+    return { users, posts, comments }
   }
   catch (error) {
     console.error('批量请求失败:', error)
@@ -355,61 +332,26 @@ DELETE 请求
 
 **返回：** `Promise<AxiosResponse['data']>`
 
-#### requestWithCancel\<R\>(requestId, config)
+#### upload\<R\>(url, formData, config?)
 
-创建可取消的请求
+文件上传
 
 **参数：**
-- `requestId: string` - 请求ID，用于标识和取消请求
-- `config: AxiosRequestConfig` - 请求配置
+- `url: string` - 上传地址
+- `formData: FormData` - 上传数据
+- `config?: AxiosRequestConfig` - axios 配置
 
 **返回：** `Promise<AxiosResponse['data']>`
-
-#### cancelRequest(requestId, reason?)
-
-取消指定请求
-
-**参数：**
-- `requestId: string` - 请求ID
-- `reason?: string` - 取消原因
-
-#### cancelAllRequests(reason?)
-
-取消所有请求
-
-**参数：**
-- `reason?: string` - 取消原因
 
 #### all\<R\>(requests)
 
 批量请求
 
 **参数：**
-- `requests: AxiosRequestConfig[]` - 请求配置数组
+- `requests: (AxiosRequestConfig | Promise<AxiosResponse<R>>)[]` - 请求配置数组或已发起的请求 Promise
 
 **返回：** `Promise<AxiosResponse['data'][]>`
 
-#### allWithCancel\<R\>(requestId, requests)
-
-批量请求（可取消）
-
-**参数：**
-- `requestId: string` - 请求ID
-- `requests: AxiosRequestConfig[]` - 请求配置数组
-
-**返回：** `Promise<AxiosResponse['data'][]>`
-
-#### getActiveRequestsCount()
-
-获取当前活跃的请求数量
-
-**返回：** `number`
-
-#### getActiveRequestIds()
-
-获取当前活跃的请求ID列表
-
-**返回：** `string[]`
 
 ### 受保护方法（可重写）
 
@@ -465,5 +407,5 @@ axios 实例，可直接访问底层 axios 实例
 1. 响应数据会自动根据 `responseFields` 配置进行字段映射
 2. 支持路径解析，如 `responseFields.code` 可以是 `'status.code'`
 3. 当 `document` 不存在时（SSR 环境），错误提示会使用 `console` 输出
-4. 请求取消功能依赖于 `CancelToken`，需要确保 axios 版本支持
+4. 当前未内置请求取消封装，如需取消请求可直接通过 axios 自行实现
 

@@ -112,4 +112,3 @@ export interface ContentArea {
   /** 底部位置 */
   bottom: number
 }
-
