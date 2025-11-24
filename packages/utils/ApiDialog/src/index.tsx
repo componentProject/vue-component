@@ -113,6 +113,13 @@ export function createApiDialog(DialogComponent?: Component) {
         {
           ...props,
           modelValue: true,
+          onUpdateModelValue: (val: boolean) => {
+            console.log('val', val)
+            if (!val) {
+              reject(new Error('对话框已关闭'))
+              cleanup()
+            }
+          },
           // 监听关闭事件
           onClose: () => {
             reject(new Error('对话框已关闭'))

@@ -44,6 +44,8 @@ const inputValue = defineModel({
  */
 function handleReadCard() {
   // 读卡逻辑由用户自行实现
+  // /commonSdk/index
+  // http://localhost:26784/
 }
 </script>
 

@@ -127,7 +127,7 @@ const comparisonResult = ref<any>(null)
 
 // 配置信息
 const apiUrl = 'http://192.168.209.103:9099/ts-fm/fileType/list'
-const token = 'ebc92758-f3d3-469f-a7da-422906724d58'
+const token = 'da944408-5366-41d8-bfc1-230ea42e3ab4'
 
 const requestParams = {
   sortOrder: '',

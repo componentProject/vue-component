@@ -1,8 +1,17 @@
 // autoRoutes入口文件
 import type { Plugin } from 'vite'
+import fs from 'node:fs'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { createVirtualPlugin } from '../_utils/virtual.ts'
 // AutoRoutes/index.ts
 import { findDefaultRouteHandle, findParentRouteHandle, generateRoutes } from './routeGenerator.ts'
+
+// 读取 dts 模板文件
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
+const dtsTemplatePath = path.resolve(__dirname, './_templates/dts.d.ts')
+const dtsTemplateRaw = fs.readFileSync(dtsTemplatePath, 'utf-8')
 
 interface RouteModule {
   path: string
@@ -15,6 +24,8 @@ interface RouteModule {
 interface objRouteConfig {
   glob: string | string[]
   baseRoute?: RouteModule | string
+  /** 是否使用同步加载（eager），默认为 false（懒加载） */
+  eager?: boolean
 }
 
 interface RouteConfig {
@@ -26,27 +37,11 @@ interface AutoRoutesPluginOptions {
   virtualModuleId?: string
   dts?: string | boolean
   root?: string
+  /** 全局是否使用同步加载（eager），默认为 false（懒加载）。单个路由配置的 eager 选项会覆盖此全局设置 */
+  eager?: boolean
 }
 
-// 声明文件模板：由通用工厂按 dts/root 默认落盘
-const dtsTemplate = `// 此文件由ViteConfig自动生成，请勿手动修改
-declare module 'virtual:auto-routes' {
-  interface RouteModule {
-    path: string
-    name: string
-    meta?: any
-    component: () => Promise<any>
-    children?: RouteModule[]
-  }
-
-  const routes: RouteModule[]
-  const findDefaultRoute: (routes: any[]) => string
-  export { findDefaultRoute, routes }
-  export default routes
-}
-`
-
-function createAutoRoutesPlugin({ routeConfig, virtualModuleId, dts, root }: AutoRoutesPluginOptions): Plugin {
+function createAutoRoutesPlugin({ routeConfig, virtualModuleId, dts, root, eager: globalEager }: AutoRoutesPluginOptions): Plugin {
   const VIRTUAL_MODULE_ID = virtualModuleId || 'virtual:auto-routes'
 
   // 已默认监听所有文件，无需计算 watch globs
@@ -56,44 +51,62 @@ function createAutoRoutesPlugin({ routeConfig, virtualModuleId, dts, root }: Aut
     return Array.isArray(g) ? g : [g]
   })
 
+  // 创建插件
   return createVirtualPlugin(
     {
       name: 'vite-plugin-auto-routes',
       virtualModuleId: VIRTUAL_MODULE_ID,
       dts,
       root,
-      typeContent: dtsTemplate,
       watch: watchGlobs,
-    },
-    // 生成虚拟模块代码：仅负责产出字符串，监听/HMR/缓存由工厂统一处理
-    () => {
-      const imports: string[] = []
-      const routes: string[] = []
+      enforce: 'pre',
+      // 生成虚拟模块代码：仅负责产出字符串，监听/HMR/缓存由工厂统一处理
+      generateModule: () => {
+        const imports: string[] = []
+        const routes: string[] = []
 
-      Object.entries(routeConfig).forEach(([prefix, globVal], index) => {
-        const varName = `files${index}`
-        const glob: string | string[] = (globVal as objRouteConfig).glob || (globVal as string | string[])
-        imports.push(
-          `const ${varName} = import.meta.glob(${JSON.stringify(glob)}, { eager: true, import: 'default' });\n`,
-        )
-        const baseRoute: RouteModule = (globVal as objRouteConfig).baseRoute!
-        routes.push(`...generateRoutes(${varName}, '${prefix}',${JSON.stringify(baseRoute)})`)
-      })
+        Object.entries(routeConfig).forEach(([prefix, globVal], index) => {
+          const varName = `files${index}`
+          const glob: string | string[] = (globVal as objRouteConfig).glob || (globVal as string | string[])
+          // 优先使用路由配置项的 eager，如果没有则使用全局的 eager，默认 false
+          const eager = (globVal as objRouteConfig).eager ?? globalEager ?? false
 
-      return `
-        ${imports.join('\n')}
-        const findParentRoute = ${findParentRouteHandle}
-        // 用于routes
-        const generateRoutes = ${generateRoutes};
-        // 用于导出
-        const findDefaultRoute = ${findDefaultRouteHandle};
+          // 根据 eager 选项决定使用懒加载还是同步加载
+          if (eager) {
+            // 同步加载模式
+            imports.push(
+              `const ${varName} = import.meta.glob(${JSON.stringify(glob)}, { eager: true, import: 'default' });\n`,
+            )
+          }
+          else {
+            // 懒加载模式
+            imports.push(
+              `const ${varName} = import.meta.glob(${JSON.stringify(glob)});\n`,
+            )
+          }
 
-        ${findParentRouteHandle}
-        ${findDefaultRouteHandle}
-        const routes = [${routes.join(',\n')}];
-        export { routes, findDefaultRoute };
-        export default routes;
-      `
+          const baseRoute: RouteModule | string = (globVal as objRouteConfig).baseRoute!
+          routes.push(`...generateRoutes(${varName}, '${prefix}',${JSON.stringify(baseRoute)}, ${eager})`)
+        })
+
+        return `
+          ${imports.join('\n')}
+          const findParentRoute = ${findParentRouteHandle}
+          // 用于routes
+          const generateRoutes = ${generateRoutes};
+          // 用于导出
+          const findDefaultRoute = ${findDefaultRouteHandle};
+
+          ${findParentRouteHandle}
+          ${findDefaultRouteHandle}
+          const routes = [${routes.join(',\n')}];
+
+          export { routes, findDefaultRoute };
+          export default routes;
+        `
+      },
+      // 生成类型声明文件
+      generateDts: () => dtsTemplateRaw,
     },
   )
 }

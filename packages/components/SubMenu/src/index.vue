@@ -11,7 +11,9 @@
       <template #title>
         {{ getRouteTitle(route) }}
       </template>
-      <SubMenu :routes="route.children ?? []" />
+      <div :style="`max-height: calc(100vh - ${props.menuHeight || 0}px - 30px);overflow: auto`">
+        <SubMenu :routes="route.children ?? []" />
+      </div>
     </ElSubMenu>
 
     <ElMenuItem
@@ -35,6 +37,7 @@ defineOptions({
 
 const props = withDefaults(defineProps<propsType>(), {
   routes: () => [],
+  menuHeight: 60,
 })
 
 /**

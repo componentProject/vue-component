@@ -30,6 +30,7 @@
     "@antfu/eslint-config": "^4.16.1",
     "@moluoxixi/constant": "workspace:*",
     "@moluoxixi/utils": "workspace:*",
+    "@moluoxixi/components": "workspace:*",
     "@tailwindcss/postcss": "catalog:dev",
     "@types/lodash": "catalog:type",
     "@types/node": "catalog:type",

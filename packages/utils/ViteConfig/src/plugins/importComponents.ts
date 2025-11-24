@@ -111,7 +111,6 @@ export default function importComponents(options: ImportComponentsOrUtilsOptions
       virtualModuleId,
       dts: options.dts,
       watch: options.watch,
-      typeContent: `declare module '${virtualModuleId}/*' {\n  const anyModule: any\n  export default anyModule\n}`,
     },
     async ({ id }): Promise<string> => {
       const name = normalizeRequestName(id)
@@ -128,5 +127,7 @@ export default function importComponents(options: ImportComponentsOrUtilsOptions
         `
       }
     },
+    // 生成类型声明文件
+    () => `declare module '${virtualModuleId}/*' {\n  const anyModule: any\n  export default anyModule\n}`,
   )
 }

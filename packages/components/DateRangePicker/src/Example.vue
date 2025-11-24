@@ -163,11 +163,6 @@ import moment from 'moment'
 import { ref } from 'vue'
 import DateRangePicker from './index.vue'
 
-const a = `(function (a, b) {
-  console.log(a,b)
-})(this,2)`
-// eslint-disable-next-line no-new-func
-console.log('vvvvvvvvv', new Function('_this', a.replace('this', '_this'))({}))
 // 日期范围选择器
 const dateRange1 = ref([])
 const dateRange2 = ref([])

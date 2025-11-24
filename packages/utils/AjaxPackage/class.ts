@@ -24,7 +24,7 @@ import {
   createMessageWrapper,
   createNotificationWrapper,
 } from './_utils'
-import SystemErrorDialog, { extractSystemErrorInfo } from './SystemErrorDialog'
+import { extractSystemErrorInfo } from './_utils/systemErrorInfo'
 
 /**
  * 检查是否在浏览器环境
@@ -32,9 +32,9 @@ import SystemErrorDialog, { extractSystemErrorInfo } from './SystemErrorDialog'
 const hasDocument = typeof document !== 'undefined'
 
 /**
- * 系统异常对话框实例，仅在浏览器环境创建
+ * SystemErrorDialog 实例缓存
  */
-const systemErrorDialogInstance = hasDocument ? createApiDialog(SystemErrorDialog) : null
+let systemErrorDialogInstance: ReturnType<typeof createApiDialog> | null = null
 
 /**
  * 默认登录失效回调，跳转到登录页
@@ -57,12 +57,13 @@ function defaultGetToken() {
  * 基于 axios 封装的 HTTP 请求类，提供统一的请求处理、错误处理和响应解析
  */
 export default class BaseApi {
-  protected baseURL: string
-  protected timeout: number
+  protected baseURL: string = ''
+  protected timeout: number = 5000
   protected responseFields: Required<BaseApiConfig['responseFields']>
   protected onTimeout: () => void
   protected getToken?: () => string | null
   protected onLoginRequired?: () => void
+  protected enableSystemErrorDialog: boolean
   instance: ReturnType<typeof axios.create>
   protected messageInstance: MessageInstance
   protected notificationInstance: NotificationInstance
@@ -72,8 +73,20 @@ export default class BaseApi {
    * @param config - API 配置对象
    */
   constructor(config: BaseApiConfig) {
-    this.baseURL = config.baseURL || ''
-    this.timeout = config.timeout || 5000
+    // 提取BaseApi特有的配置
+    const {
+      baseURL = '',
+      timeout = 5000,
+      responseFields,
+      onTimeout = () => {},
+      getToken = defaultGetToken,
+      onLoginRequired = defaultOnLoginRequired,
+      enableSystemErrorDialog = true,
+      ...axiosConfig
+    } = config
+
+    this.baseURL = baseURL
+    this.timeout = timeout
     this.messageInstance = createMessageWrapper()
     this.notificationInstance = createNotificationWrapper()
     this.responseFields = {
@@ -82,23 +95,12 @@ export default class BaseApi {
       data: 'data',
       errors: 'errors',
       tips: 'tips',
-      ...config.responseFields,
+      ...responseFields,
     }
-    this.onTimeout = config.onTimeout || (() => {})
-
-    this.getToken = config.getToken || defaultGetToken
-    this.onLoginRequired = config.onLoginRequired || defaultOnLoginRequired
-
-    // 提取BaseApi特有的配置
-    const {
-      baseURL,
-      timeout,
-      responseFields,
-      onTimeout,
-      getToken,
-      onLoginRequired,
-      ...axiosConfig
-    } = config
+    this.onTimeout = onTimeout
+    this.getToken = getToken
+    this.onLoginRequired = onLoginRequired
+    this.enableSystemErrorDialog = enableSystemErrorDialog
 
     // 创建axios实例，传入所有剩余配置
     this.instance = axios.create({
@@ -145,16 +147,25 @@ export default class BaseApi {
 
     // 使用配置的字段名获取值，支持路径解析
     const code = getValueByPath(data, this.responseFields?.code)
-    const message = getValueByPath(data, this.responseFields?.message) || ''
-    const responseData = getValueByPath(data, this.responseFields?.data) || data
+    const message = getValueByPath(data, this.responseFields?.message)
+    const responseData = getValueByPath(data, this.responseFields?.data)
 
+    // console.log('responseData', data, this.responseFields?.data, getValueByPath(data, this.responseFields?.data))
+
+    // console.log('code', code)
     // 处理错误码
     if (code === 401) {
       throw new Error('登录失效，请重新登录')
     }
 
     if (code === -1) {
-      this.showSystemExceptionDialog(response, responseData, code, message)
+      // 如果启用了系统异常弹窗，则显示弹窗
+      if (this.enableSystemErrorDialog) {
+        // 异步调用，不阻塞错误抛出
+        this.showSystemExceptionDialog(response, responseData, code, message).catch((error) => {
+          console.error('显示系统异常对话框失败：', error)
+        })
+      }
       throw new Error(message || '系统异常')
     }
 
@@ -400,15 +411,35 @@ export default class BaseApi {
    * @param code - 错误状态码
    * @param message - 错误消息
    */
-  private showSystemExceptionDialog(response: AxiosResponse, responseData: AxiosResponse['data'], code: number, message: string): void {
-    if (!hasDocument || !systemErrorDialogInstance) {
+  private async showSystemExceptionDialog(response: AxiosResponse, responseData: AxiosResponse['data'], code: number, message: string): Promise<void> {
+    // 非浏览器环境，直接输出错误信息
+    if (!hasDocument) {
       console.error('系统异常信息：', responseData)
       return
     }
 
     try {
+      // 动态加载 SystemErrorDialog 模块（仅在浏览器环境中）
+      if (!systemErrorDialogInstance) {
+        try {
+          const module = await import('./SystemErrorDialog.vue')
+          if (module?.default) {
+            systemErrorDialogInstance = createApiDialog(module.default)
+          }
+          else {
+            console.error('系统异常信息：', responseData)
+            return
+          }
+        }
+        catch (error) {
+          console.warn('Failed to load SystemErrorDialog:', error)
+          console.error('系统异常信息：', responseData)
+          return
+        }
+      }
+
       // 从 response 中提取必要的信息，避免传递大对象
-      const errorInfo = extractSystemErrorInfo(response, code, message, responseData)
+      const errorInfo = extractSystemErrorInfo(response, code, message)
 
       systemErrorDialogInstance.show({
         props: {
@@ -416,7 +447,7 @@ export default class BaseApi {
           width: 600,
           ...errorInfo,
         },
-      }).then((result) => {
+      }).then((result: any) => {
         if (result?.reported) {
           console.log('系统异常已上报:', result)
           // 这里可以添加实际的错误上报逻辑
@@ -426,8 +457,8 @@ export default class BaseApi {
         else {
           console.log('系统异常对话框已确认')
         }
-      }).catch(() => {
-        console.log('系统异常对话框已关闭')
+      }).catch((e: any) => {
+        console.log('系统异常对话框已关闭', e)
       })
     }
     catch (error) {

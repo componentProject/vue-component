@@ -20,11 +20,11 @@
           v-if="!qiankunWindow.__POWERED_BY_QIANKUN__"
           class="headerbox"
           style="padding: 0"
-          height="30"
+          height="60"
         >
           <div class="w-full h-full bg-primary flex justify-center">
             <ElMenu :default-active="defaultTab" :ellipsis="false" mode="horizontal" router>
-              <SubMenu :routes="routes" />
+              <SubMenu menu-height="60" :routes="routes" />
             </ElMenu>
           </div>
         </ElHeader>

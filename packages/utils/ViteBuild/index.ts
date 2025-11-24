@@ -20,7 +20,7 @@ import AddUuidToTemplatePlugin from '../AddUuidToTemplatePlugin'
 import CssInjectedByJsPlugin from '../CssInjectedByJsPlugin'
 import cssModuleGlobalRootPlugin from '../cssModuleGlobalRootPlugin'
 // import { lazyImport, VxeResolver } from 'vite-plugin-lazy-import'
-import { UploadEvent } from './utils/UploadComponent.ts'
+// UploadEvent 使用动态导入，避免在模块加载时触发 SCSS 依赖链
 
 export type ViteConfigType = UserConfig | ((mode: ConfigEnv) => UserConfig)
 
@@ -555,7 +555,7 @@ async function analyzeComponentDeps(ctx: BuildContext, comp: string) {
     console.log('files', files)
     // 执行依赖分析
     console.log('正在使用dependency-cruiser分析依赖...')
-    const cruiseModules = []
+    const cruiseModules: any[] = []
     const callbacks = files.map(async (file) => {
       const cruiseResult = await cruise([file], cruiseOptions)
       cruiseModules.push(...(JSON.parse(cruiseResult.output as string)?.modules || []))
@@ -584,8 +584,8 @@ async function analyzeComponentDeps(ctx: BuildContext, comp: string) {
     for (const module of cruiseModules) {
       if (module.dependencies) {
         for (const dep of module.dependencies) {
-          const depPath = resolve(ctx.packDir, (dep as any).resolved)
-          console.log('depPath', depPath, dep)
+          // const depPath = resolve(ctx.packDir, (dep as any).resolved)
+          // console.log('depPath', depPath, dep)
 
           if (dep.dependencyTypes?.includes('npm')) {
             externalDeps.set(dep.module, allProjectDeps[dep.module])
@@ -1104,8 +1104,9 @@ async function buildComponent(
           return false
         }
       }
-      // 有 uploadType，使用 UploadEvent 上传
+      // 有 uploadType，使用 UploadEvent 上传（动态导入避免 SCSS 依赖问题）
       else if (ctx.uploadType) {
+        const { UploadEvent } = await import('./utils/UploadComponent.ts')
         const res = await UploadEvent(outputDir, buildName, ctx.uploadType)
         console.log('res', res)
       }

@@ -94,11 +94,11 @@ const { options: serverOrLocalOptions } = useOptions(props)
 
 /**
  * 默认禁用处理函数
- * @param label - 标签文本
- * @param value - 标签值
- * @returns 是否禁用
+ * @param params
+ * @param params.label - 标签文本
+ * @param params.value - 标签值
  */
-function defaultDisabledHandler({ label, value }: { [label: string]: any }) {
+function defaultDisabledHandler({ label, value }: { label: any, value: any }) {
   return props.disabledValues.includes(value) || props.disabledLabels.includes(label)
 }
 

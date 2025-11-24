@@ -59,18 +59,21 @@ export function findParentRouteHandle(
 
 /**
  * 根据文件结构生成路由配置
- * @param files - 文件映射对象
+ * @param files - 文件映射对象（懒加载模式下是函数映射，同步加载模式下是组件映射）
  * @param prefix - 路由前缀
  * @param baseRoute - 基础路由配置
+ * @param eager - 是否使用同步加载模式
  * @returns 生成的路由数组
  */
 export function generateRoutes(
-  files: FilesMap,
+  files: FilesMap | Record<string, () => Promise<any>> | Record<string, any>,
   prefix: string = '',
   baseRoute?: RouteModule | string,
+  eager: boolean = false,
 ): RouteModule[] {
   const newBaseRoute: RouteModule | undefined = typeof baseRoute === 'string' ? { name: baseRoute } : baseRoute
   const modules: RouteModule[] = newBaseRoute ? [newBaseRoute] : []
+
   return Object.keys(files)
     .sort((a, b) => {
       const aLength = a.split('/').length
@@ -78,8 +81,8 @@ export function generateRoutes(
       return bLength > aLength ? -1 : 1
     })
     .reduce((modules: RouteModule[] = [], modulePath: string) => {
-      const component = files[modulePath]
-      if (!component || modulePath === 'install')
+      const componentLoader = files[modulePath]
+      if (!componentLoader || modulePath === 'install')
         return modules
 
       const pathArr = modulePath.split('/').filter((item: string) => item && !item.includes('.'))
@@ -87,7 +90,6 @@ export function generateRoutes(
         pathArr.pop()
       }
       const componentName = pathArr.at(-1)
-      const name = component.name || componentName
 
       const path = `/${pathArr.join('/')}`
       const parentPath = `/${pathArr.slice(0, -1).join('/')}`
@@ -101,14 +103,31 @@ export function generateRoutes(
       else {
         parentRoute = findParentRouteHandle(modules, parentPath)
       }
+
+      // 根据加载模式处理 component
+      let component: any
+      let metaTitle: string = componentName!
+
+      if (eager) {
+        // 同步加载模式：componentLoader 已经是组件对象
+        component = componentLoader
+        // 优先使用组件的 name 属性，如果没有则使用 componentName
+        metaTitle = component?.name || componentName!
+      }
+      else {
+        // 懒加载模式：componentLoader 是函数
+        component = typeof componentLoader === 'function' ? componentLoader : componentLoader
+        metaTitle = componentName!
+      }
+
       if (parentRoute) {
         if (!parentRoute.children)
           parentRoute.children = []
         parentRoute.children.push({
           path,
-          name: path,
+          name: componentName!,
           meta: {
-            title: component.name || name,
+            title: metaTitle,
           },
           component,
         })
@@ -116,9 +135,9 @@ export function generateRoutes(
       else {
         modules.push({
           path,
-          name: path,
+          name: componentName!,
           meta: {
-            title: component.name || name,
+            title: metaTitle,
           },
           component,
         })
