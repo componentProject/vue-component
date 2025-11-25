@@ -1,13 +1,13 @@
 {
   "ViteConfig": "0.0.19",
-  "EslintConfig": "0.0.7-beta.0",
-  "AjaxPackage": "0.0.7-beta.0",
-  "ClassNames": "0.0.3-beta.0",
+  "EslintConfig": "0.0.7",
+  "AjaxPackage": "0.0.7",
+  "ClassNames": "0.0.3",
   "GoogleModel": "0.0.4",
-  "AddUuidToTemplatePlugin": "0.0.2-beta.0",
-  "ApiDialog": "0.0.2-beta.0",
-  "autoRoutes": "0.0.2-beta.0",
-  "CssInjectedByJsPlugin": "0.0.2-beta.0",
-  "cssModuleGlobalRootPlugin": "0.0.2-beta.0",
+  "AddUuidToTemplatePlugin": "0.0.2",
+  "ApiDialog": "0.0.2",
+  "autoRoutes": "0.0.2",
+  "CssInjectedByJsPlugin": "0.0.2",
+  "cssModuleGlobalRootPlugin": "0.0.2",
   "ViteBuild": "0.0.2"
 }

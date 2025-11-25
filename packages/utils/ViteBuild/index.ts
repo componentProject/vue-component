@@ -335,11 +335,16 @@ async function getComponentNames(ctx: BuildContext) {
 //#region 版本管理
 /**
  * 异步获取所有组件的版本号对象
+ * @param ctx 构建上下文
  * @returns 版本号对象 Record<string, string>
  */
 async function getCurrentVersions(ctx: BuildContext): Promise<Record<string, string>> {
   try {
-    const versionPath = resolve(ctx.packDir, 'version.json')
+    // 当 uploadType 存在且包含 Test 时，使用测试版本文件
+    const versionPath = ctx.uploadType && ctx.uploadType.includes('Test')
+      ? resolve(ctx.packDir, 'test-version.json')
+      : resolve(ctx.packDir, 'version.json')
+
     if (!fs.existsSync(versionPath)) {
       // 如果不存在，创建默认版本文件
       const defaultVersions: Record<string, string> = {}
@@ -411,12 +416,20 @@ function getNextVersion(currentVersion: string, type: 'major' | 'minor' | 'patch
 
 /**
  * 将版本号写回 version.json 文件
- * @param ctx
+ * @param ctx 构建上下文
  * @param versions 要更新的版本号对象
  */
 async function writeComponentVersions(ctx: BuildContext, versions: Record<string, string>): Promise<boolean> {
   try {
-    const versionPath = resolve(ctx.packDir, 'version.json')
+    let versionPath: string
+
+    // 当 uploadType 存在且包含 Test 时，使用测试版本文件
+    if (ctx.uploadType && ctx.uploadType.includes('Test')) {
+      versionPath = resolve(ctx.packDir, 'test-version.json')
+    }
+    else {
+      versionPath = resolve(ctx.packDir, 'version.json')
+    }
 
     // 读取现有版本文件
     let existingVersions: Record<string, string> = {}
@@ -552,7 +565,6 @@ async function analyzeComponentDeps(ctx: BuildContext, comp: string) {
       absolute: true,
       onlyFiles: true,
     })
-    console.log('files', files)
     // 执行依赖分析
     console.log('正在使用dependency-cruiser分析依赖...')
     const cruiseModules: any[] = []
