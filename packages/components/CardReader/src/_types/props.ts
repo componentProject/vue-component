@@ -7,5 +7,5 @@ export interface propsType extends Partial<cardReaderPluginType> {
   /** 输入框占位符 */
   placeholder?: string
   /** 读卡触发方式 */
-  readType?: 'focus' | 'select'
+  readType?: 'focus' | 'select' | 'enter'
 }

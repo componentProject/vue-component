@@ -5,6 +5,7 @@
     v-model="inputValue"
     :placeholder="props.placeholder"
     @focus="handleInputFocus"
+    @keydown.enter="handleInputEnter"
   >
     <template #append>
       <TsSelect
@@ -43,7 +44,7 @@ defineOptions({
 
 const props = withDefaults(defineProps<propsType>(), {
   placeholder: '请输入或读卡',
-  readType: 'focus',
+  readType: 'enter',
 })
 
 const emit = defineEmits<emitsType>()
@@ -222,6 +223,14 @@ function handleInputFocus() {
     handleReadCard()
   }
 }
+/**
+ * 处理输入框回车事件
+ */
+function handleInputEnter() {
+  if (props.readType === 'enter') {
+    handleReadCard()
+  }
+}
 
 /**
  * 处理选择器变化事件
@@ -236,8 +245,6 @@ function handleSelectChange() {
  * 处理读卡
  */
 async function handleReadCard() {
-  console.log(currentPluginType.value, pluginList.value)
-
   // 使用 for await 遍历插件列表，调用 CommonSdk
   if (currentPluginType.value && pluginList.value && pluginList.value.length > 0) {
     for await (const plugin of pluginList.value) {
