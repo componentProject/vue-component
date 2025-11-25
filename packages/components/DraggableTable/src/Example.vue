@@ -49,7 +49,7 @@
     </div>
     <!-- 使用DraggableTable组件 -->
     <div class="border-2 flex-1-hidden">
-      <aDraggableTable
+      <DraggableTable
         id="demo_table_12355666"
         ref="draggableTableRef"
         v-model="tableData"
@@ -78,7 +78,7 @@
       >
         <template #expand_content="{ row }">
           <div class="expand-wrapper">
-            <aDraggableTable v-bind="childGridOptions" :data="row.childList" />
+            <DraggableTable v-bind="childGridOptions" :data="row.childList" />
           </div>
         </template>
 
@@ -97,7 +97,7 @@
         <template #sex>
           <TsSelect :options="options" />
         </template>
-      </aDraggableTable>
+      </DraggableTable>
     </div>
   </div>
 </template>
@@ -105,7 +105,7 @@
 <script lang="ts" setup>
 import { ElButton, ElMessage } from 'element-plus'
 import { onMounted, ref, useTemplateRef } from 'vue'
-import aDraggableTable from './index.vue'
+import DraggableTable from './index.vue'
 // 表格加载状态
 const loading = ref(false)
 // 拖拽开关状态

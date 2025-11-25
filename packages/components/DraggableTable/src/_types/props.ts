@@ -19,7 +19,7 @@ export type types = VxeColumnPropTypes.Type & customCustomTypes
 /**
  * DraggableTable 组件的 Props 类型定义
  */
-export interface propsType {
+interface propsTypeBase {
   resizable: boolean
 
   cellConfig: VxeTablePropTypes.CellConfig
@@ -58,17 +58,17 @@ export interface propsType {
    */
   dragType: string
   /** 需要禁用拖拽的行class */
-  rowDisabledClass?: string
+  rowDisabledClass: string
   /** 行拖拽禁用方法 */
-  rowDragDisabledMethod?: (...args: any[]) => any
+  rowDragDisabledMethod: (...args: any[]) => any
   /** 行拖拽结束回调方法 */
-  rowDragEndMethod?: (...args: any[]) => any
+  rowDragEndMethod: (...args: any[]) => any
   /** 行拖拽配置对象 */
   rowDragConfig: VxeTablePropTypes.RowDragConfig
   /** 列拖拽禁用方法 */
-  columnDragDisabledMethod?: (...args: any[]) => any
+  columnDragDisabledMethod: (...args: any[]) => any
   /** 列拖拽结束回调方法 */
-  columnDragEndMethod?: (...args: any[]) => any
+  columnDragEndMethod: (...args: any[]) => any
   /** 列拖拽配置对象 */
   columnDragConfig: VxeTablePropTypes.ColumnDragConfig
   //#endregion
@@ -113,21 +113,23 @@ export interface propsType {
   //#region 存储相关
   saveType: 'local' | 'server' | 'default'
   saveHotKeys: string[]
-  getConfig?: (config: customConfigType) => Promise<ColumnType[]>
-  setConfig?: (config: customConfigType, columns: ColumnType[]) => Promise<any>
+  getConfig: (config: customConfigType) => Promise<ColumnType[]>
+  setConfig: (config: customConfigType, columns: ColumnType[]) => Promise<any>
   /** 自定义自定义存储弹窗的columns */
   customColumns: ColumnType[]
   // 表格唯一ID，用于本地存储识别
-  id?: string
-  pageId?: string
-  userId?: string
+  id: string
+  pageId: string
+  userId: string
   // 是否有权限统一配置（个性话化列配置）
   isConfiguration: boolean
   /** 自定义弹窗配置 */
-  dialogProps?: any
+  dialogProps: any
   //#endregion
 }
+export interface propsType extends Partial<propsTypeBase> {
 
+}
 interface customColumnProps {
   type?: types
   /** 仅贡编辑模式下select下拉框使用，传递后默认启动select */

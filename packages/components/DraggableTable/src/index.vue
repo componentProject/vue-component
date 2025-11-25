@@ -5,9 +5,9 @@
       ref="xTable"
       border
       auto-resize
-      show-overflow
-      show-header-overflow
-      show-footer-overflow
+      show-overflow="title"
+      show-header-overflow="title"
+      show-footer-overflow="title"
       keep-source
       :columns="computedColumns"
       :header-cell-style="computedHeaderCellStyle"
@@ -78,6 +78,7 @@ import type {
   VxeTablePropTypes,
 } from 'vxe-table'
 import type { ColumnType, emitsType, propsType } from './_types'
+// import VxeGrid from '@moluoxixi/components/VxeGrid'
 import { deleteMemoryUpload, getMemoryQuery, setMemoryUpload } from '@moluoxixi/utils/_api/cache'
 import {
   getClass,
@@ -104,7 +105,6 @@ import {
   watch,
 } from 'vue'
 
-import { VxePager, VxeTooltip } from 'vxe-pc-ui'
 import { getCustomType, handleGetRequiredFields } from './_utils'
 import CustomConfigDialog from './components/CustomConfigDialog.vue'
 // 导入自定义渲染器，改造了VxeGrid，直接用Grid的VxeUI
@@ -264,17 +264,6 @@ const emit = defineEmits<emitsType>()
 
 // 获取插槽
 const slots = defineSlots<slotsType>()
-
-// 注册 VxeUI 组件
-/**
- * 安装 VxeUI 组件
- * @param VxeUI - VxeUI 实例
- */
-function installVxeUIComponent(VxeUI: any) {
-  VxeUI.component(VxePager)
-  VxeUI.component(VxeTooltip)
-}
-
 //#region 根据props动态计算的vxeGrid属性
 /**
  * 获取高度数值
@@ -614,7 +603,6 @@ const collectColumn = computed<ColumnType[]>(() => {
   if (!VxeUI) {
     VxeUI = xTable.value.VxeUI
     installFn(VxeUI)
-    installVxeUIComponent(VxeUI)
   }
   const { collectColumn } = xTable.value.getTableColumn()
   return collectColumn as any[]

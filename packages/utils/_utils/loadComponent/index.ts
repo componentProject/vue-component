@@ -119,6 +119,23 @@ export async function registerAllComponent(Vue: any, app: any, type?: string, is
   })
 }
 
+/**
+ * 获取文件导出内容
+ * @param Vue
+ * @param app
+ * @param type
+ * @param isLongRange
+ * @param moduleType
+ * @param componentCode
+ */
+export async function getContent(Vue: any, app: any, type?: string, isLongRange = false, componentCode: string, moduleType: string = 'umd') {
+  const vueVersion = getVueVersion(Vue)
+  const componentItemKey = type ?? vueVersion
+  isString(componentItemKey)
+  const allComponentList: any[] = await idbStorage.getItem(componentItemKey)
+  return await loadRemoteComponent(Vue, componentCode, allComponentList, moduleType, isLongRange)
+}
+
 function getiifeComponent(Vue: any, vueShared: any, componentCode: string, componentName: string) {
   // eslint-disable-next-line no-new-func
   return new Function(

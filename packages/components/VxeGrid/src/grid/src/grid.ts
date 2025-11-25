@@ -1,8 +1,9 @@
-// VxeGrid的grid组件
 import type { ComponentPublicInstance, PropType, Ref, VNode } from 'vue'
 import type { ValueOf, VxeFormEvents, VxeFormInstance, VxeFormItemProps, VxePagerEvents, VxePagerInstance } from 'vxe-pc-ui'
 import type { GridMethods, GridPrivateMethods, GridPrivateRef, GridReactData, VxeGridConstructor, VxeGridEmits, VxeGridPrivateComputed, VxeGridPrivateMethods, VxeGridProps, VxeGridPropTypes, VxeTableConstructor, VxeTableDefines, VxeTableEventProps, VxeTableEvents, VxeTableMethods, VxeTablePrivateMethods, VxeTableProps, VxeToolbarInstance, VxeToolbarPropTypes } from '../../../types'
 import { computed, createCommentVNode, defineComponent, h, nextTick, onMounted, onUnmounted, provide, reactive, ref, watch } from 'vue'
+// VxeGrid的grid组件
+import { VxeForm, VxePager } from 'vxe-pc-ui'
 import XEUtils from 'xe-utils'
 // 导入 CSS Modules 样式文件
 // 注意：grid 组件中已经有 styles 变量（来自 computeStyles），所以使用 cssModules 作为变量名
@@ -61,10 +62,10 @@ export default defineComponent({
     const xID = XEUtils.uniqueId()
 
     // 使用已安装的组件，如果未安装则不渲染
-    const VxeUIFormComponent = VxeUI.getComponent<VxeFormComponent>('VxeForm')
-    const VxeUIPagerComponent = VxeUI.getComponent<VxePagerComponent>('VxePager')
-    // const VxeUIFormComponent = VxeForm
-    // const VxeUIPagerComponent = VxePager
+    // const VxeUIFormComponent = VxeUI.getComponent<VxeFormComponent>('VxeForm')
+    // const VxeUIPagerComponent = VxeUI.getComponent<VxePagerComponent>('VxePager')
+    const VxeUIFormComponent = VxeForm
+    const VxeUIPagerComponent = VxePager
 
     const { computeSize } = useFns.useSize(props)
 

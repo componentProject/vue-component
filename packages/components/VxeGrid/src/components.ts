@@ -34,6 +34,9 @@ if (!VxeUI.hasLanguage('zh-CN')) {
 }
 VxeUI.setTheme('light')
 
+export {
+  VxeUI,
+}
 export * from './colgroup'
 
 export * from './column'

@@ -3,9 +3,9 @@ import type { PropType, Ref, VNode } from 'vue'
 import type { VxeButtonEvents } from 'vxe-pc-ui'
 import type { VxeColumnPropTypes, VxeTableConstructor, VxeTableDefines, VxeTableMethods, VxeTablePrivateMethods } from '../../../../types'
 import { createCommentVNode, defineComponent, h, inject, nextTick, ref, TransitionGroup } from 'vue'
+import { VxeTooltip } from 'vxe-pc-ui'
 import XEUtils from 'xe-utils'
 import { VxeUI } from '../../../ui'
-
 import { addClass, removeClass } from '../../../ui/src/dom'
 import { errLog } from '../../../ui/src/log'
 import { formatText } from '../../../ui/src/utils'
@@ -25,13 +25,13 @@ export default defineComponent({
     const VxeUIDrawerComponent = VxeUI.getComponent<VxeDrawerComponent>('VxeDrawer')
     const VxeUIButtonComponent = VxeUI.getComponent<VxeButtonComponent>('VxeButton')
     const VxeUIInputComponent = VxeUI.getComponent<VxeInputComponent>('VxeInput')
-    const VxeUITooltipComponent = VxeUI.getComponent<VxeTooltipComponent>('VxeTooltip')
+    // const VxeUITooltipComponent = VxeUI.getComponent<VxeTooltipComponent>('VxeTooltip')
     const VxeUIRadioGroupComponent = VxeUI.getComponent<VxeRadioGroupComponent>('VxeRadioGroup')
     // const VxeUIModalComponent = VxeModal
     // const VxeUIDrawerComponent = VxeDrawer
     // const VxeUIButtonComponent = VxeButton
     // const VxeUIInputComponent = VxeInput
-    // const VxeUITooltipComponent = VxeTooltip
+    const VxeUITooltipComponent = VxeTooltip
     // const VxeUIRadioGroupComponent = VxeRadioGroup
 
     const $xeTable = inject('$xeTable', {} as VxeTableConstructor & VxeTableMethods & VxeTablePrivateMethods)
