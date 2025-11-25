@@ -16,7 +16,7 @@ export type FilterMethod = (query: string) => void
 /**
  * TsSelect 组件的 Props 类型定义
  */
-export interface propsType {
+interface propsTypeBase {
   tagType: 'success' | 'info' | 'warning' | 'danger' | 'primary'
   teleported: boolean
   clearable: boolean
@@ -44,3 +44,4 @@ export interface propsType {
   responseDataPath: string
   optionProps?: Record<string, any>
 }
+export interface propsType extends Partial<propsTypeBase> {}

@@ -10,11 +10,13 @@
         v-model="cardValue"
         button-text="读取卡片"
         placeholder="请点击按钮读卡"
+        :plugin-type="pluginType"
+        fun-name="readIdCard"
         @read-success="handleReadSuccess"
         @read-error="handleReadError"
       />
       <p class="mt-2 text-gray-600">
-        当前值: {{ cardValue2 }}
+        当前值: {{ cardValue }}
       </p>
     </div>
   </div>
@@ -25,7 +27,7 @@ import { ref } from 'vue'
 import CardReader from './index.vue'
 
 const cardValue = ref('')
-
+const pluginType = ref('idCard')
 /**
  * 处理读卡成功
  * @param data - 读卡数据
