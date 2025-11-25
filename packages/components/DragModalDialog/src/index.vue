@@ -532,6 +532,11 @@ function initPosition() {
   if (!modalRef.value)
     return
 
+  // 如果 rememberPosition 为 false，清除之前保存的位置数据
+  if (!props.rememberPosition) {
+    clearPositionFromStorage(getStorageKey())
+  }
+
   // 尝试从localStorage加载位置
   const savedPosition = loadPosition()
 
@@ -643,6 +648,16 @@ function initPosition() {
     currentHeight.value = targetHeight
   }
 }
+
+/**
+ * 监听 rememberPosition 变化，当变为 false 时清除保存的位置数据
+ */
+watch(() => props.rememberPosition, (newVal: any, oldVal: any) => {
+  // 当 rememberPosition 从 true 变为 false 时，清除保存的位置数据
+  if (oldVal === true && newVal === false) {
+    clearPositionFromStorage(getStorageKey())
+  }
+})
 
 /**
  * 监听 visible 变化，初始化位置并触发相应事件
