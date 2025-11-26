@@ -1,8 +1,8 @@
 // _scripts的buildComponent组件
+import type { GlobalFormatConfig } from '@moluoxixi/utils/ViteBuild'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { COMPONENT_SETTING_TYPE } from '@moluoxixi/constant'
-
 import { runBuildCliAndExit } from '@moluoxixi/utils/ViteBuild'
 // === 组件库命名空间配置 ===
 const LIB_NAMESPACE = 'moluoxixi'
@@ -25,6 +25,18 @@ const alias = {
   '@moluoxixi/utils/*': resolve(rootDir, './packages/utils/*'),
 }
 
+/**
+ * 格式配置：浏览器环境打 ES 和 UMD 格式
+ * browserFormats 默认为 { es: true }，这里添加 umd: true
+ * 注意：如果不提供 formatConfig，默认就是浏览器环境，只打 ES 格式
+ */
+const formatConfig: GlobalFormatConfig = {
+  // isNodeEnv 默认为 false（浏览器环境），可省略
+  browserFormats: {
+    umd: true, // 在默认 ES 基础上添加 UMD 格式
+  },
+}
+
 runBuildCliAndExit(
   {
     libNamespace: LIB_NAMESPACE,
@@ -32,6 +44,7 @@ runBuildCliAndExit(
     alias,
     rootDir,
     packDir,
+    formatConfig,
     // styleType: 'scoped',
     presetGlobals: {
     },

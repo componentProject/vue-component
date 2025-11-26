@@ -48,7 +48,7 @@
       </ElButton>
     </div>
     <!-- 使用DraggableTable组件 -->
-    <div class="border-2 flex-1-hidden">
+    <div class="border-2 h-[300px]!">
       <DraggableTable
         id="demo_table_12355666"
         ref="draggableTableRef"
@@ -105,7 +105,7 @@
 <script lang="ts" setup>
 import { ElButton, ElMessage } from 'element-plus'
 import { onMounted, ref, useTemplateRef } from 'vue'
-import DraggableTable from './index.vue'
+// import DraggableTable from './index.vue'
 // 表格加载状态
 const loading = ref(false)
 // 拖拽开关状态
