@@ -32,7 +32,7 @@ import type {
   emitsType,
   propsType,
 } from './_types'
-import TsSelect from '@moluoxixi/components/TsSelect'
+// import TsSelect from '@moluoxixi/components/TsSelect'
 import BaseApi from '@moluoxixi/utils/AjaxPackage/class'
 import { ElInput } from 'element-plus'
 import { computed, ref, watch } from 'vue'
