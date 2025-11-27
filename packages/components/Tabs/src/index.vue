@@ -63,7 +63,7 @@ const emit = defineEmits<emitsType>()
 // 获取插槽
 const slots = defineSlots<slotsType>()
 
-const activeName = defineModel({ default: '0', type: String })
+const activeName = defineModel({ default: 0, type: Number })
 
 // 计算字段名
 const computedLabel = computed(() => props.labelKey || props.label)
@@ -77,8 +77,11 @@ const filteredOptions = computed(() => {
   if (props.tabList?.length) {
     return props.tabList?.filter(item => item.show ? item.show(item) : true) || []
   }
-  else {
+  else if (serverOrLocalOptions.value?.length) {
     return serverOrLocalOptions.value.filter(item => item.show ? item.show(item) : true)
+  }
+  else {
+    return Object.keys(slots).map((key, index) => ({ show: true, label: key, name: index, slot: key, lazy: false }))
   }
 })
 

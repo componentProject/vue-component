@@ -1,24 +1,29 @@
 <!-- CardReader组件主文件 -->
 <template>
-  <ElInput
-    v-bind="$attrs"
-    v-model="inputValue"
-    :placeholder="props.placeholder"
-    @focus="handleInputFocus"
-    @keydown.enter="handleInputEnter"
-  >
-    <template #append>
-      <TsSelect
-        v-model="selectedPluginType"
-        :options="hardwareClassList"
-        label="dictItem"
-        value="dictValue"
-        style="width: 118px"
-        :clearable="false"
-        @change="handleSelectChange"
+  <div style="display: flex">
+    <template
+      v-for="showType in props.showTypes"
+      :key="showType"
+    >
+      <ElInput
+        v-if="showType === 'card'"
+        v-bind="$attrs"
+        v-model="inputValue"
+        clearable
+        style="margin-right: 12px"
+        :placeholder="props.placeholder"
+        @focus="handleInputFocus"
+        @blur="handleInputBlur"
+        @keydown.enter="handleInputEnter"
       />
+      <ElButton v-if="showType === 'qrcode'" type="primary" @click="medicalInsuranceQRCodeHandler">
+        医保扫码
+      </ElButton>
+      <ElButton v-if="showType === 'face'" type="primary" @click="medicalInsuranceFaceScanningHandler">
+        医保扫脸
+      </ElButton>
     </template>
-  </ElInput>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -34,8 +39,9 @@ import type {
 } from './_types'
 // import TsSelect from '@moluoxixi/components/TsSelect'
 import BaseApi from '@moluoxixi/utils/AjaxPackage/class'
-import { ElInput } from 'element-plus'
-import { computed, ref, watch } from 'vue'
+import { ElButton, ElInput, ElMessage } from 'element-plus'
+import { isEmpty } from 'radash'
+import { ref } from 'vue'
 
 defineOptions({
   name: 'CardReader',
@@ -43,8 +49,9 @@ defineOptions({
 })
 
 const props = withDefaults(defineProps<propsType>(), {
-  placeholder: '请输入或读卡',
-  readType: 'enter',
+  placeholder: '点击读取身份证/社保卡',
+  readTypes: ['focus'],
+  showTypes: ['card', 'qrcode', 'face'],
 })
 
 const emit = defineEmits<emitsType>()
@@ -53,7 +60,7 @@ const inputValue = defineModel({
   type: String,
   default: '',
 })
-
+const isBlur = ref(false)
 /** HTTP 服务实例 */
 const httpService = new BaseApi({
   baseURL: 'http://localhost:26784',
@@ -64,20 +71,31 @@ const httpService = new BaseApi({
   },
 })
 
+/** HTTP 服务实例 */
+const readService = new BaseApi({
+  baseURL: 'http://localhost:26784',
+  timeout: 500000,
+  responseFields: {
+    code: 'statusCode',
+    message: 'message',
+    data: 'object',
+  },
+})
+
+async function medicalInsuranceQRCodeHandler() {
+  const res = await baseHandler(['medicalInsurance'], 'medicalInsuranceQRCode')
+  inputValue.value = res?.authCheckedObj?.idNo || res?.authObj?.idNo
+}
+async function medicalInsuranceFaceScanningHandler() {
+  const res = await baseHandler(['medicalInsurance'], 'faceScanning')
+  inputValue.value = res?.authCheckedObj?.idNo || res?.authObj?.idNo
+}
+
 /** 操作系统对象 */
 const systemInfo = ref<cardReaderSystemType | null>(null)
 
 /** 硬件分类列表 */
 const hardwareClassList = ref<cardReaderHardwareClassType[]>([])
-
-/** 选中的插件类型 */
-const selectedPluginType = ref<string>('')
-
-/** 当前使用的插件类型（用于加载插件列表） */
-const currentPluginType = computed(() => selectedPluginType.value || props.pluginType || '')
-
-/** 插件列表 */
-const pluginList = ref<cardReaderPluginType[]>([])
 
 /**
  * 获取操作系统信息
@@ -91,11 +109,10 @@ async function getSystemInfo() {
   }
 
   try {
-    const result
-      = await httpService.get<cardReaderSystemType[]>(
-        '/mini-portal/dict/page/detail',
-        params,
-      )
+    const result = await httpService.get<cardReaderSystemType[]>(
+      '/mini-portal/dict/page/detail',
+      params,
+    )
     // 取 rows 中的第一个对象
     systemInfo.value = result?.[0] || null
     return systemInfo.value
@@ -121,15 +138,7 @@ async function getHardwareClassList() {
       '/mini-portal/dict/page/detail',
       params,
     )
-    hardwareClassList.value = result || []
-    // 如果没有传入 pluginType，则取列表第一个的 dictValue
-    if (!props.pluginType && hardwareClassList.value.length > 0) {
-      selectedPluginType.value = hardwareClassList.value[0].dictValue
-    }
-    else if (props.pluginType) {
-      selectedPluginType.value = props.pluginType
-    }
-    return result
+    hardwareClassList.value = (result || [])
   }
   catch (error) {
     console.error('获取硬件分类列表失败:', error)
@@ -140,56 +149,70 @@ async function getHardwareClassList() {
 /**
  * 获取插件列表
  */
-async function getPluginList(osType: string) {
+async function getPluginList(osType: string, pluginType: string) {
   const params: cardReaderPluginParamsType = {
     pageNo: 1,
     pageSize: 100,
     company: '',
     model: '',
     osType,
-    pluginType: currentPluginType.value,
+    pluginType,
     searchKey: '',
   }
 
   try {
-    const result = await httpService.get<cardReaderPluginType[]>(
+    // pluginList.value = result || []
+    return await httpService.get<cardReaderPluginType[]>(
       '/mini-portal/plugin',
       params,
     )
-    pluginList.value = result || []
-    return result
   }
   catch (error) {
     console.error('获取插件列表失败:', error)
     return null
   }
 }
+function JoinldcardAlias(item) {
+  return `${item.pluginType}_${item.pluginName}_${item.code}_${item.company}_${item.model}`
+}
+async function getCallCommonSdk(osType: string, pluginType: string, funName: string) {
+  const pluginList = await getPluginList(osType, pluginType)
+  for (const plugin of pluginList) {
+    const ioType = plugin.ioType ? JSON.parse(plugin.ioType) : []
+    for (const ioTypeElement of ioType) {
+      const result = await callCommonSdk(plugin, pluginType, funName || ioTypeElement, ioType)
+      const res = {}
+      if (result) {
+        Object.keys(result).forEach((key) => {
+          if (!isEmpty(res[key])) {
+            res[key] = result[key]
+          }
+        })
+      }
+
+      if (!isEmpty(res)) {
+        return res
+        break
+      }
+    }
+  }
+}
 
 /**
  * 调用 CommonSdk 接口
  */
-async function callCommonSdk(plugin: cardReaderPluginType) {
+async function callCommonSdk(plugin: cardReaderPluginType, pluginType: string, funName: string, ioType: string[]) {
   // 构建参数：包含插件对象的所有属性、pluginType 和 props 中的所有插件相关属性
   const params: cardReaderCommonSdkParamsType = {
     ...plugin,
-    pluginType: currentPluginType.value,
-    // 合并 props 中的插件相关属性（如果存在）
-    ...(Object.keys(props).reduce((acc, key) => {
-      if (
-        key !== 'placeholder'
-        && key !== 'pluginType'
-        && key !== 'readType'
-        && props[key as keyof typeof props] !== undefined
-      ) {
-        acc[key] = props[key as keyof typeof props]
-      }
-      return acc
-    }, {} as Record<string, any>)),
+    pluginType,
+    funName,
+    ioType,
+    alias: JoinldcardAlias(plugin),
   }
 
   try {
-    const result = await httpService.post('/commonSdk/index', params)
-    return result
+    return await readService.post('/commonSdk/index', params)
   }
   catch (error) {
     console.error('调用 CommonSdk 失败:', error)
@@ -202,42 +225,39 @@ getSystemInfo()
 getHardwareClassList()
 
 /**
- * 监听 currentPluginType 和 systemInfo 的变化，都存在时调用 getPluginList
- */
-watch(
-  [() => currentPluginType.value, () => systemInfo.value],
-  async () => {
-    // 判断 systemInfo 和 pluginType 都有值才调用
-    if (systemInfo.value?.dictValue && currentPluginType.value) {
-      await getPluginList(systemInfo.value.dictValue)
-    }
-  },
-  { immediate: true },
-)
-
-/**
  * 处理输入框聚焦事件
  */
 function handleInputFocus() {
-  if (props.readType === 'focus') {
-    handleReadCard()
+  isBlur.value = false
+  if (props.readTypes.includes('focus')) {
+    queueReadCard()
   }
+  emit('focus')
 }
+
+function handleInputBlur() {
+  isBlur.value = true
+  emit('blur')
+}
+
 /**
  * 处理输入框回车事件
  */
 function handleInputEnter() {
-  if (props.readType === 'enter') {
-    handleReadCard()
+  if (props.readTypes.includes('enter')) {
+    queueReadCard()
   }
+  emit('enter')
 }
 
-/**
- * 处理选择器变化事件
- */
-function handleSelectChange() {
-  if (props.readType === 'select') {
-    handleReadCard()
+async function queueReadCard() {
+  const startTime = Date.now()
+  while (Date.now() - startTime < 3000 && !isBlur.value) {
+    const res = await handleReadCard()
+    if (res?.CardNo && !isBlur.value) {
+      inputValue.value = res.CardNo
+      break
+    }
   }
 }
 
@@ -245,17 +265,28 @@ function handleSelectChange() {
  * 处理读卡
  */
 async function handleReadCard() {
-  // 使用 for await 遍历插件列表，调用 CommonSdk
-  if (currentPluginType.value && pluginList.value && pluginList.value.length > 0) {
-    for await (const plugin of pluginList.value) {
-      await callCommonSdk(plugin)
+  return await baseHandler(['idCard', 'socialWelfareCard'])
+}
+async function baseHandler(idCards: string[] = [], funName?: string) {
+  const list = hardwareClassList.value?.filter(item => idCards.includes(item.dictValue)) || []
+  if (!list?.length) {
+    ElMessage.warning('请等待插件分类请求')
+    return
+  }
+  for (const hardwareClass of list) {
+    const res = await getCallCommonSdk(systemInfo.value.dictValue, hardwareClass.dictValue, funName)
+
+    if (!isEmpty(res)) {
+      // console.log('res', res, isEmpty(res))
+      emit('readSuccess', res)
+      return res
+      break
     }
   }
 }
-
 // 暴露方法供外部调用
 defineExpose({
-  handleReadCard,
+  queueReadCard,
 })
 </script>
 

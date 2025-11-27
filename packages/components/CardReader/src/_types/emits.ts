@@ -6,4 +6,6 @@ export interface emitsType {
   (e: 'readSuccess', data: any): void
   /** 读卡失败时触发 */
   (e: 'readError', error: any): void
+  (e: 'focus', error: any): void
+  (e: 'enter', error: any): void
 }

@@ -2,32 +2,18 @@
 <template>
   <div class="space-y-6">
     <!-- 自定义按钮文字和占位符 -->
-    <div>
-      <h3 class=" font-semibold mb-4">
-        自定义按钮文字和占位符和事件处理示例
-      </h3>
-      <CardReader
-        v-model="cardValue"
-        button-text="读取卡片"
-        placeholder="请点击按钮读卡"
-        :plugin-type="pluginType"
-        fun-name="readIdCard"
-        @read-success="handleReadSuccess"
-        @read-error="handleReadError"
-      />
-      <p class="mt-2 text-gray-600">
-        当前值: {{ cardValue }}
-      </p>
-    </div>
+    <CardReader
+      button-text="读取身份证"
+      plugin-type="idCard"
+      fun-name="readIdCard"
+      @read-success="handleReadSuccess"
+      @read-error="handleReadError"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
 import CardReader from './index.vue'
-
-const cardValue = ref('')
-const pluginType = ref('idCard')
 /**
  * 处理读卡成功
  * @param data - 读卡数据

@@ -15,7 +15,7 @@ export type DisabledHandler = (params: { label: string, value: any, data: Option
  */
 export interface TabItem {
   label: string
-  name: string | number
+  name: number
   slot?: string
   lazy?: boolean
   show?: (item: any) => boolean
