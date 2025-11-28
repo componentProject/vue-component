@@ -11,7 +11,7 @@
 import type { slotsType } from '@moluoxixi/components/_types'
 import { ElButton as OldElButton } from 'element-plus'
 // 获取插槽
-import { throttle as _throttle } from 'lodash'
+import { throttle as _throttle } from 'lodash-es'
 import { computed } from 'vue'
 
 defineOptions({

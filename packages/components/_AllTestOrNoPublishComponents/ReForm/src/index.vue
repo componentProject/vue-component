@@ -80,8 +80,8 @@ import type { ReFormEmits, ReFormProps, ReGridResponsive } from './_types'
 import { throttle } from '@moluoxixi/utils/_utils/event'
 /** 导入 Element Plus 组件 */
 import { ElButton, ElForm, ElFormItem } from 'element-plus'
-/** 导入 lodash 工具函数 */
-import { cloneDeep, isUndefined } from 'lodash'
+/** 导入 lodash-es 工具函数 */
+import { cloneDeep, isUndefined } from 'lodash-es'
 /** 导入拖拽排序库 */
 import Sortable from 'sortablejs'
 /** 导入 Vue 组合式 API */

@@ -41,7 +41,7 @@
     "highlight.js": "^10.7.2",
     "jsoneditor": "^9.9.0",
     "keycon": "^1.1.2",
-    "lodash": "catalog:build",
+    "lodash-es": "catalog:build",
     "markdown-it": "catalog:build",
     "markdown-it-abbr": "^1.0.4",
     "markdown-it-anchor": "^9.2.0",
@@ -87,7 +87,6 @@
   "devDependencies": {
     "@types/qrcode": "^1.5.6",
     "@types/file-saver": "catalog:type",
-    "@types/lodash": "catalog:type",
     "@types/markdown-it": "catalog:type",
     "@types/markdown-it-container": "catalog:type",
     "@types/uuid": "catalog:type",

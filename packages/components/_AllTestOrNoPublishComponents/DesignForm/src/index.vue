@@ -40,7 +40,7 @@ import type {
   FormItemClickEvent,
 } from './types'
 import { ElMessage } from 'element-plus'
-import { isObject } from 'lodash'
+import { isObject } from 'lodash-es'
 import { onMounted, ref, watch } from 'vue'
 import DesignFormList from './components/DesignFormList.vue'
 import DesignFormRules from './components/DesignFormRules.vue'

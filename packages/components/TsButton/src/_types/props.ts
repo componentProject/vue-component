@@ -1,5 +1,5 @@
 // TsButton的props组件
-import type { DebounceSettings, ThrottleSettings } from 'lodash'
+import type { DebounceSettings, ThrottleSettings } from 'lodash-es'
 
 export type ShowType = 'content' | 'disabled'
 export type ThrottleOrDebounceOptions = Partial<DebounceSettings & ThrottleSettings> & { promise?: boolean }

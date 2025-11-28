@@ -91,7 +91,7 @@ import {
   onHotkeys,
 } from '@moluoxixi/utils/_utils/event'
 import { ElMessage } from 'element-plus'
-import { cloneDeep, groupBy } from 'lodash'
+import { cloneDeep, groupBy } from 'lodash-es'
 import { diff, isEmpty } from 'radash'
 import Sortable from 'sortablejs'
 import {

@@ -20,12 +20,11 @@
     "@vueuse/core": "^11.0.0",
     "axios": "catalog:build",
     "element-plus": "catalog:build",
-    "lodash": "catalog:build",
+    "lodash-es": "catalog:build",
     "vue": "catalog:build",
     "vue-router": "catalog:build"
   },
   "devDependencies": {
-    "@types/lodash": "catalog:type",
     "sass": "catalog:dev",
     "sass-embedded": "catalog:dev",
     "sass-loader": "catalog:dev",

@@ -82,7 +82,7 @@ import type { VxeTableDefines } from 'vxe-table'
 import type { filterRendererPropsType } from './_types'
 import { getTypeDefault } from '@moluoxixi/utils/_utils'
 import { ElButton, ElCheckbox, ElInput } from 'element-plus'
-import { groupBy } from 'lodash'
+import { groupBy } from 'lodash-es'
 import { computed, ref, watch } from 'vue'
 
 interface ColValItem {

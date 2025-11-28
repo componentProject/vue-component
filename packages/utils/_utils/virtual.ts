@@ -7,7 +7,7 @@ import type { HmrContext, ModuleNode, Plugin, ResolvedConfig, ViteDevServer } fr
 import fs from 'node:fs'
 import path from 'node:path'
 import process from 'node:process'
-import { debounce } from 'lodash'
+import { debounce } from 'lodash-es'
 import { normalizePath } from 'vite'
 import { getType } from './base.ts'
 
@@ -77,7 +77,7 @@ class VirtualModuleState {
   isInitialized = false
   /** 标记初始化期间是否有文件变化，初始化完成后会处理这些变化 */
   hasPendingChange = false
-  /** HMR 热更新的防抖函数，lodash debounce 返回的函数有 cancel 方法，可以手动取消 */
+  /** HMR 热更新的防抖函数，lodash-es debounce 返回的函数有 cancel 方法，可以手动取消 */
   hmrDebouncedInvalidate?: ReturnType<typeof debounce>
   /** watchChange 钩子的防抖函数，用于清理模块缓存 */
   watchChangeDebouncedClear?: ReturnType<typeof debounce>
@@ -195,7 +195,7 @@ interface WatcherOptions {
  * @param options - 监听器配置选项
  * @remarks
  * - 监听的事件类型：change（修改）、unlink（删除文件）、unlinkDir（删除目录）、add（新增文件）、addDir（新增目录）
- * - 使用 lodash debounce 实现防抖，自动处理定时器清理
+ * - 使用 lodash-es debounce 实现防抖，自动处理定时器清理
  * - 等待 watcher.ready 和 httpServer.listening 事件后才启用监听，避免初始化阶段的问题
  */
 function setupFileWatcher(options: WatcherOptions) {
@@ -205,7 +205,7 @@ function setupFileWatcher(options: WatcherOptions) {
   let netReady = false
   let enabled = false
 
-  // 使用 lodash debounce，自动处理定时器清理
+  // 使用 lodash-es debounce，自动处理定时器清理
   const debouncedInvalidate = debounce(onInvalidate, debounceMs, {
     trailing: true,
     leading: false,
@@ -616,7 +616,7 @@ export function createVirtualPlugin(userConfig: VirtualPluginUserConfig): Plugin
         return []
       }
 
-      // 使用 lodash debounce，首次调用时创建，后续复用
+      // 使用 lodash-es debounce，首次调用时创建，后续复用
       if (!state.hmrDebouncedInvalidate) {
         state.hmrDebouncedInvalidate = debounce(
           () => {
@@ -662,7 +662,7 @@ export function createVirtualPlugin(userConfig: VirtualPluginUserConfig): Plugin
           return
         }
 
-        // 使用 lodash debounce，首次调用时创建，后续复用
+        // 使用 lodash-es debounce，首次调用时创建，后续复用
         if (!state.watchChangeDebouncedClear) {
           state.watchChangeDebouncedClear = debounce(
             () => {

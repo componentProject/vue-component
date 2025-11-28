@@ -1,7 +1,7 @@
 // _hooks的useOptions组件
 import type { ComputedRef } from 'vue'
 import BaseApi from '@moluoxixi/utils/AjaxPackage/class'
-import { isEqual } from 'lodash'
+import { isEqual } from 'lodash-es'
 import { computed, ref, watch } from 'vue'
 
 // 定义请求类型

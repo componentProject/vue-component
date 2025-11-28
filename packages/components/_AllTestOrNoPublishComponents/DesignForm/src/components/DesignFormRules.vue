@@ -46,7 +46,7 @@ import type {
   TabItem,
 } from '../types'
 import { ElButton, ElMessageBox } from 'element-plus'
-import { debounce } from 'lodash'
+import { debounce } from 'lodash-es'
 import { ref, watch } from 'vue'
 import { formItemConfig as defaultFormItemConfig } from '../datas/formData'
 import { deepClone } from '../utils/formSerializer'

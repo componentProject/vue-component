@@ -9,8 +9,8 @@ import type {
   ReFormRules,
   ReGridResponsive,
 } from '../_types'
-/** 导入 lodash 工具函数 */
-import { cloneDeep, isUndefined } from 'lodash'
+/** 导入 lodash-es 工具函数 */
+import { cloneDeep, isUndefined } from 'lodash-es'
 /** 导入 Vue 组合式 API */
 import {
   computed,

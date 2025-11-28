@@ -4,8 +4,8 @@ import type { Ref } from 'vue'
 import type { ReGridResponsive } from './types'
 /** 导入 VueUse 工具函数 */
 import { useResizeObserver } from '@vueuse/core'
-/** 导入 lodash 工具函数 */
-import { isNumber, isObject, isUndefined } from 'lodash'
+/** 导入 lodash-es 工具函数 */
+import { isNumber, isObject, isUndefined } from 'lodash-es'
 
 /** 导入 Vue 组合式 API */
 import { computed, onScopeDispose, ref, unref, watch } from 'vue'

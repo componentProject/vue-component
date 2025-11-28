@@ -2,8 +2,8 @@
 import type { ComputedRef, MaybeRef } from 'vue'
 /** 导入表单属性类型 */
 import type { ReFormProps } from '../_types'
-/** 导入 lodash 工具函数 */
-import { isUndefined } from 'lodash'
+/** 导入 lodash-es 工具函数 */
+import { isUndefined } from 'lodash-es'
 /** 导入 Vue 组合式 API */
 import { computed, unref } from 'vue'
 /** 导入栅格响应式工具函数 */

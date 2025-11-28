@@ -130,8 +130,8 @@ import type { ReFormItem } from '../_types'
 import { QuestionFilled } from '@element-plus/icons-vue'
 /** 导入 Element Plus 组件 */
 import { ElFormItem, ElIcon, ElInput, ElTooltip } from 'element-plus'
-/** 导入 lodash 工具函数 */
-import { isArray, isUndefined } from 'lodash'
+/** 导入 lodash-es 工具函数 */
+import { isArray, isUndefined } from 'lodash-es'
 /** 导入 Vue 组合式 API */
 import { inject } from 'vue'
 /** 导入工具函数 */

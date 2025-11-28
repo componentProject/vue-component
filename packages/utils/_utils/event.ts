@@ -1,6 +1,6 @@
 // event.ts文件
-import type { DebounceSettings, ThrottleSettings } from 'lodash'
-import { debounce as lodashDebounce, throttle as lodashThrottle } from 'lodash'
+import type { DebounceSettings, ThrottleSettings } from 'lodash-es'
+import { debounce as lodashDebounce, throttle as lodashThrottle } from 'lodash-es'
 
 //#region event相关
 type EventType = string | Event
@@ -24,7 +24,7 @@ export function dispatchEvents(target: Document, events: EventType | EventType[]
 type ThrottleExtraOptions = ThrottleSettings & { promise?: boolean }
 
 /**
- * 节流：默认使用 lodash 节流，配置 { trailing: true, leading: false }，可自定义；
+ * 节流：默认使用 lodash-es 节流，配置 { trailing: true, leading: false }，可自定义；
  * 当开启 promise 模式时，需等待上一次 Promise 完成（成功或失败）后，才会进行下一次执行，且仍遵循 wait 与 leading/trailing 语义。
  */
 export function throttle<F extends (...args: any[]) => any>(
@@ -35,7 +35,7 @@ export function throttle<F extends (...args: any[]) => any>(
   const { promise, ...rest } = options
   const merged: ThrottleSettings = { trailing: true, leading: false, ...rest }
   if (!promise) {
-    // 直接返回 lodash 的节流函数
+    // 直接返回 lodash-es 的节流函数
     return lodashThrottle(fn, wait, merged) as unknown as (...args: Parameters<F>) => ReturnType<F>
   }
   else {
@@ -110,7 +110,7 @@ export function promiseThrottle<F extends (...args: any[]) => any>(
   }
 }
 
-/** 防抖：默认使用 lodash 防抖，配置 { trailing: true, leading: false }，可自定义 */
+/** 防抖：默认使用 lodash-es 防抖，配置 { trailing: true, leading: false }，可自定义 */
 export function debounce<F extends (...args: any[]) => any>(
   fn: F,
   wait = 300,
