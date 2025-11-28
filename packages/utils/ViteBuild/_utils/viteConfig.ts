@@ -10,9 +10,7 @@ import vueJsx from '@vitejs/plugin-vue-jsx'
 import autoprefixer from 'autoprefixer'
 import AutoImport from 'unplugin-auto-import/vite'
 import { mergeConfig } from 'vite'
-import dts from 'vite-plugin-dts'
-import viteImagemin from 'vite-plugin-imagemin'
-import AddUuidToTemplatePlugin from '../../AddUuidToTemplatePlugin'
+import { dynamicImports } from '../../_utils/dynamicImport'
 import CssInjectedByJsPlugin from '../../CssInjectedByJsPlugin'
 import cssModuleGlobalRootPlugin from '../../cssModuleGlobalRootPlugin'
 
@@ -22,10 +20,8 @@ import cssModuleGlobalRootPlugin from '../../cssModuleGlobalRootPlugin'
  * @param comp 组件名
  * @returns 基础配置对象
  */
-export function createBaseConfig(ctx: BuildContext, comp: string): InlineConfig {
-  const plugins = [
-    // 当styleType为scoped时，添加UUID插件用于样式隔离
-    ctx.styleType === 'scoped' && AddUuidToTemplatePlugin(),
+export async function createBaseConfig(ctx: BuildContext, comp: string): Promise<InlineConfig> {
+  const plugins: any[] = [
     pluginVue(),
     vueJsx(),
     // lazyImport({
@@ -44,8 +40,19 @@ export function createBaseConfig(ctx: BuildContext, comp: string): InlineConfig 
       resolvers: [],
       dts: resolve(ctx.packDir, './_typings/auto-imports.d.ts'),
     } as any),
-    // 按需启用图片压缩（重型插件）
-    !ctx.excludeHeavyPlugins && viteImagemin({
+    CssInjectedByJsPlugin(),
+  ]
+
+  // 当styleType为scoped时，动态导入并添加UUID插件用于样式隔离（配置使用，动态导入）
+  if (ctx.styleType === 'scoped') {
+    const { default: AddUuidToTemplatePlugin } = await dynamicImports<{ default: typeof import('../../AddUuidToTemplatePlugin')['default'] }>(import('../../AddUuidToTemplatePlugin'), ['default'])
+    plugins.push(AddUuidToTemplatePlugin())
+  }
+
+  // 按需启用图片压缩（重型插件，配置使用，动态导入）
+  if (!ctx.excludeHeavyPlugins) {
+    const { default: viteImagemin } = await dynamicImports<{ default: typeof import('vite-plugin-imagemin')['default'] }>(import('vite-plugin-imagemin'), ['default'])
+    plugins.push(viteImagemin({
       gifsicle: { optimizationLevel: 7, interlaced: false },
       optipng: { optimizationLevel: 7 },
       mozjpeg: { quality: 20 },
@@ -53,16 +60,19 @@ export function createBaseConfig(ctx: BuildContext, comp: string): InlineConfig 
       svgo: {
         plugins: [{ name: 'removeViewBox' }, { name: 'removeEmptyAttrs', active: false }],
       },
-    }),
-    // 按需启用类型声明生成（重型插件）
-    !ctx.excludeHeavyPlugins && dts({
+    }))
+  }
+
+  // 按需启用类型声明生成（重型插件，配置使用，动态导入）
+  if (!ctx.excludeHeavyPlugins) {
+    const { default: dts } = await dynamicImports<{ default: typeof import('vite-plugin-dts')['default'] }>(import('vite-plugin-dts'), ['default'])
+    plugins.push(dts({
       root: ctx.packDir,
       entryRoot: `.${ctx.entryBaseUrl}${comp}`,
       tsconfigPath: './tsconfig.build.json',
       declarationOnly: false,
-    }),
-    CssInjectedByJsPlugin(),
-  ].filter(Boolean) // 过滤掉false值
+    }))
+  }
   return mergeConfig({
     root: ctx.packDir,
     configFile: false,

@@ -2,4 +2,5 @@
 export * from './base'
 export * from './down'
 export * from './drag'
+export * from './dynamicImport'
 export * from './object'

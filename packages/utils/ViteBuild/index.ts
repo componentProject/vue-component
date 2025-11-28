@@ -15,10 +15,10 @@ import { execSync } from 'node:child_process'
 import fs from 'node:fs'
 import fsp from 'node:fs/promises'
 import { resolve } from 'node:path'
-import { obfuscator } from 'rollup-obfuscator'
 import { build, mergeConfig } from 'vite'
 
 // 导入工具函数
+import { dynamicImports } from '../_utils/dynamicImport'
 import { getFlagValue, hasFlag, parseBoolean, printUsage } from './_utils/cli'
 import { clearDir, findComponentEntry, getComponentNames, sleep, toPascalCase } from './_utils/component'
 import { getComponentFormats } from './_utils/config'
@@ -45,7 +45,9 @@ export async function runBuildCli(params: RunBuildCliParams, cli?: RunBuildCliOp
   const command = (firstArg === 'build' || firstArg === 'build-publish')
     ? firstArg
     : (cli?.command || 'build-publish')
+
   const mode = getFlagValue(args, 'mode', 'allComponent')
+
   // const excludeHeavyPlugins = parseBoolean(getFlagValue(args, 'excludeHeavyPlugins', 'false'), false)
   const excludeHeavyPlugins = parseBoolean(getFlagValue(args, 'excludeHeavyPlugins', 'true'), false)
   const uploadType = getFlagValue(args, 'uploadType', cli?.uploadType)
@@ -58,6 +60,7 @@ export async function runBuildCli(params: RunBuildCliParams, cli?: RunBuildCliOp
     return 1
   }
 
+  // 直接调用 buildComponentsWithOptions，交互式选择逻辑已集成到 getComponentNames 中
   const result = await buildComponentsWithOptions({
     ...params,
     mode,
@@ -66,6 +69,12 @@ export async function runBuildCli(params: RunBuildCliParams, cli?: RunBuildCliOp
     uploadType,
     npmPublish,
   })
+
+  // 如果用户取消选择，返回 0（正常退出）
+  if (result === null) {
+    return 0
+  }
+
   return result ? 0 : 1
 }
 
@@ -112,7 +121,13 @@ async function bundleComponentModule(ctx: BuildContext, {
   exportsType,
   skipManualChunks,
 }: BundleComponentModuleOptions) {
-  const currentComponent = comp
+  // 动态导入 obfuscator（配置使用，只在需要混淆时加载
+  let obfuscatorPlugin: any = null
+  if (ctx.useObfuscator) {
+    const { obfuscator } = await dynamicImports<{ obfuscator: typeof import('rollup-obfuscator')['obfuscator'] }>(import('rollup-obfuscator'), ['obfuscator'])
+    obfuscatorPlugin = obfuscator()
+  }
+
   await build(mergeConfig({
     ...baseConfig,
     build: {
@@ -129,7 +144,7 @@ async function bundleComponentModule(ctx: BuildContext, {
       rollupOptions: {
         plugins: [
           // 添加代码混淆插件
-          ctx.useObfuscator && obfuscator(),
+          obfuscatorPlugin,
         ],
         external: (id: string) => {
           // 排除内部依赖，internalDeps 现在存储的是 @${LIB_NAMESPACE}/${packageName.toLowerCase()} 格式,它是被alias转换${ctx.aliasComponentPath}/${packageName}
@@ -208,7 +223,7 @@ async function getComponentConfig(ctx: BuildContext, comp: string): Promise<Comp
   // 获取输出目录
   const outputDir = resolve(ctx.packDir, `${ctx.LIB_NAMESPACE}/${comp ? `/packages/${componentName}` : ''}`)
 
-  // 分析组件依赖
+  // 分析组件依赖（必须使用，静态导入）
   let dependencies: ComponentDependencies = {
     internal: [],
     external: {},
@@ -358,7 +373,7 @@ async function buildComponent(
 
     console.log('--------------------------->globals', globals)
     // 创建基础配置
-    const baseConfig = createBaseConfig(ctx, comp)
+    const baseConfig = await createBaseConfig(ctx, comp)
 
     // 获取需要打包的格式列表
     const formats = getComponentFormats(ctx, comp)
@@ -528,7 +543,7 @@ async function buildComponent(
       }
       // 有 uploadType，使用 UploadEvent 上传（动态导入避免 SCSS 依赖问题）
       else if (ctx.uploadType) {
-        const { UploadEvent } = await import('./_utils/UploadComponent.ts')
+        const { UploadEvent } = await dynamicImports<{ UploadEvent: typeof import('./_utils/UploadComponent.ts')['UploadEvent'] }>(import('./_utils/UploadComponent.ts'), ['UploadEvent'])
         const res = await UploadEvent(outputDir, buildName, ctx.uploadType)
         console.log('res', res)
       }
@@ -557,15 +572,23 @@ async function buildLibrary(ctx: BuildContext, shouldPublish: boolean) {
  * 打包所有单个组件
  * @param ctx
  * @param shouldPublish 是否发布组件
- * @returns 是否全部成功
+ * @param enableInteractive 是否启用交互式选择（当 mode为  allComponent 时）
+ * @returns 是否全部成功，如果用户取消选择则返回 null
  */
-async function buildAllComponents(ctx: BuildContext, shouldPublish = false) {
-  console.log(`开始打包所有单个组件${shouldPublish ? '并发布' : ''}...`)
+async function buildAllComponents(ctx: BuildContext, shouldPublish = false, enableInteractive = false): Promise<boolean | null> {
+  console.log(`开始打包所有单个组�?${shouldPublish ? '并发�?' : ''}...`)
 
   try {
-    // 获取所有组件名
-    const componentNames = await getComponentNames(ctx)
-    console.log(`找到 ${componentNames?.length || 0} 个组件:`, componentNames)
+    // 获取所有组件名（getComponentNames 已处理交互式选择"全部组件"的逻辑）
+    const componentNames = await getComponentNames(ctx, enableInteractive)
+
+    // 如果用户取消选择或没有选择任何组件
+    if (componentNames.length === 0) {
+      console.log('未找�?/选择任何组件，退出构�?')
+      return null
+    }
+
+    console.log(`找到/选择 ${componentNames.length} 个组件:`, componentNames)
 
     // 串行打包所有组件，避免内存溢出
     let successCount = 0
@@ -598,19 +621,22 @@ async function buildAllComponents(ctx: BuildContext, shouldPublish = false) {
  * @param ctx
  * @param mode 打包模式：'all'、'library'、或组件名
  * @param shouldPublish 是否发布
- * @returns 是否成功
+ * @returns 是否成功，如果用户取消选择则返回 null
  */
-async function doBuild(ctx: BuildContext, mode = 'all', shouldPublish = false) {
+async function doBuild(ctx: BuildContext, mode = 'all', shouldPublish = false): Promise<boolean | null> {
   try {
     if (mode === 'all') {
       const librarySuccess = await buildLibrary(ctx, shouldPublish)
       // 每个组件打包完成后，主动等待
       await sleep(200)
-      const componentsSuccess = await buildAllComponents(ctx, shouldPublish)
+      const componentsSuccess = await buildAllComponents(ctx, shouldPublish, false)
+      if (componentsSuccess === null) {
+        return null
+      }
       return componentsSuccess && librarySuccess
     }
     else if (mode === 'allComponent') {
-      return await buildAllComponents(ctx, shouldPublish)
+      return await buildAllComponents(ctx, shouldPublish, true) // 启用交互式选择
     }
     else if (mode === 'library') {
       return await buildLibrary(ctx, shouldPublish)
@@ -631,8 +657,9 @@ async function doBuild(ctx: BuildContext, mode = 'all', shouldPublish = false) {
 /**
  * 对外暴露的打包函数：根据入参配置执行打包
  * - 所有必填入参缺失时会抛出错误
+ * @returns 打包是否成功，如果用户取消选择则返回 null
  */
-export async function buildComponentsWithOptions(options: BuildOptions): Promise<boolean> {
+export async function buildComponentsWithOptions(options: BuildOptions): Promise<boolean | null> {
   const {
     mode = 'all',
     shouldPublish = false,
@@ -690,11 +717,16 @@ export async function buildComponentsWithOptions(options: BuildOptions): Promise
 
   // 校验 mode 合法性（当为组件名时）
   if (mode !== 'all' && mode !== 'library' && mode !== 'allComponent') {
-    const componentNames = await getComponentNames(ctx)
+    const componentNames = await getComponentNames(ctx, false)
     if (!componentNames.includes(mode)) {
       throw new Error(`错误: 无效的模式或文件夹名称 "${mode}"，可用文件夹名称: ${componentNames.join(', ')}`)
     }
   }
 
-  return await doBuild(ctx, mode, shouldPublish)
+  const result = await doBuild(ctx, mode, shouldPublish)
+  // 如果用户取消选择，返回 null
+  if (result === null) {
+    return null
+  }
+  return result
 }

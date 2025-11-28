@@ -4,6 +4,7 @@ import type { BuildContext } from '../_types'
  */
 import fsp from 'node:fs/promises'
 import glob from 'fast-glob'
+import { dynamicImport } from '../../_utils/dynamicImport'
 
 /** 必须排除的文件 */
 export const mustExcludeDirs = ['moluoxixi', 'node_modules', 'typings', '_typings']
@@ -15,17 +16,49 @@ export function sleep(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms))
 }
 
-/** 获取组件列表（只分目录的组件） */
-export async function getComponentNames(ctx: BuildContext) {
+/**
+ * 获取组件列表（只分目录的组件）
+ * @param ctx 构建上下文
+ * @param enableInteractive 是否启用交互式选择（当 mode = allComponent 时）
+ * @returns 组件名集合
+ */
+export async function getComponentNames(ctx: BuildContext, enableInteractive = false): Promise<string[]> {
   const componentDirs = await glob([`.${ctx.entryBaseUrl}*`, `!.${ctx.entryBaseUrl}_*`, ...mustExcludeDirs.map(i => `!${i}`)], {
     cwd: ctx.packDir,
     onlyDirectories: true,
     ignore: [`${ctx.entryBaseUrl}_*`],
   })
   const excludeDirs = [ctx.LIB_NAMESPACE, ...mustExcludeDirs]
-  return componentDirs
+  const allComponentNames = componentDirs
     .map(dir => dir.split('/').pop() || '')
     .filter(dirName => !!dirName && !excludeDirs.includes(dirName))
+
+  // 如果不需要交互式选择，直接返回组件名列表
+  if (!enableInteractive) {
+    return allComponentNames
+  }
+
+  // 如果启用交互式选择，弹出选择界面
+  if (allComponentNames.length === 0) {
+    return []
+  }
+
+  // 动态导入 @inquirer/checkbox（只在交互式选择时加载）
+  const checkbox = await dynamicImport<typeof import('@inquirer/checkbox')['default']>('@inquirer/checkbox')
+
+  // 使用 @inquirer/checkbox 进行多选（支持 a 键全选）
+  const selected = await checkbox({
+    message: '请选择要打包的组件（使用空格选择，按 a 全选，回车确认�?:',
+    choices: allComponentNames.map(name => ({ name, value: name })),
+    validate: (choices) => {
+      if (choices.length === 0) {
+        return '请至少选择一个选项'
+      }
+      return true
+    },
+  })
+
+  return selected
 }
 
 /**

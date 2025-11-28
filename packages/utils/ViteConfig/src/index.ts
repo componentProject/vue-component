@@ -36,10 +36,9 @@ import viteImagemin from 'vite-plugin-imagemin'
 // 页面路由
 import Pages from 'vite-plugin-pages'
 import { VitePWA } from 'vite-plugin-pwa'
-// qiankun
-import qiankunPlugin from 'vite-plugin-qiankun'
 
 import vueDevTools from 'vite-plugin-vue-devtools'
+import { dynamicImports } from '../../_utils/dynamicImport'
 import { deepMerge } from '../../_utils/object.ts'
 
 // 自动路由
@@ -53,7 +52,7 @@ import scopedCssPrefixPlugin from './plugins/addScopedAndReplacePrefix.ts'
 //   url: URL
 // }
 
-function getViteConfig(Config: ViteConfigType, params?: ConfigEnv) {
+async function getViteConfig(Config: ViteConfigType, params?: ConfigEnv) {
   const config = typeof Config === 'function'
     ? Config(params!)
     : Config
@@ -245,34 +244,41 @@ function getViteConfig(Config: ViteConfigType, params?: ConfigEnv) {
     ),
   ].filter(Boolean)
 
-  const defaultConfig: UserConfig = {
-    plugins: [
-      ...plugins,
-      qiankun && qiankunPlugin(envSystemCode!, { useDevMode: qiankunDevMode }),
-      qiankun && appCode && scopedCssPrefixPlugin({
+  // qiankun
+  if (qiankun) {
+    const { default: qiankunPlugin } = await dynamicImports<{ default: typeof import('vite-plugin-qiankun')['default'] }>(import('vite-plugin-qiankun'), ['default'])
+    plugins.push(qiankunPlugin(envSystemCode!, { useDevMode: qiankunDevMode }))
+    if (appCode) {
+      plugins.push(scopedCssPrefixPlugin({
         prefixScoped: `div[data-qiankun='${envSystemCode}']`,
         oldPrefix: 'el',
         newPrefix: appCode,
         useDevMode: qiankunDevMode,
-      }),
-      autoRoutes && AutoRoutesPlugin(
-        deepMerge(
-          {
-            root: rootPath,
-            routeConfig: {
-              views: ['/src/views/**/index.vue', '!/src/views/**/components/*'],
-              examples: '/src/examples/**/index.vue',
-              componentExamples: {
-                glob: ['/src/components/**/Example.vue', '!/src/components/**/components/*'],
-                baseRoute: '组件示例',
-              },
+      }))
+    }
+  }
+  if (autoRoutes) {
+    plugins.push(AutoRoutesPlugin(
+      deepMerge(
+        {
+          root: rootPath,
+          routeConfig: {
+            views: ['/src/views/**/index.vue', '!/src/views/**/components/*'],
+            examples: '/src/examples/**/index.vue',
+            componentExamples: {
+              glob: ['/src/components/**/Example.vue', '!/src/components/**/components/*'],
+              baseRoute: '组件示例',
             },
-            dts: path.resolve(rootPath, './typings/auto-routes.d.ts'),
           },
-          autoRoutes,
-        ),
+          dts: path.resolve(rootPath, './typings/auto-routes.d.ts'),
+        },
+        autoRoutes,
       ),
-    ].filter(Boolean),
+    ))
+  }
+
+  const defaultConfig: UserConfig = {
+    plugins,
     esbuild: {
       pure:
           !isDev && dropConsole
@@ -366,7 +372,7 @@ function getViteConfig(Config: ViteConfigType, params?: ConfigEnv) {
 }
 
 function createViteConfig(Config: ViteConfigType) {
-  return defineConfig((params: ConfigEnv) => getViteConfig(Config, params))
+  return defineConfig(async (params: ConfigEnv) => await getViteConfig(Config, params))
 }
 export {
   createViteConfig,
