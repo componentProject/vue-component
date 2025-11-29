@@ -49,10 +49,14 @@ export async function runBuildCli(params: RunBuildCliParams, cli?: RunBuildCliOp
   const mode = getFlagValue(args, 'mode', 'allComponent')
 
   // const excludeHeavyPlugins = parseBoolean(getFlagValue(args, 'excludeHeavyPlugins', 'false'), false)
-  const excludeHeavyPlugins = parseBoolean(getFlagValue(args, 'excludeHeavyPlugins', 'true'), false)
+  let excludeHeavyPlugins = parseBoolean(getFlagValue(args, 'excludeHeavyPlugins', 'true'), false)
   const uploadType = getFlagValue(args, 'uploadType', cli?.uploadType)
   // 检查 --publish 标志，如果存在则设置 npmPublish 为 true
   const npmPublish = hasFlag(args, 'publish')
+  // 当使用 --publish 时，强制 excludeHeavyPlugins 为 true
+  if (npmPublish) {
+    excludeHeavyPlugins = true
+  }
 
   if (!uploadType) {
     console.error('错误: 缺少必填参数 uploadType')
@@ -576,7 +580,7 @@ async function buildLibrary(ctx: BuildContext, shouldPublish: boolean) {
  * @returns 是否全部成功，如果用户取消选择则返回 null
  */
 async function buildAllComponents(ctx: BuildContext, shouldPublish = false, enableInteractive = false): Promise<boolean | null> {
-  console.log(`开始打包所有单个组�?${shouldPublish ? '并发�?' : ''}...`)
+  console.log(`开始打包所有单个组件${shouldPublish ? '并发布' : ''}...`)
 
   try {
     // 获取所有组件名（getComponentNames 已处理交互式选择"全部组件"的逻辑）
@@ -584,7 +588,7 @@ async function buildAllComponents(ctx: BuildContext, shouldPublish = false, enab
 
     // 如果用户取消选择或没有选择任何组件
     if (componentNames.length === 0) {
-      console.log('未找�?/选择任何组件，退出构�?')
+      console.log('未找到/选择任何组件，退出构建')
       return null
     }
 

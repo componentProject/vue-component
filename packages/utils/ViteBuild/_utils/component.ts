@@ -48,7 +48,7 @@ export async function getComponentNames(ctx: BuildContext, enableInteractive = f
 
   // 使用 @inquirer/checkbox 进行多选（支持 a 键全选）
   const selected = await checkbox({
-    message: '请选择要打包的组件（使用空格选择，按 a 全选，回车确认�?:',
+    message: '请选择要打包的组件（使用空格选择，按 a 全选，回车确认）:',
     choices: allComponentNames.map(name => ({ name, value: name })),
     validate: (choices) => {
       if (choices.length === 0) {

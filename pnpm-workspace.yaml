@@ -84,7 +84,7 @@ catalogs:
     unplugin-auto-import: ^19.3.0
     unplugin-vue-components: ^28.7.0
     # vite插件
-    vite: ^6.2.4
+    vite: 7.1.11
     vite-plugin-compression: ^0.5.1
     vite-plugin-html: ^3.2.2
     vite-plugin-imagemin: ^0.6.1

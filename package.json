@@ -29,16 +29,14 @@
     "lint-check": "eslint --inspect-config",
     "lint:eslint": "eslint . --fix",
     "lint": "run-s lint:*",
+    "prepare": "node .husky/install.mjs",
     "lint-staged": "lint-staged",
     "commit": "git-cz",
     "remove-comments": "tsx scripts/removeComments.mts && eslint --fix"
   },
   "lint-staged": {
-    "*.{vue,jsx,tsx}": [
+    "*.{jsx,tsx,js,ts,vue,css,scss,less}": [
       "eslint --fix"
-    ],
-    "*.{css,scss,less,vue,jsx,tsx}": [
-      "stylelint --fix"
     ]
   },
   "config": {
@@ -51,20 +49,6 @@
   },
   "license": "MIT",
   "author": "1983531544@qq.com",
-  "pnpm": {
-    "packageExtensions": {
-      "@moluoxixi/element-setters@*": {
-        "dependencies": {
-          "@moluoxixi/element-prototypes": "1.0.4"
-        }
-      }
-    },
-    "overrides": {
-      "@moluoxixi/element-prototypes": "1.0.4",
-      "@moluoxixi/element-renderer": "1.0.4",
-      "@moluoxixi/element-settings-form": "1.0.4"
-    }
-  },
   "repository": {
     "type": "git",
     "url": "git+http://192.168.18.106/middle-tec/front-web/vue-component.git"
@@ -101,16 +85,8 @@
     "husky": "^9.1.7",
     "lint-staged": "^15.5.1",
     "npm-run-all2": "^7.0.2",
-    "stylelint": "^16.17.0",
-    "stylelint-config-standard": "^36.0.1",
-    "stylelint-config-standard-less": "^3.0.1",
-    "stylelint-config-standard-scss": "^14.0.0",
-    "stylelint-config-standard-vue": "^1.0.0",
-    "tsx": "^4.20.5",
+    "tsx": "catalog:dev",
     "typescript": "catalog:dev",
     "vite": "catalog:dev"
-  },
-  "dependencies": {
-    "@vueuse/integrations": "^13.9.0"
   }
 }

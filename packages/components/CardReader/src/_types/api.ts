@@ -102,6 +102,8 @@ export interface cardReaderPluginParamsType {
 export interface cardReaderCommonSdkParamsType extends Partial<cardReaderPluginType> {
   /** 插件类型 */
   pluginType: string
+  /** 别名 */
+  alias?: string
 }
 
 /**
