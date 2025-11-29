@@ -1,0 +1,13 @@
+.root :global(.el-dialog__header) {
+  padding: 0 12px 12px;
+}
+
+.root :global(.el-dialog__body) {
+  border-top: 1px solid #e5e7eb;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 0 12px;
+}
+
+.root :global(.el-dialog__footer) {
+  padding: 0 12px;
+}

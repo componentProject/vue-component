@@ -61,10 +61,6 @@ export async function createBaseConfig(ctx: BuildContext, comp: string): Promise
         plugins: [{ name: 'removeViewBox' }, { name: 'removeEmptyAttrs', active: false }],
       },
     }))
-  }
-
-  // 按需启用类型声明生成（重型插件，配置使用，动态导入）
-  if (!ctx.excludeHeavyPlugins) {
     const { default: dts } = await dynamicImports<{ default: typeof import('vite-plugin-dts')['default'] }>(import('vite-plugin-dts'), ['default'])
     plugins.push(dts({
       root: ctx.packDir,

@@ -55,7 +55,7 @@ export async function runBuildCli(params: RunBuildCliParams, cli?: RunBuildCliOp
   const npmPublish = hasFlag(args, 'publish')
   // 当使用 --publish 时，强制 excludeHeavyPlugins 为 true
   if (npmPublish) {
-    excludeHeavyPlugins = true
+    excludeHeavyPlugins = false
   }
 
   if (!uploadType) {

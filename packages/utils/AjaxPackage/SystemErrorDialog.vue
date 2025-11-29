@@ -105,7 +105,8 @@ import { ElButton, ElDialog, ElMessage } from 'element-plus'
 import { computed, ref } from 'vue'
 import { getUserInfoFromLocalStorage } from './_utils/systemErrorInfo'
 import BaseApi from './class'
-import cssModules from './styles/modules/index.module.scss'
+// import cssModules from './styles/modules/index.module.scss'
+import cssModules from './styles/modules/index.module.css'
 
 defineOptions({
   name: 'SystemErrorDialog',
@@ -235,7 +236,7 @@ defineExpose({
 })
 </script>
 
-<style scoped lang="scss">
+<style scoped lang="css">
 .dialog-header {
   display: flex;
   align-items: center;
@@ -243,25 +244,25 @@ defineExpose({
   font-size: 16px;
   font-weight: bold;
   color: #303133;
+}
 
-  .header-icon {
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    background-color: #f56c6c;
-    color: #fff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 14px;
-    font-weight: bold;
-    flex-shrink: 0;
-  }
+.dialog-header .header-icon {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: #f56c6c;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: bold;
+  flex-shrink: 0;
+}
 
-  .header-title {
-    font-weight: bold;
-    font-size: 16px;
-  }
+.dialog-header .header-title {
+  font-weight: bold;
+  font-size: 16px;
 }
 
 .dialog-content {
@@ -273,57 +274,57 @@ defineExpose({
 .content-section {
   padding: 20px;
   border-bottom: 1px solid #ebeef5;
+}
 
-  .section-title {
-    margin: 0 0 12px 0;
-    font-size: 16px;
-    font-weight: bold;
-    color: #303133;
-  }
+.content-section .section-title {
+  margin: 0 0 12px 0;
+  font-size: 16px;
+  font-weight: bold;
+  color: #303133;
+}
 
-  .section-text {
-    margin: 0;
-    color: #606266;
-    line-height: 1.5;
-  }
+.content-section .section-text {
+  margin: 0;
+  color: #606266;
+  line-height: 1.5;
 }
 
 .tech-summary-section {
   border-bottom: 1px solid #ebeef5;
+}
 
-  .tech-summary-header {
-    padding: 16px 20px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background-color: #fafafa;
+.tech-summary-section .tech-summary-header {
+  padding: 16px 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #fafafa;
+}
 
-    &.has-border {
-      border-bottom: 1px solid #ebeef5;
-    }
+.tech-summary-section .tech-summary-header.has-border {
+  border-bottom: 1px solid #ebeef5;
+}
 
-    .tech-summary-title {
-      font-weight: bold;
-      color: #303133;
-    }
+.tech-summary-section .tech-summary-header .tech-summary-title {
+  font-weight: bold;
+  color: #303133;
+}
 
-    .tech-summary-arrow {
-      font-size: 12px;
-      color: #909399;
-      transform: scaleY(1.5) rotate(0deg);
-      transition: transform 0.3s;
+.tech-summary-section .tech-summary-header .tech-summary-arrow {
+  font-size: 12px;
+  color: #909399;
+  transform: scaleY(1.5) rotate(0deg);
+  transition: transform 0.3s;
+}
 
-      &.expanded {
-        transform: scaleX(1.5) rotate(90deg);
-      }
-    }
-  }
+.tech-summary-section .tech-summary-header .tech-summary-arrow.expanded {
+  transform: scaleX(1.5) rotate(90deg);
+}
 
-  .tech-summary-content {
-    padding: 16px 20px;
-    background-color: #fafafa;
-  }
+.tech-summary-section .tech-summary-content {
+  padding: 16px 20px;
+  background-color: #fafafa;
 }
 
 .error-info-item {
@@ -332,34 +333,34 @@ defineExpose({
   margin-bottom: 12px;
   line-height: 1.5;
   flex-direction: row;
+}
 
-  &.is-mobile {
-    flex-direction: column;
+.error-info-item.is-mobile {
+  flex-direction: column;
+}
 
-    .error-info-label {
-      width: auto;
-      text-align: left;
-      margin-right: 0;
-      margin-bottom: 4px;
-    }
-  }
+.error-info-item.is-mobile .error-info-label {
+  width: auto;
+  text-align: left;
+  margin-right: 0;
+  margin-bottom: 4px;
+}
 
-  .error-info-label {
-    flex-shrink: 0;
-    width: 100px;
-    font-weight: 500;
-    color: #606266;
-    text-align: right;
-    margin-right: 12px;
-    margin-bottom: 0;
-  }
+.error-info-item .error-info-label {
+  flex-shrink: 0;
+  width: 100px;
+  font-weight: 500;
+  color: #606266;
+  text-align: right;
+  margin-right: 12px;
+  margin-bottom: 0;
+}
 
-  .error-info-value {
-    flex: 1;
-    color: #303133;
-    word-break: break-all;
-    word-wrap: break-word;
-  }
+.error-info-item .error-info-value {
+  flex: 1;
+  color: #303133;
+  word-break: break-all;
+  word-wrap: break-word;
 }
 
 .skywalking-section {
@@ -376,16 +377,16 @@ defineExpose({
   line-height: 1.5;
   max-height: 200px;
   overflow-y: auto;
+}
 
-  .trace-id {
-    margin-bottom: 8px;
-    color: #ecf0f1;
-  }
+.error-info-section .trace-id {
+  margin-bottom: 8px;
+  color: #ecf0f1;
+}
 
-  .error-message {
-    color: #e74c3c;
-    font-weight: bold;
-  }
+.error-info-section .error-message {
+  color: #e74c3c;
+  font-weight: bold;
 }
 
 .dialog-footer {
@@ -393,11 +394,11 @@ defineExpose({
   justify-content: flex-end;
   align-items: center;
   padding-top: 16px;
+}
 
-  .footer-right {
-    display: flex;
-    gap: 12px;
-    margin-left: auto;
-  }
+.dialog-footer .footer-right {
+  display: flex;
+  gap: 12px;
+  margin-left: auto;
 }
 </style>

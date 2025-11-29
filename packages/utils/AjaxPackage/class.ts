@@ -19,6 +19,7 @@ import type {
 import type { BaseApiConfig } from './_types'
 import type { MessageInstance, NotificationInstance } from './_utils'
 import axios from 'axios'
+import { dynamicImports } from '../_utils'
 import createApiDialog from '../ApiDialog'
 import {
   createMessageWrapper,
@@ -422,14 +423,8 @@ export default class BaseApi {
       // 动态加载 SystemErrorDialog 模块（仅在浏览器环境中）
       if (!systemErrorDialogInstance) {
         try {
-          const module = await import('./SystemErrorDialog.vue')
-          if (module?.default) {
-            systemErrorDialogInstance = createApiDialog(module.default)
-          }
-          else {
-            console.error('系统异常信息：', responseData)
-            return
-          }
+          const { default: SystemErrorDialog } = await dynamicImports(import('./SystemErrorDialog.vue'), ['default'])
+          systemErrorDialogInstance = createApiDialog(SystemErrorDialog)
         }
         catch (error) {
           console.warn('Failed to load SystemErrorDialog:', error)
