@@ -125,8 +125,8 @@ export async function registerAllComponent(Vue: any, app: any, type?: string, is
  * @param app
  * @param type
  * @param isLongRange
- * @param moduleType
  * @param componentCode
+ * @param moduleType
  */
 export async function getContent(Vue: any, app: any, type?: string, isLongRange = false, componentCode: string, moduleType: string = 'umd') {
   const vueVersion = getVueVersion(Vue)

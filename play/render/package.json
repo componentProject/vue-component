@@ -7,9 +7,8 @@
   },
   "scripts": {
     "dev": "vite",
-    "CICD": "node ./scripts/CICD.mjs",
-    "build": "vite build --mode production & node ./scripts/build.mjs",
-    "pages:build": "vite build --mode github",
+    "CICD": "tsx ./scripts/CICD.mts",
+    "build": "vite build --mode production & tsx ./scripts/build.mts",
     "preview": "vite preview"
   },
   "postcss": {
