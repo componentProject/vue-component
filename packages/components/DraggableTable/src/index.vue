@@ -926,10 +926,10 @@ const isNoSave = computed(
 async function handleGetStoredColumns(): Promise<ColumnType[]> {
   try {
     if (getType(props.getConfig, 'function')) {
-      return await props.getConfig({
-        pageId: props.pageId,
+      return await props.getConfig!({
+        pageId: props.pageId || '',
         widgetId: getStorageKey(),
-        userId: props.userId,
+        userId: props.userId || '',
       })
     }
     else if (props.saveType === 'server') {
@@ -1106,11 +1106,11 @@ async function handleSaveColumnsToStorage() {
     // 只保存必要的列属性（递归处理 tree 结构）
     const columns = mapColumnsTree(collectColumn as any[], requiredFields.value)
     if (getType(props.setConfig, 'function')) {
-      await props.setConfig(
+      await props.setConfig!(
         {
-          pageId: props.pageId,
+          pageId: props.pageId || '',
           widgetId: getStorageKey(),
-          userId: props.userId,
+          userId: props.userId || '',
         },
         JSON.stringify(columns),
       )

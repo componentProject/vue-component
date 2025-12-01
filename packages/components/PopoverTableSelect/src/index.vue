@@ -192,7 +192,7 @@ const computedInput = computed(() => {
  * 处理滚动边界事件，触发加载更多
  * @param obj - 滚动边界对象，包含方向信息
  */
-function handleScrollBoundary(obj) {
+function handleScrollBoundary(obj: any) {
   if (props.enableLoadMore && props.hasMore && obj.direction === 'bottom') {
     emit('loadMore')
   }

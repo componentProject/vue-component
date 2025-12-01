@@ -59,7 +59,7 @@ const props = withDefaults(defineProps<propsType>(), {
   collapseTags: true,
   label: 'label',
   value: 'value',
-  disabledHandler: null,
+  disabledHandler: undefined,
   disabledValues: () => [],
   disabledLabels: () => [],
   options: () => [],
@@ -245,7 +245,9 @@ function setupIntersectionObserver() {
       threshold: [0.1],
     })
 
-    observer.value.observe(loadMoreTrigger.value)
+    if (loadMoreTrigger.value) {
+      observer.value.observe(loadMoreTrigger.value)
+    }
   })
 }
 

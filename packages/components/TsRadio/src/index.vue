@@ -45,7 +45,7 @@ const props = withDefaults(defineProps<propsType>(), {
   gridColumns: 4,
   label: 'label',
   value: 'value',
-  disabledHandler: null,
+  disabledHandler: undefined,
   disabledValues: () => [],
   disabledLabels: () => [],
   options: () => [],

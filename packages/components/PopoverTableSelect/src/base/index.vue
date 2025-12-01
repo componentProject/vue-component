@@ -44,7 +44,7 @@ defineOptions({
 })
 
 const props = withDefaults(defineProps<basePropsType>(), {
-  popoverProps: () => ({}),
+  popoverProps: () => ({} as any),
   height: 300,
   id: 'popoverTableSelect',
   columns: () => [],
@@ -82,15 +82,16 @@ const computedPopoverProps = computed(() => {
     teleported: true,
     persistent: true,
     width: props.width || 400,
-    ...props.popoverProps,
+    ...(props.popoverProps as any),
   }
   if (props.zIndex) {
     popoverProps.popperStyle = {
       zIndex: props.zIndex,
-      ...popoverProps.popperStyle,
+      ...(popoverProps.popperStyle || {}),
     }
   }
-  return popoverProps
+  const { visible, virtualRef, ...rest } = popoverProps
+  return rest
 })
 const popoverVisible = defineModel({
   type: Boolean,
@@ -185,7 +186,7 @@ function cleanupEventListeners() {
 /**
  * draggabletable表头右键菜单
  */
-const headerContextContainer = ref<HTMLElement>(null)
+const headerContextContainer = ref<HTMLElement | null>(null)
 
 /**
  * 处理点击外部区域，关闭popover
@@ -248,8 +249,8 @@ function selectRow(index: number) {
     return
   currentRowIndex.value = index
   const row = props.data[index]
-  gridRef.value?.getTable()?.setCurrentRow(row)
-  gridRef.value?.getTable()?.scrollToRow(row)
+  ;(gridRef.value as any)?.getTable()?.setCurrentRow(row)
+  ;(gridRef.value as any)?.getTable()?.scrollToRow(row)
 }
 
 /**
