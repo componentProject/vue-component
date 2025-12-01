@@ -47,7 +47,7 @@ const props = withDefaults(defineProps<propsType>(), {
   options: () => [],
   label: 'label',
   value: 'name',
-  disabledHandler: null,
+  disabledHandler: undefined,
   disabledValues: () => [],
   disabledLabels: () => [],
   requestMethod: 'POST',

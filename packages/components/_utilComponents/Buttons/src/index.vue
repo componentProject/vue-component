@@ -31,9 +31,12 @@
 import type { propsType } from './_types'
 import { Render } from '@moluoxixi/components/_utilComponents'
 import { ElButton, ElIcon, ElTooltip } from 'element-plus'
+import { useAttrs } from 'vue'
 
 const props = withDefaults(defineProps<propsType>(), {
   buttons: () => [],
+  data: undefined,
+  node: undefined,
 })
 const attrs = useAttrs()
 
@@ -43,7 +46,7 @@ const attrs = useAttrs()
  * @returns 按钮属性对象
  */
 function btnProps(btn: propsType['buttons'][number]) {
-  const { btnType, slot, icon, event, tooltip, ...rest } = btn
+  const { btnType, slot, icon, event, tooltip, text, ...rest } = btn
   return { ...attrs, ...rest }
 }
 </script>

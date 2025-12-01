@@ -20,7 +20,7 @@
 import type { emitsType, propsType, slotsType } from './_types'
 import { getTypeDefault } from '@moluoxixi/utils/_utils'
 import { ElButton } from 'element-plus'
-import { computed } from 'vue'
+import { computed, useTemplateRef } from 'vue'
 import { read, utils } from 'xlsx'
 
 defineOptions({
@@ -45,7 +45,7 @@ const fileInputRef = useTemplateRef('fileInputRef')
  * @param val - 要规范化的值
  * @returns 规范化后的数组
  */
-function toArray(val) {
+function toArray(val: any) {
   if (Array.isArray(val))
     return val.filter(v => v != null).map(v => String(v).trim())
   if (val == null)
@@ -59,7 +59,7 @@ function toArray(val) {
  * @param keys - 键名或键名数组
  * @returns 第一个非空值
  */
-function getValueByKeys(obj, keys) {
+function getValueByKeys(obj: any, keys: string | string[]) {
   const keyList = Array.isArray(keys) ? keys : [keys]
   for (const key of keyList) {
     const value = obj?.[key]
@@ -76,9 +76,9 @@ function getValueByKeys(obj, keys) {
  * @param fieldKeys - 字段键名数组
  * @returns 映射对数组
  */
-function buildPairsFromColumns(columnsList, titleKeys, fieldKeys) {
-  const pairs = []
-  columnsList.forEach((col) => {
+function buildPairsFromColumns(columnsList: any[], titleKeys: string[], fieldKeys: string[]) {
+  const pairs: [string, string][] = []
+  columnsList.forEach((col: any) => {
     const headerVal = getValueByKeys(col, titleKeys)
     const keyVal = getValueByKeys(col, fieldKeys)
     const headerList = toArray(headerVal)
@@ -129,14 +129,16 @@ function triggerSelect() {
  * 处理文件选择变化事件
  * @param e - 文件输入事件
  */
-function handleFileChange(e) {
+function handleFileChange(e: any) {
   const file = e?.target?.files?.[0]
   if (!file)
     return
   const reader = new FileReader()
   reader.onload = (evt) => {
     try {
-      const data = new Uint8Array(evt.target.result)
+      if (!evt.target || !evt.target.result)
+        return
+      const data = new Uint8Array(evt.target.result as ArrayBuffer)
       const wb = read(data, { type: 'array' })
       const firstSheetName = wb.SheetNames[0]
       const ws = wb.Sheets[firstSheetName]
@@ -151,22 +153,22 @@ function handleFileChange(e) {
         return
       }
 
-      const [headerRow, ...bodyRows] = sheetJson
+      const [headerRow, ...bodyRows] = sheetJson as any[][]
       // 构造头部映射，支持 label->prop 与 title->field 匹配
       const headerMap = headerToKeyMap.value
-      const keys = headerRow.map(h => headerMap.get(String(h).trim()) || null)
+      const keys = headerRow.map((h: any) => headerMap.get(String(h).trim()) || null)
 
       // 只保留映射到的列
       const filteredIndexes = keys
-        .map((k, idx) => (k ? idx : -1))
-        .filter(idx => idx >= 0)
+        .map((k: any, idx: any) => (k ? idx : -1))
+        .filter((idx: number) => idx >= 0)
 
-      const mappedKeys = filteredIndexes.map(i => keys[i])
+      const mappedKeys = filteredIndexes.map((i: number) => keys[i])
 
       // 组装数据
-      const result = bodyRows.map((row) => {
-        const obj = {}
-        filteredIndexes.forEach((i, colIdx) => {
+      const result = bodyRows.map((row: any[]) => {
+        const obj: Record<string, any> = {}
+        filteredIndexes.forEach((i: number, colIdx: number) => {
           obj[mappedKeys[colIdx]] = row[i]
         })
         return obj

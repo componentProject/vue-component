@@ -220,9 +220,9 @@ const idMaps = computed(() => {
  * @param node - 树节点
  * @returns 是否显示左侧连接线
  */
-function leftLineShow(item: number, node: TreeNode & { parent: any }) {
+function leftLineShow(item: number, node: TreeNode & { parent: any }): boolean {
   if (item === 1) {
-    return node.parent[props.childrenField].findIndex(i => i === node) < node.parent[props.childrenField].length - 1
+    return node.parent[props.childrenField].findIndex((i: any) => i === node) < node.parent[props.childrenField].length - 1
   }
   else {
     return leftLineShow(item - 1, node.parent)
@@ -446,7 +446,7 @@ function toggleExpand(data?: TreeNodeData, node?: TreeNode) {
   const nodeKeys = getNodeKeys(data)
   let expanded
   if (!node) {
-    expanded = treeData.value.some(item => treeRef.value?.getNode(item[props.rowField]).expanded)
+    expanded = treeData.value.some(item => treeRef.value?.getNode(item[props.rowField])?.expanded)
   }
   else {
     expanded = node.expanded
@@ -456,7 +456,10 @@ function toggleExpand(data?: TreeNodeData, node?: TreeNode) {
   }
   else {
     nodeKeys.forEach((nodeKey) => {
-      treeRef.value?.collapseNode(treeRef.value?.getNode(nodeKey))
+      const node = treeRef.value?.getNode(nodeKey)
+      if (node) {
+        treeRef.value?.collapseNode(node)
+      }
     })
   }
 }

@@ -19,7 +19,7 @@
 </template>
 
 <script setup lang="ts">
-import type { emitsType, propsType, slotsType } from './_types'
+import type { propsType, slotsType } from './_types'
 
 defineOptions({
   // eslint-disable-next-line vue/no-reserved-component-names
@@ -32,7 +32,7 @@ const props = withDefaults(defineProps<propsType>(), {
   name: '',
 })
 
-const emit = defineEmits<emitsType>()
+// const emit = defineEmits<emitsType>()
 
 // 获取插槽
 const slots = defineSlots<slotsType>()

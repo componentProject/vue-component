@@ -4,4 +4,4 @@
  */
 
 // 导出所有常量模块
-export * from './common.ts'
+export * from './common'

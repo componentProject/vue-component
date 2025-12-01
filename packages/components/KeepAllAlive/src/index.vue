@@ -28,7 +28,7 @@ const slots = defineSlots<slotsType>()
 // 自定义name的壳的集合
 const wrapperMap = new Map()
 // 缓存列表
-const include = ref([])
+const include = ref<string[]>([])
 const currentRoute = useRoute()
 
 /**
@@ -37,7 +37,7 @@ const currentRoute = useRoute()
  * @param type - 期望的类型
  * @returns 是否为指定类型
  */
-function isType(value, type) {
+function isType(value: any, type: string) {
   return Object.prototype.toString.call(value).slice(8, -1).toLowerCase() === type.toLowerCase()
 }
 
@@ -51,7 +51,7 @@ watch(
       return
     // 根据query参数中keepAlive的值或默认值决定是否缓存该路由
     const shouldCache = isType(props.defaultKeepAlive, 'function')
-      ? props.defaultKeepAlive(currentRoute)
+      ? props.defaultKeepAlive!(currentRoute)
       : currentRoute.query.keepAlive === 'true' || currentRoute.meta.keepAlive
     const routePath = currentRoute.fullPath
 
@@ -83,7 +83,7 @@ watch(
  * @param component - 组件实例
  * @returns 包装后的组件
  */
-function wrap(fullPath, component) {
+function wrap(fullPath: string, component: any) {
   let wrapper
   // 使用完整路径(包含参数)作为组件名，这样不同参数的路由会被视为不同组件
   if (component) {
@@ -108,7 +108,7 @@ function wrap(fullPath, component) {
  * 清除特定路由的缓存
  * @param fullPath - 路由完整路径
  */
-function clearCache(fullPath) {
+function clearCache(fullPath: string) {
   const index = include.value.indexOf(fullPath)
   if (index !== -1) {
     include.value.splice(index, 1)

@@ -27,10 +27,9 @@
 </template>
 
 <script setup lang="ts">
-import type { QRCodeRenderersOptions } from 'qrcode'
+// import type { QRCodeRenderersOptions } from 'qrcode'
 import type { emitsType, propsType, slotsType } from './_types'
 import { downloadImage } from '@moluoxixi/utils/_utils'
-// @ts-expect-error - qrcode没有默认导出但实际可以这样使用
 import QRCode from 'qrcode'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 
@@ -169,7 +168,7 @@ async function generateQRCode() {
     const processedText = processText(props.text)
 
     const borderWidth = props.showBorder ? props.borderWidth * 2 : 0
-    const options: QRCodeRenderersOptions = {
+    const options: any = {
       width: props.size - borderWidth,
       margin: props.margin,
       color: {

@@ -4,4 +4,4 @@ import Tree from './src/index.vue'
 
 export * from './src/types'
 
-export default withInstall(Tree)
+export default withInstall(Tree) as any

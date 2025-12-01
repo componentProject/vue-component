@@ -12,7 +12,7 @@
         :collapsible="getPanelProp(slotName, 'collapsible', false)"
       >
         <div class="bg-white w-full h-full">
-          <slot :name="getPanelProp(index, 'slot', slotName)" />
+          <slot :name="getPanelProp(index, 'slot', slotName) as string" />
         </div>
       </ElSplitterPanel>
     </template>
@@ -21,7 +21,7 @@
 
 <script setup lang="ts">
 import type { slotsType } from '@moluoxixi/components/_types'
-import type { emitsType, propsType } from './_types'
+import type { propsType } from './_types'
 import { ElSplitter, ElSplitterPanel } from 'element-plus'
 import { computed } from 'vue'
 
@@ -48,7 +48,7 @@ const props = withDefaults(defineProps<propsType>(), {
   panels: () => [],
 })
 
-const emit = defineEmits<emitsType>()
+// const emit = defineEmits<emitsType>()
 
 const slots = defineSlots<slotsType>()
 

@@ -4,15 +4,15 @@
 </template>
 
 <script setup lang="ts">
-import type { emitsType, propsType, slotsType } from './_types'
+import type { propsType } from './_types'
 import { getQueryMedicaIInsuranceInfoApi } from '@moluoxixi/utils/_api'
-import { onMounted, ref, useAttrs } from 'vue'
+import { onMounted, ref } from 'vue'
 
 defineOptions({ name: 'HisFooter', inheritAttrs: false })
 
 const props = withDefaults(defineProps<propsType>(), {
   token: '',
-  params: {},
+  params: () => ({}),
   paramsObj: () => ({
     medicalInsuranceCode: '国家医疗机构个人编码',
     paltOrgCode: '国家定点医疗机构编码',
@@ -20,12 +20,12 @@ const props = withDefaults(defineProps<propsType>(), {
   addSign: () => {},
 })
 
-const emit = defineEmits<emitsType>()
+// const emit = defineEmits<emitsType>()
 
 // 获取插槽
-const slots = defineSlots<slotsType>()
+// const slots = defineSlots<slotsType>()
 
-const attrs = useAttrs()
+// const attrs = useAttrs()
 
 const items = ref<any[]>([])
 

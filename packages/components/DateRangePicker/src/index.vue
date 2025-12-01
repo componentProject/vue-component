@@ -29,6 +29,7 @@
 import type {
   DateType,
 } from '@moluoxixi/utils/_utils/_types/date'
+import type { Moment } from 'moment'
 import type { emitsType, propsType, slotsType } from './_types'
 import {
   getTypeDefault,
@@ -51,7 +52,7 @@ defineOptions({
 
 const props = withDefaults(defineProps<propsType>(), {
   type: 'date',
-  format: null,
+  format: undefined,
   valueFormat: 'YYYY-MM-DD HH:mm:ss',
   placeholder: '请选择日期',
   startPlaceholder: '开始日期',
@@ -59,12 +60,12 @@ const props = withDefaults(defineProps<propsType>(), {
   rangeSeparator: '至',
   modelValue: () => [],
   defaultToday: true,
-  dateRange: null,
+  dateRange: undefined,
   dateRangeType: 'day',
   dateRangeBaseDate: () => moment(),
-  minDate: null,
-  maxDate: null,
-  disabledDateRange: null,
+  minDate: undefined,
+  maxDate: undefined,
+  disabledDateRange: undefined,
   datetimeDisableTypes: () => ['hours', 'minutes', 'seconds'],
   shortcuts: false,
 })
@@ -75,7 +76,7 @@ const emit = defineEmits<emitsType>()
 const slots = defineSlots<slotsType>()
 
 // 本地日期值，用于与el-date-picker交互
-const localDateValue = ref([])
+const localDateValue = ref<any>([])
 
 const computedOutputFormat = computed(() => {
   if (props.type !== 'datetime') {
@@ -327,7 +328,7 @@ function disabledSecondsFn(...rest: restParams) {
  * 根据 dateRange 配置生成初始日期范围
  */
 function generateDateRangeByConfig() {
-  if (props.dateRange !== null) {
+  if (props.dateRange !== undefined && props.dateRange !== null) {
     const baseDate = props.dateRangeBaseDate ? moment(props.dateRangeBaseDate) : moment()
     let startDate: Moment, endDate: Moment
     if (Array.isArray(props.dateRange)) {
@@ -338,14 +339,15 @@ function generateDateRangeByConfig() {
     }
     else {
       // 数字形式
-      if (+props.dateRange >= 0) {
+      const range = props.dateRange as number
+      if (+range >= 0) {
         // 正数表示当前日期往后n天
         startDate = moment(baseDate)
-        endDate = moment(baseDate).add(+props.dateRange, props.dateRangeType)
+        endDate = moment(baseDate).add(+range, props.dateRangeType)
       }
       else {
         // 负数表示往前n天
-        startDate = moment(baseDate).add(+props.dateRange, props.dateRangeType)
+        startDate = moment(baseDate).add(+range, props.dateRangeType)
         endDate = moment(baseDate)
       }
     }

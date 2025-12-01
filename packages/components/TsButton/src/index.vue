@@ -56,7 +56,7 @@ const computedPopoverProps = computed(() => {
   const { popperStyle = {}, ...rest } = props.popoverProps || {}
   return {
     placement: 'top',
-    trigger: 'hover',
+    trigger: 'hover' as any,
     width: 'auto',
     popperStyle: {
       maxWidth: '400px',

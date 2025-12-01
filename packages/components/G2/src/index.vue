@@ -20,18 +20,21 @@ const props = withDefaults(defineProps<propsType>(), {
 // 按需打包，https://g2.antv.antgroup.com/manual/extra-topics/bundle
 const Chart = extend(Runtime, corelib())
 
-const container = useTemplateRef('container')
-let chart
+const container = useTemplateRef<HTMLElement>('container')
+let chart: any
 
 /**
  * 渲染图表
  */
 async function renderChart() {
-  if (!chart) {
+  if (!chart && container.value) {
     chart = new Chart({
       container: container.value,
     })
   }
+  if (!chart)
+    return
+
   if (props.options) {
     chart.options(props.options)
   }
@@ -45,18 +48,22 @@ async function renderChart() {
  * 组件挂载时创建并渲染图表
  */
 onMounted(() => {
-  chart = new Chart({
-    container: container.value,
-  })
-  renderChart()
+  if (container.value) {
+    chart = new Chart({
+      container: container.value,
+    })
+    renderChart()
+  }
 })
 
 /**
  * 组件卸载时销毁图表
  */
 onUnmounted(() => {
-  chart.destroy()
-  chart = null
+  if (chart) {
+    chart.destroy()
+    chart = null
+  }
 })
 
 defineExpose({

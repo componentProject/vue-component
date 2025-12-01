@@ -16,7 +16,7 @@
 </template>
 
 <script setup lang="ts">
-import type { emitsType, NormalizedItem, propsType, slotsType } from './_types'
+import type { NormalizedItem, propsType, slotsType } from './_types'
 import { computed } from 'vue'
 
 defineOptions({ name: 'TsFooter' })
@@ -35,7 +35,7 @@ const props = withDefaults(defineProps<propsType>(), {
   size: 12,
 })
 
-const emit = defineEmits<emitsType>()
+// const emit = defineEmits<emitsType>()
 
 // 获取插槽
 const slots = defineSlots<slotsType>()
@@ -59,7 +59,7 @@ const justifyMap = {
   center: 'center',
   right: 'flex-end',
 }
-const computedStyle = computed<CSSStyleDeclaration>(() => {
+const computedStyle = computed<any>(() => {
   return {
     'margin-top': `${props.mt || props.my}px`,
     'margin-bottom': `${props.mb || props.my}px`,
@@ -78,7 +78,7 @@ const computedStyle = computed<CSSStyleDeclaration>(() => {
  * @param item - 规格化的项目对象
  * @returns 文本样式对象
  */
-function textStyle(item: NormalizedItem): CSSStyleDeclaration {
+function textStyle(item: NormalizedItem): any {
   const customStyle = props.textStyle?.(item) || {}
   return {
     color: 'rgba(41, 53, 79, 0.8)',

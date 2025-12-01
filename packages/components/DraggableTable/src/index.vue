@@ -903,9 +903,10 @@ function getColumnUniqueKey(col: Record<string, any>): string {
 
 /**
  * 处理自定义配置保存
- * @param params - 参数对象
- * @param params.customColumns - 自定义列配置
- * @param params.rest - 其他配置
+ * @param payload
+ * @param payload.customColumns - 自定义列配置
+ * @param payload.isReset
+ * @param payload.isCommon
  */
 function handleCustomConfigSave(payload: {
   customColumns: ColumnType[]

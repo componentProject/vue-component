@@ -52,7 +52,7 @@ const isDisabled = computed(() => {
 const computedColumn = computed(() => {
   const columns = getTypeDefault(props.columns, 'array')
   const fieldKeys = getTypeDefault(props.fields, 'array')
-  return columns.filter(col => fieldKeys.some(k => col && col[k] !== undefined && col[k] !== ''))
+  return columns.filter((col: any) => fieldKeys.some((k: string) => col && col[k] !== undefined && col[k] !== ''))
 })
 
 /**
@@ -60,7 +60,7 @@ const computedColumn = computed(() => {
  */
 const computedHeader = computed(() => {
   const titleKeys = getTypeDefault(props.titles, 'array')
-  return computedColumn.value.map((col) => {
+  return computedColumn.value.map((col: any) => {
     for (const k of titleKeys) {
       if (col && col[k] !== undefined && col[k] !== null) {
         return String(col[k])
@@ -75,7 +75,7 @@ const computedHeader = computed(() => {
  */
 const computedKeys = computed(() => {
   const fieldKeys = getTypeDefault(props.fields, 'array')
-  return computedColumn.value.map((col) => {
+  return computedColumn.value.map((col: any) => {
     for (const k of fieldKeys) {
       if (col && col[k] !== undefined && col[k] !== null && col[k] !== '') {
         return String(col[k])
@@ -127,13 +127,13 @@ function handleExport() {
  * @param keys - 表格列的 key
  * @returns 格式化后的数据
  */
-function formatData(dataSource, keys) {
-  return dataSource.map((item, rowIndex) => {
-    const newItem = {}
+function formatData(dataSource: any[], keys: string[]) {
+  return dataSource.map((item: any, rowIndex: number) => {
+    const newItem: Record<string, any> = {}
 
-    keys.forEach((key, colIndex) => {
+    keys.forEach((key: string, colIndex: number) => {
       // 处理列级格式化函数
-      const column = computedColumn.value[colIndex]
+      const column = computedColumn.value[colIndex] as any
       if (column && typeof column.formatter === 'function') {
         newItem[key] = column.formatter(item, column, rowIndex)
         return
@@ -143,7 +143,7 @@ function formatData(dataSource, keys) {
       if (key.includes('.')) {
         const keyArr = key.split('.')
         let value = item
-        keyArr.forEach((k) => {
+        keyArr.forEach((k: string) => {
           value = value?.[k]
         })
         newItem[key] = value !== undefined ? value : ''
@@ -163,7 +163,7 @@ function formatData(dataSource, keys) {
  * @param fileName - 文件名
  * @param keys - 可选，列 key，用于空数据导出
  */
-function exportExcel(data, header, fileName, keys = null) {
+function exportExcel(data: any[], header: string[], fileName: string, keys: string[] | null = null) {
   // 创建工作簿
   const wb = utils.book_new()
 
@@ -173,22 +173,22 @@ function exportExcel(data, header, fileName, keys = null) {
   if (data.length === 1 && Object.keys(data[0]).length === 0 && keys) {
     // 处理空数据导出情况
     // 为每个key创建一个空对象
-    const emptyObj = {}
-    keys.forEach((key) => {
+    const emptyObj: Record<string, any> = {}
+    keys.forEach((key: string) => {
       emptyObj[key] = ''
     })
     worksheet = utils.json_to_sheet([emptyObj], { header: keys })
   }
   else {
     // 正常数据导出
-    worksheet = utils.json_to_sheet(data, { header: keys })
+    worksheet = utils.json_to_sheet(data, keys ? { header: keys } : undefined)
   }
 
   // 添加表头
   utils.sheet_add_aoa(worksheet, [header], { origin: 'A1' })
 
   // 设置表头样式（加粗）
-  const range = utils.decode_range(worksheet['!ref'])
+  const range = utils.decode_range(worksheet['!ref'] || '')
   for (let col = range.s.c; col <= range.e.c; ++col) {
     const cellRef = utils.encode_cell({ r: 0, c: col })
     if (!worksheet[cellRef])
@@ -207,10 +207,10 @@ function exportExcel(data, header, fileName, keys = null) {
   // 如果需要自动调整列宽
   if (props.autoWidth) {
     // 获取所有列的最大宽度
-    const columnsWidth = []
+    const columnsWidth: { wch: number }[] = []
 
     // 先加入表头的宽度
-    header.forEach((h, idx) => {
+    header.forEach((h: string, idx: number) => {
       columnsWidth[idx] = {
         wch: calculateCellWidth(h.toString()),
       }
@@ -219,8 +219,8 @@ function exportExcel(data, header, fileName, keys = null) {
     // 遍历所有数据行
     if (data.length > 0) {
       const dataKeys = keys || Object.keys(data[0])
-      data.forEach((row) => {
-        dataKeys.forEach((key, idx) => {
+      data.forEach((row: any) => {
+        dataKeys.forEach((key: string, idx: number) => {
           const cellValue = row[key] === null || row[key] === undefined ? '' : row[key].toString()
           const cellWidth = calculateCellWidth(cellValue)
           if (!columnsWidth[idx] || columnsWidth[idx].wch < cellWidth) {
@@ -260,7 +260,7 @@ function exportExcel(data, header, fileName, keys = null) {
  * @param cellValue - 单元格内容
  * @returns 宽度值
  */
-function calculateCellWidth(cellValue) {
+function calculateCellWidth(cellValue: string) {
   if (!cellValue)
     return 10
 

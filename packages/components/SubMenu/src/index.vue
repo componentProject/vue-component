@@ -12,7 +12,7 @@
         {{ getRouteTitle(route) }}
       </template>
       <div :style="`max-height: calc(100vh - ${props.menuHeight || 0}px - 30px);overflow: auto`">
-        <SubMenu :routes="route.children ?? []" />
+        <SubMenu :routes="route.children ?? []" :menu-height="props.menuHeight" />
       </div>
     </ElSubMenu>
 

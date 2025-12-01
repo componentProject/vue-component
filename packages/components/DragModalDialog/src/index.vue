@@ -590,10 +590,10 @@ function initPosition() {
     targetHeight = Math.max(props.minHeight, Math.min(targetHeight, contentArea.height))
 
     // 计算位置：确保在内容区域内
-    let targetLeft: number
-    let targetTop: number
-    let targetRight: number
-    let targetBottom: number
+    let targetLeft: number | undefined
+    let targetTop: number | undefined
+    let targetRight: number | undefined
+    let targetBottom: number | undefined
 
     // fullscreen 时直接贴边（考虑 margin）
     if (props.size === 'fullscreen') {
