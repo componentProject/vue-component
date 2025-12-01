@@ -286,7 +286,7 @@ function save(value: string, html: any): void {
 
   // 否则使用默认的 IndexedDB 保存
   saveToIndexedDB(value).then((result) => {
-    console.log('result', result)
+    // console.log('result', result)
     if (result.success) {
       // 触发自定义保存成功事件，使用扩展运算符传递所有结果
       emit('saveSuccess', {

@@ -16,6 +16,8 @@
       "@moluoxixi/constant": ["../constant"],
       "@moluoxixi/constant/*": ["../constant/*"]
     },
+    "module": "NodeNext",
+    "moduleResolution": "nodenext",
     "resolveJsonModule": true,
     "allowJs": true,
     "strict": true,

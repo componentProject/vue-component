@@ -5,11 +5,16 @@ import type { ConfigEnv, PluginOption, UserConfig } from 'vite'
 import type { UserOptions as PagesOptions } from 'vite-plugin-pages'
 import type {
   CompressionOptions,
+  CompressionPlugin,
   ImageminOptions,
+  ImageminPlugin,
+  ModeConfig,
   PluginMap,
   PluginType,
+  QiankunPlugin,
   ViteConfigType,
 } from './_types/index.ts'
+
 import path from 'node:path'
 
 import tailwindcss from '@tailwindcss/postcss'
@@ -39,12 +44,16 @@ import { VitePWA } from 'vite-plugin-pwa'
 // vite vue插件
 import qiankunPlugin from 'vite-plugin-qiankun'
 import vueDevTools from 'vite-plugin-vue-devtools'
-import { deepMerge } from '../../_utils'
 
-// 自动路由
-import AutoRoutesPlugin from '../../AutoRoutesPlugin'
+import { deepMerge } from '../../_utils/index.ts'
+import AutoRoutesPlugin from '../../AutoRoutesPlugin/index.ts'
 import { modules } from './constants/index.ts'
 import scopedCssPrefixPlugin from './plugins/addScopedAndReplacePrefix.ts'
+
+// 插件函数类型转换（这些插件是默认导出的函数，需要通过 unknown 进行类型转换）
+const compressionPlugin = viteCompression as unknown as CompressionPlugin
+const imageminPlugin = viteImagemin as unknown as ImageminPlugin
+const qiankunPluginFn = qiankunPlugin as unknown as QiankunPlugin
 
 // // workbox urlPattern 参数类型
 // interface UrlPatternContext {
@@ -53,43 +62,49 @@ import scopedCssPrefixPlugin from './plugins/addScopedAndReplacePrefix.ts'
 // }
 
 async function getViteConfig(Config: ViteConfigType, params?: ConfigEnv) {
-  const config = typeof Config === 'function'
+  const configResult = typeof Config === 'function'
     ? Config(params!)
     : Config
+  if (!configResult || !configResult.rootPath) {
+    throw new Error('rootPath is required in ViteConfig')
+  }
+  const config = configResult
   const { mode = 'base' } = params || {}
-  const rootPath = config?.rootPath
+  const rootPath = config.rootPath
 
-  const modeConfig = config?.mode || {}
-  const baseConfig = modeConfig?.base || {}
-  const currentModeConfig = modeConfig?.[mode] || {}
+  const modeConfig = config.mode || {}
+  const baseConfig = modeConfig.base || {}
+  const currentModeConfig = (modeConfig[mode as keyof typeof modeConfig] || {}) as ModeConfig
   const viteEnv = { ...baseConfig, ...currentModeConfig }
   const isDev = mode === 'development'
 
   // 插件配置，从 viteEnv 中读取（viteEnv 来自 ModeConfig，包含所有插件配置）
   const {
-    autoImport = config?.autoImport ?? true,
-    autoComponent = config?.autoComponent ?? true,
-    compression = config?.compression ?? true,
-    imagemin = config?.imagemin ?? true,
-    codeInspector = config?.codeInspector ?? true,
-    port = config?.port,
-    visualizer = config?.visualizer ?? false,
-    autoRoutes = config?.autoRoutes ?? false,
-    cdn = config?.cdn ?? false,
-    pageRoutes = config?.pageRoutes ?? false,
-    pwa = config?.pwa ?? false,
-    devtools = config?.devtools,
-    open = config?.open,
-    qiankunDevMode = config?.qiankunDevMode,
-    qiankun = config?.qiankun,
-    namespace = config?.namespace,
-    dropConsole = config?.dropConsole,
-    appTitle = config.appTitle,
-    appCode = config.appCode,
+    autoImport = config.autoImport ?? true,
+    autoComponent = config.autoComponent ?? true,
+    compression = config.compression ?? true,
+    imagemin = config.imagemin ?? true,
+    codeInspector = config.codeInspector ?? true,
+    port = config.port,
+    visualizer = config.visualizer ?? false,
+    autoRoutes = config.autoRoutes ?? false,
+    cdn = config.cdn ?? false,
+    pageRoutes = config.pageRoutes ?? false,
+    pwa = config.pwa ?? false,
+    devtools = config.devtools,
+    open = config.open,
+    qiankunDevMode = config.qiankunDevMode,
+    qiankun = config.qiankun,
+    namespace = config.namespace,
+    dropConsole = config.dropConsole,
     vue = config.vue ?? true,
     react = config.react,
-    vitepress = config?.vitepress,
+    vitepress = config.vitepress,
   } = viteEnv
+
+  // appTitle 和 appCode 从 config 中获取，因为它们不在 ModeConfig 中
+  const appTitle = config.appTitle
+  const appCode = config.appCode
 
   const isOnlyVue = !vitepress && !react && vue
   // const isOnlyReact = !vitepress && !vue && react
@@ -118,7 +133,7 @@ async function getViteConfig(Config: ViteConfigType, params?: ConfigEnv) {
       deepMerge(
         {
           imports: ['vue'],
-          resolvers: [isVueOrVitepress && ElementPlusResolver()].filter(Boolean),
+          resolvers: (isVueOrVitepress ? [ElementPlusResolver()] : []),
           dts: path.resolve(rootPath, './typings/auto-imports.d.ts'),
         },
         autoImport,
@@ -127,7 +142,7 @@ async function getViteConfig(Config: ViteConfigType, params?: ConfigEnv) {
     autoComponent && Components(
       deepMerge(
         {
-          resolvers: [isVueOrVitepress && ElementPlusResolver()].filter(Boolean),
+          resolvers: (isVueOrVitepress ? [ElementPlusResolver()] : []),
           globs: [],
           dts: path.resolve(rootPath, './typings/components.d.ts'),
         },
@@ -141,7 +156,7 @@ async function getViteConfig(Config: ViteConfigType, params?: ConfigEnv) {
         },
       },
     }),
-    compression && viteCompression(
+    compression && compressionPlugin(
       deepMerge(
         {
           algorithm: 'brotliCompress' as const,
@@ -154,7 +169,7 @@ async function getViteConfig(Config: ViteConfigType, params?: ConfigEnv) {
         compression,
       ) as CompressionOptions,
     ),
-    imagemin && viteImagemin(
+    imagemin && imageminPlugin(
       deepMerge(
         {
           gifsicle: { optimizationLevel: 7, interlaced: false },
@@ -220,8 +235,8 @@ async function getViteConfig(Config: ViteConfigType, params?: ConfigEnv) {
           },
           includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg'],
           manifest: {
-            id: appCode ?? `/${appCode}/`,
-            start_url: appCode ?? `/${appCode}/`,
+            id: appCode ? `/${appCode}/` : '/',
+            start_url: appCode ? `/${appCode}/` : '/',
             name: appTitle || 'Vue 应用',
             short_name: appTitle || '应用',
             description: '渐进式 Web 应用',
@@ -242,11 +257,11 @@ async function getViteConfig(Config: ViteConfigType, params?: ConfigEnv) {
         codeInspector,
       ),
     ),
-  ].filter(Boolean)
+  ].filter(Boolean) as PluginOption[]
 
   // qiankun
   if (qiankun) {
-    plugins.push(qiankunPlugin(envSystemCode!, { useDevMode: qiankunDevMode }))
+    plugins.push(qiankunPluginFn(envSystemCode || 'el', { useDevMode: qiankunDevMode }))
     if (appCode) {
       plugins.push(scopedCssPrefixPlugin({
         prefixScoped: `div[data-qiankun='${envSystemCode}']`,
@@ -286,7 +301,7 @@ async function getViteConfig(Config: ViteConfigType, params?: ConfigEnv) {
     },
     build: {
       sourcemap: isDev,
-      outDir: appCode ?? `${appCode}`,
+      outDir: appCode || 'dist',
       cssCodeSplit: true,
       chunkSizeWarningLimit: 1500,
       minify: 'esbuild',
@@ -325,6 +340,7 @@ async function getViteConfig(Config: ViteConfigType, params?: ConfigEnv) {
     css: {
       preprocessorOptions: {
         scss: {
+          // @ts-expect-error - api is a valid option but not in types
           api: 'modern-compiler',
         },
       },
@@ -353,12 +369,16 @@ async function getViteConfig(Config: ViteConfigType, params?: ConfigEnv) {
   const viteConfig = typeof config.viteConfig === 'function'
     ? config.viteConfig(params!)
     : config.viteConfig
-  const viteConfigPluginNames = (viteConfig?.plugins || []).map((i: any) => {
-    return Array.isArray(i) ? (i[0] as PluginType)?.name : (i as PluginType)?.name
-  })
-  const defaultPluginNamesMap = (defaultConfig.plugins || []).reduce((nameMap: Record<string, any>, i: any) => {
-    const name: string = Array.isArray(i) ? (i[0] as PluginType)?.name : (i as PluginType)?.name
-    nameMap[name] = i
+  const viteConfigPluginNames = (viteConfig?.plugins || []).map((i: PluginOption) => {
+    const plugin = Array.isArray(i) ? i[0] : i
+    return (plugin as PluginType)?.name
+  }).filter((name): name is string => Boolean(name))
+  const defaultPluginNamesMap = (defaultConfig.plugins || []).reduce((nameMap: PluginMap, i: PluginOption) => {
+    const plugin = Array.isArray(i) ? i[0] : i
+    const name = (plugin as PluginType)?.name
+    if (name) {
+      nameMap[name] = i
+    }
     return nameMap
   }, {} as PluginMap)
 

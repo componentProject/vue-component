@@ -41,8 +41,6 @@ export default function qiankunCssInject(options: QiankunCssInjectOptions = {}):
   // const cssInclude = '**/*.{css,scss,sass,less,style}'; // 处理的文件类型
   const filterCss = createFilter(cssInclude, cssExclude)
   const identifier = `/* ${appId}-css-identifier */`
-  // 创建属性前缀
-  const attributePrefix = `data-qiankun="${appId}"`
   return {
     name: 'vite-plugin-qiankun-css-inject',
     apply: 'serve',
@@ -92,9 +90,12 @@ export default function qiankunCssInject(options: QiankunCssInjectOptions = {}):
 
                     // 为其他选择器添加属性前缀
                     if (sel.type === 'selector') {
+                      // 解析属性选择器字符串，提取属性名和值
                       const attributeNode = selectorParser.attribute({
-                        attribute: attributePrefix,
-                      })
+                        attribute: 'data-qiankun',
+                        value: `"${appId}"`,
+                        raws: {},
+                      } as any)
 
                       // 将属性选择器插入到最前面
                       sel.nodes.unshift(selectorParser.combinator({

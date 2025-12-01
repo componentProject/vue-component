@@ -399,7 +399,7 @@ async function buildComponent(
       globals[`node:${nodeDep}`] = globalName
     }
 
-    console.log('--------------------------->globals', globals)
+    // console.log('--------------------------->globals', globals)
     // 创建基础配置
     const baseConfig = await createBaseConfig(ctx, comp)
 

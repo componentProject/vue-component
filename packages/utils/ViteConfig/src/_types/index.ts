@@ -4,13 +4,29 @@ import type { Options as unpluginAutoImportOptions } from 'unplugin-auto-import/
 import type { Options as unpluginVueComponentsOptions } from 'unplugin-vue-components/types'
 import type { ConfigEnv, PluginOption, UserConfig } from 'vite'
 import type importToCDN from 'vite-plugin-cdn-import'
-import type viteCompression from 'vite-plugin-compression'
-import type viteImagemin from 'vite-plugin-imagemin'
 import type { UserOptions as PagesOptions } from 'vite-plugin-pages'
 import type { Options as VitePWAOptions } from 'vite-plugin-pwa'
 
-export type CompressionOptions = Parameters<typeof viteCompression>[0]
-export type ImageminOptions = Parameters<typeof viteImagemin>[0]
+// 使用模块类型来获取插件函数的参数类型
+type ViteCompressionModule = typeof import('vite-plugin-compression')
+type ViteImageminModule = typeof import('vite-plugin-imagemin')
+
+export type CompressionOptions = ViteCompressionModule extends { default: infer F }
+  ? F extends (...args: any[]) => any
+    ? Parameters<F>[0]
+    : never
+  : never
+
+export type ImageminOptions = ViteImageminModule extends { default: infer F }
+  ? F extends (...args: any[]) => any
+    ? Parameters<F>[0]
+    : never
+  : never
+
+// 插件函数类型定义（这些插件是默认导出的函数）
+export type CompressionPlugin = (options?: CompressionOptions) => PluginOption
+export type ImageminPlugin = (options?: ImageminOptions) => PluginOption
+export type QiankunPlugin = (name: string, options?: { useDevMode?: boolean }) => PluginOption
 export type CDNOptions = Parameters<typeof importToCDN>[0] & {
   /**
    * CDN的基本url
@@ -176,7 +192,6 @@ export interface Config extends PluginConfig {
     base?: ModeConfig
     development?: ModeConfig
     production?: ModeConfig
-    [key: string]: ModeConfig
   }
   viteConfig?: UserConfig | ((mode: ConfigEnv) => UserConfig)
 }

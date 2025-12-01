@@ -33,6 +33,7 @@
     "@moluoxixi/constant": "workspace:*",
     "@moluoxixi/utils": "workspace:*",
     "@tailwindcss/postcss": "catalog:dev",
+    "@types/lodash-es": "catalog:type",
     "@types/node": "catalog:type",
     "@types/uuid": "catalog:type",
     "@vitejs/plugin-vue": "catalog:dev",

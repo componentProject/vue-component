@@ -143,14 +143,14 @@ function addInternalDep(
   // 根据是整包还是子路径，设置不同的 alias key
   if (!fullPackageName) {
     // 整包导入：使用 resolvedPackage 作为 alias key
-    console.log(`✓ 发现内部依赖（整包）: ${packageName} -> ${internalDepName}`)
+    // console.log(`✓ 发现内部依赖（整包）: ${packageName} -> ${internalDepName}`)
     aliasMappings[resolvedPackage] = internalDepName
     aliasMappings[`${resolvedPackage}/*`] = `${internalDepName}/*`
   }
   else {
     // 子路径导入：使用 ${resolvedPackage}/${packageName} 作为 alias key
     const aliasKey = `${resolvedPackage}/${packageName}`
-    console.log(`✓ 发现内部依赖: ${packageName} -> ${internalDepName} (${resolvedPackage}/${fullPackageName})`)
+    // console.log(`✓ 发现内部依赖: ${packageName} -> ${internalDepName} (${resolvedPackage}/${fullPackageName})`)
     aliasMappings[aliasKey] = internalDepName
     aliasMappings[`${aliasKey}/*`] = `${internalDepName}/*`
   }
@@ -253,7 +253,7 @@ export async function analyzeComponentDeps(ctx: BuildContext, comp: string): Pro
       if (dep.coreModule) {
         // node 依赖单独存储（Set会自动去重）
         if (!nodeDeps.has(dep.module)) {
-          console.log(`✓ 发现node依赖: ${dep.module}`)
+          // console.log(`✓ 发现node依赖: ${dep.module}`)
           nodeDeps.add(dep.module)
         }
       }
@@ -267,7 +267,7 @@ export async function analyzeComponentDeps(ctx: BuildContext, comp: string): Pro
           // 4. 如果是正常包名（例如 1.2.3 那种版本号），就是外部依赖
           if (isValidVersion(version)) {
             if (!externalDeps.get(resolvedPackage)) {
-              console.log(`✓ 发现外部依赖: ${resolvedPackage}@${version}`)
+              // console.log(`✓ 发现外部依赖: ${resolvedPackage}@${version}`)
               externalDeps.set(resolvedPackage, version)
             }
           }
@@ -333,7 +333,7 @@ export async function analyzeComponentDeps(ctx: BuildContext, comp: string): Pro
       nodeDeps: Array.from(nodeDeps).sort() as string[],
       peerDependencies: Object.fromEntries(peerDeps),
     }
-    console.log('result', result)
+    // console.log('result', result)
 
     // 输出结果
     console.log(`\n=== 组件 ${comp} 依赖分析结果 ===`)
