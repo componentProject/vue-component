@@ -2,11 +2,11 @@
  * Vite 配置相关工具函数
  */
 import type { InlineConfig } from 'vite'
-import type { BuildContext } from '../_types'
+import type { BuildContext } from '../_types/index.ts'
 import { resolve } from 'node:path'
-import { dynamicImports } from '@moluoxixi/utils/_utils'
-import CssInjectedByJsPlugin from '@moluoxixi/utils/CssInjectedByJsPlugin'
-import cssModuleGlobalRootPlugin from '@moluoxixi/utils/cssModuleGlobalRootPlugin'
+import { dynamicImports } from '@moluoxixi/utils/_utils/index.ts'
+import CssInjectedByJsPlugin from '@moluoxixi/utils/CssInjectedByJsPlugin/index.ts'
+import cssModuleGlobalRootPlugin from '@moluoxixi/utils/cssModuleGlobalRootPlugin/index.ts'
 import tailwindcss from '@tailwindcss/postcss'
 import pluginVue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
@@ -45,7 +45,7 @@ export async function createBaseConfig(ctx: BuildContext, comp: string): Promise
 
   // 当styleType为scoped时，动态导入并添加UUID插件用于样式隔离（配置使用，动态导入）
   if (ctx.styleType === 'scoped') {
-    const { default: AddUuidToTemplatePlugin } = await dynamicImports<{ default: typeof import('../../AddUuidToTemplatePlugin')['default'] }>(import('../../AddUuidToTemplatePlugin'), ['default'])
+    const { default: AddUuidToTemplatePlugin } = await dynamicImports<{ default: typeof import('@moluoxixi/utils/AddUuidToTemplatePlugin/index.ts')['default'] }>(import('@moluoxixi/utils/AddUuidToTemplatePlugin/index.ts'), ['default'])
     plugins.push(AddUuidToTemplatePlugin())
   }
 

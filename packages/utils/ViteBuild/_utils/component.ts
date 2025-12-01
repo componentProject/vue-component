@@ -1,9 +1,9 @@
-import type { BuildContext } from '../_types'
+import type { BuildContext } from '../_types/index.ts'
 /**
  * 组件相关工具函数
  */
 import fsp from 'node:fs/promises'
-import { dynamicImport } from '@moluoxixi/utils/_utils'
+import { dynamicImport } from '@moluoxixi/utils/_utils/index.ts'
 import glob from 'fast-glob'
 
 /** 必须排除的文件 */
@@ -50,7 +50,7 @@ export async function getComponentNames(ctx: BuildContext, enableInteractive = f
   const selected = await checkbox({
     message: '请选择要打包的组件（使用空格选择，按 a 全选，回车确认）:',
     choices: allComponentNames.map(name => ({ name, value: name })),
-    validate: (choices) => {
+    validate: (choices: any) => {
       if (choices.length === 0) {
         return '请至少选择一个选项'
       }

@@ -17,7 +17,7 @@
  */
 export async function dynamicImport<T = any>(
   modulePath: string,
-  exportName?: string = 'default',
+  exportName: string = 'default',
 ): Promise<T> {
   const module = await import(modulePath)
 

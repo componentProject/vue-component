@@ -9,25 +9,25 @@ import type {
   ModuleFormat,
   RunBuildCliOptions,
   RunBuildCliParams,
-} from './_types'
+} from './_types/index.ts'
 
 import { execSync } from 'node:child_process'
 import fs from 'node:fs'
 import fsp from 'node:fs/promises'
 import { resolve } from 'node:path'
 // 导入工具函数
-import { dynamicImports } from '@moluoxixi/utils'
+import { dynamicImports } from '@moluoxixi/utils/_utils/index.ts'
 
 import { build, mergeConfig } from 'vite'
-import { getFlagValue, hasFlag, parseBoolean, printUsage } from './_utils/cli'
-import { clearDir, findComponentEntry, getComponentNames, sleep, toPascalCase } from './_utils/component'
-import { getComponentFormats } from './_utils/config'
-import { analyzeComponentDeps } from './_utils/deps'
-import { getCurrentVersions, getNextVersion, writeComponentVersions } from './_utils/version'
-import { createBaseConfig } from './_utils/viteConfig'
+import { getFlagValue, hasFlag, parseBoolean, printUsage } from './_utils/cli.ts'
+import { clearDir, findComponentEntry, getComponentNames, sleep, toPascalCase } from './_utils/component.ts'
+import { getComponentFormats } from './_utils/config.ts'
+import { analyzeComponentDeps } from './_utils/deps.ts'
+import { getCurrentVersions, getNextVersion, writeComponentVersions } from './_utils/version.ts'
+import { createBaseConfig } from './_utils/viteConfig.ts'
 
 // 重新导出类型
-export type { BuildOptions, ComponentFormatConfig, GlobalFormatConfig, ViteConfigType } from './_types'
+export type { BuildOptions, ComponentFormatConfig, GlobalFormatConfig, ViteConfigType } from './_types/index.ts'
 
 //#region CLI 运行器
 /**
@@ -151,6 +151,8 @@ async function bundleComponentModule(ctx: BuildContext, {
       tsconfigPath: './tsconfig.build.json',
       include: [`${comp}/**/*`],
       declarationOnly: false,
+      copyDtsFiles: false,
+      logLevel: 'warn',
     }))
   }
   await build(mergeConfig({
@@ -174,7 +176,7 @@ async function bundleComponentModule(ctx: BuildContext, {
         ],
         external: (id: string) => {
           // 排除内部依赖，internalDeps 现在存储的是 @${LIB_NAMESPACE}/${packageName.toLowerCase()} 格式,它是被alias转换${ctx.aliasComponentPath}/${packageName}
-          if (dependencies.internal.some(i => id.includes(i))) {
+          if (dependencies.internal.some((i: string) => id.includes(i))) {
             return true
           }
           // 排除全局预设依赖
@@ -524,7 +526,7 @@ async function buildComponent(
       ...deps.peerDependencies,
     }
     // internalDeps 现在存储的就是 @${LIB_NAMESPACE}/${packageName.toLowerCase()} 格式
-    const internal: Record<string, string> = deps.internal.reduce((p, item) => {
+    const internal: Record<string, string> = deps.internal.reduce((p: Record<string, string>, item: string) => {
       // item 已经是 @${LIB_NAMESPACE}/${packageName.toLowerCase()} 格式
       p[item] = 'latest'
       return p
@@ -734,6 +736,7 @@ export async function buildComponentsWithOptions(options: BuildOptions): Promise
       ...aliasMap,
     },
     aliasPacks: [],
+    excludePacks: rest.excludePacks || [],
     ...rest,
   }
   ctx.aliasPacks = Object.keys(ctx.alias).filter((i: string) => !i.endsWith('*'))

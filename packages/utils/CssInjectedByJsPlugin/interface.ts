@@ -1,7 +1,7 @@
 // interface.ts文件
 import type { ModuleFormat, OutputAsset, OutputChunk } from 'rollup'
 import type { BuildOptions } from 'vite'
-import type { InjectCode, InjectCodeFunction } from './utils'
+import type { InjectCode, InjectCodeFunction } from './utils.ts'
 
 export interface DevOptions {
   enableDev?: boolean

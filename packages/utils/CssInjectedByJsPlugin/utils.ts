@@ -1,12 +1,21 @@
 // utils.ts文件
 import type { OutputAsset, OutputBundle, OutputChunk } from 'rollup'
 import type { Plugin } from 'vite'
-import type { BuildCSSInjectionConfiguration, CSSInjectionConfiguration, PluginConfiguration } from './interface'
+import type { BuildCSSInjectionConfiguration, CSSInjectionConfiguration, PluginConfiguration } from './interface.ts'
 import { v4 } from 'uuid'
 import { build } from 'vite'
 
+// 扩展 OutputChunk 类型以包含 Vite 的 viteMetadata
+interface ViteMetadata {
+  importedCss: Set<string>
+}
+
+interface ViteOutputChunk extends OutputChunk {
+  viteMetadata?: ViteMetadata
+}
+
 interface InjectCodeOptions {
-  styleId?: string | (() => string)
+  styleId?: string
   useStrictCSP?: boolean
   // TODO: (BC) Migrate styleId into attributes.
   attributes?: { [key: string]: string } | undefined
@@ -48,7 +57,7 @@ const defaultInjectCode: InjectCode = (cssCode, { styleId, useStrictCSP, attribu
 
   const cspInjection = useStrictCSP ? `elementStyle.nonce = document.head.querySelector('meta[property=csp-nonce]')?.content;` : ''
 
-  return createStyle(cssCode, styleId, [styleIdInjection, cspInjection, attributesInjection])
+  return createStyle(cssCode, styleId || '', [styleIdInjection, cspInjection, attributesInjection])
 }
 
 export async function buildCSSInjectionCode({
@@ -201,8 +210,12 @@ export function buildJsCssMap(
   }
 
   for (const key of bundleKeys) {
-    const chunk = bundle[key]
-    if (chunk.type === 'asset' || !chunk.viteMetadata || chunk.viteMetadata.importedCss.size === 0) {
+    const item = bundle[key]
+    if (item.type === 'asset') {
+      continue
+    }
+    const chunk = item as ViteOutputChunk
+    if (!chunk.viteMetadata || chunk.viteMetadata.importedCss.size === 0) {
       continue
     }
 
@@ -357,7 +370,7 @@ export function buildOutputChunkWithCssInjectionCode(
 export function clearImportedCssViteMetadataFromBundle(bundle: OutputBundle, unusedCssAssets: string[]): void {
   // Required to exclude removed files from manifest.json
   for (const key in bundle) {
-    const chunk = bundle[key] as OutputChunk
+    const chunk = bundle[key] as ViteOutputChunk
     if (chunk.viteMetadata && chunk.viteMetadata.importedCss.size > 0) {
       const importedCssFileNames = chunk.viteMetadata.importedCss
       importedCssFileNames.forEach((importedCssFileName: any) => {

@@ -1,7 +1,7 @@
 // src入口文件
 import type { AppContext, Component, VNode } from 'vue'
 import { ElButton, ElDialog } from 'element-plus'
-import { createVNode, defineComponent, render } from 'vue'
+import { createVNode, defineComponent, h, render } from 'vue'
 
 // 插槽类型定义
 export type SlotType = VNode[] | VNode | Component | string | (() => VNode[])
@@ -52,38 +52,29 @@ export function createApiDialog(DialogComponent?: Component) {
         emit('update:modelValue', false)
       }
 
-      return () => (
-        <ElDialog
-          modelValue={props.modelValue}
-          title={props.title}
-          width={props.width}
-          onUpdate:modelValue={(val: boolean) => {
-            emit('update:modelValue', val)
-            if (!val) {
-              handleClose()
-            }
-          }}
-          v-slots={{
-            default: () => slots.default?.(),
-            header: slots.header,
-            footer: slots.footer || (() => (
-              <div class="dialog-footer">
-                <ElButton
-                  onClick={() => handleClose()}
-                >
-                  取消
-                </ElButton>
-                <ElButton
-                  type="primary"
-                  onClick={() => handleConfirm({})}
-                >
-                  确定
-                </ElButton>
-              </div>
-            )),
-          }}
-        />
-      )
+      return () => h(ElDialog, {
+        'modelValue': props.modelValue,
+        'title': props.title,
+        'width': props.width,
+        'onUpdate:modelValue': (val: boolean) => {
+          emit('update:modelValue', val)
+          if (!val) {
+            handleClose()
+          }
+        },
+      }, {
+        default: () => slots.default?.(),
+        header: slots.header,
+        footer: slots.footer || (() => h('div', { class: 'dialog-footer' }, [
+          h(ElButton, {
+            onClick: () => handleClose(),
+          }, () => '取消'),
+          h(ElButton, {
+            type: 'primary',
+            onClick: () => handleConfirm({}),
+          }, () => '确定'),
+        ])),
+      })
     },
   })
 

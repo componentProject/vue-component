@@ -1,6 +1,6 @@
 // _utils入口文件
-export * from './base'
-export * from './down'
-export * from './drag'
-export * from './dynamicImport'
-export * from './object'
+export * from './base.ts'
+export * from './down.ts'
+export * from './drag.ts'
+export * from './dynamicImport.ts'
+export * from './object.ts'

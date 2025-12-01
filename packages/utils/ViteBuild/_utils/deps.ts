@@ -1,4 +1,4 @@
-import type { BuildContext, ComponentDependencies } from '../_types'
+import type { BuildContext, ComponentDependencies } from '../_types/index.ts'
 /**
  * 依赖分析工具函数
  */
@@ -6,7 +6,7 @@ import { execSync } from 'node:child_process'
 import fs from 'node:fs'
 import { relative, resolve } from 'node:path'
 import { cruise } from 'dependency-cruiser'
-import { findComponentEntry, getFirstPathSegment } from './component'
+import { findComponentEntry, getFirstPathSegment } from './component.ts'
 
 /**
  * 读取指定目录下 pnpm list --json 的依赖，并分类返回
@@ -340,7 +340,7 @@ export async function analyzeComponentDeps(ctx: BuildContext, comp: string): Pro
 
     if (result.internal.length > 0) {
       console.log(`内部组件依赖 (${result.internal.length}个):`)
-      result.internal.forEach(dep => console.log(`  - ${dep}`))
+      result.internal.forEach((dep: string) => console.log(`  - ${dep}`))
     }
     else {
       console.log(`内部组件依赖: 无`)
@@ -349,7 +349,7 @@ export async function analyzeComponentDeps(ctx: BuildContext, comp: string): Pro
     const nodeDepCount = result.nodeDeps.length
     if (nodeDepCount > 0) {
       console.log(`\nNode依赖 (${nodeDepCount}个):`)
-      result.nodeDeps.forEach((dep) => {
+      result.nodeDeps.forEach((dep: string) => {
         console.log(`  - ${dep}`)
       })
     }

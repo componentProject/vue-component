@@ -1,7 +1,7 @@
 /**
  * 配置相关工具函数
  */
-import type { BuildContext } from '../_types'
+import type { BuildContext } from '../_types/index.ts'
 
 /**
  * 模块格式类型

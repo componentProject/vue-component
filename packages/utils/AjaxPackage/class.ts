@@ -16,16 +16,16 @@ import type {
  * Copyright (c) 2025 by ${git_name_email}, All Rights Reserved.
  */
 
-import type { BaseApiConfig } from './_types'
-import type { MessageInstance, NotificationInstance } from './_utils'
+import type { BaseApiConfig } from './_types/index.ts'
+import type { MessageInstance, NotificationInstance } from './_utils/index.ts'
 import axios from 'axios'
-import { dynamicImports } from '../_utils'
-import createApiDialog from '../ApiDialog'
+import { dynamicImports } from '../_utils/index.ts'
+import createApiDialog from '../ApiDialog/index.ts'
 import {
   createMessageWrapper,
   createNotificationWrapper,
-} from './_utils'
-import { extractSystemErrorInfo } from './_utils/systemErrorInfo'
+} from './_utils/index.ts'
+import { extractSystemErrorInfo } from './_utils/systemErrorInfo.ts'
 
 /**
  * 检查是否在浏览器环境

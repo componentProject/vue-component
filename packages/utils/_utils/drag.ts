@@ -9,7 +9,7 @@ import type {
   PositionData,
   ResizeDirection,
   ResizeState,
-} from './_types/drag'
+} from './_types/drag.ts'
 
 // 导出类型供外部使用
 export type {

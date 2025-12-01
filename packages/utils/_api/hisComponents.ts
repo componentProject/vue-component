@@ -1,5 +1,5 @@
 // hisComponents.ts文件
-import { getHttpService } from '@moluoxixi/utils/AjaxPackage'
+import { getHttpService } from '@moluoxixi/utils/AjaxPackage/index.ts'
 
 const httpApi: any = getHttpService({
   baseURL: '/ts-bs-his-base',
@@ -14,7 +14,7 @@ const httpApi: any = getHttpService({
 })
 
 // HIS6.0 获取HisFooter（医保信息）
-export function getQueryMedicaIInsuranceInfoApi(headers: any, addSign, params = {}) {
+export function getQueryMedicaIInsuranceInfoApi(headers: any, addSign: any, params = {}) {
   // 前端服务
   // return httpApi.post('/ts-pfs-bas/queryMedicalInsuranceInfo', {}, headers, addSign)
   // 业务服务

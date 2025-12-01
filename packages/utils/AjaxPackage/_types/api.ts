@@ -1,5 +1,5 @@
 import type { App } from 'vue'
-import type BaseApi from '../class'
+import type BaseApi from '../class.ts'
 /**
  * BaseApi 配置接口，用于配置 BaseApi 实例的所有选项
  */

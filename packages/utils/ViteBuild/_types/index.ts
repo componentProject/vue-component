@@ -2,7 +2,7 @@
  * ViteBuild 类型定义
  */
 import type { ConfigEnv, UserConfig } from 'vite'
-import type { GlobalFormatConfig } from '../_utils/config'
+import type { GlobalFormatConfig } from '../_utils/config.ts'
 
 export type ViteConfigType = UserConfig | ((mode: ConfigEnv) => UserConfig)
 
@@ -105,4 +105,4 @@ export interface BuildOptions extends Partial<BuildConfigBase> {
 }
 
 // 重新导出配置类型
-export type { ComponentFormatConfig, GlobalFormatConfig } from '../_utils/config'
+export type { ComponentFormatConfig, GlobalFormatConfig } from '../_utils/config.ts'

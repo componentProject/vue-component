@@ -3,7 +3,7 @@
  * 封装所有 IndexDB 操作的核心逻辑，供主线程和 Worker 线程共享使用
  */
 
-import type { StorageRecord } from './_types'
+import type { StorageRecord } from './_types/index.ts'
 
 export interface IndexDBManagerOptions {
   dbName?: string

@@ -3,7 +3,7 @@
  * 在后台线程中处理 IndexDB 操作，避免阻塞主线程
  */
 
-import type { IndexDBOperation, WorkerMessage, WorkerResponse } from './_types'
+import type { IndexDBOperation, WorkerMessage, WorkerResponse } from './_types/index.ts'
 import { IndexedDBManager } from './IndexedDBManager.ts'
 
 interface DBConfig {

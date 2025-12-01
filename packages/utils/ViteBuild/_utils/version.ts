@@ -1,4 +1,4 @@
-import type { BuildContext } from '../_types'
+import type { BuildContext } from '../_types/index.ts'
 /**
  * 版本管理工具函数
  */
@@ -61,9 +61,11 @@ export function getNextVersion(currentVersion: string = '', type: 'major' | 'min
       newMinor++
       newPatch = 0
       break
-    case 'prerelease':
-      newPrerelease++
+    case 'prerelease': {
+      const pre = Number.parseInt(newPrerelease)
+      newPrerelease = String(pre + 1)
       break
+    }
     default: // patch
       newPatch++
       break
