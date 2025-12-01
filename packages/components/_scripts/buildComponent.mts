@@ -52,6 +52,13 @@ runBuildCliAndExit(
       build: {
         minify: false,
       },
+      define: {
+        process: {
+          env: {
+            VUE_APP_VXE_ENV: 'production',
+          },
+        },
+      },
       css: {
         preprocessorOptions: {
           scss: {

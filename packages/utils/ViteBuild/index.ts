@@ -157,7 +157,7 @@ async function bundleComponentModule(ctx: BuildContext, {
   }
   await build(mergeConfig({
     ...baseConfig,
-    plugins,
+    plugins: [...(baseConfig.plugins || []), ...plugins],
     build: {
       outDir,
       emptyOutDir: true,

@@ -1,5 +1,5 @@
 // utils入口文件
-export * from './modules/modifyComponent.tsx'
+export * from './modules/modifyComponent'
 
 export function getType(obj: any, type?: string) {
   if (type) {

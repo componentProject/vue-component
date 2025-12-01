@@ -73,13 +73,6 @@ export async function createBaseConfig(ctx: BuildContext, comp: string): Promise
       extensions: ['.js', '.jsx', '.ts', '.tsx', '.vue'],
       alias: ctx.alias,
     },
-    define: {
-      process: {
-        env: {
-          VUE_APP_VXE_ENV: 'production',
-        },
-      },
-    },
     css: {
       postcss: {
         plugins: [
@@ -87,12 +80,6 @@ export async function createBaseConfig(ctx: BuildContext, comp: string): Promise
           autoprefixer(),
           cssModuleGlobalRootPlugin(),
         ],
-      },
-      preprocessorOptions: {
-        scss: {
-          // 使用legacy避免initAsyncCompiler错误
-          api: 'legacy',
-        },
       },
     },
   }, typeof ctx?.viteConfig === 'function' ? ctx.viteConfig({ command: 'build', mode: 'production' }) : (ctx?.viteConfig || {}))
