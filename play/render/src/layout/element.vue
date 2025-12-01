@@ -31,14 +31,14 @@
         <ElMain>
           <ElContainer class="h-full w-full">
             <ElMain style="background-color: #fff">
-              <transition name="fade">
-                <RouterView v-slot="{ Component, route }">
-                  <keep-alive>
-                    <component :is="Component" v-if="route.meta.keep" :key="route.path" />
-                  </keep-alive>
-                  <component :is="Component" v-if="!route.meta.keep" :key="route.path" />
-                </RouterView>
-              </transition>
+              <RouterView v-slot="{ Component, route }">
+                <Transition name="fade">
+                  <KeepAlive v-if="route.meta.keep">
+                    <Component :is="Component" :key="route.path" />
+                  </KeepAlive>
+                  <component :is="Component" v-else :key="route.path" />
+                </Transition>
+              </RouterView>
             </ElMain>
           </ElContainer>
         </ElMain>

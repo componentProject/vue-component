@@ -1,11 +1,18 @@
+import type { OptionsConfig } from '@antfu/eslint-config'
 // src入口文件
-import type { optionsType, userConfigType } from './_types/index.ts'
+import type { createEslintConfigReturnType, optionsType, userConfigType } from './_types/index.ts'
 
 import antfu from '@antfu/eslint-config'
-import { deepMerge } from '@moluoxixi/utils/_utils'
+import { deepMerge } from '@moluoxixi/utils/_utils/index.ts'
 
-export default function createEslintConfig(config: optionsType, ...userConfigs: userConfigType[]) {
-  const { ignores, ...otherOptions } = config
+/**
+ * 创建 ESLint 配置
+ * @param config - 基础配置选项
+ * @param userConfigs - 额外的用户配置，按序合并覆盖
+ * @returns ESLint 配置数组
+ */
+export default function createEslintConfig(config: optionsType, ...userConfigs: userConfigType[]): createEslintConfigReturnType {
+  const { ignores = [], ...otherOptions } = config
   return antfu(
     deepMerge({
       typescript: true,
@@ -58,7 +65,7 @@ export default function createEslintConfig(config: optionsType, ...userConfigs: 
         // 'yaml/spaced-comment': 'off',
         // #endregion
       },
-    }, otherOptions),
+    }, otherOptions) as OptionsConfig,
     ...userConfigs,
   )
 }
