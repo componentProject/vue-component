@@ -1,7 +1,7 @@
 // _api的components组件
 import { COMPONENT_SETTING_TYPE } from '@moluoxixi/constant'
+import { getHttpService } from '@moluoxixi/utils/AjaxPackage'
 import FormData from 'form-data'
-import { getHttpService } from '../../utils/AjaxPackage'
 
 const httpApi: any = getHttpService({
   baseURL: 'http://192.168.209.103:10019/ts-fm',

@@ -5,15 +5,13 @@ import { routes as autoRoutes, findDefaultRoute } from 'virtual:auto-routes'
 import { qiankunWindow } from 'vite-plugin-qiankun/dist/helper'
 import { createRouter, createWebHistory } from 'vue-router'
 
-// 自动生成的路由
-const routesChildrens = autoRoutes
 const Routes = [
   {
     path: '/',
     name: 'layout',
     component: () => import('./layout.vue' as string),
-    redirect: findDefaultRoute(routesChildrens),
-    children: routesChildrens,
+    redirect: findDefaultRoute(autoRoutes),
+    children: autoRoutes,
   },
   {
     path: '/:pathMatch(.*)*',
@@ -26,12 +24,6 @@ function getRouter(props: any) {
   const routes = cloneDeep(Routes)
   if (qiankunWindow.__POWERED_BY_QIANKUN__) {
     const { activeRule } = props.data
-    // const layout = routes.find((item) => item.name == 'layout')
-    // if (layout) {
-    //   layout.meta = {
-    //     isQiandun: true
-    //   }
-    // }
     base = activeRule
   }
   else {

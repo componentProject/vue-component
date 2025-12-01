@@ -1,0 +1,31 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "jsx": "preserve",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": [
+        "src/*"
+      ],
+      "@moluoxixi/components": ["../../components"],
+      "@moluoxixi/components/*": ["../../components/*"],
+      "@moluoxixi/utils": ["../../utils"],
+      "@moluoxixi/utils/*": ["../../utils/*"],
+      "@moluoxixi/constant": ["../../constant"],
+      "@moluoxixi/constant/*": ["../../constant/*"]
+    },
+    "resolveJsonModule": true,
+    "allowJs": true,
+    "strict": true,
+    "strictNullChecks": true,
+    "noUnusedLocals": true,
+    "noEmit": false,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "isolatedModules": true,
+    "skipLibCheck": true,
+    "allowImportingTsExtensions": false,
+    "composite": true,
+    "declaration": true
+  }
+}

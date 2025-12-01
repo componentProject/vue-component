@@ -1,11 +1,10 @@
-import cssModuleGlobalRootPlugin from '../../../../../packages/utils/cssModuleGlobalRootPlugin'
+import cssModuleGlobalRootPlugin from '../../../../../packages/utils/cssModuleGlobalRootPlugin/index.ts'
 import { getViteConfig } from '../../../../../packages/utils/ViteConfig/index.ts'
-import { appCode, docsPath } from '../../../contants/index.ts'
+import { docsPath } from '../../../contants/index.ts'
 import { MarkdownTransform } from './plugins/markdown-transform.ts'
 
 const viteConfig = getViteConfig({
   rootPath: docsPath,
-  appCode,
   vitepress: true,
   codeInspector: false,
   viteConfig: {

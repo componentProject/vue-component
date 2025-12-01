@@ -101,6 +101,62 @@ export function isValidVersion(version: string): boolean {
 }
 
 /**
+ * 处理内部依赖的添加逻辑
+ * @param ctx 构建上下文
+ * @param packageName 包名（去掉命名空间前缀后的）
+ * @param comp 当前组件名
+ * @param resolvedPackage 解析后的完整包名（带命名空间）
+ * @param fullPackageName 子路径，null 表示整包导入
+ * @param internalDeps 内部依赖集合
+ * @param aliasMappings alias 映射对象
+ */
+function addInternalDep(
+  ctx: BuildContext,
+  packageName: string,
+  comp: string,
+  resolvedPackage: string,
+  fullPackageName: string | null,
+  internalDeps: Set<string>,
+  aliasMappings: Record<string, string>,
+): void {
+  // 检查包名是否有效
+  if (packageName.startsWith('_') || !packageName || packageName === comp) {
+    return
+  }
+
+  // 构建内部依赖名称
+  const internalDepName = `@${ctx.LIB_NAMESPACE}/${packageName.toLowerCase()}`
+
+  // 如果是整包导入，需要检查 excludePacks
+  if (!fullPackageName && [`@${ctx.LIB_NAMESPACE}/constant`, ...(ctx.excludePacks || [])].includes(internalDepName)) {
+    return
+  }
+
+  // 检查是否已经存在
+  if (internalDeps.has(internalDepName)) {
+    return
+  }
+
+  // 添加到内部依赖集合
+  internalDeps.add(internalDepName)
+
+  // 根据是整包还是子路径，设置不同的 alias key
+  if (!fullPackageName) {
+    // 整包导入：使用 resolvedPackage 作为 alias key
+    console.log(`✓ 发现内部依赖（整包）: ${packageName} -> ${internalDepName}`)
+    aliasMappings[resolvedPackage] = internalDepName
+    aliasMappings[`${resolvedPackage}/*`] = `${internalDepName}/*`
+  }
+  else {
+    // 子路径导入：使用 ${resolvedPackage}/${packageName} 作为 alias key
+    const aliasKey = `${resolvedPackage}/${packageName}`
+    console.log(`✓ 发现内部依赖: ${packageName} -> ${internalDepName} (${resolvedPackage}/${fullPackageName})`)
+    aliasMappings[aliasKey] = internalDepName
+    aliasMappings[`${aliasKey}/*`] = `${internalDepName}/*`
+  }
+}
+
+/**
  * 递归查找模块在项目依赖列表中的版本信息。
  * @param moduleName 当前引入的模块名称 (例如: '@moluoxixi/constant/utils/time')
  * @param allProjectDeps 包含所有项目依赖信息的对象 (Key为包名，Value为版本号字符串)
@@ -196,8 +252,10 @@ export async function analyzeComponentDeps(ctx: BuildContext, comp: string): Pro
       // 1. 先分析 node 模块
       if (dep.coreModule) {
         // node 依赖单独存储（Set会自动去重）
-        console.log(`✓ 发现node依赖: ${dep.module}`)
-        nodeDeps.add(dep.module)
+        if (!nodeDeps.has(dep.module)) {
+          console.log(`✓ 发现node依赖: ${dep.module}`)
+          nodeDeps.add(dep.module)
+        }
       }
       else {
         // 2. 非 node 模块，调用解析函数
@@ -208,8 +266,10 @@ export async function analyzeComponentDeps(ctx: BuildContext, comp: string): Pro
           const version = allProjectDeps[resolvedPackage]
           // 4. 如果是正常包名（例如 1.2.3 那种版本号），就是外部依赖
           if (isValidVersion(version)) {
-            console.log(`✓ 发现外部依赖: ${resolvedPackage}@${version}`)
-            externalDeps.set(resolvedPackage, version)
+            if (!externalDeps.get(resolvedPackage)) {
+              console.log(`✓ 发现外部依赖: ${resolvedPackage}@${version}`)
+              externalDeps.set(resolvedPackage, version)
+            }
           }
           else {
             // 检查 resolvedPackage 是否以 @${LIB_NAMESPACE} 开头，只有这样才能认为是内部依赖
@@ -221,34 +281,13 @@ export async function analyzeComponentDeps(ctx: BuildContext, comp: string): Pro
               if (!fullPackageName) {
                 // 直接使用 resolvedPackage 作为内部依赖
                 const packageName = resolvedPackage.replace(namespacePrefix, '')
-                if (!packageName.startsWith('_') && packageName && packageName !== comp) {
-                  const internalDepName = `@${ctx.LIB_NAMESPACE}/${packageName.toLowerCase()}`
-                  console.log(`✓ 发现内部依赖（整包）: ${packageName} -> ${internalDepName}`)
-                  internalDeps.add(internalDepName)
-
-                  // 添加 alias 映射：${resolvedPackage} -> @${LIB_NAMESPACE}/${packageName.toLowerCase()}
-                  aliasMappings[resolvedPackage] = internalDepName
-                  aliasMappings[`${resolvedPackage}/*`] = `${internalDepName}/*`
-                }
+                addInternalDep(ctx, packageName, comp, resolvedPackage, null, internalDeps, aliasMappings)
               }
               else {
                 // 支持整包引入逻辑
-                // const packageName = !fullPackageName ? resolvedPackage : getFirstPathSegment(fullPackageName)
                 // 把整包里的导入打包进去
                 const packageName = getFirstPathSegment(fullPackageName)
-                if (!packageName.startsWith('_') && packageName && packageName !== comp) {
-                  // 版本号格式不正常，但包存在，是内部依赖
-                  // 存储格式：@${LIB_NAMESPACE}/${packageName.toLowerCase()}
-                  const internalDepName = `@${ctx.LIB_NAMESPACE}/${packageName.toLowerCase()}`
-                  console.log(`✓ 发现内部依赖: ${packageName} -> ${internalDepName} (${resolvedPackage}/${fullPackageName})`)
-                  internalDeps.add(internalDepName)
-
-                  // 添加 alias 映射：${resolvedPackage}/${packageName} -> @${LIB_NAMESPACE}/${packageName.toLowerCase()}
-                  const aliasKey = `${resolvedPackage}/${packageName}`
-                  aliasMappings[aliasKey] = internalDepName
-                  // 也添加通配符映射
-                  aliasMappings[`${aliasKey}/*`] = `${internalDepName}/*`
-                }
+                addInternalDep(ctx, packageName, comp, resolvedPackage, fullPackageName, internalDeps, aliasMappings)
               }
             }
           }

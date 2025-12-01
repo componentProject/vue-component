@@ -2,7 +2,7 @@
 import fs from 'node:fs/promises'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { setWebUpload } from '../../_api'
+import { setWebUpload } from '@moluoxixi/utils/_api'
 
 // 上传组件至服务器
 export async function UploadEvent(outputDir: string, buildName: string, type: string = 'vue3Test') {

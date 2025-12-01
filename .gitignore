@@ -1,20 +1,14 @@
 # user
-#输出文件
 test
 test.zip
 moluoxixi
 moluoxixivue2
 docsOut
-# 文档
-docs/vitepress/.obsidian
-docs/vitepress/.vitepress/cache
-typings
-_typings
-stats.html
 dev-dist
+.obsidian
+cache
+typings
 
-pnpm-lock.yaml
-yarn.lock
 # Logs
 logs
 *.log
@@ -24,13 +18,16 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+
+# project files
 node_modules
 .DS_Store
 dist
 dist-ssr
 coverage
 *.local
-
+stats.html
+pnpm-lock.yaml
 /cypress/videos/
 /cypress/screenshots/
 
@@ -48,3 +45,4 @@ coverage
 
 # Sentry Config File
 .env.sentry-build-plugin
+

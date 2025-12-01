@@ -423,7 +423,7 @@ export default class BaseApi {
       // 动态加载 SystemErrorDialog 模块（仅在浏览器环境中）
       if (!systemErrorDialogInstance) {
         try {
-          const { default: SystemErrorDialog } = await dynamicImports(import('./SystemErrorDialog.vue'), ['default'])
+          const { default: SystemErrorDialog } = await dynamicImports(import('./SystemErrorDialog.ts'), ['default'])
           systemErrorDialogInstance = createApiDialog(SystemErrorDialog)
         }
         catch (error) {

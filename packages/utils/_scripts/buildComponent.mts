@@ -30,13 +30,17 @@ const formatConfig: GlobalFormatConfig = {
   componentFormats: {
     ViteBuild: {
       isNodeEnv: true, // 指定为 Node 环境
-      // nodeFormats 默认为 { cjs: true }，如需覆盖可在此配置
+      es: true,
     },
     ViteConfig: {
       isNodeEnv: true, // 指定为 Node 环境
+      es: true,
+      cjs: false,
     },
     EslintConfig: {
       isNodeEnv: true, // 指定为 Node 环境
+      es: true,
+      cjs: false,
     },
   },
 }

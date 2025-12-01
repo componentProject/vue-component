@@ -3,11 +3,11 @@ import type { BuildContext } from '../_types'
  * 组件相关工具函数
  */
 import fsp from 'node:fs/promises'
+import { dynamicImport } from '@moluoxixi/utils/_utils'
 import glob from 'fast-glob'
-import { dynamicImport } from '../../_utils/dynamicImport'
 
 /** 必须排除的文件 */
-export const mustExcludeDirs = ['moluoxixi', 'node_modules', 'typings', '_typings']
+export const mustExcludeDirs = ['node_modules', 'typings']
 
 /**
  * 简单延迟函数，用于在批量打包时给 GC 和系统 I/O 缓冲时间
@@ -23,7 +23,7 @@ export function sleep(ms: number): Promise<void> {
  * @returns 组件名集合
  */
 export async function getComponentNames(ctx: BuildContext, enableInteractive = false): Promise<string[]> {
-  const componentDirs = await glob([`.${ctx.entryBaseUrl}*`, `!.${ctx.entryBaseUrl}_*`, ...mustExcludeDirs.map(i => `!${i}`)], {
+  const componentDirs = await glob([`.${ctx.entryBaseUrl}*`, `!.${ctx.entryBaseUrl}_*`, ctx.LIB_NAMESPACE, ...mustExcludeDirs.map(i => `!${i}`)], {
     cwd: ctx.packDir,
     onlyDirectories: true,
     ignore: [`${ctx.entryBaseUrl}_*`],

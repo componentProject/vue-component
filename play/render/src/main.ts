@@ -22,10 +22,10 @@ import i18n from '@/locales'
 import { store } from '@/stores'
 import { modifyComponents } from '@/utils'
 
-import App from './App.vue'
+import App from '@/App.vue'
 
-import getRouter from './router'
-import { useSystemStore } from './stores/modules/system.ts'
+import getRouter from '@/router'
+import { useSystemStore } from '@/stores/modules/system'
 import '@/assets/styles/main.css'
 import 'moment/dist/locale/zh-cn' // 中文化
 

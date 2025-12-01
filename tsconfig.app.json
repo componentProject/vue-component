@@ -1,5 +1,23 @@
 {
-  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "target": "ESNext",
+    "jsx": "preserve",
+    "lib": [
+      "DOM",
+      "ESNext"
+    ],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "types": [
+      "vite/client"
+    ],
+    "composite": true,
+    "paths": {
+      "@/*": [
+        "src/*"
+      ]
+    }
+  },
   "vueCompilerOptions": {
     "plugins": [
       "@vue-macros/volar/define-models",
@@ -9,6 +27,7 @@
     ]
   },
   "exclude": [
-    "./packages/utils/**/*"
+    "./packages/utils/**/*",
+    "./docs/**/*"
   ]
 }

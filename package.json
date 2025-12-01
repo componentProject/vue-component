@@ -25,8 +25,6 @@
     "element:publish": "pnpm run -C packages/ElementPlus publish",
     "utils:build": "pnpm run -C packages/utils build",
     "utils:publish": "pnpm run -C packages/utils publish",
-    "type-check": "vue-tsc --build",
-    "lint-check": "eslint --inspect-config",
     "lint:eslint": "eslint . --fix",
     "lint": "run-s lint:*",
     "prepare": "node .husky/install.mjs",

@@ -15,10 +15,10 @@ import { execSync } from 'node:child_process'
 import fs from 'node:fs'
 import fsp from 'node:fs/promises'
 import { resolve } from 'node:path'
-import { build, mergeConfig } from 'vite'
-
 // 导入工具函数
-import { dynamicImports } from '../_utils/dynamicImport'
+import { dynamicImports } from '@moluoxixi/utils'
+
+import { build, mergeConfig } from 'vite'
 import { getFlagValue, hasFlag, parseBoolean, printUsage } from './_utils/cli'
 import { clearDir, findComponentEntry, getComponentNames, sleep, toPascalCase } from './_utils/component'
 import { getComponentFormats } from './_utils/config'
@@ -127,13 +127,34 @@ async function bundleComponentModule(ctx: BuildContext, {
 }: BundleComponentModuleOptions) {
   // 动态导入 obfuscator（配置使用，只在需要混淆时加载
   let obfuscatorPlugin: any = null
+  const plugins = []
   if (ctx.useObfuscator) {
     const { obfuscator } = await dynamicImports<{ obfuscator: typeof import('rollup-obfuscator')['obfuscator'] }>(import('rollup-obfuscator'), ['obfuscator'])
     obfuscatorPlugin = obfuscator()
   }
-
+  // 按需启用图片压缩（重型插件，配置使用，动态导入）
+  if (!ctx.excludeHeavyPlugins) {
+    const { default: viteImagemin } = await dynamicImports<{ default: typeof import('vite-plugin-imagemin')['default'] }>(import('vite-plugin-imagemin'), ['default'])
+    plugins.push(viteImagemin({
+      gifsicle: { optimizationLevel: 7, interlaced: false },
+      optipng: { optimizationLevel: 7 },
+      mozjpeg: { quality: 20 },
+      pngquant: { quality: [0.8, 0.9], speed: 4 },
+      svgo: {
+        plugins: [{ name: 'removeViewBox' }, { name: 'removeEmptyAttrs', active: false }],
+      },
+    }))
+    const { default: dts } = await dynamicImports<{ default: typeof import('vite-plugin-dts')['default'] }>(import('vite-plugin-dts'), ['default'])
+    plugins.push(dts({
+      root: ctx.packDir,
+      entryRoot: `.${ctx.entryBaseUrl}${comp}`,
+      tsconfigPath: './tsconfig.build.json',
+      declarationOnly: false,
+    }))
+  }
   await build(mergeConfig({
     ...baseConfig,
+    plugins,
     build: {
       outDir,
       emptyOutDir: true,
@@ -340,7 +361,7 @@ async function buildComponent(
   // 1. 异步获取当前版本号
   const versions = await getCurrentVersions(ctx)
   const componentKey = comp || 'components'
-  const currentVersion = versions[componentKey] || '0.0.1'
+  const currentVersion = versions[componentKey]
 
   console.log(`\n========== 开始打包: ${buildName}，版本：${currentVersion} ==========`)
 
@@ -385,10 +406,10 @@ async function buildComponent(
 
     const callbacks = []
     const esOutputDir = resolve(outputDir, 'es')
+    await clearDir(outputDir)
 
     // 根据配置打包不同格式
     if (formats.includes('es')) {
-      await clearDir(esOutputDir)
       callbacks.push(bundleComponentModule(ctx, {
         comp,
         entry,
@@ -404,7 +425,6 @@ async function buildComponent(
 
     if (formats.includes('cjs')) {
       const libOutputDir = resolve(outputDir, 'lib')
-      await clearDir(libOutputDir)
       callbacks.push(bundleComponentModule(ctx, {
         comp,
         entry,
@@ -421,7 +441,6 @@ async function buildComponent(
 
     if (formats.includes('umd')) {
       const umdOutputDir = resolve(outputDir, 'umd')
-      await clearDir(umdOutputDir)
       callbacks.push(bundleComponentModule(ctx, {
         comp,
         entry,
@@ -438,7 +457,6 @@ async function buildComponent(
 
     if (formats.includes('iife')) {
       const iifeOutputDir = resolve(outputDir, 'iife')
-      await clearDir(iifeOutputDir)
       callbacks.push(bundleComponentModule(ctx, {
         comp,
         entry,
@@ -516,7 +534,7 @@ async function buildComponent(
     }
 
     // 生成新版本号
-    const newVersion = getNextVersion(currentVersion, 'patch', ctx.uploadType)
+    const newVersion = getNextVersion(currentVersion, ctx.uploadType?.includes('Test') ? 'prerelease' : 'patch')
     pkgJson.version = newVersion
 
     // 写入package.json

@@ -17,7 +17,7 @@
  */
 export async function dynamicImport<T = any>(
   modulePath: string,
-  exportName?: string,
+  exportName?: string = 'default',
 ): Promise<T> {
   const module = await import(modulePath)
 
@@ -48,7 +48,8 @@ export async function dynamicImports<T extends Record<string, any> = Record<stri
   const module = await modulePromise
   const result = {} as T
 
-  for (const name of exportNames) {
+  for (const _name of exportNames) {
+    const name = _name || 'default'
     if (!(name in module)) {
       throw new Error(`模块中不存在导出 "${name}"`)
     }

@@ -1,5 +1,28 @@
 {
-  "files": [],
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@moluoxixi/components": ["packages/components"],
+      "@moluoxixi/components/*": ["packages/components/*"],
+      "@moluoxixi/utils": ["packages/utils"],
+      "@moluoxixi/utils/*": ["packages/utils/*"],
+      "@moluoxixi/constant": ["packages/constant"],
+      "@moluoxixi/render": ["play/render"],
+      "@moluoxixi/docs": ["docs/vitepress"],
+      "@moluoxixi/storybook": ["docs/storybook"]
+    },
+    "resolveJsonModule": true,
+    "allowJs": true,
+    "strict": true,
+    "strictNullChecks": true,
+    "noUnusedLocals": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "isolatedModules": true,
+    "skipLibCheck": true,
+    "allowImportingTsExtensions": true
+  },
   "references": [
     {
       "path": "./tsconfig.app.json"

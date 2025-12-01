@@ -13,9 +13,8 @@ import type {
 import path from 'node:path'
 
 import tailwindcss from '@tailwindcss/postcss'
-// vite vue插件
-import pluginVue from '@vitejs/plugin-vue'
 
+import pluginVue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
 // tailwind
 import autoprefixer from 'autoprefixer'
@@ -37,9 +36,10 @@ import viteImagemin from 'vite-plugin-imagemin'
 import Pages from 'vite-plugin-pages'
 import { VitePWA } from 'vite-plugin-pwa'
 
+// vite vue插件
+import qiankunPlugin from 'vite-plugin-qiankun'
 import vueDevTools from 'vite-plugin-vue-devtools'
-import { dynamicImports } from '../../_utils/dynamicImport'
-import { deepMerge } from '../../_utils/object.ts'
+import { deepMerge } from '../../_utils'
 
 // 自动路由
 import AutoRoutesPlugin from '../../AutoRoutesPlugin'
@@ -246,7 +246,6 @@ async function getViteConfig(Config: ViteConfigType, params?: ConfigEnv) {
 
   // qiankun
   if (qiankun) {
-    const { default: qiankunPlugin } = await dynamicImports<{ default: typeof import('vite-plugin-qiankun')['default'] }>(import('vite-plugin-qiankun'), ['default'])
     plugins.push(qiankunPlugin(envSystemCode!, { useDevMode: qiankunDevMode }))
     if (appCode) {
       plugins.push(scopedCssPrefixPlugin({
@@ -324,6 +323,11 @@ async function getViteConfig(Config: ViteConfigType, params?: ConfigEnv) {
       }, process),
     },
     css: {
+      preprocessorOptions: {
+        scss: {
+          api: 'modern-compiler',
+        },
+      },
       postcss: {
         plugins: [tailwindcss() as Plugin, autoprefixer() as Plugin],
       },

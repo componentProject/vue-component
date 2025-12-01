@@ -1,5 +1,5 @@
 // cache.ts文件
-import { getHttpService } from '../../utils/AjaxPackage/netseriver'
+import { getHttpService } from '@moluoxixi/utils/AjaxPackage'
 
 const memoryApi: any = getHttpService({
   baseURL: '/ts-cache',

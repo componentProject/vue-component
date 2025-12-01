@@ -2,7 +2,7 @@
  * ViteBuild 类型定义
  */
 import type { ConfigEnv, UserConfig } from 'vite'
-import type { ComponentFormatConfig, GlobalFormatConfig } from '../_utils/config'
+import type { GlobalFormatConfig } from '../_utils/config'
 
 export type ViteConfigType = UserConfig | ((mode: ConfigEnv) => UserConfig)
 
@@ -10,6 +10,8 @@ export type ModuleFormat = 'es' | 'cjs' | 'umd' | 'iife'
 
 /** 构建配置的基础字段 */
 export interface BuildConfigBase {
+  /** 不应该被打包的包 */
+  excludePacks: string[]
   /** 组件库命名空间 */
   libNamespace: string
   /** 别名或者外部包的路径 */
@@ -104,4 +106,3 @@ export interface BuildOptions extends Partial<BuildConfigBase> {
 
 // 重新导出配置类型
 export type { ComponentFormatConfig, GlobalFormatConfig } from '../_utils/config'
-

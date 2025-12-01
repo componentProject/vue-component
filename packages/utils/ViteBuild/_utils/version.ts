@@ -13,10 +13,7 @@ import { resolve } from 'node:path'
  */
 export async function getCurrentVersions(ctx: BuildContext): Promise<Record<string, string>> {
   try {
-    // 当 uploadType 存在且包含 Test 时，使用测试版本文件
-    const versionPath = ctx.uploadType && ctx.uploadType.includes('Test')
-      ? resolve(ctx.packDir, 'test-version.json')
-      : resolve(ctx.packDir, 'version.json')
+    const versionPath = resolve(ctx.packDir, 'version.json')
 
     if (!fs.existsSync(versionPath)) {
       // 如果不存在，创建默认版本文件
@@ -36,17 +33,18 @@ export async function getCurrentVersions(ctx: BuildContext): Promise<Record<stri
 /**
  * 获取下一个版本号
  * @param currentVersion 当前版本号
- * @param type 版本类型：major, minor, patch
- * @param uploadType
+ * @param type 版本类型：major, minor, patch,prerelease
  * @returns 下一个版本号
  */
-export function getNextVersion(currentVersion: string, type: 'major' | 'minor' | 'patch' = 'patch', uploadType?: string): string {
+export function getNextVersion(currentVersion: string = '', type: 'major' | 'minor' | 'patch' | 'prerelease' = 'patch'): string {
   // 解析当前版本号，处理可能存在的预发布版本号
   const versionParts = currentVersion.split('-')
   const mainVersion = versionParts[0]
+  const testVersion = versionParts[1] || 'beta.0'
+  let newPrerelease = testVersion.split('beta.')[1]
 
   // 解析主版本号
-  const [major, minor, patch] = mainVersion.split('.').map(Number)
+  const [major = 0, minor = 0, patch = 0] = mainVersion.split('.').map(Number)
 
   // 根据类型计算新版本号
   let newMajor = major
@@ -63,30 +61,20 @@ export function getNextVersion(currentVersion: string, type: 'major' | 'minor' |
       newMinor++
       newPatch = 0
       break
+    case 'prerelease':
+      newPrerelease++
+      break
     default: // patch
       newPatch++
       break
   }
-  if (uploadType?.includes('Test')) {
-    // 生成新版本号并添加 beta 后缀
-    // 如果当前版本已经是 beta 版本，则递增 beta 版本号
-    if (versionParts.length > 1 && versionParts[1].startsWith('beta.')) {
-      // 提取 beta 版本号
-      const betaVersionMatch = versionParts[1].match(/^beta\.(\d+)$/)
-      const betaVersion = betaVersionMatch ? Number.parseInt(betaVersionMatch[1], 10) + 1 : 0
-      return `${newMajor}.${newMinor}.${newPatch}-beta.${betaVersion}`
-    }
-    else {
-      // 如果是新的 beta 版本，从 0 开始
-      return `${newMajor}.${newMinor}.${newPatch}-beta.0`
-    }
+  if (testVersion) {
+    return `${newMajor}.${newMinor}.${newPatch}-beta.${newPrerelease}`
   }
   else {
-    // 如果是新的 beta 版本，从 0 开始
     return `${newMajor}.${newMinor}.${newPatch}`
   }
 }
-
 /**
  * 将版本号写回 version.json 文件
  * @param ctx 构建上下文
@@ -94,15 +82,7 @@ export function getNextVersion(currentVersion: string, type: 'major' | 'minor' |
  */
 export async function writeComponentVersions(ctx: BuildContext, versions: Record<string, string>): Promise<boolean> {
   try {
-    let versionPath: string
-
-    // 当 uploadType 存在且包含 Test 时，使用测试版本文件
-    if (ctx.uploadType && ctx.uploadType.includes('Test')) {
-      versionPath = resolve(ctx.packDir, 'test-version.json')
-    }
-    else {
-      versionPath = resolve(ctx.packDir, 'version.json')
-    }
+    const versionPath: string = resolve(ctx.packDir, 'version.json')
 
     // 读取现有版本文件
     let existingVersions: Record<string, string> = {}

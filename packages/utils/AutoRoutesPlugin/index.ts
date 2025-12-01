@@ -1,17 +1,8 @@
 // autoRoutes入口文件
 import type { Plugin } from 'vite'
-import fs from 'node:fs'
-import path from 'node:path'
-import { fileURLToPath } from 'node:url'
 import { createVirtualPlugin } from '../_utils/virtual.ts'
 // AutoRoutes/index.ts
 import { findDefaultRouteHandle, findParentRouteHandle, generateRoutes } from './routeGenerator.ts'
-
-// 读取 dts 模板文件
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
-const dtsTemplatePath = path.resolve(__dirname, './_templates/dts.d.ts')
-const dtsTemplateRaw = fs.readFileSync(dtsTemplatePath, 'utf-8')
 
 interface RouteModule {
   path: string
@@ -106,7 +97,21 @@ function createAutoRoutesPlugin({ routeConfig, virtualModuleId, dts, root, eager
         `
       },
       // 生成类型声明文件
-      generateDts: () => dtsTemplateRaw,
+      generateDts: () => `// 此文件由ViteConfig自动生成，请勿手动修改
+declare module 'virtual:auto-routes' {
+  interface RouteModule {
+    path: string
+    name: string
+    meta?: any
+    component: () => Promise<any>
+    children?: RouteModule[]
+  }
+
+  const routes: RouteModule[]
+  const findDefaultRoute: (routes: any[]) => string
+  export { findDefaultRoute, routes }
+  export default routes
+}`,
     },
   )
 }

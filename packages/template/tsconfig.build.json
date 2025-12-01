@@ -1,45 +1,30 @@
 {
+  "extends": "./tsconfig.base.json",
   "compilerOptions": {
-    "target": "ESNext",
-    "jsx": "preserve",
-    "jsxImportSource": "vue",
     "lib": [
       "DOM",
       "ESNext"
     ],
-    "baseUrl": ".",
-    "paths": {
-      "@moluoxixi/components": [
-        "./"
-      ],
-      "@moluoxixi/components/*": [
-        "./*"
-      ],
-      "@moluoxixi/utils": [
-        "../utils"
-      ],
-      "@moluoxixi/utils/*": [
-        "../utils/*"
-      ]
-    },
     "module": "ESNext",
     "moduleResolution": "Bundler",
-    "resolveJsonModule": true,
     "types": [
       "vite/client"
     ],
-    "allowJs": true,
-    "strict": true,
-    "strictNullChecks": true,
-    "noUnusedLocals": true,
-    "noEmit": true,
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "isolatedModules": true,
-    "skipLibCheck": true,
-    "allowImportingTsExtensions": true
+    "composite": true
   },
-  "include": [
-    "./**/*"
+  "vueCompilerOptions": {
+    "plugins": [
+      "@vue-macros/volar/define-models",
+      "@vue-macros/volar/define-slots",
+      "@vue-macros/volar/define-props",
+      "@vue-macros/volar/define-emits"
+    ]
+  },
+  "exclude": [
+    "dist",
+    "moluoxixi",
+    "typings",
+    "node_modules",
+    "_scripts/**/*"
   ]
 }

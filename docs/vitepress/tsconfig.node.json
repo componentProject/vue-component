@@ -1,26 +1,18 @@
 {
+  "extends": "./tsconfig.base.json",
   "compilerOptions": {
-    "target": "ESNext",
-    "jsx": "preserve",
     "lib": [
       "ESNext"
     ],
-    "baseUrl": ".",
-    "module": "ESNext",
+    "module": "NodeNext",
     "moduleResolution": "nodenext",
-    "resolveJsonModule": true,
-    "allowJs": true,
-    "strict": true,
-    "strictNullChecks": true,
-    "noUnusedLocals": true,
     "noEmit": true,
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "isolatedModules": true,
-    "skipLibCheck": true,
-    "allowImportingTsExtensions": true
+    "allowImportingTsExtensions": true,
+    "composite": true
   },
   "include": [
+    "contants/*",
+    "contants/**/*",
     ".vitepress/config/**/*",
     ".vitepress/config/*"
   ]

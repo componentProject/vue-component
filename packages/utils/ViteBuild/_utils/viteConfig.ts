@@ -4,15 +4,15 @@
 import type { InlineConfig } from 'vite'
 import type { BuildContext } from '../_types'
 import { resolve } from 'node:path'
+import { dynamicImports } from '@moluoxixi/utils/_utils'
+import CssInjectedByJsPlugin from '@moluoxixi/utils/CssInjectedByJsPlugin'
+import cssModuleGlobalRootPlugin from '@moluoxixi/utils/cssModuleGlobalRootPlugin'
 import tailwindcss from '@tailwindcss/postcss'
 import pluginVue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
 import autoprefixer from 'autoprefixer'
 import AutoImport from 'unplugin-auto-import/vite'
 import { mergeConfig } from 'vite'
-import { dynamicImports } from '../../_utils/dynamicImport'
-import CssInjectedByJsPlugin from '../../CssInjectedByJsPlugin'
-import cssModuleGlobalRootPlugin from '../../cssModuleGlobalRootPlugin'
 
 /**
  * 创建基础Vite配置
@@ -38,7 +38,7 @@ export async function createBaseConfig(ctx: BuildContext, comp: string): Promise
     AutoImport({
       imports: ['vue'],
       resolvers: [],
-      dts: resolve(ctx.packDir, './_typings/auto-imports.d.ts'),
+      dts: resolve(ctx.packDir, './typings/auto-imports.d.ts'),
     } as any),
     CssInjectedByJsPlugin(),
   ]
@@ -60,13 +60,6 @@ export async function createBaseConfig(ctx: BuildContext, comp: string): Promise
       svgo: {
         plugins: [{ name: 'removeViewBox' }, { name: 'removeEmptyAttrs', active: false }],
       },
-    }))
-    const { default: dts } = await dynamicImports<{ default: typeof import('vite-plugin-dts')['default'] }>(import('vite-plugin-dts'), ['default'])
-    plugins.push(dts({
-      root: ctx.packDir,
-      entryRoot: `.${ctx.entryBaseUrl}${comp}`,
-      tsconfigPath: './tsconfig.build.json',
-      declarationOnly: false,
     }))
   }
   return mergeConfig({

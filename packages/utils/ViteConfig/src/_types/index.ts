@@ -172,7 +172,7 @@ export interface Config extends PluginConfig {
   /**
    * 环境配置
    */
-  mode: {
+  mode?: {
     base?: ModeConfig
     development?: ModeConfig
     production?: ModeConfig
