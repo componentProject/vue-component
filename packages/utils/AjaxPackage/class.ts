@@ -16,16 +16,16 @@ import type {
  * Copyright (c) 2025 by ${git_name_email}, All Rights Reserved.
  */
 
-import type { BaseApiConfig } from './_types/index.ts'
-import type { MessageInstance, NotificationInstance } from './_utils/index.ts'
+import type { BaseApiConfig } from './_types/index'
+import type { MessageInstance, NotificationInstance } from './_utils/index'
 import axios from 'axios'
-import { dynamicImports } from '../_utils/index.ts'
-import createApiDialog from '../ApiDialog/index.ts'
+import { dynamicImports } from '../_utils/index'
+import createApiDialog from '../ApiDialog/index'
 import {
   createMessageWrapper,
   createNotificationWrapper,
-} from './_utils/index.ts'
-import { extractSystemErrorInfo } from './_utils/systemErrorInfo.ts'
+} from './_utils/index'
+import { extractSystemErrorInfo } from './_utils/systemErrorInfo'
 
 /**
  * 检查是否在浏览器环境
@@ -423,7 +423,7 @@ export default class BaseApi {
       // 动态加载 SystemErrorDialog 模块（仅在浏览器环境中）
       if (!systemErrorDialogInstance) {
         try {
-          const { default: SystemErrorDialog } = await dynamicImports(import('./SystemErrorDialog.ts'), ['default'])
+          const { default: SystemErrorDialog } = await dynamicImports(import('./SystemErrorDialog'), ['default'])
           systemErrorDialogInstance = createApiDialog(SystemErrorDialog)
         }
         catch (error) {

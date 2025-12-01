@@ -33,7 +33,7 @@
             size="small"
             maxlength="4"
             :disabled="!row.resizable"
-            :placeholder="getPlaceholder(column.title)"
+            :placeholder="getPlaceholder(String(column.title || ''))"
             style="width: 100%"
             @update:model-value="handlePositiveNumberInput(row, column.field, $event)"
           />
@@ -120,7 +120,7 @@ import type { CustomConfigDialogEmitsType, CustomConfigDialogPropsType } from '@
 import type { VxeGridInstance } from 'vxe-table'
 import { getTypeName } from '@moluoxixi/components/DraggableTable/src/_utils'
 import { flattenTree, getClass } from '@moluoxixi/utils/_utils'
-import { ElButton, ElCheckbox, ElInput, ElPopover, ElSwitch } from 'element-plus'
+import { ElButton, ElCheckbox, ElInput, ElMessage, ElPopover, ElSwitch } from 'element-plus'
 import { cloneDeep } from 'lodash-es'
 import Sortable from 'sortablejs'
 import { computed, ref, useTemplateRef, watch } from 'vue'
@@ -187,7 +187,7 @@ function getPlaceholder(title: string) {
   return `请输入${title}（大于0）,不输入则为自适应`
 }
 
-const tableData = ref([])
+const tableData = ref<any[]>([])
 function processData(data: any[] = []): any[] {
   return data.map((item: any) => {
     const { visible, width, resizeWidth, children, ...rest } = item
@@ -221,7 +221,7 @@ const computedRowDragConfig = computed(() => ({
   isPeerDrag: true,
   showGuidesStatus: true,
   showIcon: true,
-  trigger: 'cell',
+  trigger: 'cell' as const,
 }))
 const computedTreeConfig = computed(() => ({
   expandAll: true,
@@ -243,7 +243,7 @@ function handleEvent(type: 'confirm' | 'reset' | 'cancel') {
       break
     case 'confirm':
       emit('confirm', {
-        customColumns: xTable.value?.getTableData()?.fullData,
+        customColumns: xTable.value?.getTableData()?.fullData || [],
         isCommon: isCommon.value,
       })
       break
@@ -254,7 +254,7 @@ function handleEvent(type: 'confirm' | 'reset' | 'cancel') {
 }
 
 //#region draggable模式逻辑
-function handleRowClassName({ row }) {
+function handleRowClassName({ row }: { row: any }) {
   if (row.level > 1) {
     return 'has-parent'
   }
@@ -308,7 +308,7 @@ function initRowDraggable() {
       const dragPos = oldIndex > newIndex ? 'top' : 'bottom'
       const newRow = dragPos === 'top' ? tableDataCopy[newIndex + 1] : tableDataCopy[newIndex - 1]
       const oldRow = tableDataCopy[newIndex]
-      const hasParent = newRow.level > 1 || oldRow.level > 1
+      const hasParent = (newRow?.level && newRow.level > 1) || (oldRow?.level && oldRow.level > 1)
       const flag = props.rowDragEndMethod
         ? props.rowDragEndMethod({
             oldIndex,
@@ -400,7 +400,7 @@ function initColumnDraggable() {
       fullColumn.splice(newColumnIndex, 0, currRow)
 
       // 将修改后的列配置保存到本地
-      saveColumns(fullColumn)
+      // saveColumns(fullColumn)
 
       // 构造vxe格式的事件参数
       const dragColumn = tableColumn[oldIndex]

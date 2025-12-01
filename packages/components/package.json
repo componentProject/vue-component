@@ -86,9 +86,11 @@
   },
   "devDependencies": {
     "@types/file-saver": "catalog:type",
+    "@types/lodash-es": "catalog:type",
     "@types/markdown-it": "catalog:type",
     "@types/markdown-it-container": "catalog:type",
     "@types/qrcode": "^1.5.6",
+    "@types/sortablejs": "catalog:type",
     "@types/uuid": "catalog:type",
     "fast-glob": "catalog:dev",
     "qs": "catalog:dev",

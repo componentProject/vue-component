@@ -1,7 +1,7 @@
 import { ElButton, ElDialog, ElMessage } from 'element-plus'
 import { computed, defineComponent, h, ref } from 'vue'
-import { getUserInfoFromLocalStorage } from './_utils/systemErrorInfo.ts'
-import BaseApi from './class.ts'
+import { getUserInfoFromLocalStorage } from './_utils/systemErrorInfo'
+import BaseApi from './class'
 import cssModules from './styles/modules/index.module.css'
 
 /**

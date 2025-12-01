@@ -1,6 +1,6 @@
-import cellRenderer from './cell/index.tsx'
-import editRenderer from './edit/index.tsx'
-import filterRenderer from './filter/index.tsx'
+import cellRenderer from './cell'
+import editRenderer from './edit'
+import filterRenderer from './filter'
 // // DraggableTable组件主文件
 // import './filter/index.tsx'
 // import './edit/index.tsx'

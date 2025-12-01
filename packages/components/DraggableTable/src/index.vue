@@ -73,6 +73,7 @@ import type { slotsType } from '@moluoxixi/components/_types'
 import type {
   VxeGridInstance,
   VxeGridProps,
+  VxeGridPropTypes,
   VxeTableConstructor,
   VxeTableDefines,
   VxeTablePropTypes,
@@ -208,7 +209,6 @@ const props = withDefaults(defineProps<propsType>(), {
   //#endregion
   //#region 回车容器相关
   allowSelectNextInEmpty: false,
-  containerType: '',
   //#endregion
   //#region 存储相关
   saveType: 'default',
@@ -252,7 +252,7 @@ const props = withDefaults(defineProps<propsType>(), {
       ],
     }, slots: { default: 'select' } },
     { field: 'resizable', width: 70, title: '可调整', align: 'center', editable: true, slots: { default: 'switch' } },
-  ],
+  ] as ColumnType[],
   // 是否有权限统一配置（个性话化列配置）
   isConfiguration: false,
   dialogProps: () => ({ zIndex: 1000 }),
@@ -271,7 +271,10 @@ const slots = defineSlots<slotsType>()
  * @returns 高度数值
  */
 function getHeight(height?: number | string): number {
-  if (typeof height === 'string' && height.endsWith('px')) {
+  if (!height) {
+    return 32
+  }
+  else if (typeof height === 'string' && height.endsWith('px')) {
     return +height.replace('px', '') || 32
   }
   else {
@@ -297,9 +300,9 @@ const computedPagerConfig = computed(() => {
       'Sizes',
       'FullJump',
       'Total',
-    ],
+    ] as const,
     ...props.pagerConfig,
-  }
+  } as VxeGridPropTypes.PagerConfig
 })
 
 const computedHeaderCellStyle = computed(() => {
@@ -307,7 +310,7 @@ const computedHeaderCellStyle = computed(() => {
   return (params: any) => {
     return {
       height: `${getHeight(height)}px`,
-      ...(getType(props.headerCellStyle, 'object') ? props.headerCellStyle : props.headerCellStyle?.(params)),
+      ...(getType((props as any).headerCellStyle, 'object') ? (props as any).headerCellStyle : (props as any).headerCellStyle?.(params)),
     }
   }
 })
@@ -355,7 +358,7 @@ const computedRowDragConfig = computed(() => {
   return {
     showGuidesStatus: true,
     showIcon: false,
-    trigger: 'row',
+    trigger: 'row' as const,
     isPeerDrag: true,
     dragEndMethod: (params: any) => {
       const isDrag = props.rowDragEndMethod ? props.rowDragEndMethod(params) : true
@@ -390,12 +393,12 @@ const computedRowDragConfig = computed(() => {
 const computedEditConfig = computed(() => {
   return {
     enabled: props.editable,
-    trigger: 'dblclick',
-    mode: 'cell',
+    trigger: 'dblclick' as const,
+    mode: 'cell' as const,
     showStatus: true,
     showIcon: false,
     ...props.editConfig,
-  }
+  } as VxeTablePropTypes.EditConfig
 })
 const computedEditRules = computed(() => {
   return {
@@ -416,7 +419,7 @@ const computedColumnDragConfig = computed(() => {
   const columnDragConfig = {
     showGuidesStatus: true,
     showIcon: false,
-    trigger: 'cell',
+    trigger: 'cell' as const,
     isPeerDrag: true,
     dragEndMethod: (params: any) => {
       const isDrag = props.columnDragEndMethod ? props.columnDragEndMethod(params) : true
@@ -438,7 +441,7 @@ const computedColumnDragConfig = computed(() => {
 const computedResizableConfig = computed(() => {
   return {
     minWidth: 50,
-    ...props.resizableConfig,
+    ...((props as any).resizableConfig || {}),
   } as VxeGridProps['resizableConfig']
 })
 
@@ -475,7 +478,7 @@ const xTable = useTemplateRef<VxeGridInstance>('xTable')
 //#region 回车下一个功能
 const tableVirtualRefs = ref<HTMLElement[]>([])
 /** 是否符合收集回车元素的条件 */
-const needCollect = computed(() => ['row', 'table'].includes(props.containerType))
+const needCollect = computed(() => ['row', 'table'].includes(props.containerType || ''))
 /**
  * 收集表格虚拟引用，用于 EnterNextContainer 组件
  */
@@ -601,7 +604,7 @@ const collectColumn = computed<ColumnType[]>(() => {
   if (!xTable.value)
     return []
   if (!VxeUI) {
-    VxeUI = xTable.value.VxeUI
+    VxeUI = (xTable.value as any).VxeUI
     installFn(VxeUI)
   }
   const { collectColumn } = xTable.value.getTableColumn()
@@ -876,7 +879,7 @@ const offEffect = ref()
 const requiredFields = computed<string[]>(() => handleGetRequiredFields(props.customColumns.filter((i: any) => i.editable)))
 onMounted(() => {
   if (props.saveType !== 'default') {
-    offEffect.value = onHotkeys(props.saveHotKeys, () => customConfigDialogVisible.value = true, { target: container.value })
+    offEffect.value = onHotkeys(props.saveHotKeys, () => customConfigDialogVisible.value = true, { target: container.value || undefined })
   }
 })
 onBeforeUnmount(() => offEffect.value?.())
@@ -904,22 +907,20 @@ function getColumnUniqueKey(col: Record<string, any>): string {
  * @param params.customColumns - 自定义列配置
  * @param params.rest - 其他配置
  */
-function handleCustomConfigSave({
-  customColumns,
-  ...rest
-}: {
+function handleCustomConfigSave(payload: {
   customColumns: ColumnType[]
-  rest: any[]
+  isCommon: boolean
+  isReset?: boolean
 }) {
-  customRestConfig.value = rest
-  saveColumns(customColumns)
+  customRestConfig.value = { isCommon: payload.isCommon, isReset: payload.isReset }
+  saveColumns(payload.customColumns)
 }
 
 // 本地存储键名
 const getStorageKey = () => (props.id ? `table_columns_${props.id}` : ``)
 /** 是否不使用内部存储实现 */
 const isNoSave = computed(
-  () => attrs.customConfig?.storage || !['server', 'local'].includes(props.saveType),
+  () => (attrs.customConfig as any)?.storage || !['server', 'local'].includes(props.saveType),
 )
 /** 获取本地存储的列配置 */
 async function handleGetStoredColumns(): Promise<ColumnType[]> {
@@ -938,7 +939,7 @@ async function handleGetStoredColumns(): Promise<ColumnType[]> {
         userId: props.userId,
       })
       if (res.data && props.isConfiguration && customConfigDialogRef.value) {
-        customConfigDialogRef.value.isCommon = res?.isExist !== 1
+        (customConfigDialogRef.value as any).isCommon = res?.isExist !== 1
       }
       return (JSON.parse(res.data) || []) as ColumnType[]
     }
@@ -961,7 +962,7 @@ async function handleGetStoredColumns(): Promise<ColumnType[]> {
  * @param columns - 列配置 JSON 字符串
  */
 async function handleSaveColumnsToServer(key: string, columns: string) {
-  const { isCommon, isReset } = customRestConfig.value || {}
+  const { isCommon, isReset } = (customRestConfig.value as any) || {}
   const callbacks = []
 
   if (isReset) {

@@ -67,13 +67,6 @@ function load() {
   currColumn.value = column
 }
 
-function clearEdit() {
-  const xTable = props.renderParams?.$grid
-  if (xTable) {
-    xTable.clearEdit()
-  }
-}
-
 function validateHandle() {
   const xTable = props.renderParams?.$grid
   if (xTable) {

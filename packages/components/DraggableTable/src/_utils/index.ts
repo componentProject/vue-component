@@ -21,7 +21,7 @@ const typeMap = {
 }
 
 export function getTypeName(type?: types) {
-  return type ? typeMap[type] || '' : ''
+  return type ? (typeMap as any)[type] || '' : ''
 }
 
 export function getCustomType(type?: types) {

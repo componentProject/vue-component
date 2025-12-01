@@ -1,5 +1,5 @@
 // DraggableTable的props组件
-import type { VxeGridPropTypes, VxeTableDefines, VxeTablePropTypes } from 'vxe-table'
+import type { VxeColumnPropTypes, VxeGridPropTypes, VxeTableDefines, VxeTablePropTypes } from 'vxe-table'
 import type { objType } from '../../../_types'
 
 export interface customConfigType {
@@ -24,7 +24,7 @@ interface propsTypeBase {
 
   cellConfig: VxeTablePropTypes.CellConfig
   headerCellConfig: VxeTablePropTypes.HeaderCellConfig
-  headerCellStyle: VxeTablePropTypes.HeaderCellStyle
+  align: VxeColumnPropTypes.Align
 
   //#region 编辑相关
   /** 是否允许编辑 */
@@ -114,7 +114,7 @@ interface propsTypeBase {
   saveType: 'local' | 'server' | 'default'
   saveHotKeys: string[]
   getConfig: (config: customConfigType) => Promise<ColumnType[]>
-  setConfig: (config: customConfigType, columns: ColumnType[]) => Promise<any>
+  setConfig: (config: customConfigType, columns: string) => Promise<any>
   /** 自定义自定义存储弹窗的columns */
   customColumns: ColumnType[]
   // 表格唯一ID，用于本地存储识别

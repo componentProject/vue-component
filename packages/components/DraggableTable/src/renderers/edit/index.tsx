@@ -12,7 +12,7 @@ export default {
   name: 'editRenderer',
   render: {
     // 自定义编辑模板
-    renderTableEdit(renderOpts, renderParams) {
+    renderTableEdit(renderOpts: any, renderParams: any) {
       return <EditRenderer render-opts={renderOpts} render-params={renderParams} />
     },
   },

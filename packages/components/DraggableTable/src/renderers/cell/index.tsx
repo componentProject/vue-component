@@ -12,7 +12,7 @@ export default {
   name: 'cellRenderer',
   render: {
   // 自定义默认模板
-    renderTableDefault(renderOpts, renderParams) {
+    renderTableDefault(renderOpts: any, renderParams: any) {
       return <CellRenderer render-opts={renderOpts} render-params={renderParams} />
     },
   },

@@ -86,6 +86,7 @@ const config: UserConfig = {
     // 使用自定义规则作为额外的验证层，提供友好的中文错误提示
     // 它会先于 config-conventional 的规则执行，在格式错误时提供友好提示
     'custom-commit-format': [2, 'always'],
+    'subject-case': [0],
   },
 }
 

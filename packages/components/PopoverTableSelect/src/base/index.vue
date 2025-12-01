@@ -185,7 +185,7 @@ function cleanupEventListeners() {
 /**
  * draggabletable表头右键菜单
  */
-const headerContextContainer = ref<HTMLElement | null>(null)
+const headerContextContainer = ref<HTMLElement>(null)
 
 /**
  * 处理点击外部区域，关闭popover

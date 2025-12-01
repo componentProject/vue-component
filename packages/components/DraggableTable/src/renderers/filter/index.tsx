@@ -31,18 +31,18 @@ export default {
     // 不显示底部按钮，使用自定义的按钮
     showTableFilterFooter: false,
     // 自定义筛选模板
-    renderTableFilter(renderOpts, renderParams) {
+    renderTableFilter(renderOpts: any, renderParams: any) {
       return <FilterRenderer render-opts={renderOpts} render-params={renderParams} />
     },
     // 自定义重置数据方法
-    tableFilterResetMethod(params) {
+    tableFilterResetMethod(params: any) {
       const { options } = params
-      options.forEach((option) => {
+      options.forEach((option: any) => {
         option.data = { vals: [], sVal: '' }
       })
     },
     // 自定义筛选数据方法
-    tableFilterMethod(params) {
+    tableFilterMethod(params: any) {
       const { option, row, column } = params
       const { vals } = option.data
       const cellValue = row[column.field]

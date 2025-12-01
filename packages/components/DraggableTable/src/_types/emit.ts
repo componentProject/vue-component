@@ -18,14 +18,18 @@ export interface emitsType {
   (e: 'noSelectValue', params: NoSelectValueParams): void
   (e: 'toggleTreeExpand', params: VxeTableDefines.ToggleRowExpandEventParams): void
   (e: 'cellClick', params: VxeTableDefines.CellClickEventParams): void
+  (e: 'dataChange'): void
 }
 // Emits for CustomConfigDialog component
 export interface CustomConfigDialogConfirmPayload {
   customColumns: any[]
   isCommon: boolean
+  isReset?: boolean
 }
 export interface CustomConfigDialogEmitsType {
   (e: 'confirm', payload: CustomConfigDialogConfirmPayload): void
+  (e: 'rowDragend', params: any): void
+  (e: 'columnDragend', params: any): void
 }
 /** 当没有下一个输入元素时触发的事件参数 */
 export interface NoNextInputParams {
