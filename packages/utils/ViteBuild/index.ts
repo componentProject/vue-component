@@ -53,7 +53,7 @@ export async function runBuildCli(params: RunBuildCliParams, cli?: RunBuildCliOp
   const uploadType = getFlagValue(args, 'uploadType', cli?.uploadType)
   // 检查 --publish 标志，如果存在则设置 npmPublish 为 true
   const npmPublish = hasFlag(args, 'publish')
-  // 当使用 --publish 时，强制 excludeHeavyPlugins 为 true
+  // 当使用 --publish 时，强制 excludeHeavyPlugins 为 false
   if (npmPublish) {
     excludeHeavyPlugins = false
   }
@@ -149,6 +149,7 @@ async function bundleComponentModule(ctx: BuildContext, {
       root: ctx.packDir,
       entryRoot: `.${ctx.entryBaseUrl}${comp}`,
       tsconfigPath: './tsconfig.build.json',
+      include: [`${comp}/**/*`],
       declarationOnly: false,
     }))
   }
