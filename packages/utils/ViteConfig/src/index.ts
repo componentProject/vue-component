@@ -18,42 +18,13 @@ import type {
 import path from 'node:path'
 
 import tailwindcss from '@tailwindcss/postcss'
-
-import pluginVue from '@vitejs/plugin-vue'
-import vueJsx from '@vitejs/plugin-vue-jsx'
-// tailwind
 import autoprefixer from 'autoprefixer'
-import { codeInspectorPlugin } from 'code-inspector-plugin'
-// 性能优化模块
-import { visualizer as visualizerPlugin } from 'rollup-plugin-visualizer'
-import AutoImport from 'unplugin-auto-import/vite'
-import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
-import Components from 'unplugin-vue-components/vite'
-// 其余vite插件与配置
+
 import { defineConfig, mergeConfig } from 'vite'
-import importToCDN from 'vite-plugin-cdn-import'
-import viteCompression from 'vite-plugin-compression'
 
 import { createHtmlPlugin } from 'vite-plugin-html'
-import viteImagemin from 'vite-plugin-imagemin'
-
-// 页面路由
-import Pages from 'vite-plugin-pages'
-import { VitePWA } from 'vite-plugin-pwa'
-
-// vite vue插件
-import qiankunPlugin from 'vite-plugin-qiankun'
-import vueDevTools from 'vite-plugin-vue-devtools'
-
-import { deepMerge } from '../../_utils/index.ts'
-import AutoRoutesPlugin from '../../AutoRoutesPlugin/index.ts'
-import { modules } from './constants/index.ts'
+import { deepMerge, dynamicImport } from '../../_utils/index.ts'
 import scopedCssPrefixPlugin from './plugins/addScopedAndReplacePrefix.ts'
-
-// 插件函数类型转换（这些插件是默认导出的函数，需要通过 unknown 进行类型转换）
-const compressionPlugin = viteCompression as unknown as CompressionPlugin
-const imageminPlugin = viteImagemin as unknown as ImageminPlugin
-const qiankunPluginFn = qiankunPlugin as unknown as QiankunPlugin
 
 // // workbox urlPattern 参数类型
 // interface UrlPatternContext {
@@ -112,10 +83,32 @@ async function getViteConfig(Config: ViteConfigType, params?: ConfigEnv) {
   const isVueOrVitepress = vue || vitepress
   const envSystemCode = isDev && !qiankunDevMode ? 'el' : (namespace ?? appCode)
 
-  const plugins = [
-    isOnlyVue && pluginVue(),
-    isVueOrVitepress && vueJsx(),
-    pageRoutes && Pages(
+  const plugins: PluginOption[] = [
+    createHtmlPlugin({
+      inject: {
+        data: {
+          title: appTitle,
+        },
+      },
+    }),
+  ]
+
+  // pluginVue
+  if (isOnlyVue) {
+    const pluginVue = await dynamicImport(import('@vitejs/plugin-vue'))
+    plugins.push(pluginVue())
+  }
+
+  // vueJsx
+  if (isVueOrVitepress) {
+    const vueJsx = await dynamicImport(import('@vitejs/plugin-vue-jsx'))
+    plugins.push(vueJsx())
+  }
+
+  // Pages
+  if (pageRoutes) {
+    const Pages = await dynamicImport(import('vite-plugin-pages'))
+    plugins.push(Pages(
       deepMerge(
         {
           dirs: 'src/pages',
@@ -127,9 +120,21 @@ async function getViteConfig(Config: ViteConfigType, params?: ConfigEnv) {
         },
         pageRoutes,
       ) as PagesOptions,
-    ),
-    isDev && devtools && vueDevTools(),
-    autoImport && AutoImport(
+    ))
+  }
+
+  // vueDevTools
+  if (isDev && devtools) {
+    const vueDevTools = await dynamicImport(import('vite-plugin-vue-devtools'))
+    plugins.push(vueDevTools())
+  }
+
+  // AutoImport
+  if (autoImport) {
+    const AutoImport = await dynamicImport(import('unplugin-auto-import/vite'))
+    const ElementPlusResolverModule = await dynamicImport(import('unplugin-vue-components/resolvers'))
+    const { ElementPlusResolver } = ElementPlusResolverModule
+    plugins.push(AutoImport(
       deepMerge(
         {
           imports: ['vue'],
@@ -138,8 +143,15 @@ async function getViteConfig(Config: ViteConfigType, params?: ConfigEnv) {
         },
         autoImport,
       ),
-    ),
-    autoComponent && Components(
+    ) as PluginOption)
+  }
+
+  // Components
+  if (autoComponent) {
+    const Components = await dynamicImport(import('unplugin-vue-components/vite'))
+    const ElementPlusResolverModule = await dynamicImport(import('unplugin-vue-components/resolvers'))
+    const { ElementPlusResolver } = ElementPlusResolverModule
+    plugins.push(Components(
       deepMerge(
         {
           resolvers: (isVueOrVitepress ? [ElementPlusResolver()] : []),
@@ -148,15 +160,14 @@ async function getViteConfig(Config: ViteConfigType, params?: ConfigEnv) {
         },
         autoComponent,
       ),
-    ),
-    createHtmlPlugin({
-      inject: {
-        data: {
-          title: appTitle,
-        },
-      },
-    }),
-    compression && compressionPlugin(
+    ) as PluginOption)
+  }
+
+  // compression
+  if (compression) {
+    const viteCompression = await dynamicImport(import('vite-plugin-compression'))
+    const compressionPlugin = viteCompression as unknown as CompressionPlugin
+    plugins.push(compressionPlugin(
       deepMerge(
         {
           algorithm: 'brotliCompress' as const,
@@ -168,8 +179,14 @@ async function getViteConfig(Config: ViteConfigType, params?: ConfigEnv) {
         },
         compression,
       ) as CompressionOptions,
-    ),
-    imagemin && imageminPlugin(
+    ))
+  }
+
+  // imagemin
+  if (imagemin) {
+    const viteImagemin = await dynamicImport(import('vite-plugin-imagemin'))
+    const imageminPlugin = viteImagemin as unknown as ImageminPlugin
+    plugins.push(imageminPlugin(
       deepMerge(
         {
           gifsicle: { optimizationLevel: 7, interlaced: false },
@@ -182,8 +199,14 @@ async function getViteConfig(Config: ViteConfigType, params?: ConfigEnv) {
         },
         imagemin,
       ) as ImageminOptions,
-    ),
-    cdn && importToCDN(
+    ))
+  }
+
+  // cdn
+  if (cdn) {
+    const importToCDN = await dynamicImport(import('vite-plugin-cdn-import'))
+    const { modules } = await dynamicImport(import('./constants/index.ts'))
+    plugins.push(importToCDN(
       deepMerge(
         {
           enableInDevMode: false,
@@ -215,16 +238,28 @@ async function getViteConfig(Config: ViteConfigType, params?: ConfigEnv) {
         },
         cdn,
       ),
-    ),
-    visualizer && visualizerPlugin(
+    ) as PluginOption)
+  }
+
+  // visualizer
+  if (visualizer) {
+    const visualizerModule = await dynamicImport(import('rollup-plugin-visualizer'))
+    const { visualizer: visualizerPlugin } = visualizerModule
+    plugins.push(visualizerPlugin(
       deepMerge(
         {
           open: true,
         },
         visualizer,
       ),
-    ),
-    pwa && VitePWA(
+    ))
+  }
+
+  // pwa
+  if (pwa) {
+    const pwaModule = await dynamicImport(import('vite-plugin-pwa'))
+    const { VitePWA } = pwaModule
+    plugins.push(VitePWA(
       deepMerge(
         {
           strategies: 'generateSW' as const,
@@ -247,8 +282,14 @@ async function getViteConfig(Config: ViteConfigType, params?: ConfigEnv) {
         },
         pwa,
       ),
-    ),
-    isDev && codeInspector && codeInspectorPlugin(
+    ))
+  }
+
+  // codeInspector
+  if (isDev && codeInspector) {
+    const codeInspectorModule = await dynamicImport(import('code-inspector-plugin'))
+    const { codeInspectorPlugin } = codeInspectorModule
+    plugins.push(codeInspectorPlugin(
       deepMerge(
         {
           bundler: 'vite' as const,
@@ -256,11 +297,13 @@ async function getViteConfig(Config: ViteConfigType, params?: ConfigEnv) {
         },
         codeInspector,
       ),
-    ),
-  ].filter(Boolean) as PluginOption[]
+    ))
+  }
 
   // qiankun
   if (qiankun) {
+    const qiankunPlugin = await dynamicImport(import('vite-plugin-qiankun'))
+    const qiankunPluginFn = qiankunPlugin as unknown as QiankunPlugin
     plugins.push(qiankunPluginFn(envSystemCode || 'el', { useDevMode: qiankunDevMode }))
     if (appCode) {
       plugins.push(scopedCssPrefixPlugin({
@@ -271,7 +314,10 @@ async function getViteConfig(Config: ViteConfigType, params?: ConfigEnv) {
       }))
     }
   }
+
+  // autoRoutes
   if (autoRoutes) {
+    const AutoRoutesPlugin = await dynamicImport(import('../../AutoRoutesPlugin/index.ts'))
     plugins.push(AutoRoutesPlugin(
       deepMerge(
         {
@@ -340,7 +386,6 @@ async function getViteConfig(Config: ViteConfigType, params?: ConfigEnv) {
     css: {
       preprocessorOptions: {
         scss: {
-          // @ts-expect-error - api is a valid option but not in types
           api: 'modern-compiler',
         },
       },

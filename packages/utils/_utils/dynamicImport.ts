@@ -3,33 +3,46 @@
  */
 
 /**
- * 动态导入模块并获取指定的导出值
- * @param modulePath 模块路径（支持相对路径和包名）
- * @param exportName 导出的名称（可选，如果不提供则返回默认导出）
- * @returns 导出的值
- * @example
- * // 获取命名导出
- * const { build } = await dynamicImport('vite', 'build')
- * // 获取默认导出
- * const checkbox = await dynamicImport('@inquirer/checkbox')
- * // 获取相对路径模块的导出
- * const { analyzeComponentDeps } = await dynamicImport('./deps', 'analyzeComponentDeps')
+ * 从模块类型中提取默认导出类型
  */
-export async function dynamicImport<T = any>(
-  modulePath: string,
-  exportName: string = 'default',
-): Promise<T> {
-  const module = await import(modulePath)
+type ExtractDefaultExport<T> = T extends { default: infer D } ? D : T
 
-  if (exportName) {
-    if (!(exportName in module)) {
-      throw new Error(`模块 "${modulePath}" 中不存在导出 "${exportName}"`)
-    }
-    return module[exportName] as T
+/**
+ * 从模块类型中提取命名导出类型
+ */
+type ExtractNamedExport<T, K extends string> = T extends Record<K, infer E> ? E : never
+
+/**
+ * 动态导入模块并获取指定的导出值
+ * @param modulePromise 动态 import 语句返回的 Promise
+ * @param exportName 导出的名称（可选，默认为 'default'，获取默认导出）
+ * @returns 导出的值，类型会自动推断
+ * @example
+ * // 获取默认导出（自动推断类型）
+ * const pluginVue = await dynamicImport(import('@vitejs/plugin-vue'))
+ * // pluginVue 的类型会被正确推断为 @vitejs/plugin-vue 的默认导出类型
+ *
+ * // 获取命名导出
+ * const { visualizer } = await dynamicImport(import('rollup-plugin-visualizer'), 'visualizer')
+ */
+export async function dynamicImport<
+  TModule extends Record<string, any>,
+  TExportName extends string = 'default',
+>(
+  modulePromise: Promise<TModule>,
+  exportName: TExportName = 'default' as TExportName,
+): Promise<TExportName extends 'default' ? ExtractDefaultExport<TModule> : ExtractNamedExport<TModule, TExportName>> {
+  const module = await modulePromise
+
+  if (exportName === 'default') {
+    // 返回默认导出，如果没有默认导出则返回整个模块
+    return (module.default ?? module) as any
   }
 
-  // 如果没有指定导出名，返回默认导出，如果没有默认导出则返回整个模块
-  return (module.default ?? module) as T
+  if (!(exportName in module)) {
+    throw new Error(`模块中不存在导出 "${exportName}"`)
+  }
+  return module[exportName] as any
 }
 
 /**
