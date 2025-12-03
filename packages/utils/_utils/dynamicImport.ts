@@ -13,6 +13,21 @@ type ExtractDefaultExport<T> = T extends { default: infer D } ? D : T
 type ExtractNamedExport<T, K extends string> = T extends Record<K, infer E> ? E : never
 
 /**
+ * 从模块类型中提取多个导出类型
+ */
+type ExtractExports<TModule, TExportNames extends readonly string[]> = {
+  [K in TExportNames[number]]: K extends 'default'
+    ? ExtractDefaultExport<TModule>
+    : K extends keyof TModule
+      ? TModule[K]
+      : TModule extends Record<string, any>
+        ? K extends string
+          ? TModule[K]
+          : never
+        : never
+}
+
+/**
  * 动态导入模块并获取指定的导出值
  * @param modulePromise 动态 import 语句返回的 Promise
  * @param exportName 导出的名称（可选，默认为 'default'，获取默认导出）
@@ -48,26 +63,42 @@ export async function dynamicImport<
 /**
  * 动态导入多个命名导出
  * @param modulePromise 动态 import 语句返回的 Promise
- * @param exportNames 导出的名称数组
- * @returns 包含所有导出值的对象
+ * @param exportNames 导出的名称数组（字面量类型，用于类型推导，建议使用 as const）
+ * @returns 包含所有导出值的对象，类型会自动推断
  * @example
- * const { build, mergeConfig } = await dynamicImports(import('vite'), ['build', 'mergeConfig'])
- * const { obfuscator } = await dynamicImports(import('rollup-obfuscator'), ['obfuscator'])
+ * // 自动推断类型，无需手动指定泛型
+ * const { build, mergeConfig } = await dynamicImports(import('vite'), ['build', 'mergeConfig'] as const)
+ * // build 和 mergeConfig 的类型会被正确推断
+ *
+ * const { obfuscator } = await dynamicImports(import('rollup-obfuscator'), ['obfuscator'] as const)
+ * // obfuscator 的类型会被正确推断
+ *
+ * const { default: viteImagemin } = await dynamicImports(import('vite-plugin-imagemin'), ['default'] as const)
+ * // viteImagemin 的类型会被正确推断为默认导出类型
  */
-export async function dynamicImports<T extends Record<string, any> = Record<string, any>>(
-  modulePromise: Promise<any>,
-  exportNames: string[],
-): Promise<T> {
+export async function dynamicImports<
+  TModule extends Record<string, any>,
+  TExportNames extends readonly string[],
+>(
+  modulePromise: Promise<TModule>,
+  exportNames: TExportNames,
+): Promise<ExtractExports<TModule, TExportNames>> {
   const module = await modulePromise
-  const result = {} as T
+  const result = {} as any
 
   for (const _name of exportNames) {
     const name = _name || 'default'
-    if (!(name in module)) {
-      throw new Error(`模块中不存在导出 "${name}"`)
+    if (name === 'default') {
+      // 处理默认导出
+      result[name] = module.default ?? module
     }
-    (result as any)[name] = module[name]
+    else {
+      if (!(name in module)) {
+        throw new Error(`模块中不存在导出 "${name}"`)
+      }
+      result[name] = module[name]
+    }
   }
 
-  return result
+  return result as ExtractExports<TModule, TExportNames>
 }

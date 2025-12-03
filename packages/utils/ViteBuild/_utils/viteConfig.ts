@@ -4,7 +4,7 @@
 import type { InlineConfig } from 'vite'
 import type { BuildContext } from '../_types/index.ts'
 import { resolve } from 'node:path'
-import { dynamicImports } from '@moluoxixi/utils/_utils/index.ts'
+import { dynamicImport } from '@moluoxixi/utils/_utils/index.ts'
 import CssInjectedByJsPlugin from '@moluoxixi/utils/CssInjectedByJsPlugin/index.ts'
 import cssModuleGlobalRootPlugin from '@moluoxixi/utils/cssModuleGlobalRootPlugin/index.ts'
 import tailwindcss from '@tailwindcss/postcss'
@@ -17,10 +17,9 @@ import { mergeConfig } from 'vite'
 /**
  * 创建基础Vite配置
  * @param ctx 构建上下文
- * @param comp 组件名
  * @returns 基础配置对象
  */
-export async function createBaseConfig(ctx: BuildContext, comp: string): Promise<InlineConfig> {
+export async function createBaseConfig(ctx: BuildContext): Promise<InlineConfig> {
   const plugins: any[] = [
     pluginVue(),
     vueJsx(),
@@ -45,13 +44,13 @@ export async function createBaseConfig(ctx: BuildContext, comp: string): Promise
 
   // 当styleType为scoped时，动态导入并添加UUID插件用于样式隔离（配置使用，动态导入）
   if (ctx.styleType === 'scoped') {
-    const { default: AddUuidToTemplatePlugin } = await dynamicImports<{ default: typeof import('@moluoxixi/utils/AddUuidToTemplatePlugin/index.ts')['default'] }>(import('@moluoxixi/utils/AddUuidToTemplatePlugin/index.ts'), ['default'])
+    const AddUuidToTemplatePlugin = await dynamicImport(import('@moluoxixi/utils/AddUuidToTemplatePlugin/index.ts'))
     plugins.push(AddUuidToTemplatePlugin())
   }
 
   // 按需启用图片压缩（重型插件，配置使用，动态导入）
   if (!ctx.excludeHeavyPlugins) {
-    const { default: viteImagemin } = await dynamicImports<{ default: typeof import('vite-plugin-imagemin')['default'] }>(import('vite-plugin-imagemin'), ['default'])
+    const viteImagemin = await dynamicImport(import('vite-plugin-imagemin')) as unknown as (options?: any) => any
     plugins.push(viteImagemin({
       gifsicle: { optimizationLevel: 7, interlaced: false },
       optipng: { optimizationLevel: 7 },

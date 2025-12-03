@@ -44,7 +44,7 @@ export async function getComponentNames(ctx: BuildContext, enableInteractive = f
   }
 
   // 动态导入 @inquirer/checkbox（只在交互式选择时加载）
-  const checkbox = await dynamicImport<typeof import('@inquirer/checkbox')['default']>('@inquirer/checkbox')
+  const checkbox = await dynamicImport(import('@inquirer/checkbox'))
 
   // 使用 @inquirer/checkbox 进行多选（支持 a 键全选）
   const selected = await checkbox({

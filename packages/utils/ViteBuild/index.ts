@@ -1,5 +1,6 @@
 // build入口文件
 // 导入类型
+import type { Plugin } from 'rollup'
 import type {
   BuildContext,
   BuildOptions,
@@ -16,7 +17,7 @@ import fs from 'node:fs'
 import fsp from 'node:fs/promises'
 import { resolve } from 'node:path'
 // 导入工具函数
-import { dynamicImports } from '@moluoxixi/utils/_utils/index.ts'
+import { dynamicImport, dynamicImports } from '@moluoxixi/utils/_utils/index.ts'
 
 import { build, mergeConfig } from 'vite'
 import { getFlagValue, hasFlag, parseBoolean, printUsage } from './_utils/cli.ts'
@@ -125,16 +126,15 @@ async function bundleComponentModule(ctx: BuildContext, {
   exportsType,
   skipManualChunks,
 }: BundleComponentModuleOptions) {
-  // 动态导入 obfuscator（配置使用，只在需要混淆时加载
-  let obfuscatorPlugin: any = null
+  const rollupPlugins: Plugin[] = []
   const plugins = []
   if (ctx.useObfuscator) {
-    const { obfuscator } = await dynamicImports<{ obfuscator: typeof import('rollup-obfuscator')['obfuscator'] }>(import('rollup-obfuscator'), ['obfuscator'])
-    obfuscatorPlugin = obfuscator()
+    const { obfuscator } = await dynamicImports(import('rollup-obfuscator'), ['obfuscator'] as const)
+    rollupPlugins.push(obfuscator() as Plugin)
   }
   // 按需启用图片压缩（重型插件，配置使用，动态导入）
   if (!ctx.excludeHeavyPlugins) {
-    const { default: viteImagemin } = await dynamicImports<{ default: typeof import('vite-plugin-imagemin')['default'] }>(import('vite-plugin-imagemin'), ['default'])
+    const viteImagemin = await dynamicImport(import('vite-plugin-imagemin')) as unknown as (options?: any) => any
     plugins.push(viteImagemin({
       gifsicle: { optimizationLevel: 7, interlaced: false },
       optipng: { optimizationLevel: 7 },
@@ -144,7 +144,7 @@ async function bundleComponentModule(ctx: BuildContext, {
         plugins: [{ name: 'removeViewBox' }, { name: 'removeEmptyAttrs', active: false }],
       },
     }))
-    const { default: dts } = await dynamicImports<{ default: typeof import('vite-plugin-dts')['default'] }>(import('vite-plugin-dts'), ['default'])
+    const dts = await dynamicImport(import('vite-plugin-dts'))
     plugins.push(dts({
       root: ctx.packDir,
       entryRoot: `.${ctx.entryBaseUrl}${comp}`,
@@ -170,10 +170,7 @@ async function bundleComponentModule(ctx: BuildContext, {
         formats: [format],
       },
       rollupOptions: {
-        plugins: [
-          // 添加代码混淆插件
-          obfuscatorPlugin,
-        ],
+        plugins: rollupPlugins,
         external: (id: string) => {
           // 排除内部依赖，internalDeps 现在存储的是 @${LIB_NAMESPACE}/${packageName kebab-case} 格式,它是被alias转换${ctx.aliasComponentPath}/${packageName kebab-case}
           if (dependencies.internal.some((i: string) => id.includes(i))) {
@@ -401,7 +398,7 @@ async function buildComponent(
 
     // console.log('--------------------------->globals', globals)
     // 创建基础配置
-    const baseConfig = await createBaseConfig(ctx, comp)
+    const baseConfig = await createBaseConfig(ctx)
 
     // 获取需要打包的格式列表
     const formats = getComponentFormats(ctx, comp)
@@ -568,7 +565,7 @@ async function buildComponent(
       }
       // 有 uploadType，使用 UploadEvent 上传（动态导入避免 SCSS 依赖问题）
       else if (ctx.uploadType) {
-        const { UploadEvent } = await dynamicImports<{ UploadEvent: typeof import('./_utils/UploadComponent.ts')['UploadEvent'] }>(import('./_utils/UploadComponent.ts'), ['UploadEvent'])
+        const { UploadEvent } = await dynamicImports(import('./_utils/UploadComponent.ts'), ['UploadEvent'] as const)
         const res = await UploadEvent(outputDir, buildName, ctx.uploadType)
         console.log('res', res)
       }
