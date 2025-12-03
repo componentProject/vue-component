@@ -70,7 +70,7 @@ export function getNextVersion(currentVersion: string = '', type: 'major' | 'min
       newPatch++
       break
   }
-  if (testVersion) {
+  if (type === 'prerelease') {
     return `${newMajor}.${newMinor}.${newPatch}-beta.${newPrerelease}`
   }
   else {
