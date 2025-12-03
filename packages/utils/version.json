@@ -2,14 +2,13 @@
   "ViteConfig": "0.0.26",
   "EslintConfig": "0.0.10",
   "AjaxPackage": "0.0.11-beta.2",
-  "ClassNames": "0.0.3",
+  "ClassNames": "0.0.3-beta.1",
   "GoogleModel": "0.0.4",
   "AddUuidToTemplatePlugin": "0.0.2",
   "ApiDialog": "0.0.4",
-  "autoRoutes": "0.0.2",
   "CssInjectedByJsPlugin": "0.0.2",
   "cssModuleGlobalRootPlugin": "0.0.5",
   "ViteBuild": "0.0.5",
-  "AutoRoutesPlugin": "0.0.3-beta.1",
+  "AutoRoutesPlugin": "0.0.3-beta.2",
   "cssInjectedByJsPlugin": "0.0.3"
 }
