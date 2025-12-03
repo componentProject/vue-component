@@ -4,8 +4,8 @@ import type {
   vueAxiosPluginOptionsType,
   vueAxiosPluginType,
   vueHttpServiceType,
-} from './_types/index'
-import BaseApi from './class'
+} from './_types/index.ts'
+import BaseApi from './class.ts'
 
 declare global {
   interface Window {

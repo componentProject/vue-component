@@ -1,7 +1,7 @@
 // AjaxPackage 工具包入口文件
 // 基础功能导出
-import BaseApi from './class'
-import VueAxiosPlugin, { createHttpService, getHttpService } from './netseriver'
+import BaseApi from './class.ts'
+import VueAxiosPlugin, { createHttpService, getHttpService } from './netseriver.ts'
 
 // 导出所有功能
 export {
