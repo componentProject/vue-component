@@ -1,3 +1,3 @@
-export * from './messageWrapper'
-export * from './notificationWrapper'
-export * from './systemErrorInfo'
+export * from './messageWrapper.ts'
+export * from './notificationWrapper.ts'
+export * from './systemErrorInfo.ts'

@@ -1,8 +1,8 @@
 // date.ts文件
-import type { functionType } from '@moluoxixi/components/_types'
-import type { DateType, StartOf } from './_types/date'
+import type { functionType } from '@moluoxixi/components/_types/index.ts'
+import type { DateType, StartOf } from './_types/date.ts'
 import moment from 'moment'
-import { getType } from './base'
+import { getType } from './base.ts'
 
 //#region 日期相关
 /**

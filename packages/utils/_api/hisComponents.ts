@@ -1,5 +1,5 @@
 // hisComponents.ts文件
-import { getHttpService } from '@moluoxixi/utils/AjaxPackage/index'
+import { getHttpService } from '@moluoxixi/utils/AjaxPackage/index.ts'
 
 const httpApi: any = getHttpService({
   baseURL: '/ts-bs-his-base',
