@@ -1,118 +1,116 @@
 <!-- DraggableTable的对话框组件 -->
 <template>
-  <div v-if="visible">
-    <DragModalDialog
-      v-model:visible="visible"
-      resizable
-      v-bind="computedDialogProps"
+  <DragModalDialog
+    v-model:visible="visible"
+    resizable
+    v-bind="computedDialogProps"
+  >
+    <VxeGrid
+      ref="xTable"
+      border
+      show-overflow="title"
+      show-header-overflow="title"
+      show-footer-overflow="title"
+      :header-cell-style="{ height: '32px' }"
+      :header-cell-config="{ height: 32 }"
+      :cell-config="{ height: 32 }"
+      height="100%"
+      :columns="computedColumns"
+      :checkbox-config="computedCheckboxConfig"
+      :row-class-name="handleRowClassName"
+      :row-config="computedRowConfig"
+      :row-drag-config="computedRowDragConfig"
+      :tree-config="computedTreeConfig"
+      :data="computedGridData"
     >
-      <VxeGrid
-        ref="xTable"
-        border
-        show-overflow="title"
-        show-header-overflow="title"
-        show-footer-overflow="title"
-        :header-cell-style="{ height: '32px' }"
-        :header-cell-config="{ height: 32 }"
-        :cell-config="{ height: 32 }"
-        height="100%"
-        :columns="computedColumns"
-        :checkbox-config="computedCheckboxConfig"
-        :row-class-name="handleRowClassName"
-        :row-config="computedRowConfig"
-        :row-drag-config="computedRowDragConfig"
-        :tree-config="computedTreeConfig"
-        :data="computedGridData"
-      >
-        <template #title="{ row }">
-          <div>{{ getTypeName(row.type) || row.title }}</div>
-        </template>
-        <template #input="{ row, column }">
-          <ElInput
-            :model-value="row[column.field]"
-            size="small"
-            maxlength="4"
-            :disabled="!row.resizable"
-            :placeholder="getPlaceholder(String(column.title || ''))"
-            style="width: 100%"
-            @update:model-value="handlePositiveNumberInput(row, column.field, $event)"
-          />
-        </template>
-        <template #switch="{ row, column }">
-          <ElSwitch
-            v-model="row[column.field]"
-            size="small"
-          />
-        </template>
-        <template #select="{ row, column }">
-          <TsSelect
-            v-if="column.field !== 'fixed' || !row.parentId"
-            v-model="row[column.field]"
-            :empty-values="[undefined]"
-            :options="column.params.options"
-            class="m-2"
-            :popper-style="computedPopperStyle"
-            placeholder="Select"
-            size="small"
-            :disabled="!row.resizable"
-          />
-        </template>
-      </VxeGrid>
-
-      <template #footer>
-        <div class="flex justify-end items-center">
-          <ElCheckbox
-            v-if="isConfiguration"
-            v-model="isCommon" style="margin-right: 40px;" label="作为统一配置"
-            size="large"
-          />
-          <ElPopover :visible="resetPopoverVisible" placement="top" :width="180">
-            <p v-if="isCommon" style="white-space: pre-wrap;">
-              恢复默认将清除【公共及个人自定义】样式恢复到系统默认样式，请您确定是否继续？
-            </p>
-            <p v-else style="white-space: pre-wrap;">
-              恢复默认将清除您【个人自定义】样式恢复到系统默认样式，请您确定是否继续？
-            </p>
-            <div style="text-align: right; margin: 0">
-              <ElButton size="small" @click="resetPopoverVisible = false">
-                取消
-              </ElButton>
-              <ElButton size="small" type="primary" @click="handleEvent('reset')">
-                确定
-              </ElButton>
-            </div>
-            <template #reference>
-              <ElButton @click="resetPopoverVisible = true">
-                恢复默认
-              </ElButton>
-            </template>
-          </ElPopover>
-          <!--          <ElPopover :visible="confirmPopoverVisible" placement="top" :width="180"> -->
-          <!--            <p style="white-space: pre-wrap;"> -->
-          <!--              是否同步删除个人配置？ -->
-          <!--            </p> -->
-          <!--            <div style="text-align: right; margin: 0"> -->
-          <!--              <ElButton size="small" @click="confirmPopoverVisible = false"> -->
-          <!--                否 -->
-          <!--              </ElButton> -->
-          <!--              <ElButton size="small" type="primary" @click="handleEvent('confirm')"> -->
-          <!--                是 -->
-          <!--              </ElButton> -->
-          <!--            </div> -->
-          <!--            <template #reference> -->
-          <!--              -->
-          <!--            </template> -->
-          <!--          </ElPopover> -->
-          <ElButton type="primary" @click="handleEvent('confirm')">
-            确认
-          </ElButton>
-          <ElButton @click="handleEvent('cancel')">
-            取消
-          </ElButton>
-        </div>
+      <template #title="{ row }">
+        <div>{{ getTypeName(row.type) || row.title }}</div>
       </template>
-    </DragModalDialog>
-  </div>
+      <template #input="{ row, column }">
+        <ElInput
+          :model-value="row[column.field]"
+          size="small"
+          maxlength="4"
+          :disabled="!row.resizable"
+          :placeholder="getPlaceholder(String(column.title || ''))"
+          style="width: 100%"
+          @update:model-value="handlePositiveNumberInput(row, column.field, $event)"
+        />
+      </template>
+      <template #switch="{ row, column }">
+        <ElSwitch
+          v-model="row[column.field]"
+          size="small"
+        />
+      </template>
+      <template #select="{ row, column }">
+        <TsSelect
+          v-if="column.field !== 'fixed' || !row.parentId"
+          v-model="row[column.field]"
+          :empty-values="[undefined]"
+          :options="column.params.options"
+          class="m-2"
+          :popper-style="computedPopperStyle"
+          placeholder="Select"
+          size="small"
+          :disabled="!row.resizable"
+        />
+      </template>
+    </VxeGrid>
+
+    <template #footer>
+      <div class="flex justify-end items-center">
+        <ElCheckbox
+          v-if="isConfiguration"
+          v-model="isCommon" style="margin-right: 40px;" label="作为统一配置"
+          size="large"
+        />
+        <ElPopover :visible="resetPopoverVisible" placement="top" :width="180">
+          <p v-if="isCommon" style="white-space: pre-wrap;">
+            恢复默认将清除【公共及个人自定义】样式恢复到系统默认样式，请您确定是否继续？
+          </p>
+          <p v-else style="white-space: pre-wrap;">
+            恢复默认将清除您【个人自定义】样式恢复到系统默认样式，请您确定是否继续？
+          </p>
+          <div style="text-align: right; margin: 0">
+            <ElButton size="small" @click="resetPopoverVisible = false">
+              取消
+            </ElButton>
+            <ElButton size="small" type="primary" @click="handleEvent('reset')">
+              确定
+            </ElButton>
+          </div>
+          <template #reference>
+            <ElButton @click="resetPopoverVisible = true">
+              恢复默认
+            </ElButton>
+          </template>
+        </ElPopover>
+        <!--          <ElPopover :visible="confirmPopoverVisible" placement="top" :width="180"> -->
+        <!--            <p style="white-space: pre-wrap;"> -->
+        <!--              是否同步删除个人配置？ -->
+        <!--            </p> -->
+        <!--            <div style="text-align: right; margin: 0"> -->
+        <!--              <ElButton size="small" @click="confirmPopoverVisible = false"> -->
+        <!--                否 -->
+        <!--              </ElButton> -->
+        <!--              <ElButton size="small" type="primary" @click="handleEvent('confirm')"> -->
+        <!--                是 -->
+        <!--              </ElButton> -->
+        <!--            </div> -->
+        <!--            <template #reference> -->
+        <!--              -->
+        <!--            </template> -->
+        <!--          </ElPopover> -->
+        <ElButton type="primary" @click="handleEvent('confirm')">
+          确认
+        </ElButton>
+        <ElButton @click="handleEvent('cancel')">
+          取消
+        </ElButton>
+      </div>
+    </template>
+  </DragModalDialog>
 </template>
 
 <script lang="ts" setup>
