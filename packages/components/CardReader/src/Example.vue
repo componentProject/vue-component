@@ -19,7 +19,8 @@ import CardReader from './index.vue'
  * @param data - 读卡数据
  */
 function handleReadSuccess(data: any) {
-  console.log('读卡成功:', data)
+  console.log('读卡成功，接收到的数据:', data)
+  console.log('读卡成功，格式化后的数据:', JSON.stringify(data, null, 2))
 }
 
 /**

@@ -86,10 +86,24 @@ const selectedDropdownValue = ref<string>('')
 /** 轮询标志 */
 let isPolling = false
 
+/** 不支持轮询的选项值数组 */
+const noPollingValues = ['medicalInsurance', 'medicalInsuranceElectronicVoucher']
+
 /** 过滤后的下拉选项列表 */
 const filteredDropdownOptions = computed(() => {
   /** 允许的硬件分类值 */
-  const allowedHardwareClassValues = ['idCard', 'medicalInsurance', 'socialWelfareCard', 'hospitalCard']
+  const allowedHardwareClassValues = [
+    // 身份证
+    'idCard',
+    // 医保扫脸
+    'medicalInsurance',
+    // 医保扫码
+    'medicalInsuranceElectronicVoucher',
+    // 社会保障卡
+    'socialWelfareCard',
+    // 诊疗卡
+    'hospitalCard',
+  ]
 
   const hardwareOptions = hardwareClassList.value
     .filter(item => allowedHardwareClassValues.includes(item.dictValue))
@@ -252,25 +266,46 @@ function JoinldcardAlias(item: cardReaderPluginType): string {
  */
 async function getCallCommonSdk(osType: string, pluginType: string, funName: string) {
   const pluginList = await getPluginList(osType, pluginType)
-  if (!pluginList) {
+  if (!pluginList || pluginList.length === 0) {
     return null
   }
-  for (const plugin of pluginList) {
-    const ioType = plugin.ioType ? JSON.parse(plugin.ioType) : []
-    for (const ioTypeElement of ioType) {
-      const result = await callCommonSdk(plugin, pluginType, funName || ioTypeElement, ioType)
-      const res: Record<string, any> = {}
-      if (result) {
-        Object.keys(result).forEach((key) => {
-          if (!isEmpty((result as any)[key])) {
-            res[key] = (result as any)[key]
-          }
-        })
-      }
 
-      if (!isEmpty(res)) {
-        return res
-      }
+  // 先调用 /commonSdk/device/active 接口，入参为 pluginType
+  let activeDevice: { alias?: string } | null = null
+  try {
+    activeDevice = await readService.get<{ alias?: string }>('/commonSdk/device/active', { pluginType })
+  }
+  catch (error) {
+    console.error('调用 /commonSdk/device/active 失败:', error)
+  }
+
+  // 根据返回值的 alias 找到对应的 plugin，否则使用第一个
+  let selectedPlugin: cardReaderPluginType | null = null
+  if (activeDevice?.alias) {
+    // 查找 alias 匹配的 plugin
+    selectedPlugin = pluginList.find((plugin: cardReaderPluginType) => JoinldcardAlias(plugin) === activeDevice!.alias) || null
+  }
+
+  // 如果没有找到匹配的，使用第一个
+  if (!selectedPlugin) {
+    selectedPlugin = pluginList[0]
+  }
+
+  // 对选中的 plugin 执行后续逻辑
+  const ioType = selectedPlugin.ioType ? JSON.parse(selectedPlugin.ioType) : []
+  for (const ioTypeElement of ioType) {
+    const result = await callCommonSdk(selectedPlugin, pluginType, funName || ioTypeElement, ioType)
+    const res: Record<string, any> = {}
+    if (result) {
+      Object.keys(result).forEach((key) => {
+        if (!isEmpty((result as any)[key])) {
+          res[key] = (result as any)[key]
+        }
+      })
+    }
+
+    if (!isEmpty(res)) {
+      return res
     }
   }
   return null
@@ -310,7 +345,7 @@ getHardwareClassList()
 // 监听下拉选项列表变化，默认选中第一个选项
 watch(
   filteredDropdownOptions,
-  (options) => {
+  (options: any[]) => {
     if (options.length > 0 && !selectedDropdownValue.value) {
       selectedDropdownValue.value = options[0].value
     }
@@ -326,13 +361,9 @@ async function executePolling() {
     return
   }
 
-  if (!selectedDropdownValue.value || selectedDropdownValue.value === 'medicalInsurance') {
-    // 如果选中值为空或是医保类型，等待后继续检查
-    setTimeout(() => {
-      if (isPolling) {
-        executePolling()
-      }
-    }, props.pollingInterval)
+  // 如果选中值为空或在不支持轮询的数组中，停止轮询
+  if (!selectedDropdownValue.value || noPollingValues.includes(selectedDropdownValue.value)) {
+    stopPolling()
     return
   }
 
@@ -367,14 +398,11 @@ function stopPolling() {
   isPolling = false
 }
 
-// 监听轮询配置和选中值变化
+// 监听轮询配置变化，当禁用轮询时停止轮询
 watch(
-  [() => props.enablePolling, selectedDropdownValue],
-  () => {
-    if (props.enablePolling) {
-      startPolling()
-    }
-    else {
+  () => props.enablePolling,
+  (newValue: boolean) => {
+    if (!newValue) {
       stopPolling()
     }
   },
@@ -397,9 +425,9 @@ function handleDropdownClick() {
 /**
  * 处理下拉选择变化事件
  */
-function handleCardTypeChange(value: string) {
+async function handleCardTypeChange(value: string) {
   selectedDropdownValue.value = value
-  const selectedOption = filteredDropdownOptions.value.find(option => option.value === value)
+  const selectedOption = filteredDropdownOptions.value.find((option: any) => option.value === value)
   if (!selectedOption) {
     return
   }
@@ -410,8 +438,15 @@ function handleCardTypeChange(value: string) {
     return
   }
 
-  // 如果是硬件分类选项，执行读卡逻辑
-  handleReadCardByType(value)
+  // 如果是硬件分类选项
+  // 如果启用轮询且不在不支持轮询的数组中，启动轮询（轮询中会读卡）
+  if (props.enablePolling && value && !noPollingValues.includes(value)) {
+    startPolling()
+  }
+  else {
+    // 否则只读一次卡
+    await handleReadCardByType(value)
+  }
 }
 
 /**
@@ -428,7 +463,7 @@ async function handleReadCardByType(cardType: string) {
  * @returns 处理结果
  */
 async function baseHandler(idCards: string[] = [], funName?: string) {
-  const list = hardwareClassList.value?.filter(item => idCards.includes(item.dictValue)) || []
+  const list = hardwareClassList.value?.filter((item: cardReaderHardwareClassType) => idCards.includes(item.dictValue)) || []
   if (!list?.length) {
     ElMessage.warning('请等待插件分类请求')
     return null
