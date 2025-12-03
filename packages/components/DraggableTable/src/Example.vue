@@ -48,7 +48,7 @@
       </ElButton>
     </div>
     <!-- 使用DraggableTable组件 -->
-    <div class="border-2 h-[300px]!">
+    <div class="border-2 flex-1-hidden">
       <DraggableTable
         id="demo_table_12355666"
         ref="draggableTableRef"

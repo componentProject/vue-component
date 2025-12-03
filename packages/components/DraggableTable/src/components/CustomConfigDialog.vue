@@ -400,7 +400,7 @@ function initColumnDraggable() {
       fullColumn.splice(newColumnIndex, 0, currRow)
 
       // 将修改后的列配置保存到本地
-      // saveColumns(fullColumn)
+      saveColumns(fullColumn)
 
       // 构造vxe格式的事件参数
       const dragColumn = tableColumn[oldIndex]

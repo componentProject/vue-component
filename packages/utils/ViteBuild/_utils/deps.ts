@@ -6,7 +6,7 @@ import { execSync } from 'node:child_process'
 import fs from 'node:fs'
 import { relative, resolve } from 'node:path'
 import { cruise } from 'dependency-cruiser'
-import { findComponentEntry, getFirstPathSegment } from './component.ts'
+import { findComponentEntry, getFirstPathSegment, toKebabCase } from './component.ts'
 
 /**
  * 读取指定目录下 pnpm list --json 的依赖，并分类返回
@@ -124,11 +124,11 @@ function addInternalDep(
     return
   }
 
-  // 构建内部依赖名称
-  const internalDepName = `@${ctx.LIB_NAMESPACE}/${packageName.toLowerCase()}`
+  // 构建内部依赖名称（将大小驼峰转换为 kebab-case 格式）
+  const internalDepName = `@${ctx.LIB_NAMESPACE}/${toKebabCase(packageName)}`
 
-  // 如果是整包导入，需要检查 excludePacks
-  if (!fullPackageName && [`@${ctx.LIB_NAMESPACE}/constant`, ...(ctx.excludePacks || [])].includes(internalDepName)) {
+  // 如果是整包导入，需要检查 excludeInternalPacks
+  if (!fullPackageName && [`@${ctx.LIB_NAMESPACE}/constant`, ...(ctx.excludeInternalPacks || [])].includes(internalDepName)) {
     return
   }
 

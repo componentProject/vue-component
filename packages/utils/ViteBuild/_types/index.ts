@@ -10,8 +10,8 @@ export type ModuleFormat = 'es' | 'cjs' | 'umd' | 'iife'
 
 /** 构建配置的基础字段 */
 export interface BuildConfigBase {
-  /** 不应该被打包的包 */
-  excludePacks: string[]
+  /** 不应该被打包的内部依赖包 */
+  excludeInternalPacks: string[]
   /** 组件库命名空间 */
   libNamespace: string
   /** 别名或者外部包的路径 */

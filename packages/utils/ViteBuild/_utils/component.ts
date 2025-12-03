@@ -157,6 +157,30 @@ export function toPascalCase(packageName: string): string {
     .join('')
 }
 
+/**
+ * 将大小驼峰格式的字符串转换为 kebab-case 格式
+ * @param str 需要转换的字符串 (例如: 'TsSelect', 'tsSelect', 'PopoverTableSelect')
+ * @returns kebab-case 格式的字符串 (例如: 'ts-select', 'popover-table-select')
+ */
+export function toKebabCase(str: string): string {
+  if (!str)
+    return ''
+
+  // 处理已经是 kebab-case 或包含连字符的情况，先转为标准格式
+  if (str.includes('-') || str.includes('_')) {
+    return str
+      .replace(/[_\s]+/g, '-')
+      .toLowerCase()
+  }
+
+  // 将大小驼峰转换为 kebab-case
+  // 匹配大写字母前的位置（除了第一个字符），并在其前面添加连字符
+  return str
+    .replace(/([a-z\d])([A-Z])/g, '$1-$2') // 在小写字母/数字和大写字母之间插入连字符
+    .replace(/([A-Z]+)([A-Z][a-z])/g, '$1-$2') // 在连续大写字母和后面跟着小写字母的大写字母之间插入连字符
+    .toLowerCase()
+}
+
 /** 清空目录 */
 export async function clearDir(DirPath: string) {
   // 清空目录

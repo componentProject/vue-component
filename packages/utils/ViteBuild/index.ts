@@ -20,7 +20,7 @@ import { dynamicImports } from '@moluoxixi/utils/_utils/index.ts'
 
 import { build, mergeConfig } from 'vite'
 import { getFlagValue, hasFlag, parseBoolean, printUsage } from './_utils/cli.ts'
-import { clearDir, findComponentEntry, getComponentNames, sleep, toPascalCase } from './_utils/component.ts'
+import { clearDir, findComponentEntry, getComponentNames, sleep, toKebabCase, toPascalCase } from './_utils/component.ts'
 import { getComponentFormats } from './_utils/config.ts'
 import { analyzeComponentDeps } from './_utils/deps.ts'
 import { getCurrentVersions, getNextVersion, writeComponentVersions } from './_utils/version.ts'
@@ -175,7 +175,7 @@ async function bundleComponentModule(ctx: BuildContext, {
           obfuscatorPlugin,
         ],
         external: (id: string) => {
-          // 排除内部依赖，internalDeps 现在存储的是 @${LIB_NAMESPACE}/${packageName.toLowerCase()} 格式,它是被alias转换${ctx.aliasComponentPath}/${packageName}
+          // 排除内部依赖，internalDeps 现在存储的是 @${LIB_NAMESPACE}/${packageName kebab-case} 格式,它是被alias转换${ctx.aliasComponentPath}/${packageName kebab-case}
           if (dependencies.internal.some((i: string) => id.includes(i))) {
             return true
           }
@@ -376,13 +376,13 @@ async function buildComponent(
     const globals: Record<string, string> = Object.assign({}, ctx.presetGlobals)
 
     // 为内部依赖添加 globals
-    // internalDeps 现在存储的是 @${LIB_NAMESPACE}/${packageName.toLowerCase()} 格式
+    // internalDeps 现在存储的是 @${LIB_NAMESPACE}/${packageName kebab-case} 格式
     for (const internalDep of deps.internal) {
       // 当打包的是组件时，排除当前组件的自引用
-      // internalDep 格式：@${LIB_NAMESPACE}/${packageName.toLowerCase()}
-      // 提取 packageName
+      // internalDep 格式：@${LIB_NAMESPACE}/${packageName kebab-case}
+      // 提取 packageName（已经是 kebab-case 格式）
       const packageName = internalDep.replace(`@${ctx.LIB_NAMESPACE}/`, '')
-      if (packageName !== comp.toLowerCase()) {
+      if (packageName !== toKebabCase(comp)) {
         globals[internalDep] = packageName
       }
     }
@@ -487,7 +487,7 @@ async function buildComponent(
 
     // 生成package.json
     const pkgJson: any = {
-      name: `@${ctx.LIB_NAMESPACE}${(comp ? `/${comp}` : '/components').toLowerCase()}`,
+      name: `@${ctx.LIB_NAMESPACE}${comp ? `/${toKebabCase(comp)}` : '/components'}`,
       version: currentVersion,
       description: `${comp} 组件`,
       sideEffects: [
@@ -525,9 +525,9 @@ async function buildComponent(
     pkgJson.peerDependencies = {
       ...deps.peerDependencies,
     }
-    // internalDeps 现在存储的就是 @${LIB_NAMESPACE}/${packageName.toLowerCase()} 格式
+    // internalDeps 现在存储的就是 @${LIB_NAMESPACE}/${packageName kebab-case} 格式
     const internal: Record<string, string> = deps.internal.reduce((p: Record<string, string>, item: string) => {
-      // item 已经是 @${LIB_NAMESPACE}/${packageName.toLowerCase()} 格式
+      // item 已经是 @${LIB_NAMESPACE}/${packageName kebab-case} 格式
       p[item] = 'latest'
       return p
     }, {} as Record<string, string>)
@@ -736,7 +736,7 @@ export async function buildComponentsWithOptions(options: BuildOptions): Promise
       ...aliasMap,
     },
     aliasPacks: [],
-    excludePacks: rest.excludePacks || [],
+    excludeInternalPacks: rest.excludeInternalPacks || [],
     ...rest,
   }
   ctx.aliasPacks = Object.keys(ctx.alias).filter((i: string) => !i.endsWith('*'))
