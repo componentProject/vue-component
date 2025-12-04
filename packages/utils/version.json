@@ -1,5 +1,5 @@
 {
-  "ViteConfig": "0.0.26",
+  "ViteConfig": "0.0.27",
   "EslintConfig": "0.0.10",
   "AjaxPackage": "0.0.11-beta.2",
   "ClassNames": "0.0.3-beta.1",
@@ -9,6 +9,6 @@
   "CssInjectedByJsPlugin": "0.0.2",
   "cssModuleGlobalRootPlugin": "0.0.5",
   "ViteBuild": "0.0.5",
-  "AutoRoutesPlugin": "0.0.3-beta.2",
+  "AutoRoutesPlugin": "0.0.4",
   "cssInjectedByJsPlugin": "0.0.3"
 }
