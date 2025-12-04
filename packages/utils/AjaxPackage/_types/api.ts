@@ -1,4 +1,5 @@
 import type { App } from 'vue'
+import type { MessageInstance } from '../_utils/index.ts'
 import type BaseApi from '../class.ts'
 /**
  * BaseHttpClient 基础配置接口，包含最基础的 HTTP 客户端配置
@@ -8,12 +9,12 @@ export interface BaseHttpClientConfig {
   baseURL?: string
   /** 请求超时时间（毫秒），默认 5000 */
   timeout?: number
-  /** 请求超时回调函数 */
-  onTimeout?: () => void
+  /** 请求超时回调函数，接收 messageInstance 用于显示消息提示 */
+  onTimeout?: (messageInstance: MessageInstance) => void
   /** 获取 token 的函数，每次请求前自动调用 */
   getToken?: () => string | null
-  /** 登录失效回调函数，当检测到 401 错误时调用 */
-  onLoginRequired?: () => void
+  /** 登录失效回调函数，当检测到 401 错误时调用，接收 messageInstance 用于显示消息提示 */
+  onLoginRequired?: (messageInstance: MessageInstance) => void
   /** 允许其他任意配置项，会直接传递给 axios.create */
   [key: string]: any
 }

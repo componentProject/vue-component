@@ -1,6 +1,8 @@
 // class.ts文件
 import type {
+  AxiosError,
   AxiosResponse,
+  InternalAxiosRequestConfig,
 } from 'axios'
 /*
  * @Author: moluoxixi 1983531544@qq.com
@@ -53,6 +55,7 @@ export default class BaseApi extends BaseHttpClient {
     // 调用父类构造函数
     super(baseConfig)
 
+    // 设置 responseFields（BaseApi 特有的功能）
     this.responseFields = {
       code: 'Code',
       message: 'Message',
@@ -65,14 +68,100 @@ export default class BaseApi extends BaseHttpClient {
   }
 
   /**
-   * 处理响应配置，解析响应数据并处理错误
-   * 支持嵌套路径解析，自动处理登录失效、系统异常等错误
-   * 重写父类方法，提供增强的响应解析功能
+   * 处理请求配置，子类可重写此方法自定义请求配置
+   * 显式声明以确保类型一致性，避免打包后的类型不兼容问题
+   * @param config - 请求配置对象
+   * @returns 处理后的请求配置
+   */
+  processRequestConfig(config: InternalAxiosRequestConfig): InternalAxiosRequestConfig {
+    return super.processRequestConfig(config)
+  }
+
+  /**
+   * 处理响应错误，子类可重写此方法自定义错误处理
+   * 显式声明以确保类型一致性，避免打包后的类型不兼容问题
+   * @param error - Axios 错误对象
+   * @returns 处理后的错误对象
+   */
+  async processResponseError(error: AxiosError): Promise<AxiosError> {
+    return super.processResponseError(error)
+  }
+
+  /**
+   * 处理 HTTP 状态码
+   * 重写父类方法，确保子类可以重写此方法
+   * @param response - Axios 响应对象
+   */
+  protected handleHttpStatus(response: AxiosResponse): void {
+    return super.handleHttpStatus(response)
+  }
+
+  /**
+   * 处理认证错误（401 - 未授权/登录失效）
+   * 重写父类方法，处理 HTTP 401 错误
+   * 子类可重写此方法来自定义 HTTP 认证错误处理逻辑
+   * @param error - Axios 错误对象
+   */
+  protected handleAuthenticationError(error: AxiosError): void {
+    // 调用父类处理 HTTP 401
+    super.handleAuthenticationError(error)
+  }
+
+  /**
+   * 处理超时错误
+   * 重写父类方法，确保子类可以重写此方法
+   * @param error - Axios 错误对象
+   */
+  protected handleTimeoutError(error: AxiosError): void {
+    return super.handleTimeoutError(error)
+  }
+
+  /**
+   * 处理网络错误（其他错误）
+   * 重写父类方法，确保子类可以重写此方法
+   * @param error - Axios 错误对象
+   */
+  protected handleNetworkError(error: AxiosError): void {
+    return super.handleNetworkError(error)
+  }
+
+  /**
+   * 处理成功响应
+   * 重写父类方法，在标准 HTTP 成功响应基础上，处理业务特定的响应结构
+   * 支持嵌套路径解析，自动处理业务层的登录失效、系统异常等错误
+   * 注意：HTTP 层的错误（如 HTTP 401、超时等）由父类 BaseHttpClient 处理
    * @param response - Axios 响应对象
    * @returns 解析后的响应数据
    */
-  processResponseConfig(response: AxiosResponse): AxiosResponse['data'] {
-    const data = response.data
+  protected handleSuccessResponse(response: AxiosResponse): AxiosResponse['data'] {
+    // 先调用父类处理标准 HTTP 成功响应（获取 response.data）
+    const httpData = super.handleSuccessResponse(response)
+
+    // 解析业务响应字段
+    const parsedFields = this.parseResponseFields(httpData)
+    const { code, message, responseData } = parsedFields
+
+    // 处理业务层的错误情况
+    this.handleSystemError(response, code, message, responseData)
+    this.handleBusinessError(code, message)
+    this.handleErrorArray(responseData)
+    this.handleTips(responseData)
+
+    // 返回业务数据
+    return responseData
+  }
+
+  /**
+   * 解析响应字段，支持嵌套路径解析
+   * 子类可重写此方法来自定义字段解析逻辑
+   * @param data - 响应数据对象
+   * @returns 解析后的字段值对象
+   */
+  protected parseResponseFields(data: any): {
+    code: any
+    message: any
+    responseData: any
+  } {
     // 支持路径解析的辅助函数
     const getValueByPath = (obj: any, path: string | undefined) => {
       if (!path)
@@ -95,14 +184,18 @@ export default class BaseApi extends BaseHttpClient {
     const message = getValueByPath(data, this.responseFields?.message)
     const responseData = getValueByPath(data, this.responseFields?.data)
 
-    // console.log('responseData', data, this.responseFields?.data, getValueByPath(data, this.responseFields?.data))
+    return { code, message, responseData }
+  }
 
-    // console.log('code', code)
-    // 处理错误码
-    if (code === 401) {
-      throw new Error('登录失效，请重新登录')
-    }
-
+  /**
+   * 处理系统异常错误（-1 - 系统异常）
+   * 子类可重写此方法来自定义系统异常处理逻辑
+   * @param response - Axios 响应对象
+   * @param code - 响应状态码
+   * @param message - 错误消息
+   * @param responseData - 响应数据
+   */
+  protected handleSystemError(response: AxiosResponse, code: any, message: any, responseData: any): void {
     if (code === -1) {
       // 如果启用了系统异常弹窗，则显示弹窗
       if (this.enableSystemErrorDialog) {
@@ -113,7 +206,15 @@ export default class BaseApi extends BaseHttpClient {
       }
       throw new Error(message || '系统异常')
     }
+  }
 
+  /**
+   * 处理业务错误（其他非200错误码）
+   * 子类可重写此方法来自定义业务错误处理逻辑
+   * @param code - 响应状态码
+   * @param message - 错误消息
+   */
+  protected handleBusinessError(code: any, message: any): void {
     if (code && code !== 200) {
       this.messageInstance?.error({
         message: message || '请求失败',
@@ -121,64 +222,91 @@ export default class BaseApi extends BaseHttpClient {
       })
       throw new Error(message || '请求失败')
     }
+  }
 
-    // 处理错误数组 errors（如果有配置）
+  /**
+   * 处理错误数组 errors（如果有配置）
+   * 子类可重写此方法来自定义错误数组处理逻辑
+   * @param responseData - 响应数据
+   */
+  protected handleErrorArray(responseData: any): void {
     const errorsField = this.responseFields?.errors
     if (errorsField) {
       const errors = (responseData as any)?.[errorsField]
       if (Array.isArray(errors) && errors.length) {
-        const html = errors
-          .map((item: any) => `<div style="font-size: 14px;color:red">${item.code}：${item.message}</div>`)
-          .join('')
-
-        if (hasDocument) {
-          this.notificationInstance?.({
-            title: '提示',
-            message: html,
-            type: 'error',
-          } as any)
-        }
-        else {
-          const errorMessages = errors.map((item: any) => `${item.code}：${item.message}`).join('\n')
-          this.notificationInstance?.({
-            title: '提示',
-            message: errorMessages,
-            type: 'error',
-          } as any)
-        }
-
+        this.showErrorArrayNotification(errors)
         throw new Error('请求错误')
       }
     }
+  }
 
-    // 处理提示信息 tips（如果有配置）
+  /**
+   * 显示错误数组通知
+   * 子类可重写此方法来自定义错误数组通知显示方式
+   * @param errors - 错误数组
+   */
+  protected showErrorArrayNotification(errors: Array<{ code: string, message: string }>): void {
+    const html = errors
+      .map((item: any) => `<div style="font-size: 14px;color:red">${item.code}：${item.message}</div>`)
+      .join('')
+
+    if (hasDocument) {
+      this.notificationInstance?.({
+        title: '提示',
+        message: html,
+        type: 'error',
+      } as any)
+    }
+    else {
+      const errorMessages = errors.map((item: any) => `${item.code}：${item.message}`).join('\n')
+      this.notificationInstance?.({
+        title: '提示',
+        message: errorMessages,
+        type: 'error',
+      } as any)
+    }
+  }
+
+  /**
+   * 处理提示信息 tips（如果有配置）
+   * 子类可重写此方法来自定义提示信息处理逻辑
+   * @param responseData - 响应数据
+   */
+  protected handleTips(responseData: any): void {
     const tipsField = this.responseFields?.tips
     if (tipsField) {
       const tips = (responseData as any)?.[tipsField]
       if (Array.isArray(tips) && tips.length) {
-        const html = tips
-          .map((item: any) => `<div style="font-size: 14px;color:#E6A23C">${item.code}：${item.message}</div>`)
-          .join('')
-
-        if (hasDocument) {
-          this.notificationInstance?.({
-            title: '提示',
-            message: html,
-            type: 'warning',
-          } as any)
-        }
-        else {
-          const tipMessages = tips.map((item: any) => `${item.code}：${item.message}`).join('\n')
-          this.notificationInstance?.({
-            title: '提示',
-            message: tipMessages,
-            type: 'warning',
-          } as any)
-        }
+        this.showTipsNotification(tips)
       }
     }
+  }
 
-    return responseData
+  /**
+   * 显示提示信息通知
+   * 子类可重写此方法来自定义提示信息通知显示方式
+   * @param tips - 提示信息数组
+   */
+  protected showTipsNotification(tips: Array<{ code: string, message: string }>): void {
+    const html = tips
+      .map((item: any) => `<div style="font-size: 14px;color:#E6A23C">${item.code}：${item.message}</div>`)
+      .join('')
+
+    if (hasDocument) {
+      this.notificationInstance?.({
+        title: '提示',
+        message: html,
+        type: 'warning',
+      } as any)
+    }
+    else {
+      const tipMessages = tips.map((item: any) => `${item.code}：${item.message}`).join('\n')
+      this.notificationInstance?.({
+        title: '提示',
+        message: tipMessages,
+        type: 'warning',
+      } as any)
+    }
   }
 
   /**
@@ -242,7 +370,7 @@ export default class BaseApi extends BaseHttpClient {
    * 上报错误信息到服务器，默认实现仅显示提示，子类可重写实现真实上报
    * @param errorInfo - 错误信息对象
    */
-  private async reportError(errorInfo: any): Promise<void> {
+  protected async reportError(errorInfo: any): Promise<void> {
     try {
       console.log('🚀 开始上报错误信息:', errorInfo)
 
