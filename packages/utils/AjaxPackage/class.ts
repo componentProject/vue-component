@@ -1,6 +1,7 @@
 // class.ts文件
 import type {
   AxiosError,
+  AxiosRequestConfig,
   AxiosResponse,
   InternalAxiosRequestConfig,
 } from 'axios'
@@ -75,6 +76,16 @@ export default class BaseApi extends BaseHttpClient {
    */
   processRequestConfig(config: InternalAxiosRequestConfig): InternalAxiosRequestConfig {
     return super.processRequestConfig(config)
+  }
+
+  /**
+   * 处理响应配置，子类可重写此方法自定义响应处理
+   * 显式声明以确保类型一致性，避免打包后的类型不兼容问题
+   * @param response - Axios 响应对象
+   * @returns 解析后的响应数据
+   */
+  processResponseConfig(response: AxiosResponse): AxiosResponse['data'] {
+    return super.processResponseConfig(response)
   }
 
   /**
@@ -394,5 +405,97 @@ export default class BaseApi extends BaseHttpClient {
         duration: 5 * 1000,
       })
     }
+  }
+
+  /**
+   * 发送 HTTP 请求，所有 HTTP 方法最终都调用此方法
+   * 显式声明以确保类型一致性，子类可重写此方法
+   * @param config - Axios 请求配置对象
+   * @returns 解析后的响应数据
+   */
+  protected async request<R>(config: AxiosRequestConfig): Promise<AxiosResponse['data']> {
+    return super.request<R>(config)
+  }
+
+  /**
+   * 发送 GET 请求
+   * 显式声明以确保类型一致性，子类可重写此方法
+   * @param url - 请求 URL 路径
+   * @param params - 查询参数对象
+   * @param config - 额外的请求配置
+   * @returns 解析后的响应数据
+   */
+  public async get<R>(url: string, params?: Record<string, any>, config?: AxiosRequestConfig): Promise<AxiosResponse['data']> {
+    return super.get<R>(url, params, config)
+  }
+
+  /**
+   * 发送 POST 请求
+   * 显式声明以确保类型一致性，子类可重写此方法
+   * @param url - 请求 URL 路径
+   * @param data - 请求体数据
+   * @param config - 额外的请求配置
+   * @returns 解析后的响应数据
+   */
+  public async post<R>(url: string, data?: Record<string, any>, config?: AxiosRequestConfig): Promise<AxiosResponse['data']> {
+    return super.post<R>(url, data, config)
+  }
+
+  /**
+   * 发送 DELETE 请求
+   * 显式声明以确保类型一致性，子类可重写此方法
+   * @param url - 请求 URL 路径
+   * @param params - 查询参数对象
+   * @param config - 额外的请求配置
+   * @returns 解析后的响应数据
+   */
+  public async delete<R>(url: string, params?: Record<string, any>, config?: AxiosRequestConfig): Promise<AxiosResponse['data']> {
+    return super.delete<R>(url, params, config)
+  }
+
+  /**
+   * 发送 PUT 请求
+   * 显式声明以确保类型一致性，子类可重写此方法
+   * @param url - 请求 URL 路径
+   * @param data - 请求体数据
+   * @param config - 额外的请求配置
+   * @returns 解析后的响应数据
+   */
+  public async put<R>(url: string, data?: Record<string, any>, config?: AxiosRequestConfig): Promise<AxiosResponse['data']> {
+    return super.put<R>(url, data, config)
+  }
+
+  /**
+   * 批量请求，并发发送多个请求
+   * 显式声明以确保类型一致性，子类可重写此方法
+   * @param requests - 请求配置数组或已发起的请求 Promise 数组
+   * @returns 所有请求的响应数据数组
+   */
+  public async all<R>(
+    requests: Array<AxiosRequestConfig | Promise<AxiosResponse<R>>>,
+  ): Promise<AxiosResponse['data'][]> {
+    return super.all<R>(requests)
+  }
+
+  /**
+   * 文件上传，将文件包装为 FormData 发送
+   * 显式声明以确保类型一致性，子类可重写此方法
+   * @param url - 上传地址
+   * @param file - 文件对象
+   * @param config - 额外的请求配置
+   * @returns 解析后的响应数据
+   */
+  public async uploadFile<R>(url: string, file: File | Blob, config?: AxiosRequestConfig): Promise<AxiosResponse['data']> {
+    return super.uploadFile<R>(url, file, config)
+  }
+
+  /**
+   * 下载文件，将 Blob 对象下载到本地
+   * 显式声明以确保类型一致性，子类可重写此方法
+   * @param blob - Blob 对象
+   * @param filename - 文件名，如果不提供则使用时间戳
+   */
+  public downloadFile(blob: Blob, filename?: string): void {
+    return super.downloadFile(blob, filename)
   }
 }

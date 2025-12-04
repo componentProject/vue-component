@@ -14,5 +14,14 @@ export {
   VueAxiosPlugin,
 }
 
+// 导出所有类型
+export type {
+  BaseApiConfig,
+  BaseHttpClientConfig,
+  vueAxiosPluginOptionsType,
+  vueAxiosPluginType,
+  vueHttpServiceType,
+} from './_types/index.ts'
+
 // 默认导出插件
 export default getHttpService

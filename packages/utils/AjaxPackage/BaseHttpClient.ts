@@ -60,7 +60,7 @@ export default class BaseHttpClient {
   protected onTimeout: (messageInstance: MessageInstance) => void
   protected getToken?: () => string | null
   protected onLoginRequired?: (messageInstance: MessageInstance) => void
-  instance: ReturnType<typeof axios.create>
+  public instance: ReturnType<typeof axios.create>
   protected messageInstance: MessageInstance
   protected notificationInstance: NotificationInstance
 
