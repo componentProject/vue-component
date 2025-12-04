@@ -40,6 +40,7 @@
     "@moluoxixi/ajaxpackage": "catalog:dev",
     "@moluoxixi/components": "workspace:*",
     "@moluoxixi/eslintconfig": "catalog:dev",
+    "@types/lodash-es": "catalog:type",
     "@moluoxixi/utils": "workspace:*",
     "@moluoxixi/viteconfig": "catalog:dev",
     "@tailwindcss/postcss": "catalog:dev",

@@ -5,13 +5,38 @@ import { routes as autoRoutes, findDefaultRoute } from 'virtual:auto-routes'
 import { qiankunWindow } from 'vite-plugin-qiankun/dist/helper'
 import { createRouter, createWebHistory } from 'vue-router'
 
+/**
+ * 清理路由结构，确保所有 children 要么是数组，要么不存在
+ * @param routes - 路由数组
+ * @returns 清理后的路由数组
+ */
+function cleanRoutes(routes: any[]): any[] {
+  return routes.map((route) => {
+    const cleaned: any = { ...route }
+    if (cleaned.children !== undefined) {
+      if (Array.isArray(cleaned.children)) {
+        cleaned.children = cleanRoutes(cleaned.children)
+      }
+      else {
+        delete cleaned.children
+      }
+    }
+    return cleaned
+  })
+}
+
+// 确保 autoRoutes 是数组，并清理路由结构
+const normalizedAutoRoutes = Array.isArray(autoRoutes) ? autoRoutes : []
+const cleanedRoutes = cleanRoutes(normalizedAutoRoutes)
+const defaultRoutePath = findDefaultRoute(cleanedRoutes)
+
 const Routes = [
   {
     path: '/',
     name: 'layout',
     component: () => import('./layout.vue' as string),
-    redirect: findDefaultRoute(autoRoutes),
-    children: autoRoutes,
+    redirect: defaultRoutePath || undefined,
+    children: cleanedRoutes.length > 0 ? cleanedRoutes : undefined,
   },
   {
     path: '/:pathMatch(.*)*',

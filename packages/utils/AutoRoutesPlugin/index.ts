@@ -2,7 +2,7 @@
 import type { Plugin } from 'vite'
 import { createVirtualPlugin } from '../_utils/virtual.ts'
 // AutoRoutes/index.ts
-import { findDefaultRouteHandle, findParentRouteHandle, generateRoutes } from './routeGenerator.ts'
+import { cleanRoute, findDefaultRouteHandle, findParentRouteHandle, generateRoutes, parseModulePath, processComponent } from './routeGenerator.ts'
 
 interface RouteModule {
   path: string
@@ -32,13 +32,46 @@ interface AutoRoutesPluginOptions {
   eager?: boolean
 }
 
+/**
+ * 从路由配置值中提取 glob 模式
+ * @param globVal - 路由配置值（可能是字符串、数组或对象）
+ * @returns glob 模式（字符串或数组）
+ */
+function extractGlob(globVal: string | string[] | objRouteConfig): string | string[] {
+  return (globVal as objRouteConfig).glob || (globVal as string | string[])
+}
+
+/**
+ * 获取路由配置的 eager 选项
+ * @param globVal - 路由配置值
+ * @param globalEager - 全局 eager 选项
+ * @returns eager 值
+ */
+function getEagerOption(globVal: string | string[] | objRouteConfig, globalEager?: boolean): boolean {
+  return (globVal as objRouteConfig).eager ?? globalEager ?? false
+}
+
+/**
+ * 生成 import.meta.glob 代码
+ * @param varName - 变量名
+ * @param glob - glob 模式
+ * @param eager - 是否使用同步加载
+ * @returns 生成的代码字符串
+ */
+function generateImportCode(varName: string, glob: string | string[], eager: boolean): string {
+  if (eager) {
+    return `const ${varName} = import.meta.glob(${JSON.stringify(glob)}, { eager: true, import: 'default' });\n`
+  }
+  return `const ${varName} = import.meta.glob(${JSON.stringify(glob)});\n`
+}
+
 function createAutoRoutesPlugin({ routeConfig, virtualModuleId, dts, root, eager: globalEager }: AutoRoutesPluginOptions): Plugin {
   const VIRTUAL_MODULE_ID = virtualModuleId || 'virtual:auto-routes'
 
   // 已默认监听所有文件，无需计算 watch globs
   // 优化：根据 routeConfig 计算更精确的 watch globs，减少无关监听
   const watchGlobs: string[] = Object.values(routeConfig).flatMap((globVal) => {
-    const g = (globVal as objRouteConfig).glob || (globVal as string | string[])
+    const g = extractGlob(globVal)
     return Array.isArray(g) ? g : [g]
   })
 
@@ -58,39 +91,32 @@ function createAutoRoutesPlugin({ routeConfig, virtualModuleId, dts, root, eager
 
         Object.entries(routeConfig).forEach(([prefix, globVal], index) => {
           const varName = `files${index}`
-          const glob: string | string[] = (globVal as objRouteConfig).glob || (globVal as string | string[])
-          // 优先使用路由配置项的 eager，如果没有则使用全局的 eager，默认 false
-          const eager = (globVal as objRouteConfig).eager ?? globalEager ?? false
+          const glob = extractGlob(globVal)
+          const eager = getEagerOption(globVal, globalEager)
+          const baseRoute: RouteModule | string | undefined = (globVal as objRouteConfig).baseRoute
+          const baseRouteParam = baseRoute !== undefined ? JSON.stringify(baseRoute) : 'undefined'
 
-          // 根据 eager 选项决定使用懒加载还是同步加载
-          if (eager) {
-            // 同步加载模式
-            imports.push(
-              `const ${varName} = import.meta.glob(${JSON.stringify(glob)}, { eager: true, import: 'default' });\n`,
-            )
-          }
-          else {
-            // 懒加载模式
-            imports.push(
-              `const ${varName} = import.meta.glob(${JSON.stringify(glob)});\n`,
-            )
-          }
-
-          const baseRoute: RouteModule | string = (globVal as objRouteConfig).baseRoute!
-          routes.push(`...generateRoutes(${varName}, '${prefix}',${JSON.stringify(baseRoute)}, ${eager})`)
+          imports.push(generateImportCode(varName, glob, eager))
+          routes.push(`...generateRoutes(${varName}, '${prefix}',${baseRouteParam}, ${eager})`)
         })
+
+        const routesCode = routes.length > 0 ? `[${routes.join(',\n')}]` : '[]'
 
         return `
           ${imports.join('\n')}
+          ${findParentRouteHandle}
+          ${parseModulePath}
+          ${processComponent}
+          ${cleanRoute}
+          ${findDefaultRouteHandle}
+
           const findParentRoute = ${findParentRouteHandle}
           // 用于routes
           const generateRoutes = ${generateRoutes};
           // 用于导出
           const findDefaultRoute = ${findDefaultRouteHandle};
 
-          ${findParentRouteHandle}
-          ${findDefaultRouteHandle}
-          const routes = [${routes.join(',\n')}];
+          const routes = ${routesCode}.flat().filter(Boolean);
 
           export { routes, findDefaultRoute };
           export default routes;
