@@ -118,7 +118,7 @@ import type { CustomConfigDialogEmitsType, CustomConfigDialogPropsType } from '@
 import type { VxeGridInstance } from 'vxe-table'
 import { getTypeName } from '@moluoxixi/components/DraggableTable/src/_utils'
 import { flattenTree, getClass } from '@moluoxixi/utils/_utils'
-import { ElButton, ElCheckbox, ElInput, ElMessage, ElPopover, ElSwitch } from 'element-plus'
+import { ElButton, ElCheckbox, ElInput, ElPopover, ElSwitch } from 'element-plus'
 import { cloneDeep } from 'lodash-es'
 import Sortable from 'sortablejs'
 import { computed, ref, useTemplateRef, watch } from 'vue'
@@ -145,7 +145,6 @@ const computedDialogProps = computed(() => {
     title: '个性化列配置',
     width: '800px',
     height: '60%',
-    teleportTo: '.containerMain',
     contentStyle: {
       padding: '8px',
     },
@@ -348,110 +347,15 @@ function initRowDraggable() {
   })
 }
 
-// 初始化列拖拽
-function initColumnDraggable() {
-  // 先销毁旧实例
-  destroyColumnSortable()
-
-  if (!xTable.value)
-    return
-
-  const headerTr = xTable.value.$el.querySelector(
-    '.vxe-table--header-wrapper .vxe-table--header tr',
-    '.vxe-table--header tr',
-  )
-  if (!headerTr)
-    return
-
-  // 创建Sortable实例
-  columnSortableInstance.value = Sortable.create(headerTr, {
-    animation: 150,
-    handle: 'th',
-    onEnd: ({ oldIndex = 0, newIndex = 0, item }: Record<string, any>) => {
-      if (oldIndex === newIndex || !xTable.value)
-        return
-
-      // 获取列配置副本
-      const { fullColumn, tableColumn } = xTable.value.getTableColumn() || {}
-      if (!fullColumn || !tableColumn)
-        return
-      const wrapperElem = item.parentNode
-      const newColumn = fullColumn[newIndex]
-      if (newColumn.fixed) {
-        // 错误的移动
-        const oldTrElement = wrapperElem?.children[oldIndex]
-        if (oldTrElement) {
-          if (newIndex > oldIndex) {
-            wrapperElem?.insertBefore(item, oldTrElement)
-          }
-          else {
-            wrapperElem?.insertBefore(oldTrElement, item)
-          }
-        }
-        return ElMessage.warning('固定列不允许拖动！')
-      }
-      // 转换真实索引
-      const oldColumnIndex = xTable.value.getColumnIndex(tableColumn[oldIndex])
-      const newColumnIndex = xTable.value.getColumnIndex(tableColumn[newIndex])
-      // 移动到目标列
-      const currRow = fullColumn.splice(oldColumnIndex, 1)[0]
-      fullColumn.splice(newColumnIndex, 0, currRow)
-
-      // // 将修改后的列配置保存到本地
-      // saveColumns(fullColumn)
-
-      // 构造vxe格式的事件参数
-      const dragColumn = tableColumn[oldIndex]
-      const oldColumn = tableColumn[oldIndex]
-      const dragPos = newIndex > oldIndex ? 'right' : 'left'
-      const dragToChild = false
-
-      const eventParams = {
-        dragColumn,
-        dragPos,
-        dragToChild,
-        newColumn: tableColumn[newIndex],
-        offsetIndex: Math.abs(newIndex - oldIndex),
-        oldColumn,
-      }
-
-      // 发送与vxe格式相同的事件参数
-      emit('columnDragend', eventParams)
-      // 调用用户自定义的拖拽结束方法
-      props.columnDragEndMethod?.({
-        newColumn: tableColumn[newIndex],
-        oldColumn: tableColumn[oldIndex],
-        dragColumn,
-        dragPos,
-        dragToChild,
-      })
-    },
-  })
-}
-
 function destroySortable() {
-  if (props.dragable) {
+  if (props.rowdragable) {
     destroyRowSortable()
-    destroyColumnSortable()
-  }
-  else if (props.rowdragable) {
-    destroyRowSortable()
-  }
-  else if (props.columndragable) {
-    destroyColumnSortable()
   }
 }
 
 function initSortable() {
   setTimeout(() => {
-    if (props.dragable) {
-      initRowDraggable()
-      initColumnDraggable()
-    }
-    else if (props.columndragable) {
-      initColumnDraggable()
-    }
-    else if (props.rowdragable) {
+    if (props.rowdragable) {
       initRowDraggable()
     }
   }, 100)
