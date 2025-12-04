@@ -355,7 +355,7 @@ export default class BaseHttpClient {
     link.click()
 
     // 清理：移除链接元素并释放 Blob URL
-    document.body.removeChild(link)
+    link.remove()
     window.URL.revokeObjectURL(url)
   }
 }

@@ -288,7 +288,7 @@ export default defineComponent({
               // 黑色错误信息区域
               h('div', { style: { backgroundColor: '#2c3e50', color: '#fff', padding: '16px 20px', fontFamily: 'Monaco, Consolas, "Courier New", monospace', fontSize: '12px', lineHeight: 1.5, maxHeight: '200px', overflowY: 'auto' } }, [
                 h('div', { style: { marginBottom: '8px', color: '#ecf0f1' } }, `Trace ID: ${props.traceId || 'a1b2c3d4-e5f6-7890-g1h2-i3j4k5l6m7n8'}`),
-                h('div', { style: { color: '#e74c3c', fontWeight: 'bold' } }, `Error: ${props.errorMessage || 'Connection timeout after 5000ms'}`),
+                h('div', { style: { color: '#e74c3c', fontWeight: 'bold', whiteSpace: 'pre-wrap' } }, `Error: ${props.errorMessage || 'Connection timeout after 5000ms'}`),
               ]),
             ]),
           footer: () =>
