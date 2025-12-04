@@ -3,9 +3,9 @@ import path from 'node:path'
 import process from 'node:process'
 import { loadEnv } from 'vite'
 import cssModuleGlobalRootPlugin from '../../packages/utils/cssModuleGlobalRootPlugin/index.ts'
-import viteConfig, { wrapperEnv } from '../../packages/utils/ViteConfig/index.ts'
+import { ViteConfig, wrapperEnv } from '../../packages/utils/ViteConfig/index.ts'
 
-export default viteConfig(
+export default ViteConfig(
   ({ mode }) => {
     const env = loadEnv(mode!, process.cwd())
     const viteEnv = wrapperEnv(env)

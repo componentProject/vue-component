@@ -1,13 +1,27 @@
 import type { App } from 'vue'
 import type BaseApi from '../class.ts'
 /**
- * BaseApi 配置接口，用于配置 BaseApi 实例的所有选项
+ * BaseHttpClient 基础配置接口，包含最基础的 HTTP 客户端配置
  */
-export interface BaseApiConfig {
+export interface BaseHttpClientConfig {
   /** API 基础地址 */
   baseURL?: string
   /** 请求超时时间（毫秒），默认 5000 */
   timeout?: number
+  /** 请求超时回调函数 */
+  onTimeout?: () => void
+  /** 获取 token 的函数，每次请求前自动调用 */
+  getToken?: () => string | null
+  /** 登录失效回调函数，当检测到 401 错误时调用 */
+  onLoginRequired?: () => void
+  /** 允许其他任意配置项，会直接传递给 axios.create */
+  [key: string]: any
+}
+/**
+ * BaseApi 配置接口，用于配置 BaseApi 实例的所有选项
+ * 继承 BaseHttpClientConfig，添加响应字段映射和系统异常弹窗配置
+ */
+export interface BaseApiConfig extends BaseHttpClientConfig {
   /** 响应字段映射配置 */
   responseFields?: {
     /** 响应状态码字段名，默认 'Code' */
@@ -21,16 +35,8 @@ export interface BaseApiConfig {
     /** 提示信息字段名 */
     tips?: string
   }
-  /** 请求超时回调函数 */
-  onTimeout?: () => void
-  /** 获取 token 的函数，每次请求前自动调用 */
-  getToken?: () => string | null
-  /** 登录失效回调函数，当检测到 401 错误时调用 */
-  onLoginRequired?: () => void
   /** 是否启用 code === -1 的系统异常弹窗，默认为 true */
   enableSystemErrorDialog?: boolean
-  /** 允许其他任意配置项，会直接传递给 axios.create */
-  [key: string]: any
 }
 /**
  * Vue Axios 插件配置选项

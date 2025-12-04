@@ -35,6 +35,24 @@ export interface FilesMap {
 }
 
 /**
+ * 清理路由结构，确保 children 要么是有效数组，要么不存在
+ * @param route - 路由对象
+ * @returns 清理后的路由对象
+ */
+export function cleanRoute(route: RouteModule): RouteModule {
+  const cleaned = { ...route }
+  if (cleaned.children) {
+    if (Array.isArray(cleaned.children) && cleaned.children.length > 0) {
+      cleaned.children = cleaned.children.map(cleanRoute)
+    }
+    else {
+      delete cleaned.children
+    }
+  }
+  return cleaned
+}
+
+/**
  * 在路由模块中查找父级路由
  * @param modules - 路由模块数组
  * @param parentPath - 要查找的父级路由路径
@@ -58,6 +76,47 @@ export function findParentRouteHandle(
 }
 
 /**
+ * 解析文件路径，提取路径信息
+ * @param modulePath - 模块路径
+ * @returns 路径信息对象
+ */
+export function parseModulePath(modulePath: string) {
+  const pathArr = modulePath.split('/').filter((item: string) => item && !item.includes('.'))
+  if (pathArr.at(-1) === 'src') {
+    pathArr.pop()
+  }
+  const componentName = pathArr.at(-1)
+  const path = `/${pathArr.join('/')}`
+  const parentPath = `/${pathArr.slice(0, -1).join('/')}`
+
+  return { pathArr, componentName, path, parentPath }
+}
+
+/**
+ * 根据加载模式处理组件加载器
+ * @param componentLoader - 组件加载器
+ * @param componentName - 组件名称
+ * @param eager - 是否使用同步加载
+ * @returns 组件和元数据标题
+ */
+export function processComponent(
+  componentLoader: any,
+  componentName: string,
+  eager: boolean,
+): { component: any, metaTitle: string } {
+  if (eager) {
+    return {
+      component: componentLoader,
+      metaTitle: componentLoader?.name || componentName,
+    }
+  }
+  return {
+    component: typeof componentLoader === 'function' ? componentLoader : componentLoader,
+    metaTitle: componentName,
+  }
+}
+
+/**
  * 根据文件结构生成路由配置
  * @param files - 文件映射对象（懒加载模式下是函数映射，同步加载模式下是组件映射）
  * @param prefix - 路由前缀
@@ -73,8 +132,13 @@ export function generateRoutes(
 ): RouteModule[] {
   const newBaseRoute: RouteModule | undefined = typeof baseRoute === 'string' ? { name: baseRoute } : baseRoute
   const modules: RouteModule[] = newBaseRoute ? [newBaseRoute] : []
+  const fileKeys = Object.keys(files)
 
-  return Object.keys(files)
+  if (fileKeys.length === 0) {
+    return []
+  }
+
+  return fileKeys
     .sort((a, b) => {
       const aLength = a.split('/').length
       const bLength = b.split('/').length
@@ -82,18 +146,16 @@ export function generateRoutes(
     })
     .reduce((modules: RouteModule[] = [], modulePath: string) => {
       const componentLoader = files[modulePath]
-      if (!componentLoader || modulePath === 'install')
+      if (!componentLoader || modulePath === 'install') {
         return modules
-
-      const pathArr = modulePath.split('/').filter((item: string) => item && !item.includes('.'))
-      if (pathArr.at(-1) === 'src') {
-        pathArr.pop()
       }
-      const componentName = pathArr.at(-1)
 
-      const path = `/${pathArr.join('/')}`
-      const parentPath = `/${pathArr.slice(0, -1).join('/')}`
-      let parentRoute
+      const { path, parentPath, componentName } = parseModulePath(modulePath)
+      if (!componentName) {
+        return modules
+      }
+
+      let parentRoute: RouteModule | undefined
       if (newBaseRoute) {
         newBaseRoute.children = newBaseRoute.children || []
         newBaseRoute.name = newBaseRoute.name || prefix
@@ -104,62 +166,58 @@ export function generateRoutes(
         parentRoute = findParentRouteHandle(modules, parentPath)
       }
 
-      // 根据加载模式处理 component
-      let component: any
-      let metaTitle: string = componentName!
+      const { component, metaTitle } = processComponent(componentLoader, componentName, eager)
 
-      if (eager) {
-        // 同步加载模式：componentLoader 已经是组件对象
-        component = componentLoader
-        // 优先使用组件的 name 属性，如果没有则使用 componentName
-        metaTitle = component?.name || componentName!
-      }
-      else {
-        // 懒加载模式：componentLoader 是函数
-        component = typeof componentLoader === 'function' ? componentLoader : componentLoader
-        metaTitle = componentName!
+      const routeItem: RouteModule = {
+        path,
+        name: componentName,
+        meta: {
+          title: metaTitle,
+        },
+        component,
       }
 
       if (parentRoute) {
-        if (!parentRoute.children)
+        if (!parentRoute.children) {
           parentRoute.children = []
-        parentRoute.children.push({
-          path,
-          name: componentName!,
-          meta: {
-            title: metaTitle,
-          },
-          component,
-        })
+        }
+        parentRoute.children.push(routeItem)
       }
       else {
-        modules.push({
-          path,
-          name: componentName!,
-          meta: {
-            title: metaTitle,
-          },
-          component,
-        })
+        modules.push(routeItem)
       }
+
       return modules
     }, modules)
+    .map(cleanRoute)
+    .filter((route) => {
+      // 过滤掉只有 baseRoute 但没有实际子路由的情况
+      return !(route.children && Array.isArray(route.children) && route.children.length === 0)
+    })
 }
 
 /**
  * 查找默认路由
- * @param routes
+ * @param routes - 路由数组
+ * @returns 默认路由路径，如果没有找到则返回空字符串
  */
 export function findDefaultRouteHandle(routes: any[]): string {
+  if (!routes || routes.length === 0) {
+    return ''
+  }
+
   for (const route of routes) {
     if (route.meta?.default) {
-      return route.path
+      return route.path || ''
     }
-    else {
-      if (route.children?.length) {
-        return findDefaultRouteHandle(route.children)
+
+    if (route.children?.length) {
+      const childPath = findDefaultRouteHandle(route.children)
+      if (childPath) {
+        return childPath
       }
     }
   }
-  return routes?.[0]?.path
+
+  return routes[0]?.path || ''
 }
