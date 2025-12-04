@@ -10,12 +10,14 @@ export default ViteConfig(
     const env = loadEnv(mode!, process.cwd())
     const viteEnv = wrapperEnv(env)
     const rootPath = path.resolve()
-    const appCode = viteEnv.VITE_GLOB_APP_CODE
+    const appCode = viteEnv.VITE_APP_CODE
+    const appTitle = viteEnv.VITE_APP_TITLE
+    const port = viteEnv.VITE_PORT
     return {
       rootPath,
-      appTitle: viteEnv.VITE_GLOB_APP_TITLE,
+      appTitle,
       appCode,
-      port: 3301,
+      port,
       autoComponent: true,
       // pwa: {
       //   manifest: {
