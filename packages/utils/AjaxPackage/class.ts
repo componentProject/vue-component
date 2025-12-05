@@ -1,7 +1,5 @@
-// class.ts文件
 import type {
   AxiosError,
-  AxiosRequestConfig,
   AxiosResponse,
   InternalAxiosRequestConfig,
 } from 'axios'
@@ -16,7 +14,7 @@ import type {
  * Copyright (c) 2025 by ${git_name_email}, All Rights Reserved.
  */
 
-import type { BaseApiConfig } from './_types/index.ts'
+import type { BaseApiConfig, ExtendedAxiosRequestConfig, NotificationOptions } from './_types/index.ts'
 import { dynamicImports } from '../_utils/index.ts'
 import createApiDialog from '../ApiDialog/index.ts'
 import { extractSystemErrorInfo } from './_utils/systemErrorInfo.ts'
@@ -61,8 +59,8 @@ export default class BaseApi extends BaseHttpClient {
       code: 'Code',
       message: 'Message',
       data: 'data',
-      errors: 'errors',
-      tips: 'tips',
+      errors: 'data.errors',
+      tips: 'data.tips',
       ...responseFields,
     }
     this.enableSystemErrorDialog = enableSystemErrorDialog
@@ -152,14 +150,43 @@ export default class BaseApi extends BaseHttpClient {
     const parsedFields = this.parseResponseFields(httpData)
     const { code, message, responseData } = parsedFields
 
-    // 处理业务层的错误情况
+    const config = response.config as ExtendedAxiosRequestConfig
+    const isCustomMessage = config?.isCustomMessage ?? false
+
     this.handleSystemError(response, code, message, responseData)
-    this.handleBusinessError(code, message)
-    this.handleErrorArray(responseData)
-    this.handleTips(responseData)
+
+    // 如果配置了 isCustomMessage 为 true，则跳过业务错误、错误数组和提示的处理
+    // 默认值为 false，即默认会执行这些处理
+    if (!isCustomMessage) {
+      this.handleBusinessError(code, message, response)
+      this.handleErrorArray(httpData, response)
+      this.handleTips(httpData, response)
+    }
 
     // 返回业务数据
     return responseData
+  }
+
+  /**
+   * 支持路径解析的辅助函数
+   * @param obj
+   * @param path
+   * @protected
+   */
+  protected getValueByPath(obj: any, path: string | undefined): any {
+    if (!path)
+      return obj
+    const keys = path.split('.')
+    let result = obj
+    for (const key of keys) {
+      if (result && typeof result === 'object' && key in result) {
+        result = result[key]
+      }
+      else {
+        return undefined
+      }
+    }
+    return result
   }
 
   /**
@@ -173,27 +200,9 @@ export default class BaseApi extends BaseHttpClient {
     message: any
     responseData: any
   } {
-    // 支持路径解析的辅助函数
-    const getValueByPath = (obj: any, path: string | undefined) => {
-      if (!path)
-        return obj
-      const keys = path.split('.')
-      let result = obj
-      for (const key of keys) {
-        if (result && typeof result === 'object' && key in result) {
-          result = result[key]
-        }
-        else {
-          return undefined
-        }
-      }
-      return result
-    }
-
-    // 使用配置的字段名获取值，支持路径解析
-    const code = getValueByPath(data, this.responseFields?.code)
-    const message = getValueByPath(data, this.responseFields?.message)
-    const responseData = getValueByPath(data, this.responseFields?.data)
+    const code = this.getValueByPath(data, this.responseFields?.code)
+    const message = this.getValueByPath(data, this.responseFields?.message)
+    const responseData = this.getValueByPath(data, this.responseFields?.data)
 
     return { code, message, responseData }
   }
@@ -238,14 +247,17 @@ export default class BaseApi extends BaseHttpClient {
   /**
    * 处理错误数组 errors（如果有配置）
    * 子类可重写此方法来自定义错误数组处理逻辑
-   * @param responseData - 响应数据
+   * @param httpData
+   * @param response
    */
-  protected handleErrorArray(responseData: any): void {
+  protected handleErrorArray(httpData: any, response: AxiosResponse): void {
     const errorsField = this.responseFields?.errors
     if (errorsField) {
-      const errors = (responseData as any)?.[errorsField]
+      const errors = this.getValueByPath(httpData, errorsField)
       if (Array.isArray(errors) && errors.length) {
-        this.showErrorArrayNotification(errors)
+        const config = response.config as ExtendedAxiosRequestConfig
+        const notificationOptions = config?.errorNotificationOptions
+        this.showErrorArrayNotification(errors, notificationOptions)
         throw new Error('请求错误')
       }
     }
@@ -255,40 +267,51 @@ export default class BaseApi extends BaseHttpClient {
    * 显示错误数组通知
    * 子类可重写此方法来自定义错误数组通知显示方式
    * @param errors - 错误数组
+   * @param notificationOptions
    */
-  protected showErrorArrayNotification(errors: Array<{ code: string, message: string }>): void {
+  protected showErrorArrayNotification(errors: Array<{ code: string, message: string }>, notificationOptions?: NotificationOptions): void {
     const html = errors
       .map((item: any) => `<div style="font-size: 14px;color:red">${item.code}：${item.message}</div>`)
       .join('')
 
+    const defaultOptions: NotificationOptions = {
+      title: '提示',
+      type: 'error',
+    }
+
     if (hasDocument) {
-      this.notificationInstance?.({
-        title: '提示',
+      const finalOptions: NotificationOptions = {
+        ...defaultOptions,
+        ...notificationOptions,
         message: html,
-        type: 'error',
-      } as any)
+      }
+      this.notificationInstance?.(finalOptions as any)
     }
     else {
       const errorMessages = errors.map((item: any) => `${item.code}：${item.message}`).join('\n')
-      this.notificationInstance?.({
-        title: '提示',
+      const finalOptions: NotificationOptions = {
+        ...defaultOptions,
+        ...notificationOptions,
         message: errorMessages,
-        type: 'error',
-      } as any)
+      }
+      this.notificationInstance?.(finalOptions as any)
     }
   }
 
   /**
    * 处理提示信息 tips（如果有配置）
    * 子类可重写此方法来自定义提示信息处理逻辑
-   * @param responseData - 响应数据
+   * @param httpData
+   * @param response
    */
-  protected handleTips(responseData: any): void {
+  protected handleTips(httpData: any, response: AxiosResponse): void {
     const tipsField = this.responseFields?.tips
     if (tipsField) {
-      const tips = (responseData as any)?.[tipsField]
+      const tips = this.getValueByPath(httpData, tipsField)
       if (Array.isArray(tips) && tips.length) {
-        this.showTipsNotification(tips)
+        const config = response.config as ExtendedAxiosRequestConfig
+        const notificationOptions = config?.tipsNotificationOptions
+        this.showTipsNotification(tips, notificationOptions)
       }
     }
   }
@@ -297,26 +320,34 @@ export default class BaseApi extends BaseHttpClient {
    * 显示提示信息通知
    * 子类可重写此方法来自定义提示信息通知显示方式
    * @param tips - 提示信息数组
+   * @param notificationOptions
    */
-  protected showTipsNotification(tips: Array<{ code: string, message: string }>): void {
+  protected showTipsNotification(tips: Array<{ code: string, message: string }>, notificationOptions?: NotificationOptions): void {
     const html = tips
       .map((item: any) => `<div style="font-size: 14px;color:#E6A23C">${item.code}：${item.message}</div>`)
       .join('')
 
+    const defaultOptions: NotificationOptions = {
+      title: '提示',
+      type: 'warning',
+    }
+
     if (hasDocument) {
-      this.notificationInstance?.({
-        title: '提示',
+      const finalOptions: NotificationOptions = {
+        ...defaultOptions,
+        ...notificationOptions,
         message: html,
-        type: 'warning',
-      } as any)
+      }
+      this.notificationInstance?.(finalOptions as any)
     }
     else {
       const tipMessages = tips.map((item: any) => `${item.code}：${item.message}`).join('\n')
-      this.notificationInstance?.({
-        title: '提示',
+      const finalOptions: NotificationOptions = {
+        ...defaultOptions,
+        ...notificationOptions,
         message: tipMessages,
-        type: 'warning',
-      } as any)
+      }
+      this.notificationInstance?.(finalOptions as any)
     }
   }
 
@@ -413,7 +444,7 @@ export default class BaseApi extends BaseHttpClient {
    * @param config - Axios 请求配置对象
    * @returns 解析后的响应数据
    */
-  protected async request<R>(config: AxiosRequestConfig): Promise<AxiosResponse['data']> {
+  protected async request<R>(config: ExtendedAxiosRequestConfig): Promise<AxiosResponse['data']> {
     return super.request<R>(config)
   }
 
@@ -425,7 +456,7 @@ export default class BaseApi extends BaseHttpClient {
    * @param config - 额外的请求配置
    * @returns 解析后的响应数据
    */
-  public async get<R>(url: string, params?: Record<string, any>, config?: AxiosRequestConfig): Promise<AxiosResponse['data']> {
+  public async get<R>(url: string, params?: Record<string, any>, config?: ExtendedAxiosRequestConfig): Promise<AxiosResponse['data']> {
     return super.get<R>(url, params, config)
   }
 
@@ -437,7 +468,7 @@ export default class BaseApi extends BaseHttpClient {
    * @param config - 额外的请求配置
    * @returns 解析后的响应数据
    */
-  public async post<R>(url: string, data?: Record<string, any>, config?: AxiosRequestConfig): Promise<AxiosResponse['data']> {
+  public async post<R>(url: string, data?: Record<string, any>, config?: ExtendedAxiosRequestConfig): Promise<AxiosResponse['data']> {
     return super.post<R>(url, data, config)
   }
 
@@ -449,7 +480,7 @@ export default class BaseApi extends BaseHttpClient {
    * @param config - 额外的请求配置
    * @returns 解析后的响应数据
    */
-  public async delete<R>(url: string, params?: Record<string, any>, config?: AxiosRequestConfig): Promise<AxiosResponse['data']> {
+  public async delete<R>(url: string, params?: Record<string, any>, config?: ExtendedAxiosRequestConfig): Promise<AxiosResponse['data']> {
     return super.delete<R>(url, params, config)
   }
 
@@ -461,7 +492,7 @@ export default class BaseApi extends BaseHttpClient {
    * @param config - 额外的请求配置
    * @returns 解析后的响应数据
    */
-  public async put<R>(url: string, data?: Record<string, any>, config?: AxiosRequestConfig): Promise<AxiosResponse['data']> {
+  public async put<R>(url: string, data?: Record<string, any>, config?: ExtendedAxiosRequestConfig): Promise<AxiosResponse['data']> {
     return super.put<R>(url, data, config)
   }
 
@@ -472,7 +503,7 @@ export default class BaseApi extends BaseHttpClient {
    * @returns 所有请求的响应数据数组
    */
   public async all<R>(
-    requests: Array<AxiosRequestConfig | Promise<AxiosResponse<R>>>,
+    requests: Array<ExtendedAxiosRequestConfig | Promise<AxiosResponse<R>>>,
   ): Promise<AxiosResponse['data'][]> {
     return super.all<R>(requests)
   }
@@ -485,7 +516,7 @@ export default class BaseApi extends BaseHttpClient {
    * @param config - 额外的请求配置
    * @returns 解析后的响应数据
    */
-  public async uploadFile<R>(url: string, file: File | Blob, config?: AxiosRequestConfig): Promise<AxiosResponse['data']> {
+  public async uploadFile<R>(url: string, file: File | Blob, config?: ExtendedAxiosRequestConfig): Promise<AxiosResponse['data']> {
     return super.uploadFile<R>(url, file, config)
   }
 

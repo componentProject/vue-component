@@ -1,3 +1,4 @@
+import type { AxiosRequestConfig } from 'axios'
 import type { App } from 'vue'
 import type { MessageInstance } from '../_utils/index.ts'
 import type BaseApi from '../class.ts'
@@ -64,4 +65,58 @@ export interface vueAxiosPluginType {
    * @param options - 插件配置选项
    */
   install: (app: App, options?: vueAxiosPluginOptionsType) => void
+}
+
+/**
+ * 通知配置选项
+ */
+export interface NotificationOptions {
+  /**
+   * 通知标题
+   */
+  title?: string
+  /**
+   * 通知类型
+   */
+  type?: 'success' | 'error' | 'warning' | 'info'
+  /**
+   * 通知持续时间（毫秒）
+   */
+  duration?: number
+  /**
+   * 是否显示关闭按钮
+   */
+  showClose?: boolean
+  /**
+   * 自定义类名
+   */
+  customClass?: string
+  /**
+   * 自定义样式
+   */
+  customStyle?: string | Record<string, any>
+  /**
+   * 其他通知选项
+   */
+  [key: string]: any
+}
+
+/**
+ * 扩展 AxiosRequestConfig，支持自定义通知配置
+ */
+export interface ExtendedAxiosRequestConfig extends AxiosRequestConfig {
+  /**
+   * 错误通知配置选项，用于覆盖默认的错误通知参数
+   */
+  errorNotificationOptions?: NotificationOptions
+  /**
+   * 提示通知配置选项，用于覆盖默认的提示通知参数
+   */
+  tipsNotificationOptions?: NotificationOptions
+  /**
+   * 是否使用自定义消息处理
+   * 当为 true 时，handleBusinessError、handleErrorArray、handleTips 都不会执行
+   * 默认值为 false
+   */
+  isCustomMessage?: boolean
 }
