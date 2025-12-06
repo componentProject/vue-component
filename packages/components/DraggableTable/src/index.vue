@@ -79,6 +79,7 @@ import type {
   VxeTablePropTypes,
 } from 'vxe-table'
 import type { ColumnType, emitsType, propsType } from './_types'
+import VxeGrid from '@moluoxixi/components/DraggableTable/src/components/VxeGrid'
 // import VxeGrid from '@moluoxixi/components/VxeGrid'
 import { deleteMemoryUpload, getMemoryQuery, setMemoryUpload } from '@moluoxixi/utils/_api/cache'
 import {
@@ -91,6 +92,7 @@ import {
   dispatchEvents,
   onHotkeys,
 } from '@moluoxixi/utils/_utils/event'
+import { VxeUI } from '@vxe-ui/core'
 import { ElMessage } from 'element-plus'
 import { cloneDeep, groupBy } from 'lodash-es'
 import { diff, isEmpty } from 'radash'
@@ -598,15 +600,16 @@ function handleTableRendered(params: VxeTableDefines.ToggleRowExpandEventParams)
   emit('toggleTreeExpand', params)
 }
 //#endregion
-let VxeUI: any
+// let VxeUI: any
 //#region 表头配置弹窗功能，同时收集VxeUI用于处理渲染器等
 const collectColumn = computed<ColumnType[]>(() => {
   if (!xTable.value)
     return []
-  if (!VxeUI) {
-    VxeUI = (xTable.value as any).VxeUI
-    installFn(VxeUI)
-  }
+  // if (!VxeUI) {
+  //   VxeUI = (xTable.value as any).VxeUI
+  //   installFn(VxeUI)
+  // }
+  installFn(VxeUI)
   const { collectColumn } = xTable.value.getTableColumn()
   return collectColumn as any[]
 })

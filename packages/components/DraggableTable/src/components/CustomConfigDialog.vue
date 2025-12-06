@@ -117,6 +117,7 @@
 import type { CustomConfigDialogEmitsType, CustomConfigDialogPropsType } from '@moluoxixi/components/DraggableTable/src/_types'
 import type { VxeGridInstance } from 'vxe-table'
 import { getTypeName } from '@moluoxixi/components/DraggableTable/src/_utils'
+import VxeGrid from '@moluoxixi/components/DraggableTable/src/components/VxeGrid'
 import { flattenTree, getClass } from '@moluoxixi/utils/_utils'
 import { ElButton, ElCheckbox, ElInput, ElPopover, ElSwitch } from 'element-plus'
 import { cloneDeep } from 'lodash-es'

@@ -1363,7 +1363,8 @@ export default defineComponent({
     }
 
     $xeGrid.renderVN = renderVN
-    $xeGrid.VxeUI = VxeUI
+    // 补充VxeUI用于外部组件使用
+    // $xeGrid.VxeUI = VxeUI
     provide('$xeGrid', $xeGrid)
 
     return $xeGrid
