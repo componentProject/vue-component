@@ -49,7 +49,7 @@ function collectInputElements(type: string = '') {
   })
 
   // 收集所有的input和select元素
-  const elements = Array.from(container.querySelectorAll('input, select')) as HTMLElement[]
+  const elements = Array.from(container.querySelectorAll('input, select,textarea')) as HTMLElement[]
 
   // 过滤掉有 disabled 属性的元素
   const enabledElements = elements.filter(el => !el.hasAttribute('disabled'))
