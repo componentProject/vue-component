@@ -31,7 +31,7 @@
         v-bind="props.qrcodeButtonProps"
         @click="medicalInsuranceQRCodeHandler"
       >
-        医保扫码
+        {{ props.qrcodeButtonText }}
       </ElButton>
       <ElButton
         v-if="showType === 'face'"
@@ -39,7 +39,7 @@
         v-bind="props.faceButtonProps"
         @click="medicalInsuranceFaceScanningHandler"
       >
-        医保扫脸
+        {{ props.faceButtonText }}
       </ElButton>
     </template>
   </div>
@@ -48,6 +48,7 @@
 <script setup lang="ts">
 import type {
   cardReaderCommonSdkParamsType,
+  cardReaderCustomDropdownOptionType,
   cardReaderDictDetailParamsType,
   cardReaderHardwareClassType,
   cardReaderPluginParamsType,
@@ -72,7 +73,9 @@ const props = withDefaults(defineProps<propsType>(), {
   placeholder: '点击读取身份证/社保卡',
   showTypes: () => ['dropdown', 'qrcode', 'face'],
   qrcodeButtonProps: () => ({}),
+  qrcodeButtonText: '医保扫码',
   faceButtonProps: () => ({}),
+  faceButtonText: '医保扫脸',
   customDropdownOptions: () => [],
   enablePolling: false,
   pollingInterval: 1000,
@@ -85,6 +88,12 @@ const selectedDropdownValue = ref<string>('')
 
 /** 轮询标志 */
 let isPolling = false
+
+/** 轮询类型队列 */
+const pollingTypes = ref<string[]>([])
+
+/** 当前轮询的索引 */
+const currentPollingIndex = ref<number>(0)
 
 /** 不支持轮询的选项值数组 */
 const noPollingValues = ['medicalInsurance', 'medicalInsuranceElectronicVoucher']
@@ -106,15 +115,15 @@ const filteredDropdownOptions = computed(() => {
   ]
 
   const hardwareOptions = hardwareClassList.value
-    .filter(item => allowedHardwareClassValues.includes(item.dictValue))
-    .map(item => ({
+    .filter((item: cardReaderHardwareClassType) => allowedHardwareClassValues.includes(item.dictValue))
+    .map((item: cardReaderHardwareClassType) => ({
       label: item.dictItem,
       value: item.dictValue,
       isCustom: false,
       data: item,
     }))
 
-  const customOptions = (props.customDropdownOptions || []).map(item => ({
+  const customOptions = (props.customDropdownOptions || []).map((item: cardReaderCustomDropdownOptionType) => ({
     ...item,
     isCustom: true,
     data: item,
@@ -123,10 +132,18 @@ const filteredDropdownOptions = computed(() => {
   return [...hardwareOptions, ...customOptions]
 })
 
+/** 下拉选项类型 */
+interface DropdownOptionType {
+  value: string
+  label: string
+  isCustom: boolean
+  data: any
+}
+
 /** 当前选中项的label */
 const currentSelectedLabel = computed(() => {
   if (selectedDropdownValue.value) {
-    const selectedOption = filteredDropdownOptions.value.find(option => option.value === selectedDropdownValue.value)
+    const selectedOption = filteredDropdownOptions.value.find((option: DropdownOptionType) => option.value === selectedDropdownValue.value)
     return selectedOption?.label || '请选择'
   }
   // 默认显示第一个选项的label
@@ -157,7 +174,7 @@ const readService = new BaseApi({
  * 医保扫码处理函数
  */
 async function medicalInsuranceQRCodeHandler() {
-  await baseHandler(['medicalInsurance'], 'medicalInsuranceQRCode')
+  await baseHandler(['medicalInsuranceElectronicVoucher'], 'medicalInsuranceQRCode')
 }
 
 /**
@@ -172,6 +189,8 @@ const systemInfo = ref<cardReaderSystemType | null>(null)
 
 /** 硬件分类列表 */
 const hardwareClassList = ref<cardReaderHardwareClassType[]>([])
+/** 方法名称列表 */
+const funNameList = ref([])
 
 /**
  * 获取操作系统信息
@@ -198,7 +217,6 @@ async function getSystemInfo() {
     return null
   }
 }
-
 /**
  * 获取硬件分类列表
  */
@@ -218,6 +236,28 @@ async function getHardwareClassList() {
   }
   catch (error) {
     console.error('获取硬件分类列表失败:', error)
+    return null
+  }
+}
+/**
+ * 获取方法名称列表
+ */
+async function getFunNameList() {
+  const params: cardReaderDictDetailParamsType = {
+    dictCode: 'ioType',
+    pageNo: 1,
+    pageSize: 100,
+  }
+
+  try {
+    const result = await httpService.get<cardReaderHardwareClassType[]>(
+      '/mini-portal/dict/page/detail',
+      params,
+    )
+    funNameList.value = (result || [])
+  }
+  catch (error) {
+    console.error('获取方法名称列表失败:', error)
     return null
   }
 }
@@ -341,6 +381,7 @@ async function callCommonSdk(plugin: cardReaderPluginType, pluginType: string, f
 // 直接调用获取操作系统信息和硬件分类列表
 getSystemInfo()
 getHardwareClassList()
+// getFunNameList()
 
 // 监听下拉选项列表变化，默认选中第一个选项
 watch(
@@ -361,16 +402,44 @@ async function executePolling() {
     return
   }
 
-  // 如果选中值为空或在不支持轮询的数组中，停止轮询
-  if (!selectedDropdownValue.value || noPollingValues.includes(selectedDropdownValue.value)) {
+  // 如果轮询队列为空，停止轮询
+  if (pollingTypes.value.length === 0) {
     stopPolling()
     return
   }
 
-  // 执行读卡
-  await handleReadCardByType(selectedDropdownValue.value)
+  // 过滤掉不支持轮询的类型（医保的两个类型不轮询）
+  const validTypes = pollingTypes.value.filter((type: string) => !noPollingValues.includes(type))
 
-  // 等待指定时间后继续下一次轮询
+  if (validTypes.length === 0) {
+    stopPolling()
+    return
+  }
+
+  // 依次执行每个类型的读卡，只要有一个成功就停止轮询
+  for (let i = 0; i < validTypes.length; i++) {
+    if (!isPolling) {
+      // 如果轮询被停止，中断循环
+      break
+    }
+
+    currentPollingIndex.value = i
+    const cardType = validTypes[i]
+
+    // 执行读卡
+    const result = await handleReadCardByType([cardType])
+
+    // 如果读卡成功，停止轮询
+    if (result && !isEmpty(result)) {
+      stopPolling()
+      return
+    }
+  }
+
+  // 重置索引，准备下一轮循环
+  currentPollingIndex.value = 0
+
+  // 等待指定时间后继续下一次轮询循环
   if (isPolling) {
     setTimeout(() => {
       if (isPolling) {
@@ -382,12 +451,33 @@ async function executePolling() {
 
 /**
  * 启动轮询
+ * @param types - 要轮询的卡片类型数组，如果不传则使用当前选中的类型
  */
-function startPolling() {
+function startPolling(types?: string[]) {
   if (isPolling) {
     return
   }
+
+  // 如果传入了类型数组，使用传入的类型；否则使用当前选中的类型
+  if (types && types.length > 0) {
+    pollingTypes.value = types
+  }
+  else if (selectedDropdownValue.value) {
+    pollingTypes.value = [selectedDropdownValue.value]
+  }
+  else {
+    return
+  }
+
+  // 过滤掉不支持轮询的类型
+  pollingTypes.value = pollingTypes.value.filter((type: string) => !noPollingValues.includes(type))
+
+  if (pollingTypes.value.length === 0) {
+    return
+  }
+
   isPolling = true
+  currentPollingIndex.value = 0
   executePolling()
 }
 
@@ -396,6 +486,9 @@ function startPolling() {
  */
 function stopPolling() {
   isPolling = false
+  pollingTypes.value = []
+  currentPollingIndex.value = 0
+  emit('pollingStopped')
 }
 
 // 监听轮询配置变化，当禁用轮询时停止轮询
@@ -441,20 +534,43 @@ async function handleCardTypeChange(value: string) {
   // 如果是硬件分类选项
   // 如果启用轮询且不在不支持轮询的数组中，启动轮询（轮询中会读卡）
   if (props.enablePolling && value && !noPollingValues.includes(value)) {
-    startPolling()
+    startPolling([value])
   }
   else {
     // 否则只读一次卡
-    await handleReadCardByType(value)
+    // handleReadCardByType内部已经处理了失败情况的emit
+    await handleReadCardByType([value])
   }
 }
 
 /**
  * 根据类型处理读卡
- * @param cardType - 卡片类型
+ * @param cardTypes - 卡片类型或类型数组
+ * @returns 读卡结果，如果传入多个类型，返回第一个成功的结果，只要有一个成功就返回
  */
-async function handleReadCardByType(cardType: string) {
-  await baseHandler([cardType])
+async function handleReadCardByType(cardTypes: string | string[]) {
+  const types = Array.isArray(cardTypes) ? cardTypes : [cardTypes]
+  // 检查前置条件
+  if (!hardwareClassList.value?.length) {
+    const error = new Error('请等待插件分类请求')
+    emit('readError', error)
+    return null
+  }
+  if (!systemInfo.value?.dictValue) {
+    const error = new Error('请等待系统信息请求')
+    emit('readError', error)
+    return null
+  }
+  // 如果传入多个类型，依次尝试，只要有一个成功就返回
+  for (const cardType of types) {
+    const result = await baseHandler([cardType])
+    if (result && !isEmpty(result)) {
+      return result
+    }
+  }
+  // 所有类型都读卡失败，emit失败事件
+  emit('readError', new Error('读卡失败：所有卡片类型均未读取到数据'))
+  return null
 }
 /**
  * 基础处理函数
@@ -480,11 +596,14 @@ async function baseHandler(idCards: string[] = [], funName?: string) {
       return res
     }
   }
+  // 所有硬件分类都读卡失败，但不在这里emit，由调用方统一处理
   return null
 }
 // 暴露方法供外部调用
 defineExpose({
-  handleCardTypeChange,
+  handleReadCardByType,
+  startPolling,
+  stopPolling,
 })
 </script>
 
