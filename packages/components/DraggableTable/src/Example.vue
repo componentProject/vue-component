@@ -65,6 +65,10 @@
           padding: true,
           mode: 'inside',
         }"
+        :dialog-props="{
+          title: '测试',
+          zIndex: 899999,
+        }"
         :loading="loading"
         is-configuration
         :header-cell-config="{ height: 60 }"

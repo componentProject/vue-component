@@ -50,7 +50,6 @@
           :empty-values="[undefined]"
           :options="column.params.options"
           class="m-2"
-          :popper-style="computedPopperStyle"
           placeholder="Select"
           size="small"
           :disabled="!row.resizable"
@@ -65,7 +64,8 @@
           v-model="isCommon" style="margin-right: 40px;" label="作为统一配置"
           size="large"
         />
-        <ElPopover :visible="resetPopoverVisible" placement="top" :width="180">
+
+        <ElPopover :popper-style="computedPopperStyle" :visible="resetPopoverVisible" placement="top" :width="180">
           <p v-if="isCommon" style="white-space: pre-wrap;">
             恢复默认将清除【公共及个人自定义】样式恢复到系统默认样式，请您确定是否继续？
           </p>
@@ -154,7 +154,7 @@ const computedDialogProps = computed(() => {
 })
 
 const computedPopperStyle = computed(() => {
-  if (props.dialogProps?.zIndex) {
+  if (props.dialogProps?.zIndex && typeof props.dialogProps.zIndex === 'number') {
     return {
       zIndex: props.dialogProps.zIndex + 1,
     }
