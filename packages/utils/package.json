@@ -51,7 +51,6 @@
     "postcss": "catalog:dev",
     "postcss-selector-parser": "^7.0.0",
     "qs": "catalog:dev",
-    "rollup-obfuscator": "^4.1.0",
     "rollup-plugin-visualizer": "catalog:dev",
     "sass": "catalog:dev",
     "sass-embedded": "catalog:dev",

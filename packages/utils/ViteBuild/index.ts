@@ -17,7 +17,7 @@ import fs from 'node:fs'
 import fsp from 'node:fs/promises'
 import { resolve } from 'node:path'
 // 导入工具函数
-import { dynamicImport, dynamicImports } from '@moluoxixi/utils/_utils/index.ts'
+import { dynamicImport } from '@moluoxixi/utils/_utils/index.ts'
 
 import { build, mergeConfig } from 'vite'
 import { getFlagValue, hasFlag, parseBoolean, printUsage } from './_utils/cli.ts'
@@ -128,10 +128,6 @@ async function bundleComponentModule(ctx: BuildContext, {
 }: BundleComponentModuleOptions) {
   const rollupPlugins: Plugin[] = []
   const plugins = []
-  if (ctx.useObfuscator) {
-    const { obfuscator } = await dynamicImports(import('rollup-obfuscator'), ['obfuscator'] as const)
-    rollupPlugins.push(obfuscator() as Plugin)
-  }
   // 按需启用图片压缩（重型插件，配置使用，动态导入）
   if (!ctx.excludeHeavyPlugins) {
     const viteImagemin = await dynamicImport(import('vite-plugin-imagemin')) as unknown as (options?: any) => any
@@ -565,7 +561,7 @@ async function buildComponent(
       }
       // 有 uploadType，使用 UploadEvent 上传（动态导入避免 SCSS 依赖问题）
       else if (ctx.uploadType) {
-        const { UploadEvent } = await dynamicImports(import('./_utils/UploadComponent.ts'), ['UploadEvent'] as const)
+        const UploadEvent = await dynamicImport(import('./_utils/UploadComponent.ts'), 'UploadEvent' as const)
         const res = await UploadEvent(outputDir, buildName, ctx.uploadType)
         console.log('res', res)
       }

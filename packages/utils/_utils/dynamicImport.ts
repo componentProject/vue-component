@@ -83,22 +83,14 @@ export async function dynamicImports<
   modulePromise: Promise<TModule>,
   exportNames: TExportNames,
 ): Promise<ExtractExports<TModule, TExportNames>> {
-  const module = await modulePromise
-  const result = {} as any
+  const result = {} as ExtractExports<TModule, TExportNames>
 
-  for (const _name of exportNames) {
-    const name = _name || 'default'
-    if (name === 'default') {
-      // 处理默认导出
-      result[name] = module.default ?? module
-    }
-    else {
-      if (!(name in module)) {
-        throw new Error(`模块中不存在导出 "${name}"`)
-      }
-      result[name] = module[name]
+  for (const name of exportNames) {
+    const exportCode = await dynamicImport(modulePromise, name)
+    if (exportCode) {
+      result[name as keyof ExtractExports<TModule, TExportNames>] = exportCode as any
     }
   }
 
-  return result as ExtractExports<TModule, TExportNames>
+  return result
 }
