@@ -14,15 +14,15 @@
   "devDependencies": {
     "@moluoxixi/components": "workspace:*",
     "@moluoxixi/utils": "workspace:*",
-    "storybook": "8.4.7",
-    "@storybook/addon-essentials": "8.4.7",
-    "@storybook/addon-interactions": "8.4.7",
-    "@storybook/addon-onboarding": "8.4.7",
-    "@storybook/addon-storysource": "^8.6.14",
-    "@storybook/blocks": "8.4.7",
-    "@storybook/test": "8.4.7",
-    "@storybook/vue3": "8.4.7",
-    "@storybook/vue3-vite": "8.4.7"
+    "storybook": "catalog:dev",
+    "@storybook/addon-essentials": "catalog:dev",
+    "@storybook/addon-interactions": "catalog:dev",
+    "@storybook/addon-onboarding": "catalog:dev",
+    "@storybook/addon-storysource": "catalog:dev",
+    "@storybook/blocks": "catalog:dev",
+    "@storybook/test": "catalog:dev",
+    "@storybook/vue3": "catalog:dev",
+    "@storybook/vue3-vite": "catalog:dev"
   },
   "dependencies": {
     "element-plus": "catalog:build"

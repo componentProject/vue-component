@@ -48,7 +48,6 @@ export default ViteConfig(
       //   },
       // },
       autoRoutes: {
-        eager: true,
         routeConfig: {
           componentExamples: {
             glob: [

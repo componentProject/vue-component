@@ -39,6 +39,8 @@ export interface BaseApiConfig extends BaseHttpClientConfig {
   }
   /** 是否启用 code === -1 的系统异常弹窗，默认为 true */
   enableSystemErrorDialog?: boolean
+  /** 系统错误消息提示文本，默认为 '系统错误' */
+  systemErrorMessage?: string
 }
 /**
  * Vue Axios 插件配置选项

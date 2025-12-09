@@ -24,6 +24,8 @@ export interface BuildConfigBase {
   useObfuscator: boolean
   /** 是否启用依赖排除,不启用时，仅排除核心依赖（vue模块，node模块） */
   useExternal: boolean
+  /** ES 模式下是否使用 rollup-plugin-external-globals 排除依赖（默认 false） */
+  esUseExternalGlobals?: boolean
   /** 控制是否排除重型插件 */
   excludeHeavyPlugins: boolean
   /** 需要项目预设的依赖 */
@@ -105,4 +107,9 @@ export interface BuildOptions extends Partial<BuildConfigBase> {
 }
 
 // 重新导出配置类型
-export type { ComponentFormatConfig, GlobalFormatConfig } from '../_utils/config.ts'
+export type {
+  ComponentFormatConfig,
+  ComponentFormatConfigWithFormat,
+  FormatConfig,
+  GlobalFormatConfig,
+} from '../_utils/config.ts'

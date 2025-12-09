@@ -1,8 +1,4 @@
-import type {
-  AxiosError,
-  AxiosResponse,
-  InternalAxiosRequestConfig,
-} from 'axios'
+import type { AxiosResponse } from 'axios'
 /*
  * @Author: moluoxixi 1983531544@qq.com
  * @Date: 2025-05-09 08:53:16
@@ -15,20 +11,11 @@ import type {
  */
 
 import type { BaseApiConfig, ExtendedAxiosRequestConfig, NotificationOptions } from './_types/index.ts'
+import { h } from 'vue'
 import { dynamicImports } from '../_utils/index.ts'
 import createApiDialog from '../ApiDialog/index.ts'
 import { extractSystemErrorInfo } from './_utils/systemErrorInfo.ts'
 import BaseHttpClient from './BaseHttpClient.ts'
-
-/**
- * 检查是否在浏览器环境
- */
-const hasDocument = typeof document !== 'undefined'
-
-/**
- * SystemErrorDialog 实例缓存
- */
-let systemErrorDialogInstance: ReturnType<typeof createApiDialog> | null = null
 
 /**
  * BaseApi 类
@@ -38,6 +25,144 @@ let systemErrorDialogInstance: ReturnType<typeof createApiDialog> | null = null
 export default class BaseApi extends BaseHttpClient {
   protected responseFields: Required<BaseApiConfig['responseFields']>
   protected enableSystemErrorDialog: boolean
+  protected systemErrorMessage: string
+
+  /**
+   * 检查是否在浏览器环境（在类初始化时判断）
+   * 注意：这是静态属性，所有实例共享
+   */
+  private static readonly hasDocument = typeof document !== 'undefined'
+
+  /**
+   * SystemErrorDialog 实例
+   * 注意：这是实例属性，每个实例有自己的对话框实例
+   * 在构造函数中初始化（如果启用系统错误弹窗）
+   */
+  private systemErrorDialogInstance: ReturnType<typeof createApiDialog> | null = null
+
+  /**
+   * SystemErrorDialog 初始化 Promise
+   * 用于跟踪初始化状态，避免重复初始化
+   */
+  private systemErrorDialogInitPromise: Promise<void> | null = null
+
+  /**
+   * 系统错误信息存储，用于在点击 icon 时打开详细错误弹窗
+   * key: 错误ID，value: 错误信息对象
+   * 注意：这是静态属性，所有实例共享同一个错误信息存储
+   */
+  private static systemErrorInfoMap = new Map<string, {
+    response: AxiosResponse
+    responseData: AxiosResponse['data']
+    code: number
+    message: string
+  }>()
+
+  /**
+   * 获取是否在浏览器环境（实例 getter）
+   * @returns 是否在浏览器环境
+   */
+  protected get hasDocument(): boolean {
+    return BaseApi.hasDocument
+  }
+
+  /**
+   * 获取系统错误信息存储（实例 getter）
+   * @returns 系统错误信息存储 Map
+   */
+  protected get systemErrorInfoMap(): Map<string, {
+    response: AxiosResponse
+    responseData: AxiosResponse['data']
+    code: number
+    message: string
+  }> {
+    return BaseApi.systemErrorInfoMap
+  }
+
+  /**
+   * 生成唯一错误ID（实例方法）
+   * @returns 唯一错误ID
+   */
+  protected generateErrorId(): string {
+    return `system_error_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+  }
+
+  /**
+   * 打开系统错误详细弹窗（实例方法）
+   * @param errorId - 错误ID
+   */
+  private async openSystemErrorDialog(errorId: string): Promise<void> {
+    const errorInfo = this.systemErrorInfoMap.get(errorId)
+    if (!errorInfo) {
+      console.warn('未找到错误信息，ID:', errorId)
+      return
+    }
+
+    // 清理已使用的错误信息
+    this.systemErrorInfoMap.delete(errorId)
+
+    // 显示系统错误弹窗
+    try {
+      // 如果对话框实例还未初始化，等待初始化完成
+      if (!this.systemErrorDialogInstance) {
+        // 如果正在初始化，等待初始化完成
+        if (this.systemErrorDialogInitPromise) {
+          try {
+            await this.systemErrorDialogInitPromise
+          }
+          catch {
+            // 初始化失败，直接返回
+            console.error('系统异常信息：', errorInfo.responseData)
+            return
+          }
+        }
+        else {
+          // 如果还没有开始初始化，立即初始化
+          try {
+            await this.initSystemErrorDialog()
+          }
+          catch {
+            // 初始化失败，直接返回
+            console.error('系统异常信息：', errorInfo.responseData)
+            return
+          }
+        }
+        // 如果初始化后仍然没有实例，直接返回
+        if (!this.systemErrorDialogInstance) {
+          console.error('系统异常信息：', errorInfo.responseData)
+          return
+        }
+      }
+
+      // 从 response 中提取必要的信息
+      const errorInfoData = extractSystemErrorInfo(
+        errorInfo.response,
+        errorInfo.code,
+        errorInfo.message,
+      )
+
+      this.systemErrorDialogInstance.show({
+        props: {
+          title: '系统异常信息',
+          width: 600,
+          ...errorInfoData,
+        },
+      }).then((result: any) => {
+        if (result?.reported) {
+          console.log('系统异常已上报:', result)
+        }
+        else {
+          console.log('系统异常对话框已确认')
+        }
+      }).catch((e: any) => {
+        console.log('系统异常对话框已关闭', e)
+      })
+    }
+    catch (error) {
+      console.error('显示系统异常对话框失败：', error)
+      console.error('系统异常信息：', errorInfo.responseData)
+    }
+  }
 
   /**
    * 创建 BaseApi 实例
@@ -48,6 +173,7 @@ export default class BaseApi extends BaseHttpClient {
     const {
       responseFields,
       enableSystemErrorDialog = true,
+      systemErrorMessage = '系统错误',
       ...baseConfig
     } = config
 
@@ -64,74 +190,30 @@ export default class BaseApi extends BaseHttpClient {
       ...responseFields,
     }
     this.enableSystemErrorDialog = enableSystemErrorDialog
+    this.systemErrorMessage = systemErrorMessage
+
+    // 初始化 SystemErrorDialog 实例（如果启用系统错误弹窗且在浏览器环境）
+    if (this.enableSystemErrorDialog && this.hasDocument) {
+      // 启动异步初始化，不阻塞构造函数
+      this.systemErrorDialogInitPromise = this.initSystemErrorDialog()
+    }
   }
 
   /**
-   * 处理请求配置，子类可重写此方法自定义请求配置
-   * 显式声明以确保类型一致性，避免打包后的类型不兼容问题
-   * @param config - 请求配置对象
-   * @returns 处理后的请求配置
+   * 初始化 SystemErrorDialog 实例
+   * 在构造函数中调用，提前加载对话框组件
+   * @returns Promise，初始化完成后 resolve
    */
-  processRequestConfig(config: InternalAxiosRequestConfig): InternalAxiosRequestConfig {
-    return super.processRequestConfig(config)
-  }
-
-  /**
-   * 处理响应配置，子类可重写此方法自定义响应处理
-   * 显式声明以确保类型一致性，避免打包后的类型不兼容问题
-   * @param response - Axios 响应对象
-   * @returns 解析后的响应数据
-   */
-  processResponseConfig(response: AxiosResponse): AxiosResponse['data'] {
-    return super.processResponseConfig(response)
-  }
-
-  /**
-   * 处理响应错误，子类可重写此方法自定义错误处理
-   * 显式声明以确保类型一致性，避免打包后的类型不兼容问题
-   * @param error - Axios 错误对象
-   * @returns 处理后的错误对象
-   */
-  async processResponseError(error: AxiosError): Promise<AxiosError> {
-    return super.processResponseError(error)
-  }
-
-  /**
-   * 处理 HTTP 状态码
-   * 重写父类方法，确保子类可以重写此方法
-   * @param response - Axios 响应对象
-   */
-  protected handleHttpStatus(response: AxiosResponse): void {
-    return super.handleHttpStatus(response)
-  }
-
-  /**
-   * 处理认证错误（401 - 未授权/登录失效）
-   * 重写父类方法，处理 HTTP 401 错误
-   * 子类可重写此方法来自定义 HTTP 认证错误处理逻辑
-   * @param error - Axios 错误对象
-   */
-  protected handleAuthenticationError(error: AxiosError): void {
-    // 调用父类处理 HTTP 401
-    super.handleAuthenticationError(error)
-  }
-
-  /**
-   * 处理超时错误
-   * 重写父类方法，确保子类可以重写此方法
-   * @param error - Axios 错误对象
-   */
-  protected handleTimeoutError(error: AxiosError): void {
-    return super.handleTimeoutError(error)
-  }
-
-  /**
-   * 处理网络错误（其他错误）
-   * 重写父类方法，确保子类可以重写此方法
-   * @param error - Axios 错误对象
-   */
-  protected handleNetworkError(error: AxiosError): void {
-    return super.handleNetworkError(error)
+  private async initSystemErrorDialog(): Promise<void> {
+    try {
+      const { default: SystemErrorDialog } = await dynamicImports(import('./SystemErrorDialog.ts'), ['default'] as const)
+      this.systemErrorDialogInstance = createApiDialog(SystemErrorDialog)
+    }
+    catch (error) {
+      console.warn('Failed to load SystemErrorDialog:', error)
+      // 初始化失败不影响其他功能，只是无法显示系统错误弹窗
+      throw error
+    }
   }
 
   /**
@@ -158,7 +240,7 @@ export default class BaseApi extends BaseHttpClient {
     // 如果配置了 isCustomMessage 为 true，则跳过业务错误、错误数组和提示的处理
     // 默认值为 false，即默认会执行这些处理
     if (!isCustomMessage) {
-      this.handleBusinessError(code, message, response)
+      this.handleBusinessError(code, message)
       this.handleErrorArray(httpData, response)
       this.handleTips(httpData, response)
     }
@@ -169,9 +251,9 @@ export default class BaseApi extends BaseHttpClient {
 
   /**
    * 支持路径解析的辅助函数
-   * @param obj
-   * @param path
-   * @protected
+   * @param obj - 要解析的对象
+   * @param path - 路径字符串，支持点号分隔的嵌套路径，如 'data.errors'
+   * @returns 解析后的值，如果路径不存在则返回 undefined
    */
   protected getValueByPath(obj: any, path: string | undefined): any {
     if (!path)
@@ -217,15 +299,91 @@ export default class BaseApi extends BaseHttpClient {
    */
   protected handleSystemError(response: AxiosResponse, code: any, message: any, responseData: any): void {
     if (code === -1) {
-      // 如果启用了系统异常弹窗，则显示弹窗
+      // 如果启用了系统异常弹窗，先显示错误消息，点击 icon 后再打开详细弹窗
       if (this.enableSystemErrorDialog) {
-        // 异步调用，不阻塞错误抛出
-        this.showSystemExceptionDialog(response, responseData, code, message).catch((error) => {
-          console.error('显示系统异常对话框失败：', error)
-        })
+        this.showSystemErrorMessage(response, responseData, code, message)
       }
       throw new Error(message || '系统异常')
     }
+  }
+
+  /**
+   * 显示系统错误消息（带可点击 icon）
+   * 使用 vNode 渲染，点击 icon 后打开详细错误弹窗
+   * @param response - Axios 响应对象
+   * @param responseData - 响应数据
+   * @param code - 错误状态码
+   * @param message - 错误消息
+   */
+  private showSystemErrorMessage(response: AxiosResponse, responseData: AxiosResponse['data'], code: number, message: string): void {
+    // 非浏览器环境，直接输出错误信息
+    if (!this.hasDocument) {
+      console.error('系统异常信息：', responseData)
+      return
+    }
+
+    // 生成唯一错误ID
+    const errorId = this.generateErrorId()
+
+    // 存储错误信息，供点击 icon 时使用
+    this.systemErrorInfoMap.set(errorId, {
+      response,
+      responseData,
+      code,
+      message,
+    })
+
+    // 设置清理定时器，5分钟后自动清理（避免内存泄漏）
+    setTimeout(() => {
+      this.systemErrorInfoMap.delete(errorId)
+    }, 5 * 60 * 1000)
+
+    // 创建点击 icon 的处理函数
+    const handleIconClick = () => {
+      this.openSystemErrorDialog(errorId).catch((error) => {
+        console.error('打开系统错误对话框失败：', error)
+      })
+    }
+
+    // 使用 vNode 创建消息内容
+    const messageVNode = h('div', {
+      style: {
+        display: 'flex',
+        alignItems: 'center',
+        gap: '8px',
+        maxWidth: '100%',
+      },
+    }, [
+      h('div', {
+        style: {
+          color: 'var(--el-message-text-color)',
+          lineHeight: '24px',
+        },
+      }, message || this.systemErrorMessage),
+      h('svg', {
+        onClick: handleIconClick,
+        style: {
+          cursor: 'pointer',
+          color: '#F56C6C',
+          width: '16px',
+          height: '16px',
+          flexShrink: 0,
+        },
+        viewBox: '0 0 1024 1024',
+        fill: 'currentColor',
+        xmlns: 'http://www.w3.org/2000/svg',
+      }, [
+        h('path', {
+          d: 'M512 64C264.6 64 64 264.6 64 512s200.6 448 448 448 448-200.6 448-448S759.4 64 512 64zm32 664c0 4.4-3.6 8-8 8h-48c-4.4 0-8-3.6-8-8V456c0-4.4 3.6-8 8-8h48c4.4 0 8 3.6 8 8v272zm-32-344a48.01 48.01 0 0 1 0-96 48.01 48.01 0 0 1 0 96z',
+        }),
+      ]),
+    ])
+
+    // 显示错误消息（使用 vNode）
+    this.messageInstance?.error({
+      message: messageVNode as any,
+      duration: 5 * 1000,
+    })
   }
 
   /**
@@ -247,8 +405,8 @@ export default class BaseApi extends BaseHttpClient {
   /**
    * 处理错误数组 errors（如果有配置）
    * 子类可重写此方法来自定义错误数组处理逻辑
-   * @param httpData
-   * @param response
+   * @param httpData - HTTP 响应数据
+   * @param response - Axios 响应对象
    */
   protected handleErrorArray(httpData: any, response: AxiosResponse): void {
     const errorsField = this.responseFields?.errors
@@ -264,22 +422,27 @@ export default class BaseApi extends BaseHttpClient {
   }
 
   /**
-   * 显示错误数组通知
-   * 子类可重写此方法来自定义错误数组通知显示方式
-   * @param errors - 错误数组
-   * @param notificationOptions
+   * 显示通知的通用方法
+   * @param items - 通知项数组
+   * @param type - 通知类型
+   * @param color - HTML 颜色
+   * @param notificationOptions - 通知配置选项
    */
-  protected showErrorArrayNotification(errors: Array<{ code: string, message: string }>, notificationOptions?: NotificationOptions): void {
-    const html = errors
-      .map((item: any) => `<div style="font-size: 14px;color:red">${item.code}：${item.message}</div>`)
-      .join('')
-
+  private showNotification(
+    items: Array<{ code: string, message: string }>,
+    type: 'error' | 'warning',
+    color: string,
+    notificationOptions?: NotificationOptions,
+  ): void {
     const defaultOptions: NotificationOptions = {
       title: '提示',
-      type: 'error',
+      type,
     }
 
-    if (hasDocument) {
+    if (this.hasDocument) {
+      const html = items
+        .map((item: any) => `<div style="font-size: 14px;color:${color}">${item.code}：${item.message}</div>`)
+        .join('')
       const finalOptions: NotificationOptions = {
         ...defaultOptions,
         ...notificationOptions,
@@ -288,21 +451,31 @@ export default class BaseApi extends BaseHttpClient {
       this.notificationInstance?.(finalOptions as any)
     }
     else {
-      const errorMessages = errors.map((item: any) => `${item.code}：${item.message}`).join('\n')
+      const messages = items.map((item: any) => `${item.code}：${item.message}`).join('\n')
       const finalOptions: NotificationOptions = {
         ...defaultOptions,
         ...notificationOptions,
-        message: errorMessages,
+        message: messages,
       }
       this.notificationInstance?.(finalOptions as any)
     }
   }
 
   /**
+   * 显示错误数组通知
+   * 子类可重写此方法来自定义错误数组通知显示方式
+   * @param errors - 错误数组
+   * @param notificationOptions - 通知配置选项
+   */
+  protected showErrorArrayNotification(errors: Array<{ code: string, message: string }>, notificationOptions?: NotificationOptions): void {
+    this.showNotification(errors, 'error', 'red', notificationOptions)
+  }
+
+  /**
    * 处理提示信息 tips（如果有配置）
    * 子类可重写此方法来自定义提示信息处理逻辑
-   * @param httpData
-   * @param response
+   * @param httpData - HTTP 响应数据
+   * @param response - Axios 响应对象
    */
   protected handleTips(httpData: any, response: AxiosResponse): void {
     const tipsField = this.responseFields?.tips
@@ -320,122 +493,10 @@ export default class BaseApi extends BaseHttpClient {
    * 显示提示信息通知
    * 子类可重写此方法来自定义提示信息通知显示方式
    * @param tips - 提示信息数组
-   * @param notificationOptions
+   * @param notificationOptions - 通知配置选项
    */
   protected showTipsNotification(tips: Array<{ code: string, message: string }>, notificationOptions?: NotificationOptions): void {
-    const html = tips
-      .map((item: any) => `<div style="font-size: 14px;color:#E6A23C">${item.code}：${item.message}</div>`)
-      .join('')
-
-    const defaultOptions: NotificationOptions = {
-      title: '提示',
-      type: 'warning',
-    }
-
-    if (hasDocument) {
-      const finalOptions: NotificationOptions = {
-        ...defaultOptions,
-        ...notificationOptions,
-        message: html,
-      }
-      this.notificationInstance?.(finalOptions as any)
-    }
-    else {
-      const tipMessages = tips.map((item: any) => `${item.code}：${item.message}`).join('\n')
-      const finalOptions: NotificationOptions = {
-        ...defaultOptions,
-        ...notificationOptions,
-        message: tipMessages,
-      }
-      this.notificationInstance?.(finalOptions as any)
-    }
-  }
-
-  /**
-   * 显示系统异常对话框，当响应状态码为 -1 时调用
-   * @param response - Axios 响应对象
-   * @param responseData - 响应数据
-   * @param code - 错误状态码
-   * @param message - 错误消息
-   */
-  private async showSystemExceptionDialog(response: AxiosResponse, responseData: AxiosResponse['data'], code: number, message: string): Promise<void> {
-    // 非浏览器环境，直接输出错误信息
-    if (!hasDocument) {
-      console.error('系统异常信息：', responseData)
-      return
-    }
-
-    try {
-      // 动态加载 SystemErrorDialog 模块（仅在浏览器环境中）
-      if (!systemErrorDialogInstance) {
-        try {
-          const { default: SystemErrorDialog } = await dynamicImports(import('./SystemErrorDialog.ts'), ['default'] as const)
-          systemErrorDialogInstance = createApiDialog(SystemErrorDialog)
-        }
-        catch (error) {
-          console.warn('Failed to load SystemErrorDialog:', error)
-          console.error('系统异常信息：', responseData)
-          return
-        }
-      }
-
-      // 从 response 中提取必要的信息，避免传递大对象
-      const errorInfo = extractSystemErrorInfo(response, code, message)
-
-      systemErrorDialogInstance.show({
-        props: {
-          title: '系统异常信息',
-          width: 600,
-          ...errorInfo,
-        },
-      }).then((result: any) => {
-        if (result?.reported) {
-          console.log('系统异常已上报:', result)
-          // 这里可以添加实际的错误上报逻辑
-          // 例如：发送错误信息到服务器
-          this.reportError(result.errorInfo)
-        }
-        else {
-          console.log('系统异常对话框已确认')
-        }
-      }).catch((e: any) => {
-        console.log('系统异常对话框已关闭', e)
-      })
-    }
-    catch (error) {
-      console.error('显示系统异常对话框失败：', error)
-      console.error('系统异常信息：', responseData)
-    }
-  }
-
-  /**
-   * 上报错误信息到服务器，默认实现仅显示提示，子类可重写实现真实上报
-   * @param errorInfo - 错误信息对象
-   */
-  protected async reportError(errorInfo: any): Promise<void> {
-    try {
-      console.log('🚀 开始上报错误信息:', errorInfo)
-
-      // 这里可以实现实际的错误上报逻辑
-      // 例如：调用错误上报接口
-      // await this.post('/api/error/report', errorInfo)
-
-      // 临时使用 console 输出，实际项目中应该调用真实的上报接口
-      console.log('✅ 错误信息上报成功')
-
-      this.messageInstance?.success({
-        message: '错误信息已成功上报',
-        duration: 3 * 1000,
-      })
-    }
-    catch (error) {
-      console.error('❌ 错误信息上报失败:', error)
-
-      this.messageInstance?.error({
-        message: '错误信息上报失败，请稍后重试',
-        duration: 5 * 1000,
-      })
-    }
+    this.showNotification(tips, 'warning', '#E6A23C', notificationOptions)
   }
 
   /**

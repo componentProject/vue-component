@@ -22,13 +22,20 @@ import { dynamicImport, dynamicImports } from '@moluoxixi/utils/_utils/index.ts'
 import { build, mergeConfig } from 'vite'
 import { getFlagValue, hasFlag, parseBoolean, printUsage } from './_utils/cli.ts'
 import { clearDir, findComponentEntry, getComponentNames, sleep, toKebabCase, toPascalCase } from './_utils/component.ts'
-import { getComponentFormats } from './_utils/config.ts'
+import { getComponentFormats, getComponentIsNodeEnv } from './_utils/config.ts'
 import { analyzeComponentDeps } from './_utils/deps.ts'
 import { getCurrentVersions, getNextVersion, writeComponentVersions } from './_utils/version.ts'
 import { createBaseConfig } from './_utils/viteConfig.ts'
 
 // 重新导出类型
-export type { BuildOptions, ComponentFormatConfig, GlobalFormatConfig, ViteConfigType } from './_types/index.ts'
+export type {
+  BuildOptions,
+  ComponentFormatConfig,
+  ComponentFormatConfigWithFormat,
+  FormatConfig,
+  GlobalFormatConfig,
+  ViteConfigType,
+} from './_types/index.ts'
 
 //#region CLI 运行器
 /**
@@ -128,6 +135,20 @@ async function bundleComponentModule(ctx: BuildContext, {
 }: BundleComponentModuleOptions) {
   const rollupPlugins: Plugin[] = []
   const plugins = []
+
+  // ES 模式下，如果启用了 esUseExternalGlobals，使用 rollup-plugin-external-globals
+  if (format === 'es' && ctx.esUseExternalGlobals) {
+    try {
+      const externalGlobalsModule = await dynamicImport(import('rollup-plugin-external-globals'))
+      // 处理默认导出或命名导出
+      const externalGlobals = (externalGlobalsModule?.default || externalGlobalsModule) as (options: Record<string, string>) => Plugin
+      rollupPlugins.push(externalGlobals(globals))
+    }
+    catch (error) {
+      console.warn('Failed to load rollup-plugin-external-globals:', error)
+      console.warn('Please install rollup-plugin-external-globals: npm install -D rollup-plugin-external-globals')
+    }
+  }
   if (ctx.useObfuscator) {
     const { obfuscator } = await dynamicImports(import('rollup-obfuscator'), ['obfuscator'] as const)
     rollupPlugins.push(obfuscator() as Plugin)
@@ -191,8 +212,7 @@ async function bundleComponentModule(ctx: BuildContext, {
           // 排除外部依赖
           // Node 环境下强制启用依赖排除，浏览器环境根据 useExternal 配置
           // 检查组件配置中的 isNodeEnv，或者全局 isNodeEnv
-          const componentConfig = ctx.formatConfig?.componentFormats?.[comp]
-          const isNodeEnv = componentConfig?.isNodeEnv ?? (ctx.formatConfig?.isNodeEnv ?? false)
+          const isNodeEnv = getComponentIsNodeEnv(ctx.formatConfig, comp)
           const isExternal = isNodeEnv || ctx.useExternal
           if (isExternal && Object.keys(dependencies.external).some(i => id.includes(i))) {
             return true
@@ -203,7 +223,9 @@ async function bundleComponentModule(ctx: BuildContext, {
           preserveModulesRoot: resolve(ctx.packDir, `.${ctx.entryBaseUrl}${comp}`),
           entryFileNames,
           chunkFileNames,
-          globals,
+          // ES 模式下 globals 无效，不需要配置
+          // 如果启用了 esUseExternalGlobals，则使用 rollup-plugin-external-globals 处理
+          ...(format !== 'es' ? { globals } : {}),
           ...(exportsType ? { exports: exportsType } : {}),
           // 禁用手动分块，避免文件拆分
           manualChunks: !skipManualChunks && ((id: string) => {
@@ -696,6 +718,7 @@ export async function buildComponentsWithOptions(options: BuildOptions): Promise
     preserveModules = false,
     useObfuscator = false,
     useExternal = false,
+    esUseExternalGlobals = false,
     entryBaseUrl: ebu = '/',
     presetGlobals: _presetGlobals,
     ...rest
@@ -723,6 +746,7 @@ export async function buildComponentsWithOptions(options: BuildOptions): Promise
     preserveModules,
     useObfuscator,
     useExternal,
+    esUseExternalGlobals,
     excludeHeavyPlugins,
     presetGlobals,
     peerDepList,
