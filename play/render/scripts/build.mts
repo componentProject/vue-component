@@ -1,9 +1,9 @@
-// build.mjs文件
 import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import compressing from 'compressing'
 import { resolveConfig } from 'vite'
+
 // 获取当前模块的文件名
 const __filename = fileURLToPath(import.meta.url)
 
@@ -18,8 +18,10 @@ const renameDir = buildoutputDir
 uploadWeb().then(r => console.log(r))
 
 async function uploadWeb() {
-  const renamePath = path.resolve(__dirname, `../${renameDir}.zip`)
-  const form = path.resolve(__dirname, `../${buildoutputDir}`)
+  // 使用 path.join 和 path.resolve 确保跨平台兼容性（支持 Linux 和 Windows）
+  const rootDir = path.resolve(__dirname, '..')
+  const renamePath = path.resolve(rootDir, `${renameDir}.zip`)
+  const form = path.resolve(rootDir, buildoutputDir)
   try {
     // let ip = '192.168.208.18';
     // 服务器前端静态资源存储路径
