@@ -81,7 +81,8 @@ export default defineComponent({
       const localUserInfo = getUserInfoFromLocalStorage()
       return {
         userName: localUserInfo.username ?? props.userName,
-        userId: localUserInfo.id ?? props.userId,
+        // userId: localUserInfo.id ?? props.userId,
+        userId: localUserInfo.usercode ?? props.userId,
         deptName: localUserInfo.workDeptName ?? props.deptName,
         deptId: localUserInfo.workDeptId ?? props.deptId,
         clientIp: localUserInfo.loginip ?? props.clientIp,
@@ -193,6 +194,7 @@ export default defineComponent({
           'showClose': true,
           'closeOnClickModal': false,
           'closeOnPressEscape': false,
+          'zIndex': 99999999,
           'style': { padding: '16px 0' },
           'onUpdate:modelValue': handleModelValueChange,
         },

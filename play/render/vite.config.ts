@@ -73,50 +73,6 @@ export default ViteConfig(
           outDir: '../../dist',
         },
         plugins: [],
-        server: {
-          proxy: {
-            // '/ts-bs-his-base': {
-            //   target: `${viteEnv.VITE_PROXY_URL}`,
-            //   secure: false,
-            //   changeOrigin: true,
-            //   configure: (proxy: any) => {
-            //     const encryptedList = ['appId', 'randomStr', 'timestamp', 'version', 'sign']
-            //     proxy.on('proxyReq', (proxyReq: any, req: any) => {
-            //       encryptedList.forEach((item) => {
-            //         proxyReq.setHeader(item, req.headers[item.toLocaleLowerCase()] || req.headers[item])
-            //       })
-            //     })
-            //   },
-            // },
-            '/ompBase': {
-              changeOrigin: true,
-              target: 'http://192.168.209.103:9099',
-            },
-            '/ts-bs-his-base': {
-              changeOrigin: true,
-              target: 'http://192.168.208.26:9099',
-            },
-            '/ts-cache': {
-              changeOrigin: true,
-              target: 'http://192.168.209.103:9099',
-            },
-            '/ts-fm': {
-              changeOrigin: true,
-              target: 'http://192.168.209.103:9099',
-            },
-            '/ai-application': {
-              // target: 'http://192.168.31.46:19061',
-              target: 'http://192.168.209.101:19061',
-              // target: 'http://192.168.31.218:19061',
-              changeOrigin: true,
-            },
-            '/sso': {
-              // target: 'http://192.168.211.135:8080',
-              target: 'http://192.168.209.103:9099',
-              changeOrigin: true,
-            },
-          },
-        },
         css: {
           postcss: {
             plugins: [

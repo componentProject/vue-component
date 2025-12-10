@@ -158,7 +158,7 @@ export default class BaseApi extends BaseHttpClient {
     // 如果配置了 isCustomMessage 为 true，则跳过业务错误、错误数组和提示的处理
     // 默认值为 false，即默认会执行这些处理
     if (!isCustomMessage) {
-      this.handleBusinessError(code, message, response)
+      this.handleBusinessError(code, message)
       this.handleErrorArray(httpData, response)
       this.handleTips(httpData, response)
     }

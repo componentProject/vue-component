@@ -1,11 +1,11 @@
 /**
  * 通用常量定义
  */
-export const COMPONENT_SETTING_TYPE = 'Vue3'
+export const COMPONENT_SETTING_TYPE = 'vue3Test'
 /**
  * 通用常量定义
  */
-export const COMPONENT_VUE2_SETTING_TYPE = 'Vue2'
+export const COMPONENT_VUE2_SETTING_TYPE = 'vue2Test'
 /**
  * 通用常量定义
  */

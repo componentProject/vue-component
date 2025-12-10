@@ -551,7 +551,7 @@ async function buildComponent(
 
           // 发布组件
           const packageDir = comp ? `${ctx.LIB_NAMESPACE}/packages/${comp}` : ctx.LIB_NAMESPACE
-          execSync(`cd ${packageDir} && npm publish --tag beta`, { stdio: 'inherit' })
+          execSync(`cd ${packageDir} && npm publish --tag ${ctx.uploadType?.includes('Test') ? 'beta' : 'latest'}`, { stdio: 'inherit' })
           console.log(`${pkgJson.name}@${pkgJson.version} 发布成功！`)
         }
         catch (error) {
