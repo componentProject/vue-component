@@ -17,7 +17,7 @@
     "@element-plus/icons-vue": "catalog:build",
     "@moluoxixi/constant": "workspace:*",
     "@moluoxixi/utils": "workspace:*",
-    "@vueuse/core": "^11.0.0",
+    "@vueuse/core": "catalog:build",
     "axios": "catalog:build",
     "element-plus": "catalog:build",
     "lodash-es": "catalog:build",
@@ -29,7 +29,7 @@
     "sass-embedded": "catalog:dev",
     "sass-loader": "catalog:dev",
     "tailwindcss": "catalog:dev",
-    "tsx": "^4.20.5",
+    "tsx": "catalog:dev",
     "typescript": "catalog:dev",
     "vite": "catalog:dev"
   },

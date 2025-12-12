@@ -30,49 +30,44 @@ runBuildCliAndExit(
 
 ### 配置打包格式
 
-#### 全局配置
+#### 新格式（推荐）
+
+新格式更加简洁直观，使用 `format` 字段和组件名作为键：
 
 ```typescript
 import { runBuildCliAndExit } from '@moluoxixi/utils/ViteBuild'
 import type { GlobalFormatConfig } from '@moluoxixi/utils/ViteBuild'
 
 const formatConfig: GlobalFormatConfig = {
-  // 指定环境（可选，默认为 false，即浏览器环境）
-  // 方式1：全局指定 isNodeEnv
-  // isNodeEnv: true, // 或 false，或不指定（默认 false）
+  // 全局环境配置（可选，默认为 false，即浏览器环境）
+  isNodeEnv: false,
 
-  // Node 环境下的打包格式配置（可选，默认值为 { cjs: true }）
-  // 配置会与默认值合并，未指定的格式保持默认值
-  nodeFormats: {
-    // cjs: true 是默认值，无需显式指定
-    // 如需添加其他格式，可在此配置，例如：
-    // es: true,   // 在默认 CJS 基础上添加 ES 模块
+  // 全局格式配置（可选）
+  // 根据 isNodeEnv 自动决定默认值：
+  // - Node 环境默认：{ cjs: true }
+  // - 浏览器环境默认：{ es: true }
+  format: {
+    es: true,  // 浏览器环境默认值
+    umd: true, // 添加 UMD 格式
   },
 
-  // 浏览器环境下的打包格式配置（可选，默认值为 { es: true }）
-  // 配置会与默认值合并，未指定的格式保持默认值
-  browserFormats: {
-    // es: true 是默认值，无需显式指定
-    umd: true,   // 在默认 ES 基础上添加 UMD 模块
-  },
-
-  // 单个组件的格式配置覆盖（可选）
-  // 组件配置会与对应环境的默认值和全局配置合并
-  componentFormats: {
-    // 针对特定组件的配置
-    'CardReader': {
-      // 浏览器环境默认有 es: true，这里添加 cjs: true
-      cjs: true,  // 在默认 ES 基础上添加 CJS 格式
-    },
-    'AIAgent': {
-      // 浏览器环境默认有 es: true，这里添加 umd 和 iife
+  // 组件级配置（组件名作为键）
+  'ViteBuild': {
+    isNodeEnv: true, // 指定为 Node 环境
+    format: {
+      es: true,
       umd: true,
-      iife: true, // 在默认 ES 基础上添加 IIFE 格式
     },
-    // 方式2：为特定组件指定 Node 环境（优先级高于全局 isNodeEnv）
-    'ViteBuild': {
-      isNodeEnv: true, // 指定为 Node 环境
-      // nodeFormats 默认为 { cjs: true }，如需覆盖可在此配置
+  },
+  'ViteConfig': {
+    isNodeEnv: true, // 指定为 Node 环境
+    // 如果不指定 format，使用 Node 环境默认值 { cjs: true }
+  },
+  'CardReader': {
+    // 不指定 isNodeEnv，使用全局 isNodeEnv（浏览器环境）
+    format: {
+      es: true, // 浏览器环境默认值
+      cjs: true, // 添加 CJS 格式
     },
   },
 }
@@ -89,12 +84,16 @@ runBuildCliAndExit(
 )
 ```
 
+#### 兼容旧格式
+
+为了向后兼容，系统仍然支持旧格式（`nodeFormats`、`browserFormats`、`componentFormats`），但建议使用新格式。
+
 #### 默认行为
 
 如果不提供 `formatConfig`，系统会使用以下默认配置：
 
-- **Node 环境**：只打包 CJS 格式
-- **浏览器环境**：打包 ES 和 UMD 格式
+- **Node 环境默认格式**：`{ cjs: true }` - 只打包 CJS 格式
+- **浏览器环境默认格式**：`{ es: true }` - 只打包 ES 格式
 
 ### 工具函数分类
 
@@ -116,54 +115,60 @@ runBuildCliAndExit(
 
 ### GlobalFormatConfig
 
-全局格式配置接口：
+全局格式配置接口（新格式）：
 
 ```typescript
 interface GlobalFormatConfig {
   /** 是否为 Node 环境（可选，默认为 false，即浏览器环境） */
   isNodeEnv?: boolean
-  /** Node 环境下的打包格式配置 */
-  nodeFormats?: ComponentFormatConfig
-  /** 浏览器环境下的打包格式配置 */
-  browserFormats?: ComponentFormatConfig
-  /** 单个组件的格式配置覆盖（组件名 -> 格式配置） */
-  componentFormats?: Record<string, ComponentFormatConfig>
+  /** 全局格式配置 */
+  format?: FormatConfig
+  /**
+   * 组件级配置（组件名 -> 配置）
+   * 可以是 ComponentFormatConfig（兼容旧格式）或 ComponentFormatConfigWithFormat（新格式）
+   */
+  [componentName: string]: FormatConfig | ComponentFormatConfig | ComponentFormatConfigWithFormat | boolean | undefined
 }
 ```
 
-### ComponentFormatConfig
+### FormatConfig
 
-组件格式配置接口（可在 `componentFormats` 中使用）：
+格式配置接口（不包含环境信息）：
 
 ```typescript
-interface ComponentFormatConfig {
-  /** 是否为 Node 环境（可选，用于在 componentFormats 中指定单个组件的环境，优先级高于全局 isNodeEnv） */
+interface FormatConfig {
+  /** 是否打包 ES 模块格式 */
+  es?: boolean
+  /** 是否打包 CJS 模块格式 */
+  cjs?: boolean
+  /** 是否打包 UMD 模块格式 */
+  umd?: boolean
+  /** 是否打包 IIFE 模块格式 */
+  iife?: boolean
+}
+```
+
+### ComponentFormatConfigWithFormat
+
+组件格式配置接口（新格式）：
+
+```typescript
+interface ComponentFormatConfigWithFormat {
+  /** 是否为 Node 环境 */
   isNodeEnv?: boolean
-  /** 是否打包 ES 模块格式 */
-  es?: boolean
-  /** 是否打包 CJS 模块格式 */
-  cjs?: boolean
-  /** 是否打包 UMD 模块格式 */
-  umd?: boolean
-  /** 是否打包 IIFE 模块格式 */
-  iife?: boolean
+  /** 格式配置 */
+  format?: FormatConfig
 }
 ```
 
 ### ComponentFormatConfig
 
-组件格式配置接口：
+组件格式配置接口（兼容旧格式）：
 
 ```typescript
-interface ComponentFormatConfig {
-  /** 是否打包 ES 模块格式 */
-  es?: boolean
-  /** 是否打包 CJS 模块格式 */
-  cjs?: boolean
-  /** 是否打包 UMD 模块格式 */
-  umd?: boolean
-  /** 是否打包 IIFE 模块格式 */
-  iife?: boolean
+interface ComponentFormatConfig extends FormatConfig {
+  /** 是否为 Node 环境（可选，用于在组件配置中指定单个组件的环境） */
+  isNodeEnv?: boolean
 }
 ```
 
@@ -187,68 +192,75 @@ runBuildCliAndExit(
 ```typescript
 const formatConfig: GlobalFormatConfig = {
   isNodeEnv: true,
-  // nodeFormats 默认为 { cjs: true }，无需配置
+  // format 不指定时，Node 环境默认使用 { cjs: true }
 }
 ```
 
-### 示例 2.1：指定特定组件使用 Node 环境
+### 示例 2.1：指定特定组件使用 Node 环境（新格式）
 
 ```typescript
 const formatConfig: GlobalFormatConfig = {
-  // 默认浏览器环境，通过 componentFormats 为特定组件指定 Node 环境
-  componentFormats: {
-    'ViteBuild': {
-      isNodeEnv: true, // 指定为 Node 环境
-      // nodeFormats 默认为 { cjs: true }，如需覆盖可在此配置
-    },
-    'ViteConfig': {
-      isNodeEnv: true, // 指定为 Node 环境
-    },
-    'EslintConfig': {
-      isNodeEnv: true, // 指定为 Node 环境
+  // 默认浏览器环境
+  format: {
+    es: true,
+    umd: true,
+  },
+  // 特定组件使用 Node 环境
+  'ViteBuild': {
+    isNodeEnv: true, // 指定为 Node 环境
+    format: {
+      es: true,
     },
   },
-  // 这些组件会使用 nodeFormats 配置（默认 { cjs: true }）
-  // 其他组件使用 browserFormats 配置（默认 { es: true }）
+  'ViteConfig': {
+    isNodeEnv: true, // 指定为 Node 环境
+    // 不指定 format，使用 Node 环境默认值 { cjs: true }
+  },
+  'EslintConfig': {
+    isNodeEnv: true, // 指定为 Node 环境
+  },
 }
 ```
 
-### 示例 3：浏览器环境打 ES 和 UMD（在默认值基础上添加）
+### 示例 3：浏览器环境打 ES 和 UMD（新格式）
 
 ```typescript
 const formatConfig: GlobalFormatConfig = {
   // isNodeEnv 默认为 false（浏览器环境），可省略
-  browserFormats: {
-    // es: true 是默认值，无需显式指定
-    umd: true, // 在默认 ES 基础上添加 UMD
+  format: {
+    es: true,  // 浏览器环境默认值
+    umd: true, // 添加 UMD 格式
   },
 }
 ```
 
-### 示例 4：Node 环境打 CJS 和 ES（在默认值基础上添加）
+### 示例 4：Node 环境打 CJS 和 ES（新格式）
 
 ```typescript
 const formatConfig: GlobalFormatConfig = {
   isNodeEnv: true,
-  nodeFormats: {
-    // cjs: true 是默认值，无需显式指定
-    es: true, // 在默认 CJS 基础上添加 ES
+  format: {
+    cjs: true, // Node 环境默认值
+    es: true,  // 添加 ES 格式
   },
 }
 ```
 
-### 示例 5：特定组件特殊配置（合并默认值和全局配置）
+### 示例 5：特定组件特殊配置（新格式）
 
 ```typescript
 const formatConfig: GlobalFormatConfig = {
-  isNodeEnv: false,
-  browserFormats: {
-    umd: true, // 全局：ES（默认）+ UMD
+  // 全局配置：浏览器环境，ES + UMD
+  format: {
+    es: true,
+    umd: true,
   },
-  componentFormats: {
-    // 这个组件在浏览器环境打 ES（默认）+ UMD（全局）+ CJS（组件特有）
-    'ViteConfig': {
-      cjs: true, // 在默认 ES 和全局 UMD 基础上添加 CJS
+  // 特定组件添加 CJS 格式
+  'ViteConfig': {
+    format: {
+      es: true,  // 继承全局配置
+      umd: true, // 继承全局配置
+      cjs: true, // 组件特有
     },
   },
 }
@@ -261,19 +273,53 @@ const formatConfig: GlobalFormatConfig = {
 
 ## 配置合并规则
 
-1. **默认值** → **全局配置** → **组件配置**（后面的配置会合并覆盖前面的配置）
-2. 如果某个格式在配置中未指定，则使用默认值或上一级配置的值
-3. 配置是**合并**而非**替换**，例如：
-   - 默认值：`{ cjs: true }`
-   - 全局配置：`{ es: true }`
-   - 最终结果：`{ cjs: true, es: true }`（合并）
+1. **环境判断优先级**：
+   - 组件配置中的 `isNodeEnv`（最高优先级）
+   - 全局 `isNodeEnv`
+   - 默认 `false`（浏览器环境）
+
+2. **格式配置合并**：
+   - 根据环境选择默认值（Node: `{ cjs: true }`，浏览器: `{ es: true }`）
+   - 全局 `format` 配置会与默认值合并
+   - 组件 `format` 配置会与全局配置和默认值合并
+   - 配置是**合并**而非**替换**
+
+3. **示例**：
+   ```typescript
+   // 全局配置
+   {
+     isNodeEnv: false,
+     format: { es: true, umd: true }
+   }
+   // 组件配置
+   {
+     'Component': {
+       format: { cjs: true }
+     }
+   }
+   // 最终结果：{ es: true, umd: true, cjs: true }
+   ```
 
 ## 注意事项
 
 1. **`formatConfig` 和 `isNodeEnv` 都是可选的**：
    - 如果不提供 `formatConfig`，默认使用浏览器环境，打包 ES 格式
    - 如果提供 `formatConfig` 但不指定 `isNodeEnv`，默认为 `false`（浏览器环境）
-2. `nodeFormats` 和 `browserFormats` 有默认值，只需配置需要添加或覆盖的格式
-3. 组件特定配置会与全局配置和默认值合并
-4. package.json 的 `exports` 字段会根据实际打包的格式自动生成
+
+2. **格式默认值**：
+   - Node 环境默认：`{ cjs: true }`
+   - 浏览器环境默认：`{ es: true }`
+   - 如果指定了 `format`，会与默认值合并
+
+3. **组件配置**：
+   - 组件配置直接在顶层，使用组件名作为键
+   - 可以只指定 `isNodeEnv`，使用环境默认格式
+   - 可以指定 `format`，与全局配置和默认值合并
+
+4. **向后兼容**：
+   - 系统仍然支持旧格式（`nodeFormats`、`browserFormats`、`componentFormats`）
+   - 建议使用新格式，更简洁直观
+
+5. **package.json**：
+   - `exports` 字段会根据实际打包的格式自动生成
 

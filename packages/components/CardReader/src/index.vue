@@ -151,17 +151,20 @@ const currentSelectedLabel = computed(() => {
 })
 /** HTTP 服务实例 */
 const httpService = new BaseApi({
-  baseURL: 'http://localhost:26784',
+  baseURL: '/mini-portal',
   responseFields: {
     code: 'statusCode',
     message: 'message',
     data: 'rows',
   },
+  headers: {
+    'Content-Type': 'application/json; charset=utf-8',
+  },
 })
 
 /** HTTP 服务实例 */
 const readService = new BaseApi({
-  baseURL: 'http://localhost:26784',
+  baseURL: 'http://localhost:26784/commonSdk',
   timeout: 500000,
   responseFields: {
     code: 'statusCode',
@@ -205,7 +208,7 @@ async function getSystemInfo() {
 
   try {
     const result = await httpService.get<cardReaderSystemType[]>(
-      '/mini-portal/dict/page/detail',
+      '/dict/page/detail',
       params,
     )
     // 取 rows 中的第一个对象
@@ -229,7 +232,7 @@ async function getHardwareClassList() {
 
   try {
     const result = await httpService.get<cardReaderHardwareClassType[]>(
-      '/mini-portal/dict/page/detail',
+      '/dict/page/detail',
       params,
     )
     hardwareClassList.value = (result || [])
@@ -251,7 +254,7 @@ async function getFunNameList() {
 
   try {
     const result = await httpService.get<cardReaderHardwareClassType[]>(
-      '/mini-portal/dict/page/detail',
+      '/dict/page/detail',
       params,
     )
     funNameList.value = (result || [])
@@ -279,7 +282,7 @@ async function getPluginList(osType: string, pluginType: string) {
   try {
     // pluginList.value = result || []
     return await httpService.get<cardReaderPluginType[]>(
-      '/mini-portal/plugin',
+      '/plugin',
       params,
     )
   }
@@ -313,7 +316,7 @@ async function getCallCommonSdk(osType: string, pluginType: string, funName: str
   // 先调用 /commonSdk/device/active 接口，入参为 pluginType
   let activeDevice: { alias?: string } | null = null
   try {
-    activeDevice = await readService.get<{ alias?: string }>('/commonSdk/device/active', { pluginType })
+    activeDevice = await readService.get<{ alias?: string }>('/device/active', { pluginType })
   }
   catch (error) {
     console.error('调用 /commonSdk/device/active 失败:', error)
@@ -370,7 +373,7 @@ async function callCommonSdk(plugin: cardReaderPluginType, pluginType: string, f
   }
 
   try {
-    return await readService.post('/commonSdk/index', params)
+    return await readService.post('/index', params)
   }
   catch (error) {
     console.error('调用 CommonSdk 失败:', error)

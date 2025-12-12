@@ -9,11 +9,9 @@ import type { BuildContext } from '../_types/index.ts'
 export type ModuleFormat = 'es' | 'cjs' | 'umd' | 'iife'
 
 /**
- * 组件打包格式配置
+ * 格式配置（不包含环境信息）
  */
-export interface ComponentFormatConfig {
-  /** 是否为 Node 环境（可选，用于在 componentFormats 中指定单个组件的环境） */
-  isNodeEnv?: boolean
+export interface FormatConfig {
   /** 是否打包 ES 模块格式 */
   es?: boolean
   /** 是否打包 CJS 模块格式 */
@@ -25,27 +23,56 @@ export interface ComponentFormatConfig {
 }
 
 /**
+ * 组件打包格式配置（兼容旧版本，包含环境信息）
+ */
+export interface ComponentFormatConfig extends FormatConfig {
+  /** 是否为 Node 环境（可选，用于在组件配置中指定单个组件的环境） */
+  isNodeEnv?: boolean
+}
+
+/**
+ * 组件级格式配置（新格式，支持 format 字段）
+ */
+export interface ComponentFormatConfigWithFormat {
+  /** 是否为 Node 环境 */
+  isNodeEnv?: boolean
+  /** 格式配置 */
+  format?: FormatConfig
+}
+
+/**
  * 全局打包格式配置
+ *
+ * 新格式示例：
+ * ```typescript
+ * {
+ *   isNodeEnv: true,
+ *   format: { es: true, umd: true },
+ *   'ViteBuild': { isNodeEnv: true, format: { es: true, umd: true } },
+ *   'ViteConfig': { isNodeEnv: true }
+ * }
+ * ```
  */
 export interface GlobalFormatConfig {
   /** 是否为 Node 环境（可选，默认为 false，即浏览器环境） */
   isNodeEnv?: boolean
-  /** Node 环境下的打包格式配置 */
-  nodeFormats?: ComponentFormatConfig
-  /** 浏览器环境下的打包格式配置 */
-  browserFormats?: ComponentFormatConfig
-  /** 单个组件的格式配置覆盖（组件名 -> 格式配置） */
-  componentFormats?: Record<string, ComponentFormatConfig>
+  /** 全局格式配置 */
+  format?: FormatConfig
+  /**
+   * 组件级配置（组件名 -> 配置）
+   * 可以是 ComponentFormatConfig（兼容旧格式）或 ComponentFormatConfigWithFormat（新格式）
+   */
+  [componentName: string]: FormatConfig | ComponentFormatConfig | ComponentFormatConfigWithFormat | boolean | undefined
 }
 
 /**
  * 默认格式配置
  */
-const DEFAULT_NODE_FORMATS: ComponentFormatConfig = {
+const DEFAULT_NODE_FORMATS: FormatConfig = {
   cjs: true, // Node 环境默认只打 CJS
 }
 
-const DEFAULT_BROWSER_FORMATS: ComponentFormatConfig = {
+const DEFAULT_BROWSER_FORMATS: FormatConfig = {
   es: true, // 浏览器环境默认打 ES 模块
 }
 
@@ -56,9 +83,9 @@ const DEFAULT_BROWSER_FORMATS: ComponentFormatConfig = {
  * @returns 合并后的配置
  */
 function mergeFormatConfigWithDefaults(
-  defaultConfig: ComponentFormatConfig,
-  userConfig?: ComponentFormatConfig,
-): ComponentFormatConfig {
+  defaultConfig: FormatConfig,
+  userConfig?: FormatConfig,
+): FormatConfig {
   if (!userConfig)
     return defaultConfig
 
@@ -68,6 +95,27 @@ function mergeFormatConfigWithDefaults(
     umd: userConfig.umd ?? defaultConfig.umd,
     iife: userConfig.iife ?? defaultConfig.iife,
   }
+}
+
+/**
+ * 从组件配置中提取格式配置
+ * @param config 组件配置（可能是旧格式或新格式）
+ * @returns 格式配置
+ */
+function extractFormatFromComponentConfig(
+  config: ComponentFormatConfig | ComponentFormatConfigWithFormat | FormatConfig | undefined,
+): FormatConfig | undefined {
+  if (!config)
+    return undefined
+
+  // 新格式：有 format 字段
+  if ('format' in config && config.format) {
+    return config.format
+  }
+
+  // 旧格式或直接是 FormatConfig：直接返回（排除 isNodeEnv）
+  const { isNodeEnv: _, ...formatConfig } = config as ComponentFormatConfig
+  return formatConfig
 }
 
 /**
@@ -85,22 +133,41 @@ export function getComponentFormats(ctx: BuildContext, comp: string): ModuleForm
     return ['es']
   }
 
-  // 获取组件特定的配置
-  const componentConfig = formatConfig.componentFormats?.[comp]
+  // 获取组件特定的配置（兼容旧格式 componentFormats 和新格式直接作为键）
+  const componentConfigRaw = (formatConfig as any).componentFormats?.[comp] || formatConfig[comp]
+  const componentConfig = componentConfigRaw as ComponentFormatConfig | ComponentFormatConfigWithFormat | FormatConfig | undefined
 
   // 判断组件是否应该使用 Node 环境
-  // 优先级：1. componentFormats 中的 isNodeEnv 2. 全局 isNodeEnv 3. 默认 false（浏览器环境）
-  const isNode = componentConfig?.isNodeEnv ?? (formatConfig.isNodeEnv ?? false)
+  // 优先级：1. 组件配置中的 isNodeEnv 2. 全局 isNodeEnv 3. 默认 false（浏览器环境）
+  let isNode = false
+  if (componentConfig && typeof componentConfig === 'object' && 'isNodeEnv' in componentConfig) {
+    isNode = componentConfig.isNodeEnv ?? false
+  }
+  else {
+    isNode = formatConfig.isNodeEnv ?? false
+  }
 
   // 获取默认配置
   const defaultConfig = isNode ? DEFAULT_NODE_FORMATS : DEFAULT_BROWSER_FORMATS
 
   // 获取用户配置：优先使用组件配置，否则使用全局配置
-  const userConfig = componentConfig || (isNode ? formatConfig.nodeFormats : formatConfig.browserFormats)
+  let userFormatConfig: FormatConfig | undefined
+  if (componentConfig) {
+    userFormatConfig = extractFormatFromComponentConfig(componentConfig)
+  }
+  else {
+    // 兼容旧格式：nodeFormats / browserFormats
+    const oldConfig = isNode ? (formatConfig as any).nodeFormats : (formatConfig as any).browserFormats
+    if (oldConfig) {
+      userFormatConfig = extractFormatFromComponentConfig(oldConfig)
+    }
+    else {
+      // 新格式：使用全局 format
+      userFormatConfig = formatConfig.format
+    }
+  }
 
   // 合并默认配置和用户配置（用户配置覆盖默认配置）
-  // 注意：合并时排除 isNodeEnv 字段，因为它只用于环境判断
-  const { isNodeEnv: _, ...userFormatConfig } = userConfig || {}
   const config = mergeFormatConfigWithDefaults(defaultConfig, userFormatConfig)
 
   // 根据配置添加格式
@@ -124,6 +191,29 @@ export function getComponentFormats(ctx: BuildContext, comp: string): ModuleForm
   }
 
   return formats
+}
+
+/**
+ * 获取组件的 isNodeEnv 配置
+ * @param formatConfig 格式配置
+ * @param comp 组件名
+ * @returns 是否为 Node 环境
+ */
+export function getComponentIsNodeEnv(formatConfig: GlobalFormatConfig | undefined, comp: string): boolean {
+  if (!formatConfig)
+    return false
+
+  // 获取组件特定的配置（兼容旧格式 componentFormats 和新格式直接作为键）
+  const componentConfigRaw = (formatConfig as any).componentFormats?.[comp] || formatConfig[comp]
+  const componentConfig = componentConfigRaw as ComponentFormatConfig | ComponentFormatConfigWithFormat | FormatConfig | undefined
+
+  // 判断组件是否应该使用 Node 环境
+  // 优先级：1. 组件配置中的 isNodeEnv 2. 全局 isNodeEnv 3. 默认 false（浏览器环境）
+  if (componentConfig && typeof componentConfig === 'object' && 'isNodeEnv' in componentConfig) {
+    return componentConfig.isNodeEnv ?? false
+  }
+
+  return formatConfig.isNodeEnv ?? false
 }
 
 /**

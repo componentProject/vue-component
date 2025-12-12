@@ -22,8 +22,10 @@ export interface propsType extends Partial<cardReaderPluginType> {
   showTypes?: string[]
   /** 医保扫码按钮的props */
   qrcodeButtonProps?: Record<string, any>
+  qrcodeButtonText?: string
   /** 医保扫脸按钮的props */
   faceButtonProps?: Record<string, any>
+  faceButtonText?: string
   /** 自定义下拉选项 */
   customDropdownOptions?: cardReaderCustomDropdownOptionType[]
   /** 是否开启轮询 */
