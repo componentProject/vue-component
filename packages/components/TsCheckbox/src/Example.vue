@@ -15,6 +15,23 @@
       </div>
     </div>
 
+    <h3>分组显示</h3>
+    <div class="checkbox-container">
+      <TsCheckbox
+        v-model="groupValues"
+        :options="groupData"
+        label="name"
+        value="id"
+        is-group
+        group-key="departmentId"
+        group-label="departmentName"
+        @change="onGroupChange"
+      />
+      <div class="value-display">
+        当前选中值: {{ groupValues }}
+      </div>
+    </div>
+
     <h3>远程数据源</h3>
     <div class="checkbox-container">
       <TsCheckbox

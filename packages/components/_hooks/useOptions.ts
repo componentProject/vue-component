@@ -1,4 +1,3 @@
-// _hooks的useOptions组件
 import type { ComputedRef } from 'vue'
 import BaseApi from '@moluoxixi/utils/AjaxPackage/class'
 import { isEqual } from 'lodash-es'
@@ -16,6 +15,7 @@ export interface UseOptionsProps {
   requestParamsType?: RequestParamsType
   requestHeaders?: Record<string, any>
   responseDataPath?: string
+  addSign?: (config: Record<string, any>) => void
 }
 
 export interface UseOptionsReturn {
@@ -57,6 +57,7 @@ export function useOptions(props: UseOptionsProps): UseOptionsReturn {
         onTimeout: () => {
           console.warn('请求超时')
         },
+        addSign: props.addSign,
         // 将自定义请求头传给BaseApi
         headers: {
           'Content-Type': 'application/json',
@@ -93,6 +94,7 @@ export function useOptions(props: UseOptionsProps): UseOptionsReturn {
           onTimeout: () => {
             console.warn('请求超时')
           },
+          addSign: props.addSign,
           headers: {
             ...props.requestHeaders, // 不设置Content-Type
           },

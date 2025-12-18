@@ -4,7 +4,7 @@ import { getHttpService } from '@moluoxixi/utils/AjaxPackage/index.ts'
 import FormData from 'form-data'
 
 const httpApi: any = getHttpService({
-  baseURL: 'http://172.16.1.246:10019/ts-fm',
+  baseURL: 'http://192.168.209.103:9099/ts-fm',
   timeout: 300000,
   getToken: () => null,
   // 响应字段配置

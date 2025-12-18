@@ -11,7 +11,7 @@ function isObject(value: unknown): value is PlainObject {
  * @param source 源对象，如果不是对象则直接返回target
  * @returns 合并后的对象
  */
-export function deepMerge<T extends PlainObject>(target: T, source: unknown): T {
+export function deepMerge<T extends PlainObject>(target: T, source: any): T {
   if (!isObject(source)) {
     return target
   }

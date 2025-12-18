@@ -37,6 +37,7 @@
     "@types/lodash-es": "catalog:type",
     "@types/node": "catalog:type",
     "@types/uuid": "catalog:type",
+    "@vitejs/plugin-react": "catalog:dev",
     "@vitejs/plugin-vue": "catalog:dev",
     "@vitejs/plugin-vue-jsx": "catalog:dev",
     "@vue-macros/volar": "catalog:dev",

@@ -32,4 +32,9 @@ export interface propsType {
   requestHeaders: Record<string, any>
   responseDataPath: string
   checkboxProps?: Record<string, any>
+  groupKey?: string
+  groupLabel?: string
+  isGroup?: boolean
+  virtualScroll?: boolean
+  visibleCount?: number
 }

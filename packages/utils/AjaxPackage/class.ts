@@ -44,7 +44,7 @@ export default class BaseApi extends BaseHttpClient {
    * SystemErrorDialog 初始化 Promise
    * 用于跟踪初始化状态，避免重复初始化
    */
-  private systemErrorDialogInitPromise: Promise<void> | null = null
+  private readonly systemErrorDialogInitPromise: Promise<void> | null = null
 
   /**
    * 系统错误信息存储，用于在点击 icon 时打开详细错误弹窗

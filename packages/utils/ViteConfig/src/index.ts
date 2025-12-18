@@ -69,7 +69,7 @@ async function getViteConfig(Config: ViteConfigType, params?: ConfigEnv) {
     namespace = config.namespace,
     dropConsole = config.dropConsole,
     vue = config.vue ?? true,
-    react = config.react,
+    react = config.react ?? false,
     vitepress = config.vitepress,
   } = viteEnv
 
@@ -77,9 +77,9 @@ async function getViteConfig(Config: ViteConfigType, params?: ConfigEnv) {
   const appTitle = config.appTitle
   const appCode = config.appCode
 
-  const isOnlyVue = !vitepress && !react && vue
-  // const isOnlyReact = !vitepress && !vue && react
-  // const isOnlyVitepress = !vue && !react && vitepress
+  const isVue = !vitepress && vue
+  const isReact = !vitepress && react
+  const isVitepress = vitepress
   const isVueOrVitepress = vue || vitepress
   const envSystemCode = isDev && !qiankunDevMode ? 'el' : (namespace ?? appCode)
 
@@ -94,9 +94,15 @@ async function getViteConfig(Config: ViteConfigType, params?: ConfigEnv) {
   ]
 
   // pluginVue
-  if (isOnlyVue) {
+  if (isVue) {
     const pluginVue = await dynamicImport(import('@vitejs/plugin-vue'))
     plugins.push(pluginVue())
+  }
+
+  // pluginReact
+  if (isReact) {
+    const pluginReact = await dynamicImport(import('@vitejs/plugin-react'))
+    plugins.push(pluginReact())
   }
 
   // vueJsx
@@ -105,14 +111,22 @@ async function getViteConfig(Config: ViteConfigType, params?: ConfigEnv) {
     plugins.push(vueJsx())
   }
 
-  // Pages
+  // Pages（支持 Vue 和 React）
   if (pageRoutes) {
     const Pages = await dynamicImport(import('vite-plugin-pages'))
+    // 根据框架类型确定文件扩展名
+    const extensions = []
+    if (isVue) {
+      extensions.push('vue')
+    }
+    if (isReact) {
+      extensions.push('tsx', 'jsx')
+    }
     plugins.push(Pages(
       deepMerge(
         {
           dirs: 'src/pages',
-          extensions: [isOnlyVue && 'vue'].filter(Boolean),
+          extensions,
           exclude: [
             '**/components/**',
             '**/__tests__/**',
@@ -124,13 +138,13 @@ async function getViteConfig(Config: ViteConfigType, params?: ConfigEnv) {
   }
 
   // vueDevTools
-  if (isDev && devtools) {
+  if (isDev && devtools && isVueOrVitepress) {
     const vueDevTools = await dynamicImport(import('vite-plugin-vue-devtools'))
     plugins.push(vueDevTools())
   }
 
-  // AutoImport
-  if (autoImport) {
+  // AutoImport（仅 Vue/Vitepress 需要）
+  if (autoImport && isVueOrVitepress) {
     const AutoImport = await dynamicImport(import('unplugin-auto-import/vite'))
     const ElementPlusResolverModule = await dynamicImport(import('unplugin-vue-components/resolvers'))
     const { ElementPlusResolver } = ElementPlusResolverModule
@@ -138,7 +152,7 @@ async function getViteConfig(Config: ViteConfigType, params?: ConfigEnv) {
       deepMerge(
         {
           imports: ['vue'],
-          resolvers: (isVueOrVitepress ? [ElementPlusResolver()] : []),
+          resolvers: [ElementPlusResolver()],
           dts: path.resolve(rootPath, './typings/auto-imports.d.ts'),
         },
         autoImport,
@@ -146,15 +160,15 @@ async function getViteConfig(Config: ViteConfigType, params?: ConfigEnv) {
     ) as PluginOption)
   }
 
-  // Components
-  if (autoComponent) {
+  // Components（仅 Vue/Vitepress 需要）
+  if (autoComponent && isVueOrVitepress) {
     const Components = await dynamicImport(import('unplugin-vue-components/vite'))
     const ElementPlusResolverModule = await dynamicImport(import('unplugin-vue-components/resolvers'))
     const { ElementPlusResolver } = ElementPlusResolverModule
     plugins.push(Components(
       deepMerge(
         {
-          resolvers: (isVueOrVitepress ? [ElementPlusResolver()] : []),
+          resolvers: [ElementPlusResolver()],
           globs: [],
           dts: path.resolve(rootPath, './typings/components.d.ts'),
         },
@@ -272,7 +286,7 @@ async function getViteConfig(Config: ViteConfigType, params?: ConfigEnv) {
           manifest: {
             id: appCode ? `/${appCode}/` : '/',
             start_url: appCode ? `/${appCode}/` : '/',
-            name: appTitle || 'Vue 应用',
+            name: appTitle || '应用',
             short_name: appTitle || '应用',
             description: '渐进式 Web 应用',
             display: 'standalone' as const,
@@ -315,8 +329,8 @@ async function getViteConfig(Config: ViteConfigType, params?: ConfigEnv) {
     }
   }
 
-  // autoRoutes
-  if (autoRoutes) {
+  // autoRoutes（仅 Vue 需要）
+  if (autoRoutes && isVueOrVitepress) {
     const AutoRoutesPlugin = await dynamicImport(import('../../AutoRoutesPlugin/index.ts'))
     plugins.push(AutoRoutesPlugin(
       deepMerge(
@@ -363,11 +377,22 @@ async function getViteConfig(Config: ViteConfigType, params?: ConfigEnv) {
               if (id.includes('lodash-es')) {
                 return 'lodash-vendor'
               }
+              // Vue 相关
               if (id.includes('element-plus')) {
                 return 'el-vendor'
               }
               if (id.includes('@vue') || id.includes('vue')) {
                 return 'vue-vendor'
+              }
+              // React 相关
+              if (id.includes('antd') || id.includes('@ant-design')) {
+                return 'antd-vendor'
+              }
+              if (id.includes('react-dom')) {
+                return 'react-dom-vendor'
+              }
+              if (id.includes('react')) {
+                return 'react-vendor'
               }
               return 'vendor'
             }

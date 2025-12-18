@@ -63,6 +63,7 @@ export default class BaseHttpClient {
   public instance: ReturnType<typeof axios.create>
   protected messageInstance: MessageInstance
   protected notificationInstance: NotificationInstance
+  protected addSign?: (config: AxiosRequestConfig) => void
 
   /**
    * 创建 BaseHttpClient 实例
@@ -76,6 +77,7 @@ export default class BaseHttpClient {
       onTimeout = () => {},
       getToken = defaultGetToken,
       onLoginRequired = defaultOnLoginRequired,
+      addSign,
       ...axiosConfig
     } = config
 
@@ -86,6 +88,7 @@ export default class BaseHttpClient {
     this.onTimeout = onTimeout
     this.getToken = getToken
     this.onLoginRequired = onLoginRequired
+    this.addSign = addSign
 
     // 创建axios实例，传入所有剩余配置
     this.instance = axios.create({
@@ -102,6 +105,10 @@ export default class BaseHttpClient {
    * @returns 处理后的请求配置
    */
   processRequestConfig(config: InternalAxiosRequestConfig) {
+    // 在请求发送前调用addSign函数
+    if (this.addSign) {
+      this.addSign(config)
+    }
     return config
   }
 
