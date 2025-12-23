@@ -52,7 +52,7 @@ function getRouter(props: any) {
     base = activeRule
   }
   else {
-    base = import.meta.env.VITE_GLOB_APP_CODE
+    base = import.meta.env.VITE_APP_CODE
   }
   const router = createRouter({
     history: createWebHistory(base),

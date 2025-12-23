@@ -16,7 +16,7 @@ export default viteConfig(({ mode }) => {
   return {
     rootPath: path.resolve(),
     mode: {
-      base: { VITE_GLOB_APP_TITLE: viteEnv.VITE_GLOB_APP_TITLE, VITE_GLOB_APP_CODE: viteEnv.VITE_GLOB_APP_CODE, VITE_AUTO_ROUTES: true },
+      base: { VITE_APP_TITLE: viteEnv.VITE_APP_TITLE, VITE_APP_CODE: viteEnv.VITE_APP_CODE, VITE_AUTO_ROUTES: true },
       development: { VITE_DEVTOOLS: true },
       production: {},
     },

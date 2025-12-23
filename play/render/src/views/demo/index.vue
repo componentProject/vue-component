@@ -62,7 +62,10 @@ const ApiConfig = {
   timeout: 10000,
   getToken: () => 'mock-token',
 }
-
+function a() {
+  console.log('a')
+}
+a()
 const systemErrorApi = new BaseApi({
   ...ApiConfig,
   responseFields: {

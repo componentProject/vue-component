@@ -3,11 +3,11 @@ declare interface ViteEnv {
   /**
    * 项目标题
    */
-  VITE_GLOB_APP_TITLE: string
+  VITE_APP_TITLE: string
   /**
    * 项目code
    */
-  VITE_GLOB_APP_CODE: string
+  VITE_APP_CODE: string
   /**
    * 是否启用vue-devtools
    */
