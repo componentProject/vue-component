@@ -1,0 +1,57 @@
+export default {
+  selectedIds: [],
+  title: '选择科室',
+  searchTips: '检索科室',
+  selectFieldKey: 'campus',
+  selectProps: {
+    placeholder: '请选择院区',
+    requestUrl: '/ompBase/upgServices',
+    requestParams: {
+      applicationId: '2',
+      pageNo: 1,
+      pageSize: 999,
+    },
+    requestMethod: 'GET',
+    requestHeaders: {
+      token: '152190c4-b030-428f-ab01-f1fde72b77e1',
+    },
+    responseDataPath: 'rows',
+    // options: [
+    //   { id: '1', name: '南院区' },
+    //   { id: '2', name: '北院区' },
+    // ],
+    label: 'name',
+    value: 'id',
+  },
+  checkboxProps: {
+    label: 'name',
+    value: 'id',
+    isGroup: true,
+    groupKey: 'departmentId',
+    groupLabel: 'departmentName',
+    checkAllText: '全部科室',
+    // requestUrl: '/ompBase/upgServices',
+    // requestParams: {
+    //   applicationId: '2',
+    //   pageNo: 1,
+    //   pageSize: 999,
+    // },
+    // requestMethod: 'GET',
+    // requestHeaders: {
+    //   token: 'cb1c6635-d4fe-4d1f-bf35-6ab78a302eec',
+    // },
+    // responseDataPath: 'rows',
+    options: [
+      { id: '1', name: '内科', departmentId: '1', departmentName: '南院区' },
+      { id: '2', name: '外科', departmentId: '1', departmentName: '南院区' },
+      { id: '3', name: '儿科', departmentId: '1', departmentName: '南院区' },
+      { id: '4', name: '妇科', departmentId: '1', departmentName: '南院区' },
+      { id: '5', name: '眼科', departmentId: '2', departmentName: '北院区' },
+      { id: '6', name: '口腔科', departmentId: '2', departmentName: '北院区' },
+      { id: '7', name: '耳鼻喉科', departmentId: '2', departmentName: '北院区' },
+      { id: '8', name: '皮肤科', departmentId: '2', departmentName: '北院区' },
+      { id: '9', name: '中医科', departmentId: '2', departmentName: '北院区' },
+      { id: '10', name: '骨科', departmentId: '2', departmentName: '北院区' },
+    ],
+  },
+}

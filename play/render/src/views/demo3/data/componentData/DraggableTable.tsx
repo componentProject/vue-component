@@ -1,8 +1,7 @@
-// DraggableTable.tsx文件
 import { reactive } from 'vue'
 
 const props = reactive({
-  // 基础数据
+
   pagerConfig: {
     enable: true,
     total: 0,
@@ -61,8 +60,7 @@ const props = reactive({
     zIndex: 10000,
   },
   onPageChange: pageChange,
-  // columndragable: true,
-  // 数据绑定配置
+
   bindings: ['v-model=tableData'],
 })
 let id = 0

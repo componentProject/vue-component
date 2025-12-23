@@ -1,4 +1,3 @@
-<!-- ExportExcel组件主文件 -->
 <template>
   <div class="export-excel-wrapper">
     <!-- 使用默认按钮 -->
@@ -17,6 +16,7 @@ import { ElButton } from 'element-plus'
 import fileSaver from 'file-saver'
 import { computed } from 'vue'
 import { utils, write } from 'xlsx'
+import { write as writeStyle } from 'xlsx-style-vite'
 
 // 设置组件不继承属性到根元素，而是手动通过$attrs绑定
 defineOptions({
@@ -193,15 +193,13 @@ function exportExcel(data: any[], header: string[], fileName: string, keys: stri
     const cellRef = utils.encode_cell({ r: 0, c: col })
     if (!worksheet[cellRef])
       continue
-    worksheet[cellRef].s = {
-      font: {
-        bold: true,
-      },
-      alignment: {
-        horizontal: 'center',
-        vertical: 'center',
-      },
-    }
+
+    // 获取当前列的align属性
+    const column = computedColumn.value[col] as any
+    const align = column?.align || 'left'
+
+    // 使用表头样式函数
+    worksheet[cellRef].s = getHeaderStyle(align)
   }
 
   // 如果需要自动调整列宽
@@ -234,24 +232,89 @@ function exportExcel(data: any[], header: string[], fileName: string, keys: stri
     worksheet['!cols'] = columnsWidth
   }
 
+  // 处理单元格合并
+  if (props.spanMethod && data.length > 0 && computedColumn) {
+    const merges: any[] = []
+    const headerLength = header.length
+
+    for (let rowIndex = 0; rowIndex < data.length; rowIndex++) {
+      for (let columnIndex = 0; columnIndex < headerLength; columnIndex++) {
+        const spanInfo = props.spanMethod({
+          rowIndex,
+          columnIndex,
+          row: data[rowIndex],
+          column: computedColumn.value[columnIndex],
+        })
+
+        if (spanInfo) {
+          let rowspan: number
+          let colspan: number
+
+          if (Array.isArray(spanInfo)) {
+            rowspan = spanInfo[0]
+            colspan = spanInfo[1]
+          }
+          else {
+            rowspan = spanInfo.rowspan
+            colspan = spanInfo.colspan
+          }
+
+          if (rowspan === 0 || colspan === 0) {
+            continue
+          }
+
+          if (rowspan > 1 || colspan > 1) {
+            const startRow = rowIndex + 1
+            const startCol = columnIndex
+            const endRow = startRow + rowspan - 1
+            const endCol = startCol + colspan - 1
+
+            merges.push({
+              s: { r: startRow, c: startCol },
+              e: { r: endRow, c: endCol },
+            })
+          }
+        }
+      }
+    }
+
+    if (merges.length > 0) {
+      worksheet['!merges'] = merges
+    }
+  }
+
+  // 添加样式设置
+  setPubExcel(worksheet)
+  mergeCell(worksheet)
   // 添加到工作簿
   utils.book_append_sheet(wb, worksheet, 'Sheet1')
 
   // 导出文件
   const fileType = props.exportType === 'xlsx' ? 'xlsx' : 'csv'
   const bookType = props.exportType === 'xlsx' ? 'xlsx' : 'csv'
-
   // 生成文件并下载
-  const wbout = write(wb, { bookType, type: 'array' })
-  const blob = new Blob([wbout], { type: 'application/octet-stream' })
+  let wbout
+  if (props.exportType === 'xlsx') {
+    // 使用xlsx-style-vite写入带样式的Excel文件
+    wbout = writeStyle(wb, {
+      bookType: 'xlsx',
+      bookSST: false,
+      type: 'binary',
+    })
+    const blob = new Blob([s2ab(wbout)], { type: 'application/octet-stream;charset=utf-8' })
+    const timestamp = new Date().getTime()
+    const fullFileName = `${fileName}_${timestamp}.${fileType}`
+    fileSaver.saveAs(blob, fullFileName)
+  }
+  else {
+    // 使用原始xlsx库写入csv文件
+    wbout = write(wb, { bookType, type: 'array' })
+    const blob = new Blob([wbout], { type: 'application/octet-stream' })
+    const timestamp = new Date().getTime()
+    const fullFileName = `${fileName}_${timestamp}.${fileType}`
+    fileSaver.saveAs(blob, fullFileName)
+  }
 
-  // 添加时间戳
-  const timestamp = new Date().getTime()
-  const fullFileName = `${fileName}_${timestamp}.${fileType}`
-
-  fileSaver.saveAs(blob, fullFileName)
-
-  // 导出成功提示
   emit('success')
 }
 
@@ -273,6 +336,118 @@ function calculateCellWidth(cellValue: string) {
 
   // 给一些宽度余量，确保内容显示完整
   return Math.max(width + 4, 10)
+}
+
+// 获取单元格基础样式
+function getBaseStyle(align: string) {
+  return {
+    border: {
+      top: { style: 'thin', color: { rgb: 'aaaaaa' } },
+      bottom: { style: 'thin', color: { rgb: 'aaaaaa' } },
+      left: { style: 'thin', color: { rgb: 'aaaaaa' } },
+      right: { style: 'thin', color: { rgb: 'aaaaaa' } },
+    },
+    alignment: {
+      horizontal: align,
+      vertical: 'center',
+      wrapText: true,
+      indent: 0,
+    },
+  }
+}
+
+// 获取表头样式
+function getHeaderStyle(align: string) {
+  const baseStyle = getBaseStyle(align)
+  return {
+    ...baseStyle,
+    font: {
+      bold: true,
+    },
+    fill: {
+      fgColor: { rgb: 'F3F4F6' },
+    },
+  }
+}
+
+// 获取内容单元格样式
+function getContentStyle(align: string) {
+  return getBaseStyle(align)
+}
+
+// 获取合并单元格样式
+function getMergeStyle(align: string) {
+  const { ...baseStyleWithoutPadding } = getBaseStyle(align)
+  return {
+    ...baseStyleWithoutPadding,
+    font: {
+      sz: 11,
+    },
+  }
+}
+
+// 表格样式设置
+function setPubExcel(data: any) {
+  const excludes = ['!cols', '!fullref', '!merges', '!ref', '!rows']
+  for (let key in data) {
+    if (Object.prototype.hasOwnProperty.call(data, key)) {
+      if (!excludes.includes(key)) {
+        // 解析单元格位置
+        const cell = utils.decode_cell(key)
+        const isHeader = cell.r === 0
+        // 获取当前列的align属性
+        const column = computedColumn.value[cell.c] as any
+        const align = column?.align || 'left'
+        data[key].s = isHeader ? getHeaderStyle(align) : getContentStyle(align)
+      }
+    }
+  }
+  // 确保!rows数组存在且长度足够
+  if (!data['!rows']) {
+    data['!rows'] = []
+  }
+
+  // 获取数据总行数
+  const totalRows = data['!ref'] ? utils.decode_range(data['!ref']).e.r + 1 : 0
+
+  // 初始化!rows数组
+  while (data['!rows'].length < totalRows) {
+    data['!rows'].push({})
+  }
+
+  // 设置表头行高
+  data['!rows'][0] = { hpx: 30 } // 表头行高30像素
+
+  // 设置内容行默认行高
+  for (let i = 1; i < data['!rows'].length; i++) {
+    data['!rows'][i] = { hpx: 20 } // 内容行高20像素
+  }
+}
+
+function mergeCell(ws: any) {
+  if (ws['!merges']) {
+    ws['!merges'].forEach((merge: any) => {
+      const startCell = utils.encode_cell({ r: merge.s.r, c: merge.s.c })
+      if (ws[startCell]) {
+        // 获取当前列的align属性
+        const column = computedColumn.value[merge.s.c] as any
+        const align = column?.align || 'left'
+        // 使用复用的合并单元格样式
+        ws[startCell].s = getMergeStyle(align)
+      }
+    })
+  }
+  return ws
+}
+
+// 字符串转ArrayBuffer
+function s2ab(s: string) {
+  const buf = new ArrayBuffer(s.length)
+  const view = new Uint8Array(buf)
+  for (let i = 0; i < s.length; i++) {
+    view[i] = s.charCodeAt(i) & 0xFF
+  }
+  return buf
 }
 </script>
 

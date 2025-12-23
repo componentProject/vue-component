@@ -1,7 +1,7 @@
 {
   "ViteConfig": "0.0.27",
   "EslintConfig": "0.0.10",
-  "AjaxPackage": "0.0.26",
+  "AjaxPackage": "0.0.29",
   "ClassNames": "0.0.3-beta.1",
   "GoogleModel": "0.0.4",
   "AddUuidToTemplatePlugin": "0.0.2",

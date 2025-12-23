@@ -22,4 +22,12 @@ export interface propsType {
   allowEmptyExport?: boolean
   /** 空数据导出提示信息 */
   emptyMessage?: string
+  /** 合并函数 */
+  spanMethod?: (data: {
+    rowIndex: number
+    columnIndex: number
+    row: any
+    column: any
+  }) => { rowspan: number, colspan: number } | number[] | void
+
 }

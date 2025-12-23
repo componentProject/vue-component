@@ -1,8 +1,10 @@
-<!-- demo3入口文件 -->
 <template>
   <div class="h-full flex flex-col">
     <div class="title">
       调试与演示
+    </div>
+    <div>
+      <componentObj />
     </div>
     <div class="flex">
       <div class="w-[200px]">
@@ -15,7 +17,19 @@
     <div class="flex-1-hidden">
       <Tabs v-model="componentName" placeholder="请选择展示的组件" label="componentCode" value="componentCode" :options="componentOptions">
         <template #default="{ item }">
+          <div v-if="item.componentCode === 'HisDepartment'">
+            <ElButton type="primary" @click="dialogVisible = true">
+              打开弹窗
+            </ElButton>
+            <component
+              v-model="dialogVisible"
+              :addSign="addSign"
+              :is="item.componentCode"
+              v-bind="getComponentProps(item)"
+            />
+          </div>
           <component
+            v-else
             :is="item.componentCode"
             v-bind="getComponentProps(item)"
           />
@@ -26,17 +40,17 @@
 </template>
 
 <script setup lang="ts">
-// 虚拟模块由 Vite 插件在运行时提供
 import { getList, setDeleteByPathAndCode } from '@moluoxixi/utils/_api'
 import { ElButton, ElMessage } from 'element-plus'
 import { onBeforeMount, ref } from 'vue'
 import componentData from './data'
-// import Tabs from '@moluoxixi/components/Tabs'
+import { addSign } from './data/addSign'
+import componentObj from '../../../../../packages/components/ExportExcel/src/Example.vue'
 
 defineOptions({ name: '调试与演示iife和umd' })
 // 调试与演示组件库的组件，直接修改组件名
-// const componentName = ref('DesignForm')
-const componentName = ref('DraggableTable')
+const componentName = ref('TsRadio')
+const dialogVisible = ref(false)
 
 function getComponentProps(item: any) {
   const props = componentData[item.componentCode] || {}

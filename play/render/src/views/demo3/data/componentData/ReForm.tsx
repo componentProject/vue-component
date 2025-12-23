@@ -1,4 +1,3 @@
-// ReForm.tsx文件
 import {
   ElCheckbox,
   ElCheckboxGroup,
@@ -13,9 +12,8 @@ import {
 export default {
   size: 'default',
   labelPosition: 'right',
-  layout: 'flex', // grid、flex
-  // editable: false, // 表单是否可编辑 可以用作详情使用
-  // disabled: true, // 表单是否禁止编辑
+  layout: 'flex',
+
   items: [
     {
       label: 'Name',
@@ -23,7 +21,7 @@ export default {
       defaultValue: '',
       component: ElInput,
       tooltip: '这是tooltip',
-      // itemWidth: 800,
+
       props: {
         clearable: true,
       },
@@ -78,11 +76,11 @@ export default {
     },
     {
       type: 'group',
-      field: 'extra', // 单纯为了一个唯一值，所以一定要配置，不记录表单数据
-      defaultCollapsed: true, // 默认展开/收起
-      collapsedText: '更多配置', // ['展开更多配置', '收起更多配置']
-      labelPosition: 'right', // ['left', 'right']
-      collapsedTriggerIndex: true, // 触发器缩进 - label-position === 'left' / 'right' 需要控制
+      field: 'extra',
+      defaultCollapsed: true,
+      collapsedText: '更多配置',
+      labelPosition: 'right',
+      collapsedTriggerIndex: true,
       component: '',
       children: [
         {
@@ -90,7 +88,7 @@ export default {
           field: 'age3',
           defaultValue: 3,
           component: ElInput,
-          // itemWidth: 200,
+
           props: {
             change: (val: string) => {
               console.log('change22222222', val)
@@ -101,7 +99,7 @@ export default {
           label: 'Remark',
           field: 'remark',
           component: 'el-textarea',
-          // itemWidth: 200,
+
           props: {
             rows: 4,
             change: (val: string) => {

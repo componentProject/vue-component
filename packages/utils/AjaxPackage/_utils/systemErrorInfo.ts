@@ -72,6 +72,25 @@ export function getUserInfoFromLocalStorage(): Record<string, any> {
   }
 }
 
+export function getCurrentMenuLocalStorage(): Record<string, any> {
+  if (typeof window === 'undefined' || typeof localStorage === 'undefined')
+    return {}
+
+  try {
+    const userInfoStr = localStorage.getItem('currentMenu')
+
+    if (!userInfoStr)
+      return {}
+
+    const currentMenu = JSON.parse(userInfoStr)
+    return currentMenu || {}
+  }
+  catch (error) {
+    console.warn('Failed to parse currentMenu from localStorage:', error)
+    return {}
+  }
+}
+
 /**
  * 从 AxiosResponse 中提取系统错误信息
  * @param response Axios 响应对象
@@ -110,6 +129,7 @@ export function extractSystemErrorInfo(
 
   // 从 localStorage 读取 userInfo
   const userInfo = getUserInfoFromLocalStorage()
+  const currentMenu = getCurrentMenuLocalStorage()
 
   return {
     userName: userInfo.username ?? mergedRequestPayload.userName ?? mergedRequestPayload.username,
@@ -117,6 +137,8 @@ export function extractSystemErrorInfo(
     deptName: userInfo.workDeptName ?? mergedRequestPayload.deptName ?? mergedRequestPayload.departmentName,
     deptId: userInfo.workDeptId ?? mergedRequestPayload.deptId ?? mergedRequestPayload.departmentId,
     clientIp: userInfo.loginip ?? mergedRequestPayload.clientIp ?? mergedRequestPayload.ip,
+    isStart: userInfo.isStart ?? mergedRequestPayload.isStart,
+    menuName: currentMenu.title ?? mergedRequestPayload.menuName,
     requestUrl: getFullRequestUrl(),
     traceId: resolveTraceId(response.headers),
     errorCode: code,

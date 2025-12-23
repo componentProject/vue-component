@@ -1,5 +1,23 @@
 # ExportExcel
 
+## 样式说明
+
+### 默认样式
+
+- **表头**：加粗字体、浅灰色背景（#F3F4F6）、水平居中对齐
+- **内容单元格**：正常字体、白色背景、根据列配置的 `align` 属性对齐（默认左对齐）
+- **边框**：所有单元格均有浅灰色细线边框（#aaaaaa）
+- **自动换行**：单元格内容自动换行
+
+### 自定义样式
+
+组件的样式是固定的，目前不支持通过 props 自定义样式。如果需要定制样式，可以修改组件源码中的样式函数：
+
+- `getBaseStyle`：基础样式，包含对齐方式、边框等
+- `getHeaderStyle`：表头样式，继承基础样式并添加字体加粗和背景色
+- `getContentStyle`：内容单元格样式，直接使用基础样式
+- `getMergeStyle`：合并单元格样式，继承基础样式并添加边框
+
 ## 组件示例
 
 导出 Excel/CSV 的通用按钮组件。通过 `columns` 与 `tableData` 组织导出数据，支持自定义列头键名与字段键名优先级（`titles`/
@@ -108,7 +126,27 @@ ExportExcel/emptyMessage/custom
 ExportExcel/formatter/formatter
 :::
 
+### 单元格对齐方式（columns.align）
+
+列配置支持 `align` 属性，可设置单元格内容的水平对齐方式：
+- `left`：左对齐（默认）
+- `center`：居中对齐
+- `right`：右对齐
+
+:::demo
+ExportExcel/align/align
+:::
+
+### 单元格合并（spanMethod）
+
+支持通过 `spanMethod` 配置单元格合并，用法同 Element Plus Table 的 `spanMethod`。
+
+:::demo
+ExportExcel/spanMethod/spanMethod
+:::
+
 ## API
+
 
 ### Props
 
@@ -123,6 +161,7 @@ ExportExcel/formatter/formatter
 | exportType       | 导出类型                                      | `xlsx` \| `csv` | `xlsx`              |
 | allowEmptyExport | 是否允许空数据导出                                 | boolean         | true                |
 | emptyMessage     | 禁止空导出时的提示文案                               | string          | '暂无数据可导出'           |
+| spanMethod       | 单元格合并方法，同 Element Plus Table 的 spanMethod | Function        | —                   |
 
 ### Events
 
@@ -137,5 +176,6 @@ ExportExcel/formatter/formatter
 ### Expose
 
 该组件未暴露实例方法。
+
 
 

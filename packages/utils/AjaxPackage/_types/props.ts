@@ -24,4 +24,8 @@ export interface SystemErrorDialogPropsType {
   errorMessage?: string
   /** 错误代码 */
   errorCode?: number | string
+  /** 本地服务是否启用 */
+  isStart?: boolean
+  /** 菜单名称 */
+  menuName?: string
 }

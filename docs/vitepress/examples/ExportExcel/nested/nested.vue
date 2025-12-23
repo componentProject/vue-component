@@ -1,4 +1,3 @@
-<!-- nested.vue文件 -->
 <template>
   <div>
     <ElTable :data="tableData" border>
@@ -21,6 +20,7 @@
 </template>
 
 <script setup lang="ts">
+import { ElTable, ElTableColumn } from 'element-plus'
 import { ref } from 'vue'
 
 const tableData = ref([

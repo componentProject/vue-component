@@ -13,6 +13,8 @@
     "eslint": "eslint . --ext .vue,.js,.jsx,.ts,.tsx --fix"
   },
   "dependencies": {
+    "crypto-js": "catalog:build",
+    "uuid": "catalog:build",
     "@antv/g2": "catalog:build",
     "@codemirror/lang-css": "catalog:build",
     "@codemirror/lang-html": "catalog:build",
@@ -82,7 +84,8 @@
     "vxe-table": "catalog:build",
     "wangeditor": "catalog:build",
     "xe-utils": "catalog:build",
-    "xlsx": "catalog:build"
+    "xlsx": "catalog:build",
+    "xlsx-style-vite": "catalog:build"
   },
   "devDependencies": {
     "@types/file-saver": "catalog:type",

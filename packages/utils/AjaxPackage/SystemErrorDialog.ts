@@ -1,6 +1,6 @@
 import { ElButton, ElDialog, ElMessage } from 'element-plus'
 import { computed, defineComponent, h, ref } from 'vue'
-import { getUserInfoFromLocalStorage } from './_utils/systemErrorInfo.ts'
+import { getCurrentMenuLocalStorage, getUserInfoFromLocalStorage } from './_utils/systemErrorInfo.ts'
 import BaseApi from './class.ts'
 import cssModules from './styles/modules/index.module.css'
 
@@ -79,24 +79,27 @@ export default defineComponent({
     // 从 localStorage 读取用户信息（优先使用 localStorage，props 作为后备）
     const userInfo = computed(() => {
       const localUserInfo = getUserInfoFromLocalStorage()
+      const currentMenu = getCurrentMenuLocalStorage()
       return {
         userName: localUserInfo.username ?? props.userName,
         // userId: localUserInfo.id ?? props.userId,
         userId: localUserInfo.usercode ?? props.userId,
+        isStart: localUserInfo.isStart ?? false,
+        menuName: currentMenu?.title ?? '',
         deptName: localUserInfo.workDeptName ?? props.deptName,
         deptId: localUserInfo.workDeptId ?? props.deptId,
-        clientIp: localUserInfo.loginip ?? props.clientIp,
+        clientIp: localUserInfo.isStart ? localUserInfo.loginip ?? props.clientIp : '',
       }
     })
 
-    // 技术摘要数据项
     const techSummaryItems = computed(() => [
       { label: '用户名', value: userInfo.value.userName },
       { label: '用户ID', value: userInfo.value.userId },
       { label: '科室名称', value: userInfo.value.deptName },
       { label: '科室ID', value: userInfo.value.deptId },
       { label: '客户端IP', value: userInfo.value.clientIp },
-      { label: '菜单名称', value: currentUrl },
+      { label: '菜单URL', value: currentUrl },
+      { label: '菜单名称', value: userInfo.value.menuName },
       { label: '请求URL路径', value: props.requestUrl },
       { label: '链路ID', value: props.traceId },
     ])
@@ -132,7 +135,8 @@ export default defineComponent({
         clientIp: userInfo.value.clientIp,
         requestPath: props.requestUrl,
         traceId: props.traceId,
-        menuName: currentUrl,
+        menuName: userInfo.value.menuName,
+        menuUrl: currentUrl,
         errorMessage: props.errorMessage,
       })
       ElMessage.success('上报成功')
@@ -241,38 +245,38 @@ export default defineComponent({
                 ),
                 techSummaryExpanded.value
                   ? h(
-                      'div',
-                      { style: { padding: '16px 20px', backgroundColor: '#fafafa' } },
-                      techSummaryItems.value.map(item =>
-                        h(
-                          'div',
-                          {
-                            key: item.label,
-                            style: {
-                              display: 'flex',
-                              alignItems: 'flex-start',
-                              marginBottom: '12px',
-                              lineHeight: 1.5,
-                              flexDirection: isMobile ? 'column' : 'row',
-                            },
+                    'div',
+                    { style: { padding: '16px 20px', backgroundColor: '#fafafa' } },
+                    techSummaryItems.value.map(item =>
+                      h(
+                        'div',
+                        {
+                          key: item.label,
+                          style: {
+                            display: 'flex',
+                            alignItems: 'flex-start',
+                            marginBottom: '12px',
+                            lineHeight: 1.5,
+                            flexDirection: isMobile ? 'column' : 'row',
                           },
-                          [
-                            h('span', {
-                              style: {
-                                flexShrink: 0,
-                                width: isMobile ? 'auto' : '100px',
-                                fontWeight: 500,
-                                color: '#606266',
-                                textAlign: isMobile ? 'left' : 'right',
-                                marginRight: isMobile ? 0 : '12px',
-                                marginBottom: isMobile ? '4px' : 0,
-                              },
-                            }, `${item.label}：`),
-                            h('span', { style: { flex: 1, color: '#303133', wordBreak: 'break-all', wordWrap: 'break-word' } }, item.value || '未知'),
-                          ],
-                        ),
+                        },
+                        [
+                          h('span', {
+                            style: {
+                              flexShrink: 0,
+                              width: isMobile ? 'auto' : '100px',
+                              fontWeight: 500,
+                              color: '#606266',
+                              textAlign: isMobile ? 'left' : 'right',
+                              marginRight: isMobile ? 0 : '12px',
+                              marginBottom: isMobile ? '4px' : 0,
+                            },
+                          }, `${item.label}：`),
+                          h('span', { style: { flex: 1, color: '#303133', wordBreak: 'break-all', wordWrap: 'break-word' } }, item.value || '未知'),
+                        ],
                       ),
-                    )
+                    ),
+                  )
                   : null,
               ]),
               // SkyWalking 按钮

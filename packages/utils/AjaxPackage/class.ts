@@ -352,6 +352,7 @@ export default class BaseApi extends BaseHttpClient {
         alignItems: 'center',
         gap: '8px',
         maxWidth: '100%',
+        whiteSpace: 'normal',
       },
     }, [
       h('div', {
@@ -383,7 +384,25 @@ export default class BaseApi extends BaseHttpClient {
     this.messageInstance?.error({
       message: messageVNode as any,
       duration: 5 * 1000,
+      customClass: 'system-error-message', // 添加自定义类名
     })
+
+    // 确保自定义类名的样式被正确应用
+    if (typeof document !== 'undefined') {
+      // 获取或创建样式元素
+      let styleElement = document.getElementById('system-error-message-style')
+      if (!styleElement) {
+        styleElement = document.createElement('style')
+        styleElement.id = 'system-error-message-style'
+        document.head.appendChild(styleElement)
+      }
+      // 设置高优先级样式
+      styleElement.textContent = `
+        .system-error-message {
+          z-index: 99999998 !important;
+        }
+      `
+    }
   }
 
   /**
@@ -446,6 +465,7 @@ export default class BaseApi extends BaseHttpClient {
       const finalOptions: NotificationOptions = {
         ...defaultOptions,
         ...notificationOptions,
+        dangerouslyUseHTMLString: true,
         message: html,
       }
       this.notificationInstance?.(finalOptions as any)
