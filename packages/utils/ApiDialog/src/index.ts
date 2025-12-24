@@ -17,7 +17,7 @@ export interface ApiDialogOptions {
 }
 
 // createApiDialog 工具函数
-export function createApiDialog(DialogComponent?: Component) {
+export function createApiDialog(DialogComponent?: Component, parentContainer?: HTMLElement | null) {
   let container: HTMLDivElement | null = null
   let vnode: VNode | null = null
   let isOpen = false
@@ -56,6 +56,8 @@ export function createApiDialog(DialogComponent?: Component) {
         'modelValue': props.modelValue,
         'title': props.title,
         'width': props.width,
+        // 如果提供了父容器，则挂载到父容器中
+        'appendTo': parentContainer || undefined,
         'onUpdate:modelValue': (val: boolean) => {
           emit('update:modelValue', val)
           if (!val) {
@@ -84,7 +86,9 @@ export function createApiDialog(DialogComponent?: Component) {
   // 创建容器
   function createContainer() {
     const el = document.createElement('div')
-    document.body.appendChild(el)
+    // 如果提供了父容器，则挂载到父容器中，否则挂载到 body
+    const mountTarget = parentContainer || document.body
+    mountTarget.appendChild(el)
     return el
   }
 

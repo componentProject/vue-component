@@ -4,34 +4,48 @@
  */
 import { ElMessage } from 'element-plus'
 
-// 检查 document 是否存在
-const hasDocument = typeof document !== 'undefined'
-
 /**
  * 创建消息实例的包装函数
- * @returns 消息实例，支持 success、error、warning、info 方法
+ * @param hasDocument - 是否在浏览器环境
+ * @param container - 容器元素，如果提供则消息将挂载到该容器中
+ * @returns 消息函数实例，直接调用即可，支持传入 type: 'success' | 'error' | 'warning' | 'info'
  */
-export function createMessageWrapper() {
+export function createMessageWrapper(hasDocument: boolean, container?: HTMLElement | null) {
   if (hasDocument) {
-    return ElMessage
+    /**
+     * 浏览器环境下的消息函数
+     * @param options - 字符串或配置对象，配置对象可以包含 type、message 等
+     */
+    return (options: string | { message?: string, type?: 'success' | 'error' | 'warning' | 'info', [key: string]: any }) => {
+      const opts = typeof options === 'string' ? { message: options } : options
+      const finalOptions = container
+        ? { ...opts, appendTo: container }
+        : opts
+      return ElMessage(finalOptions as any)
+    }
   }
-  return {
-    success: (options: string | { message?: string, [key: string]: any }) => {
-      const message = typeof options === 'string' ? options : options?.message || ''
-      console.log(`[Message Success] ${message}`)
-    },
-    error: (options: string | { message?: string, [key: string]: any }) => {
-      const message = typeof options === 'string' ? options : options?.message || ''
-      console.error(`[Message Error] ${message}`)
-    },
-    warning: (options: string | { message?: string, [key: string]: any }) => {
-      const message = typeof options === 'string' ? options : options?.message || ''
-      console.warn(`[Message Warning] ${message}`)
-    },
-    info: (options: string | { message?: string, [key: string]: any }) => {
-      const message = typeof options === 'string' ? options : options?.message || ''
-      console.info(`[Message Info] ${message}`)
-    },
+
+  // 非浏览器环境下，使用 console 进行降级输出
+  return (options: string | { message?: string, type?: 'success' | 'error' | 'warning' | 'info', [key: string]: any }) => {
+    const opts = typeof options === 'string' ? { message: options } : options
+    const message = opts?.message || ''
+    const type = opts?.type || 'info'
+
+    const logMessage = `[Message ${type}] ${message}`
+    switch (type) {
+      case 'success':
+        console.log(logMessage)
+        break
+      case 'error':
+        console.error(logMessage)
+        break
+      case 'warning':
+        console.warn(logMessage)
+        break
+      default:
+        console.info(logMessage)
+        break
+    }
   }
 }
 

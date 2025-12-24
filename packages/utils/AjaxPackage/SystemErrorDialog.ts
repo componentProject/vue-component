@@ -1,5 +1,6 @@
 import { ElButton, ElDialog, ElMessage } from 'element-plus'
 import { computed, defineComponent, h, ref } from 'vue'
+import { copyToClipboard } from '../_utils/index.ts'
 import { getCurrentMenuLocalStorage, getUserInfoFromLocalStorage } from './_utils/systemErrorInfo.ts'
 import BaseApi from './class.ts'
 import cssModules from './styles/modules/index.module.css'
@@ -125,6 +126,36 @@ export default defineComponent({
       emit('update:modelValue', val)
     }
 
+    /**
+     * 获取 ajaxPackage-message 容器（用于 Message 和 Notification）
+     */
+    function getAjaxPackageMessageContainer(): HTMLElement | null {
+      if (typeof document === 'undefined')
+        return null
+      return document.getElementById('ajaxPackage-message')
+    }
+
+    /**
+     * 获取 ajaxPackage-popover 容器（用于 Dialog）
+     */
+    function getAjaxPackagePopoverContainer(): HTMLElement | null {
+      if (typeof document === 'undefined')
+        return null
+      return document.getElementById('ajaxPackage-popover')
+    }
+
+    /**
+     * 统一的消息提示函数，挂载到 #ajaxPackage-message 中
+     */
+    function showMessage(options: { type?: 'success' | 'warning' | 'error', message: string }) {
+      const container = getAjaxPackageMessageContainer()
+      const { type = 'info', message } = options
+      const finalOptions = container
+        ? { type, message, appendTo: container }
+        : { type, message }
+      ElMessage(finalOptions as any)
+    }
+
     // 处理错误上报
     async function handleReport() {
       await baseApi.post('/upgGlobalExceptionReports', {
@@ -139,7 +170,7 @@ export default defineComponent({
         menuUrl: currentUrl,
         errorMessage: props.errorMessage,
       })
-      ElMessage.success('上报成功')
+      showMessage({ type: 'success', message: '上报成功' })
       handleClose()
     }
 
@@ -174,6 +205,27 @@ export default defineComponent({
       window.open(skyWalkingUrl, '_blank')
     }
 
+    /**
+     * 复制 traceId 到剪贴板
+     * 点击黑色错误信息区域时触发
+     */
+    async function handleCopyTraceId() {
+      const traceId = props.traceId
+
+      if (!traceId) {
+        showMessage({ type: 'warning', message: 'TraceId 不存在' })
+        return
+      }
+
+      const success = await copyToClipboard(traceId)
+      if (success) {
+        showMessage({ type: 'success', message: '复制 traceId 成功' })
+      }
+      else {
+        showMessage({ type: 'error', message: '复制 traceId 失败' })
+      }
+    }
+
     // 导出方法给 createApiDialog 使用
     function close() {
       handleClose()
@@ -189,6 +241,7 @@ export default defineComponent({
     })
 
     return () => {
+      const popoverContainer = getAjaxPackagePopoverContainer()
       return h(
         ElDialog,
         {
@@ -198,8 +251,8 @@ export default defineComponent({
           'showClose': true,
           'closeOnClickModal': false,
           'closeOnPressEscape': false,
-          'zIndex': 99999999,
           'style': { padding: '16px 0' },
+          'appendTo': popoverContainer || undefined,
           'onUpdate:modelValue': handleModelValueChange,
         },
         {
@@ -292,7 +345,20 @@ export default defineComponent({
                 ),
               ]),
               // 黑色错误信息区域
-              h('div', { style: { backgroundColor: '#2c3e50', color: '#fff', padding: '16px 20px', fontFamily: 'Monaco, Consolas, "Courier New", monospace', fontSize: '12px', lineHeight: 1.5, maxHeight: '200px', overflowY: 'auto' } }, [
+              h('div', {
+                style: {
+                  backgroundColor: '#2c3e50',
+                  color: '#fff',
+                  padding: '16px 20px',
+                  fontFamily: 'Monaco, Consolas, "Courier New", monospace',
+                  fontSize: '12px',
+                  lineHeight: 1.5,
+                  maxHeight: '200px',
+                  overflowY: 'auto',
+                  cursor: 'pointer',
+                },
+                onClick: handleCopyTraceId,
+              }, [
                 h('div', { style: { marginBottom: '8px', color: '#ecf0f1' } }, `Trace ID: ${props.traceId || 'a1b2c3d4-e5f6-7890-g1h2-i3j4k5l6m7n8'}`),
                 h('div', { style: { color: '#e74c3c', fontWeight: 'bold', whiteSpace: 'pre-wrap' } }, `Error: ${props.errorMessage || 'Connection timeout after 5000ms'}`),
               ]),

@@ -1,6 +1,8 @@
 <!-- .vitepress/theme/Layout.vue -->
 <template>
-  <DefaultTheme.Layout />
+  <ClientOnly>
+    <DefaultTheme.Layout />
+  </ClientOnly>
 </template>
 
 <script setup lang="ts">

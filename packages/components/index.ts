@@ -9,7 +9,6 @@ export * from './_hooks'
 export * from './components'
 
 const components: Component[] = Object.keys(Components)
-
 export default {
   install(app: App) {
     components.forEach((component) => {

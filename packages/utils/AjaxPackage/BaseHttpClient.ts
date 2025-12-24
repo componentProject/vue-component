@@ -29,7 +29,8 @@ import {
  * @param messageInstance - 消息实例，用于显示提示
  */
 function defaultOnLoginRequired(messageInstance: MessageInstance) {
-  messageInstance?.error({
+  messageInstance?.({
+    type: 'error',
     message: '登录已过期，请重新登录',
     duration: 5 * 1000,
   })
@@ -66,6 +67,83 @@ export default class BaseHttpClient {
   protected addSign?: (config: AxiosRequestConfig) => void
 
   /**
+   * 检查是否在浏览器环境（在类初始化时判断）
+   * 注意：这是静态属性，所有实例共享
+   */
+  protected static readonly hasDocument = typeof document !== 'undefined'
+
+  /**
+   * 获取是否在浏览器环境（实例 getter）
+   * @returns 是否在浏览器环境
+   */
+  protected get hasDocument(): boolean {
+    return BaseHttpClient.hasDocument
+  }
+
+  /**
+   * 获取或创建 ajaxPackage-container 容器元素
+   * @returns 容器元素，如果不是浏览器环境则返回 null
+   */
+  protected getContainer(): HTMLElement | null {
+    if (!this.hasDocument) {
+      return null
+    }
+
+    // 检查是否已存在容器
+    let container = document.getElementById('ajaxPackage-container')
+    if (!container) {
+      // 创建容器元素，作为所有 AjaxPackage 弹层的统一挂载点
+      container = document.createElement('div')
+      container.id = 'ajaxPackage-container'
+      document.body.appendChild(container)
+
+      // 创建 #ajaxPackage-popover 子元素（用于 Dialog）
+      const popoverContainer = document.createElement('div')
+      popoverContainer.id = 'ajaxPackage-popover'
+      container.appendChild(popoverContainer)
+
+      // 创建 #ajaxPackage-message 子元素（用于 Message 和 Notification）
+      const messageContainer = document.createElement('div')
+      messageContainer.id = 'ajaxPackage-message'
+      messageContainer.style.zIndex = '99999999'
+      container.appendChild(messageContainer)
+    }
+    return container
+  }
+
+  /**
+   * 获取或创建 ajaxPackage-popover 容器元素（用于 Dialog）
+   * @returns 容器元素，如果不是浏览器环境则返回 null
+   */
+  protected getPopoverContainer(): HTMLElement | null {
+    if (!this.hasDocument) {
+      return null
+    }
+
+    // 确保主容器存在
+    this.getContainer()
+
+    // 获取或返回 popover 容器
+    return document.getElementById('ajaxPackage-popover')
+  }
+
+  /**
+   * 获取或创建 ajaxPackage-message 容器元素（用于 Message 和 Notification）
+   * @returns 容器元素，如果不是浏览器环境则返回 null
+   */
+  protected getMessageContainer(): HTMLElement | null {
+    if (!this.hasDocument) {
+      return null
+    }
+
+    // 确保主容器存在
+    this.getContainer()
+
+    // 获取或返回 message 容器
+    return document.getElementById('ajaxPackage-message')
+  }
+
+  /**
    * 创建 BaseHttpClient 实例
    * @param config - HTTP 客户端配置对象
    */
@@ -83,8 +161,16 @@ export default class BaseHttpClient {
 
     this.baseURL = baseURL
     this.timeout = timeout
-    this.messageInstance = createMessageWrapper()
-    this.notificationInstance = createNotificationWrapper()
+
+    // 创建容器（如果是在浏览器环境）
+    this.getContainer()
+
+    // 获取 message 容器（用于 Message 和 Notification）
+    const messageContainer = this.getMessageContainer()
+
+    // 创建消息和通知实例，传入 hasDocument 和 message 容器
+    this.messageInstance = createMessageWrapper(this.hasDocument, messageContainer)
+    this.notificationInstance = createNotificationWrapper(this.hasDocument, messageContainer)
     this.onTimeout = onTimeout
     this.getToken = getToken
     this.onLoginRequired = onLoginRequired
@@ -199,7 +285,8 @@ export default class BaseHttpClient {
     // 如果不是认证错误和超时错误，则处理为网络错误
     if (error.response?.status !== 401 && error.code !== 'ECONNABORTED') {
       const fallbackError = error as AxiosError<any>
-      this.messageInstance?.error({
+      this.messageInstance?.({
+        type: 'error',
         message: (fallbackError.response?.data as string) || fallbackError.message || '网络错误',
         duration: 5 * 1000,
       })

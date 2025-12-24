@@ -4,16 +4,30 @@
  */
 import { ElNotification } from 'element-plus'
 
-// 检查 document 是否存在
-const hasDocument = typeof document !== 'undefined'
-
 /**
  * 创建通知实例的包装函数（用于 errors / tips 展示）
- * @returns 通知实例，支持 success、error、warning、info 方法
+ * @param hasDocument - 是否在浏览器环境
+ * @param container - 容器元素，如果提供则通知将挂载到该容器中
+ * @returns 通知函数实例，直接调用即可，支持传入 type: 'success' | 'error' | 'warning' | 'info'
  */
-export function createNotificationWrapper() {
+export function createNotificationWrapper(hasDocument: boolean, container?: HTMLElement | null) {
   if (hasDocument) {
-    return ElNotification
+    /**
+     * 浏览器环境下的通知函数
+     * @param options - 字符串或配置对象，配置对象可以包含 type、message、title 等
+     */
+    return (options: string | {
+      message?: string
+      title?: string
+      type?: 'success' | 'error' | 'warning' | 'info'
+      [key: string]: any
+    }) => {
+      const opts = typeof options === 'string' ? { message: options } : options
+      const finalOptions = container
+        ? { ...opts, appendTo: container }
+        : opts
+      return ElNotification(finalOptions as any)
+    }
   }
 
   const consoleNotification = (
@@ -40,6 +54,7 @@ export function createNotificationWrapper() {
     }
   }
 
+  // 非浏览器环境下，返回一个函数，内部用 console 输出
   const wrapper = (options: string | {
     message?: string
     title?: string

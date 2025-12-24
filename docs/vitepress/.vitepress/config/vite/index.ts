@@ -37,7 +37,7 @@ const viteConfig = getViteConfig({
           silenceDeprecations: ['legacy-js-api'],
           api: 'modern-compiler',
           additionalData: (source: string, filename: string) => {
-            if (filename.includes('.vue') && !filename.includes('AIAgent')) {
+            if (filename.includes('.vue')) {
               return `@forward '@moluoxixi/components/_assets/styles/tailwind.scss';
                 ${source}`
             }

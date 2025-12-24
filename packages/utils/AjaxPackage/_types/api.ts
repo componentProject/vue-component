@@ -104,21 +104,61 @@ export interface NotificationOptions {
 }
 
 /**
- * 扩展 AxiosRequestConfig，支持自定义通知配置
+ * 消息配置选项
  */
-export interface ExtendedAxiosRequestConfig extends AxiosRequestConfig {
+export interface MessageOptions {
+  /**
+   * 消息类型
+   */
+  type?: 'success' | 'error' | 'warning' | 'info'
+  /**
+   * 消息内容
+   */
+  message?: string
+  /**
+   * 消息持续时间（毫秒）
+   */
+  duration?: number
+  /**
+   * 是否显示关闭按钮
+   */
+  showClose?: boolean
+  /**
+   * 自定义类名
+   */
+  customClass?: string
+  /**
+   * 其他消息选项
+   */
+  [key: string]: any
+}
+
+/**
+ * 消息相关配置选项
+ */
+export interface MessageConfigs {
   /**
    * 错误通知配置选项，用于覆盖默认的错误通知参数
    */
   errorNotificationOptions?: NotificationOptions
   /**
-   * 提示通知配置选项，用于覆盖默认的提示通知参数
+   * 提示消息配置选项，用于覆盖默认的提示消息参数
    */
-  tipsNotificationOptions?: NotificationOptions
+  tipsMessageOptions?: MessageOptions
   /**
    * 是否使用自定义消息处理
    * 当为 true 时，handleBusinessError、handleErrorArray、handleTips 都不会执行
    * 默认值为 false
    */
   isCustomMessage?: boolean
+}
+
+/**
+ * 扩展 AxiosRequestConfig，支持自定义通知配置
+ */
+export interface ExtendedAxiosRequestConfig extends AxiosRequestConfig {
+  /**
+   * 消息相关配置选项，集中管理消息、通知和自定义处理配置
+   */
+  messageConfigs?: MessageConfigs
 }

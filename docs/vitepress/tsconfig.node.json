@@ -8,9 +8,7 @@
     "composite": true
   },
   "include": [
-    "contants/*",
     "contants/**/*",
     ".vitepress/config/**/*",
-    ".vitepress/config/*"
   ]
 }

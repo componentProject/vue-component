@@ -10,7 +10,7 @@ import type { AxiosResponse } from 'axios'
  * Copyright (c) 2025 by ${git_name_email}, All Rights Reserved.
  */
 
-import type { BaseApiConfig, ExtendedAxiosRequestConfig, NotificationOptions } from './_types/index.ts'
+import type { BaseApiConfig, ExtendedAxiosRequestConfig, MessageOptions, NotificationOptions } from './_types/index.ts'
 import { h } from 'vue'
 import { dynamicImports } from '../_utils/index.ts'
 import createApiDialog from '../ApiDialog/index.ts'
@@ -26,12 +26,6 @@ export default class BaseApi extends BaseHttpClient {
   protected responseFields: Required<BaseApiConfig['responseFields']>
   protected enableSystemErrorDialog: boolean
   protected systemErrorMessage: string
-
-  /**
-   * 检查是否在浏览器环境（在类初始化时判断）
-   * 注意：这是静态属性，所有实例共享
-   */
-  private static readonly hasDocument = typeof document !== 'undefined'
 
   /**
    * SystemErrorDialog 实例
@@ -57,14 +51,6 @@ export default class BaseApi extends BaseHttpClient {
     code: number
     message: string
   }>()
-
-  /**
-   * 获取是否在浏览器环境（实例 getter）
-   * @returns 是否在浏览器环境
-   */
-  protected get hasDocument(): boolean {
-    return BaseApi.hasDocument
-  }
 
   /**
    * 获取系统错误信息存储（实例 getter）
@@ -173,7 +159,7 @@ export default class BaseApi extends BaseHttpClient {
     const {
       responseFields,
       enableSystemErrorDialog = true,
-      systemErrorMessage = '系统错误',
+      systemErrorMessage = '系统异常，点击看详情',
       ...baseConfig
     } = config
 
@@ -207,7 +193,9 @@ export default class BaseApi extends BaseHttpClient {
   private async initSystemErrorDialog(): Promise<void> {
     try {
       const { default: SystemErrorDialog } = await dynamicImports(import('./SystemErrorDialog.ts'), ['default'] as const)
-      this.systemErrorDialogInstance = createApiDialog(SystemErrorDialog)
+      // 获取 popover 容器，传递给 createApiDialog（用于 Dialog）
+      const popoverContainer = this.getPopoverContainer()
+      this.systemErrorDialogInstance = createApiDialog(SystemErrorDialog, popoverContainer)
     }
     catch (error) {
       console.warn('Failed to load SystemErrorDialog:', error)
@@ -233,7 +221,8 @@ export default class BaseApi extends BaseHttpClient {
     const { code, message, responseData } = parsedFields
 
     const config = response.config as ExtendedAxiosRequestConfig
-    const isCustomMessage = config?.isCustomMessage ?? false
+    const messageConfigs = config?.messageConfigs
+    const isCustomMessage = messageConfigs?.isCustomMessage ?? false
 
     this.handleSystemError(response, code, message, responseData)
 
@@ -303,7 +292,8 @@ export default class BaseApi extends BaseHttpClient {
       if (this.enableSystemErrorDialog) {
         this.showSystemErrorMessage(response, responseData, code, message)
       }
-      throw new Error(message || '系统异常')
+      // 抛出错误优先原始错误
+      throw new Error(message || this.systemErrorMessage)
     }
   }
 
@@ -360,7 +350,7 @@ export default class BaseApi extends BaseHttpClient {
           color: 'var(--el-message-text-color)',
           lineHeight: '24px',
         },
-      }, message || this.systemErrorMessage),
+      }, this.systemErrorMessage || message),
       h('svg', {
         onClick: handleIconClick,
         style: {
@@ -380,29 +370,13 @@ export default class BaseApi extends BaseHttpClient {
       ]),
     ])
 
-    // 显示错误消息（使用 vNode）
-    this.messageInstance?.error({
+    // 显示错误消息（使用 vNode，统一通过函数调用）
+    this.messageInstance?.({
+      type: 'error',
       message: messageVNode as any,
       duration: 5 * 1000,
       customClass: 'system-error-message', // 添加自定义类名
     })
-
-    // 确保自定义类名的样式被正确应用
-    if (typeof document !== 'undefined') {
-      // 获取或创建样式元素
-      let styleElement = document.getElementById('system-error-message-style')
-      if (!styleElement) {
-        styleElement = document.createElement('style')
-        styleElement.id = 'system-error-message-style'
-        document.head.appendChild(styleElement)
-      }
-      // 设置高优先级样式
-      styleElement.textContent = `
-        .system-error-message {
-          z-index: 99999998 !important;
-        }
-      `
-    }
   }
 
   /**
@@ -413,7 +387,8 @@ export default class BaseApi extends BaseHttpClient {
    */
   protected handleBusinessError(code: any, message: any): void {
     if (code && code !== 200) {
-      this.messageInstance?.error({
+      this.messageInstance?.({
+        type: 'error',
         message: message || '请求失败',
         duration: 5 * 1000,
       })
@@ -433,34 +408,29 @@ export default class BaseApi extends BaseHttpClient {
       const errors = this.getValueByPath(httpData, errorsField)
       if (Array.isArray(errors) && errors.length) {
         const config = response.config as ExtendedAxiosRequestConfig
-        const notificationOptions = config?.errorNotificationOptions
-        this.showErrorArrayNotification(errors, notificationOptions)
+        const notificationOptions = config?.messageConfigs?.errorNotificationOptions
+        this.showErrors(errors, notificationOptions)
         throw new Error('请求错误')
       }
     }
   }
 
   /**
-   * 显示通知的通用方法
-   * @param items - 通知项数组
-   * @param type - 通知类型
-   * @param color - HTML 颜色
+   * 显示错误信息（默认实现）
+   * 使用 notification 显示错误信息
+   * 子类可重写此方法来自定义错误信息显示方式
+   * @param errors - 错误数组
    * @param notificationOptions - 通知配置选项
    */
-  private showNotification(
-    items: Array<{ code: string, message: string }>,
-    type: 'error' | 'warning',
-    color: string,
-    notificationOptions?: NotificationOptions,
-  ): void {
+  protected showErrors(errors: Array<{ code: string, message: string }>, notificationOptions?: NotificationOptions): void {
     const defaultOptions: NotificationOptions = {
       title: '提示',
-      type,
+      type: 'error',
     }
 
     if (this.hasDocument) {
-      const html = items
-        .map((item: any) => `<div style="font-size: 14px;color:${color}">${item.code}：${item.message}</div>`)
+      const html = errors
+        .map((item: any) => `<div style="font-size: 14px;color:red">${item.code}：${item.message}</div>`)
         .join('')
       const finalOptions: NotificationOptions = {
         ...defaultOptions,
@@ -471,7 +441,7 @@ export default class BaseApi extends BaseHttpClient {
       this.notificationInstance?.(finalOptions as any)
     }
     else {
-      const messages = items.map((item: any) => `${item.code}：${item.message}`).join('\n')
+      const messages = errors.map((item: any) => `${item.code}：${item.message}`).join('\n')
       const finalOptions: NotificationOptions = {
         ...defaultOptions,
         ...notificationOptions,
@@ -479,16 +449,6 @@ export default class BaseApi extends BaseHttpClient {
       }
       this.notificationInstance?.(finalOptions as any)
     }
-  }
-
-  /**
-   * 显示错误数组通知
-   * 子类可重写此方法来自定义错误数组通知显示方式
-   * @param errors - 错误数组
-   * @param notificationOptions - 通知配置选项
-   */
-  protected showErrorArrayNotification(errors: Array<{ code: string, message: string }>, notificationOptions?: NotificationOptions): void {
-    this.showNotification(errors, 'error', 'red', notificationOptions)
   }
 
   /**
@@ -503,20 +463,43 @@ export default class BaseApi extends BaseHttpClient {
       const tips = this.getValueByPath(httpData, tipsField)
       if (Array.isArray(tips) && tips.length) {
         const config = response.config as ExtendedAxiosRequestConfig
-        const notificationOptions = config?.tipsNotificationOptions
-        this.showTipsNotification(tips, notificationOptions)
+        const messageOptions = config?.messageConfigs?.tipsMessageOptions
+        this.showTips(tips, messageOptions)
       }
     }
   }
 
   /**
-   * 显示提示信息通知
-   * 子类可重写此方法来自定义提示信息通知显示方式
+   * 显示提示信息（默认实现）
+   * 根据 messageOptions.type 指定消息类型显示，提取所有 message 并连接
+   * 子类可重写此方法来自定义提示信息显示方式
    * @param tips - 提示信息数组
-   * @param notificationOptions - 通知配置选项
+   * @param messageOptions - 消息配置选项
    */
-  protected showTipsNotification(tips: Array<{ code: string, message: string }>, notificationOptions?: NotificationOptions): void {
-    this.showNotification(tips, 'warning', '#E6A23C', notificationOptions)
+  protected showTips(tips: Array<{ code: string, message: string }>, messageOptions?: MessageOptions): void {
+    // 提取所有 message 并连接
+    const tipsMessage = tips.map(item => item.message).join('')
+
+    // 默认配置
+    const defaultOptions: MessageOptions = {
+      type: 'success',
+      duration: 3000,
+      showClose: true,
+      message: tipsMessage,
+    }
+
+    // 合并配置（如果用户提供了 message，则使用用户的；否则使用从 tips 提取的）
+    const finalOptions: MessageOptions = {
+      ...defaultOptions,
+      ...messageOptions,
+      message: messageOptions?.message ?? tipsMessage,
+    }
+
+    // 使用统一的消息函数，根据 type 传递配置
+    const messageInstance = this.messageInstance
+    if (!messageInstance)
+      return
+    messageInstance(finalOptions as any)
   }
 
   /**
