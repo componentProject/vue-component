@@ -23,7 +23,7 @@ import autoprefixer from 'autoprefixer'
 import { defineConfig, mergeConfig } from 'vite'
 
 import { createHtmlPlugin } from 'vite-plugin-html'
-import { deepMerge, dynamicImport } from '../../_utils/index.ts'
+import { deepMerge, dynamicImport, validateMutuallyExclusive } from '../../_utils/index.ts'
 import scopedCssPrefixPlugin from './plugins/addScopedAndReplacePrefix.ts'
 
 // // workbox urlPattern 参数类型
@@ -68,18 +68,21 @@ async function getViteConfig(Config: ViteConfigType, params?: ConfigEnv) {
     qiankun = config.qiankun,
     namespace = config.namespace,
     dropConsole = config.dropConsole,
-    vue = config.vue ?? true,
-    react = config.react ?? false,
-    vitepress = config.vitepress,
+    vue: vueRaw = config.vue,
+    react: reactRaw = config.react,
+    vitepress: vitepressRaw = config.vitepress,
   } = viteEnv
+
+  // 验证 vue、react、vitepress 互斥性，只能有一个为 true，都不指定时默认 vue 为 true
+  const { vue, react, vitepress } = validateMutuallyExclusive(
+    { vue: vueRaw, react: reactRaw, vitepress: vitepressRaw },
+    'vue',
+  )
 
   // appTitle 和 appCode 从 config 中获取，因为它们不在 ModeConfig 中
   const appTitle = config.appTitle
   const appCode = config.appCode
 
-  const isVue = !vitepress && vue
-  const isReact = !vitepress && react
-  const isVitepress = vitepress
   const isVueOrVitepress = vue || vitepress
   const envSystemCode = isDev && !qiankunDevMode ? 'el' : (namespace ?? appCode)
 
@@ -94,13 +97,13 @@ async function getViteConfig(Config: ViteConfigType, params?: ConfigEnv) {
   ]
 
   // pluginVue
-  if (isVue) {
+  if (vue) {
     const pluginVue = await dynamicImport(import('@vitejs/plugin-vue'))
     plugins.push(pluginVue())
   }
 
   // pluginReact
-  if (isReact) {
+  if (react) {
     const pluginReact = await dynamicImport(import('@vitejs/plugin-react'))
     plugins.push(pluginReact())
   }
@@ -116,10 +119,10 @@ async function getViteConfig(Config: ViteConfigType, params?: ConfigEnv) {
     const Pages = await dynamicImport(import('vite-plugin-pages'))
     // 根据框架类型确定文件扩展名
     const extensions = []
-    if (isVue) {
+    if (vue) {
       extensions.push('vue')
     }
-    if (isReact) {
+    if (react) {
       extensions.push('tsx', 'jsx')
     }
     plugins.push(Pages(
