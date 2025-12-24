@@ -4,13 +4,13 @@ const hasOwn = {}.hasOwnProperty
 type ClassDictionary = Record<string, any>
 type ClassArray = ClassValue[]
 type ClassValue
-    = | string
-      | null
-      | undefined
-      | false
-      | ClassDictionary
-      | ClassArray
-      | { toString: () => string }
+  = | string
+    | null
+    | undefined
+    | false
+    | ClassDictionary
+    | ClassArray
+    | { toString: () => string }
 
 function isCustomToString(value: unknown): value is { toString: () => string } {
   if (value && typeof value === 'object') {

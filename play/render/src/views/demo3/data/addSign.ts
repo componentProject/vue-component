@@ -5,12 +5,12 @@ function uuid(num: any) {
     // 如果提供了num参数，生成一个由'x'组成的字符串
     let n = ''
     for (let i = 0; i < num; i++) {
-      n = n + 'x'
+      n = `${n}x`
     }
     // 将'x'替换为随机的十六进制字符
-    return n.replace(/[xy]/g, function (c) {
+    return n.replace(/[xy]/g, (c) => {
       const r = (Math.random() * 16) | 0
-      const v = c == 'x' ? r : (r & 0x3) | 0x8
+      const v = c === 'x' ? r : (r & 0x3) | 0x8
       return v.toString(16)
     })
   }

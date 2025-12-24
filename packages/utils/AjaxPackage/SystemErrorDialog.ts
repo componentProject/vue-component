@@ -245,38 +245,38 @@ export default defineComponent({
                 ),
                 techSummaryExpanded.value
                   ? h(
-                    'div',
-                    { style: { padding: '16px 20px', backgroundColor: '#fafafa' } },
-                    techSummaryItems.value.map(item =>
-                      h(
-                        'div',
-                        {
-                          key: item.label,
-                          style: {
-                            display: 'flex',
-                            alignItems: 'flex-start',
-                            marginBottom: '12px',
-                            lineHeight: 1.5,
-                            flexDirection: isMobile ? 'column' : 'row',
-                          },
-                        },
-                        [
-                          h('span', {
+                      'div',
+                      { style: { padding: '16px 20px', backgroundColor: '#fafafa' } },
+                      techSummaryItems.value.map(item =>
+                        h(
+                          'div',
+                          {
+                            key: item.label,
                             style: {
-                              flexShrink: 0,
-                              width: isMobile ? 'auto' : '100px',
-                              fontWeight: 500,
-                              color: '#606266',
-                              textAlign: isMobile ? 'left' : 'right',
-                              marginRight: isMobile ? 0 : '12px',
-                              marginBottom: isMobile ? '4px' : 0,
+                              display: 'flex',
+                              alignItems: 'flex-start',
+                              marginBottom: '12px',
+                              lineHeight: 1.5,
+                              flexDirection: isMobile ? 'column' : 'row',
                             },
-                          }, `${item.label}：`),
-                          h('span', { style: { flex: 1, color: '#303133', wordBreak: 'break-all', wordWrap: 'break-word' } }, item.value || '未知'),
-                        ],
+                          },
+                          [
+                            h('span', {
+                              style: {
+                                flexShrink: 0,
+                                width: isMobile ? 'auto' : '100px',
+                                fontWeight: 500,
+                                color: '#606266',
+                                textAlign: isMobile ? 'left' : 'right',
+                                marginRight: isMobile ? 0 : '12px',
+                                marginBottom: isMobile ? '4px' : 0,
+                              },
+                            }, `${item.label}：`),
+                            h('span', { style: { flex: 1, color: '#303133', wordBreak: 'break-all', wordWrap: 'break-word' } }, item.value || '未知'),
+                          ],
+                        ),
                       ),
-                    ),
-                  )
+                    )
                   : null,
               ]),
               // SkyWalking 按钮

@@ -22,15 +22,15 @@
               打开弹窗
             </ElButton>
             <component
-              v-model="dialogVisible"
-              :addSign="addSign"
               :is="item.componentCode"
+              v-model="dialogVisible"
+              :add-sign="addSign"
               v-bind="getComponentProps(item)"
             />
           </div>
           <component
-            v-else
             :is="item.componentCode"
+            v-else
             v-bind="getComponentProps(item)"
           />
         </template>
@@ -43,9 +43,9 @@
 import { getList, setDeleteByPathAndCode } from '@moluoxixi/utils/_api'
 import { ElButton, ElMessage } from 'element-plus'
 import { onBeforeMount, ref } from 'vue'
+import componentObj from '../../../../../packages/components/ExportExcel/src/Example.vue'
 import componentData from './data'
 import { addSign } from './data/addSign'
-import componentObj from '../../../../../packages/components/ExportExcel/src/Example.vue'
 
 defineOptions({ name: '调试与演示iife和umd' })
 // 调试与演示组件库的组件，直接修改组件名

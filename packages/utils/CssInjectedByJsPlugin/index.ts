@@ -128,9 +128,9 @@ export default function CssInjectedByJsPlugin({
         for (const name of htmlFiles) {
           const htmlChunk = bundle[name] as OutputAsset
           let replacedHtml
-                        = htmlChunk.source instanceof Uint8Array
-                          ? new TextDecoder().decode(htmlChunk.source)
-                          : `${htmlChunk.source}`
+            = htmlChunk.source instanceof Uint8Array
+              ? new TextDecoder().decode(htmlChunk.source)
+              : `${htmlChunk.source}`
 
           cssAssets.forEach((cssName) => {
             if (!unusedCssAssets.includes(cssName)) {

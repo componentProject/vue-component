@@ -389,7 +389,7 @@ function getMergeStyle(align: string) {
 // 表格样式设置
 function setPubExcel(data: any) {
   const excludes = ['!cols', '!fullref', '!merges', '!ref', '!rows']
-  for (let key in data) {
+  for (const key in data) {
     if (Object.prototype.hasOwnProperty.call(data, key)) {
       if (!excludes.includes(key)) {
         // 解析单元格位置
