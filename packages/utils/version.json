@@ -10,5 +10,6 @@
   "cssModuleGlobalRootPlugin": "0.0.5",
   "ViteBuild": "0.0.5",
   "AutoRoutesPlugin": "0.0.4",
-  "cssInjectedByJsPlugin": "0.0.3"
+  "cssInjectedByJsPlugin": "0.0.3",
+  "inherit": true
 }
