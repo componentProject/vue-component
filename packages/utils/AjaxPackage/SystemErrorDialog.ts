@@ -127,21 +127,21 @@ export default defineComponent({
     }
 
     /**
-     * 获取 ajaxPackage-message 容器（用于 Message 和 Notification）
+     * 获取 message 容器（用于 Message 和 Notification）
+     * 通过 baseApi 实例获取，确保使用正确的 UUID 容器
      */
     function getAjaxPackageMessageContainer(): HTMLElement | null {
-      if (typeof document === 'undefined')
-        return null
-      return document.getElementById('ajaxPackage-message')
+      // 通过 baseApi 实例的方法获取容器，这样可以获取到正确的 UUID 容器
+      return baseApi.getMessageContainer()
     }
 
     /**
-     * 获取 ajaxPackage-popover 容器（用于 Dialog）
+     * 获取 popover 容器（用于 Dialog）
+     * 通过 baseApi 实例获取，确保使用正确的 UUID 容器
      */
     function getAjaxPackagePopoverContainer(): HTMLElement | null {
-      if (typeof document === 'undefined')
-        return null
-      return document.getElementById('ajaxPackage-popover')
+      // 通过 baseApi 实例的方法获取容器，这样可以获取到正确的 UUID 容器
+      return baseApi.getPopoverContainer()
     }
 
     /**

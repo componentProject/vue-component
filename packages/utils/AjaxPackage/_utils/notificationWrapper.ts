@@ -7,10 +7,10 @@ import { ElNotification } from 'element-plus'
 /**
  * 创建通知实例的包装函数（用于 errors / tips 展示）
  * @param hasDocument - 是否在浏览器环境
- * @param container - 容器元素，如果提供则通知将挂载到该容器中
+ * @param container - 容器元素或获取容器的函数，如果提供则通知将挂载到该容器中
  * @returns 通知函数实例，直接调用即可，支持传入 type: 'success' | 'error' | 'warning' | 'info'
  */
-export function createNotificationWrapper(hasDocument: boolean, container?: HTMLElement | null) {
+export function createNotificationWrapper(hasDocument: boolean, container?: HTMLElement | null | (() => HTMLElement | null)) {
   if (hasDocument) {
     /**
      * 浏览器环境下的通知函数
@@ -23,8 +23,10 @@ export function createNotificationWrapper(hasDocument: boolean, container?: HTML
       [key: string]: any
     }) => {
       const opts = typeof options === 'string' ? { message: options } : options
-      const finalOptions = container
-        ? { ...opts, appendTo: container }
+      // 如果 container 是函数，则调用它获取容器；否则直接使用
+      const actualContainer = typeof container === 'function' ? container() : container
+      const finalOptions = actualContainer
+        ? { ...opts, appendTo: actualContainer }
         : opts
       return ElNotification(finalOptions as any)
     }

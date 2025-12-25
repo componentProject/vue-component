@@ -16,6 +16,10 @@ export interface BaseHttpClientConfig {
   getToken?: () => string | null
   /** 登录失效回调函数，当检测到 401 错误时调用，接收 messageInstance 用于显示消息提示 */
   onLoginRequired?: (messageInstance: MessageInstance) => void
+  /** container 插入的目标元素，可以是 HTMLElement 或选择器字符串，默认为 document.body */
+  appendTo?: HTMLElement | string | null
+  /** 当 appendTo 配置了但找不到元素时的处理方式：'body' - 使用 document.body（默认），string - 作为选择器查找后备元素，null - 返回 null 不降级 */
+  appendToFallback?: string | null
   /** 允许其他任意配置项，会直接传递给 axios.create */
   [key: string]: any
 }

@@ -47,6 +47,22 @@ function defaultGetToken() {
 }
 
 /**
+ * 生成 UUID（简单版本）
+ * @returns UUID 字符串
+ */
+function generateUUID(): string {
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+    return crypto.randomUUID()
+  }
+  // 降级方案：使用 Math.random 生成
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+    const r = (Math.random() * 16) | 0
+    const v = c === 'x' ? r : (r & 0x3) | 0x8
+    return v.toString(16)
+  })
+}
+
+/**
  * BaseHttpClient 基础类
  * 提供最基础的 HTTP 请求功能，包括：
  * - 创建 axios 实例
@@ -61,6 +77,11 @@ export default class BaseHttpClient {
   protected onTimeout: (messageInstance: MessageInstance) => void
   protected getToken?: () => string | null
   protected onLoginRequired?: (messageInstance: MessageInstance) => void
+  protected appendTo?: HTMLElement | string | null
+  protected appendToFallback: string | null = 'body'
+  protected containerId: string = ''
+  protected popoverContainerId: string = ''
+  protected messageContainerId: string = ''
   public instance: ReturnType<typeof axios.create>
   protected messageInstance: MessageInstance
   protected notificationInstance: NotificationInstance
@@ -81,6 +102,59 @@ export default class BaseHttpClient {
   }
 
   /**
+   * 解析 appendTo 配置，返回目标 HTMLElement
+   * @returns 目标元素，如果找不到且配置为 null 则返回 null，'body' 时返回 document.body，其他字符串作为选择器查找
+   */
+  protected resolveAppendToTarget(): HTMLElement | null {
+    if (!this.hasDocument) {
+      // 非浏览器环境不应该调用此方法，但为了类型安全返回 body
+      return document.body
+    }
+
+    // 如果未配置 appendTo，默认使用 document.body
+    if (!this.appendTo) {
+      return document.body
+    }
+
+    // 如果是 HTMLElement，直接返回
+    if (this.appendTo instanceof HTMLElement) {
+      return this.appendTo
+    }
+
+    // 如果是字符串，作为选择器查询元素
+    if (typeof this.appendTo === 'string') {
+      const element = document.querySelector<HTMLElement>(this.appendTo)
+      if (element) {
+        return element
+      }
+
+      // 如果查询不到元素，根据 appendToFallback 配置处理
+      if (this.appendToFallback === null) {
+        // null 时返回 null，不降级，保障后续能正确添加到指定元素里
+        console.warn(`appendTo 选择器 "${this.appendTo}" 未找到元素，appendToFallback 为 null，返回 null`)
+        return null
+      }
+      else if (this.appendToFallback === 'body') {
+        // 'body' 时使用 document.body
+        return document.body
+      }
+      else if (typeof this.appendToFallback === 'string') {
+        // 其他字符串作为选择器查找后备元素
+        const fallbackElement = document.querySelector<HTMLElement>(this.appendToFallback)
+        if (fallbackElement) {
+          return fallbackElement
+        }
+        // 后备元素也找不到，返回 null，不降级到 body
+        console.warn(`appendTo 选择器 "${this.appendTo}" 和 appendToFallback 选择器 "${this.appendToFallback}" 都未找到元素，返回 null`)
+        return null
+      }
+    }
+
+    // 其他情况返回 null
+    return null
+  }
+
+  /**
    * 获取或创建 ajaxPackage-container 容器元素
    * @returns 容器元素，如果不是浏览器环境则返回 null
    */
@@ -89,22 +163,44 @@ export default class BaseHttpClient {
       return null
     }
 
+    // 如果还没有生成 containerId，说明容器还没创建，需要生成唯一 ID
+    if (!this.containerId) {
+      this.containerId = `ajaxPackage-container-${generateUUID()}`
+      this.popoverContainerId = `ajaxPackage-popover-${generateUUID()}`
+      this.messageContainerId = `ajaxPackage-message-${generateUUID()}`
+    }
+
     // 检查是否已存在容器
-    let container = document.getElementById('ajaxPackage-container')
+    let container = document.getElementById(this.containerId)
     if (!container) {
       // 创建容器元素，作为所有 AjaxPackage 弹层的统一挂载点
       container = document.createElement('div')
-      container.id = 'ajaxPackage-container'
-      document.body.appendChild(container)
+      container.id = this.containerId
 
-      // 创建 #ajaxPackage-popover 子元素（用于 Dialog）
+      // 使用配置的 appendTo 目标元素，默认是 document.body
+      const targetElement = this.resolveAppendToTarget()
+      if (targetElement) {
+        targetElement.appendChild(container)
+      }
+      else {
+        // 如果 targetElement 为 null，说明配置了 appendTo 但找不到元素且 fallback 为 null
+        // 这种情况下不应该创建容器，返回 null
+        return null
+      }
+
+      // 创建 popover 子元素（用于 Dialog）
       const popoverContainer = document.createElement('div')
-      popoverContainer.id = 'ajaxPackage-popover'
+      popoverContainer.id = this.popoverContainerId
+      // 设置较低的 zIndex 和 position，确保在 message 容器之下
+      popoverContainer.style.position = 'relative'
+      popoverContainer.style.zIndex = '999999'
       container.appendChild(popoverContainer)
 
-      // 创建 #ajaxPackage-message 子元素（用于 Message 和 Notification）
+      // 创建 message 子元素（用于 Message 和 Notification）
       const messageContainer = document.createElement('div')
-      messageContainer.id = 'ajaxPackage-message'
+      messageContainer.id = this.messageContainerId
+      // 设置较高的 zIndex 和 position，确保在 popover 容器之上
+      messageContainer.style.position = 'relative'
       messageContainer.style.zIndex = '99999999'
       container.appendChild(messageContainer)
     }
@@ -112,35 +208,67 @@ export default class BaseHttpClient {
   }
 
   /**
-   * 获取或创建 ajaxPackage-popover 容器元素（用于 Dialog）
+   * 获取或创建 popover 容器元素（用于 Dialog）
    * @returns 容器元素，如果不是浏览器环境则返回 null
    */
-  protected getPopoverContainer(): HTMLElement | null {
+  public getPopoverContainer(): HTMLElement | null {
     if (!this.hasDocument) {
       return null
     }
 
-    // 确保主容器存在
-    this.getContainer()
+    // 确保主容器存在（每次调用时都检查，解决微前端环境容器可能未初始化的问题）
+    const container = this.getContainer()
+    if (!container) {
+      return null
+    }
+
+    // 如果还没有生成 containerId，说明容器还没创建
+    if (!this.popoverContainerId) {
+      return null
+    }
 
     // 获取或返回 popover 容器
-    return document.getElementById('ajaxPackage-popover')
+    const popoverContainer = document.getElementById(this.popoverContainerId)
+
+    // 如果容器存在但样式未设置，确保样式正确（zIndex 较低，确保在 message 之下）
+    if (popoverContainer && !popoverContainer.style.position) {
+      popoverContainer.style.position = 'relative'
+      popoverContainer.style.zIndex = '999999'
+    }
+
+    return popoverContainer
   }
 
   /**
-   * 获取或创建 ajaxPackage-message 容器元素（用于 Message 和 Notification）
+   * 获取或创建 message 容器元素（用于 Message 和 Notification）
    * @returns 容器元素，如果不是浏览器环境则返回 null
    */
-  protected getMessageContainer(): HTMLElement | null {
+  public getMessageContainer(): HTMLElement | null {
     if (!this.hasDocument) {
       return null
     }
 
-    // 确保主容器存在
-    this.getContainer()
+    // 确保主容器存在（每次调用时都检查，解决微前端环境容器可能未初始化的问题）
+    const container = this.getContainer()
+    if (!container) {
+      return null
+    }
+
+    // 如果还没有生成 containerId，说明容器还没创建
+    if (!this.messageContainerId) {
+      return null
+    }
 
     // 获取或返回 message 容器
-    return document.getElementById('ajaxPackage-message')
+    const messageContainer = document.getElementById(this.messageContainerId)
+
+    // 如果容器存在但样式未设置，确保样式正确（zIndex 最高，确保在 popover 之上）
+    if (messageContainer && !messageContainer.style.position) {
+      messageContainer.style.position = 'relative'
+      messageContainer.style.zIndex = '99999999'
+    }
+
+    return messageContainer
   }
 
   /**
@@ -155,22 +283,21 @@ export default class BaseHttpClient {
       onTimeout = () => {},
       getToken = defaultGetToken,
       onLoginRequired = defaultOnLoginRequired,
+      appendTo,
+      appendToFallback = 'body',
       addSign,
       ...axiosConfig
     } = config
 
     this.baseURL = baseURL
     this.timeout = timeout
+    this.appendTo = appendTo
+    this.appendToFallback = appendToFallback
 
-    // 创建容器（如果是在浏览器环境）
-    this.getContainer()
-
-    // 获取 message 容器（用于 Message 和 Notification）
-    const messageContainer = this.getMessageContainer()
-
-    // 创建消息和通知实例，传入 hasDocument 和 message 容器
-    this.messageInstance = createMessageWrapper(this.hasDocument, messageContainer)
-    this.notificationInstance = createNotificationWrapper(this.hasDocument, messageContainer)
+    // 创建消息和通知实例，传入 hasDocument 和获取容器的函数
+    // 使用函数形式，确保每次调用时都能获取到最新的容器（延迟初始化，解决微前端环境问题）
+    this.messageInstance = createMessageWrapper(this.hasDocument, () => this.getMessageContainer())
+    this.notificationInstance = createNotificationWrapper(this.hasDocument, () => this.getMessageContainer())
     this.onTimeout = onTimeout
     this.getToken = getToken
     this.onLoginRequired = onLoginRequired
