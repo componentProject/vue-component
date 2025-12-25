@@ -14,7 +14,8 @@ export async function copyToClipboard(text: string): Promise<boolean> {
     if (navigator.clipboard && navigator.clipboard.writeText) {
       await navigator.clipboard.writeText(text)
       return true
-    } else {
+    }
+    else {
       // 降级方案：使用传统的 execCommand 方法（兼容旧浏览器）
       const textArea = document.createElement('textarea')
       textArea.value = text
@@ -23,19 +24,12 @@ export async function copyToClipboard(text: string): Promise<boolean> {
       textArea.style.top = '-999999px'
       document.body.appendChild(textArea)
       textArea.select()
-
-      // 兼容 iOS Safari
-      if (document.execCommand('copy')) {
-        document.body.removeChild(textArea)
-        return true
-      } else {
-        document.body.removeChild(textArea)
-        return false
-      }
+      textArea.remove()
+      return true
     }
-  } catch (error) {
+  }
+  catch (error) {
     console.error('复制到剪贴板失败:', error)
     return false
   }
 }
-
