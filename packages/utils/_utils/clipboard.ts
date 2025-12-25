@@ -24,6 +24,7 @@ export async function copyToClipboard(text: string): Promise<boolean> {
       textArea.style.top = '-999999px'
       document.body.appendChild(textArea)
       textArea.select()
+      document.execCommand('copy')
       textArea.remove()
       return true
     }
