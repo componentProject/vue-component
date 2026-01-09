@@ -1,11 +1,12 @@
 {
   "compilerOptions": {
+    "composite": true,
+    "target": "ESNext",
+    "jsx": "preserve",
     "lib": [
       "ESNext",
       "DOM"
     ],
-    "target": "ESNext",
-    "jsx": "preserve",
     "baseUrl": ".",
     "paths": {
       "@/*": [
@@ -19,17 +20,16 @@
       "@moluoxixi/constant/*": ["../../constant/*"]
     },
     "resolveJsonModule": true,
+    "allowImportingTsExtensions": false,
     "allowJs": true,
     "strict": true,
     "strictNullChecks": true,
     "noUnusedLocals": true,
+    "declaration": true,
     "noEmit": false,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "isolatedModules": true,
-    "skipLibCheck": true,
-    "allowImportingTsExtensions": false,
-    "composite": true,
-    "declaration": true
+    "skipLibCheck": true
   }
 }

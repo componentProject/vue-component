@@ -1,15 +1,10 @@
 {
   "name": "@moluoxixi/docs",
+  "type": "module",
   "version": "0.0.1",
   "description": "t-ui-plus docs",
-  "main": "index.js",
-  "type": "module",
-  "scripts": {
-    "dev": "vitepress dev",
-    "build": "vitepress build",
-    "preview": "vitepress preview",
-    "eslint": "eslint . --ext .vue,.js,.jsx,.ts,.tsx,.md --fix"
-  },
+  "author": "wocwin",
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "http://192.168.18.106/middle-tec/front-web/vue-component.git"
@@ -26,39 +21,44 @@
     "封装组件",
     "components"
   ],
-  "author": "wocwin",
-  "license": "MIT",
+  "main": "index.js",
+  "scripts": {
+    "dev": "vitepress dev",
+    "build": "vitepress build",
+    "preview": "vitepress preview",
+    "eslint": "eslint . --ext .vue,.js,.jsx,.ts,.tsx,.md --fix"
+  },
   "dependencies": {
+    "@element-plus/icons-vue": "catalog:build",
+    "element-plus": "catalog:build",
+    "highlight.js": "catalog:build",
     "markdown-it": "catalog:build",
     "markdown-it-container": "catalog:build",
     "moment": "catalog:build",
-    "highlight.js": "catalog:build",
-    "element-plus": "catalog:build",
-    "@element-plus/icons-vue": "catalog:build",
     "vxe-table": "catalog:build"
   },
   "devDependencies": {
+    "@highlightjs/vue-plugin": "catalog:build",
     "@moluoxixi/components": "workspace:*",
     "@moluoxixi/constant": "workspace:*",
     "@moluoxixi/utils": "workspace:*",
-    "@highlightjs/vue-plugin": "catalog:build",
-    "@types/js-cookie": "catalog:type",
-    "@types/markdown-it-container": "catalog:type",
-    "@types/markdown-it": "catalog:type",
-    "cross-env": "catalog:dev",
-    "vite-plugin-inspect": "catalog:dev",
-    "vitepress": "catalog:dev",
-    "unplugin-vue-components": "catalog:dev",
-    "autoprefixer": "catalog:dev",
     "@tailwindcss/postcss": "catalog:dev",
-    "tailwindcss": "catalog:dev",
-    "postcss": "catalog:dev",
-    "@vitejs/plugin-vue-jsx": "catalog:dev",
+    "@types/js-cookie": "catalog:type",
+    "@types/markdown-it": "catalog:type",
+    "@types/markdown-it-container": "catalog:type",
     "@vitejs/plugin-vue": "catalog:dev",
+    "@vitejs/plugin-vue-jsx": "catalog:dev",
+    "autoprefixer": "catalog:dev",
+    "cross-env": "catalog:dev",
+    "fast-glob": "catalog:dev",
+    "postcss": "catalog:dev",
+    "tailwindcss": "catalog:dev",
     "unplugin-auto-import": "catalog:dev",
+    "unplugin-vue-components": "catalog:dev",
     "vite-plugin-compression": "catalog:dev",
     "vite-plugin-imagemin": "catalog:dev",
-    "fast-glob": "catalog:dev"
+    "vite-plugin-inspect": "catalog:dev",
+    "vitepress": "catalog:dev"
   },
   "postcss": {
     "plugins": {

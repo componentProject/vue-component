@@ -1,5 +1,4 @@
 // 配置文件
-import path from 'node:path'
 import process from 'node:process'
 import { loadEnv } from 'vite'
 import cssModuleGlobalRootPlugin from '../../packages/utils/cssModuleGlobalRootPlugin/index.ts'
@@ -9,12 +8,10 @@ export default ViteConfig(
   ({ mode }) => {
     const env = loadEnv(mode!, process.cwd())
     const viteEnv = wrapperEnv(env)
-    const rootPath = path.resolve()
     const appCode = viteEnv.VITE_APP_CODE
     const appTitle = viteEnv.VITE_APP_TITLE
     const port = viteEnv.VITE_PORT
     return {
-      rootPath,
       appTitle,
       appCode,
       port,

@@ -2,6 +2,27 @@
   "name": "@moluoxixi/render",
   "type": "module",
   "version": "0.0.0",
+  "author": "1983531544@qq.com",
+  "license": "MIT",
+  "keywords": [
+    "element-plus",
+    "ElementPlus",
+    "vue",
+    "vite",
+    "vue3",
+    "ts",
+    "eslint",
+    "commitlint",
+    "husky",
+    "lint-staged",
+    "typescript",
+    "vite",
+    "pinia",
+    "router",
+    "sass",
+    "tailwindcss",
+    "template"
+  ],
   "engines": {
     "node": ">=20.18.0"
   },
@@ -40,11 +61,11 @@
     "@moluoxixi/ajaxpackage": "catalog:dev",
     "@moluoxixi/components": "workspace:*",
     "@moluoxixi/eslintconfig": "catalog:dev",
-    "@types/lodash-es": "catalog:type",
     "@moluoxixi/utils": "workspace:*",
     "@moluoxixi/viteconfig": "catalog:dev",
     "@tailwindcss/postcss": "catalog:dev",
     "@types/crypto-js": "catalog:type",
+    "@types/lodash-es": "catalog:type",
     "@types/node": "catalog:type",
     "@types/uuid": "catalog:type",
     "@vue-macros/volar": "catalog:dev",
@@ -65,26 +86,5 @@
     "unplugin-vue-router": "catalog:dev",
     "vite": "catalog:dev",
     "vite-plugin-qiankun": "catalog:dev"
-  },
-  "author": "1983531544@qq.com",
-  "license": "MIT",
-  "keywords": [
-    "element-plus",
-    "ElementPlus",
-    "vue",
-    "vite",
-    "vue3",
-    "ts",
-    "eslint",
-    "commitlint",
-    "husky",
-    "lint-staged",
-    "typescript",
-    "vite",
-    "pinia",
-    "router",
-    "sass",
-    "tailwindcss",
-    "template"
-  ]
+  }
 }

@@ -1,18 +1,18 @@
 {
   "compilerOptions": {
+    "composite": true,
     "target": "ESNext",
     "jsx": "preserve",
     "module": "ESNext",
     "moduleResolution": "Bundler",
-    "types": [
-      "vite/client"
-    ],
-    "composite": true,
     "paths": {
       "@/*": [
         "src/*"
       ]
-    }
+    },
+    "types": [
+      "vite/client"
+    ]
   },
   "vueCompilerOptions": {
     "plugins": [

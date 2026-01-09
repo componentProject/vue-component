@@ -12,6 +12,7 @@
       "@moluoxixi/storybook": ["docs/storybook"]
     },
     "resolveJsonModule": true,
+    "allowImportingTsExtensions": true,
     "allowJs": true,
     "strict": true,
     "strictNullChecks": true,
@@ -20,8 +21,7 @@
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "isolatedModules": true,
-    "skipLibCheck": true,
-    "allowImportingTsExtensions": true
+    "skipLibCheck": true
   },
   "references": [
     {

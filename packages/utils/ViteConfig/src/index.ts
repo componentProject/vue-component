@@ -24,6 +24,7 @@ import { defineConfig, mergeConfig } from 'vite'
 
 import { createHtmlPlugin } from 'vite-plugin-html'
 import { deepMerge, dynamicImport, validateMutuallyExclusive } from '../../_utils/index.ts'
+import { detectFramework } from './_utils/detectFramework.ts'
 import scopedCssPrefixPlugin from './plugins/addScopedAndReplacePrefix.ts'
 
 // // workbox urlPattern 参数类型
@@ -32,16 +33,15 @@ import scopedCssPrefixPlugin from './plugins/addScopedAndReplacePrefix.ts'
 //   url: URL
 // }
 
-async function getViteConfig(Config: ViteConfigType, params?: ConfigEnv) {
+async function getViteConfig(Config: ViteConfigType = { }, params?: ConfigEnv) {
   const configResult = typeof Config === 'function'
     ? Config(params!)
     : Config
-  if (!configResult || !configResult.rootPath) {
-    throw new Error('rootPath is required in ViteConfig')
-  }
   const config = configResult
   const { mode = 'base' } = params || {}
-  const rootPath = config.rootPath
+
+  // rootPath 使用 process.cwd() 作为兜底
+  const rootPath = config.rootPath || process.cwd()
 
   const modeConfig = config.mode || {}
   const baseConfig = modeConfig.base || {}
@@ -73,9 +73,21 @@ async function getViteConfig(Config: ViteConfigType, params?: ConfigEnv) {
     vitepress: vitepressRaw = config.vitepress,
   } = viteEnv
 
-  // 验证 vue、react、vitepress 互斥性，只能有一个为 true，都不指定时默认 vue 为 true
+  // 检测依赖中的 vue/react/vitepress
+  // 使用独立的检测工具，优先级：显示传入 > 检测，且优先级为 vue/react > vitepress
+  const frameworkResult = detectFramework(
+    {
+      vue: vueRaw,
+      react: reactRaw,
+      vitepress: vitepressRaw,
+    },
+    rootPath,
+  )
+
+  // 验证 vue、react、vitepress 互斥性，只能有一个为 true
+  // validateMutuallyExclusive 会自动处理：如果都没有为 true，会使用 defaultKey ('vue')
   const { vue, react, vitepress } = validateMutuallyExclusive(
-    { vue: vueRaw, react: reactRaw, vitepress: vitepressRaw },
+    frameworkResult as unknown as Record<string, boolean>,
     'vue',
   )
 

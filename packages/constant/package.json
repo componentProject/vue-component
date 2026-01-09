@@ -2,17 +2,17 @@
   "name": "@moluoxixi/constant",
   "type": "module",
   "version": "1.0.0",
-  "main": "index.ts",
-  "module": "index.ts",
-  "engines": {
-    "node": ">=16.0.0"
-  },
   "description": "项目通用常量定义包",
+  "author": "1983531544@qq.com",
+  "license": "MIT",
   "keywords": [
     "constants",
     "typescript",
     "vue3"
   ],
-  "author": "1983531544@qq.com",
-  "license": "MIT"
+  "main": "index.ts",
+  "module": "index.ts",
+  "engines": {
+    "node": ">=16.0.0"
+  }
 }

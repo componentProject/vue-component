@@ -13,9 +13,9 @@
     "eslint": "eslint . --ext .vue,.js,.jsx,.ts,.tsx --fix"
   },
   "dependencies": {
-    "@moluoxixi/template": "workspace:*",
     "@element-plus/icons-vue": "catalog:build",
     "@moluoxixi/constant": "workspace:*",
+    "@moluoxixi/template": "workspace:*",
     "@moluoxixi/utils": "workspace:*",
     "@vueuse/core": "catalog:build",
     "axios": "catalog:build",

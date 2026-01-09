@@ -2,19 +2,21 @@
   "name": "@moluoxixi/storybook",
   "version": "1.0.0",
   "description": "vue3 storybook 组件库",
+  "repository": {
+    "type": "git",
+    "url": "http://192.168.18.106/middle-tec/front-web/vue-component.git"
+  },
   "main": "index.ts",
   "scripts": {
     "dev": "storybook dev -p 6006 --config-dir ./",
     "build": "storybook build --config-dir ./ -o ../../docsOut/storybook"
   },
-  "repository": {
-    "type": "git",
-    "url": "http://192.168.18.106/middle-tec/front-web/vue-component.git"
+  "dependencies": {
+    "element-plus": "catalog:build"
   },
   "devDependencies": {
     "@moluoxixi/components": "workspace:*",
     "@moluoxixi/utils": "workspace:*",
-    "storybook": "catalog:dev",
     "@storybook/addon-essentials": "catalog:dev",
     "@storybook/addon-interactions": "catalog:dev",
     "@storybook/addon-onboarding": "catalog:dev",
@@ -22,9 +24,7 @@
     "@storybook/blocks": "catalog:dev",
     "@storybook/test": "catalog:dev",
     "@storybook/vue3": "catalog:dev",
-    "@storybook/vue3-vite": "catalog:dev"
-  },
-  "dependencies": {
-    "element-plus": "catalog:build"
+    "@storybook/vue3-vite": "catalog:dev",
+    "storybook": "catalog:dev"
   }
 }

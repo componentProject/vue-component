@@ -13,8 +13,6 @@
     "eslint": "eslint . --ext .vue,.js,.jsx,.ts,.tsx --fix"
   },
   "dependencies": {
-    "crypto-js": "catalog:build",
-    "uuid": "catalog:build",
     "@antv/g2": "catalog:build",
     "@codemirror/lang-css": "catalog:build",
     "@codemirror/lang-html": "catalog:build",
@@ -33,6 +31,7 @@
     "codemirror": "catalog:build",
     "constrained-editor-plugin": "catalog:build",
     "core-js": "catalog:build",
+    "crypto-js": "catalog:build",
     "dayjs": "catalog:build",
     "dexie": "catalog:build",
     "dom-zindex": "catalog:build",
@@ -76,6 +75,7 @@
     "screenfull": "catalog:build",
     "shepherd.js": "catalog:build",
     "sortablejs": "catalog:build",
+    "uuid": "catalog:build",
     "vue": "catalog:build",
     "vue-codemirror": "catalog:build",
     "vue-router": "catalog:build",

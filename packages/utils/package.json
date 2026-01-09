@@ -27,7 +27,6 @@
     "vue": "catalog:build"
   },
   "devDependencies": {
-    "rollup-plugin-external-globals": "catalog:dev",
     "@antfu/eslint-config": "catalog:dev",
     "@inquirer/checkbox": "catalog:dev",
     "@moluoxixi/components": "workspace:*",
@@ -53,6 +52,7 @@
     "postcss": "catalog:dev",
     "postcss-selector-parser": "catalog:dev",
     "qs": "catalog:dev",
+    "rollup-plugin-external-globals": "catalog:dev",
     "rollup-plugin-visualizer": "catalog:dev",
     "sass": "catalog:dev",
     "sass-embedded": "catalog:dev",

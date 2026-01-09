@@ -183,8 +183,9 @@ export interface AutoRoutesConfig {
 export interface Config extends PluginConfig {
   /**
    * 根目录
+   * 如果不传入，将使用 process.cwd() 作为默认值
    */
-  rootPath: string
+  rootPath?: string
   /**
    * 环境配置
    */

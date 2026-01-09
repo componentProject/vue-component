@@ -13,6 +13,7 @@ export default EslintConfig(
       'unused-imports/no-unused-vars': 'off',
       // 全局process
       'node/prefer-global/process': 'off',
+      'no-console': 'off',
     },
   },
 )
