@@ -4,12 +4,7 @@ import type { Awaitable, OptionsConfig, TypedFlatConfigItem } from '@antfu/eslin
 /**
  * EslintConfig 配置选项类型
  */
-export type optionsType = OptionsConfig & Omit<TypedFlatConfigItem, 'files'> & {
-  /**
-   * 需要忽略的文件模式
-   */
-  ignores?: string[]
-}
+export type optionsType = OptionsConfig & Omit<TypedFlatConfigItem, 'files'>
 
 /**
  * 用户自定义配置类型
