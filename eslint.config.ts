@@ -13,7 +13,10 @@ export default EslintConfig(
       'unused-imports/no-unused-vars': 'off',
       // 全局process
       'node/prefer-global/process': 'off',
+      // console
       'no-console': 'off',
+      // 不允许在定义前使用变量
+      'ts/no-use-before-define': 'off',
     },
   },
 )

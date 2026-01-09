@@ -1,8 +1,8 @@
 // src入口文件
 import type { Plugin } from 'postcss'
 import type { ConfigEnv, PluginOption, UserConfig } from 'vite'
-
 import type { UserOptions as PagesOptions } from 'vite-plugin-pages'
+
 import type {
   CompressionOptions,
   CompressionPlugin,
@@ -14,12 +14,11 @@ import type {
   QiankunPlugin,
   ViteConfigType,
 } from './_types/index.ts'
-
 import path from 'node:path'
 
 import tailwindcss from '@tailwindcss/postcss'
-import autoprefixer from 'autoprefixer'
 
+import autoprefixer from 'autoprefixer'
 import { defineConfig, mergeConfig } from 'vite'
 
 import { createHtmlPlugin } from 'vite-plugin-html'
@@ -34,10 +33,9 @@ import scopedCssPrefixPlugin from './plugins/addScopedAndReplacePrefix.ts'
 // }
 
 async function getViteConfig(Config: ViteConfigType = { }, params?: ConfigEnv) {
-  const configResult = typeof Config === 'function'
+  const config = typeof Config === 'function'
     ? Config(params!)
     : Config
-  const config = configResult
   const { mode = 'base' } = params || {}
 
   // rootPath 使用 process.cwd() 作为兜底
