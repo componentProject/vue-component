@@ -69,6 +69,19 @@ PopoverTableSelect/props/placeholder
 PopoverTableSelect/props/inputProps
 :::
 
+
+### 自定义下拉table列配置（ID，pageId，userId， saveType="server"）
+
+示例：自定义列配置
+:::demo
+PopoverTableSelect/customize/index
+:::
+
+示例：自定义列配置弹窗
+:::demo
+PopoverTableSelect/customize/popup
+:::
+
 ### 插槽（slots）
 
 示例：默认插槽在表格上方自定义区域

@@ -1,0 +1,23 @@
+@use 'vxe-table/styles/components/column.scss';
+@use 'vxe-table/styles/components/colgroup.scss';
+@use 'vxe-table/styles/components/table.scss';
+@use 'vxe-table/styles/components/grid.scss';
+@use 'vxe-table/styles/components/toolbar.scss';
+@use 'vxe-pc-ui/styles/all.scss';
+
+//以下样式替代vxe-table/style/base.scss,vxe-pc-ui/styles/base.scss
+%boxSizing {
+   box-sizing: border-box;
+ }
+
+[class*='vxe-'] {
+  font-variant: tabular-nums;
+  font-feature-settings: 'tnum';
+  @extend %boxSizing;
+  &:after,
+  &:before,
+  *:after,
+  *:before {
+    @extend %boxSizing;
+  }
+}

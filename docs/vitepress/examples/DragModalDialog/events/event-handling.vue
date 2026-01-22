@@ -1,4 +1,3 @@
-<!-- event-handling.vue文件 -->
 <template>
   <div class="container" style="height: 300px;">
     <ElButton @click="visible = true">
@@ -40,7 +39,6 @@ function addLog(message: string) {
   const timestamp = new Date().toLocaleTimeString()
   eventLogs.value.unshift(`[${timestamp}] ${message}`)
 
-  // 限制日志数量
   if (eventLogs.value.length > 10) {
     eventLogs.value = eventLogs.value.slice(0, 10)
   }

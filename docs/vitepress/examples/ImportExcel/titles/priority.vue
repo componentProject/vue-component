@@ -1,4 +1,3 @@
-<!-- priority.vue文件 -->
 <template>
   <div>
     <ImportExcel :columns="columns" :titles="['label', 'title']" @success="onSuccess" />

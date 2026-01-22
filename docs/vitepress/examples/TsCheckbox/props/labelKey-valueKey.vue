@@ -1,4 +1,3 @@
-<!-- labelKey-valueKey.vue文件 -->
 <template>
   <div class="container">
     <TsCheckbox

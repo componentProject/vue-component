@@ -1,4 +1,3 @@
-<!-- header-slots.vue文件 -->
 <template>
   <div class="container" style="height: 100px;">
     <ElButton @click="visible = true">
@@ -10,7 +9,6 @@
       :width="500"
       :height="300"
     >
-      <!-- 完全自定义头部 -->
       <template #header="{ close }">
         <div class="custom-header">
           <h3 style="margin: 0; color: #409EFF;">
@@ -36,7 +34,6 @@
       v-model:visible="visible2"
       title="原始标题"
     >
-      <!-- 自定义左侧内容 -->
       <template #header-left="{ title }">
         <div style="display: flex; align-items: center;">
           <ElIcon style="margin-right: 8px; color: #67C23A;">
@@ -46,7 +43,6 @@
         </div>
       </template>
 
-      <!-- 自定义右侧内容 -->
       <template #header-right="{ close }">
         <ElButton type="primary" size="small" @click="close">
           确认关闭

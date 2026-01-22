@@ -1,4 +1,3 @@
-<!-- throttle.vue文件 -->
 <template>
   <div class="container">
     <TsButton :throttle="800" :options="{ trailing: true }" @click="onClick">

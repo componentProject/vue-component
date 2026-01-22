@@ -1,4 +1,3 @@
-<!-- basic.vue文件 -->
 <template>
   <div class="container">
     <Tabs v-model="activeTab" :tab-list="tabList">

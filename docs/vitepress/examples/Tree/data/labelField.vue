@@ -1,4 +1,3 @@
-<!-- labelField.vue文件 -->
 <template>
   <Tree :data="tree" label-field="title" children-field="children" />
 </template>

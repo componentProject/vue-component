@@ -1,4 +1,3 @@
-<!-- type-border-card.vue文件 -->
 <template>
   <div class="container">
     <Tabs

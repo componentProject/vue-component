@@ -1,4 +1,3 @@
-<!-- filterable.vue文件 -->
 <template>
   <div class="container" style="height: 350px;">
     <DraggableTable id="dt-filter-filterable" v-model="tableData" save-type="local" :columns="columns" :filterable="true" />

@@ -1,4 +1,3 @@
-<!-- slotName.vue文件 -->
 <template>
   <div class="container">
     <Tabs v-model="active" :tab-list="tabList">

@@ -1,4 +1,3 @@
-<!-- node-click.vue文件 -->
 <template>
   <Tree :data="tree" label-field="name" children-field="children" @node-click="onNodeClick" />
   <div style="margin-top:8px">

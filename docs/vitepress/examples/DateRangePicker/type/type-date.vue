@@ -1,4 +1,3 @@
-<!-- type-date.vue文件 -->
 <template>
   <ElConfigProvider :locale="zhCn" :empty-values="[undefined, [], '']">
     <DateRangePicker v-model="val" type="date" placeholder="请选择日期" />

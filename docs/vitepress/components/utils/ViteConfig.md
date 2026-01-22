@@ -62,9 +62,9 @@ export default viteConfig(({ mode }) => {
 
 ### 环境键（ModeConfig）
 
-- VITE_APP_TITLE?: string
+- VITE_GLOB_APP_TITLE?: string
   - 页面标题，注入到 `index.html`。
-- VITE_APP_CODE?: string
+- VITE_GLOB_APP_CODE?: string
   - 系统 code，同时影响打包基础路径 `base: /{code}` 与输出目录。
 - VITE_DEVTOOLS?: boolean
   - 开发时启用 `vite-plugin-vue-devtools`。
@@ -125,16 +125,16 @@ export default viteConfig(({ mode }) => {
 - SCSS 预处理：当文件名包含 `element` 时自动注入 `$namespace: {envSystemCode};`。
   - `envSystemCode` 计算：
     - 开发且未启用 `VITE_QIANKUN_DEV`：固定为 `'el'`（与 Element 默认命名空间一致，便于本地调试）。
-    - 其他情况：使用 `VITE_APP_CODE`。
+    - 其他情况：使用 `VITE_GLOB_APP_CODE`。
 
 ### 构建与服务
 
-- base：`/{VITE_APP_CODE}`
+- base：`/{VITE_GLOB_APP_CODE}`
 - define：`__SYSTEM_CODE__ = JSON.stringify(envSystemCode)`
 - resolve.alias：`@ -> {rootPath}/src`
 - build：
   - `sourcemap`: 开发态开启
-  - `outDir`: `mode === 'github' ? './docs/pages' : '{VITE_APP_CODE}'`
+  - `outDir`: `mode === 'github' ? './docs/pages' : '{VITE_GLOB_APP_CODE}'`
   - `cssCodeSplit: true`, `minify: 'esbuild'`, `chunkSizeWarningLimit: 1500`
   - `rollupOptions.output.manualChunks`：将 `node_modules` 按一级目录拆分
 - server：`host: 0.0.0.0`，`cors: true`，`port/open` 由 `VITE_PORT`/`VITE_OPEN` 控制，`proxy` 可在 `viteConfig.server.proxy` 中自定义。
@@ -161,8 +161,8 @@ export default viteConfig(
       rootPath: __dirname,
       mode: {
         base: {
-          VITE_APP_TITLE: viteEnv.VITE_APP_TITLE,
-          VITE_APP_CODE: viteEnv.VITE_APP_CODE,
+          VITE_GLOB_APP_TITLE: viteEnv.VITE_GLOB_APP_TITLE,
+          VITE_GLOB_APP_CODE: viteEnv.VITE_GLOB_APP_CODE,
           VITE_PORT: 3300,
           VITE_OPEN: true,
         },

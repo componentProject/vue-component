@@ -1,4 +1,3 @@
-<!-- basic.vue文件 -->
 <template>
   <div>
     <ImportExcel :columns="columns" @success="onSuccess" />

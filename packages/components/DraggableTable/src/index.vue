@@ -79,11 +79,11 @@ import type {
   VxeTablePropTypes,
 } from 'vxe-table'
 import type { ColumnType, emitsType, propsType } from './_types'
+import { deleteMemoryUpload, getMemoryQuery, setMemoryUpload } from '@moluoxixi/utils/_api/cache'
 // import VxeGrid from '@moluoxixi/components/DraggableTable/src/components/VxeGrid'
 // import VxeGrid from '@moluoxixi/components/VxeGrid'
 // import cssModules from './styles/modules/all.module.scss'
 
-import { deleteMemoryUpload, getMemoryQuery, setMemoryUpload } from '@moluoxixi/utils/_api/cache'
 import {
   getClass,
   getType,
@@ -110,18 +110,17 @@ import {
   watch,
 } from 'vue'
 import { VxeGrid } from 'vxe-table'
-
 import { getCustomType, handleGetRequiredFields } from './_utils'
+
 import CustomConfigDialog from './components/CustomConfigDialog.vue'
 // 导入自定义渲染器，改造了VxeGrid，直接用Grid的VxeUI
 import installFn from './renderers'
-import 'vxe-table/lib/style.css'
+import '@moluoxixi/components/DraggableTable/src/styles/variable.scss'
 
 defineOptions({
   name: 'DraggableTable',
   inheritAttrs: false,
 })
-
 // 定义组件属性
 const props = withDefaults(defineProps<propsType>(), {
   resizable: true,
@@ -269,6 +268,10 @@ const emit = defineEmits<emitsType>()
 
 // 获取插槽
 const slots = defineSlots<slotsType>()
+
+/** 注册渲染器 */
+installFn(VxeUI)
+
 //#region 根据props动态计算的vxeGrid属性
 /**
  * 获取高度数值
@@ -603,16 +606,10 @@ function handleTableRendered(params: VxeTableDefines.ToggleRowExpandEventParams)
   emit('toggleTreeExpand', params)
 }
 //#endregion
-// let VxeUI: any
 //#region 表头配置弹窗功能，同时收集VxeUI用于处理渲染器等
 const collectColumn = computed<ColumnType[]>(() => {
   if (!xTable.value)
     return []
-  // if (!VxeUI) {
-  //   VxeUI = (xTable.value as any).VxeUI
-  //   installFn(VxeUI)
-  // }
-  installFn(VxeUI)
   const { collectColumn } = xTable.value.getTableColumn()
   return collectColumn as any[]
 })
@@ -1439,6 +1436,10 @@ defineExpose({
 </script>
 
 <style scoped lang="scss">
+@import '@moluoxixi/components/DraggableTable/src/styles/style.scss';
+:deep(*) {
+  @import '@moluoxixi/components/DraggableTable/src/styles/style.scss';
+}
 .table-box {
   :deep(.vxe-table--filter-template) {
     display: flex !important;

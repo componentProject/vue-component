@@ -1,4 +1,3 @@
-<!-- identity.vue文件 -->
 <template>
   <div style="height: 420px" class="p-8">
     <div class="h-full flex justify-between">

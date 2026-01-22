@@ -1,4 +1,3 @@
-<!-- editable.vue文件 -->
 <template>
   <div class="container" style="height: 350px">
     <DraggableTable

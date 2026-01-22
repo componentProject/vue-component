@@ -1,4 +1,3 @@
-<!-- virtualRef.vue文件 -->
 <template>
   <div class="container">
     <div ref="outer" class="box">

@@ -1,4 +1,3 @@
-<!-- indent.vue文件 -->
 <template>
   <Tree :data="tree" label-field="name" children-field="children" :indent="28" />
 </template>

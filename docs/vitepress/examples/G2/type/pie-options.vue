@@ -1,4 +1,3 @@
-<!-- pie-options.vue文件 -->
 <template>
   <div class="container">
     <G2 :options="options" />

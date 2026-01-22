@@ -1,4 +1,3 @@
-<!-- basic.vue文件 -->
 <template>
   <div class="container">
     <TsExpand :rows="3">

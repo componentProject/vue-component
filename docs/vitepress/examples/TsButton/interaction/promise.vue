@@ -1,4 +1,3 @@
-<!-- promise.vue文件 -->
 <template>
   <div class="container">
     <TsButton :throttle="600" :options="{ promise: true }" @click="onClickAsync">

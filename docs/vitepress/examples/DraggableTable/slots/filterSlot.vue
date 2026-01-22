@@ -1,4 +1,3 @@
-<!-- filterSlot.vue文件 -->
 <template>
   <div class="container" style="height: 350px;">
     <DraggableTable id="dt-slots-filterSlot" v-model="tableData" save-type="local" :columns="columns">

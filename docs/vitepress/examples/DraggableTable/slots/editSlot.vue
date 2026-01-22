@@ -1,4 +1,3 @@
-<!-- editSlot.vue文件 -->
 <template>
   <div class="container" style="height: 350px;">
     <DraggableTable id="dt-slots-editSlot" v-model="tableData" save-type="local" :columns="columns" :editable="true">

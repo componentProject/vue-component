@@ -1,4 +1,3 @@
-<!-- getTable.vue文件 -->
 <template>
   <div class="container" style="height: 350px;">
     <div>
@@ -22,7 +21,6 @@ const columns = ref([
 ])
 
 function logTable() {
-  // 仅示例：打印实例
   console.log(refTable.value?.getTable?.())
 }
 </script>

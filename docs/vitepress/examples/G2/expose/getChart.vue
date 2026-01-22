@@ -1,4 +1,3 @@
-<!-- getChart.vue文件 -->
 <template>
   <div class="container">
     <G2 ref="chartRef" :options="options" />

@@ -10,10 +10,11 @@ export * from './components'
 const components: Component[] = Object.keys(Components)
 export default {
   install(app: App) {
-    components.forEach((component) => {
+    components.forEach((componentKey) => {
+      const component = Components[componentKey]
       const name: string | undefined = (component as any)?.name
       if (!name) {
-        console.warn('[withInstall] 组件缺少 name，已跳过注册。')
+        console.error('[withInstall] 组件缺少 name，已跳过注册。')
       }
       else {
         console.log(` 组件${name}，已注册。`)

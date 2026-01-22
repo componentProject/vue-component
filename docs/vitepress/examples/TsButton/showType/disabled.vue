@@ -1,4 +1,3 @@
-<!-- disabled.vue文件 -->
 <template>
   <div class="container">
     <TsButton show-type="disabled" disabled content="按钮已禁用，原因说明">
@@ -8,7 +7,7 @@
 </template>
 
 <script setup lang="ts">
-// 已全局注册，无需引入
+
 </script>
 
 <style scoped>

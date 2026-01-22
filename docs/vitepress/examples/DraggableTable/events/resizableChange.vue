@@ -1,4 +1,3 @@
-<!-- resizableChange.vue文件 -->
 <template>
   <div class="container" style="height: 350px;">
     <DraggableTable id="dt-events-resizableChange" v-model="tableData" save-type="local" :columns="columns" @resizable-change="last = $event" />

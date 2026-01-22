@@ -1,4 +1,3 @@
-<!-- customIcon.vue文件 -->
 <template>
   <Tree :data="tree" label-field="name" children-field="children" :buttons="buttons" />
 </template>

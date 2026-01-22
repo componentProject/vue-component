@@ -1,4 +1,3 @@
-<!-- loadMore.vue文件 -->
 <template>
   <div class="container">
     <TsSelect
@@ -48,20 +47,16 @@ async function handleLoadMore() {
   isLoading.value = true
   console.log('加载更多')
 
-  // 模拟异步加载
   await new Promise(resolve => setTimeout(resolve, 1000))
 
-  // 使用响应式数组的 value 属性
   const newData = options.value.map((item: any) => ({
     ...item,
     id: item.id + 10,
     name: `${item.name}10`,
   }))
 
-  // 使用 push 方法添加到响应式数组
   options.value.push(...newData)
 
-  // 为了演示，限制最多加载3次
   if (options.value.length >= 30) {
     hasMore.value = false
   }

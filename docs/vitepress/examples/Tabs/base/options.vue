@@ -1,4 +1,3 @@
-<!-- options.vue文件 -->
 <template>
   <div class="container">
     <Tabs v-model="activeTab" :options="options" label="label" value="name">
