@@ -29,6 +29,7 @@ import { useSystemStore } from '@/stores/modules/system'
 import '@/assets/styles/main.css'
 import 'element-plus/dist/index.css'
 import 'vxe-table/lib/index.css'
+import 'vxe-pc-ui/es/style.css'
 import 'moment/dist/locale/zh-cn' // 中文化
 
 moment.locale('zh-cn')

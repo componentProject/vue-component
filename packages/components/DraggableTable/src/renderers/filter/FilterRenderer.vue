@@ -1,7 +1,8 @@
+<!-- DraggableTable的渲染器组件 -->
 <template>
   <div
     v-if="currOption"
-    class="p-8 select-none flex-1-hidden flex flex-col vxe-table--ignore-clear"
+    class="p-8 select-none flex-1-hidden flex flex-col"
   >
     <div class="flex flex-col flex-1-hidden">
       <div
@@ -9,6 +10,7 @@
         :key="item"
         class="py-4"
       >
+        <!-- 搜索输入框 -->
         <div
           v-if="item === 'input'"
           class="py-4"
@@ -28,6 +30,7 @@
           />
         </div>
 
+        <!-- 复选框列表 -->
         <div
           v-if="item === 'checkbox'"
           class="px-8 flex-1-auto"
@@ -92,11 +95,13 @@ const props = defineProps<filterRendererPropsType>()
 
 const renderOptsProps = computed<objType>(() => props.renderOpts?.props || {})
 
+// 获取格式化函数
 const formatter = computed(() => {
   const format = renderOptsProps.value.filterFormatter
   return typeof format === 'function' ? format : (obj: any) => obj.value
 })
 
+// 格式化显示值
 function getFormattedValue(obj: any) {
   try {
     return formatter.value(obj)
@@ -138,6 +143,7 @@ function load() {
   const noValueField = ['null', 'undefined', '']
   const dataToProcess = renderOptsProps.value.filterType === 'full' ? fullData : tableData
 
+  // 处理数据并格式化显示值
   const colValList = Object.keys(
     groupBy(dataToProcess, column.field),
   )
@@ -160,6 +166,7 @@ function searchEvent() {
 
   columnValList.value = option.data.sVal
     ? allValList.value.filter((item: any) => {
+      // 同时在原始值和格式化值中搜索
         const searchVal = option.data.sVal.toString().toLowerCase()
         return item.value.toString().toLowerCase().includes(searchVal)
           || item.formattedValue?.toString().toLowerCase().includes(searchVal)
@@ -182,6 +189,7 @@ async function confirmFilterEvent() {
   const { data } = option
   const { $table } = renderParams
   data.vals = columnValList.value.filter((item: any) => item.checked).map((item: any) => item.value)
+
   if (data.vals.length === 0) {
     await $table.resetFilterPanel()
   }

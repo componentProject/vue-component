@@ -15,6 +15,7 @@ import Layout from './components/layout.vue'
 import Overview from './components/Overview.vue'
 import directive from './directives'
 import 'vxe-table/lib/index.css'
+import 'vxe-pc-ui/es/style.css'
 import 'highlight.js/lib/common'
 import './styles/index.scss'
 
