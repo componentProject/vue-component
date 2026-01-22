@@ -8,12 +8,13 @@ import hljsVuePlugin from '@highlightjs/vue-plugin'
 import VueComponent from '@moluoxixi/components'
 
 import DefaultTheme from 'vitepress/theme'
-
 import ApiTyping from './components/ApiTyping.vue'
+
 import DocsCodeDemo from './components/DocsCodeDemo/index.vue'
 import Layout from './components/layout.vue'
 import Overview from './components/Overview.vue'
 import directive from './directives'
+import 'vxe-table/lib/index.css'
 import 'highlight.js/lib/common'
 import './styles/index.scss'
 

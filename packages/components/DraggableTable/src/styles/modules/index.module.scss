@@ -1,0 +1,11 @@
+.root {
+  :global {
+    @import '../style.scss';
+    @import 'vxe-table/styles/components/column.scss';
+    @import 'vxe-table/styles/components/colgroup.scss';
+    @import 'vxe-table/styles/components/table.scss';
+    @import 'vxe-table/styles/components/grid.scss';
+    @import 'vxe-table/styles/components/toolbar.scss';
+    @import 'vxe-pc-ui/styles/all.scss';
+  }
+}

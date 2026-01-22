@@ -1,5 +1,5 @@
 <template>
-  <div ref="container" :class="cssModules.root" class="h-full w-full flex-1 outline-0 table-box containerMain">
+  <div ref="container" class="h-full w-full flex-1 outline-0 table-box containerMain">
     <VxeGrid
       ref="xTable"
       border
@@ -80,14 +80,14 @@ import type {
 } from 'vxe-table'
 import type { ColumnType, emitsType, propsType } from './_types'
 import { deleteMemoryUpload, getMemoryQuery, setMemoryUpload } from '@moluoxixi/utils/_api/cache'
-// import VxeGrid from './components/VxeGrid'
-// import cssModules from './components/VxeGrid/styles/modules/all.module.scss'
-
 import {
   getClass,
   getType,
   sleep,
 } from '@moluoxixi/utils/_utils'
+// import VxeGrid from './components/VxeGrid'
+// import cssModules from './components/VxeGrid/styles/modules/all.module.scss'
+
 import {
   debounce,
   dispatchEvents,
@@ -110,11 +110,11 @@ import {
 } from 'vue'
 import { VxeGrid } from 'vxe-table'
 import { getCustomType, handleGetRequiredFields } from './_utils'
-
 import CustomConfigDialog from './components/CustomConfigDialog.vue'
+
 // 导入自定义渲染器，改造了VxeGrid，直接用Grid的VxeUI
 import installFn from './renderers'
-import '@moluoxixi/components/DraggableTable/src/styles/variable.scss'
+// import cssModules from './styles/modules/index.module.scss'
 
 defineOptions({
   name: 'DraggableTable',
@@ -281,6 +281,17 @@ const computedDialogProps = computed(() => {
     ...externalProps,
   }
 })
+
+const computedId = computed(() => {
+  return props.id || location.href
+})
+
+const computedPageId = computed(() => {
+  return props.pageId || computedId.value
+})
+const computedUserId = computed(() => {
+  return props.userId || (JSON.parse(localStorage.getItem('userInfo') || '{}'))?.id || ''
+})
 //#region 根据props动态计算的vxeGrid属性
 /**
  * 获取高度数值
@@ -418,8 +429,44 @@ const computedEditConfig = computed(() => {
   } as VxeTablePropTypes.EditConfig
 })
 const computedEditRules = computed(() => {
+  //#region 提供 field 的编辑验证规则，支持required,min,max
+  const columns: any[] = computedColumns.value
+  const transformColumn = (col: any): any => {
+    const { options, editProps, filterProps, cellProps, children, min, max, required, ...item } = col || {}
+    const obj = {}
+    // 清空验证规则
+    const isEditEnabled = props.editable || props.editConfig?.enabled
+    if (
+      isEditEnabled
+      && (getType(required, 'boolean') || getType(min, 'number') || getType(max, 'number'))
+    ) {
+      const rules: any[] = []
+
+      // 添加必填验证
+      if (required) {
+        rules.push({ required: true, message: `${item.title || ''}必须填写` })
+      }
+
+      // 添加最小值验证
+      if (min) {
+        rules.push({ min, message: `${item.title || ''}不能小于${min}` })
+      }
+
+      // 添加最大值验证
+      if (max) {
+        rules.push({ max, message: `${item.title || ''}不能大于${max}` })
+      }
+
+      if (rules.length > 0) {
+        obj[item.field] = rules
+      }
+    }
+    return obj
+  }
+  const defaultEditRules = transformColumn(columns)
+  //#endregion
   return {
-    ...defaultEditRules.value,
+    ...defaultEditRules,
     ...props.editRules,
   }
 })
@@ -652,8 +699,6 @@ function handleCheckboxChange(params: VxeTableDefines.CheckboxChangeParams) {
 //#endregion
 
 //#region 动态计算columns
-// 编辑验证规则
-const defaultEditRules = ref<VxeTablePropTypes.EditRules>({})
 // 本地保存的列配置
 const localColumns = ref<ColumnType[]>([])
 /**
@@ -679,8 +724,6 @@ const computedColumns = computed<ColumnType[]>(() => {
     return []
   }
 
-  // 清空验证规则
-  defaultEditRules.value = {}
   //#region 获取所有插槽的名称（递归收集）,并设置编辑规则
   const columnsSlotsNames: string[] = []
   const collectSlots = (col: any) => {
@@ -779,35 +822,6 @@ const computedColumns = computed<ColumnType[]>(() => {
       item.slots = {
         ...defaultSlots,
         ...item.slots,
-      }
-      //#endregion
-
-      //#region 提供 field 的编辑验证规则，支持required,min,max
-      const isEditEnabled = props.editable || props.editConfig?.enabled
-      if (
-        isEditEnabled
-        && (getType(required, 'boolean') || getType(min, 'number') || getType(max, 'number'))
-      ) {
-        const rules: any[] = []
-
-        // 添加必填验证
-        if (required) {
-          rules.push({ required: true, message: `${item.title || ''}必须填写` })
-        }
-
-        // 添加最小值验证
-        if (min) {
-          rules.push({ min, message: `${item.title || ''}不能小于${min}` })
-        }
-
-        // 添加最大值验证
-        if (max) {
-          rules.push({ max, message: `${item.title || ''}不能大于${max}` })
-        }
-
-        if (rules.length > 0) {
-          defaultEditRules.value[item.field] = rules
-        }
       }
       //#endregion
 
@@ -935,7 +949,7 @@ function handleCustomConfigSave(payload: {
 }
 
 // 本地存储键名
-const getStorageKey = () => (props.id ? `table_columns_${props.id}` : ``)
+const getStorageKey = () => (computedId.value ? `table_columns_${computedId.value}` : ``)
 /** 是否不使用内部存储实现 */
 const isNoSave = computed(
   () => (attrs.customConfig as any)?.storage || !['server', 'local'].includes(props.saveType),
@@ -945,16 +959,16 @@ async function handleGetStoredColumns(): Promise<ColumnType[]> {
   try {
     if (getType(props.getConfig, 'function')) {
       return await props.getConfig!({
-        pageId: props.pageId || '',
+        pageId: computedPageId.value,
         widgetId: getStorageKey(),
-        userId: props.userId || '',
+        userId: computedUserId.value,
       })
     }
     else if (props.saveType === 'server') {
       const res = await getMemoryQuery({
-        pageId: props.pageId,
+        pageId: computedPageId.value,
         widgetId: getStorageKey(),
-        userId: props.userId,
+        userId: computedUserId.value,
       })
       if (res.data && props.isConfiguration && customConfigDialogRef.value) {
         (customConfigDialogRef.value as any).isCommon = res?.isExist !== 1
@@ -986,15 +1000,15 @@ async function handleSaveColumnsToServer(key: string, columns: string) {
   if (isReset) {
     // 不管是公共还是个人，都需要删除个人配置，因为个人>公共
     callbacks.push(deleteMemoryUpload({
-      pageId: props.pageId,
+      pageId: computedPageId.value,
       widgetId: key,
-      userId: props.userId,
+      userId: computedUserId.value,
       data: columns,
     }))
     // 如果是公共的，则删除公共配置
     if (isCommon) {
       callbacks.push(deleteMemoryUpload({
-        pageId: props.pageId,
+        pageId: computedPageId.value,
         widgetId: key,
         userId: '',
         data: columns,
@@ -1006,16 +1020,16 @@ async function handleSaveColumnsToServer(key: string, columns: string) {
     // 如果是公共，则所有操作都需要删除个人配置，因为个人>公共
     if (isCommon) {
       callbacks.push(deleteMemoryUpload({
-        pageId: props.pageId,
+        pageId: computedPageId.value,
         widgetId: key,
-        userId: props.userId,
+        userId: computedUserId.value,
         data: columns,
       }))
     }
     callbacks.push(setMemoryUpload({
-      pageId: props.pageId,
+      pageId: computedPageId.value,
       widgetId: key,
-      userId: !isCommon ? props.userId : '',
+      userId: !isCommon ? computedUserId.value : '',
       data: columns,
     }))
   }
@@ -1126,9 +1140,9 @@ async function handleSaveColumnsToStorage() {
     if (getType(props.setConfig, 'function')) {
       await props.setConfig!(
         {
-          pageId: props.pageId || '',
+          pageId: computedPageId.value,
           widgetId: getStorageKey(),
-          userId: props.userId || '',
+          userId: computedUserId.value,
         },
         JSON.stringify(columns),
       )
