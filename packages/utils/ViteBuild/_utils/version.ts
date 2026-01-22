@@ -105,3 +105,25 @@ export async function writeComponentVersions(ctx: BuildContext, versions: Record
     return false
   }
 }
+
+/**
+ * 确保版本号至少带有 ^ 前缀
+ * @param version 版本号字符串
+ * @returns 规范化后的版本号（至少带有 ^ 前缀）
+ */
+export function ensureVersionPrefix(version: string): string {
+  // 如果已经是 latest、* 等标签，保持原样
+  if (version === 'latest' || version === '*' || version.startsWith('file:') || version.startsWith('link:') || version.startsWith('workspace:')) {
+    return version
+  }
+  // 如果已经带有 ^ 或 ~ 前缀，保持原样
+  if (version.startsWith('^') || version.startsWith('~') || version.startsWith('>=') || version.startsWith('<=') || version.startsWith('>') || version.startsWith('<')) {
+    return version
+  }
+  // 如果是范围版本（如 1.2.3 - 2.0.0），保持原样
+  if (version.includes(' - ')) {
+    return version
+  }
+  // 否则添加 ^ 前缀
+  return `^${version}`
+}

@@ -27,6 +27,7 @@
     "vue": "catalog:build"
   },
   "devDependencies": {
+    "rollup-obfuscator": "catalog:dev",
     "@antfu/eslint-config": "catalog:dev",
     "@inquirer/checkbox": "catalog:dev",
     "@moluoxixi/components": "workspace:*",

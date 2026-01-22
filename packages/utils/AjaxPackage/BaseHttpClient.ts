@@ -86,6 +86,12 @@ export default class BaseHttpClient {
   protected messageInstance: MessageInstance
   protected notificationInstance: NotificationInstance
   protected addSign?: (config: AxiosRequestConfig) => void
+  // 最近的错误信息缓存，用于避免短时间内重复显示相同错误
+  protected recentErrorCache: { message: string, timestamp: number } | null = null
+  // 错误提示的防抖时间（毫秒）
+  protected errorDebounceTime: number = 3000
+  // 缓存清理定时器引用
+  protected errorCacheTimer: NodeJS.Timeout | null = null
 
   /**
    * 检查是否在浏览器环境（在类初始化时判断）
@@ -165,9 +171,10 @@ export default class BaseHttpClient {
 
     // 如果还没有生成 containerId，说明容器还没创建，需要生成唯一 ID
     if (!this.containerId) {
-      this.containerId = `ajaxPackage-container-${generateUUID()}`
-      this.popoverContainerId = `ajaxPackage-popover-${generateUUID()}`
-      this.messageContainerId = `ajaxPackage-message-${generateUUID()}`
+      const targetElementId = generateUUID()
+      this.containerId = `ajaxPackage-container-${targetElementId}`
+      this.popoverContainerId = `ajaxPackage-popover-${targetElementId}`
+      this.messageContainerId = `ajaxPackage-message-${targetElementId}`
     }
 
     // 检查是否已存在容器
@@ -412,11 +419,40 @@ export default class BaseHttpClient {
     // 如果不是认证错误和超时错误，则处理为网络错误
     if (error.response?.status !== 401 && error.code !== 'ECONNABORTED') {
       const fallbackError = error as AxiosError<any>
-      this.messageInstance?.({
-        type: 'error',
-        message: (fallbackError.response?.data as string) || fallbackError.message || '网络错误',
-        duration: 5 * 1000,
-      })
+      let errorMessage = (fallbackError.response?.data as string) || fallbackError.message || '网络错误'
+      const currentTime = Date.now()
+      
+      // 处理请求取消错误
+      if (error.code === 'ERR_CANCELED') {
+        errorMessage = '请求已取消'
+      }
+      
+      // 检查是否与最近一次错误消息相同，且时间间隔小于防抖时间
+      const shouldShowError = !this.recentErrorCache
+        || this.recentErrorCache.message !== errorMessage
+        || (currentTime - this.recentErrorCache.timestamp > this.errorDebounceTime)
+
+      if (shouldShowError) {
+        this.messageInstance?.({
+          type: 'error',
+          message: errorMessage,
+          duration: 5 * 1000,
+        })
+        // 更新最近错误缓存
+        this.recentErrorCache = { message: errorMessage, timestamp: currentTime }
+
+        // 使用定时器引用管理
+        if (this.errorCacheTimer) {
+          clearTimeout(this.errorCacheTimer)
+        }
+        this.errorCacheTimer = setTimeout(() => {
+          // 只有当前缓存的消息与本次显示的消息相同时才清除，避免清除其他请求设置的缓存
+          if (this.recentErrorCache && this.recentErrorCache.message === errorMessage) {
+            this.recentErrorCache = null
+            this.errorCacheTimer = null
+          }
+        }, 5000) // 与错误提示显示时长一致
+      }
     }
   }
 

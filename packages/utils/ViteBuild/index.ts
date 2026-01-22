@@ -24,7 +24,7 @@ import { getFlagValue, hasFlag, parseBoolean, printUsage } from './_utils/cli.ts
 import { clearDir, findComponentEntry, getComponentNames, sleep, toKebabCase, toPascalCase } from './_utils/component.ts'
 import { getComponentFormats, getComponentIsNodeEnv } from './_utils/config.ts'
 import { analyzeComponentDeps } from './_utils/deps.ts'
-import { getCurrentVersions, getNextVersion, writeComponentVersions } from './_utils/version.ts'
+import { ensureVersionPrefix, getCurrentVersions, getNextVersion, writeComponentVersions } from './_utils/version.ts'
 import { createBaseConfig } from './_utils/viteConfig.ts'
 
 // 重新导出类型
@@ -139,9 +139,7 @@ async function bundleComponentModule(ctx: BuildContext, {
   // ES 模式下，如果启用了 esUseExternalGlobals，使用 rollup-plugin-external-globals
   if (format === 'es' && ctx.esUseExternalGlobals) {
     try {
-      const externalGlobalsModule = await dynamicImport(import('rollup-plugin-external-globals'))
-      // 处理默认导出或命名导出
-      const externalGlobals = (externalGlobalsModule?.default || externalGlobalsModule) as (options: Record<string, string>) => Plugin
+      const { default: externalGlobals } = await dynamicImport(import('rollup-plugin-external-globals'))
       rollupPlugins.push(externalGlobals(globals))
     }
     catch (error) {
@@ -150,7 +148,7 @@ async function bundleComponentModule(ctx: BuildContext, {
     }
   }
   if (ctx.useObfuscator) {
-    const { obfuscator } = await dynamicImports(import('rollup-obfuscator'), ['obfuscator'] as const)
+    const { obfuscator } = await dynamicImport(import('rollup-obfuscator'))
     rollupPlugins.push(obfuscator() as Plugin)
   }
   // 按需启用图片压缩（重型插件，配置使用，动态导入）
@@ -541,18 +539,35 @@ async function buildComponent(
     pkgJson.exports = generatePackageExports(formats, esOutputDir)
 
     // 分类依赖到 peerDependencies 和 dependencies
-    pkgJson.peerDependencies = {
-      ...deps.peerDependencies,
+    // 规范化 peerDependencies 的版本号
+    const normalizedPeerDeps: Record<string, string> = {}
+    for (const [pkg, version] of Object.entries(deps.peerDependencies)) {
+      normalizedPeerDeps[pkg] = ensureVersionPrefix(version)
     }
+    pkgJson.peerDependencies = normalizedPeerDeps
+
     // internalDeps 现在存储的就是 @${LIB_NAMESPACE}/${packageName kebab-case} 格式
+    // 获取内部依赖的实际版本号
     const internal: Record<string, string> = deps.internal.reduce((p: Record<string, string>, item: string) => {
       // item 已经是 @${LIB_NAMESPACE}/${packageName kebab-case} 格式
-      p[item] = 'latest'
+      // 提取 packageName（已经是 kebab-case 格式）
+      const packageName = item.replace(`@${ctx.LIB_NAMESPACE}/`, '')
+      // 从版本号对象中获取对应的版本号，如果没有则使用 'latest'
+      const internalVersion = versions[packageName] || 'latest'
+      // 规范化版本号，确保至少带有 ^ 前缀
+      p[item] = ensureVersionPrefix(internalVersion)
       return p
     }, {} as Record<string, string>)
+
+    // 规范化外部依赖的版本号
+    const normalizedExternal: Record<string, string> = {}
+    for (const [pkg, version] of Object.entries(deps.external)) {
+      normalizedExternal[pkg] = ensureVersionPrefix(version)
+    }
+
     pkgJson.dependencies = {
       ...internal,
-      ...deps.external,
+      ...normalizedExternal,
     }
 
     // 生成新版本号
