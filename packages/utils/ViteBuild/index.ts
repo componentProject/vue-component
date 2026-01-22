@@ -732,8 +732,8 @@ export async function buildComponentsWithOptions(options: BuildOptions): Promise
     isChunck = false,
     preserveModules = false,
     useObfuscator = false,
-    useExternal = false,
-    esUseExternalGlobals = false,
+    useExternal = true,
+    esUseExternalGlobals = true,
     entryBaseUrl: ebu = '/',
     presetGlobals: _presetGlobals,
     ...rest

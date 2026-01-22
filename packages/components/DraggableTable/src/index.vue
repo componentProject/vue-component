@@ -1,5 +1,5 @@
 <template>
-  <div ref="container" class="h-full w-full flex-1 outline-0 table-box containerMain">
+  <div ref="container" :class="cssModules.root" class="h-full w-full outline-0 table-box containerMain">
     <VxeGrid
       ref="xTable"
       border
@@ -85,14 +85,12 @@ import {
   getType,
   sleep,
 } from '@moluoxixi/utils/_utils'
-// import VxeGrid from './components/VxeGrid'
-// import cssModules from './components/VxeGrid/styles/modules/all.module.scss'
-
 import {
   debounce,
   dispatchEvents,
   onHotkeys,
 } from '@moluoxixi/utils/_utils/event'
+
 import { VxeUI } from '@vxe-ui/core'
 import { ElMessage } from 'element-plus'
 import { cloneDeep, groupBy } from 'lodash-es'
@@ -111,9 +109,12 @@ import {
 import { VxeGrid } from 'vxe-table'
 import { getCustomType, handleGetRequiredFields } from './_utils'
 import CustomConfigDialog from './components/CustomConfigDialog.vue'
-
 // 导入自定义渲染器，改造了VxeGrid，直接用Grid的VxeUI
 import installFn from './renderers'
+
+// import VxeGrid from './components/VxeGrid'
+// import cssModules from './components/VxeGrid/styles/modules/all.module.scss'
+import cssModules from './styles/modules/index.module.scss'
 // import cssModules from './styles/modules/index.module.scss'
 
 defineOptions({

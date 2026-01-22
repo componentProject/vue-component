@@ -1,6 +1,21 @@
 .root {
+  //以下样式替代vxe-table/style/base.scss,vxe-pc-ui/styles/base.scss
+  %boxSizing {
+    box-sizing: border-box;
+  }
+
+  [class*='vxe-'] {
+    font-variant: tabular-nums;
+    font-feature-settings: 'tnum';
+    @extend %boxSizing;
+    &:after,
+    &:before,
+    *:after,
+    *:before {
+      @extend %boxSizing;
+    }
+  }
   :global {
-    @import '../style.scss';
     @import 'vxe-table/styles/components/column.scss';
     @import 'vxe-table/styles/components/colgroup.scss';
     @import 'vxe-table/styles/components/table.scss';
@@ -8,4 +23,9 @@
     @import 'vxe-table/styles/components/toolbar.scss';
     @import 'vxe-pc-ui/styles/all.scss';
   }
+}
+:global {
+  @import 'vxe-table/styles/theme/light.scss';
+  @import 'vxe-table/styles/theme/dark.scss';
+  @import 'vxe-table/styles/variable.scss';
 }

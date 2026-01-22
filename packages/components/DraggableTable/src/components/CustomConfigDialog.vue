@@ -136,6 +136,7 @@ const computedDialogProps = computed(() => {
     contentStyle: {
       padding: '8px',
     },
+    teleportTo: '.containerMain',
     ...props.dialogProps,
   }
 })
