@@ -1,4 +1,3 @@
-<!-- DraggableTable的对话框组件 -->
 <template>
   <DragModalDialog
     v-model:visible="visible"
@@ -44,16 +43,20 @@
         />
       </template>
       <template #select="{ row, column }">
-        <TsSelect
-          v-if="column.field !== 'fixed' || !row.parentId"
-          v-model="row[column.field]"
-          :empty-values="[undefined]"
-          :options="column.params.options"
-          class="m-2"
-          placeholder="Select"
-          size="small"
-          :disabled="!row.resizable"
-        />
+        <!-- <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80%;"></div> -->
+        <div style="position: absolute; top: 3px; left: 10%; width: 80%;">
+          <ElSelect
+            v-if="column.field !== 'fixed' || !row.parentId"
+            v-model="row[column.field]"
+            :teleported="false"
+            :empty-values="[undefined]"
+            :options="column.params.options"
+            class="w-full"
+            placeholder="Select"
+            size="small"
+            :disabled="!row.resizable"
+          />
+        </div>
       </template>
     </VxeGrid>
 
@@ -86,22 +89,7 @@
             </ElButton>
           </template>
         </ElPopover>
-        <!--          <ElPopover :visible="confirmPopoverVisible" placement="top" :width="180"> -->
-        <!--            <p style="white-space: pre-wrap;"> -->
-        <!--              是否同步删除个人配置？ -->
-        <!--            </p> -->
-        <!--            <div style="text-align: right; margin: 0"> -->
-        <!--              <ElButton size="small" @click="confirmPopoverVisible = false"> -->
-        <!--                否 -->
-        <!--              </ElButton> -->
-        <!--              <ElButton size="small" type="primary" @click="handleEvent('confirm')"> -->
-        <!--                是 -->
-        <!--              </ElButton> -->
-        <!--            </div> -->
-        <!--            <template #reference> -->
-        <!--              -->
-        <!--            </template> -->
-        <!--          </ElPopover> -->
+
         <ElButton type="primary" @click="handleEvent('confirm')">
           确认
         </ElButton>
@@ -117,14 +105,12 @@
 import type { CustomConfigDialogEmitsType, CustomConfigDialogPropsType } from '@moluoxixi/components/DraggableTable/src/_types'
 import type { VxeGridInstance } from 'vxe-table'
 import { getTypeName } from '@moluoxixi/components/DraggableTable/src/_utils'
-// import VxeGrid from '@moluoxixi/components/DraggableTable/src/components/VxeGrid'
+import VxeGrid from '@moluoxixi/components/DraggableTable/src/components/VxeGrid'
 import { flattenTree, getClass } from '@moluoxixi/utils/_utils'
-import { ElButton, ElCheckbox, ElInput, ElPopover, ElSwitch } from 'element-plus'
+import { ElButton, ElCheckbox, ElInput, ElPopover, ElSelect, ElSwitch } from 'element-plus'
 import { cloneDeep } from 'lodash-es'
 import Sortable from 'sortablejs'
 import { computed, ref, useTemplateRef, watch } from 'vue'
-import { VxeGrid } from 'vxe-table'
-// import DragModalDialog from '@moluoxixi/components/DragModalDialog'
 
 const props = withDefaults(defineProps<CustomConfigDialogPropsType>(), {
   columns: () => [],
@@ -132,14 +118,13 @@ const props = withDefaults(defineProps<CustomConfigDialogPropsType>(), {
   customColumns: () => [],
   dragType: 'draggable',
   rowdragable: true,
-  /** 需要禁用拖拽的行class */
+
   rowDisabledClass: '.has-parent',
   isConfiguration: false,
 })
 
 const emit = defineEmits<CustomConfigDialogEmitsType>()
-// const xTableRef = useTemplateRef<VxeGridInstance>('xTable')
-// const xTable = computed(() => xTableRef.value?.tableRef)
+
 const xTable = useTemplateRef<VxeGridInstance>('xTable')
 
 const computedDialogProps = computed(() => {
@@ -172,7 +157,6 @@ const visible = defineModel<boolean>({ default: false })
 const resetPopoverVisible = ref(false)
 const confirmPopoverVisible = ref(false)
 
-// 处理正整数输入
 function handlePositiveNumberInput(row: any, field: string, value: string) {
   let filtered = String(value || '').replace(/\D/g, '')
   filtered = filtered.replace(/^0+/, '') || ''
@@ -211,8 +195,7 @@ const computedCheckboxConfig = computed(() => ({
   checkField: 'visible',
 }))
 const computedRowConfig = computed(() => ({
-  // useKey: true,
-  // resizable: true,
+
   height: 32,
   drag: true,
 }))
@@ -252,17 +235,15 @@ function handleEvent(type: 'confirm' | 'reset' | 'cancel') {
   visible.value = false
 }
 
-//#region draggable模式逻辑
 function handleRowClassName({ row }: { row: any }) {
   if (row.level > 1) {
     return 'has-parent'
   }
 }
-// 保存拖拽实例的引用
+
 const rowSortableInstance = ref<InstanceType<typeof Sortable> | null>()
 const columnSortableInstance = ref<InstanceType<typeof Sortable> | null>()
 
-// 销毁行拖拽实例
 function destroyRowSortable() {
   if (rowSortableInstance.value) {
     rowSortableInstance.value.destroy()
@@ -270,7 +251,6 @@ function destroyRowSortable() {
   }
 }
 
-// 销毁列拖拽实例
 function destroyColumnSortable() {
   if (columnSortableInstance.value) {
     columnSortableInstance.value.destroy()
@@ -278,9 +258,7 @@ function destroyColumnSortable() {
   }
 }
 
-// 初始化行拖拽
 function initRowDraggable() {
-  // 先销毁旧实例
   destroyRowSortable()
 
   if (!xTable.value)
@@ -291,7 +269,6 @@ function initRowDraggable() {
   if (!tableBody)
     return
 
-  // 创建Sortable实例
   rowSortableInstance.value = Sortable.create(tableBody, {
     animation: 150,
     handle: 'tr',
@@ -299,9 +276,9 @@ function initRowDraggable() {
     onEnd: ({ oldIndex = 0, newIndex = 0, item }: Record<string, any>) => {
       if (oldIndex === newIndex || !xTable.value)
         return
-      // 获取源数据副本
+
       const tableDataCopy = [...tableData.value]
-      // 移动行数据
+
       const rowData = tableDataCopy.splice(oldIndex, 1)[0]
       tableDataCopy.splice(newIndex, 0, rowData)
       const dragPos = oldIndex > newIndex ? 'top' : 'bottom'
@@ -332,10 +309,9 @@ function initRowDraggable() {
         }
         return
       }
-      // 更新数据并发送事件
+
       tableData.value = tableDataCopy
-      // { newRow, oldRow, dragRow, dragPos, dragToChild, offsetIndex, $event }
-      // 构造vxe格式的事件参数
+
       const eventParams = {
         dragRow: rowData,
         newRow,
@@ -372,12 +348,11 @@ watch(() => visible.value, (newVal) => {
 }, {
   immediate: true,
 })
-//#endregion
 
 defineExpose({
   isCommon,
 })
 </script>
 
-<style scoped lang="scss">
+<style>
 </style>

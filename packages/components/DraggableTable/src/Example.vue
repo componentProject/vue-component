@@ -1,6 +1,5 @@
-<!-- DraggableTable的示例文件 -->
 <template>
-  <div class="h-full flex flex-col">
+  <div class="h-full flex flex-col overflow-hidden">
     <h2>可拖拽表格演示</h2>
     <div class="demo-actions">
       <ElButton @click="addRow">
@@ -47,8 +46,8 @@
         校验表格
       </ElButton>
     </div>
-    <!-- 使用DraggableTable组件 -->
-    <div class="border-2 flex-1-hidden">
+
+    <div class="border-2 flex-1" style="height: 400px">
       <DraggableTable
         id="demo_table_12355666"
         ref="draggableTableRef"
@@ -57,6 +56,7 @@
         class="p-[8px]!"
         page-id="page1"
         user-id="shabi"
+        :save-hot-keys="['a', 's']"
         :editable="editable"
         :sortable="sortable"
         :filterable="filterable"
@@ -76,7 +76,8 @@
         save-type="server"
         :rowdragable="rowdragable"
         :columndragable="columndragable"
-        show-pagination
+        :menu-config="menuConfig"
+        :show-pagination="false"
         @page-change="pageChange"
         @data-change="handleDataChange"
       >
@@ -86,14 +87,10 @@
           </div>
         </template>
 
-        <!-- 自定义操作列插槽 -->
         <template #aaa>
           <TsButton show-type="disabled" content="你好" disabled type="danger" size="small">
             aaa自定义插槽按钮
           </TsButton>
-        </template>
-        <template #name>
-          <TsSelect :options="options" />
         </template>
         <template #name1>
           <TsSelect :options="options" />
@@ -109,18 +106,153 @@
 <script lang="ts" setup>
 import { ElButton, ElMessage } from 'element-plus'
 import { onMounted, ref, useTemplateRef } from 'vue'
-// import DraggableTable from './index.vue'
-// 表格加载状态
+import DraggableTable from './index.vue'
+
 const loading = ref(false)
-// 拖拽开关状态
+
 const rowdragable = ref(false)
 const columndragable = ref(false)
 
 const editable = ref(true)
 const filterable = ref(true)
 const sortable = ref(true)
-// 表格引用
+
 const draggableTableRef = useTemplateRef('draggableTableRef')
+
+const menuConfig = {
+  transfer: false,
+  body: {
+    options: [
+      // 第一组：补充医嘱名称
+      [
+        {
+          code: 'supplementName',
+          name: '补充医嘱名称',
+          visible: true,
+          disabled: true,
+        },
+      ],
+      // 第二组：刷新、成组、取消成组
+      [
+        {
+          code: 'refresh',
+          name: '刷新',
+          visible: true,
+          disabled: false,
+        },
+        {
+          code: 'group',
+          name: '成组',
+          visible: true,
+          disabled: false,
+        },
+        {
+          code: 'cancelGroup',
+          name: '取消成组',
+          visible: true,
+          disabled: false,
+        },
+      ],
+      // 第三组：标记相关
+      [
+        {
+          code: 'markSelfPrepared',
+          name: '标记为自备药',
+          visible: true,
+          disabled: false,
+        },
+        {
+          code: 'addMark',
+          name: '添加医嘱标记',
+          visible: true,
+          disabled: false,
+          children: [
+            {
+              code: 'markWholeBox',
+              name: '标记以[整盒]开立',
+              visible: true,
+              disabled: false,
+            },
+          ],
+        },
+        {
+          code: 'cancelMark',
+          name: '取消医嘱标记',
+          visible: true,
+          disabled: false,
+        },
+      ],
+      // 第四组：模板和药品信息
+      [
+        {
+          code: 'storeTemplate',
+          name: '存为模板',
+          visible: true,
+          disabled: false,
+        },
+        {
+          code: 'medicineInfo',
+          name: '药品信息与说明书',
+          visible: true,
+          disabled: false,
+        },
+      ],
+      // 第五组：插入、复制、粘贴、删除
+      [
+        {
+          code: 'insertUp',
+          name: '向上插入一行',
+          visible: true,
+          disabled: false,
+        },
+        {
+          code: 'insertDown',
+          name: '向下插入一行',
+          visible: true,
+          disabled: false,
+        },
+        {
+          code: 'copy',
+          name: '复制',
+          visible: true,
+          disabled: false,
+        },
+        {
+          code: 'paste',
+          name: '粘贴',
+          visible: true,
+          disabled: false,
+        },
+        {
+          code: 'delete',
+          name: '删除',
+          visible: true,
+          disabled: false,
+        },
+        {
+          code: 'copyAgain',
+          name: '复制重开医嘱',
+          visible: true,
+          disabled: false,
+        },
+      ],
+      // [
+      //   { code: 'custom3', name: '自定义前缀图标', prefixConfig: { icon: 'vxe-icon-download' } },
+      //   { code: 'custom4', name: '自定义前缀内容', prefixConfig: { content: 'Ctrl+S' } }
+      // ],
+      // [
+      //   {
+      //     code: 'custom5',
+      //     name: '二级菜单',
+      //     children: [
+      //       { code: 'custom6', name: '自定义前缀图标', prefixConfig: { icon: 'vxe-icon-download' } },
+      //       { code: 'custom7', name: '自定义前缀内容', prefixConfig: { content: 'Ctrl+S' } }
+      //     ]
+      //   }
+      // ]
+    ],
+  },
+}
 
 let id = 0
 const data = Array.from({ length: 10000 }).map(() => ({
@@ -133,15 +265,8 @@ const data = Array.from({ length: 10000 }).map(() => ({
   email: 'zhangsan@example.com',
   status: 1,
   createTime: '2023-01-01 12:30',
-  childList: [
-    { id: 10031, name: 'Test366 366 366 366366366366', role: 'Test', sex: 'Man', age: 76, address: 'test rtyty' },
-    { id: 10032, name: 'Test345', role: 'Develop', sex: 'Women', age: 56, address: 'Guangzhou' },
-    { id: 10032, name: 'Test361 361 361361361361361361361361361361361361', role: 'Test', sex: 'Women', age: 21, address: 'Guangzhou' },
-    { id: 10033, name: 'Test367', role: 'Develop', sex: 'Women', age: 28, address: 'Guangzhou' },
-    { id: 10034, name: 'Test3213', role: 'Test', sex: 'Man', age: 35, address: 'Guangzhou' },
-  ],
 }))
-// 表格数据
+
 const tableData = ref([])
 const childGridOptions = reactive<VxeGridProps<RowVO>>({
   border: true,
@@ -190,7 +315,6 @@ onMounted(() => {
   handlePageData()
 })
 
-// 列配置
 const columns = ref([
   { field: 'sql', type: 'seq', width: 200 },
   { type: 'expand', width: 200, fixed: 'left', slots: { content: 'expand_content' } },
@@ -219,9 +343,6 @@ const columns = ref([
     min: 3,
     max: 10,
     required: true,
-    slots: {
-      default: 'name',
-    },
   },
   {
     field: 'name1',
@@ -233,25 +354,6 @@ const columns = ref([
     slots: {
       default: 'name1',
     },
-  },
-  {
-    field: 'age1',
-    title: 'Age1',
-    slots: {
-      default: 'age1',
-    },
-    children: [
-      { field: 'bbb', title: 'bbb', width: 140 },
-      {
-        field: 'baaa',
-        title: 'baaa',
-        children: [
-          { field: 'dddd', title: 'dddd', width: 900 },
-          { field: 'gggg', title: 'gggg', width: 220 },
-        ],
-      },
-
-    ],
   },
   {
     field: 'aaa',
@@ -317,24 +419,15 @@ const cellTypeList = ref([
 
 function changeCellType(type: any) {
   console.log('type', type)
-  // const item = columns.value.at(-3)
-  // columns.value[columns.value.length - 3] = {
-  //   ...item,
-  //   type,
-  //
-  // }
 }
 
-// 组件挂载时的初始化
 onMounted(() => {
-  // 模拟加载数据过程
   loading.value = true
   setTimeout(() => {
     loading.value = false
   }, 800)
 })
 
-// 添加新行
 function addRow() {
   const newId
     = tableData.value.length > 0 ? Math.max(...tableData.value.map((item: string) => item.id)) + 1 : 1
@@ -355,7 +448,6 @@ function addRow() {
   ElMessage.success('已添加新行')
 }
 
-// 编辑行
 function handleValidate() {
   draggableTableRef.value?.getTable()?.validate()
 }

@@ -1,4 +1,3 @@
-// PopoverTableSelect的props组件
 import type { ColumnType } from '@moluoxixi/components/DraggableTable'
 import type { InputInstance, InputProps, PopoverProps } from 'element-plus'
 import type { DebounceSettings, ThrottleSettings } from 'lodash-es'

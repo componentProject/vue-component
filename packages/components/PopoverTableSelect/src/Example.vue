@@ -1,4 +1,3 @@
-<!-- PopoverTableSelect的示例文件 -->
 <template>
   <div>
     <div>
@@ -64,6 +63,31 @@
             placement: 'bottom-start',
           }"
           :width="600"
+          @select="handleInputSelect"
+          @input="handleInput"
+          @enter="handleEnter"
+        />
+      </div>
+    </div>
+    <div>
+      <h2>使用列配置功能</h2>
+      <div class="w-[240px]!">
+        <PopoverTableSelect
+          id="123456789"
+          v-model:input-value="inputValue1"
+          :z-index="999999"
+          :throttle="100"
+          pop-type="input"
+          :columns="columns"
+          :data="tableData"
+          :popover-props="{
+            placement: 'bottom-start',
+          }"
+          :width="600"
+          page-id="page2"
+          user-id="shab2"
+          save-type="server"
+          :save-hot-keys="['shift', 'a']"
           @select="handleInputSelect"
           @input="handleInput"
           @enter="handleEnter"

@@ -1,4 +1,3 @@
-<!-- DraggableTable的渲染器组件 -->
 <template>
   <div class="h-full flex items-center" style="align-items: center">
     <DateRangePicker
@@ -104,7 +103,6 @@ const currentValue = computed<any>(() => {
 const propsOptions = computed(() => renderOptsProps.value.options)
 const valueFormat = computed(() => detectDateFormatByReplace(currentValue.value))
 
-// 判断是否为日期类型
 const dateType = computed(() => {
   return renderOptsPropsType.value === 'date' || renderOptsPropsType.value === 'datetime'
     ? renderOptsPropsType.value

@@ -1,6 +1,5 @@
-<!-- DraggableTable组件主文件 -->
 <template>
-  <div ref="container" :class="cssModules.root" class="h-full w-full flex-1 overflow-hidden outline-0 table-box containerMain">
+  <div ref="container" :class="cssModules.root" class="h-full w-full flex-1 outline-0 table-box containerMain">
     <VxeGrid
       ref="xTable"
       border
@@ -10,6 +9,7 @@
       show-footer-overflow="title"
       keep-source
       :columns="computedColumns"
+      :params="paramsObj"
       :header-cell-style="computedHeaderCellStyle"
       :pager-config="computedPagerConfig"
       :scroll-y="computedVirtualYConfig"
@@ -62,7 +62,7 @@
       :is-configuration="props.isConfiguration"
       :collect-columns="collectColumn"
       :custom-columns="props.customColumns"
-      :dialog-props="props.dialogProps"
+      :dialog-props="computedDialogProps"
       @confirm="handleCustomConfigSave"
     />
   </div>
@@ -80,9 +80,8 @@ import type {
 } from 'vxe-table'
 import type { ColumnType, emitsType, propsType } from './_types'
 import { deleteMemoryUpload, getMemoryQuery, setMemoryUpload } from '@moluoxixi/utils/_api/cache'
-// import VxeGrid from '@moluoxixi/components/DraggableTable/src/components/VxeGrid'
-// import VxeGrid from '@moluoxixi/components/VxeGrid'
-// import cssModules from './styles/modules/all.module.scss'
+// import VxeGrid from './components/VxeGrid'
+// import cssModules from './components/VxeGrid/styles/modules/all.module.scss'
 
 import {
   getClass,
@@ -218,6 +217,7 @@ const props = withDefaults(defineProps<propsType>(), {
   saveType: 'default',
   saveHotKeys: () => ['shift', 'alt', 'ctrl', 'f12'],
   /** 自定义自定义存储弹窗的columns */
+  virtualRef: null,
   customColumns: () => [
     { type: 'checkbox', width: 45, align: 'center' },
     { field: 'field', minWidth: 160, title: '字段', treeNode: true, dragSort: true },
@@ -268,10 +268,19 @@ const emit = defineEmits<emitsType>()
 
 // 获取插槽
 const slots = defineSlots<slotsType>()
-
 /** 注册渲染器 */
 installFn(VxeUI)
-
+// 合并默认dialogProps和外部传入的值
+const computedDialogProps = computed(() => {
+  const defaultProps = {
+    zIndex: 1000,
+  }
+  const externalProps = typeof props.dialogProps === 'function' ? props.dialogProps() : props.dialogProps || {}
+  return {
+    ...defaultProps,
+    ...externalProps,
+  }
+})
 //#region 根据props动态计算的vxeGrid属性
 /**
  * 获取高度数值
@@ -421,6 +430,12 @@ const computedColumnConfig = computed(() => {
     drag: props.dragType === 'vxe' && (props.columndragable || props.dragable),
     ...props.columnConfig,
   } as VxeGridProps['columnConfig']
+})
+
+const paramsObj = computed(() => {
+  return {
+    panelTo: container.value,
+  }
 })
 
 const computedColumnDragConfig = computed(() => {
@@ -665,7 +680,6 @@ const computedColumns = computed<ColumnType[]>(() => {
   }
 
   // 清空验证规则
-  // eslint-disable-next-line vue/no-side-effects-in-computed-properties
   defaultEditRules.value = {}
   //#region 获取所有插槽的名称（递归收集）,并设置编辑规则
   const columnsSlotsNames: string[] = []
@@ -882,7 +896,7 @@ const offEffect = ref()
 const requiredFields = computed<string[]>(() => handleGetRequiredFields(props.customColumns.filter((i: any) => i.editable)))
 onMounted(() => {
   if (props.saveType !== 'default') {
-    offEffect.value = onHotkeys(props.saveHotKeys, () => customConfigDialogVisible.value = true, { target: container.value || undefined })
+    offEffect.value = onHotkeys(props.saveHotKeys, () => customConfigDialogVisible.value = true, { target: props.virtualRef?.ref ?? (container.value || undefined) })
   }
 })
 onBeforeUnmount(() => offEffect.value?.())
@@ -1436,9 +1450,8 @@ defineExpose({
 </script>
 
 <style scoped lang="scss">
-@import '@moluoxixi/components/DraggableTable/src/styles/style.scss';
-:deep(*) {
-  @import '@moluoxixi/components/DraggableTable/src/styles/style.scss';
+.containerMain {
+  position: relative;
 }
 .table-box {
   :deep(.vxe-table--filter-template) {
@@ -1452,5 +1465,9 @@ defineExpose({
       }
     }
   }
+}
+:deep(.vxe-table--body-wrapper) {
+  overflow: auto !important;
+  scrollbar-width: auto !important;
 }
 </style>

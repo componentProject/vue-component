@@ -1,4 +1,3 @@
-<!-- PopoverTableSelect组件主文件 -->
 <template>
   <div class="w-full">
     <PopoverTableSelect

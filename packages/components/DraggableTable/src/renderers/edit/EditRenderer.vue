@@ -1,4 +1,3 @@
-<!-- DraggableTable的渲染器组件 -->
 <template>
   <div class="h-full flex items-center" style="align-items: center">
     <DateRangePicker
@@ -94,7 +93,7 @@ const computedType = computed(() => {
     return 'date'
   }
 })
-// 判断是否为日期类型
+
 const isDateType = computed(() => getMomentIsValidIsNoNum(currentValue.value))
 
 const DateRender = computed(() => {

@@ -1,4 +1,3 @@
-// DraggableTable的props组件
 import type { VxeColumnPropTypes, VxeGridPropTypes, VxeTableDefines, VxeTablePropTypes } from 'vxe-table'
 import type { objType } from '../../../_types'
 

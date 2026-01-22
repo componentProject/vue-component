@@ -1,4 +1,3 @@
-// DraggableTable组件主文件
 import type { ColumnType, types } from '@moluoxixi/components/DraggableTable/src/_types'
 
 /** 自定义的列模板 */
@@ -161,5 +160,5 @@ export function handleGetRequiredFields(customColumns: ColumnType[] = []): strin
     if (column.field)
       requiredFields.push(column.field)
   })
-  return Array.from(new Set(['field', 'type', 'children', ...requiredFields]))
+  return Array.from(new Set(['field', 'type', 'children', 'visible', ...requiredFields]))
 }

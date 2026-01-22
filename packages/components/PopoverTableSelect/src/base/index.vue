@@ -1,21 +1,28 @@
-<!-- PopoverTableSelect组件主文件 -->
 <template>
   <ElPopover
+    ref="elPopoverRef"
     :visible="popoverVisible"
     virtual-triggering
     :virtual-ref="props.virtualRef"
     v-bind="computedPopoverProps"
   >
-    <div ref="popoverRef">
+    <div v-if="props.virtualRef" ref="popoverRef" :style="popoverRefStyle">
       <slot name="default" />
       <div @click.stop.prevent="handlePopoverClick">
         <DraggableTable
           :id="props.id"
-          v-bind="$attrs"
+          v-bind="{
+            ...$attrs,
+            dialogProps: {
+              zIndex: props?.zIndex ? props.zIndex + 1 : 10000,
+              ...(props.dialogProps || {}),
+            },
+          }"
           ref="gridRef"
           :columns="columns"
           :model-value="data"
           :height="height"
+          :virtual-ref="props.virtualRef"
           @cell-click.stop="handleCellClick"
           @cell-dblclick.stop="handleCellDblclick"
           @resizable-change="handleColumnResizableChange"
@@ -37,6 +44,7 @@ import type { ComponentPublicInstance } from 'vue'
 import type { VxeTableDefines, VxeTablePropTypes } from 'vxe-table'
 import type { baseEmitsType, basePropsType } from '../_types'
 import { ElPopover } from 'element-plus'
+import { debounce } from 'lodash-es'
 import { computed, nextTick, onUnmounted, ref, useTemplateRef, watch } from 'vue'
 
 defineOptions({
@@ -49,15 +57,29 @@ const props = withDefaults(defineProps<basePropsType>(), {
   id: 'popoverTableSelect',
   columns: () => [],
   data: () => [],
+  width: 400,
   selectTrigger: 'click',
+  virtualRef: null,
 })
 
 const emit = defineEmits<baseEmitsType>()
 
-// 获取插槽
 const slots = defineSlots<slotsType>()
 
+const updatePopoverPosition = debounce(() => {
+  elPopoverRef.value?.popperRef?.popperInstanceRef?.update()
+}, 500)
+
 const slotNames = computed<string[]>(() => Object.keys(slots) as string[])
+
+const popoverRefStyle = computed(() => {
+  const style: any = {}
+  if (props.width === 'auto') {
+    style.width = props.width
+    style.maxWidth = 'calc(100vw - 64px)'
+  }
+  return style
+})
 
 const computedPopoverProps = computed(() => {
   const popoverProps = {
@@ -118,6 +140,7 @@ watch(
 let virtualElement: HTMLElement | null = null
 
 const popoverRef = useTemplateRef('popoverRef')
+const elPopoverRef = useTemplateRef('elPopoverRef')
 // 监听virtualRef的变化
 watch(
   () => props.virtualRef,
@@ -131,11 +154,20 @@ watch(
   { immediate: true },
 )
 
+watch(
+  () => props.columns,
+  () => {
+    updatePopoverPosition()
+  },
+  { immediate: true },
+)
+
 // 监听popoverVisible的变化
 watch(
   () => popoverVisible.value,
   (visible: boolean) => {
     if (visible) {
+      updatePopoverPosition()
       if (props.data.length > 0) {
         // 当popover显示时，确保选中第一行
         nextTick(() => {
