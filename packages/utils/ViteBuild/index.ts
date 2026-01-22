@@ -139,7 +139,7 @@ async function bundleComponentModule(ctx: BuildContext, {
   // ES 模式下，如果启用了 esUseExternalGlobals，使用 rollup-plugin-external-globals
   if (format === 'es' && ctx.esUseExternalGlobals) {
     try {
-      const { default: externalGlobals } = await dynamicImport(import('rollup-plugin-external-globals'))
+      const externalGlobals = await dynamicImport(import('rollup-plugin-external-globals')) as unknown as (options?: any) => any
       rollupPlugins.push(externalGlobals(globals))
     }
     catch (error) {
