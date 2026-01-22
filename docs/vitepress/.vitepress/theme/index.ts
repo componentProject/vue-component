@@ -2,7 +2,7 @@
 import type { Theme } from 'vitepress'
 import type { App as VueApp } from 'vue'
 
-import hljsVuePlugin from '@highlightjs/vue-plugin/dist/highlightjs-vue.esm.min.js'
+import hljsVuePlugin from '@highlightjs/vue-plugin'
 
 // 引入vue-component组件库
 import VueComponent from '@moluoxixi/components'
@@ -13,7 +13,7 @@ import ApiTyping from './components/ApiTyping.vue'
 import DocsCodeDemo from './components/DocsCodeDemo/index.vue'
 import Layout from './components/layout.vue'
 import Overview from './components/Overview.vue'
-import directive from './directives/index.ts'
+import directive from './directives'
 import 'highlight.js/lib/common'
 import './styles/index.scss'
 

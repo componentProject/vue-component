@@ -1,4 +1,3 @@
-// index.ts入口文件
 import type { App, Component } from 'vue'
 
 import * as Components from './components'

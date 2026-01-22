@@ -100,7 +100,7 @@ catalogs:
     vue-router: 4.5.0
     vuedraggable: ^4.1.0
     vxe-pc-ui: ^4.9.17
-    vxe-table: 4.7.94
+    vxe-table: latest
     wangeditor: ^4.7.15
     xe-utils: 3.7.9
     xlsx: ^0.18.5

@@ -79,8 +79,10 @@ import type {
   VxeTablePropTypes,
 } from 'vxe-table'
 import type { ColumnType, emitsType, propsType } from './_types'
-import VxeGrid from '@moluoxixi/components/DraggableTable/src/components/VxeGrid'
+// import VxeGrid from '@moluoxixi/components/DraggableTable/src/components/VxeGrid'
 // import VxeGrid from '@moluoxixi/components/VxeGrid'
+// import cssModules from './styles/modules/all.module.scss'
+
 import { deleteMemoryUpload, getMemoryQuery, setMemoryUpload } from '@moluoxixi/utils/_api/cache'
 import {
   getClass,
@@ -107,12 +109,13 @@ import {
   useTemplateRef,
   watch,
 } from 'vue'
+import { VxeGrid } from 'vxe-table'
 
 import { getCustomType, handleGetRequiredFields } from './_utils'
 import CustomConfigDialog from './components/CustomConfigDialog.vue'
 // 导入自定义渲染器，改造了VxeGrid，直接用Grid的VxeUI
 import installFn from './renderers'
-import cssModules from './styles/modules/all.module.scss'
+import 'vxe-table/lib/style.css'
 
 defineOptions({
   name: 'DraggableTable',
