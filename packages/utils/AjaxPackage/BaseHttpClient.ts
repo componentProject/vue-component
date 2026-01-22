@@ -421,12 +421,12 @@ export default class BaseHttpClient {
       const fallbackError = error as AxiosError<any>
       let errorMessage = (fallbackError.response?.data as string) || fallbackError.message || '网络错误'
       const currentTime = Date.now()
-      
+
       // 处理请求取消错误
       if (error.code === 'ERR_CANCELED') {
         errorMessage = '请求已取消'
       }
-      
+
       // 检查是否与最近一次错误消息相同，且时间间隔小于防抖时间
       const shouldShowError = !this.recentErrorCache
         || this.recentErrorCache.message !== errorMessage
