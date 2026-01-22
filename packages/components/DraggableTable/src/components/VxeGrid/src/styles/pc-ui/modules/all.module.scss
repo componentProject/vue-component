@@ -1,89 +1,19 @@
-/* DraggableTable的all.module组件 */
 .root {
   :global {
     @import '../components/icon.scss';
-    //@import 'vxe-pc-ui/styles/components/icon-picker.scss';
+
     @import '../components/pager.scss';
     @import '../components/tooltip.scss';
     @import '../components/input.scss';
     @import '../components/number-input.scss';
-    //@import 'vxe-pc-ui/styles/components/password-input.scss';
-    //@import 'vxe-pc-ui/styles/components/table-select.scss';
-    //@import 'vxe-pc-ui/styles/components/tree-select.scss';
+
     @import '../components/select.scss';
     @import '../components/drawer.scss';
-    //@import 'vxe-pc-ui/styles/components/radio.scss';
-    //@import 'vxe-pc-ui/styles/components/radio-button.scss';
+
     @import '../components/radio-group.scss';
     @import '../components/modal.scss';
     @import '../components/button.scss';
     @import '../components/loading.scss';
     @import '../components/checkbox.scss';
-    //@import 'vxe-pc-ui/styles/components/checkbox-button.scss';
-    //@import 'vxe-pc-ui/styles/components/checkbox-group.scss';
-
-    //@import 'vxe-pc-ui/styles/components/alert.scss';
-    //@import 'vxe-pc-ui/styles/components/anchor.scss';
-    //@import 'vxe-pc-ui/styles/components/anchor-link.scss';
-    //@import 'vxe-pc-ui/styles/components/avatar.scss';
-    //@import 'vxe-pc-ui/styles/components/badge.scss';
-    //@import 'vxe-pc-ui/styles/components/breadcrumb.scss';
-    //@import 'vxe-pc-ui/styles/components/breadcrumb-item.scss';
-    //@import 'vxe-pc-ui/styles/components/button-group.scss';
-    //@import 'vxe-pc-ui/styles/components/calendar.scss';
-    //@import 'vxe-pc-ui/styles/components/card.scss';
-    //@import 'vxe-pc-ui/styles/components/carousel.scss';
-    //@import 'vxe-pc-ui/styles/components/carousel-item.scss';
-
-    //@import 'vxe-pc-ui/styles/components/col.scss';
-    //@import 'vxe-pc-ui/styles/components/collapse.scss';
-    //@import 'vxe-pc-ui/styles/components/collapse-pane.scss';
-    //@import 'vxe-pc-ui/styles/components/color-picker.scss';
-    //@import 'vxe-pc-ui/styles/components/countdown.scss';
-    //@import 'vxe-pc-ui/styles/components/date-panel.scss';
-    //@import 'vxe-pc-ui/styles/components/date-picker.scss';
-    //@import 'vxe-pc-ui/styles/components/date-range-picker.scss';
-    //@import 'vxe-pc-ui/styles/components/empty.scss';
-    //@import 'vxe-pc-ui/styles/components/form.scss';
-    //@import 'vxe-pc-ui/styles/components/form-gather.scss';
-    //@import 'vxe-pc-ui/styles/components/form-group.scss';
-    //@import 'vxe-pc-ui/styles/components/form-item.scss';
-    //@import 'vxe-pc-ui/styles/components/image.scss';
-    //@import 'vxe-pc-ui/styles/components/image-group.scss';
-    //@import 'vxe-pc-ui/styles/components/image-preview.scss';
-    //@import 'vxe-pc-ui/styles/components/layout-aside.scss';
-    //@import 'vxe-pc-ui/styles/components/layout-body.scss';
-    //@import 'vxe-pc-ui/styles/components/layout-container.scss';
-    //@import 'vxe-pc-ui/styles/components/layout-footer.scss';
-    //@import 'vxe-pc-ui/styles/components/layout-header.scss';
-    //@import 'vxe-pc-ui/styles/components/link.scss';
-    //@import 'vxe-pc-ui/styles/components/list.scss';
-    //@import 'vxe-pc-ui/styles/components/menu.scss';
-    //@import 'vxe-pc-ui/styles/components/notice-bar.scss';
-    //@import 'vxe-pc-ui/styles/components/optgroup.scss';
-    //@import 'vxe-pc-ui/styles/components/option.scss';
-    //@import 'vxe-pc-ui/styles/components/print-page-break.scss';
-    //@import 'vxe-pc-ui/styles/components/print.scss';
-    //@import 'vxe-pc-ui/styles/components/pulldown.scss';
-
-    //@import 'vxe-pc-ui/styles/components/rate.scss';
-    //@import 'vxe-pc-ui/styles/components/result.scss';
-    //@import 'vxe-pc-ui/styles/components/row.scss';
-    //@import 'vxe-pc-ui/styles/components/split.scss';
-    //@import 'vxe-pc-ui/styles/components/split-pane.scss';
-    //@import 'vxe-pc-ui/styles/components/slider.scss';
-    //@import 'vxe-pc-ui/styles/components/steps.scss';
-    //@import 'vxe-pc-ui/styles/components/switch.scss';
-    //@import 'vxe-pc-ui/styles/components/tab-pane.scss';
-    //@import 'vxe-pc-ui/styles/components/tabs.scss';
-    //@import 'vxe-pc-ui/styles/components/tag.scss';
-    //@import 'vxe-pc-ui/styles/components/text-ellipsis.scss';
-    //@import 'vxe-pc-ui/styles/components/text.scss';
-    //@import 'vxe-pc-ui/styles/components/textarea.scss';
-    //@import 'vxe-pc-ui/styles/components/tip.scss';
-    //@import 'vxe-pc-ui/styles/components/tree.scss';
-
-    //@import 'vxe-pc-ui/styles/components/upload.scss';
-    //@import 'vxe-pc-ui/styles/components/watermark.scss';
   }
 }

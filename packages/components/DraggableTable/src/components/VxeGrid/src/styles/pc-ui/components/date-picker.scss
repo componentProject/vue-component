@@ -1,4 +1,3 @@
-/* DraggableTable的date-picker组件 */
 @use 'sass:list';
 @use '../helpers/baseMixin.scss';
 @use '../helpers/placement.scss';
@@ -39,7 +38,6 @@
   }
 }
 
-// 禁用
 .vxe-date-picker {
   &.is--disabled {
     background-color: var(--vxe-ui-input-disabled-background-color);
@@ -56,7 +54,6 @@
   }
 }
 
-// 图标
 .vxe-date-picker {
   display: inline-flex;
   flex-direction: row;

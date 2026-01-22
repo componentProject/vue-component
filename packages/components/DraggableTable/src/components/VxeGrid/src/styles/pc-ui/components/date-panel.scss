@@ -1,4 +1,3 @@
-/* DraggableTable的date-panel组件 */
 @use 'sass:list';
 
 .vxe-date-panel {
@@ -264,17 +263,6 @@
     }
   }
 }
-
-// .vxe-date-range-picker--panel {
-//   .vxe-date-panel--view-item {
-//     &.is--range-disabled {
-//       .vxe-date-panel--view-item-inner {
-//         color: var(--vxe-ui-input-disabled-color);
-//         background-color: inherit;
-//       }
-//     }
-//   }
-// }
 
 .vxe-date-panel--view-wrapper {
   &.type--week {

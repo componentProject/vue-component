@@ -1,4 +1,3 @@
-/* VxeGrid的old-icon组件 */
 @import '../helpers/mixin.scss';
 
 [class*='vxe-icon--'] {
@@ -721,7 +720,6 @@
   }
 }
 
-// 已废弃
 .vxe-icon-warnion-circle-fill:before {
   content: '\e848';
 }

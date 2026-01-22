@@ -1,4 +1,3 @@
-/* VxeGrid的table组件 */
 @import '../helpers/mixin.scss';
 @import './icon.scss';
 @import './table-module/all.scss';
@@ -46,7 +45,6 @@
   outline: 0;
 }
 
-/*默认的渲染*/
 .vxe-cell,
 .vxe-table--filter-template {
   .vxe-default-input,
@@ -212,7 +210,6 @@
   }
 }
 
-/*复选框-范围选择*/
 .vxe-table--checkbox-range {
   background-color: var(--vxe-ui-table-checkbox-range-background-color);
   border: var(--vxe-ui-table-checkbox-range-border-width) solid var(--vxe-ui-table-checkbox-range-border-color);
@@ -289,7 +286,6 @@
   }
 }
 
-/*圆角*/
 .vxe-table--render-default {
   &.is--round {
     %AllRadius {
@@ -381,7 +377,6 @@
   }
 }
 
-/*列宽*/
 .vxe-table {
   &.column--calc {
     .vxe-header--column,
@@ -395,7 +390,6 @@
   }
 }
 
-/*header*/
 .vxe-table {
   .vxe-table--header-wrapper {
     color: var(--vxe-ui-table-header-font-color);
@@ -407,7 +401,7 @@
       border-bottom: var(--vxe-ui-table-border-width) solid var(--vxe-ui-table-border-color);
     }
   }
-  /*排序*/
+
   .vxe-cell--sort {
     text-align: center;
     position: relative;
@@ -456,7 +450,7 @@
 .vxe-header--column {
   position: relative;
   font-weight: var(--vxe-ui-table-header-font-weight);
-  // user-select: none;
+
   &.col--ellipsis {
     & > .vxe-cell {
       display: flex;
@@ -490,13 +484,7 @@
       top: 0.2em;
     }
   }
-  // .vxe-cell--required-icon,
-  // .vxe-cell--edit-icon,
-  // .vxe-cell-title-prefix-icon,
-  // .vxe-cell-title-suffix-icon,
-  // .vxe-cell--title {
-  //   vertical-align: middle;
-  // }
+
   .vxe-cell--required-icon {
     padding-right: 0.1em;
   }
@@ -546,7 +534,6 @@
   }
 }
 
-/*table*/
 .vxe-table--render-default {
   position: relative;
   font-size: var(--vxe-ui-font-size-default);
@@ -616,55 +603,7 @@
       }
     }
   }
-  // &.is--tree-line {
-  //   .vxe-body--row {
-  //     &.row--stripe {
-  //       .vxe-tree--btn-wrapper {
-  //         background-color: var(--vxe-ui-table-row-striped-background-color);
-  //       }
-  //     }
-  //     &.row--radio {
-  //       .vxe-tree--btn-wrapper {
-  //         background-color: var(--vxe-ui-table-row-radio-checked-background-color);
-  //       }
-  //     }
-  //     &.row--checked {
-  //       .vxe-tree--btn-wrapper {
-  //         background-color: var(--vxe-ui-table-row-checkbox-checked-background-color);
-  //       }
-  //     }
-  //     &.row--current {
-  //       .vxe-tree--btn-wrapper {
-  //         background-color: var(--vxe-ui-table-row-current-background-color);
-  //       }
-  //     }
-  //     &.row--hover {
-  //       .vxe-tree--btn-wrapper {
-  //         background-color: var(--vxe-ui-table-row-hover-background-color);
-  //       }
-  //       &.row--stripe {
-  //         .vxe-tree--btn-wrapper {
-  //           background-color: var(--vxe-ui-table-row-hover-striped-background-color);
-  //         }
-  //       }
-  //       &.row--radio {
-  //         .vxe-tree--btn-wrapper {
-  //           background-color: var(--vxe-ui-table-row-hover-radio-checked-background-color);
-  //         }
-  //       }
-  //       &.row--checked {
-  //         .vxe-tree--btn-wrapper {
-  //           background-color: var(--vxe-ui-table-row-hover-checkbox-checked-background-color);
-  //         }
-  //       }
-  //       &.row--current {
-  //         .vxe-tree--btn-wrapper {
-  //           background-color: var(--vxe-ui-table-row-hover-current-background-color);
-  //         }
-  //       }
-  //     }
-  //   }
-  // }
+
   &.drag--resize {
     .vxe-table--main-wrapper,
     .vxe-table--fixed-left-wrapper,
@@ -741,9 +680,6 @@
     text-align: left;
     &.col--current {
       background-color: var(--vxe-ui-table-column-current-background-color);
-      // .vxe-tree--btn-wrapper {
-      //   background-color: var(--vxe-ui-table-column-current-background-color);
-      // }
     }
     &.col--center {
       text-align: center;
@@ -752,17 +688,7 @@
       text-align: right;
     }
   }
-  // &.is--tree-line {
-  //   .vxe-header--column,
-  //   .vxe-body--column,
-  //   .vxe-footer--column {
-  //     &.col--current {
-  //       .vxe-tree--btn-wrapper {
-  //         background-color: var(--vxe-ui-table-column-current-background-color);
-  //       }
-  //     }
-  //   }
-  // }
+
   .vxe-header--column,
   .vxe-footer--column {
     &.col--ellipsis {
@@ -778,32 +704,10 @@
       }
     }
   }
-
-  /*边框*/
   .vxe-table--footer-wrapper {
     border-top: var(--vxe-ui-table-border-width) solid var(--vxe-ui-table-border-color);
   }
-  // &.border--default,
-  // &.border--full,
-  // &.border--inner,
-  // &.border--outer {
-  //   .vxe-body--row {
-  //     &:last-child {
-  //       & > .vxe-body--column {
-  //         & > .vxe-cell {
-  //           border-bottom: 1px solid transparent;
-  //         }
-  //       }
-  //     }
-  //   }
-  //   .vxe-body--column {
-  //     &:first-child {
-  //       & > .vxe-cell {
-  //         border-left: 1px solid transparent;
-  //       }
-  //     }
-  //   }
-  // }
+
   &.border--default,
   &.border--full,
   &.border--outer {
@@ -838,7 +742,6 @@
         right bottom;
     }
     .vxe-table--fixed-left-wrapper {
-      // border-right: 1px solid var(--vxe-ui-table-border-color);
       .vxe-body--column {
         border-right-color: var(--vxe-ui-table-border-color);
       }
@@ -973,13 +876,9 @@
     white-space: pre-line;
     word-break: break-all;
   }
-
-  // 单元格占位符
   .vxe-cell--placeholder {
     color: var(--vxe-ui-table-cell-placeholder-color);
   }
-
-  // 单选框和复选框
   .vxe-cell--radio {
     @include createRadioIcon();
   }
@@ -1060,8 +959,6 @@
     width: 0;
     float: left;
   }
-
-  /*列宽线*/
   .vxe-table--resizable-bar {
     display: none;
     position: absolute;
@@ -1078,8 +975,6 @@
       background-color: var(--vxe-ui-table-resizable-drag-line-color);
     }
   }
-
-  /*边框线*/
   .vxe-table--border-line {
     position: absolute;
     top: 0;
@@ -1091,21 +986,6 @@
     border: var(--vxe-ui-table-border-width) solid var(--vxe-ui-table-border-color);
   }
 
-  /*树形节点*/
-  // &.is--tree-line {
-  //   .vxe-body--row {
-  //     &:first-child {
-  //       .vxe-tree--line {
-  //         border-width: 0 0 1px 0;
-  //       }
-  //     }
-  //   }
-  //   .vxe-body--row {
-  //     .vxe-body--column {
-  //       background-image: none;
-  //     }
-  //   }
-  // }
   .vxe-tree--line-wrapper {
     position: relative;
     display: block;
@@ -1131,7 +1011,7 @@
     height: 1em;
     text-align: center;
     transform: translateY(-50%);
-    // background-color: var(--vxe-ui-layout-background-color);
+
     z-index: 1;
     user-select: none;
     cursor: pointer;
@@ -1160,7 +1040,6 @@
     }
   }
 
-  /*展开行*/
   .vxe-table--expanded {
     cursor: pointer;
     .vxe-table--expand-btn {
@@ -1207,8 +1086,6 @@
       outline: 0;
     }
   }
-
-  /*设置列高度*/
   &.vxe-editable {
     .vxe-body--column {
       @extend %DefaultColumnHeight;
@@ -1230,7 +1107,6 @@
     }
   }
 
-  /*溢出列*/
   .vxe-header--column,
   .vxe-body--column,
   .vxe-footer--column {
@@ -1310,8 +1186,6 @@
       font-size: var(--vxe-radio-font-size-mini);
     }
   }
-
-  /*暂无数据*/
   .vxe-table--empty-placeholder,
   .vxe-table--empty-block {
     color: var(--vxe-ui-input-placeholder-color);
@@ -1329,7 +1203,7 @@
     visibility: hidden;
   }
   .vxe-table--empty-placeholder {
-    display: none;
+    display: none !important;
     position: absolute;
     top: 0;
     z-index: 5;
@@ -1342,7 +1216,7 @@
   &.is--empty {
     .vxe-table--empty-block,
     .vxe-table--empty-placeholder {
-      display: flex;
+      display: flex !important;
     }
   }
 
@@ -1352,7 +1226,6 @@
     }
   }
 
-  /*校验不通过*/
   .vxe-body--column {
     &.col--active,
     &.col--selected {
@@ -1412,7 +1285,7 @@
       }
     }
   }
-  /*已废弃，旧的校验样式**/
+
   &.old-cell-valid {
     .vxe-body--column {
       &.col--valid-error {
@@ -1454,8 +1327,6 @@
       }
     }
   }
-
-  /*单元格标记删除状态*/
   .vxe-body--row {
     &.row--pending {
       color: var(--vxe-ui-table-validate-error-color);
@@ -1476,8 +1347,6 @@
       }
     }
   }
-
-  /*单元格编辑状态*/
   .vxe-body--row {
     &.row--new {
       & > .vxe-body--column {
@@ -1511,7 +1380,6 @@
     }
   }
 
-  /*可编辑*/
   &.vxe-editable {
     &.cell--highlight {
       .vxe-body--column {
@@ -1545,7 +1413,6 @@
   }
 }
 
-/*valid error*/
 div.vxe-table--tooltip-wrapper {
   &.vxe-table--valid-error {
     padding: 0;
@@ -1559,7 +1426,6 @@ div.vxe-table--tooltip-wrapper {
   }
 }
 
-/*footer*/
 .vxe-table--footer-wrapper {
   color: var(--vxe-ui-table-footer-font-color);
   margin-top: -1px;
