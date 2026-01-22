@@ -25,11 +25,6 @@ export default defineComponent({
     const VxeUISelectComponent = VxeUI.getComponent<VxeSelectComponent>('VxeSelect')
     const VxeUIInputComponent = VxeUI.getComponent<VxeInputComponent>('VxeInput')
     const VxeUICheckboxComponent = VxeUI.getComponent<VxeCheckboxComponent>('VxeCheckbox')
-    // const VxeUIModalComponent = VxeModal
-    // const VxeUIButtonComponent = VxeButton
-    // const VxeUISelectComponent = VxeSelect
-    // const VxeUIInputComponent = VxeInput
-    // const VxeUICheckboxComponent = VxeCheckbox
 
     const $xeTable = inject('$xeTable', {} as VxeTableConstructor & VxeTableMethods & VxeTablePrivateMethods)
     const { computeExportOpts, computePrintOpts } = $xeTable.getComputeMaps()

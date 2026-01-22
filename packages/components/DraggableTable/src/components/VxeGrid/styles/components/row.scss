@@ -1,6 +1,5 @@
-/* DraggableTable的row组件 */
 @use 'sass:list';
-@use '../helpers/baseVar' as base_var;
+@use '../helpers/baseVar.scss' as base_var;
 
 .vxe-row {
   position: relative;

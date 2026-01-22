@@ -1,6 +1,5 @@
-/* DraggableTable的base组件 */
-@use 'theme/light';
-@use 'theme/dark';
+@use './theme/light.scss';
+@use './theme/dark.scss';
 
 %boxSizing {
   box-sizing: border-box;

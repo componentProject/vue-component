@@ -1,7 +1,6 @@
-/* DraggableTable的date-range-picker组件 */
 @use 'sass:list';
-@use '../helpers/baseMixin';
-@use '../helpers/placement';
+@use '../helpers/baseMixin.scss';
+@use '../helpers/placement.scss';
 
 .vxe-date-range-picker--readonly {
   color: var(--vxe-ui-font-color);
@@ -39,7 +38,6 @@
   }
 }
 
-// 禁用
 .vxe-date-range-picker {
   &.is--disabled {
     background-color: var(--vxe-ui-input-disabled-background-color);
@@ -56,7 +54,6 @@
   }
 }
 
-// 图标
 .vxe-date-range-picker {
   display: inline-flex;
   flex-direction: row;

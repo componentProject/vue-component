@@ -1,4 +1,3 @@
-// VxeGrid的columnInfo组件
 import type { VxeTableConstructor, VxeTablePrivateMethods } from '../../../types'
 import XEUtils from 'xe-utils'
 import { VxeUI } from '../../ui'

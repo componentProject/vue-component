@@ -349,10 +349,7 @@ hooks.add('tableValidatorModule', {
         return true
       }
       // 如果存在 pattern，正则校验
-      if (pattern && !(XEUtils.isRegExp(pattern) ? pattern : new RegExp(pattern)).test(val)) {
-        return true
-      }
-      return false
+      return !!(pattern && !(XEUtils.isRegExp(pattern) ? pattern : new RegExp(pattern)).test(val))
     }
 
     validatorPrivateMethods = {

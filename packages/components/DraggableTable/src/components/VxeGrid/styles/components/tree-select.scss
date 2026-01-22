@@ -1,6 +1,5 @@
-/* DraggableTable的tree-select组件 */
-@use '../helpers/baseMixin';
-@use '../helpers/placement';
+@use '../helpers/baseMixin.scss';
+@use '../helpers/placement.scss';
 
 .vxe-tree-select {
   position: relative;

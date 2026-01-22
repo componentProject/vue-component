@@ -1,5 +1,4 @@
-/* DraggableTable的placement组件 */
-@use 'baseMixin';
+@use './baseMixin.scss';
 
 @mixin createPlacementPanel {
   display: none;

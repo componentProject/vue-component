@@ -1,4 +1,3 @@
-// VxeGrid的header组件
 import type { PropType, Ref } from 'vue'
 import type { VxeColumnPropTypes, VxeTableConstructor, VxeTableDefines, VxeTableMethods, VxeTablePrivateMethods } from '../../../types'
 import { createCommentVNode, defineComponent, h, inject, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
@@ -183,7 +182,6 @@ export default defineComponent({
         renderColumnList = visibleColumn
       }
       else {
-        // 如果是使用优化模式
         if (fixedType) {
           if (scrollXLoad || allColumnHeaderOverflow) {
             renderColumnList = fixedColumn as VxeTableDefines.ColumnInfo[]

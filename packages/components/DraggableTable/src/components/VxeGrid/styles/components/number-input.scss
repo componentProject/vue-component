@@ -1,6 +1,5 @@
-/* DraggableTable的number-input组件 */
 @use 'sass:list';
-@use '../helpers/baseMixin';
+@use '../helpers/baseMixin.scss';
 
 .vxe-number-input--readonly {
   color: var(--vxe-ui-font-color);
@@ -51,7 +50,6 @@
   overflow: hidden;
 }
 
-// 禁用
 .vxe-number-input {
   &.is--disabled {
     background-color: var(--vxe-ui-input-disabled-background-color);
@@ -67,7 +65,6 @@
   }
 }
 
-// 图标
 .vxe-number-input {
   display: inline-flex;
   flex-direction: row;
@@ -116,7 +113,6 @@
   }
 }
 
-// 统计字数
 .vxe-number-input--count {
   flex-shrink: 0;
   color: var(--vxe-ui-input-count-color);
@@ -127,7 +123,6 @@
   }
 }
 
-// 对齐方式
 .vxe-number-input {
   &.is--left {
     .vxe-number-input--input {
@@ -146,7 +141,6 @@
   }
 }
 
-// 控制按钮
 .vxe-number-input--minus-btn,
 .vxe-number-input--plus-btn {
   border: 0;

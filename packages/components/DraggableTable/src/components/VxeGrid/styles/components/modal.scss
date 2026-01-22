@@ -1,5 +1,4 @@
-/* DraggableTable的modal组件 */
-@use '../helpers/baseMixin';
+@use '../helpers/baseMixin.scss';
 
 html[data-vxe-lock-scroll] {
   overflow: hidden;

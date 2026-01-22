@@ -1,4 +1,3 @@
-// VxeGrid的hook组件
 import type { TableMenuMethods, TableMenuPrivateMethods } from '../../../../types'
 import { nextTick } from 'vue'
 import XEUtils from 'xe-utils'

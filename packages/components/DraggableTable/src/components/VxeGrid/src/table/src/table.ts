@@ -574,7 +574,7 @@ export default defineComponent({
     const computeFixedColumnSize = computed(() => {
       const { collectColumn } = internalData
       let fixedSize = 0
-      // 只判断第一层
+
       collectColumn.forEach((column) => {
         if (column.renderFixed) {
           fixedSize++
@@ -1003,10 +1003,6 @@ export default defineComponent({
       }
     }
 
-    /**
-     * 更新数据列的 Map
-     * 牺牲数据组装的耗时，用来换取使用过程中的流畅
-     */
     const cacheColumnMap = () => {
       const { tableFullColumn, collectColumn } = internalData
       const fullColumnIdData: any = internalData.fullColumnIdData = {}
@@ -2490,10 +2486,6 @@ export default defineComponent({
       nextTick(() => setTimeout(() => tableMethods.recalculate()))
     }
 
-    /**
-     * 处理初始化的默认行为
-     * 只会执行一次
-     */
     const handleInitDefaults = () => {
       handleDefaultSort()
     }
@@ -3974,9 +3966,7 @@ export default defineComponent({
         const rowOpts = computeRowOpts.value
         return rowOpts.isCurrent || props.highlightCurrentRow ? reactData.currentRow : null
       },
-      /**
-       * 用于单选行，获取当已选中的数据
-       */
+
       getRadioRecord(isFull) {
         const { fullDataRowIdData, afterFullRowMaps } = internalData
         const { selectRadioRow } = reactData
@@ -4180,9 +4170,7 @@ export default defineComponent({
         }
         return sortList
       },
-      /**
-       * 关闭筛选
-       */
+
       closeFilter() {
         const { filterStore } = reactData
         const { column, visible } = filterStore
@@ -4301,7 +4289,6 @@ export default defineComponent({
             rows = [rows]
           }
           if (accordion) {
-            // 只能同时展开一个
             rExpandedMaps = {}
             rows = rows.slice(rows.length - 1, rows.length)
           }
@@ -4392,10 +4379,7 @@ export default defineComponent({
         })
         return rest
       },
-      /**
-       * 判断树节点是否懒加载完成
-       * @param {Row} row 行对象
-       */
+
       isTreeExpandLoaded(row) {
         const { fullAllDataRowIdData } = internalData
         const rest = fullAllDataRowIdData[getRowid($xeTable, row)]
@@ -7064,11 +7048,6 @@ export default defineComponent({
           handleInitDefaults()
         }
         if (process.env.VUE_APP_VXE_ENV === 'development') {
-          // const checkboxOpts = computeCheckboxOpts.value
-          // const checkboxColumn = internalData.tableFullColumn.find(column => column.type === 'checkbox')
-          // if (checkboxColumn && internalData.tableFullData.length > 300 && !checkboxOpts.checkField) {
-          //   warnLog('vxe.error.checkProp', ['checkbox-config.checkField'])
-          // }
           if ((scrollXLoad || scrollYLoad) && expandColumn) {
             warnLog('vxe.error.scrollErrProp', ['column.type=expand'])
           }
@@ -7309,9 +7288,7 @@ export default defineComponent({
           if (mouseOpts.area && mouseOpts.selected) {
             warnLog('vxe.error.errConflicts', ['mouse-config.area', 'mouse-config.selected'])
           }
-          // if (mouseOpts.area && checkboxOpts.range) {
-          //   warnLog('vxe.error.errConflicts', ['mouse-config.area', 'checkbox-config.range'])
-          // }
+
           if (props.treeConfig && mouseOpts.area) {
             errLog('vxe.error.noTree', ['mouse-config.area'])
           }

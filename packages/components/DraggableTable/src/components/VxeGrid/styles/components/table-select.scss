@@ -1,6 +1,5 @@
-/* DraggableTable的table-select组件 */
-@use '../helpers/baseMixin';
-@use '../helpers/placement';
+@use '../helpers/baseMixin.scss';
+@use '../helpers/placement.scss';
 
 .vxe-table-select {
   position: relative;

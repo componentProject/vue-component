@@ -37,7 +37,7 @@ export default defineComponent({
       const menuOpts = computeMenuOpts.value
 
       return h(Teleport, {
-        to: 'body',
+        to: $xeTable?.props?.params?.panelTo || 'body',
         disabled: false,
       }, [
         h('div', {

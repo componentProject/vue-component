@@ -1,6 +1,5 @@
-/* DraggableTable的color-picker组件 */
-@use '../helpers/baseMixin';
-@use '../helpers/placement';
+@use '../helpers/baseMixin.scss';
+@use '../helpers/placement.scss';
 
 .vxe-color-picker {
   &.is--selected {

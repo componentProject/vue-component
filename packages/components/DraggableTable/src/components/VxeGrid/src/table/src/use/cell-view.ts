@@ -1,4 +1,3 @@
-// VxeGrid的cell-view组件
 import type { VxeGlobalRendererHandles, VxeTableDefines } from '../../../../types'
 import { computed } from 'vue'
 

@@ -1,6 +1,5 @@
-/* DraggableTable的split组件 */
 @use 'sass:list';
-@use '../helpers/baseMixin';
+@use '../helpers/baseMixin.scss';
 
 .vxe-split {
   position: relative;

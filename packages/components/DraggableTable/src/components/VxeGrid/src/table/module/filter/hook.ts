@@ -10,7 +10,7 @@ import { handleFieldOrColumn, toFilters } from '../../src/util'
 
 const { renderer, hooks } = VxeUI
 
-const tableFilterMethodKeys: (keyof TableFilterMethods)[] = ['openFilter', 'setFilter', 'clearFilter', 'getCheckedFilters', 'updateFilterOptionStatus']
+const tableFilterMethodKeys: (keyof TableFilterMethods)[] = ['openFilter', 'setFilter', 'clearFilter', 'getCheckedFilters', 'updateFilterOptionStatus', 'resetFilterPanel', 'saveFilterPanel']
 
 hooks.add('tableFilterModule', {
   setupTable($xeTable) {
@@ -338,6 +338,16 @@ hooks.add('tableFilterModule', {
       updateFilterOptionStatus(item: any, checked: boolean) {
         item._checked = checked
         item.checked = checked
+        return nextTick()
+      },
+      resetFilterPanel() {
+        const { filterStore } = reactData
+        $xeTable.handleFilterResetFilter(null, filterStore.column || null)
+        return nextTick()
+      },
+      saveFilterPanel() {
+        const { filterStore } = reactData
+        $xeTable.handleFilterConfirmFilter(null, filterStore.column || null)
         return nextTick()
       },
     }

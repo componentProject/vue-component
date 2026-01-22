@@ -25,14 +25,10 @@ export default defineComponent({
     const VxeUIDrawerComponent = VxeUI.getComponent<VxeDrawerComponent>('VxeDrawer')
     const VxeUIButtonComponent = VxeUI.getComponent<VxeButtonComponent>('VxeButton')
     const VxeUIInputComponent = VxeUI.getComponent<VxeInputComponent>('VxeInput')
-    // const VxeUITooltipComponent = VxeUI.getComponent<VxeTooltipComponent>('VxeTooltip')
+
     const VxeUIRadioGroupComponent = VxeUI.getComponent<VxeRadioGroupComponent>('VxeRadioGroup')
-    // const VxeUIModalComponent = VxeModal
-    // const VxeUIDrawerComponent = VxeDrawer
-    // const VxeUIButtonComponent = VxeButton
-    // const VxeUIInputComponent = VxeInput
+
     const VxeUITooltipComponent = VxeTooltip
-    // const VxeUIRadioGroupComponent = VxeRadioGroup
 
     const $xeTable = inject('$xeTable', {} as VxeTableConstructor & VxeTableMethods & VxeTablePrivateMethods)
 

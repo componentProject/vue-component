@@ -1,8 +1,7 @@
-/* DraggableTable的button组件 */
 @use 'sass:map';
 @use 'sass:list';
-@use '../helpers/baseMixin';
-@use '../helpers/placement';
+@use '../helpers/baseMixin.scss';
+@use '../helpers/placement.scss';
 
 $btnThemeList: (
   (

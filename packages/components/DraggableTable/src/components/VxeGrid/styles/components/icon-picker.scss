@@ -1,7 +1,5 @@
-/* DraggableTable的icon-picker组件 */
-@use '../helpers/baseMixin';
+@use '../helpers/baseMixin.scss';
 
-// 避免 class 跟 icon 冲突，取名 ico
 .vxe-ico-picker {
   position: relative;
   display: inline-block;

@@ -23,9 +23,6 @@ export default defineComponent({
     const VxeUIModalComponent = VxeUI.getComponent<VxeModalComponent>('VxeModal')
     const VxeUIButtonComponent = VxeUI.getComponent<VxeButtonComponent>('VxeButton')
     const VxeUISelectComponent = VxeUI.getComponent<VxeSelectComponent>('VxeSelect')
-    // const VxeUIModalComponent = VxeModal
-    // const VxeUIButtonComponent = VxeButton
-    // const VxeUISelectComponent = VxeSelect
 
     const $xeTable = inject('$xeTable', {} as VxeTableConstructor & VxeTableMethods & VxeTablePrivateMethods)
     const { computeImportOpts } = $xeTable.getComputeMaps()

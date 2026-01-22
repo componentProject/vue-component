@@ -1,7 +1,6 @@
-/* DraggableTable的slider组件 */
 @use 'sass:map';
 @use 'sass:list';
-@use '../helpers/baseMixin';
+@use '../helpers/baseMixin.scss';
 
 $sliderThemeList: (
   (

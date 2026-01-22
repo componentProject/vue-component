@@ -1,4 +1,3 @@
-// VxeGrid的emits组件
 import type { VxeTableEmits } from '../../../types'
 
 export default [

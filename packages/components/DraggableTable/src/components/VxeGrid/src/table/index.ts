@@ -1,4 +1,3 @@
-// VxeGrid组件主文件
 import type { App } from 'vue'
 import type { TableHandleExport } from '../../types'
 import { VxeUI } from '../ui'

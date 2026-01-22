@@ -1,7 +1,5 @@
-/* DraggableTable的checkbox组件 */
-@use '../helpers/baseMixin';
+@use '../helpers/baseMixin.scss';
 
-/*checkbox-group*/
 .vxe-checkbox-group {
   display: inline-block;
   vertical-align: middle;
@@ -16,7 +14,6 @@
   display: inline-flex;
 }
 
-/*checkbox*/
 .vxe-checkbox {
   display: inline-block;
   vertical-align: middle;
