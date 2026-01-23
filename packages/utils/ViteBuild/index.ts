@@ -131,7 +131,7 @@ async function bundleComponentModule(ctx: BuildContext, {
   entryFileNames,
   chunkFileNames,
   exportsType,
-  skipManualChunks,
+  skipManualChunks: preserveModulesBase,
 }: BundleComponentModuleOptions) {
   const rollupPlugins: Plugin[] = []
   const plugins = []
@@ -174,6 +174,13 @@ async function bundleComponentModule(ctx: BuildContext, {
       logLevel: 'warn',
     }))
   }
+  /**
+   * preserveModules 是否按目录拆包，用于保持目录结构一致，于npm友好
+   * preserveModules与manualChunks冲突
+   */
+  const preserveModules = ctx.preserveModules && format !== 'umd' && format !== 'iife'
+  const skipManualChunks = preserveModulesBase || preserveModules
+  const isChunck = !preserveModules
   await build(mergeConfig({
     ...baseConfig,
     plugins: [...(baseConfig.plugins || []), ...plugins],
@@ -217,7 +224,7 @@ async function bundleComponentModule(ctx: BuildContext, {
           }
         },
         output: {
-          preserveModules: ctx.preserveModules,
+          preserveModules,
           preserveModulesRoot: resolve(ctx.packDir, `.${ctx.entryBaseUrl}${comp}`),
           entryFileNames,
           chunkFileNames,
@@ -227,7 +234,7 @@ async function bundleComponentModule(ctx: BuildContext, {
           ...(exportsType ? { exports: exportsType } : {}),
           // 禁用手动分块，避免文件拆分
           manualChunks: !skipManualChunks && ((id: string) => {
-            if (!ctx.isChunck) {
+            if (!isChunck) {
               return 'index'
             }
             else {
@@ -729,8 +736,7 @@ export async function buildComponentsWithOptions(options: BuildOptions): Promise
     },
     rootDir,
     packDir,
-    isChunck = false,
-    preserveModules = false,
+    preserveModules = true,
     useObfuscator = false,
     useExternal = true,
     esUseExternalGlobals = true,
@@ -757,7 +763,6 @@ export async function buildComponentsWithOptions(options: BuildOptions): Promise
   const ctx: BuildContext = {
     libNamespace,
     LIB_NAMESPACE: libNamespace,
-    isChunck,
     preserveModules,
     useObfuscator,
     useExternal,

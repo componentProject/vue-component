@@ -16,8 +16,6 @@ export interface BuildConfigBase {
   libNamespace: string
   /** 别名或者外部包的路径 */
   aliasComponentPath: string
-  /** 是否分包，与preserveModules冲突，如果preserveModules开启，则需按preserveModules的目录结构分包 */
-  isChunck: boolean
   /** 是否严格按照目录分组 */
   preserveModules: boolean
   /** 是否启用混淆 */

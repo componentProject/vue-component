@@ -15,7 +15,7 @@ import TsFooter from '@moluoxixi/components/TsFooter'
 import TsRadio from '@moluoxixi/components/TsRadio'
 import TsSelect from '@moluoxixi/components/TsSelect'
 
-export {
+export default {
   DateRangePicker,
   DraggableTable,
   DragModalDialog,
