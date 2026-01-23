@@ -111,7 +111,7 @@ catalogs:
     '@highlightjs/vue-plugin': ^2.1.0
     '@inquirer/checkbox': ^5.0.1
     '@moluoxixi/ajax-package': latest
-    '@moluoxixi/css-module-global-root-plugin': latest
+    '@moluoxixi/css-module-global-root-plugin': 0.0.9
     '@moluoxixi/eslint-config': latest
     '@moluoxixi/vite-config': latest
     '@storybook/addon-essentials': 8.4.7

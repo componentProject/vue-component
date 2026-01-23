@@ -1,4 +1,3 @@
-import type { Plugin } from 'postcss'
 // 配置文件
 import process from 'node:process'
 import cssModuleGlobalRootPlugin from '@moluoxixi/css-module-global-root-plugin'
@@ -73,7 +72,7 @@ export default ViteConfig(
         css: {
           postcss: {
             plugins: [
-              cssModuleGlobalRootPlugin() as unknown as Plugin,
+              cssModuleGlobalRootPlugin(),
             ],
           },
           preprocessorOptions: {

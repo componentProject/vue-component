@@ -2,8 +2,10 @@
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
     "composite": true,
-    "module": "ESNext",
-    "moduleResolution": "Bundler",
+    "lib": [
+      "DOM",
+      "ESNext"
+    ],
     "types": [
       "vite/client"
     ]

@@ -8,6 +8,8 @@
       "DOM"
     ],
     "baseUrl": ".",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
     "paths": {},
     "resolveJsonModule": true,
     "allowImportingTsExtensions": false,

@@ -3,9 +3,10 @@
     "composite": true,
     "target": "ESNext",
     "jsx": "preserve",
-    "module": "NodeNext",
-    "moduleResolution": "nodenext",
-    "allowImportingTsExtensions": true
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "allowImportingTsExtensions": true,
+    "rewriteRelativeImportExtensions": true
   },
   "include": [
     "packages/utils/**/*",

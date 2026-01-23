@@ -9,8 +9,8 @@
     ],
     "baseUrl": ".",
     "rootDir": ".",
-    "module": "NodeNext",
-    "moduleResolution": "nodenext",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
     "paths": {
       "@moluoxixi/components": ["../components"],
       "@moluoxixi/components/*": ["../components/*"],

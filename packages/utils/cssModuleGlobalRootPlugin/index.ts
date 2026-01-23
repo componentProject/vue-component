@@ -71,7 +71,7 @@ export interface CssModuleGlobalRootPluginOptions {
  * @param options 插件配置选项
  * @returns {Plugin} PostCSS 插件实例
  */
-export default function cssModuleGlobalRootPlugin(options: CssModuleGlobalRootPluginOptions = {}): Plugin {
+function cssModuleGlobalRootPlugin(options: CssModuleGlobalRootPluginOptions = {}): Plugin {
   const { removeRoot = true } = options
   return {
     postcssPlugin: 'css-module-global-root',
@@ -158,6 +158,7 @@ export default function cssModuleGlobalRootPlugin(options: CssModuleGlobalRootPl
     },
   }
 }
-
 // 设置插件名称（PostCSS 要求）
 cssModuleGlobalRootPlugin.postcss = true
+export default cssModuleGlobalRootPlugin()
+export { cssModuleGlobalRootPlugin }

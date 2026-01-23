@@ -2,10 +2,9 @@
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
     "composite": false,
-    "module": "NodeNext",
-    "moduleResolution": "nodenext",
     "types": ["vite/client"],
     "allowImportingTsExtensions": true,
+    "rewriteRelativeImportExtensions": true,
     "declaration": true
   },
   "exclude": [
