@@ -2,7 +2,7 @@
 import { COMPONENT_SETTING_TYPE } from '@moluoxixi/constant'
 import { getHttpService } from '../../../../packages/utils/AjaxPackage'
 
-// import { getHttpService } from '@moluoxixi/AjaxPackage'
+// import { getHttpService } from '@moluoxixi/ajax-package'
 
 export const httpApi: any = getHttpService({
   baseURL: 'http://192.168.209.103:10019/',

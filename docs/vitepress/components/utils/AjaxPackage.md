@@ -16,7 +16,7 @@
 ### 使用示例
 
 ```ts
-import {getHttpService} from '@moluoxixi/AjaxPackage'
+import {getHttpService} from '@moluoxixi/ajax-package'
 
 //如果有多个服务，可以创建多个http实例分别调用
 const httpApi: any = getHttpService({

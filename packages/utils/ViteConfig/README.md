@@ -6,7 +6,7 @@
 
 ```ts
 // vite.config.ts
-import viteConfig, { wrapperEnv } from '@moluoxixi/viteconfig'
+import viteConfig, { wrapperEnv } from '@moluoxixi/vite-config'
 import path from 'node:path'
 import { loadEnv } from 'vite'
 

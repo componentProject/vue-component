@@ -12,7 +12,7 @@
 
 ```ts
 // vite.config.ts
-import viteConfig, { wrapperEnv } from '@moluoxixi/viteconfig'
+import viteConfig, { wrapperEnv } from '@moluoxixi/vite-config'
 import path from 'node:path'
 import { loadEnv } from 'vite'
 
@@ -147,7 +147,7 @@ export default viteConfig(({ mode }) => {
 ### 使用示例：代理与第三方插件
 
 ```ts
-import viteConfig, {wrapperEnv} from '@moluoxixi/viteconfig'
+import viteConfig, {wrapperEnv} from '@moluoxixi/vite-config'
 import process from 'node:process'
 import {loadEnv} from 'vite'
 // sentry

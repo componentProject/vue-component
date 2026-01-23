@@ -31,7 +31,7 @@ pnpm add @moluoxixi/utils
 
 ```typescript
 import { defineConfig } from 'vite'
-import cssModuleGlobalRootPlugin from '@moluoxixi/utils/cssModuleGlobalRootPlugin/index.mts'
+import cssModuleGlobalRootPlugin from '@moluoxixi/css-module-global-root-plugin'
 
 export default defineConfig({
   css: {
@@ -48,7 +48,7 @@ export default defineConfig({
 
 ```typescript
 import { defineConfig } from 'vite'
-import cssModuleGlobalRootPlugin from '@moluoxixi/utils/cssModuleGlobalRootPlugin/index.mts'
+import cssModuleGlobalRootPlugin from '@moluoxixi/css-module-global-root-plugin'
 
 export default defineConfig({
   css: {
@@ -150,7 +150,7 @@ export default defineConfig({
 
 ```typescript
 import { defineConfig } from 'vite'
-import cssModuleGlobalRootPlugin from '@moluoxixi/utils/cssModuleGlobalRootPlugin/index.mts'
+import cssModuleGlobalRootPlugin from '@moluoxixi/css-module-global-root-plugin'
 
 export default defineConfig({
   css: {
@@ -193,7 +193,7 @@ export default defineConfig({
 
 ```typescript
 import { defineConfig } from 'vite'
-import cssModuleGlobalRootPlugin from '@moluoxixi/utils/cssModuleGlobalRootPlugin/index.mts'
+import cssModuleGlobalRootPlugin from '@moluoxixi/css-module-global-root-plugin'
 
 export default defineConfig({
   css: {

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <ElTable :data="tableData" :columns="columns" :span-method="spanMethod" border >
+    <ElTable :data="tableData" :columns="columns" :span-method="spanMethod" border>
       <ElTableColumn v-for="column in columns" :key="column.field" :prop="column.field" :label="column.title" :align="column.align" />
     </ElTable>
     <div class="actions">
@@ -26,7 +26,7 @@ const tableData = ref([
     address: '北京市海淀区',
     phone: '13800138000',
     email: 'zhangsan@example.com',
-    status: 'active'
+    status: 'active',
   },
   {
     name: '李四',
@@ -35,7 +35,7 @@ const tableData = ref([
     address: '上海市浦东新区',
     phone: '13800138001',
     email: 'lisi@example.com',
-    status: 'inactive'
+    status: 'inactive',
   },
   {
     name: '王五',
@@ -44,7 +44,7 @@ const tableData = ref([
     address: '广州市天河区',
     phone: '13800138002',
     email: 'wangwu@example.com',
-    status: 'active'
+    status: 'active',
   },
   {
     name: '老刘',
@@ -53,7 +53,7 @@ const tableData = ref([
     address: '广州市天河区',
     phone: '13800138002',
     email: 'wangwu@example.com',
-    status: 'active'
+    status: 'active',
   },
   {
     name: '老七',
@@ -62,7 +62,7 @@ const tableData = ref([
     address: '广州市天河区',
     phone: '13800138002',
     email: 'wangwu@example.com',
-    status: 'active'
+    status: 'active',
   },
   {
     name: '老八',
@@ -71,7 +71,7 @@ const tableData = ref([
     address: '广州市天河区',
     phone: '13800138002',
     email: 'wangwu@example.com',
-    status: 'active'
+    status: 'active',
   },
   {
     name: '老九',
@@ -80,30 +80,30 @@ const tableData = ref([
     address: '广州市天河区',
     phone: '13800138002',
     email: 'wangwu@example.com',
-    status: 'active'
-  }
+    status: 'active',
+  },
 ])
 
 const columns = ref([
   {
     title: '部门',
     field: 'department',
-    align: 'center'
+    align: 'center',
   },
   {
     title: '姓名',
     field: 'name',
-    align: 'center'
+    align: 'center',
   },
   {
     title: '年龄',
     field: 'age',
-    align: 'left'
+    align: 'left',
   },
   {
     title: '地址',
     field: 'address',
-    align: 'right'
+    align: 'right',
   },
   {
     title: '电话',
@@ -119,7 +119,7 @@ const columns = ref([
     formatter: (row: any) => {
       return row.status === 'active' ? '活跃' : '不活跃'
     },
-  }
+  },
 ])
 
 function spanMethod({ row, column, rowIndex, columnIndex }) {

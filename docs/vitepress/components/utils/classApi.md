@@ -16,7 +16,7 @@
 ### 创建实例
 
 ```ts
-import { BaseApi } from '@moluoxixi/AjaxPackage'
+import { BaseApi } from '@moluoxixi/ajax-package'
 
 const api = new BaseApi({
   baseURL: 'https://api.example.com',
@@ -52,7 +52,7 @@ export async function deleteUser(id: string) {
 ### 文件上传
 
 ```ts
-import { BaseApi } from '@moluoxixi/AjaxPackage'
+import { BaseApi } from '@moluoxixi/ajax-package'
 
 const api = new BaseApi({
   baseURL: 'https://api.example.com',
@@ -75,7 +75,7 @@ export async function uploadAvatar(file: File) {
 支持自定义响应字段映射、超时处理等配置。
 
 ```ts
-import { BaseApi } from '@moluoxixi/AjaxPackage'
+import { BaseApi } from '@moluoxixi/ajax-package'
 
 // 自定义响应字段映射
 const api = new BaseApi({
@@ -107,7 +107,7 @@ export async function getData() {
 可以通过继承 `BaseApi` 创建自定义的 API 类，重写 `processRequestConfig` 和 `processResponseError` 方法。
 
 ```ts
-import { BaseApi } from '@moluoxixi/AjaxPackage'
+import { BaseApi } from '@moluoxixi/ajax-package'
 import type { InternalAxiosRequestConfig, AxiosError } from 'axios'
 
 class UserApi extends BaseApi {
@@ -170,7 +170,7 @@ export async function fetchUser(id: string) {
 使用 `all` 方法同时发起多个请求。入参既可以是 `AxiosRequestConfig[]`，也可以是已经发起的请求 `Promise[]`。
 
 ```ts
-import { BaseApi } from '@moluoxixi/AjaxPackage'
+import { BaseApi } from '@moluoxixi/ajax-package'
 import type { AxiosRequestConfig } from 'axios'
 
 const api = new BaseApi({
@@ -221,7 +221,7 @@ export async function fetchMultipleDataByPromises() {
 使用 `allWithCancel` 方法创建可取消的批量请求。
 
 ```ts
-import { BaseApi } from '@moluoxixi/AjaxPackage'
+import { BaseApi } from '@moluoxixi/ajax-package'
 import type { AxiosRequestConfig } from 'axios'
 import axios from 'axios'
 

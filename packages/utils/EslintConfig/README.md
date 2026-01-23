@@ -5,7 +5,7 @@
 ## 使用示例
 
 ```ts
-import createEslintConfig from '@moluoxixi/eslintconfig'
+import createEslintConfig from '@moluoxixi/eslint-config'
 
 export default createEslintConfig({
   ignores: [

@@ -1,5 +1,5 @@
-import cssModuleGlobalRootPlugin from '../../../../../packages/utils/cssModuleGlobalRootPlugin/index.ts'
-import { getViteConfig } from '../../../../../packages/utils/ViteConfig/index.ts'
+import cssModuleGlobalRootPlugin from '@moluoxixi/css-module-global-root-plugin'
+import { getViteConfig } from '@moluoxixi/vite-config'
 import { docsPath } from '../../../contants/index.ts'
 import { MarkdownTransform } from './plugins/markdown-transform.ts'
 

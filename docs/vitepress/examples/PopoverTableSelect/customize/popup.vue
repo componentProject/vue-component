@@ -1,6 +1,7 @@
 <template>
   <div class="container">
     <PopoverTableSelect
+      id="123456789"
       v-model:input-value="inputValue1"
       pop-type="input"
       :columns="columns"
@@ -13,7 +14,6 @@
         zIndex: 899999,
       }"
       :width="600"
-      id="123456789"
       page-id="page3"
       user-id="shab3"
       save-type="server"

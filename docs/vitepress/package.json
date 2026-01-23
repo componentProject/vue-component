@@ -38,10 +38,12 @@
     "vxe-table": "catalog:build"
   },
   "devDependencies": {
-    "@highlightjs/vue-plugin": "catalog:build",
+    "@highlightjs/vue-plugin": "catalog:dev",
     "@moluoxixi/components": "workspace:*",
     "@moluoxixi/constant": "workspace:*",
+    "@moluoxixi/css-module-global-root-plugin": "catalog:dev",
     "@moluoxixi/utils": "workspace:*",
+    "@moluoxixi/vite-config": "catalog:dev",
     "@tailwindcss/postcss": "catalog:dev",
     "@types/js-cookie": "catalog:type",
     "@types/markdown-it": "catalog:type",

@@ -28,7 +28,6 @@ catalogs:
     '@formily/validator': ^2.1.5
     '@formily/vue': ^2.3.7
     '@google/genai': ^1.20.0
-    '@highlightjs/vue-plugin': ^2.1.0
     '@moluoxixi/classnames': latest
     '@sentry/vite-plugin': ^3.5.0
     '@sentry/vue': ^9.27.0
@@ -109,10 +108,12 @@ catalogs:
     '@antfu/eslint-config': 6.2.0
     '@commitlint/cli': ^19.8.0
     '@commitlint/config-conventional': ^19.8.0
+    '@highlightjs/vue-plugin': ^2.1.0
     '@inquirer/checkbox': ^5.0.1
-    '@moluoxixi/ajaxpackage': ^0.0.2
-    '@moluoxixi/eslintconfig': latest
-    '@moluoxixi/viteconfig': ^0.0.17
+    '@moluoxixi/ajax-package': latest
+    '@moluoxixi/css-module-global-root-plugin': latest
+    '@moluoxixi/eslint-config': latest
+    '@moluoxixi/vite-config': latest
     '@storybook/addon-essentials': 8.4.7
     '@storybook/addon-interactions': 8.4.7
     '@storybook/addon-onboarding': 8.4.7

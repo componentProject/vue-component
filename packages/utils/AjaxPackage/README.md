@@ -18,7 +18,7 @@
 ### 使用 getHttpService
 
 ```ts
-import { getHttpService } from '@moluoxixi/ajaxpackage'
+import { getHttpService } from '@moluoxixi/ajax-package'
 
 const httpApi = getHttpService({
   baseURL: 'https://api.example.com',
@@ -43,7 +43,7 @@ export function createUser(data: any) {
 ### 使用 BaseApi 类
 
 ```ts
-import { BaseApi } from '@moluoxixi/ajaxpackage'
+import { BaseApi } from '@moluoxixi/ajax-package'
 
 const api = new BaseApi({
   baseURL: 'https://api.example.com',
@@ -68,7 +68,7 @@ export async function createUser(data: any) {
 
 ```ts
 import { createApp } from 'vue'
-import VueAxiosPlugin from '@moluoxixi/ajaxpackage'
+import VueAxiosPlugin from '@moluoxixi/ajax-package'
 
 const app = createApp(App)
 
@@ -113,7 +113,7 @@ export default {
 ### 使用示例：基础配置
 
 ```ts
-import { getHttpService } from '@moluoxixi/ajaxpackage'
+import { getHttpService } from '@moluoxixi/ajax-package'
 
 const httpApi = getHttpService({
   baseURL: 'https://api.example.com',
@@ -132,7 +132,7 @@ const httpApi = getHttpService({
 ### 使用示例：自定义响应字段映射
 
 ```ts
-import { getHttpService } from '@moluoxixi/ajaxpackage'
+import { getHttpService } from '@moluoxixi/ajax-package'
 
 const httpApi = getHttpService({
   baseURL: 'https://api.example.com',
@@ -150,7 +150,7 @@ const httpApi = getHttpService({
 ### 使用示例：路径解析
 
 ```ts
-import { getHttpService } from '@moluoxixi/ajaxpackage'
+import { getHttpService } from '@moluoxixi/ajax-package'
 
 const httpApi = getHttpService({
   baseURL: 'https://api.example.com',
@@ -165,7 +165,7 @@ const httpApi = getHttpService({
 ### 使用示例：登录失效处理
 
 ```ts
-import { getHttpService } from '@moluoxixi/ajaxpackage'
+import { getHttpService } from '@moluoxixi/ajax-package'
 
 const httpApi = getHttpService({
   baseURL: 'https://api.example.com',
@@ -195,7 +195,7 @@ const httpApi = getHttpService({
 **示例：**
 
 ```ts
-import { getHttpService } from '@moluoxixi/ajaxpackage'
+import { getHttpService } from '@moluoxixi/ajax-package'
 
 const httpApi = getHttpService({
   baseURL: 'https://api.example.com',
@@ -236,7 +236,7 @@ async function searchUsers(keyword: string) {
 **示例：**
 
 ```ts
-import { getHttpService } from '@moluoxixi/ajaxpackage'
+import { getHttpService } from '@moluoxixi/ajax-package'
 import type { AxiosRequestConfig } from 'axios'
 
 const httpApi = getHttpService({
@@ -290,7 +290,7 @@ function generateSign(data: any, timestamp: number): string {
 **示例：**
 
 ```ts
-import { getHttpService } from '@moluoxixi/ajaxpackage'
+import { getHttpService } from '@moluoxixi/ajax-package'
 
 const httpApi = getHttpService({
   baseURL: 'https://api.example.com',
@@ -325,7 +325,7 @@ async function updateUserPartial(id: string, partialData: any) {
 **示例：**
 
 ```ts
-import { getHttpService } from '@moluoxixi/ajaxpackage'
+import { getHttpService } from '@moluoxixi/ajax-package'
 
 const httpApi = getHttpService({
   baseURL: 'https://api.example.com',
@@ -360,7 +360,7 @@ async function deleteUsers(ids: string[]) {
 **示例：**
 
 ```ts
-import { getHttpService } from '@moluoxixi/ajaxpackage'
+import { getHttpService } from '@moluoxixi/ajax-package'
 
 const httpApi = getHttpService({
   baseURL: 'https://api.example.com',
@@ -396,7 +396,7 @@ async function uploadFileWithProgress(file: File, onProgress: (progress: number)
 **示例：**
 
 ```ts
-import { getHttpService } from '@moluoxixi/ajaxpackage'
+import { getHttpService } from '@moluoxixi/ajax-package'
 
 const httpApi = getHttpService({
   baseURL: 'https://api.example.com',
@@ -441,7 +441,7 @@ async function loadUserData(userId: string) {
 **示例：**
 
 ```ts
-import { BaseApi } from '@moluoxixi/ajaxpackage'
+import { BaseApi } from '@moluoxixi/ajax-package'
 
 const api = new BaseApi({
   baseURL: 'https://api.example.com',
@@ -460,7 +460,7 @@ async function getUserList() {
 **示例：**
 
 ```ts
-import { BaseApi } from '@moluoxixi/ajaxpackage'
+import { BaseApi } from '@moluoxixi/ajax-package'
 
 const api = new BaseApi({
   baseURL: 'https://api.example.com',
@@ -479,7 +479,7 @@ async function createUser(userData: any) {
 **示例：**
 
 ```ts
-import { BaseApi } from '@moluoxixi/ajaxpackage'
+import { BaseApi } from '@moluoxixi/ajax-package'
 
 const api = new BaseApi({
   baseURL: 'https://api.example.com',
@@ -498,7 +498,7 @@ async function updateUser(id: string, userData: any) {
 **示例：**
 
 ```ts
-import { BaseApi } from '@moluoxixi/ajaxpackage'
+import { BaseApi } from '@moluoxixi/ajax-package'
 
 const api = new BaseApi({
   baseURL: 'https://api.example.com',
@@ -517,7 +517,7 @@ async function deleteUser(id: string) {
 **示例：**
 
 ```ts
-import { BaseApi } from '@moluoxixi/ajaxpackage'
+import { BaseApi } from '@moluoxixi/ajax-package'
 
 const api = new BaseApi({
   baseURL: 'https://api.example.com',
@@ -543,7 +543,7 @@ async function uploadFile(file: File) {
 **示例：**
 
 ```ts
-import { BaseApi } from '@moluoxixi/ajaxpackage'
+import { BaseApi } from '@moluoxixi/ajax-package'
 import type { AxiosRequestConfig } from 'axios'
 
 const api = new BaseApi({
@@ -579,7 +579,7 @@ async function loadDashboardDataByPromises() {
 **示例：**
 
 ```ts
-import { BaseApi } from '@moluoxixi/ajaxpackage'
+import { BaseApi } from '@moluoxixi/ajax-package'
 import type { InternalAxiosRequestConfig, AxiosError } from 'axios'
 
 class UserApi extends BaseApi {
@@ -624,7 +624,7 @@ export default userApi
 
 ```ts
 import { createApp } from 'vue'
-import VueAxiosPlugin from '@moluoxixi/ajaxpackage'
+import VueAxiosPlugin from '@moluoxixi/ajax-package'
 
 const app = createApp(App)
 
@@ -649,7 +649,7 @@ app.use(VueAxiosPlugin, {
 
 ```ts
 import { createApp } from 'vue'
-import VueAxiosPlugin from '@moluoxixi/ajaxpackage'
+import VueAxiosPlugin from '@moluoxixi/ajax-package'
 
 const app = createApp(App)
 
@@ -674,7 +674,7 @@ export default {
 
 ```ts
 import { createApp } from 'vue'
-import VueAxiosPlugin from '@moluoxixi/ajaxpackage'
+import VueAxiosPlugin from '@moluoxixi/ajax-package'
 
 const app = createApp(App)
 
@@ -847,7 +847,7 @@ AjaxPackage 支持 SSR（服务端渲染）环境。当 `document` 不存在时�
 <script setup>
 import { ref } from 'vue'
 import { ElButton } from 'element-plus'
-import SystemErrorDialog from '@moluoxixi/ajaxpackage/SystemErrorDialog.vue'
+import SystemErrorDialog from '@moluoxixi/ajax-package/SystemErrorDialog.vue'
 
 const dialogVisible = ref(false)
 
@@ -896,7 +896,7 @@ function handleConfirm() {
 
 <script setup>
 import { ref } from 'vue'
-import SystemErrorDialog from '@moluoxixi/ajaxpackage/SystemErrorDialog.vue'
+import SystemErrorDialog from '@moluoxixi/ajax-package/SystemErrorDialog.vue'
 
 const dialogVisible = ref(false)
 
@@ -923,7 +923,7 @@ function handleConfirm() {
 
 ```typescript
 import type { AxiosResponse } from 'axios'
-import SystemErrorDialog from '@moluoxixi/ajaxpackage/SystemErrorDialog.vue'
+import SystemErrorDialog from '@moluoxixi/ajax-package/SystemErrorDialog.vue'
 
 // 工具函数：从响应对象提取异常信息
 function extractErrorInfo(response: AxiosResponse) {
@@ -971,7 +971,7 @@ function handleApiError(error: any) {
 
 <script setup>
 import { ref } from 'vue'
-import SystemErrorDialog from '@moluoxixi/ajaxpackage/SystemErrorDialog.vue'
+import SystemErrorDialog from '@moluoxixi/ajax-package/SystemErrorDialog.vue'
 
 const errorDialogRef = ref()
 
