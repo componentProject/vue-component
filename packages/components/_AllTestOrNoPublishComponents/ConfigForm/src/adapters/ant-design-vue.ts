@@ -3,6 +3,7 @@
  * Ant Design Vue UI 适配器
  */
 
+import type { Component, PropType } from 'vue'
 import type { UIAdapter } from '../_types/adapter'
 import {
   ArrowDownOutlined,
@@ -50,14 +51,104 @@ import {
 import { defineComponent, h } from 'vue'
 
 /**
+ * Create v-model wrapper for Ant Design Vue components
+ * Ant Design Vue uses v-model:value instead of v-model
+ * 为 Ant Design Vue 组件创建 v-model 包装器
+ */
+function createVModelWrapper(component: Component, name: string) {
+  return defineComponent({
+    name,
+    inheritAttrs: false,
+    props: {
+      modelValue: {
+        type: [String, Number, Boolean, Array, Object, Date] as PropType<any>,
+        default: undefined,
+      },
+    },
+    emits: ['update:modelValue', 'change'],
+    setup(props, { attrs, emit, slots }) {
+      return () => h(component, {
+        ...attrs,
+        'value': props.modelValue,
+        'onUpdate:value': (val: any) => emit('update:modelValue', val),
+        'onChange': (val: any) => {
+          // Handle different event formats
+          const value = val?.target?.value ?? val
+          emit('change', value)
+        },
+      }, slots)
+    },
+  })
+}
+
+/**
+ * Create v-model:checked wrapper for Switch/Checkbox
+ * 为 Switch/Checkbox 创建 v-model:checked 包装器
+ */
+function createCheckedWrapper(component: Component, name: string) {
+  return defineComponent({
+    name,
+    inheritAttrs: false,
+    props: {
+      modelValue: {
+        type: Boolean,
+        default: false,
+      },
+    },
+    emits: ['update:modelValue', 'change'],
+    setup(props, { attrs, emit, slots }) {
+      return () => h(component, {
+        ...attrs,
+        'checked': props.modelValue,
+        'onUpdate:checked': (val: boolean) => emit('update:modelValue', val),
+        'onChange': (val: any) => {
+          const value = typeof val === 'boolean' ? val : val?.target?.checked
+          emit('change', value)
+        },
+      }, slots)
+    },
+  })
+}
+
+// Wrapped components for v-model compatibility
+const WrappedInput = createVModelWrapper(AInput, 'WrappedAInput')
+const WrappedTextarea = createVModelWrapper(ATextarea, 'WrappedATextarea')
+const WrappedInputPassword = createVModelWrapper(AInputPassword, 'WrappedAInputPassword')
+const WrappedInputNumber = createVModelWrapper(AInputNumber, 'WrappedAInputNumber')
+const WrappedSelect = createVModelWrapper(ASelect, 'WrappedASelect')
+const WrappedCascader = createVModelWrapper(ACascader, 'WrappedACascader')
+const WrappedTreeSelect = createVModelWrapper(ATreeSelect, 'WrappedATreeSelect')
+const WrappedRadioGroup = createVModelWrapper(ARadioGroup, 'WrappedARadioGroup')
+const WrappedCheckboxGroup = createVModelWrapper(ACheckboxGroup, 'WrappedACheckboxGroup')
+const WrappedSwitch = createCheckedWrapper(ASwitch, 'WrappedASwitch')
+const WrappedSlider = createVModelWrapper(ASlider, 'WrappedASlider')
+const WrappedRate = createVModelWrapper(ARate, 'WrappedARate')
+const WrappedDatePicker = createVModelWrapper(ADatePicker, 'WrappedADatePicker')
+const WrappedRangePicker = createVModelWrapper(ARangePicker, 'WrappedARangePicker')
+const WrappedTimePicker = createVModelWrapper(ATimePicker, 'WrappedATimePicker')
+
+/**
  * Create datetime picker wrapper for Ant Design Vue
  * 创建日期时间选择器包装器
  */
 const DatetimeComponent = defineComponent({
   name: 'ADatetimePicker',
   inheritAttrs: false,
-  setup(_, { attrs }) {
-    return () => h(ADatePicker, { ...attrs, showTime: true })
+  props: {
+    modelValue: {
+      type: [String, Number, Object, Date] as PropType<any>,
+      default: undefined,
+    },
+  },
+  emits: ['update:modelValue', 'change'],
+  setup(props, { attrs, emit }) {
+    return () => h(ADatePicker, {
+      ...attrs,
+      'showTime': true,
+      'value': props.modelValue,
+      'onUpdate:value': (val: any) => emit('update:modelValue', val),
+      'onChange': (val: any) => emit('change', val),
+    })
   },
 })
 
@@ -68,8 +159,21 @@ const DatetimeComponent = defineComponent({
 const DatetimeRangeComponent = defineComponent({
   name: 'ADatetimeRangePicker',
   inheritAttrs: false,
-  setup(_, { attrs }) {
-    return () => h(ARangePicker, { ...attrs, showTime: true })
+  props: {
+    modelValue: {
+      type: Array as PropType<any[]>,
+      default: undefined,
+    },
+  },
+  emits: ['update:modelValue', 'change'],
+  setup(props, { attrs, emit }) {
+    return () => h(ARangePicker, {
+      ...attrs,
+      'showTime': true,
+      'value': props.modelValue,
+      'onUpdate:value': (val: any) => emit('update:modelValue', val),
+      'onChange': (val: any) => emit('change', val),
+    })
   },
 })
 
@@ -118,23 +222,23 @@ export function createAntDesignVueAdapter(): UIAdapter {
     name: 'ant-design-vue',
     components: {
       fields: {
-        input: AInput,
-        textarea: ATextarea,
-        password: AInputPassword,
-        number: AInputNumber,
-        select: ASelect,
-        multiSelect: ASelect, // Use mode="multiple" prop
-        cascader: ACascader,
-        treeSelect: ATreeSelect,
-        radio: ARadioGroup,
-        checkbox: ACheckboxGroup,
-        switch: ASwitch,
-        slider: ASlider,
-        rate: ARate,
+        input: WrappedInput,
+        textarea: WrappedTextarea,
+        password: WrappedInputPassword,
+        number: WrappedInputNumber,
+        select: WrappedSelect,
+        multiSelect: WrappedSelect, // Use mode="multiple" prop
+        cascader: WrappedCascader,
+        treeSelect: WrappedTreeSelect,
+        radio: WrappedRadioGroup,
+        checkbox: WrappedCheckboxGroup,
+        switch: WrappedSwitch,
+        slider: WrappedSlider,
+        rate: WrappedRate,
         color: ColorPickerComponent,
-        date: ADatePicker,
-        dateRange: ARangePicker,
-        time: ATimePicker,
+        date: WrappedDatePicker,
+        dateRange: WrappedRangePicker,
+        time: WrappedTimePicker,
         datetime: DatetimeComponent,
         datetimeRange: DatetimeRangeComponent,
         upload: AUpload,
@@ -255,11 +359,41 @@ export function createAntDesignVueAdapter(): UIAdapter {
       formItem: (props) => {
         const transformed = { ...props }
         // Ant Design Vue FormItem uses 'name' instead of 'prop'
+        // Note: 'name' is already set in computedFormItemProps with proper array format
         if (props.prop) {
-          transformed.name = props.prop
           delete transformed.prop
         }
         return transformed
+      },
+    },
+    // Ant Design Vue features configuration
+    features: {
+      // Ant Design Vue uses options prop instead of children
+      optionsAsProps: true,
+      // Ant Design Vue FormItem uses 'name' for field name
+      formItemNameProp: 'name',
+    },
+    // Ant Design Vue form methods
+    formMethods: {
+      validate: async (formRef) => {
+        if (!formRef?.validate) {
+          return true
+        }
+        try {
+          await formRef.validate()
+          return true
+        }
+        catch {
+          return false
+        }
+      },
+      clearValidate: (formRef, fields) => {
+        // Ant Design Vue uses clearValidate with field names
+        formRef?.clearValidate?.(fields)
+      },
+      resetFields: (formRef, fields) => {
+        // Ant Design Vue uses resetFields with field names
+        formRef?.resetFields?.(fields)
       },
     },
   }

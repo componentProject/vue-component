@@ -59,6 +59,67 @@ export function useFormValidation(options: UseFormValidationOptions): UseFormVal
   const { schema, formState, context = {} } = options
 
   /**
+   * 递归在容器类型中查找字段配置
+   */
+  function findFieldInContainer(
+    properties: Record<string, FieldConfig>,
+    targetKey: string,
+  ): FieldConfig | undefined {
+    // Container types that don't have their own data
+    const containerTypes = ['void', 'group', 'card', 'collapse', 'tabs', 'divider', 'alert']
+
+    for (const [key, field] of Object.entries(properties)) {
+      // If this is a container type, search in its children
+      if (containerTypes.includes(field.type)) {
+        // Search in properties
+        if ('properties' in field && field.properties) {
+          const childProps = field.properties as Record<string, FieldConfig>
+          // Check if target is directly in this container
+          if (childProps[targetKey]) {
+            return childProps[targetKey]
+          }
+          // Recursively search in nested containers
+          const found = findFieldInContainer(childProps, targetKey)
+          if (found) {
+            return found
+          }
+        }
+        // Search in panels (for collapse)
+        if ('panels' in field) {
+          for (const panel of (field as any).panels || []) {
+            if (panel.properties) {
+              // Check if target is directly in this panel
+              if (panel.properties[targetKey]) {
+                return panel.properties[targetKey]
+              }
+              const found = findFieldInContainer(panel.properties, targetKey)
+              if (found) {
+                return found
+              }
+            }
+          }
+        }
+        // Search in tabs
+        if ('tabs' in field) {
+          for (const tab of (field as any).tabs || []) {
+            if (tab.properties) {
+              // Check if target is directly in this tab
+              if (tab.properties[targetKey]) {
+                return tab.properties[targetKey]
+              }
+              const found = findFieldInContainer(tab.properties, targetKey)
+              if (found) {
+                return found
+              }
+            }
+          }
+        }
+      }
+    }
+    return undefined
+  }
+
+  /**
    * 获取字段配置
    */
   function getFieldConfig(path: string): FieldConfig | undefined {
@@ -68,19 +129,25 @@ export function useFormValidation(options: UseFormValidationOptions): UseFormVal
 
     for (let i = 0; i < parts.length; i++) {
       const part = parts[i]
-      // 处理数组索引
+      // Handle array index
       const arrayMatch = part.match(/^(\w+)\[(\d+)\]$/)
       const key = arrayMatch ? arrayMatch[1] : part
 
       config = current[key]
-      if (!config)
-        return undefined
 
-      // 如果是对象类型，继续深入
+      // If not found directly, search in container types
+      if (!config) {
+        config = findFieldInContainer(current, key)
+        if (!config) {
+          return undefined
+        }
+      }
+
+      // If object type, go deeper
       if (config.type === 'object' && 'properties' in config && config.properties && i < parts.length - 1) {
         current = config.properties as Record<string, FieldConfig>
       }
-      // 如果是数组类型，获取 items
+      // If array type, get items
       else if (config.type === 'array' && 'items' in config && arrayMatch) {
         const itemConfig = config.items as FieldConfig
         if (itemConfig.type === 'object' && 'properties' in itemConfig && itemConfig.properties) {

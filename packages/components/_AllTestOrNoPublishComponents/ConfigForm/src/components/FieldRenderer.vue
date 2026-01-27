@@ -52,10 +52,9 @@
       <component
         :is="layoutComponents.formItem"
         :label="computedLabel"
-        :prop="path"
         :rules="computedRules"
         :required="computedRequired"
-        v-bind="decoratorProps"
+        v-bind="computedFormItemProps"
       >
         <!-- 标签插槽 -->
         <template v-if="$slots[`field-label-${field.name}`]" #label>
@@ -84,8 +83,8 @@
               @focus="handleFocus"
               @blur="handleBlur"
             >
-              <!-- Select/Radio/Checkbox 的选项渲染 -->
-              <template v-if="hasOptions">
+              <!-- Select/Radio/Checkbox 的选项渲染 (通过子组件方式，如 Element Plus) -->
+              <template v-if="hasOptions && !useOptionsAsProps">
                 <component
                   :is="getOptionComponent(field.type)"
                   v-for="opt in computedOptions"
@@ -123,7 +122,6 @@
 <script setup lang="ts">
 import type { ComputedRef } from 'vue'
 import type { ArrayFieldConfig, FieldConfig, FieldState, FormContext, ObjectFieldConfig, SelectFieldConfig, UIAdapter, VoidFieldConfig } from '../_types'
-import { ElCheckbox, ElOption, ElRadio } from 'element-plus'
 import { computed, defineAsyncComponent, inject, toRef, watch } from 'vue'
 import { executeExpression } from '../_utils'
 import { useFieldExpression } from '../composables/useFieldExpression'
@@ -160,6 +158,15 @@ const layoutComponents = computed(() => adapter?.value.components.layout || {})
 
 // 字段组件快捷访问
 const fieldComponents = computed(() => adapter?.value.components.fields || {})
+
+// Adapter 功能配置
+const adapterFeatures = computed(() => adapter?.value.features || {})
+
+// 是否通过 props 传递选项（而不是子组件）
+const useOptionsAsProps = computed(() => adapterFeatures.value.optionsAsProps === true)
+
+// 选项组件（用于子组件渲染方式）
+const optionComponents = computed(() => adapterFeatures.value.optionComponents || {})
 
 // 注入字段状态 Map
 const fieldStates = inject<Map<string, FieldState>>('configFormFieldStates', new Map())
@@ -373,6 +380,11 @@ const computedComponentProps = computed(() => {
     baseProps.multiple = true
   }
 
+  // 如果 adapter 配置使用 props 传递选项，则添加 options
+  if (useOptionsAsProps.value && hasOptions.value) {
+    baseProps.options = computedOptions.value
+  }
+
   // 使用 adapter 的 transformer 转换 props
   if (adapter?.value.transformer?.field) {
     return adapter.value.transformer.field(props.field.type, baseProps, {
@@ -446,7 +458,7 @@ const computedOptions = computed<OptionItem[]>(() => {
   }
 })
 
-// 计算装饰器属性
+// 计算装饰器属性（不含字段名属性）
 const decoratorProps = computed(() => {
   const baseProps: Record<string, any> = {}
 
@@ -455,6 +467,43 @@ const decoratorProps = computed(() => {
     for (const [key, value] of Object.entries(props.field.decoratorProps)) {
       baseProps[key] = executeExpression(value, props.context, { handlers: formHandlers })
     }
+  }
+
+  return baseProps
+})
+
+/**
+ * Convert dot-separated path to array path
+ * 将点分隔的路径转换为数组路径
+ * @example 'workExperience.0.position' => ['workExperience', 0, 'position']
+ */
+function pathToArray(path: string): (string | number)[] {
+  return path.split('.').map((key) => {
+    const num = Number.parseInt(key, 10)
+    return Number.isNaN(num) ? key : num
+  })
+}
+
+// 计算 FormItem 完整属性（包含字段名属性）
+const computedFormItemProps = computed(() => {
+  const baseProps: Record<string, any> = { ...decoratorProps.value }
+
+  // 根据 adapter 配置设置字段名属性
+  const nameProp = adapterFeatures.value.formItemNameProp || 'prop'
+  if (nameProp === 'name') {
+    // Ant Design Vue 需要数组格式的路径用于嵌套字段验证
+    baseProps.name = props.path.includes('.') ? pathToArray(props.path) : props.path
+  }
+  else {
+    baseProps.prop = props.path
+  }
+
+  // 使用 adapter 的 transformer 转换 formItem props
+  if (adapter?.value.transformer?.formItem) {
+    return adapter.value.transformer.formItem({
+      ...baseProps,
+      label: computedLabel.value,
+    })
   }
 
   return baseProps
@@ -489,19 +538,20 @@ const fieldComponent = computed(() => {
 })
 
 /**
- * 获取选项组件（Select.Option / Radio / Checkbox）
+ * 获取选项组件（从 adapter 的 features.optionComponents 获取）
  */
 function getOptionComponent(type: string) {
+  const components = optionComponents.value
   switch (type) {
     case 'select':
     case 'multiSelect':
-      return ElOption
+      return components.select
     case 'radio':
-      return ElRadio
+      return components.radio
     case 'checkbox':
-      return ElCheckbox
+      return components.checkbox
     default:
-      return ElOption
+      return components.select
   }
 }
 

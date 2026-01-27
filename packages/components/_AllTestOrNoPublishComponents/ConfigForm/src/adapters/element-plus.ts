@@ -17,6 +17,7 @@ import {
   ElButton,
   ElCard,
   ElCascader,
+  ElCheckbox,
   ElCheckboxGroup,
   ElCol,
   ElCollapse,
@@ -31,6 +32,8 @@ import {
   ElInputNumber,
   ElMessage,
   ElMessageBox,
+  ElOption,
+  ElRadio,
   ElRadioGroup,
   ElRate,
   ElRow,
@@ -211,6 +214,40 @@ export function createElementPlusAdapter(): UIAdapter {
         }
 
         return transformed
+      },
+    },
+    // Element Plus features configuration
+    features: {
+      // Element Plus uses children for options (ElOption, ElRadio, ElCheckbox)
+      optionsAsProps: false,
+      // Element Plus FormItem uses 'prop' for field name
+      formItemNameProp: 'prop',
+      // Option components for select/radio/checkbox
+      optionComponents: {
+        select: ElOption,
+        radio: ElRadio,
+        checkbox: ElCheckbox,
+      },
+    },
+    // Element Plus form methods
+    formMethods: {
+      validate: async (formRef) => {
+        if (!formRef?.validate) {
+          return true
+        }
+        try {
+          await formRef.validate()
+          return true
+        }
+        catch {
+          return false
+        }
+      },
+      clearValidate: (formRef, fields) => {
+        formRef?.clearValidate?.(fields)
+      },
+      resetFields: (formRef, fields) => {
+        formRef?.resetFields?.(fields)
       },
     },
   }

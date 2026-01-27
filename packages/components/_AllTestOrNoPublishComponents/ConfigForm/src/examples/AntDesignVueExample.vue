@@ -351,6 +351,13 @@ const formSchema: FormSchema = {
         agreement: {
           type: 'checkbox',
           name: 'agreement',
+          required: true,
+          rules: [
+            {
+              validator: 'agreementRequired',
+              message: '请阅读并同意用户协议',
+            },
+          ],
           dataSource: {
             type: 'static',
             data: [{ label: '我已阅读并同意《用户协议》', value: true }],
@@ -366,6 +373,15 @@ const formSchema: FormSchema = {
   },
   reset: {
     text: '重置',
+  },
+  validators: {
+    agreementRequired: (value: any) => {
+      // checkbox 的值是一个数组，勾选后包含 true
+      if (!value || !Array.isArray(value) || !value.includes(true)) {
+        return '请阅读并同意用户协议'
+      }
+      return true
+    },
   },
 }
 

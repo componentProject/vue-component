@@ -181,6 +181,7 @@ const formSubmitManager = useFormSubmit({
   schema: schema.value,
   formState: formStateManager,
   formValidation: formValidationManager,
+  adapter: props.adapter,
   requestAdapter: props.requestAdapter,
   onBeforeSubmit: async (vals) => {
     emit('submit', vals)
@@ -460,6 +461,16 @@ function handleFieldBlur(fieldName: string) {
  */
 async function handleSubmit() {
   try {
+    // 使用 adapter 配置的验证方法，触发 UI 层面的验证反馈
+    const validateFn = adapter.value.formMethods?.validate
+    if (validateFn) {
+      const isValid = await validateFn(formRef.value)
+      if (!isValid) {
+        // 原生验证失败，不继续提交
+        return
+      }
+    }
+
     await submit()
   }
   catch (error) {

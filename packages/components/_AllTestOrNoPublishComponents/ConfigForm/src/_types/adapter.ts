@@ -163,6 +163,34 @@ export interface FeedbackComponents {
 }
 
 /**
+ * Form methods interface
+ * 表单方法接口（用于调用原生表单组件的方法）
+ */
+export interface FormMethods {
+  /**
+   * Validate form
+   * 验证表单
+   * @param formRef - 表单组件实例
+   * @returns Promise<boolean> - 验证结果
+   */
+  validate: (formRef: any) => Promise<boolean>
+  /**
+   * Clear validation
+   * 清除验证
+   * @param formRef - 表单组件实例
+   * @param fields - 可选的字段列表
+   */
+  clearValidate?: (formRef: any, fields?: string[]) => void
+  /**
+   * Reset fields
+   * 重置字段
+   * @param formRef - 表单组件实例
+   * @param fields - 可选的字段列表
+   */
+  resetFields?: (formRef: any, fields?: string[]) => void
+}
+
+/**
  * Component registry
  * 组件注册表
  */
@@ -237,6 +265,38 @@ export type OptionsRenderer = (
 ) => any[]
 
 /**
+ * Adapter feature flags
+ * 适配器功能配置
+ */
+export interface AdapterFeatures {
+  /**
+   * Whether to pass options via props instead of children
+   * 是否通过 props 传递选项而不是子组件
+   * - true: 使用 options prop（如 Ant Design Vue）
+   * - false: 使用子组件渲染（如 Element Plus）
+   * @default false
+   */
+  optionsAsProps?: boolean
+  /**
+   * FormItem name prop key
+   * FormItem 的字段名属性键
+   * - 'prop': Element Plus 风格
+   * - 'name': Ant Design Vue 风格
+   * @default 'prop'
+   */
+  formItemNameProp?: 'prop' | 'name'
+  /**
+   * Option components for select/radio/checkbox (when optionsAsProps is false)
+   * 选项组件（当 optionsAsProps 为 false 时使用）
+   */
+  optionComponents?: {
+    select?: Component
+    radio?: Component
+    checkbox?: Component
+  }
+}
+
+/**
  * UI Adapter interface
  * UI 适配器接口
  */
@@ -247,7 +307,11 @@ export interface UIAdapter {
   transformer?: PropsTransformer
   /** 选项渲染器 */
   optionsRenderer?: OptionsRenderer
-  /** 适配器名称 */
+  /** 适配器功能配置 */
+  features?: AdapterFeatures
+  /** 表单方法 */
+  formMethods?: FormMethods
+  /** 适配器名称（可选，用于调试） */
   name?: string
 }
 

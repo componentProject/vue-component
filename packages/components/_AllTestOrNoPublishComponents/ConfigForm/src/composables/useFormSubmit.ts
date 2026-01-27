@@ -3,11 +3,10 @@
  * 表单提交 Composable
  */
 
-import type { FormSchema, ReactionAction } from '../_types'
+import type { FormSchema, ReactionAction, UIAdapter } from '../_types'
 import type { RequestAdapter } from '../_types/props'
 import type { UseFormStateReturn } from './useFormState'
 import type { UseFormValidationReturn } from './useFormValidation'
-import { ElMessage, ElMessageBox } from 'element-plus'
 import { ref } from 'vue'
 
 /**
@@ -20,6 +19,8 @@ export interface UseFormSubmitOptions {
   formState: UseFormStateReturn
   /** 表单校验 */
   formValidation: UseFormValidationReturn
+  /** UI 适配器 */
+  adapter?: UIAdapter
   /** 请求适配器 */
   requestAdapter?: RequestAdapter
   /** 提交前回调 */
@@ -84,6 +85,7 @@ export function useFormSubmit(options: UseFormSubmitOptions): UseFormSubmitRetur
     schema,
     formState,
     formValidation,
+    adapter,
     requestAdapter = defaultRequestAdapter,
     onBeforeSubmit,
     onSubmitSuccess,
@@ -92,27 +94,40 @@ export function useFormSubmit(options: UseFormSubmitOptions): UseFormSubmitRetur
 
   const submitting = ref(false)
 
+  // Get feedback from adapter or use console fallback
+  const feedback = adapter?.components.feedback || {
+    message: {
+      success: (msg: string) => console.log('[Success]', msg),
+      error: (msg: string) => console.error('[Error]', msg),
+      warning: (msg: string) => console.warn('[Warning]', msg),
+      info: (msg: string) => console.info('[Info]', msg),
+    },
+    messageBox: {
+      confirm: async () => true,
+    },
+  }
+
   /**
    * 执行联动动作
    */
   async function executeAction(action: ReactionAction, context: any): Promise<void> {
     // 通知动作
     if ('$notify' in action) {
-      const { type, message, title, duration } = action.$notify
+      const { type, message } = action.$notify
       const msgContent = formState.executor.execute(message, context)
 
       switch (type) {
         case 'success':
-          ElMessage.success(msgContent)
+          feedback.message?.success(msgContent)
           break
         case 'error':
-          ElMessage.error(msgContent)
+          feedback.message?.error(msgContent)
           break
         case 'warning':
-          ElMessage.warning(msgContent)
+          feedback.message?.warning(msgContent)
           break
         case 'info':
-          ElMessage.info(msgContent)
+          feedback.message?.info(msgContent)
           break
       }
     }
@@ -197,14 +212,11 @@ export function useFormSubmit(options: UseFormSubmitOptions): UseFormSubmitRetur
       // 5. 确认对话框
       if (submitConfig?.confirm) {
         const { title, content } = submitConfig.confirm
-        try {
-          await ElMessageBox.confirm(content || '', title, {
-            confirmButtonText: '确定',
-            cancelButtonText: '取消',
-            type: 'warning',
-          })
-        }
-        catch {
+        const confirmed = await feedback.messageBox?.confirm({
+          title: title || '提示',
+          message: content || '',
+        })
+        if (!confirmed) {
           // 用户取消
           return
         }
@@ -279,14 +291,11 @@ export function useFormSubmit(options: UseFormSubmitOptions): UseFormSubmitRetur
 
     // 确认对话框
     if (resetConfig?.confirm) {
-      try {
-        await ElMessageBox.confirm('确定要重置表单吗？', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning',
-        })
-      }
-      catch {
+      const confirmed = await feedback.messageBox?.confirm({
+        title: '提示',
+        message: '确定要重置表单吗？',
+      })
+      if (!confirmed) {
         // 用户取消
         return
       }
