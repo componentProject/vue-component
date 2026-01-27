@@ -3,6 +3,7 @@
  * 组件 Props 类型定义
  */
 
+import type { UIAdapter } from './adapter'
 import type { FormLayout, FormSchema } from './form'
 
 /**
@@ -14,6 +15,13 @@ export interface propsType {
    * 完整的表单配置对象
    */
   schema: FormSchema
+
+  /**
+   * UI 适配器
+   * 用于自定义 UI 组件，支持 Element Plus、Ant Design Vue 等
+   * 如不传入，将使用默认的 Element Plus 适配器
+   */
+  adapter?: UIAdapter
 
   /**
    * 表单初始值

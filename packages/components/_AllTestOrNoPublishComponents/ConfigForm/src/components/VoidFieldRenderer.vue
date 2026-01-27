@@ -3,7 +3,8 @@
   <template v-if="shouldRender">
     <!-- 卡片容器 -->
     <template v-if="field.type === 'card'">
-      <ElCard
+      <component
+        :is="layoutComponents.card"
         :header="computedTitle"
         v-bind="componentProps"
         class="config-form-card"
@@ -11,22 +12,23 @@
         <template v-if="computedTitle" #header>
           <div class="config-form-card__header">
             <span>{{ computedTitle }}</span>
-            <ElButton
+            <component
+              :is="layoutComponents.button"
               v-if="isCollapsible"
               type="primary"
               link
               @click="toggleCollapse"
             >
               {{ isExpanded ? '收起' : '展开' }}
-            </ElButton>
+            </component>
           </div>
         </template>
 
-        <ElCollapseTransition>
+        <Transition name="collapse">
           <div v-show="isExpanded">
-            <ElRow :gutter="16">
+            <component :is="layoutComponents.row" :gutter="16">
               <template v-for="(childField, childName) in childFields" :key="childName">
-                <ElCol v-bind="getColProps(childField)">
+                <component :is="layoutComponents.col" v-bind="getColProps(childField)">
                   <FieldRenderer
                     :field="childField"
                     :path="getChildPath(childName)"
@@ -36,32 +38,34 @@
                       <slot :name="slotName" v-bind="slotProps" />
                     </template>
                   </FieldRenderer>
-                </ElCol>
+                </component>
               </template>
-            </ElRow>
+            </component>
           </div>
-        </ElCollapseTransition>
-      </ElCard>
+        </Transition>
+      </component>
     </template>
 
     <!-- 折叠面板 -->
     <template v-else-if="field.type === 'collapse'">
-      <ElCollapse
+      <component
+        :is="layoutComponents.collapse"
         v-model="activeCollapseKeys"
         :accordion="isAccordion"
         v-bind="componentProps"
         class="config-form-collapse"
       >
-        <ElCollapseItem
+        <component
+          :is="layoutComponents.collapseItem"
           v-for="panel in collapsePanels"
           :key="panel.key"
           :name="panel.key"
           :title="getPanelTitle(panel)"
           :disabled="isPanelDisabled(panel)"
         >
-          <ElRow :gutter="16">
+          <component :is="layoutComponents.row" :gutter="16">
             <template v-for="(childField, childName) in panel.properties" :key="childName">
-              <ElCol v-bind="getColProps(childField)">
+              <component :is="layoutComponents.col" v-bind="getColProps(childField)">
                 <FieldRenderer
                   :field="childField"
                   :path="getChildPath(childName)"
@@ -71,31 +75,33 @@
                     <slot :name="slotName" v-bind="slotProps" />
                   </template>
                 </FieldRenderer>
-              </ElCol>
+              </component>
             </template>
-          </ElRow>
-        </ElCollapseItem>
-      </ElCollapse>
+          </component>
+        </component>
+      </component>
     </template>
 
     <!-- 标签页 -->
     <template v-else-if="field.type === 'tabs'">
-      <ElTabs
+      <component
+        :is="layoutComponents.tabs"
         v-model="activeTabKey"
         :tab-position="tabPosition"
         v-bind="componentProps"
         class="config-form-tabs"
       >
-        <ElTabPane
+        <component
+          :is="layoutComponents.tabPane"
           v-for="tab in tabPanes"
           :key="tab.key"
           :name="tab.key"
           :label="getTabTitle(tab)"
           :disabled="isTabDisabled(tab)"
         >
-          <ElRow :gutter="16">
+          <component :is="layoutComponents.row" :gutter="16">
             <template v-for="(childField, childName) in tab.properties" :key="childName">
-              <ElCol v-bind="getColProps(childField)">
+              <component :is="layoutComponents.col" v-bind="getColProps(childField)">
                 <FieldRenderer
                   :field="childField"
                   :path="getChildPath(childName)"
@@ -105,11 +111,11 @@
                     <slot :name="slotName" v-bind="slotProps" />
                   </template>
                 </FieldRenderer>
-              </ElCol>
+              </component>
             </template>
-          </ElRow>
-        </ElTabPane>
-      </ElTabs>
+          </component>
+        </component>
+      </component>
     </template>
 
     <!-- 分组 -->
@@ -118,9 +124,9 @@
         <div v-if="computedTitle" class="config-form-group__title">
           {{ computedTitle }}
         </div>
-        <ElRow :gutter="16">
+        <component :is="layoutComponents.row" :gutter="16">
           <template v-for="(childField, childName) in childFields" :key="childName">
-            <ElCol v-bind="getColProps(childField)">
+            <component :is="layoutComponents.col" v-bind="getColProps(childField)">
               <FieldRenderer
                 :field="childField"
                 :path="getChildPath(childName)"
@@ -130,24 +136,25 @@
                   <slot :name="slotName" v-bind="slotProps" />
                 </template>
               </FieldRenderer>
-            </ElCol>
+            </component>
           </template>
-        </ElRow>
+        </component>
       </div>
     </template>
 
     <!-- 分割线 -->
     <template v-else-if="field.type === 'divider'">
-      <ElDivider v-bind="componentProps">
+      <component :is="layoutComponents.divider" v-bind="componentProps">
         <template v-if="computedTitle">
           {{ computedTitle }}
         </template>
-      </ElDivider>
+      </component>
     </template>
 
     <!-- 提示信息 -->
     <template v-else-if="field.type === 'alert'">
-      <ElAlert
+      <component
+        :is="layoutComponents.alert"
         :title="computedTitle || ''"
         :description="computedDescription"
         v-bind="componentProps"
@@ -158,9 +165,9 @@
     <!-- 通用 void 容器 -->
     <template v-else>
       <div class="config-form-void" v-bind="componentProps">
-        <ElRow :gutter="16">
+        <component :is="layoutComponents.row" :gutter="16">
           <template v-for="(childField, childName) in childFields" :key="childName">
-            <ElCol v-bind="getColProps(childField)">
+            <component :is="layoutComponents.col" v-bind="getColProps(childField)">
               <FieldRenderer
                 :field="childField"
                 :path="getChildPath(childName)"
@@ -170,17 +177,17 @@
                   <slot :name="slotName" v-bind="slotProps" />
                 </template>
               </FieldRenderer>
-            </ElCol>
+            </component>
           </template>
-        </ElRow>
+        </component>
       </div>
     </template>
   </template>
 </template>
 
 <script setup lang="ts">
-import type { CardFieldConfig, CollapseFieldConfig, CollapsePanel, FieldConfig, FormContext, TabPane, TabsFieldConfig } from '../_types'
-import { ElAlert, ElButton, ElCard, ElCol, ElCollapse, ElCollapseItem, ElCollapseTransition, ElDivider, ElRow, ElTabPane, ElTabs } from 'element-plus'
+import type { ComputedRef } from 'vue'
+import type { CardFieldConfig, CollapseFieldConfig, CollapsePanel, FieldConfig, FormContext, TabPane, TabsFieldConfig, UIAdapter } from '../_types'
 import { computed, inject, ref } from 'vue'
 import { executeExpression } from '../_utils'
 import FieldRenderer from './FieldRenderer.vue'
@@ -199,6 +206,12 @@ const props = defineProps<{
 }>()
 
 const formHandlers = inject<Record<string, (...args: any[]) => any>>('configFormHandlers', {})
+
+// 注入 adapter
+const adapter = inject<ComputedRef<UIAdapter>>('configFormAdapter')
+
+// 布局组件快捷访问
+const layoutComponents = computed(() => adapter?.value.components.layout || {})
 
 // 卡片展开状态
 const isExpanded = ref(

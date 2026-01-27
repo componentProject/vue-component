@@ -3,6 +3,7 @@
  * 表单配置类型定义
  */
 
+import type { ComponentPublicInstance, Ref } from 'vue'
 import type { ApiConfig, DataTransformer, OptionItem } from './dataSource'
 import type { ExpressionContext } from './expression'
 import type { FieldConfig } from './field'
@@ -264,6 +265,8 @@ export interface FormContext extends ExpressionContext {
  * 暴露给外部使用的方法
  */
 export interface FormInstance {
+  /** 底层表单组件引用（Element Plus/Ant Design Vue 等） */
+  formRef: Ref<ComponentPublicInstance | null | undefined>
   /** 获取表单值 */
   getValues: () => Record<string, any>
   /** 设置表单值 */

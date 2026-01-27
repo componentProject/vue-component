@@ -17,7 +17,7 @@
         >
           <!-- 排序手柄 -->
           <div v-if="canSort" class="config-form-array__handle">
-            <ElIcon><Rank /></ElIcon>
+            <component :is="iconComponents.drag" />
           </div>
 
           <!-- 数组项内容 -->
@@ -36,48 +36,64 @@
           <!-- 数组项操作 -->
           <div class="config-form-array__actions">
             <!-- 复制 -->
-            <ElTooltip v-if="canCopy" content="复制" placement="top">
-              <ElButton
+            <component :is="layoutComponents.tooltip" v-if="canCopy" content="复制" title="复制" placement="top">
+              <component
+                :is="layoutComponents.button"
                 type="primary"
                 link
-                :icon="CopyDocument"
                 :disabled="isMaxReached"
                 @click="copyItem(index)"
-              />
-            </ElTooltip>
+              >
+                <template #icon>
+                  <component :is="iconComponents.copy" />
+                </template>
+              </component>
+            </component>
 
             <!-- 上移 -->
-            <ElTooltip v-if="canMove" content="上移" placement="top">
-              <ElButton
+            <component :is="layoutComponents.tooltip" v-if="canMove" content="上移" title="上移" placement="top">
+              <component
+                :is="layoutComponents.button"
                 type="primary"
                 link
-                :icon="ArrowUp"
                 :disabled="index === 0"
                 @click="moveItem(index, index - 1)"
-              />
-            </ElTooltip>
+              >
+                <template #icon>
+                  <component :is="iconComponents.arrowUp" />
+                </template>
+              </component>
+            </component>
 
             <!-- 下移 -->
-            <ElTooltip v-if="canMove" content="下移" placement="top">
-              <ElButton
+            <component :is="layoutComponents.tooltip" v-if="canMove" content="下移" title="下移" placement="top">
+              <component
+                :is="layoutComponents.button"
                 type="primary"
                 link
-                :icon="ArrowDown"
                 :disabled="index >= (modelValue?.length || 0) - 1"
                 @click="moveItem(index, index + 1)"
-              />
-            </ElTooltip>
+              >
+                <template #icon>
+                  <component :is="iconComponents.arrowDown" />
+                </template>
+              </component>
+            </component>
 
             <!-- 删除 -->
-            <ElTooltip v-if="canRemove" content="删除" placement="top">
-              <ElButton
+            <component :is="layoutComponents.tooltip" v-if="canRemove" content="删除" title="删除" placement="top">
+              <component
+                :is="layoutComponents.button"
                 type="danger"
                 link
-                :icon="Delete"
                 :disabled="isMinReached"
                 @click="removeItem(index)"
-              />
-            </ElTooltip>
+              >
+                <template #icon>
+                  <component :is="iconComponents.delete" />
+                </template>
+              </component>
+            </component>
           </div>
         </div>
       </TransitionGroup>
@@ -85,18 +101,21 @@
 
     <!-- 空状态 -->
     <div v-if="!modelValue?.length" class="config-form-array__empty">
-      <ElEmpty description="暂无数据" :image-size="60" />
+      <component :is="layoutComponents.empty" description="暂无数据" :image-size="60" />
     </div>
 
     <!-- 添加按钮 -->
     <div v-if="canAdd && !isMaxReached" class="config-form-array__footer">
-      <ElButton
+      <component
+        :is="layoutComponents.button"
         type="primary"
-        :icon="Plus"
         @click="addItem"
       >
+        <template #icon>
+          <component :is="iconComponents.plus" />
+        </template>
         {{ addButtonText }}
-      </ElButton>
+      </component>
     </div>
 
     <!-- 数量限制提示（仅在配置 showLimitTip 或按钮被禁用时显示） -->
@@ -107,9 +126,8 @@
 </template>
 
 <script setup lang="ts">
-import type { ArrayFieldConfig, FieldConfig, FormContext } from '../_types'
-import { ArrowDown, ArrowUp, CopyDocument, Delete, Plus, Rank } from '@element-plus/icons-vue'
-import { ElButton, ElEmpty, ElIcon, ElMessageBox, ElTooltip } from 'element-plus'
+import type { ComputedRef } from 'vue'
+import type { ArrayFieldConfig, FieldConfig, FormContext, UIAdapter } from '../_types'
 import { computed, inject } from 'vue'
 import { executeExpression } from '../_utils'
 import FieldRenderer from './FieldRenderer.vue'
@@ -134,6 +152,15 @@ const emit = defineEmits<{
 const modelValue = defineModel<any[]>({ default: () => [] })
 
 const formHandlers = inject<Record<string, (...args: any[]) => any>>('configFormHandlers', {})
+
+// 注入 adapter
+const adapter = inject<ComputedRef<UIAdapter>>('configFormAdapter')
+
+// 布局组件快捷访问
+const layoutComponents = computed(() => adapter?.value.components.layout || {})
+
+// 图标组件快捷访问
+const iconComponents = computed(() => adapter?.value.components.icons || {})
 
 // 数组项字段配置
 const itemField = computed<FieldConfig>(() => {
@@ -313,14 +340,20 @@ async function removeItem(index: number) {
 
   // 确认删除
   if (removeConfirm.value.enabled) {
-    try {
-      await ElMessageBox.confirm(removeConfirm.value.text, '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning',
+    const feedback = adapter?.value.components.feedback
+    if (feedback?.messageBox?.confirm) {
+      const confirmed = await feedback.messageBox.confirm({
+        title: '提示',
+        message: removeConfirm.value.text,
+        confirmText: '确定',
+        cancelText: '取消',
       })
+      if (!confirmed) {
+        return
+      }
     }
-    catch {
+    // eslint-disable-next-line no-alert
+    else if (!window.confirm(removeConfirm.value.text)) {
       return
     }
   }

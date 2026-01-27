@@ -7,9 +7,9 @@
     </div>
 
     <!-- 子字段渲染 -->
-    <ElRow :gutter="16">
+    <component :is="layoutComponents.row" :gutter="16">
       <template v-for="(childField, childName) in childFields" :key="childName">
-        <ElCol v-bind="getColProps(childField)">
+        <component :is="layoutComponents.col" v-bind="getColProps(childField)">
           <FieldRenderer
             :field="childField"
             :path="getChildPath(childName as string)"
@@ -19,15 +19,15 @@
               <slot :name="slotName" v-bind="slotProps" />
             </template>
           </FieldRenderer>
-        </ElCol>
+        </component>
       </template>
-    </ElRow>
+    </component>
   </div>
 </template>
 
 <script setup lang="ts">
-import type { FieldConfig, FormContext, ObjectFieldConfig } from '../_types'
-import { ElCol, ElRow } from 'element-plus'
+import type { ComputedRef } from 'vue'
+import type { FieldConfig, FormContext, ObjectFieldConfig, UIAdapter } from '../_types'
 import { computed, inject } from 'vue'
 import { executeExpression } from '../_utils'
 import FieldRenderer from './FieldRenderer.vue'
@@ -45,13 +45,19 @@ const props = defineProps<{
   context: FormContext
 }>()
 
-const emit = defineEmits<{
+defineEmits<{
   (e: 'change', value: Record<string, any>): void
 }>()
 
-const modelValue = defineModel<Record<string, any>>({ default: () => ({}) })
+defineModel<Record<string, any>>({ default: () => ({}) })
 
 const formHandlers = inject<Record<string, (...args: any[]) => any>>('configFormHandlers', {})
+
+// 注入 adapter
+const adapter = inject<ComputedRef<UIAdapter>>('configFormAdapter')
+
+// 布局组件快捷访问
+const layoutComponents = computed(() => adapter?.value.components.layout || {})
 
 // 子字段配置
 const childFields = computed<Record<string, FieldConfig>>(() => {

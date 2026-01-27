@@ -49,7 +49,8 @@
 
     <!-- 基础类型字段 -->
     <template v-else>
-      <ElFormItem
+      <component
+        :is="layoutComponents.formItem"
         :label="computedLabel"
         :prop="path"
         :rules="computedRules"
@@ -72,79 +73,33 @@
 
           <!-- 标准字段组件 -->
           <template v-else>
-            <!-- Select 组件 -->
-            <template v-if="field.type === 'select' || field.type === 'multiSelect'">
-              <ElSelect
-                v-model="fieldValue"
-                :disabled="isDisabled"
-                :readonly="isReadonly"
-                :multiple="isMultiSelect"
-                v-bind="computedComponentProps"
-                @change="handleChange"
-                @focus="handleFocus"
-                @blur="handleBlur"
-              >
-                <ElOption
+            <!-- 使用动态组件渲染所有字段 -->
+            <component
+              :is="fieldComponent"
+              v-model="fieldValue"
+              :disabled="isDisabled"
+              :readonly="isReadonly"
+              v-bind="computedComponentProps"
+              @change="handleChange"
+              @focus="handleFocus"
+              @blur="handleBlur"
+            >
+              <!-- Select/Radio/Checkbox 的选项渲染 -->
+              <template v-if="hasOptions">
+                <component
+                  :is="getOptionComponent(field.type)"
                   v-for="opt in computedOptions"
                   :key="opt.value"
-                  :label="opt.label"
-                  :value="opt.value"
-                  :disabled="opt.disabled"
-                />
-              </ElSelect>
-            </template>
-
-            <!-- Radio 组件 -->
-            <template v-else-if="field.type === 'radio'">
-              <ElRadioGroup
-                v-model="fieldValue"
-                :disabled="isDisabled"
-                v-bind="computedComponentProps"
-                @change="handleChange"
-              >
-                <ElRadio
-                  v-for="opt in computedOptions"
-                  :key="opt.value"
+                  :label="getOptionLabel(field.type, opt)"
                   :value="opt.value"
                   :disabled="opt.disabled"
                 >
-                  {{ opt.label }}
-                </ElRadio>
-              </ElRadioGroup>
-            </template>
-
-            <!-- Checkbox 组件 -->
-            <template v-else-if="field.type === 'checkbox'">
-              <ElCheckboxGroup
-                v-model="fieldValue"
-                :disabled="isDisabled"
-                v-bind="computedComponentProps"
-                @change="handleChange"
-              >
-                <ElCheckbox
-                  v-for="opt in computedOptions"
-                  :key="opt.value"
-                  :value="opt.value"
-                  :disabled="opt.disabled"
-                >
-                  {{ opt.label }}
-                </ElCheckbox>
-              </ElCheckboxGroup>
-            </template>
-
-            <!-- 其他组件 -->
-            <template v-else>
-              <component
-                :is="fieldComponent"
-                v-model="fieldValue"
-                :disabled="isDisabled"
-                :readonly="isReadonly"
-                v-bind="computedComponentProps"
-                @change="handleChange"
-                @focus="handleFocus"
-                @blur="handleBlur"
-              />
-            </template>
+                  <template v-if="needsOptionContent">
+                    {{ opt.label }}
+                  </template>
+                </component>
+              </template>
+            </component>
           </template>
 
           <!-- 后缀插槽 -->
@@ -160,25 +115,16 @@
         <template v-else-if="computedDescription" #extra>
           <span class="config-form-field__description">{{ computedDescription }}</span>
         </template>
-      </ElFormItem>
+      </component>
     </template>
   </template>
 </template>
 
 <script setup lang="ts">
-import type { FormItemRule } from 'element-plus'
-import type { ArrayFieldConfig, FieldConfig, FieldState, FormContext, ObjectFieldConfig, SelectFieldConfig, VoidFieldConfig } from '../_types'
-import {
-  ElCheckbox,
-  ElCheckboxGroup,
-  ElFormItem,
-  ElOption,
-  ElRadio,
-  ElRadioGroup,
-  ElSelect,
-} from 'element-plus'
+import type { ComputedRef } from 'vue'
+import type { ArrayFieldConfig, FieldConfig, FieldState, FormContext, ObjectFieldConfig, SelectFieldConfig, UIAdapter, VoidFieldConfig } from '../_types'
+import { ElCheckbox, ElOption, ElRadio } from 'element-plus'
 import { computed, defineAsyncComponent, inject, toRef, watch } from 'vue'
-import { getFieldComponent } from '../_config/fieldComponents'
 import { executeExpression } from '../_utils'
 import { useFieldExpression } from '../composables/useFieldExpression'
 
@@ -205,6 +151,15 @@ const emit = defineEmits<{
 const VoidFieldRenderer = defineAsyncComponent(() => import('./VoidFieldRenderer.vue'))
 const ArrayFieldRenderer = defineAsyncComponent(() => import('./ArrayFieldRenderer.vue'))
 const ObjectFieldRenderer = defineAsyncComponent(() => import('./ObjectFieldRenderer.vue'))
+
+// 注入 adapter
+const adapter = inject<ComputedRef<UIAdapter>>('configFormAdapter')
+
+// 布局组件快捷访问
+const layoutComponents = computed(() => adapter?.value.components.layout || {})
+
+// 字段组件快捷访问
+const fieldComponents = computed(() => adapter?.value.components.fields || {})
 
 // 注入字段状态 Map
 const fieldStates = inject<Map<string, FieldState>>('configFormFieldStates', new Map())
@@ -413,6 +368,19 @@ const computedComponentProps = computed(() => {
     }
   }
 
+  // 处理 multiSelect - 添加 multiple 属性
+  if (props.field.type === 'multiSelect') {
+    baseProps.multiple = true
+  }
+
+  // 使用 adapter 的 transformer 转换 props
+  if (adapter?.value.transformer?.field) {
+    return adapter.value.transformer.field(props.field.type, baseProps, {
+      field: props.field,
+      path: props.path,
+    })
+  }
+
   return baseProps
 })
 
@@ -492,11 +460,62 @@ const decoratorProps = computed(() => {
   return baseProps
 })
 
-// 获取字段组件（使用提取的组件映射配置）
+// 是否有选项（select/radio/checkbox）
+const hasOptions = computed(() => ['select', 'multiSelect', 'radio', 'checkbox'].includes(props.field.type))
+
+// 是否需要选项内容（radio/checkbox 需要显示 label 文本）
+const needsOptionContent = computed(() => ['radio', 'checkbox'].includes(props.field.type))
+
+/**
+ * 获取字段组件（从 adapter 中获取）
+ */
 const fieldComponent = computed(() => {
   const field = props.field as any
-  return getFieldComponent(field.type, field.customComponent, field.component)
+
+  // 自定义组件优先
+  if (field.type === 'custom' && field.customComponent) {
+    return field.customComponent
+  }
+
+  // 指定组件名
+  if (field.component) {
+    return Array.isArray(field.component) ? field.component[0] : field.component
+  }
+
+  // 从 adapter 获取组件
+  const type = field.type as string
+  const components = fieldComponents.value
+  return components[type] || components.input
 })
+
+/**
+ * 获取选项组件（Select.Option / Radio / Checkbox）
+ */
+function getOptionComponent(type: string) {
+  switch (type) {
+    case 'select':
+    case 'multiSelect':
+      return ElOption
+    case 'radio':
+      return ElRadio
+    case 'checkbox':
+      return ElCheckbox
+    default:
+      return ElOption
+  }
+}
+
+/**
+ * 获取选项的 label prop 值
+ * Element Plus Select.Option 使用 label prop
+ * Radio/Checkbox 使用 value prop
+ */
+function getOptionLabel(type: string, opt: { label: string, value: any }) {
+  if (type === 'select' || type === 'multiSelect') {
+    return opt.label
+  }
+  return opt.value
+}
 
 /**
  * 获取嵌套对象的值

@@ -270,8 +270,7 @@ async function getViteConfig(Config: ViteConfigType = { }, params?: ConfigEnv) {
 
   // visualizer
   if (visualizer) {
-    const visualizerModule = await dynamicImport(import('rollup-plugin-visualizer'))
-    const { visualizer: visualizerPlugin } = visualizerModule
+    const visualizerPlugin = await dynamicImport(import('rollup-plugin-visualizer'))
     plugins.push(visualizerPlugin(
       deepMerge(
         {

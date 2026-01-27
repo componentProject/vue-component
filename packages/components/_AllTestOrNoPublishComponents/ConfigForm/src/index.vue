@@ -5,7 +5,7 @@
     <template v-if="props.loading">
       <slot name="loading">
         <div class="config-form__loading">
-          <ElSkeleton :rows="5" animated />
+          <component :is="layoutComponents.skeleton" :rows="5" animated />
         </div>
       </slot>
     </template>
@@ -15,7 +15,8 @@
       <!-- 头部插槽 -->
       <slot name="header" :context="formContext" />
 
-      <ElForm
+      <component
+        :is="layoutComponents.form"
         ref="formRef"
         :model="values"
         :label-width="labelWidth"
@@ -31,7 +32,8 @@
           <div v-if="showTopActions" class="config-form__actions config-form__actions--top" :style="actionsStyle">
             <slot name="actions" :context="formContext" :submit="handleSubmit" :reset="handleReset" :validate="handleValidate" :submitting="submitting" :validating="formState.validating" :valid="formState.valid">
               <slot name="submitButton" :context="formContext" :submit="handleSubmit" :submitting="submitting">
-                <ElButton
+                <component
+                  :is="layoutComponents.button"
                   v-if="props.showSubmit"
                   type="primary"
                   :loading="submitting"
@@ -39,24 +41,25 @@
                   @click="handleSubmit"
                 >
                   {{ submitButtonText }}
-                </ElButton>
+                </component>
               </slot>
               <slot name="resetButton" :context="formContext" :reset="handleReset">
-                <ElButton
+                <component
+                  :is="layoutComponents.button"
                   v-if="props.showReset"
                   v-bind="resetButtonProps"
                   @click="handleReset"
                 >
                   {{ resetButtonText }}
-                </ElButton>
+                </component>
               </slot>
             </slot>
           </div>
 
           <!-- 字段渲染 -->
-          <ElRow :gutter="16">
+          <component :is="layoutComponents.row" :gutter="16">
             <template v-for="(field, fieldName) in schema.properties" :key="fieldName">
-              <ElCol v-bind="getColProps(field)">
+              <component :is="layoutComponents.col" v-bind="getColProps(field)">
                 <FieldRenderer
                   :field="field"
                   :path="fieldName as string"
@@ -69,15 +72,16 @@
                     <slot :name="slotName" v-bind="slotProps" />
                   </template>
                 </FieldRenderer>
-              </ElCol>
+              </component>
             </template>
-          </ElRow>
+          </component>
 
           <!-- 操作按钮 - 底部 -->
           <div v-if="showBottomActions" class="config-form__actions config-form__actions--bottom" :style="actionsStyle">
             <slot name="actions" :context="formContext" :submit="handleSubmit" :reset="handleReset" :validate="handleValidate" :submitting="submitting" :validating="formState.validating" :valid="formState.valid">
               <slot name="submitButton" :context="formContext" :submit="handleSubmit" :submitting="submitting">
-                <ElButton
+                <component
+                  :is="layoutComponents.button"
                   v-if="props.showSubmit"
                   type="primary"
                   :loading="submitting"
@@ -85,21 +89,22 @@
                   @click="handleSubmit"
                 >
                   {{ submitButtonText }}
-                </ElButton>
+                </component>
               </slot>
               <slot name="resetButton" :context="formContext" :reset="handleReset">
-                <ElButton
+                <component
+                  :is="layoutComponents.button"
                   v-if="props.showReset"
                   v-bind="resetButtonProps"
                   @click="handleReset"
                 >
                   {{ resetButtonText }}
-                </ElButton>
+                </component>
               </slot>
             </slot>
           </div>
         </slot>
-      </ElForm>
+      </component>
 
       <!-- 底部插槽 -->
       <slot name="footer" :context="formContext" />
@@ -108,9 +113,10 @@
 </template>
 
 <script setup lang="ts">
-import type { emitsType, FieldConfig, FormContext, FormInstance, FormSchema, propsType, slotsType } from './_types'
-import { ElButton, ElCol, ElForm, ElRow, ElSkeleton } from 'element-plus'
-import { computed, onMounted, onUnmounted, provide, ref, toRaw } from 'vue'
+import type { ComponentPublicInstance } from 'vue'
+import type { emitsType, FieldConfig, FormContext, FormInstance, FormSchema, propsType, slotsType, UIAdapter } from './_types'
+import { computed, onMounted, onUnmounted, provide, toRaw, useTemplateRef } from 'vue'
+import { elementPlusAdapter } from './adapters'
 import { FieldRenderer } from './components'
 import { useFormState, useFormSubmit, useFormValidation } from './composables'
 
@@ -139,8 +145,14 @@ const emit = defineEmits<emitsType>()
 
 defineSlots<slotsType>()
 
-// 表单引用
-const formRef = ref<InstanceType<typeof ElForm>>()
+// 使用传入的 adapter 或默认的 Element Plus adapter
+const adapter = computed<UIAdapter>(() => props.adapter || elementPlusAdapter)
+
+// 布局组件快捷访问
+const layoutComponents = computed(() => adapter.value.components.layout)
+
+// 表单引用（使用 useTemplateRef 获取动态组件实例）
+const formRef = useTemplateRef<ComponentPublicInstance>('formRef')
 
 // Schema 计算属性
 const schema = computed<FormSchema>(() => props.schema)
@@ -257,31 +269,27 @@ const formContext = computed<FormContext>(() => {
     },
     message: {
       success: (content) => {
-        import('element-plus').then(({ ElMessage }) => ElMessage.success(content))
+        adapter.value.components.feedback.message?.success(content)
       },
       error: (content) => {
-        import('element-plus').then(({ ElMessage }) => ElMessage.error(content))
+        adapter.value.components.feedback.message?.error(content)
       },
       warning: (content) => {
-        import('element-plus').then(({ ElMessage }) => ElMessage.warning(content))
+        adapter.value.components.feedback.message?.warning(content)
       },
       info: (content) => {
-        import('element-plus').then(({ ElMessage }) => ElMessage.info(content))
+        adapter.value.components.feedback.message?.info(content)
       },
     },
     confirm: async ({ title, content }) => {
-      const { ElMessageBox } = await import('element-plus')
-      try {
-        await ElMessageBox.confirm(content || '', title, {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning',
+      if (adapter.value.components.feedback.messageBox?.confirm) {
+        return adapter.value.components.feedback.messageBox.confirm({
+          title,
+          message: content || '',
         })
-        return true
       }
-      catch {
-        return false
-      }
+      // eslint-disable-next-line no-alert
+      return window.confirm(content || '')
     },
     request: async (config) => {
       if (props.requestAdapter) {
@@ -302,6 +310,7 @@ provide('configFormValues', values)
 provide('configFormHandlers', schema.value.handlers || {})
 provide('configFormFieldStates', fieldStates)
 provide('configFormContext', formContext)
+provide('configFormAdapter', adapter)
 
 // 布局相关计算属性
 const labelWidth = computed(() => {
@@ -480,6 +489,7 @@ async function handleValidate() {
 
 // 暴露表单实例
 const formInstance: FormInstance = {
+  formRef,
   getValues: getFieldsValue,
   setValues: setFieldsValue,
   reset: resetFields,

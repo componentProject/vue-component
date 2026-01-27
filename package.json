@@ -68,10 +68,12 @@
     "remove-comments": "tsx scripts/removeComments.mts && eslint --fix"
   },
   "devDependencies": {
+    "@ant-design/icons-vue": "^7.0.1",
     "@antfu/eslint-config": "catalog:dev",
     "@commitlint/cli": "catalog:dev",
     "@commitlint/config-conventional": "catalog:dev",
     "@vue-macros/volar": "catalog:dev",
+    "ant-design-vue": "^4.2.6",
     "commitizen": "catalog:dev",
     "compressing": "catalog:dev",
     "cz-customizable": "catalog:dev",

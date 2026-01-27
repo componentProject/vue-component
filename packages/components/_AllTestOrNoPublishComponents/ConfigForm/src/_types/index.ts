@@ -3,6 +3,23 @@
  * 统一导出所有类型
  */
 
+// UI 适配器类型
+export type {
+  ComponentRegistry,
+  CreateAdapterOptions,
+  FeedbackComponents,
+  FieldComponents,
+  IconComponents,
+  LayoutComponents,
+  MessageBoxFeedback,
+  MessageFeedback,
+  OptionsRenderer,
+  OptionsRendererProps,
+  PropsTransformer,
+  PropsTransformFn,
+  UIAdapter,
+} from './adapter'
+
 // 数据源类型
 export type {
   ApiConfig,
