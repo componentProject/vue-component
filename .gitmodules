@@ -1,0 +1,4 @@
+[submodule ".cursor"]
+	path = .cursor
+	url = https://github.com/moluoxixi/AIRules.git
+	branch = main

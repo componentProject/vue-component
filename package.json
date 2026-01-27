@@ -46,6 +46,8 @@
     "node": ">=20.18.0"
   },
   "scripts": {
+    "submodule:update": "git submodule update --init --recursive --remote",
+    "postinstall": "pnpm run submodule:update",
     "vue:dev": "pnpm run -C play/render dev",
     "vue:build": "pnpm run -C play/render build",
     "docs:dev": "pnpm run -C docs/vitepress dev",
