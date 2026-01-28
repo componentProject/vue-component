@@ -220,6 +220,15 @@ export type PropsTransformFn = (
 ) => Record<string, any>
 
 /**
+ * ReadPretty style transformer function
+ * 阅读态样式提取函数
+ */
+export type ReadPrettyStyleTransformFn = (
+  type: string,
+  componentProps: Record<string, any>,
+) => Record<string, any> | string
+
+/**
  * Props transformer interface
  * Props 转换器接口
  */
@@ -230,6 +239,19 @@ export interface PropsTransformer {
   layout?: PropsTransformFn
   /** 表单项 props 转换 */
   formItem?: (props: Record<string, any>) => Record<string, any>
+  /**
+   * 阅读态样式提取转换器
+   * 从 componentProps 中提取阅读态需要显示的样式
+   *
+   * 不同 UI 框架的组件有不同的样式 prop：
+   * - Element Plus Input: 使用 inputStyle 设置内部样式
+   * - Ant Design Vue Input: 直接使用 style
+   *
+   * @param type - 字段类型
+   * @param componentProps - 组件 props
+   * @returns 阅读态需要应用的样式对象或样式字符串
+   */
+  readPrettyStyle?: ReadPrettyStyleTransformFn
 }
 
 /**

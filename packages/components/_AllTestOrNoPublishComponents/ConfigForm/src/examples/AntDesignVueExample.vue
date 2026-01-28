@@ -382,6 +382,22 @@ const formSchema: FormSchema = {
           },
           col: { span: 24 },
         },
+        highlightInput: {
+          type: 'input',
+          name: 'highlightInput',
+          title: '高亮样式',
+          description: '测试 Ant Design Vue readPretty 模式下的自定义样式',
+          componentProps: {
+            placeholder: '带背景色的输入框',
+            // Ant Design Vue 直接使用 style
+            style: {
+              backgroundColor: '#fff7e6',
+              color: '#fa8c16',
+              fontWeight: 'bold',
+            },
+          },
+          col: { span: 12 },
+        },
         agreement: {
           type: 'checkbox',
           name: 'agreement',
@@ -419,24 +435,31 @@ const formSchema: FormSchema = {
   },
 }
 
-// 初始值
+// 初始值（填充完整测试数据）
 const initialValues = {
-  username: '',
-  email: '',
-  userType: 'normal',
-  vipLevel: undefined,
-  gender: '',
+  username: '李四',
+  email: 'lisi@example.com',
+  userType: 'admin',
+  vipLevel: 'platinum',
+  gender: 'female',
   isActive: true,
-  age: undefined,
-  birthday: '',
-  score: 60,
-  satisfaction: 3,
-  notifyMethod: 'email',
-  notifyEmail: '',
-  notifyPhone: '',
-  workExperience: [{ company: '', position: '', isCurrent: false, leaveDate: '' }],
-  remark: '',
-  agreement: [],
+  age: 32,
+  birthday: '1992-08-20',
+  score: 85,
+  satisfaction: 5,
+  notifyMethod: 'sms',
+  notifyEmail: 'admin@example.com',
+  notifyPhone: '13900139000',
+  workExperience: [
+    { company: '字节跳动', position: '技术总监', isCurrent: true, leaveDate: '' },
+    { company: '美团', position: '高级工程师', isCurrent: false, leaveDate: '2021-12-31' },
+  ],
+  remark: '这是 Ant Design Vue 示例的备注信息，用于测试不同 UI 框架的展示效果。',
+  highlightInput: '橙色高亮文本',
+  agreement: [true],
+  // 高级设置字段（字段名与 schema 中的 name 对应）
+  introduction: '<p>这是<strong>Ant Design Vue</strong>的<em>富文本</em>内容。</p>',
+  customScript: 'const greet = () => {\n  console.log("Hello Ant Design Vue!");\n};',
 }
 
 /**

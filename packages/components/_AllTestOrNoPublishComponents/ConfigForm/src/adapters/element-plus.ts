@@ -126,14 +126,14 @@ const RichTextPlaceholder = defineComponent({
   emits: ['update:modelValue', 'change'],
   setup(props, { emit }) {
     return () => h(ElInput, {
-      type: 'textarea',
-      modelValue: props.modelValue,
-      placeholder: props.placeholder,
-      disabled: props.disabled,
-      readonly: props.readonly,
-      rows: 6,
+      'type': 'textarea',
+      'modelValue': props.modelValue,
+      'placeholder': props.placeholder,
+      'disabled': props.disabled,
+      'readonly': props.readonly,
+      'rows': 6,
       'onUpdate:modelValue': (val: string) => emit('update:modelValue', val),
-      onChange: (val: string) => emit('change', val),
+      'onChange': (val: string) => emit('change', val),
     })
   },
 })
@@ -155,15 +155,15 @@ const CodeEditorPlaceholder = defineComponent({
   emits: ['update:modelValue', 'change'],
   setup(props, { emit }) {
     return () => h(ElInput, {
-      type: 'textarea',
-      modelValue: props.modelValue,
-      placeholder: props.placeholder,
-      disabled: props.disabled,
-      readonly: props.readonly,
-      rows: 10,
-      style: { fontFamily: 'monospace' },
+      'type': 'textarea',
+      'modelValue': props.modelValue,
+      'placeholder': props.placeholder,
+      'disabled': props.disabled,
+      'readonly': props.readonly,
+      'rows': 10,
+      'style': { fontFamily: 'monospace' },
       'onUpdate:modelValue': (val: string) => emit('update:modelValue', val),
-      onChange: (val: string) => emit('change', val),
+      'onChange': (val: string) => emit('change', val),
     })
   },
 })
@@ -263,7 +263,7 @@ export function createElementPlusAdapter(): UIAdapter {
         },
       },
     },
-    // Element Plus is the baseline, no transformation needed
+    // Element Plus props transformer
     transformer: {
       field: (type, props) => {
         const transformed = { ...props }
@@ -274,6 +274,20 @@ export function createElementPlusAdapter(): UIAdapter {
         }
 
         return transformed
+      },
+      /**
+       * 阅读态样式提取
+       * Element Plus 的 Input/Textarea 组件使用 inputStyle 设置内部样式
+       * 其他组件使用 style
+       */
+      readPrettyStyle: (type, componentProps) => {
+        const inputTypes = ['input', 'textarea', 'password']
+        if (inputTypes.includes(type)) {
+          // Element Plus Input: 优先使用 inputStyle，fallback 到 style
+          return componentProps.inputStyle || componentProps.style || {}
+        }
+        // 其他组件直接使用 style
+        return componentProps.style || {}
       },
     },
     // Element Plus features configuration

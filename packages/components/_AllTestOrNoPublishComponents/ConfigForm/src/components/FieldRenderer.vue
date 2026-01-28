@@ -67,13 +67,17 @@
             <slot :name="`field-${field.name}`" :field="field" :path="path" :value="fieldValue" :context="context" :disabled="isDisabled" :readonly="isReadonly" :read-pretty="isReadPretty" />
           </template>
 
-          <!-- ReadPretty 模式 - 纯文本展示 -->
+          <!-- ReadPretty 模式 - 纯文本展示（业界标准做法） -->
           <template v-else-if="isReadPretty">
-            <div class="config-form-field__read-pretty">
+            <div
+              class="config-form-field__read-pretty"
+              :class="readPrettyClass"
+              :style="readPrettyStyle"
+            >
               <!-- 颜色字段特殊展示 -->
               <template v-if="field.type === 'color' && fieldValue">
                 <span class="config-form-field__color-preview" :style="{ backgroundColor: fieldValue }" />
-                <span>{{ formattedValue }}</span>
+                <span class="config-form-field__text">{{ fieldValue }}</span>
               </template>
               <!-- 上传字段特殊展示 -->
               <template v-else-if="field.type === 'upload' && Array.isArray(fieldValue)">
@@ -194,6 +198,42 @@ const emit = defineEmits<{
   (e: 'blur'): void
 }>()
 
+/**
+ * 根据格式模式格式化 Date 对象
+ * 支持常见的日期格式符号：YYYY, MM, DD, HH, mm, ss
+ * @param date - Date 对象
+ * @param pattern - 格式模式，如 'YYYY-MM-DD HH:mm:ss'
+ * @returns 格式化后的日期字符串
+ */
+function formatDateByPattern(date: Date, pattern: string): string {
+  const padZero = (num: number, length = 2) => String(num).padStart(length, '0')
+
+  const tokens: Record<string, string> = {
+    YYYY: String(date.getFullYear()),
+    YY: String(date.getFullYear()).slice(-2),
+    MM: padZero(date.getMonth() + 1),
+    M: String(date.getMonth() + 1),
+    DD: padZero(date.getDate()),
+    D: String(date.getDate()),
+    HH: padZero(date.getHours()),
+    H: String(date.getHours()),
+    mm: padZero(date.getMinutes()),
+    m: String(date.getMinutes()),
+    ss: padZero(date.getSeconds()),
+    s: String(date.getSeconds()),
+  }
+
+  // 按 token 长度降序排列，确保 YYYY 在 YY 之前被替换
+  const sortedTokens = Object.keys(tokens).sort((a, b) => b.length - a.length)
+
+  let result = pattern
+  for (const token of sortedTokens) {
+    result = result.replace(new RegExp(token, 'g'), tokens[token])
+  }
+
+  return result
+}
+
 // 异步加载复杂字段渲染器
 const VoidFieldRenderer = defineAsyncComponent(() => import('./VoidFieldRenderer.vue'))
 const ArrayFieldRenderer = defineAsyncComponent(() => import('./ArrayFieldRenderer.vue'))
@@ -269,19 +309,21 @@ const shouldRender = computed(() => {
 })
 
 // 是否禁用 - 显式依赖 formValuesJSON 以触发响应式更新
+// 注意：readPretty 模式不应该设置 disabled，只通过 CSS 禁止交互
 const isDisabled = computed(() => {
   // 显式追踪 formValues 的变化
   void formValuesJSON.value
   const pattern = executePattern()
-  return pattern === 'disabled' || pattern === 'readOnly' || pattern === 'readPretty'
+  return pattern === 'disabled'
 })
 
 // 是否只读 - 显式依赖 formValuesJSON 以触发响应式更新
+// 注意：readPretty 模式不应该设置 readonly，只通过 CSS 禁止交互
 const isReadonly = computed(() => {
   // 显式追踪 formValues 的变化
   void formValuesJSON.value
   const pattern = executePattern()
-  return pattern === 'readOnly' || pattern === 'readPretty'
+  return pattern === 'readOnly'
 })
 
 // 是否阅读态（纯文本展示）- 显式依赖 formValuesJSON 以触发响应式更新
@@ -334,17 +376,61 @@ const formattedValue = computed(() => {
 
     case 'date':
     case 'datetime':
-    case 'time':
-      // 日期时间直接展示
-      return value
+    case 'time': {
+      // 日期时间格式化展示
+      // 业界标准：使用 componentProps.format 作为显示格式
+      const displayFormat = computedComponentProps.value.format
+      const defaultFormats: Record<string, string> = {
+        date: 'YYYY-MM-DD',
+        datetime: 'YYYY-MM-DD HH:mm:ss',
+        time: 'HH:mm:ss',
+      }
+      const format = displayFormat || defaultFormats[type]
+
+      // dayjs 或 moment 对象：使用 format 方法
+      if (value && typeof value === 'object' && typeof value.format === 'function') {
+        return value.format(format)
+      }
+
+      // Date 对象：转换为本地格式或使用 toISOString
+      if (value instanceof Date) {
+        // 如果有自定义格式，需要手动格式化
+        if (displayFormat) {
+          // 简单的格式化实现（支持常见的格式符号）
+          return formatDateByPattern(value, format)
+        }
+        // 无自定义格式时使用本地化
+        return type === 'time'
+          ? value.toLocaleTimeString()
+          : type === 'datetime'
+            ? value.toLocaleString()
+            : value.toLocaleDateString()
+      }
+
+      // 字符串：直接返回（已经是格式化后的值）
+      return value || '-'
+    }
 
     case 'dateRange':
-    case 'datetimeRange':
-      // 日期范围
+    case 'datetimeRange': {
+      // 日期范围格式化展示
+      const displayFormat = computedComponentProps.value.format
+      const defaultFormat = type === 'datetimeRange' ? 'YYYY-MM-DD HH:mm:ss' : 'YYYY-MM-DD'
+      const format = displayFormat || defaultFormat
+
       if (Array.isArray(value) && value.length === 2) {
-        return `${value[0] || '-'} 至 ${value[1] || '-'}`
+        const formatValue = (v: any) => {
+          if (!v)
+            return '-'
+          if (typeof v === 'object' && typeof v.format === 'function') {
+            return v.format(format)
+          }
+          return v
+        }
+        return `${formatValue(value[0])} 至 ${formatValue(value[1])}`
       }
-      return value
+      return value || '-'
+    }
 
     case 'rate':
       return `${value} 星`
@@ -383,6 +469,66 @@ const formattedValue = computed(() => {
       // 默认直接返回值
       return typeof value === 'object' ? JSON.stringify(value) : value
   }
+})
+
+// ReadPretty 模式下的样式计算
+// 使用 adapter transformer 提取样式，支持不同 UI 框架的配置方式
+// Element Plus: 从 inputStyle 提取 (Input 内部样式)
+// Ant Design Vue: 从 style 提取
+const readPrettyStyle = computed(() => {
+  const componentProps = props.field.componentProps || {}
+  const fieldType = props.field.type
+
+  // 使用 adapter 的 transformer.readPrettyStyle 提取用户样式
+  // 如果 adapter 没有定义，默认从 style 获取
+  let userStyle: Record<string, any> | string = {}
+  if (adapter?.value?.transformer?.readPrettyStyle) {
+    userStyle = adapter.value.transformer.readPrettyStyle(fieldType, componentProps)
+  }
+  else {
+    // 默认 fallback：直接从 style 获取
+    userStyle = componentProps.style || {}
+  }
+
+  // 默认样式
+  const defaultStyles: Record<string, any> = {
+    minHeight: '32px',
+    lineHeight: '32px',
+  }
+
+  // 如果用户传递了 style，提取相关的样式属性
+  if (typeof userStyle === 'object') {
+    const styleKeys = [
+      'padding',
+      'fontSize',
+      'fontFamily',
+      'fontWeight',
+      'fontStyle',
+      'lineHeight',
+      'height',
+      'minHeight',
+      'textAlign',
+      'color',
+      'backgroundColor',
+      'borderRadius',
+    ]
+    for (const key of styleKeys) {
+      if (userStyle[key] !== undefined) {
+        defaultStyles[key] = userStyle[key]
+      }
+    }
+  }
+  else if (typeof userStyle === 'string') {
+    // 如果是字符串格式的 style，直接返回用户样式
+    return userStyle
+  }
+
+  return defaultStyles
+})
+
+// ReadPretty 模式下的 class 计算
+const readPrettyClass = computed(() => {
+  return props.field.componentProps?.class || ''
 })
 
 // 计算标签
@@ -794,14 +940,13 @@ watch(
   margin-top: 4px;
 }
 
-/* ReadPretty 模式样式 */
+/* ReadPretty 模式样式 - 纯文本展示（业界标准做法） */
 .config-form-field__read-pretty {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
   min-height: 32px;
-  padding: 1px 11px;
-  line-height: 30px;
+  line-height: 32px;
   color: var(--el-text-color-primary, #303133);
   width: 100%;
   box-sizing: border-box;
@@ -809,7 +954,6 @@ watch(
 
 .config-form-field__text {
   word-break: break-word;
-  flex: 1;
 }
 
 .config-form-field__color-preview {
@@ -862,6 +1006,7 @@ watch(
   background-color: var(--el-fill-color-darker, #1e1e1e);
   border-radius: 4px;
   overflow-x: auto;
+  width: 100%;
 }
 
 .config-form-field__code-preview code {

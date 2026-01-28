@@ -228,13 +228,13 @@ const RichTextPlaceholder = defineComponent({
   emits: ['update:modelValue', 'change'],
   setup(props, { emit }) {
     return () => h(ATextarea, {
-      value: props.modelValue,
-      placeholder: props.placeholder,
-      disabled: props.disabled,
-      readonly: props.readonly,
-      rows: 6,
+      'value': props.modelValue,
+      'placeholder': props.placeholder,
+      'disabled': props.disabled,
+      'readonly': props.readonly,
+      'rows': 6,
       'onUpdate:value': (val: string) => emit('update:modelValue', val),
-      onChange: (e: any) => emit('change', e?.target?.value ?? e),
+      'onChange': (e: any) => emit('change', e?.target?.value ?? e),
     })
   },
 })
@@ -256,14 +256,14 @@ const CodeEditorPlaceholder = defineComponent({
   emits: ['update:modelValue', 'change'],
   setup(props, { emit }) {
     return () => h(ATextarea, {
-      value: props.modelValue,
-      placeholder: props.placeholder,
-      disabled: props.disabled,
-      readonly: props.readonly,
-      rows: 10,
-      style: { fontFamily: 'monospace' },
+      'value': props.modelValue,
+      'placeholder': props.placeholder,
+      'disabled': props.disabled,
+      'readonly': props.readonly,
+      'rows': 10,
+      'style': { fontFamily: 'monospace' },
       'onUpdate:value': (val: string) => emit('update:modelValue', val),
-      onChange: (e: any) => emit('change', e?.target?.value ?? e),
+      'onChange': (e: any) => emit('change', e?.target?.value ?? e),
     })
   },
 })
@@ -422,6 +422,14 @@ export function createAntDesignVueAdapter(): UIAdapter {
           delete transformed.prop
         }
         return transformed
+      },
+      /**
+       * 阅读态样式提取
+       * Ant Design Vue 组件直接使用 style prop
+       */
+      readPrettyStyle: (_type, componentProps) => {
+        // Ant Design Vue 所有组件统一使用 style
+        return componentProps.style || {}
       },
     },
     // Ant Design Vue features configuration

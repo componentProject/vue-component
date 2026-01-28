@@ -381,6 +381,66 @@ const formSchema: FormSchema = {
           },
           col: { span: 24 },
         },
+
+        // ===== 自定义样式测试 =====
+        customStyleInput: {
+          type: 'input',
+          name: 'customStyleInput',
+          title: '自定义样式输入框',
+          description: '测试 readPretty 模式下样式继承（大号字体 + 大内边距）',
+          componentProps: {
+            placeholder: '这是一个大号输入框',
+            style: {
+              fontSize: '18px',
+              padding: '8px 20px',
+              height: '48px',
+              lineHeight: '30px',
+            },
+            class: 'custom-large-input',
+          },
+          col: { span: 12 },
+        },
+        customStyleInput2: {
+          type: 'input',
+          name: 'customStyleInput2',
+          title: '小号样式输入框',
+          description: '测试 readPretty 模式下样式继承（小号字体 + 小内边距）',
+          componentProps: {
+            placeholder: '这是一个小号输入框',
+            style: {
+              fontSize: '12px',
+              padding: '2px 8px',
+            },
+          },
+          col: { span: 12 },
+        },
+        highlightInput: {
+          type: 'input',
+          name: 'highlightInput',
+          title: '高亮样式',
+          description: '测试 readPretty 模式下自定义背景色和字体颜色',
+          componentProps: {
+            placeholder: '带背景色的输入框',
+            // Element Plus 使用 inputStyle 设置 Input 内部样式（官方标准用法）
+            inputStyle: {
+              backgroundColor: '#f0f9eb',
+              color: '#67c23a',
+              fontWeight: 'bold',
+            },
+          },
+          col: { span: 12 },
+        },
+        alignTestInput: {
+          type: 'input',
+          name: 'alignTestInput',
+          title: '对齐测试',
+          description: '普通输入框，用于对比对齐效果',
+          componentProps: {
+            placeholder: '普通输入框',
+          },
+          col: { span: 12 },
+        },
+
         agreement: {
           type: 'checkbox',
           name: 'agreement',
@@ -418,25 +478,36 @@ const formSchema: FormSchema = {
   },
 }
 
-// 初始值
+// 初始值（填充完整测试数据）
 const initialValues = {
-  username: '',
-  email: '',
-  userType: 'normal',
-  vipLevel: undefined,
-  gender: '',
+  username: '张三',
+  email: 'zhangsan@example.com',
+  userType: 'vip',
+  vipLevel: 'gold',
+  gender: 'male',
   isActive: true,
-  age: undefined,
-  birthday: '',
-  score: 60,
-  satisfaction: 3,
+  age: 28,
+  birthday: '1996-05-15',
+  score: 75,
+  satisfaction: 4,
   notifyMethod: 'email',
-  notifyEmail: '',
-  notifyPhone: '',
-  themeColor: '#409EFF',
-  workExperience: [{ company: '', position: '', isCurrent: false, leaveDate: '' }],
-  remark: '',
-  agreement: [],
+  notifyEmail: 'notify@example.com',
+  notifyPhone: '13800138000',
+  themeColor: '#67C23A',
+  workExperience: [
+    { company: '阿里巴巴', position: '高级前端工程师', isCurrent: true, leaveDate: '' },
+    { company: '腾讯', position: '前端工程师', isCurrent: false, leaveDate: '2022-06-30' },
+  ],
+  remark: '这是一段备注信息，用于测试文本域的展示效果。',
+  // 自定义样式测试字段
+  customStyleInput: '大号字体输入框',
+  customStyleInput2: '小号字体输入框',
+  highlightInput: '绿色高亮文本',
+  alignTestInput: '普通输入框内容',
+  agreement: [true],
+  // 高级设置字段（字段名与 schema 中的 name 对应）
+  introduction: '<p>这是一段<strong>富文本</strong>内容，支持<em>HTML格式</em>。</p>',
+  customScript: 'function hello() {\n  console.log("Hello World!");\n}',
 }
 
 /**
