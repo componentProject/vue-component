@@ -7,6 +7,16 @@
     </p>
 
     <ElTabs v-model="activeTab" type="card" class="framework-tabs">
+      <ElTabPane label="🚀 快速上手" name="quick-start">
+        <div class="tab-content">
+          <div class="framework-badge quick-start">
+            <span>📋</span>
+            <span>简单搜索栏示例</span>
+          </div>
+          <SearchFormExample />
+        </div>
+      </ElTabPane>
+
       <ElTabPane label="Element Plus" name="element-plus">
         <div class="tab-content">
           <div class="framework-badge element-plus">
@@ -33,14 +43,14 @@
 <script setup lang="ts">
 import { ElTabPane, ElTabs } from 'element-plus'
 import { ref } from 'vue'
-import { AntDesignVueExample, ElementPlusExample } from './examples'
+import { AntDesignVueExample, ElementPlusExample, SearchFormExample } from './examples'
 
 defineOptions({
   name: 'ConfigFormExample',
 })
 
 // 当前激活的标签页
-const activeTab = ref('element-plus')
+const activeTab = ref('quick-start')
 </script>
 
 <style scoped>
@@ -121,5 +131,15 @@ const activeTab = ref('element-plus')
   background: linear-gradient(135deg, #e6f7ff 0%, #f0f5ff 100%);
   color: #1890ff;
   border: 1px solid #91d5ff;
+}
+
+.framework-badge.quick-start {
+  background: linear-gradient(135deg, #f0fff4 0%, #e6ffed 100%);
+  color: #52c41a;
+  border: 1px solid #b7eb8f;
+}
+
+.framework-badge.quick-start span:first-child {
+  font-size: 20px;
 }
 </style>
