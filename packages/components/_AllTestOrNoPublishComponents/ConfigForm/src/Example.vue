@@ -7,23 +7,28 @@
     </p>
 
     <ElTabs v-model="activeTab" type="card" class="framework-tabs">
-      <ElTabPane label="🚀 快速上手" name="quick-start">
-        <div class="tab-content">
-          <div class="framework-badge quick-start">
-            <span>📋</span>
-            <span>简单搜索栏示例</span>
-          </div>
-          <SearchFormExample />
-        </div>
-      </ElTabPane>
-
       <ElTabPane label="Element Plus" name="element-plus">
         <div class="tab-content">
           <div class="framework-badge element-plus">
             <img src="https://element-plus.org/images/element-plus-logo-small.svg" alt="Element Plus">
             <span>Element Plus</span>
           </div>
-          <ElementPlusExample />
+
+          <!-- 搜索栏示例 -->
+          <div class="example-block">
+            <h3 class="example-title">
+              🔍 搜索栏示例
+            </h3>
+            <ElementPlusSearchExample />
+          </div>
+
+          <!-- 完整表单示例 -->
+          <div class="example-block">
+            <h3 class="example-title">
+              📋 完整表单示例
+            </h3>
+            <ElementPlusExample />
+          </div>
         </div>
       </ElTabPane>
 
@@ -33,7 +38,22 @@
             <img src="https://aliyuncdn.antdv.com/v2/assets/logo.1ef800a8.svg" alt="Ant Design Vue">
             <span>Ant Design Vue</span>
           </div>
-          <AntDesignVueExample />
+
+          <!-- 搜索栏示例 -->
+          <div class="example-block">
+            <h3 class="example-title">
+              🔍 搜索栏示例
+            </h3>
+            <AntDesignVueSearchExample />
+          </div>
+
+          <!-- 完整表单示例 -->
+          <div class="example-block">
+            <h3 class="example-title">
+              📋 完整表单示例
+            </h3>
+            <AntDesignVueExample />
+          </div>
         </div>
       </ElTabPane>
     </ElTabs>
@@ -43,14 +63,19 @@
 <script setup lang="ts">
 import { ElTabPane, ElTabs } from 'element-plus'
 import { ref } from 'vue'
-import { AntDesignVueExample, ElementPlusExample, SearchFormExample } from './examples'
+import {
+  AntDesignVueExample,
+  AntDesignVueSearchExample,
+  ElementPlusExample,
+  ElementPlusSearchExample,
+} from './examples'
 
 defineOptions({
   name: 'ConfigFormExample',
 })
 
 // 当前激活的标签页
-const activeTab = ref('quick-start')
+const activeTab = ref('element-plus')
 </script>
 
 <style scoped>
@@ -133,13 +158,24 @@ const activeTab = ref('quick-start')
   border: 1px solid #91d5ff;
 }
 
-.framework-badge.quick-start {
-  background: linear-gradient(135deg, #f0fff4 0%, #e6ffed 100%);
-  color: #52c41a;
-  border: 1px solid #b7eb8f;
+.example-block {
+  margin-bottom: 32px;
+  padding: 20px;
+  background: #fff;
+  border-radius: 8px;
+  border: 1px solid #ebeef5;
 }
 
-.framework-badge.quick-start span:first-child {
-  font-size: 20px;
+.example-block:last-child {
+  margin-bottom: 0;
+}
+
+.example-title {
+  margin: 0 0 16px;
+  padding-bottom: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #303133;
+  border-bottom: 1px solid #ebeef5;
 }
 </style>
