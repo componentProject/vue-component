@@ -48,7 +48,6 @@ import {
   TreeSelect as ATreeSelect,
   Upload as AUpload,
 } from 'ant-design-vue'
-import dayjs from 'dayjs'
 import { defineComponent, h } from 'vue'
 
 /**
@@ -125,86 +124,12 @@ const WrappedSwitch = createCheckedWrapper(ASwitch, 'WrappedASwitch')
 const WrappedSlider = createVModelWrapper(ASlider, 'WrappedASlider')
 const WrappedRate = createVModelWrapper(ARate, 'WrappedARate')
 const WrappedTimePicker = createVModelWrapper(ATimePicker, 'WrappedATimePicker')
-
-/**
- * Helper function to convert value to dayjs object
- * Ant Design Vue DatePicker requires dayjs object
- * 辅助函数：将值转换为 dayjs 对象
- * Ant Design Vue DatePicker 需要 dayjs 对象
- * @param value - 输入值（字符串、Date 对象或 dayjs 对象）
- * @returns dayjs 对象或 undefined
- */
-function toDayjs(value: any): any {
-  if (!value)
-    return undefined
-  if (dayjs.isDayjs(value))
-    return value
-  if (typeof value === 'string' || value instanceof Date)
-    return dayjs(value)
-  return value
-}
-
-/**
- * Create DatePicker wrapper for Ant Design Vue
- * Automatically converts string/Date to dayjs object
- * 为 Ant Design Vue DatePicker 创建包装器
- * 自动将字符串/Date 转换为 dayjs 对象
- */
-const WrappedDatePicker = defineComponent({
-  name: 'WrappedADatePicker',
-  inheritAttrs: false,
-  props: {
-    modelValue: {
-      type: [String, Number, Object, Date] as PropType<any>,
-      default: undefined,
-    },
-  },
-  emits: ['update:modelValue', 'change'],
-  setup(props, { attrs, emit }) {
-    return () => h(ADatePicker, {
-      ...attrs,
-      'value': toDayjs(props.modelValue),
-      'onUpdate:value': (val: any) => emit('update:modelValue', val),
-      'onChange': (val: any) => emit('change', val),
-    })
-  },
-})
-
-/**
- * Create RangePicker wrapper for Ant Design Vue
- * Automatically converts string/Date to dayjs object
- * 为 Ant Design Vue RangePicker 创建包装器
- * 自动将字符串/Date 转换为 dayjs 对象
- */
-const WrappedRangePicker = defineComponent({
-  name: 'WrappedARangePicker',
-  inheritAttrs: false,
-  props: {
-    modelValue: {
-      type: Array as PropType<any[]>,
-      default: undefined,
-    },
-  },
-  emits: ['update:modelValue', 'change'],
-  setup(props, { attrs, emit }) {
-    const convertedValue = () => {
-      if (!props.modelValue || !Array.isArray(props.modelValue))
-        return undefined
-      return props.modelValue.map(v => toDayjs(v))
-    }
-    return () => h(ARangePicker as any, {
-      ...attrs,
-      'value': convertedValue(),
-      'onUpdate:value': (val: any) => emit('update:modelValue', val),
-      'onChange': (val: any) => emit('change', val),
-    })
-  },
-})
+const WrappedDatePicker = createVModelWrapper(ADatePicker, 'WrappedADatePicker')
+const WrappedRangePicker = createVModelWrapper(ARangePicker, 'WrappedARangePicker')
 
 /**
  * Create datetime picker wrapper for Ant Design Vue
- * 创建日期时间选择器包装器
- * 自动将字符串/Date 转换为 dayjs 对象
+ * 创建日期时间选择器包装器（带时间选择）
  */
 const DatetimeComponent = defineComponent({
   name: 'ADatetimePicker',
@@ -220,7 +145,7 @@ const DatetimeComponent = defineComponent({
     return () => h(ADatePicker, {
       ...attrs,
       'showTime': true,
-      'value': toDayjs(props.modelValue),
+      'value': props.modelValue,
       'onUpdate:value': (val: any) => emit('update:modelValue', val),
       'onChange': (val: any) => emit('change', val),
     })
@@ -229,8 +154,7 @@ const DatetimeComponent = defineComponent({
 
 /**
  * Create datetime range picker wrapper
- * 创建日期时间范围选择器包装器
- * 自动将字符串/Date 转换为 dayjs 对象
+ * 创建日期时间范围选择器包装器（带时间选择）
  */
 const DatetimeRangeComponent = defineComponent({
   name: 'ADatetimeRangePicker',
@@ -243,15 +167,10 @@ const DatetimeRangeComponent = defineComponent({
   },
   emits: ['update:modelValue', 'change'],
   setup(props, { attrs, emit }) {
-    const convertedValue = () => {
-      if (!props.modelValue || !Array.isArray(props.modelValue))
-        return undefined
-      return props.modelValue.map(v => toDayjs(v))
-    }
     return () => h(ARangePicker as any, {
       ...attrs,
       'showTime': true,
-      'value': convertedValue(),
+      'value': props.modelValue,
       'onUpdate:value': (val: any) => emit('update:modelValue', val),
       'onChange': (val: any) => emit('change', val),
     })
