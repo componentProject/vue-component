@@ -478,10 +478,23 @@ export function createAntDesignVueAdapter(): UIAdapter {
         }
 
         // DatePicker 属性映射
-        if (type === 'date' || type === 'datetime') {
+        // Ant Design Vue DatePicker 需要 valueFormat 来接受字符串值
+        if (type === 'date' || type === 'datetime' || type === 'dateRange' || type === 'datetimeRange' || type === 'time') {
+          // 如果用户没有配置 valueFormat，自动设置默认值
+          if (!props.valueFormat) {
+            if (type === 'date' || type === 'dateRange') {
+              transformed.valueFormat = 'YYYY-MM-DD'
+            }
+            else if (type === 'datetime' || type === 'datetimeRange') {
+              transformed.valueFormat = 'YYYY-MM-DD HH:mm:ss'
+            }
+            else if (type === 'time') {
+              transformed.valueFormat = 'HH:mm:ss'
+            }
+          }
+          // 如果有 valueFormat，同时设置 format（显示格式）
           if (props.valueFormat) {
             transformed.format = props.valueFormat
-            // 保留 valueFormat 用于 v-model 转换
           }
         }
 
