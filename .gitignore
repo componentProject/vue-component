@@ -8,6 +8,7 @@ dev-dist
 .obsidian
 cache
 typings
+.playwright-mcp
 
 # Logs
 logs

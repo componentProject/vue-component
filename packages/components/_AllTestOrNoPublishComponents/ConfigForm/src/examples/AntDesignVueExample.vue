@@ -13,6 +13,9 @@
         <ARadioButton value="readOnly">
           只读模式
         </ARadioButton>
+        <ARadioButton value="readPretty">
+          阅读态
+        </ARadioButton>
       </ARadioGroup>
 
       <AButton type="primary" size="small" @click="showSchema = !showSchema">
@@ -69,7 +72,7 @@ const formRef = ref<FormInstance>()
 defineExpose({ formRef })
 
 // 表单模式
-const formPattern = ref<'editable' | 'disabled' | 'readOnly'>('editable')
+const formPattern = ref<'editable' | 'disabled' | 'readOnly' | 'readPretty'>('editable')
 
 // 是否显示 Schema
 const showSchema = ref(false)
@@ -90,6 +93,7 @@ const formContext = reactive({
 
 // 表单 Schema（与 Element Plus 示例相同，展示跨框架兼容性）
 const formSchema: FormSchema = {
+  id: 'antd-vue-example-form',
   layout: {
     type: 'horizontal',
     labelWidth: '100px',
@@ -276,6 +280,36 @@ const formSchema: FormSchema = {
         },
       ],
       defaultActiveKey: ['notify'],
+    },
+
+    // ===== 高级设置 =====
+    advancedSettings: {
+      type: 'card',
+      name: '',
+      title: '高级设置',
+      properties: {
+        introduction: {
+          type: 'richText',
+          name: 'introduction',
+          title: '个人简介',
+          description: '支持富文本格式的个人简介',
+          componentProps: {
+            placeholder: '请输入您的个人简介...',
+          },
+          col: { span: 24 },
+        },
+        customScript: {
+          type: 'codeEditor',
+          name: 'customScript',
+          title: '自定义脚本',
+          description: '支持 JavaScript 代码编辑',
+          componentProps: {
+            placeholder: '// 请输入自定义脚本代码...',
+            language: 'javascript',
+          },
+          col: { span: 24 },
+        },
+      },
     },
 
     // ===== 工作经历 =====

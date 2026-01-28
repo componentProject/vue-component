@@ -111,6 +111,64 @@ const DatetimeRangeComponent = defineComponent({
 })
 
 /**
+ * Create rich text editor placeholder wrapper
+ * 创建富文本编辑器占位组件（需要用户自行集成）
+ */
+const RichTextPlaceholder = defineComponent({
+  name: 'RichTextPlaceholder',
+  inheritAttrs: false,
+  props: {
+    modelValue: { type: String, default: '' },
+    placeholder: { type: String, default: '请输入内容...' },
+    readonly: { type: Boolean, default: false },
+    disabled: { type: Boolean, default: false },
+  },
+  emits: ['update:modelValue', 'change'],
+  setup(props, { emit }) {
+    return () => h(ElInput, {
+      type: 'textarea',
+      modelValue: props.modelValue,
+      placeholder: props.placeholder,
+      disabled: props.disabled,
+      readonly: props.readonly,
+      rows: 6,
+      'onUpdate:modelValue': (val: string) => emit('update:modelValue', val),
+      onChange: (val: string) => emit('change', val),
+    })
+  },
+})
+
+/**
+ * Create code editor placeholder wrapper
+ * 创建代码编辑器占位组件（需要用户自行集成）
+ */
+const CodeEditorPlaceholder = defineComponent({
+  name: 'CodeEditorPlaceholder',
+  inheritAttrs: false,
+  props: {
+    modelValue: { type: String, default: '' },
+    placeholder: { type: String, default: '// 请输入代码...' },
+    language: { type: String, default: 'javascript' },
+    readonly: { type: Boolean, default: false },
+    disabled: { type: Boolean, default: false },
+  },
+  emits: ['update:modelValue', 'change'],
+  setup(props, { emit }) {
+    return () => h(ElInput, {
+      type: 'textarea',
+      modelValue: props.modelValue,
+      placeholder: props.placeholder,
+      disabled: props.disabled,
+      readonly: props.readonly,
+      rows: 10,
+      style: { fontFamily: 'monospace' },
+      'onUpdate:modelValue': (val: string) => emit('update:modelValue', val),
+      onChange: (val: string) => emit('change', val),
+    })
+  },
+})
+
+/**
  * Create Element Plus UI adapter
  * 创建 Element Plus UI 适配器
  * @returns UIAdapter instance
@@ -140,6 +198,8 @@ export function createElementPlusAdapter(): UIAdapter {
         datetime: DatetimeComponent,
         datetimeRange: DatetimeRangeComponent,
         upload: ElUpload,
+        richText: RichTextPlaceholder,
+        codeEditor: CodeEditorPlaceholder,
       },
       layout: {
         form: ElForm,

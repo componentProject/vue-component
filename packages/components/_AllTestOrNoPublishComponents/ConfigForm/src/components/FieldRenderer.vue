@@ -8,9 +8,8 @@
         :path="path"
         :context="context"
       >
-        <template v-for="(_, slotName) in $slots" :key="slotName" #[slotName]="scope">
-          <!-- @ts-ignore 动态 slot 转发的类型推断限制 -->
-          <slot :name="slotName" v-bind="scope || {}" />
+        <template v-for="(_, slotName) in $slots" :key="slotName" #[slotName]="slotScope">
+          <slot :name="slotName" v-bind="slotScope || {}" />
         </template>
       </VoidFieldRenderer>
     </template>
@@ -24,9 +23,8 @@
         :context="context"
         @change="handleChange"
       >
-        <template v-for="(_, slotName) in $slots" :key="slotName" #[slotName]="scope">
-          <!-- @ts-ignore 动态 slot 转发的类型推断限制 -->
-          <slot :name="slotName" v-bind="scope || {}" />
+        <template v-for="(_, slotName) in $slots" :key="slotName" #[slotName]="slotScope">
+          <slot :name="slotName" v-bind="slotScope || {}" />
         </template>
       </ArrayFieldRenderer>
     </template>
@@ -40,9 +38,8 @@
         :context="context"
         @change="handleChange"
       >
-        <template v-for="(_, slotName) in $slots" :key="slotName" #[slotName]="scope">
-          <!-- @ts-ignore 动态 slot 转发的类型推断限制 -->
-          <slot :name="slotName" v-bind="scope || {}" />
+        <template v-for="(_, slotName) in $slots" :key="slotName" #[slotName]="slotScope">
+          <slot :name="slotName" v-bind="slotScope || {}" />
         </template>
       </ObjectFieldRenderer>
     </template>
@@ -67,7 +64,44 @@
 
           <!-- 自定义字段插槽 -->
           <template v-if="$slots[`field-${field.name}`]">
-            <slot :name="`field-${field.name}`" :field="field" :path="path" :value="fieldValue" :context="context" :disabled="isDisabled" :readonly="isReadonly" />
+            <slot :name="`field-${field.name}`" :field="field" :path="path" :value="fieldValue" :context="context" :disabled="isDisabled" :readonly="isReadonly" :read-pretty="isReadPretty" />
+          </template>
+
+          <!-- ReadPretty 模式 - 纯文本展示 -->
+          <template v-else-if="isReadPretty">
+            <div class="config-form-field__read-pretty">
+              <!-- 颜色字段特殊展示 -->
+              <template v-if="field.type === 'color' && fieldValue">
+                <span class="config-form-field__color-preview" :style="{ backgroundColor: fieldValue }" />
+                <span>{{ formattedValue }}</span>
+              </template>
+              <!-- 上传字段特殊展示 -->
+              <template v-else-if="field.type === 'upload' && Array.isArray(fieldValue)">
+                <div class="config-form-field__files">
+                  <span v-for="(file, index) in fieldValue" :key="index" class="config-form-field__file">
+                    {{ file.name || file.url || file }}
+                  </span>
+                </div>
+              </template>
+              <!-- 文本域多行展示 -->
+              <template v-else-if="field.type === 'textarea'">
+                <div class="config-form-field__textarea-preview">
+                  {{ formattedValue }}
+                </div>
+              </template>
+              <!-- 富文本预览 -->
+              <template v-else-if="field.type === 'richText'">
+                <div class="config-form-field__rich-text-preview" v-html="formattedValue" />
+              </template>
+              <!-- 代码预览 -->
+              <template v-else-if="field.type === 'codeEditor'">
+                <pre class="config-form-field__code-preview"><code>{{ formattedValue }}</code></pre>
+              </template>
+              <!-- 默认文本展示 -->
+              <template v-else>
+                <span class="config-form-field__text">{{ formattedValue }}</span>
+              </template>
+            </div>
           </template>
 
           <!-- 标准字段组件 -->
@@ -125,6 +159,21 @@ import type { ArrayFieldConfig, FieldConfig, FieldState, FormContext, ObjectFiel
 import { computed, defineAsyncComponent, inject, toRef, watch } from 'vue'
 import { executeExpression } from '../_utils'
 import { useFieldExpression } from '../composables/useFieldExpression'
+
+/**
+ * Form item rule interface (generic for cross-framework compatibility)
+ * 表单项规则接口（跨框架通用）
+ */
+interface FormItemRule {
+  required?: boolean
+  message?: string
+  trigger?: string | string[]
+  min?: number
+  max?: number
+  pattern?: RegExp
+  validator?: (rule: any, value: any, callback: any) => void
+  [key: string]: any
+}
 
 defineOptions({
   name: 'FieldRenderer',
@@ -235,10 +284,106 @@ const isReadonly = computed(() => {
   return pattern === 'readOnly' || pattern === 'readPretty'
 })
 
-// 是否多选（简化为单行表达式）
-const isMultiSelect = computed(() =>
-  props.field.type === 'multiSelect' || !!(props.field as SelectFieldConfig).multiple,
-)
+// 是否阅读态（纯文本展示）- 显式依赖 formValuesJSON 以触发响应式更新
+const isReadPretty = computed(() => {
+  // 显式追踪 formValues 的变化
+  void formValuesJSON.value
+  const pattern = executePattern()
+  return pattern === 'readPretty'
+})
+
+/**
+ * 格式化字段值用于 readPretty 模式展示
+ * @returns 格式化后的文本
+ */
+const formattedValue = computed(() => {
+  const value = fieldValue.value
+  const type = props.field.type
+
+  // 空值处理
+  if (value === undefined || value === null || value === '') {
+    return '-'
+  }
+
+  // 根据字段类型格式化
+  switch (type) {
+    case 'switch':
+      return value ? '是' : '否'
+
+    case 'select':
+    case 'radio': {
+      // 从选项中找到对应的 label
+      const options = computedOptions.value
+      const option = options.find(opt => opt.value === value)
+      return option?.label || value
+    }
+
+    case 'multiSelect':
+    case 'checkbox': {
+      // 多选值，从选项中找到对应的 labels
+      if (!Array.isArray(value)) {
+        return value
+      }
+      const options = computedOptions.value
+      const labels = value.map((v) => {
+        const option = options.find(opt => opt.value === v)
+        return option?.label || v
+      })
+      return labels.join('、')
+    }
+
+    case 'date':
+    case 'datetime':
+    case 'time':
+      // 日期时间直接展示
+      return value
+
+    case 'dateRange':
+    case 'datetimeRange':
+      // 日期范围
+      if (Array.isArray(value) && value.length === 2) {
+        return `${value[0] || '-'} 至 ${value[1] || '-'}`
+      }
+      return value
+
+    case 'rate':
+      return `${value} 星`
+
+    case 'slider':
+      return `${value}`
+
+    case 'color':
+      return value
+
+    case 'number':
+      return typeof value === 'number' ? value.toString() : value
+
+    case 'textarea':
+      return value
+
+    case 'password':
+      return '******'
+
+    case 'upload':
+      // 上传文件列表
+      if (Array.isArray(value)) {
+        return value.map((f: any) => f.name || f.url || f).join('、')
+      }
+      return value
+
+    case 'richText':
+      // 富文本内容（可能包含 HTML）
+      return value
+
+    case 'codeEditor':
+      // 代码内容
+      return value
+
+    default:
+      // 默认直接返回值
+      return typeof value === 'object' ? JSON.stringify(value) : value
+  }
+})
 
 // 计算标签
 const computedLabel = computed(() => {
@@ -647,5 +792,83 @@ watch(
   font-size: 12px;
   line-height: 1.5;
   margin-top: 4px;
+}
+
+/* ReadPretty 模式样式 */
+.config-form-field__read-pretty {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  min-height: 32px;
+  padding: 1px 11px;
+  line-height: 30px;
+  color: var(--el-text-color-primary, #303133);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.config-form-field__text {
+  word-break: break-word;
+  flex: 1;
+}
+
+.config-form-field__color-preview {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  border: 1px solid var(--el-border-color, #dcdfe6);
+  margin-right: 8px;
+  flex-shrink: 0;
+}
+
+.config-form-field__textarea-preview {
+  white-space: pre-wrap;
+  word-break: break-word;
+  line-height: 1.6;
+}
+
+.config-form-field__files {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.config-form-field__file {
+  padding: 4px 8px;
+  background-color: var(--el-fill-color-light, #f5f7fa);
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.config-form-field__rich-text-preview {
+  line-height: 1.6;
+  word-break: break-word;
+}
+
+.config-form-field__rich-text-preview :deep(p) {
+  margin: 0 0 0.5em;
+}
+
+.config-form-field__rich-text-preview :deep(ul),
+.config-form-field__rich-text-preview :deep(ol) {
+  padding-left: 1.5em;
+  margin: 0.5em 0;
+}
+
+.config-form-field__code-preview {
+  margin: 0;
+  padding: 12px;
+  background-color: var(--el-fill-color-darker, #1e1e1e);
+  border-radius: 4px;
+  overflow-x: auto;
+}
+
+.config-form-field__code-preview code {
+  font-family: 'Fira Code', 'Consolas', 'Monaco', monospace;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--el-color-white, #fff);
+  white-space: pre;
 }
 </style>

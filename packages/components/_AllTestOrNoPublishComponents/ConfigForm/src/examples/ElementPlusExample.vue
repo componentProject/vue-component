@@ -13,6 +13,9 @@
         <ElRadioButton value="readOnly">
           只读模式
         </ElRadioButton>
+        <ElRadioButton value="readPretty">
+          阅读态
+        </ElRadioButton>
       </ElRadioGroup>
 
       <ElButton type="primary" size="small" @click="showSchema = !showSchema">
@@ -60,7 +63,7 @@ const formRef = ref<FormInstance>()
 defineExpose({ formRef })
 
 // 表单模式
-const formPattern = ref<'editable' | 'disabled' | 'readOnly'>('editable')
+const formPattern = ref<'editable' | 'disabled' | 'readOnly' | 'readPretty'>('editable')
 
 // 是否显示 Schema
 const showSchema = ref(false)
@@ -275,6 +278,33 @@ const formSchema: FormSchema = {
               title: '主题颜色',
               default: '#409EFF',
               col: { span: 12 },
+            },
+          },
+        },
+        {
+          key: 'advanced',
+          title: '高级设置',
+          properties: {
+            introduction: {
+              type: 'richText',
+              name: 'introduction',
+              title: '个人简介',
+              description: '支持富文本格式的个人简介',
+              componentProps: {
+                placeholder: '请输入您的个人简介...',
+              },
+              col: { span: 24 },
+            },
+            customScript: {
+              type: 'codeEditor',
+              name: 'customScript',
+              title: '自定义脚本',
+              description: '支持 JavaScript 代码编辑',
+              componentProps: {
+                placeholder: '// 请输入自定义脚本代码...',
+                language: 'javascript',
+              },
+              col: { span: 24 },
             },
           },
         },

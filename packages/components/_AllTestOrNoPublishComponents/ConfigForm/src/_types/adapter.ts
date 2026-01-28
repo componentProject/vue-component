@@ -50,6 +50,10 @@ export interface FieldComponents {
   datetimeRange?: Component
   /** 文件上传 */
   upload?: Component
+  /** 富文本编辑器 */
+  richText?: Component
+  /** 代码编辑器 */
+  codeEditor?: Component
   /** 自定义扩展组件 */
   [key: string]: Component | undefined
 }

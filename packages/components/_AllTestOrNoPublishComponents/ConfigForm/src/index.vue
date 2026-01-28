@@ -312,6 +312,7 @@ provide('configFormHandlers', schema.value.handlers || {})
 provide('configFormFieldStates', fieldStates)
 provide('configFormContext', formContext)
 provide('configFormAdapter', adapter)
+provide('configFormPattern', computed(() => props.pattern))
 
 // 布局相关计算属性
 const labelWidth = computed(() => {

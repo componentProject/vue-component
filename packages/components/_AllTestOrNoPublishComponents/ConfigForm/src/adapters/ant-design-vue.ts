@@ -213,6 +213,62 @@ const ColorPickerComponent = defineComponent({
 })
 
 /**
+ * Create rich text editor placeholder wrapper for Ant Design Vue
+ * 创建富文本编辑器占位组件（需要用户自行集成）
+ */
+const RichTextPlaceholder = defineComponent({
+  name: 'ARichTextPlaceholder',
+  inheritAttrs: false,
+  props: {
+    modelValue: { type: String, default: '' },
+    placeholder: { type: String, default: '请输入内容...' },
+    readonly: { type: Boolean, default: false },
+    disabled: { type: Boolean, default: false },
+  },
+  emits: ['update:modelValue', 'change'],
+  setup(props, { emit }) {
+    return () => h(ATextarea, {
+      value: props.modelValue,
+      placeholder: props.placeholder,
+      disabled: props.disabled,
+      readonly: props.readonly,
+      rows: 6,
+      'onUpdate:value': (val: string) => emit('update:modelValue', val),
+      onChange: (e: any) => emit('change', e?.target?.value ?? e),
+    })
+  },
+})
+
+/**
+ * Create code editor placeholder wrapper for Ant Design Vue
+ * 创建代码编辑器占位组件（需要用户自行集成）
+ */
+const CodeEditorPlaceholder = defineComponent({
+  name: 'ACodeEditorPlaceholder',
+  inheritAttrs: false,
+  props: {
+    modelValue: { type: String, default: '' },
+    placeholder: { type: String, default: '// 请输入代码...' },
+    language: { type: String, default: 'javascript' },
+    readonly: { type: Boolean, default: false },
+    disabled: { type: Boolean, default: false },
+  },
+  emits: ['update:modelValue', 'change'],
+  setup(props, { emit }) {
+    return () => h(ATextarea, {
+      value: props.modelValue,
+      placeholder: props.placeholder,
+      disabled: props.disabled,
+      readonly: props.readonly,
+      rows: 10,
+      style: { fontFamily: 'monospace' },
+      'onUpdate:value': (val: string) => emit('update:modelValue', val),
+      onChange: (e: any) => emit('change', e?.target?.value ?? e),
+    })
+  },
+})
+
+/**
  * Create Ant Design Vue UI adapter
  * 创建 Ant Design Vue UI 适配器
  * @returns UIAdapter instance
@@ -242,6 +298,8 @@ export function createAntDesignVueAdapter(): UIAdapter {
         datetime: DatetimeComponent,
         datetimeRange: DatetimeRangeComponent,
         upload: AUpload,
+        richText: RichTextPlaceholder,
+        codeEditor: CodeEditorPlaceholder,
       },
       layout: {
         form: AForm,

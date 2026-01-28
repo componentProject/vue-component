@@ -160,5 +160,5 @@ function cssModuleGlobalRootPlugin(options: CssModuleGlobalRootPluginOptions = {
 }
 // 设置插件名称（PostCSS 要求）
 cssModuleGlobalRootPlugin.postcss = true
-export default cssModuleGlobalRootPlugin()
+export default cssModuleGlobalRootPlugin
 export { cssModuleGlobalRootPlugin }

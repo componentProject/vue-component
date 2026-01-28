@@ -1,5 +1,5 @@
 {
-  "ViteConfig": "0.0.33",
+  "ViteConfig": "0.0.36",
   "EslintConfig": "0.0.13",
   "AjaxPackage": "0.0.40",
   "ClassNames": "0.0.3-beta.1",
@@ -7,7 +7,7 @@
   "AddUuidToTemplatePlugin": "0.0.2",
   "ApiDialog": "0.0.4",
   "CssInjectedByJsPlugin": "0.0.2",
-  "cssModuleGlobalRootPlugin": "0.0.9",
+  "cssModuleGlobalRootPlugin": "0.0.10",
   "ViteBuild": "0.0.5",
   "AutoRoutesPlugin": "0.0.4",
   "cssInjectedByJsPlugin": "0.0.3",

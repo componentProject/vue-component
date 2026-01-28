@@ -5,7 +5,7 @@
 
 import type { ComputedRef, Ref } from 'vue'
 import type { FieldConfig, FieldState, FormContext } from '../_types'
-import { inject } from 'vue'
+import { inject, unref } from 'vue'
 import { executeExpression } from '../_utils'
 
 /**
@@ -57,6 +57,7 @@ export function useFieldExpression(
   // 注入表单状态
   const formValues = inject<Record<string, any>>('configFormValues', {})
   const formHandlers = inject<Record<string, (...args: any[]) => any>>('configFormHandlers', {})
+  const formPattern = inject<Ref<'editable' | 'disabled' | 'readOnly' | 'readPretty'>>('configFormPattern')
 
   /**
    * 创建响应式的表达式上下文
@@ -168,20 +169,31 @@ export function useFieldExpression(
 
   /**
    * 执行 pattern 表达式（支持语法糖）
+   * 优先级：disabledWhen > 字段 pattern > 表单全局 pattern
    * @returns 交互模式
    */
   function executePattern(): 'editable' | 'disabled' | 'readOnly' | 'readPretty' {
     const ctx = createExpressionContext()
     const f = field.value as any
 
-    // 优先级：disabledWhen > pattern
+    // 最高优先级：disabledWhen 表达式
     if (f.disabledWhen) {
       const result = executeSimpleExpression(f.disabledWhen)
-      return result ? 'disabled' : 'editable'
+      if (result) {
+        return 'disabled'
+      }
     }
+
+    // 第二优先级：字段自身的 pattern
     if (f.pattern) {
       return executeExpression(f.pattern, ctx, { handlers: formHandlers })
     }
+
+    // 第三优先级：表单全局 pattern
+    if (formPattern) {
+      return unref(formPattern)
+    }
+
     return 'editable'
   }
 

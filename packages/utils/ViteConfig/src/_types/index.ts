@@ -204,3 +204,15 @@ export type PluginType = PluginOption & { name: string }
 export interface PluginMap {
   [key: string]: PluginOption
 }
+
+/**
+ * Vite feature 配置上下文
+ */
+export interface ViteFeatureContext {
+  /** Vite 环境变量 */
+  viteEnv: Record<string, any>
+  /** 构建模式 */
+  mode: string
+  /** 应用代码 */
+  appCode: string
+}
