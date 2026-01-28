@@ -165,7 +165,6 @@ import { executeExpression } from '../_utils'
 import { useFieldExpression } from '../composables/useFieldExpression'
 
 /**
- * Form item rule interface (generic for cross-framework compatibility)
  * 表单项规则接口（跨框架通用）
  */
 interface FormItemRule {

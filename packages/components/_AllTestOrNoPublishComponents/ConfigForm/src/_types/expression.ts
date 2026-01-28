@@ -1,5 +1,5 @@
 /**
- * ConfigForm - Expression Types
+ * ConfigForm - 表达式类型
  * 表达式系统类型定义
  */
 

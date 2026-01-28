@@ -115,7 +115,7 @@
 <script setup lang="ts">
 import type { ComponentPublicInstance } from 'vue'
 import type { emitsType, FieldConfig, FormContext, FormInstance, FormSchema, propsType, slotsType, UIAdapter } from './_types'
-import { computed, onMounted, onUnmounted, provide, toRaw, useTemplateRef, watch } from 'vue'
+import { computed, onMounted, onUnmounted, provide, toRaw, useTemplateRef } from 'vue'
 import { elementPlusAdapter } from './adapters'
 import { FieldRenderer } from './components'
 import { useFormState, useFormSubmit, useFormValidation } from './composables'
@@ -143,13 +143,13 @@ const props = withDefaults(defineProps<propsType>(), {
 
 const emit = defineEmits<emitsType>()
 
+defineSlots<slotsType>()
+
 /**
  * 表单值双向绑定（支持 v-model）
  * 用于实时同步表单值到父组件
  */
 const modelValue = defineModel<Record<string, any>>('modelValue', { default: () => ({}) })
-
-defineSlots<slotsType>()
 
 // 使用传入的 adapter 或默认的 Element Plus adapter
 const adapter = computed<UIAdapter>(() => props.adapter || elementPlusAdapter)

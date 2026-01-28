@@ -4,7 +4,6 @@
     <div class="example-section">
       <h3>Element Plus 搜索栏</h3>
       <ConfigForm
-        ref="elementSearchRef"
         :schema="searchFormSchema"
         :initial-values="searchInitialValues"
         :adapter="elementPlusAdapter"
@@ -19,7 +18,6 @@
     <div class="example-section">
       <h3>Ant Design Vue 搜索栏</h3>
       <ConfigForm
-        ref="antdSearchRef"
         :schema="searchFormSchema"
         :initial-values="searchInitialValues"
         :adapter="antDesignVueAdapter"
@@ -33,19 +31,21 @@
 
     <div class="schema-preview">
       <h3>Schema 配置预览</h3>
-      <p class="schema-desc">仅需以下配置即可生成完整的搜索表单：</p>
+      <p class="schema-desc">
+        仅需以下配置即可生成完整的搜索表单：
+      </p>
       <pre class="schema-code">{{ schemaPreview }}</pre>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import type { FormSchema } from '../_types'
 /**
  * 简单搜索栏表单示例
  * 展示 ConfigForm 的最小配置方式
  */
 import { ref } from 'vue'
-import type { FormSchema } from '../_types'
 import { createAntDesignVueAdapter } from '../adapters/ant-design-vue'
 import { createElementPlusAdapter } from '../adapters/element-plus'
 import ConfigForm from '../index.vue'
@@ -237,4 +237,3 @@ const schemaPreview = `{
   overflow-x: auto;
 }
 </style>
-

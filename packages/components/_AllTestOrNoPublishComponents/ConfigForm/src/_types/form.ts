@@ -1,5 +1,5 @@
 /**
- * ConfigForm - Form Types
+ * ConfigForm - 表单类型
  * 表单配置类型定义
  */
 

@@ -128,8 +128,8 @@ const WrappedDatePicker = createVModelWrapper(ADatePicker, 'WrappedADatePicker')
 const WrappedRangePicker = createVModelWrapper(ARangePicker, 'WrappedARangePicker')
 
 /**
- * Create datetime picker wrapper for Ant Design Vue
- * 创建日期时间选择器包装器（带时间选择）
+ * 创建日期时间选择器包装器
+ * Ant Design Vue 需要设置 showTime 来启用时间选择
  */
 const DatetimeComponent = defineComponent({
   name: 'ADatetimePicker',
@@ -153,8 +153,8 @@ const DatetimeComponent = defineComponent({
 })
 
 /**
- * Create datetime range picker wrapper
- * 创建日期时间范围选择器包装器（带时间选择）
+ * 创建日期时间范围选择器包装器
+ * Ant Design Vue 需要设置 showTime 来启用时间选择
  */
 const DatetimeRangeComponent = defineComponent({
   name: 'ADatetimeRangePicker',
@@ -178,8 +178,8 @@ const DatetimeRangeComponent = defineComponent({
 })
 
 /**
- * Create color picker wrapper (Ant Design Vue doesn't have built-in color picker)
- * 创建颜色选择器包装器（Ant Design Vue 没有内置颜色选择器）
+ * 创建颜色选择器包装器
+ * Ant Design Vue 没有内置颜色选择器，使用原生 input[type=color] 实现
  */
 const ColorPickerComponent = defineComponent({
   name: 'AColorPicker',
@@ -213,8 +213,8 @@ const ColorPickerComponent = defineComponent({
 })
 
 /**
- * Create rich text editor placeholder wrapper for Ant Design Vue
- * 创建富文本编辑器占位组件（需要用户自行集成）
+ * 创建富文本编辑器占位组件
+ * 需要用户自行集成实际的富文本编辑器
  */
 const RichTextPlaceholder = defineComponent({
   name: 'ARichTextPlaceholder',
@@ -240,8 +240,8 @@ const RichTextPlaceholder = defineComponent({
 })
 
 /**
- * Create code editor placeholder wrapper for Ant Design Vue
- * 创建代码编辑器占位组件（需要用户自行集成）
+ * 创建代码编辑器占位组件
+ * 需要用户自行集成实际的代码编辑器（如 Monaco Editor、CodeMirror）
  */
 const CodeEditorPlaceholder = defineComponent({
   name: 'ACodeEditorPlaceholder',
@@ -269,9 +269,8 @@ const CodeEditorPlaceholder = defineComponent({
 })
 
 /**
- * Create Ant Design Vue UI adapter
  * 创建 Ant Design Vue UI 适配器
- * @returns UIAdapter instance
+ * @returns UIAdapter 实例
  */
 export function createAntDesignVueAdapter(): UIAdapter {
   return {

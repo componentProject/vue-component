@@ -1,8 +1,8 @@
 // 配置文件
 import process from 'node:process'
 import cssModuleGlobalRootPlugin from '@moluoxixi/css-module-global-root-plugin'
-import { ViteConfig, wrapperEnv } from '@moluoxixi/vite-config'
 import { loadEnv } from 'vite'
+import { ViteConfig, wrapperEnv } from '../../packages/utils/viteConfig/index.ts'
 
 export default ViteConfig(
   ({ mode }) => {

@@ -1,12 +1,11 @@
 /**
- * ConfigForm - UI Adapter Types
+ * ConfigForm - UI 适配器类型
  * UI 适配器类型定义，支持用户传入自定义组件
  */
 
 import type { Component } from 'vue'
 
 /**
- * Field component registry
  * 字段组件注册表
  */
 export interface FieldComponents {
@@ -59,7 +58,6 @@ export interface FieldComponents {
 }
 
 /**
- * Layout component registry
  * 布局组件注册表
  */
 export interface LayoutComponents {
@@ -98,7 +96,6 @@ export interface LayoutComponents {
 }
 
 /**
- * Icon component registry
  * 图标组件注册表
  */
 export interface IconComponents {
@@ -121,7 +118,6 @@ export interface IconComponents {
 }
 
 /**
- * Message feedback interface
  * 消息反馈接口
  */
 export interface MessageFeedback {
@@ -136,7 +132,6 @@ export interface MessageFeedback {
 }
 
 /**
- * MessageBox feedback interface
  * 弹窗反馈接口
  */
 export interface MessageBoxFeedback {
@@ -156,7 +151,6 @@ export interface MessageBoxFeedback {
 }
 
 /**
- * Feedback components registry
  * 反馈组件注册表
  */
 export interface FeedbackComponents {
@@ -167,26 +161,23 @@ export interface FeedbackComponents {
 }
 
 /**
- * Form methods interface
- * 表单方法接口（用于调用原生表单组件的方法）
+ * 表单方法接口
+ * 用于调用原生表单组件的方法
  */
 export interface FormMethods {
   /**
-   * Validate form
    * 验证表单
    * @param formRef - 表单组件实例
    * @returns Promise<boolean> - 验证结果
    */
   validate: (formRef: any) => Promise<boolean>
   /**
-   * Clear validation
    * 清除验证
    * @param formRef - 表单组件实例
    * @param fields - 可选的字段列表
    */
   clearValidate?: (formRef: any, fields?: string[]) => void
   /**
-   * Reset fields
    * 重置字段
    * @param formRef - 表单组件实例
    * @param fields - 可选的字段列表
@@ -195,7 +186,6 @@ export interface FormMethods {
 }
 
 /**
- * Component registry
  * 组件注册表
  */
 export interface ComponentRegistry {
@@ -210,7 +200,6 @@ export interface ComponentRegistry {
 }
 
 /**
- * Props transformer function
  * Props 转换函数
  */
 export type PropsTransformFn = (
@@ -220,7 +209,6 @@ export type PropsTransformFn = (
 ) => Record<string, any>
 
 /**
- * ReadPretty style transformer function
  * 阅读态样式提取函数
  */
 export type ReadPrettyStyleTransformFn = (
@@ -229,7 +217,6 @@ export type ReadPrettyStyleTransformFn = (
 ) => Record<string, any> | string
 
 /**
- * Props transformer interface
  * Props 转换器接口
  */
 export interface PropsTransformer {
@@ -255,7 +242,6 @@ export interface PropsTransformer {
 }
 
 /**
- * Select/Radio/Checkbox option item
  * 选项数据结构
  */
 export interface OptionItem {
@@ -267,7 +253,6 @@ export interface OptionItem {
 }
 
 /**
- * Options renderer props
  * 选项渲染器 props
  */
 export interface OptionsRendererProps {
@@ -282,8 +267,8 @@ export interface OptionsRendererProps {
 }
 
 /**
- * Options renderer function
- * 选项渲染函数（用于 Select/Radio/Checkbox 的选项渲染）
+ * 选项渲染函数
+ * 用于 Select/Radio/Checkbox 的选项渲染
  */
 export type OptionsRenderer = (
   type: 'select' | 'radio' | 'checkbox',
@@ -291,12 +276,10 @@ export type OptionsRenderer = (
 ) => any[]
 
 /**
- * Adapter feature flags
  * 适配器功能配置
  */
 export interface AdapterFeatures {
   /**
-   * Whether to pass options via props instead of children
    * 是否通过 props 传递选项而不是子组件
    * - true: 使用 options prop（如 Ant Design Vue）
    * - false: 使用子组件渲染（如 Element Plus）
@@ -304,7 +287,6 @@ export interface AdapterFeatures {
    */
   optionsAsProps?: boolean
   /**
-   * FormItem name prop key
    * FormItem 的字段名属性键
    * - 'prop': Element Plus 风格
    * - 'name': Ant Design Vue 风格
@@ -312,7 +294,6 @@ export interface AdapterFeatures {
    */
   formItemNameProp?: 'prop' | 'name'
   /**
-   * Option components for select/radio/checkbox (when optionsAsProps is false)
    * 选项组件（当 optionsAsProps 为 false 时使用）
    */
   optionComponents?: {
@@ -323,7 +304,6 @@ export interface AdapterFeatures {
 }
 
 /**
- * UI Adapter interface
  * UI 适配器接口
  */
 export interface UIAdapter {
@@ -342,7 +322,6 @@ export interface UIAdapter {
 }
 
 /**
- * Create adapter options
  * 创建适配器选项
  */
 export interface CreateAdapterOptions {

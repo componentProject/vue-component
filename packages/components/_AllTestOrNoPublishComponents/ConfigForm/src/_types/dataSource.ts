@@ -1,5 +1,5 @@
 /**
- * ConfigForm - DataSource Types
+ * ConfigForm - 数据源类型
  * 数据源类型定义
  */
 

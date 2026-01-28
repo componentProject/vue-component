@@ -51,7 +51,6 @@ import {
 import { defineComponent, h } from 'vue'
 
 /**
- * Create textarea component wrapper
  * 创建多行文本组件包装器
  */
 const TextareaComponent = defineComponent({
@@ -63,7 +62,6 @@ const TextareaComponent = defineComponent({
 })
 
 /**
- * Create password component wrapper
  * 创建密码输入组件包装器
  */
 const PasswordComponent = defineComponent({
@@ -75,7 +73,6 @@ const PasswordComponent = defineComponent({
 })
 
 /**
- * Create date range picker wrapper
  * 创建日期范围选择器包装器
  */
 const DateRangeComponent = defineComponent({
@@ -87,7 +84,6 @@ const DateRangeComponent = defineComponent({
 })
 
 /**
- * Create datetime picker wrapper
  * 创建日期时间选择器包装器
  */
 const DatetimeComponent = defineComponent({
@@ -99,7 +95,6 @@ const DatetimeComponent = defineComponent({
 })
 
 /**
- * Create datetime range picker wrapper
  * 创建日期时间范围选择器包装器
  */
 const DatetimeRangeComponent = defineComponent({
@@ -111,8 +106,8 @@ const DatetimeRangeComponent = defineComponent({
 })
 
 /**
- * Create rich text editor placeholder wrapper
- * 创建富文本编辑器占位组件（需要用户自行集成）
+ * 创建富文本编辑器占位组件
+ * 需要用户自行集成实际的富文本编辑器
  */
 const RichTextPlaceholder = defineComponent({
   name: 'RichTextPlaceholder',
@@ -139,8 +134,8 @@ const RichTextPlaceholder = defineComponent({
 })
 
 /**
- * Create code editor placeholder wrapper
- * 创建代码编辑器占位组件（需要用户自行集成）
+ * 创建代码编辑器占位组件
+ * 需要用户自行集成实际的代码编辑器（如 Monaco Editor、CodeMirror）
  */
 const CodeEditorPlaceholder = defineComponent({
   name: 'CodeEditorPlaceholder',

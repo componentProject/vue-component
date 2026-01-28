@@ -39,7 +39,7 @@
     />
 
     <!-- Schema 展示 -->
-    <ACollapse v-if="showSchema" v-model:activeKey="activeCollapse" class="example-schema">
+    <ACollapse v-if="showSchema" v-model:active-key="activeCollapse" class="example-schema">
       <ACollapsePanel key="schema" header="表单 Schema 配置">
         <pre>{{ JSON.stringify(formSchema, null, 2) }}</pre>
       </ACollapsePanel>

@@ -1,5 +1,5 @@
 /**
- * ConfigForm - Types Index
+ * ConfigForm - 类型索引
  * 统一导出所有类型
  */
 

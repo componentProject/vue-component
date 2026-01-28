@@ -1,5 +1,5 @@
 /**
- * ConfigForm - Emits Types
+ * ConfigForm - Emits 类型
  * 组件 Emits 类型定义
  */
 

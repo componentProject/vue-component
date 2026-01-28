@@ -1,5 +1,5 @@
 /**
- * ConfigForm - Props Types
+ * ConfigForm - Props 类型
  * 组件 Props 类型定义
  */
 

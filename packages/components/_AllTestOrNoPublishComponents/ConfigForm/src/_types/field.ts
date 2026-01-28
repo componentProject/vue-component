@@ -1,5 +1,5 @@
 /**
- * ConfigForm - Field Types
+ * ConfigForm - 字段类型
  * 字段配置类型定义
  */
 

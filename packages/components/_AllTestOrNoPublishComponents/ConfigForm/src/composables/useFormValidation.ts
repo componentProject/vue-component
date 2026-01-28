@@ -3,7 +3,7 @@
  * 表单校验 Composable
  */
 
-import type { ExpressionContext, FieldConfig, FieldValidationResult, FormSchema, FormValidationResult, ValidationRule, ValidatorContext } from '../_types'
+import type { FieldConfig, FieldValidationResult, FormSchema, FormValidationResult, ValidationRule, ValidatorContext } from '../_types'
 import type { UseFormStateReturn } from './useFormState'
 
 /**

@@ -1,5 +1,5 @@
 /**
- * ConfigForm - Reaction Types
+ * ConfigForm - 联动类型
  * 联动规则类型定义
  */
 

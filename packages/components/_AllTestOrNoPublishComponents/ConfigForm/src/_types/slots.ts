@@ -1,5 +1,5 @@
 /**
- * ConfigForm - Slots Types
+ * ConfigForm - Slots 类型
  * 组件 Slots 类型定义
  */
 

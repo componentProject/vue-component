@@ -1,5 +1,5 @@
 /**
- * ConfigForm - Validation Types
+ * ConfigForm - 校验类型
  * 校验规则类型定义
  */
 
