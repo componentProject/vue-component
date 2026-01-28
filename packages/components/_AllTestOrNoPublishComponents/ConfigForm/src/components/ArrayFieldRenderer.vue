@@ -15,8 +15,8 @@
           :key="getItemKey(item, index)"
           class="config-form-array__item"
         >
-          <!-- 排序手柄 -->
-          <div v-if="canSort" class="config-form-array__handle">
+          <!-- 排序手柄（阅读态下隐藏） -->
+          <div v-if="canSort && !isReadPretty" class="config-form-array__handle">
             <component :is="iconComponents.drag" />
           </div>
 
@@ -33,8 +33,8 @@
             </FieldRenderer>
           </div>
 
-          <!-- 数组项操作 -->
-          <div class="config-form-array__actions">
+          <!-- 数组项操作（阅读态下隐藏） -->
+          <div v-if="!isReadPretty" class="config-form-array__actions">
             <!-- 复制 -->
             <component :is="layoutComponents.tooltip" v-if="canCopy" content="复制" title="复制" placement="top">
               <component
@@ -104,8 +104,8 @@
       <component :is="layoutComponents.empty" description="暂无数据" :image-size="60" />
     </div>
 
-    <!-- 添加按钮 -->
-    <div v-if="canAdd && !isMaxReached" class="config-form-array__footer">
+    <!-- 添加按钮（阅读态下隐藏） -->
+    <div v-if="canAdd && !isMaxReached && !isReadPretty" class="config-form-array__footer">
       <component
         :is="layoutComponents.button"
         type="primary"
@@ -155,6 +155,12 @@ const formHandlers = inject<Record<string, (...args: any[]) => any>>('configForm
 
 // 注入 adapter
 const adapter = inject<ComputedRef<UIAdapter>>('configFormAdapter')
+
+// 注入表单模式（用于判断 readPretty）
+const formPattern = inject<ComputedRef<string> | undefined>('configFormPattern')
+
+// 是否为阅读态（业界标准：阅读态下隐藏所有操作按钮）
+const isReadPretty = computed(() => formPattern?.value === 'readPretty')
 
 // 布局组件快捷访问
 const layoutComponents = computed(() => adapter?.value.components.layout || {})
