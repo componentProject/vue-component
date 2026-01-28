@@ -3,7 +3,7 @@
  * 表单校验 Composable
  */
 
-import type { ExpressionContext, FieldConfig, FieldValidationResult, FormSchema, FormValidationResult, ValidationRule } from '../_types'
+import type { ExpressionContext, FieldConfig, FieldValidationResult, FormSchema, FormValidationResult, ValidationRule, ValidatorContext } from '../_types'
 import type { UseFormStateReturn } from './useFormState'
 
 /**
@@ -166,12 +166,15 @@ export function useFormValidation(options: UseFormValidationOptions): UseFormVal
 
   /**
    * 校验单个规则
+   * @param rule - 校验规则
+   * @param validatorContext - 校验器上下文
+   * @returns 错误信息或 null
    */
   async function validateRule(
     rule: ValidationRule,
-    value: any,
-    context: ExpressionContext,
+    validatorContext: ValidatorContext,
   ): Promise<string | null> {
+    const { value } = validatorContext
     // 必填校验
     if ('required' in rule && rule.required) {
       if (value === undefined || value === null || value === '' || (Array.isArray(value) && value.length === 0)) {
@@ -258,7 +261,7 @@ export function useFormValidation(options: UseFormValidationOptions): UseFormVal
     if ('validator' in rule) {
       const validator = schema.validators?.[rule.validator]
       if (validator) {
-        const result = validator(value, context)
+        const result = validator(validatorContext)
         if (typeof result === 'string') {
           return result
         }
@@ -273,7 +276,7 @@ export function useFormValidation(options: UseFormValidationOptions): UseFormVal
       const validator = schema.validators?.[rule.asyncValidator]
       if (validator) {
         try {
-          const result = await validator(value, context)
+          const result = await validator(validatorContext)
           if (typeof result === 'string') {
             return result
           }
@@ -392,9 +395,17 @@ export function useFormValidation(options: UseFormValidationOptions): UseFormVal
         rules.push(...fieldConfig.rules)
       }
 
+      // 创建校验器上下文
+      const validatorContext: ValidatorContext = {
+        ...expressionContext,
+        value,
+        path,
+        field: fieldConfig,
+      }
+
       // 执行校验
       for (const rule of rules) {
-        const error = await validateRule(rule, value, expressionContext)
+        const error = await validateRule(rule, validatorContext)
         if (error) {
           result.errors.push(error)
           result.valid = false

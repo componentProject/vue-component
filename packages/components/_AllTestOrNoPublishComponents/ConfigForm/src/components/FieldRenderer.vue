@@ -881,14 +881,31 @@ function setNestedValue(obj: Record<string, any>, path: string, value: any): voi
 }
 
 /**
- * 处理值变化
+ * 创建 Handler 上下文
+ * @param value - 当前字段值
+ * @param event - 触发事件类型
+ * @returns HandlerContext 对象
  */
-function handleChange(value: any) {
+function createHandlerContext(value: unknown, event: 'init' | 'change' | 'focus' | 'blur') {
+  return {
+    ...props.context,
+    value,
+    path: props.path,
+    field: props.field,
+    event,
+  }
+}
+
+/**
+ * 处理值变化
+ * @param value - 新的字段值
+ */
+function handleChange(value: unknown) {
   emit('change', value)
 
   // 调用 onChange 处理函数
   if (props.field.onChange && formHandlers[props.field.onChange]) {
-    formHandlers[props.field.onChange](value, props.context)
+    formHandlers[props.field.onChange](createHandlerContext(value, 'change'))
   }
 }
 
@@ -899,7 +916,7 @@ function handleFocus() {
   emit('focus')
 
   if (props.field.onFocus && formHandlers[props.field.onFocus]) {
-    formHandlers[props.field.onFocus](fieldValue.value, props.context)
+    formHandlers[props.field.onFocus](createHandlerContext(fieldValue.value, 'focus'))
   }
 }
 
@@ -910,7 +927,7 @@ function handleBlur() {
   emit('blur')
 
   if (props.field.onBlur && formHandlers[props.field.onBlur]) {
-    formHandlers[props.field.onBlur](fieldValue.value, props.context)
+    formHandlers[props.field.onBlur](createHandlerContext(fieldValue.value, 'blur'))
   }
 }
 
@@ -919,7 +936,7 @@ watch(
   () => props.field,
   () => {
     if (props.field.onInit && formHandlers[props.field.onInit]) {
-      formHandlers[props.field.onInit](fieldValue.value, props.context)
+      formHandlers[props.field.onInit](createHandlerContext(fieldValue.value, 'init'))
     }
   },
   { immediate: true },

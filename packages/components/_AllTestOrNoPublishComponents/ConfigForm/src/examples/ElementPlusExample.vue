@@ -472,7 +472,8 @@ const formSchema: FormSchema = {
     text: '重置',
   },
   validators: {
-    agreementRequired: (value: any) => {
+    // 协议必须勾选校验
+    agreementRequired: ({ value }) => {
       // checkbox 的值是一个数组，勾选后包含 true
       if (!value || !Array.isArray(value) || !value.includes(true)) {
         return '请阅读并同意用户协议'
@@ -482,24 +483,24 @@ const formSchema: FormSchema = {
   },
   handlers: {
     // 用户名失焦时去除首尾空格
-    onUsernameBlur: (value: any, context: any) => {
+    onUsernameBlur: ({ value, setFieldValue }) => {
       if (typeof value === 'string' && value !== value.trim()) {
-        context.setFieldValue('username', value.trim())
+        setFieldValue('username', value.trim())
         console.log('[Handler] 用户名已去除首尾空格:', value.trim())
       }
     },
     // 用户类型变化时的处理
-    onUserTypeChange: (value: any, context: any) => {
+    onUserTypeChange: ({ value, setFieldValue }) => {
       console.log('[Handler] 用户类型变化:', value)
       // 当切换为普通用户时，清空 VIP 等级
       if (value === 'normal') {
-        context.setFieldValue('vipLevel', undefined)
+        setFieldValue('vipLevel', undefined)
         console.log('[Handler] 已清空 VIP 等级')
       }
     },
     // 邮箱聚焦时打印日志
-    onEmailFocus: (value: any) => {
-      console.log('[Handler] 邮箱字段获得焦点，当前值:', value)
+    onEmailFocus: ({ value, path, field }) => {
+      console.log(`[Handler] 字段 ${path} (${field.title}) 获得焦点，当前值:`, value)
     },
   },
 }

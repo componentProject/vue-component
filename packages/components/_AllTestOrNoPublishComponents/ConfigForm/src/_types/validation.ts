@@ -4,6 +4,7 @@
  */
 
 import type { Expression, ExpressionContext } from './expression'
+import type { FieldConfig } from './field'
 
 // ==================== 内置校验规则 ====================
 
@@ -260,23 +261,60 @@ export interface FormValidationResult {
   errors: Array<{ field: string, message: string }>
 }
 
-// ==================== 校验器类型 ====================
+// ==================== Validator 上下文与类型 ====================
+
+/**
+ * Validator 上下文
+ * 统一的校验器入参，包含当前字段信息和表单操作方法
+ */
+export interface ValidatorContext extends ExpressionContext {
+  /** 当前字段值 */
+  value: unknown
+  /** 当前字段路径 */
+  path: string
+  /** 当前字段配置 */
+  field: FieldConfig
+}
 
 /**
  * 同步校验器函数类型
+ * @returns true 表示校验通过，string 表示错误信息
+ * @example
+ * ```ts
+ * // 基础用法
+ * passwordStrength: (ctx) => {
+ *   const { value } = ctx
+ *   if (typeof value !== 'string') return '密码必须是字符串'
+ *   if (value.length < 8) return '密码长度不能少于8位'
+ *   if (!/[A-Z]/.test(value)) return '密码必须包含大写字母'
+ *   return true
+ * }
+ *
+ * // 解构用法 + 跨字段校验
+ * confirmPassword: ({ value, $values }) => {
+ *   if (value !== $values.password) {
+ *     return '两次输入的密码不一致'
+ *   }
+ *   return true
+ * }
+ * ```
  */
-export type ValidatorFunction = (
-  value: any,
-  context: ExpressionContext,
-) => boolean | string
+export type ValidatorFunction = (context: ValidatorContext) => boolean | string
 
 /**
  * 异步校验器函数类型
+ * @returns Promise<true> 表示校验通过，Promise<string> 表示错误信息
+ * @example
+ * ```ts
+ * // 远程校验用户名是否已存在
+ * usernameExists: async ({ value }) => {
+ *   const response = await fetch(`/api/check-username?name=${value}`)
+ *   const data = await response.json()
+ *   return data.exists ? '用户名已存在' : true
+ * }
+ * ```
  */
-export type AsyncValidatorFunction = (
-  value: any,
-  context: ExpressionContext,
-) => Promise<boolean | string>
+export type AsyncValidatorFunction = (context: ValidatorContext) => Promise<boolean | string>
 
 /**
  * 校验器注册表

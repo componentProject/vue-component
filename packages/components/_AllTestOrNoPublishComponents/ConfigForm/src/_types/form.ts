@@ -156,30 +156,57 @@ export interface FormSchema {
   extra?: Record<string, any>
 }
 
-// ==================== 处理函数类型 ====================
+// ==================== Handler 上下文与类型 ====================
 
 /**
- * 通用处理函数类型
+ * Handler 触发事件类型
  */
-export type HandlerFunction = (
-  ...args: any[]
-) => any | Promise<any>
+export type HandlerEvent = 'init' | 'change' | 'focus' | 'blur'
 
 /**
- * 字段变化处理函数
+ * Handler 上下文
+ * 统一的 handler 入参，包含当前字段信息和表单操作方法
  */
-export type FieldChangeHandler = (
-  value: any,
-  context: FormContext,
-) => void | Promise<void>
+export interface HandlerContext extends FormContext {
+  /** 当前字段值 */
+  value: unknown
+  /** 当前字段路径 */
+  path: string
+  /** 当前字段配置 */
+  field: FieldConfig
+  /** 触发事件类型 */
+  event: HandlerEvent
+}
+
+/**
+ * Handler 函数类型
+ * 统一入参为 context 对象，支持解构使用
+ * @example
+ * ```ts
+ * // 基础用法
+ * onUsernameBlur: (ctx) => {
+ *   if (typeof ctx.value === 'string') {
+ *     ctx.setFieldValue('username', ctx.value.trim())
+ *   }
+ * }
+ *
+ * // 解构用法
+ * onUserTypeChange: ({ value, setFieldValue }) => {
+ *   if (value === 'normal') {
+ *     setFieldValue('vipLevel', undefined)
+ *   }
+ * }
+ * ```
+ */
+export type HandlerFunction = (context: HandlerContext) => void | Promise<void>
 
 /**
  * 表单提交前转换函数
  */
 export type SubmitTransformer = (
-  values: Record<string, any>,
+  values: Record<string, unknown>,
   context: ExpressionContext,
-) => Record<string, any>
+) => Record<string, unknown>
 
 // ==================== 表单上下文 ====================
 

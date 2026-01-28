@@ -83,7 +83,6 @@ export type {
 
 // 表单类型
 export type {
-  FieldChangeHandler,
   FormContext,
   FormInstance,
   FormLayout,
@@ -91,6 +90,8 @@ export type {
   FormResetConfig,
   FormSchema,
   FormSubmitConfig,
+  HandlerContext,
+  HandlerEvent,
   HandlerFunction,
   SubmitTransformer,
 } from './form'
@@ -151,6 +152,7 @@ export type {
   RequiredRule,
   ValidationRule,
   ValidationTrigger,
+  ValidatorContext,
   ValidatorFunction,
   ValidatorRegistry,
   ValidatorRule,
