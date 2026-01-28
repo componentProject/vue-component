@@ -19,6 +19,20 @@ export type {
   PropsTransformFn,
   UIAdapter,
 } from './adapter'
+// 常量类型
+export type {
+  DisplayType,
+  HandlerEventType,
+  LayoutType,
+  PatternType,
+} from './constants'
+
+export {
+  DISPLAY_OPTIONS,
+  HANDLER_EVENT_OPTIONS,
+  LAYOUT_OPTIONS,
+  PATTERN_OPTIONS,
+} from './constants'
 
 // 数据源类型
 export type {

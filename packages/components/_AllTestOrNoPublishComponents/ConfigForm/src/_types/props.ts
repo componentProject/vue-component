@@ -4,6 +4,7 @@
  */
 
 import type { UIAdapter } from './adapter'
+import type { PatternType } from './constants'
 import type { FormLayout, FormSchema } from './form'
 
 /**
@@ -37,7 +38,7 @@ export interface propsType {
    * - readPretty: 阅读态
    * @default 'editable'
    */
-  pattern?: 'editable' | 'disabled' | 'readOnly' | 'readPretty'
+  pattern?: PatternType
 
   /**
    * 布局配置（覆盖 schema 中的配置）

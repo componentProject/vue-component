@@ -51,7 +51,7 @@
 </template>
 
 <script setup lang="ts">
-import type { FormInstance, FormSchema } from '../_types'
+import type { FormInstance, FormSchema, PatternType } from '../_types'
 import {
   Button as AButton,
   Collapse as ACollapse,
@@ -73,7 +73,7 @@ const formRef = ref<FormInstance>()
 defineExpose({ formRef })
 
 // 表单模式
-const formPattern = ref<'editable' | 'disabled' | 'readOnly' | 'readPretty'>('editable')
+const formPattern = ref<PatternType>('editable')
 
 // 是否显示 Schema
 const showSchema = ref(true)
@@ -466,6 +466,9 @@ const initialValues = {
 
 /**
  * 处理表单值变化
+ * @param values - 当前表单所有值
+ * @param changedField - 发生变化的字段路径
+ * @param changedValue - 变化后的值
  */
 function handleChange(values: Record<string, any>, changedField: string, changedValue: any) {
   // 仅用于调试输出，实际值已通过 v-model 同步
@@ -474,6 +477,9 @@ function handleChange(values: Record<string, any>, changedField: string, changed
 
 /**
  * 处理字段值变化
+ * @param fieldName - 字段名称
+ * @param value - 新值
+ * @param oldValue - 旧值
  */
 function handleFieldChange(fieldName: string, value: any, oldValue: any) {
   console.log('[Ant Design Vue] 字段变化:', fieldName, oldValue, '->', value)
@@ -481,6 +487,7 @@ function handleFieldChange(fieldName: string, value: any, oldValue: any) {
 
 /**
  * 处理表单提交
+ * @param values - 提交的表单值
  */
 function handleSubmit(values: Record<string, any>) {
   console.log('[Ant Design Vue] 表单提交:', values)

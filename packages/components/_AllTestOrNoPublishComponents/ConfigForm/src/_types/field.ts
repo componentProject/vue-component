@@ -3,6 +3,7 @@
  * 字段配置类型定义
  */
 
+import type { DisplayType, LayoutType, PatternType } from './constants'
 import type { DataSourceConfig } from './dataSource'
 import type { Expression, MaybeExpression } from './expression'
 import type { FieldReaction, TargetReaction } from './reaction'
@@ -86,9 +87,9 @@ export interface BaseFieldConfig {
 
   // ===== 状态控制 =====
   /** 显示模式 */
-  display?: MaybeExpression<'visible' | 'hidden' | 'none'>
+  display?: MaybeExpression<DisplayType>
   /** 交互模式 */
-  pattern?: MaybeExpression<'editable' | 'disabled' | 'readOnly' | 'readPretty'>
+  pattern?: MaybeExpression<PatternType>
   /** 是否必填 */
   required?: MaybeExpression<boolean>
 
@@ -261,7 +262,7 @@ export interface ObjectFieldConfig extends BaseFieldConfig {
   /** 子字段配置 */
   properties: Record<string, FieldConfig>
   /** 布局模式 */
-  layout?: 'horizontal' | 'vertical' | 'inline'
+  layout?: LayoutType
 }
 
 // ==================== 数组字段配置 ====================

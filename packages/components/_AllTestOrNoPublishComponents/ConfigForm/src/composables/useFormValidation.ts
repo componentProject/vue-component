@@ -5,6 +5,7 @@
 
 import type { FieldConfig, FieldValidationResult, FormSchema, FormValidationResult, ValidationRule, ValidatorContext } from '../_types'
 import type { UseFormStateReturn } from './useFormState'
+import { getNestedValue } from '../_utils'
 
 /**
  * 表单校验选项
@@ -565,13 +566,4 @@ export function useFormValidation(options: UseFormValidationOptions): UseFormVal
     setFieldError,
     clearFieldError,
   }
-}
-
-/**
- * 获取嵌套对象的值
- */
-function getNestedValue(obj: Record<string, any>, path: string): any {
-  if (!path)
-    return obj
-  return path.split('.').reduce((acc, key) => acc?.[key], obj)
 }

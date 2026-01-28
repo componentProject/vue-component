@@ -5,7 +5,7 @@
 
 import type { ExpressionContext, FieldConfig, FieldState, FormSchema, FormState } from '../_types'
 import { reactive, toRaw } from 'vue'
-import { createExpressionExecutor } from '../_utils'
+import { createExpressionExecutor, getNestedValue, setNestedValue } from '../_utils'
 
 /**
  * 表单状态管理选项
@@ -89,64 +89,6 @@ function createDefaultFormState(initialValues: Record<string, any>): FormState {
     submitting: false,
     errors: {},
     pattern: 'editable',
-  }
-}
-
-/**
- * 获取嵌套对象的值
- */
-function getNestedValue(obj: Record<string, any>, path: string): any {
-  if (!path)
-    return obj
-  return path.split('.').reduce((acc, key) => {
-    if (acc === undefined || acc === null)
-      return undefined
-    // 处理数组索引
-    const arrayMatch = key.match(/^(\w+)\[(\d+)\]$/)
-    if (arrayMatch) {
-      return acc[arrayMatch[1]]?.[Number.parseInt(arrayMatch[2])]
-    }
-    return acc[key]
-  }, obj)
-}
-
-/**
- * 设置嵌套对象的值
- */
-function setNestedValue(obj: Record<string, any>, path: string, value: any): void {
-  const keys = path.split('.')
-  const lastKey = keys.pop()!
-
-  const target = keys.reduce((acc, key) => {
-    // 处理数组索引
-    const arrayMatch = key.match(/^(\w+)\[(\d+)\]$/)
-    if (arrayMatch) {
-      const arrKey = arrayMatch[1]
-      const index = Number.parseInt(arrayMatch[2])
-      if (!acc[arrKey])
-        acc[arrKey] = []
-      if (!acc[arrKey][index])
-        acc[arrKey][index] = {}
-      return acc[arrKey][index]
-    }
-
-    if (acc[key] === undefined) {
-      acc[key] = {}
-    }
-    return acc[key]
-  }, obj)
-
-  // 处理最后一个 key 的数组索引
-  const lastArrayMatch = lastKey.match(/^(\w+)\[(\d+)\]$/)
-  if (lastArrayMatch) {
-    const arrKey = lastArrayMatch[1]
-    const index = Number.parseInt(lastArrayMatch[2])
-    if (!target[arrKey])
-      target[arrKey] = []
-    target[arrKey][index] = value
-  }
-  else {
-    target[lastKey] = value
   }
 }
 

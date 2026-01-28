@@ -161,7 +161,7 @@
 import type { ComputedRef } from 'vue'
 import type { ArrayFieldConfig, FieldConfig, FieldState, FormContext, ObjectFieldConfig, SelectFieldConfig, UIAdapter, VoidFieldConfig } from '../_types'
 import { computed, defineAsyncComponent, inject, toRef, watch } from 'vue'
-import { executeExpression } from '../_utils'
+import { executeExpression, getNestedValue, setNestedValue } from '../_utils'
 import { useFieldExpression } from '../composables/useFieldExpression'
 
 /**
@@ -861,28 +861,6 @@ function getOptionLabel(type: string, opt: { label: string, value: any }) {
     return opt.label
   }
   return opt.value
-}
-
-/**
- * 获取嵌套对象的值
- */
-function getNestedValue(obj: Record<string, any>, path: string): any {
-  return path.split('.').reduce((acc, key) => acc?.[key], obj)
-}
-
-/**
- * 设置嵌套对象的值
- */
-function setNestedValue(obj: Record<string, any>, path: string, value: any): void {
-  const keys = path.split('.')
-  const lastKey = keys.pop()!
-  const target = keys.reduce((acc, key) => {
-    if (acc[key] === undefined) {
-      acc[key] = {}
-    }
-    return acc[key]
-  }, obj)
-  target[lastKey] = value
 }
 
 /**

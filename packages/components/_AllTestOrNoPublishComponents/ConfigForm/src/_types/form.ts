@@ -4,6 +4,7 @@
  */
 
 import type { ComponentPublicInstance, Ref } from 'vue'
+import type { DisplayType, LayoutType, PatternType } from './constants'
 import type { ApiConfig, DataTransformer, OptionItem } from './dataSource'
 import type { ExpressionContext } from './expression'
 import type { FieldConfig } from './field'
@@ -17,7 +18,7 @@ import type { AsyncValidatorFunction, ValidatorFunction } from './validation'
  */
 export interface FormLayout {
   /** 布局类型：horizontal(水平-label在左) | vertical(垂直-label在上) | inline(行内) */
-  type?: 'horizontal' | 'vertical' | 'inline'
+  type?: LayoutType
   /**
    * 标签固定宽度（推荐使用）
    * @example '100px' | '80px' | 'auto'
@@ -123,7 +124,7 @@ export interface FormSchema {
 
   // ===== 表单模式 =====
   /** 表单交互模式 */
-  pattern?: 'editable' | 'disabled' | 'readOnly' | 'readPretty'
+  pattern?: PatternType
 
   // ===== 字段配置 =====
   /** 字段配置 */
@@ -229,9 +230,9 @@ export interface FormContext extends ExpressionContext {
 
   // ===== 状态操作 =====
   /** 设置字段显示状态 */
-  setFieldDisplay: (path: string, display: 'visible' | 'hidden' | 'none') => void
+  setFieldDisplay: (path: string, display: DisplayType) => void
   /** 设置字段交互模式 */
-  setFieldPattern: (path: string, pattern: 'editable' | 'disabled' | 'readOnly' | 'readPretty') => void
+  setFieldPattern: (path: string, pattern: PatternType) => void
   /** 设置字段必填状态 */
   setFieldRequired: (path: string, required: boolean) => void
   /** 设置字段错误 */
@@ -312,8 +313,8 @@ export interface FormInstance {
   setFieldValue: (path: string, value: any) => void
   /** 设置字段状态 */
   setFieldState: (path: string, state: Partial<{
-    display: 'visible' | 'hidden' | 'none'
-    pattern: 'editable' | 'disabled' | 'readOnly' | 'readPretty'
+    display: DisplayType
+    pattern: PatternType
     required: boolean
     title: string
     description: string

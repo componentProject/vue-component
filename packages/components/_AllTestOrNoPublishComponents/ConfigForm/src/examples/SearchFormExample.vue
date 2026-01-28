@@ -129,6 +129,7 @@ const searchInitialValues = {
 
 /**
  * Element Plus 搜索处理
+ * @param values - 搜索表单的值
  */
 function handleElementSearch(values: Record<string, unknown>) {
   console.log('[Element Plus] 搜索条件:', values)
@@ -137,6 +138,7 @@ function handleElementSearch(values: Record<string, unknown>) {
 
 /**
  * Ant Design Vue 搜索处理
+ * @param values - 搜索表单的值
  */
 function handleAntdSearch(values: Record<string, unknown>) {
   console.log('[Ant Design Vue] 搜索条件:', values)

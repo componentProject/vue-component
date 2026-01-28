@@ -4,7 +4,7 @@
  */
 
 import type { ComputedRef, Ref } from 'vue'
-import type { FieldConfig, FieldState, FormContext } from '../_types'
+import type { DisplayType, FieldConfig, FieldState, FormContext, PatternType } from '../_types'
 import { inject, unref } from 'vue'
 import { executeExpression } from '../_utils'
 
@@ -57,7 +57,7 @@ export function useFieldExpression(
   // 注入表单状态
   const formValues = inject<Record<string, any>>('configFormValues', {})
   const formHandlers = inject<Record<string, (...args: any[]) => any>>('configFormHandlers', {})
-  const formPattern = inject<Ref<'editable' | 'disabled' | 'readOnly' | 'readPretty'>>('configFormPattern')
+  const formPattern = inject<Ref<PatternType>>('configFormPattern')
 
   /**
    * 创建响应式的表达式上下文
@@ -152,7 +152,7 @@ export function useFieldExpression(
    * 执行 display 表达式（支持语法糖）
    * @returns 显示模式
    */
-  function executeDisplay(): 'visible' | 'hidden' | 'none' {
+  function executeDisplay(): DisplayType {
     const ctx = createExpressionContext()
     const f = field.value as any
 
@@ -172,7 +172,7 @@ export function useFieldExpression(
    * 优先级：disabledWhen > 字段 pattern > 表单全局 pattern
    * @returns 交互模式
    */
-  function executePattern(): 'editable' | 'disabled' | 'readOnly' | 'readPretty' {
+  function executePattern(): PatternType {
     const ctx = createExpressionContext()
     const f = field.value as any
 

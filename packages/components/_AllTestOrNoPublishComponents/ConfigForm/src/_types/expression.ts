@@ -3,6 +3,8 @@
  * 表达式系统类型定义
  */
 
+import type { DisplayType, PatternType } from './constants'
+
 // ==================== 基础表达式类型 ====================
 
 /**
@@ -99,9 +101,9 @@ export interface FieldState {
   /** 是否已修改 */
   modified: boolean
   /** 显示模式: visible=显示, hidden=隐藏但保留值, none=不渲染 */
-  display: 'visible' | 'hidden' | 'none'
+  display: DisplayType
   /** 交互模式 */
-  pattern: 'editable' | 'disabled' | 'readOnly' | 'readPretty'
+  pattern: PatternType
   /** 是否有效 */
   valid: boolean
   /** 是否无效 */
@@ -147,7 +149,7 @@ export interface FormState {
   /** 所有错误 */
   errors: Record<string, string[]>
   /** 表单模式 */
-  pattern: 'editable' | 'disabled' | 'readOnly' | 'readPretty'
+  pattern: PatternType
 }
 
 /**

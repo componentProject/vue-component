@@ -3,6 +3,7 @@
  * 联动规则类型定义
  */
 
+import type { DisplayType, PatternType } from './constants'
 import type { ApiConfig } from './dataSource'
 import type { Expression, FieldState } from './expression'
 
@@ -164,9 +165,9 @@ export type ReactionAction
  */
 export interface ReactionStateConfig {
   /** 显示状态 */
-  display?: 'visible' | 'hidden' | 'none' | Expression
+  display?: DisplayType | Expression
   /** 交互模式 */
-  pattern?: 'editable' | 'disabled' | 'readOnly' | 'readPretty' | Expression
+  pattern?: PatternType | Expression
   /** 值 */
   value?: any | Expression
   /** 数据源 */
