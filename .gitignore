@@ -1,6 +1,5 @@
 # user
 test
-test.zip
 moluoxixi
 moluoxixivue2
 docsOut
@@ -10,31 +9,22 @@ cache
 typings
 .playwright-mcp
 
+# 依赖(可选)
+*-lock.*
+
 # Logs
 logs
 *.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
+*.log*
 
-
-# project files
+# outs
 node_modules
-.DS_Store
 dist
-dist-ssr
-coverage
+*.zip
 *.local
-stats.html
-pnpm-lock.yaml
-/cypress/videos/
-/cypress/screenshots/
+.DS_Store
 
 # Editor directories and files
-.vscode/*
-!.vscode/extensions.json
 .idea
 *.suo
 *.ntvs*
@@ -42,8 +32,17 @@ pnpm-lock.yaml
 *.sln
 *.sw?
 
+# 系统文件
+Thumbs.db
+
+# 测试覆盖率
+coverage
+
+# 环境变量
+.env.local
+.env.*.local
+
+# 缓存
+.cache
+.temp
 *.tsbuildinfo
-
-# Sentry Config File
-.env.sentry-build-plugin
-
