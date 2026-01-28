@@ -72,7 +72,7 @@ function createVModelWrapper(component: Component, name: string) {
         'value': props.modelValue,
         'onUpdate:value': (val: any) => emit('update:modelValue', val),
         'onChange': (val: any) => {
-          // Handle different event formats
+          // 处理不同的事件格式
           const value = val?.target?.value ?? val
           emit('change', value)
         },
@@ -110,7 +110,7 @@ function createCheckedWrapper(component: Component, name: string) {
   })
 }
 
-// Wrapped components for v-model compatibility
+// 封装组件以兼容 v-model
 const WrappedInput = createVModelWrapper(AInput, 'WrappedAInput')
 const WrappedTextarea = createVModelWrapper(ATextarea, 'WrappedATextarea')
 const WrappedInputPassword = createVModelWrapper(AInputPassword, 'WrappedAInputPassword')
@@ -283,7 +283,7 @@ export function createAntDesignVueAdapter(): UIAdapter {
         password: WrappedInputPassword,
         number: WrappedInputNumber,
         select: WrappedSelect,
-        multiSelect: WrappedSelect, // Use mode="multiple" prop
+        multiSelect: WrappedSelect, // 使用 mode="multiple" 属性
         cascader: WrappedCascader,
         treeSelect: WrappedTreeSelect,
         radio: WrappedRadioGroup,
@@ -359,20 +359,20 @@ export function createAntDesignVueAdapter(): UIAdapter {
         },
       },
     },
-    // Ant Design Vue props transformer
+    // Ant Design Vue 属性转换器
     transformer: {
       field: (type, props) => {
         const transformed = { ...props }
 
-        // Handle multiSelect - use mode="multiple"
+        // 处理多选下拉 - 使用 mode="multiple"
         if (type === 'multiSelect') {
           transformed.mode = 'multiple'
         }
 
-        // Ant Design Vue uses 'placeholder' same as Element Plus
-        // But some props naming differ
+        // Ant Design Vue 的 placeholder 与 Element Plus 相同
+        // 但某些属性命名不同
 
-        // Switch props mapping
+        // Switch 属性映射
         if (type === 'switch') {
           if (props.activeText) {
             transformed.checkedChildren = props.activeText
@@ -384,27 +384,27 @@ export function createAntDesignVueAdapter(): UIAdapter {
           }
         }
 
-        // Rate props mapping
+        // Rate 属性映射
         if (type === 'rate') {
           if (props.texts) {
             transformed.tooltips = props.texts
             delete transformed.texts
           }
           if (props.showText !== undefined) {
-            // Ant Design Vue Rate doesn't have showText, only tooltips
+            // Ant Design Vue Rate 没有 showText，只有 tooltips
             delete transformed.showText
           }
         }
 
-        // DatePicker props mapping
+        // DatePicker 属性映射
         if (type === 'date' || type === 'datetime') {
           if (props.valueFormat) {
             transformed.format = props.valueFormat
-            // Keep valueFormat for v-model conversion
+            // 保留 valueFormat 用于 v-model 转换
           }
         }
 
-        // Select props mapping
+        // Select 属性映射
         if (type === 'select' || type === 'multiSelect') {
           if (props.filterable !== undefined) {
             transformed.showSearch = props.filterable
@@ -416,8 +416,8 @@ export function createAntDesignVueAdapter(): UIAdapter {
       },
       formItem: (props) => {
         const transformed = { ...props }
-        // Ant Design Vue FormItem uses 'name' instead of 'prop'
-        // Note: 'name' is already set in computedFormItemProps with proper array format
+        // Ant Design Vue FormItem 使用 'name' 而非 'prop'
+        // 注意：'name' 已在 computedFormItemProps 中以正确的数组格式设置
         if (props.prop) {
           delete transformed.prop
         }
@@ -432,14 +432,14 @@ export function createAntDesignVueAdapter(): UIAdapter {
         return componentProps.style || {}
       },
     },
-    // Ant Design Vue features configuration
+    // Ant Design Vue 功能配置
     features: {
-      // Ant Design Vue uses options prop instead of children
+      // Ant Design Vue 使用 options 属性而非子组件
       optionsAsProps: true,
-      // Ant Design Vue FormItem uses 'name' for field name
+      // Ant Design Vue FormItem 使用 'name' 作为字段名属性
       formItemNameProp: 'name',
     },
-    // Ant Design Vue form methods
+    // Ant Design Vue 表单方法
     formMethods: {
       validate: async (formRef) => {
         if (!formRef?.validate) {
@@ -454,11 +454,11 @@ export function createAntDesignVueAdapter(): UIAdapter {
         }
       },
       clearValidate: (formRef, fields) => {
-        // Ant Design Vue uses clearValidate with field names
+        // Ant Design Vue 使用 clearValidate 配合字段名
         formRef?.clearValidate?.(fields)
       },
       resetFields: (formRef, fields) => {
-        // Ant Design Vue uses resetFields with field names
+        // Ant Design Vue 使用 resetFields 配合字段名
         formRef?.resetFields?.(fields)
       },
     },

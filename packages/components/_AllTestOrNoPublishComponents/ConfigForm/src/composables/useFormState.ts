@@ -199,6 +199,10 @@ function collectFieldPaths(
 
 /**
  * 表单状态管理 Composable
+ * 提供表单值管理、字段状态管理、表达式执行等核心功能
+ *
+ * @param options - 表单状态管理选项
+ * @returns 状态管理方法和数据
  */
 export function useFormState(options: UseFormStateOptions): UseFormStateReturn {
   const { schema, initialValues = {}, context = {}, handlers = {} } = options

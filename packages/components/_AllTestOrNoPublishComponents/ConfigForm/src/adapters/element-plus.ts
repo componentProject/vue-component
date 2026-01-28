@@ -183,7 +183,7 @@ export function createElementPlusAdapter(): UIAdapter {
         password: PasswordComponent,
         number: ElInputNumber,
         select: ElSelect,
-        multiSelect: ElSelect, // Use multiple prop
+        multiSelect: ElSelect, // 使用 multiple 属性
         cascader: ElCascader,
         treeSelect: ElTreeSelect,
         radio: ElRadioGroup,
@@ -263,12 +263,12 @@ export function createElementPlusAdapter(): UIAdapter {
         },
       },
     },
-    // Element Plus props transformer
+    // Element Plus 属性转换器
     transformer: {
       field: (type, props) => {
         const transformed = { ...props }
 
-        // Handle multiSelect
+        // 处理多选下拉
         if (type === 'multiSelect') {
           transformed.multiple = true
         }
@@ -290,20 +290,20 @@ export function createElementPlusAdapter(): UIAdapter {
         return componentProps.style || {}
       },
     },
-    // Element Plus features configuration
+    // Element Plus 功能配置
     features: {
-      // Element Plus uses children for options (ElOption, ElRadio, ElCheckbox)
+      // Element Plus 使用子组件渲染选项 (ElOption, ElRadio, ElCheckbox)
       optionsAsProps: false,
-      // Element Plus FormItem uses 'prop' for field name
+      // Element Plus FormItem 使用 'prop' 作为字段名属性
       formItemNameProp: 'prop',
-      // Option components for select/radio/checkbox
+      // 选项组件（用于 select/radio/checkbox）
       optionComponents: {
         select: ElOption,
         radio: ElRadio,
         checkbox: ElCheckbox,
       },
     },
-    // Element Plus form methods
+    // Element Plus 表单方法
     formMethods: {
       validate: async (formRef) => {
         if (!formRef?.validate) {

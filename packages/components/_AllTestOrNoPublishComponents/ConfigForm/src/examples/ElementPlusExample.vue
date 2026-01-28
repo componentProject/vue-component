@@ -84,6 +84,7 @@ const formContext = reactive({
 
 // 表单 Schema
 const formSchema: FormSchema = {
+  id: 'element-plus-form-schema',
   layout: {
     type: 'horizontal',
     labelWidth: '100px',
@@ -110,6 +111,7 @@ const formSchema: FormSchema = {
             placeholder: '请输入用户名',
           },
           col: { span: 12 },
+          onBlur: 'onUsernameBlur', // 失焦时触发 handler
         },
         email: {
           type: 'input',
@@ -121,6 +123,7 @@ const formSchema: FormSchema = {
             placeholder: '请输入邮箱',
           },
           col: { span: 12 },
+          onFocus: 'onEmailFocus', // 聚焦时触发 handler
         },
         userType: {
           type: 'select',
@@ -139,6 +142,7 @@ const formSchema: FormSchema = {
             placeholder: '请选择用户类型',
           },
           col: { span: 12 },
+          onChange: 'onUserTypeChange', // 值变化时触发 handler
         },
         vipLevel: {
           type: 'select',
@@ -474,6 +478,28 @@ const formSchema: FormSchema = {
         return '请阅读并同意用户协议'
       }
       return true
+    },
+  },
+  handlers: {
+    // 用户名失焦时去除首尾空格
+    onUsernameBlur: (value: any, context: any) => {
+      if (typeof value === 'string' && value !== value.trim()) {
+        context.setFieldValue('username', value.trim())
+        console.log('[Handler] 用户名已去除首尾空格:', value.trim())
+      }
+    },
+    // 用户类型变化时的处理
+    onUserTypeChange: (value: any, context: any) => {
+      console.log('[Handler] 用户类型变化:', value)
+      // 当切换为普通用户时，清空 VIP 等级
+      if (value === 'normal') {
+        context.setFieldValue('vipLevel', undefined)
+        console.log('[Handler] 已清空 VIP 等级')
+      }
+    },
+    // 邮箱聚焦时打印日志
+    onEmailFocus: (value: any) => {
+      console.log('[Handler] 邮箱字段获得焦点，当前值:', value)
     },
   },
 }

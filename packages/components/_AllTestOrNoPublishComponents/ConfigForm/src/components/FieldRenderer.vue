@@ -248,7 +248,7 @@ const layoutComponents = computed(() => adapter?.value.components.layout || {})
 // 字段组件快捷访问
 const fieldComponents = computed(() => adapter?.value.components.fields || {})
 
-// Adapter 功能配置
+// 适配器功能配置
 const adapterFeatures = computed(() => adapter?.value.features || {})
 
 // 是否通过 props 传递选项（而不是子组件）
@@ -392,7 +392,7 @@ const formattedValue = computed(() => {
         return value.format(format)
       }
 
-      // Date 对象：转换为本地格式或使用 toISOString
+      // Date 对象：转换为本地格式
       if (value instanceof Date) {
         // 如果有自定义格式，需要手动格式化
         if (displayFormat) {
@@ -729,7 +729,7 @@ const computedOptions = computed<OptionItem[]>(() => {
       return []
 
     case 'api':
-      // API 数据需要异步加载，这里返回已加载的缓存数据
+      // API 数据需要异步加载，返回已缓存的数据
       // 实际实现需要 useFieldDataSource composable
       return fieldState.value?.dataSource || []
 

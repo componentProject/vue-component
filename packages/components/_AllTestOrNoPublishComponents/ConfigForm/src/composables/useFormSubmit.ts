@@ -79,6 +79,10 @@ async function defaultRequestAdapter<T = any>(config: {
 
 /**
  * 表单提交 Composable
+ * 提供表单提交和重置功能，支持 API 请求、数据转换、确认对话框等
+ *
+ * @param options - 表单提交选项
+ * @returns 提交状态和方法
  */
 export function useFormSubmit(options: UseFormSubmitOptions): UseFormSubmitReturn {
   const {
@@ -94,7 +98,7 @@ export function useFormSubmit(options: UseFormSubmitOptions): UseFormSubmitRetur
 
   const submitting = ref(false)
 
-  // Get feedback from adapter or use console fallback
+  // 从 adapter 获取反馈组件，或使用控制台作为备选
   const feedback = adapter?.components.feedback || {
     message: {
       success: (msg: string) => console.log('[Success]', msg),

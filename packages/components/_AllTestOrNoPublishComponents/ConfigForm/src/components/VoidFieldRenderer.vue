@@ -5,16 +5,30 @@
     <template v-if="field.type === 'card'">
       <component
         :is="layoutComponents.card"
+        :title="computedTitle"
         :header="computedTitle"
         v-bind="componentProps"
         class="config-form-card"
       >
-        <template v-if="computedTitle" #header>
+        <!-- Element Plus 使用 #header slot, Ant Design Vue 使用 #title slot -->
+        <template v-if="computedTitle && isCollapsible" #header>
           <div class="config-form-card__header">
             <span>{{ computedTitle }}</span>
             <component
               :is="layoutComponents.button"
-              v-if="isCollapsible"
+              type="primary"
+              link
+              @click="toggleCollapse"
+            >
+              {{ isExpanded ? '收起' : '展开' }}
+            </component>
+          </div>
+        </template>
+        <template v-if="computedTitle && isCollapsible" #title>
+          <div class="config-form-card__header">
+            <span>{{ computedTitle }}</span>
+            <component
+              :is="layoutComponents.button"
               type="primary"
               link
               @click="toggleCollapse"

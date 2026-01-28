@@ -54,6 +54,10 @@ const FORMAT_PATTERNS: Record<string, RegExp> = {
 
 /**
  * 表单校验 Composable
+ * 提供字段校验、错误管理等功能，支持内置规则和自定义校验
+ *
+ * @param options - 表单校验选项
+ * @returns 校验方法和错误管理接口
  */
 export function useFormValidation(options: UseFormValidationOptions): UseFormValidationReturn {
   const { schema, formState, context = {} } = options
@@ -65,30 +69,30 @@ export function useFormValidation(options: UseFormValidationOptions): UseFormVal
     properties: Record<string, FieldConfig>,
     targetKey: string,
   ): FieldConfig | undefined {
-    // Container types that don't have their own data
+    // 容器类型（不产生数据的布局字段）
     const containerTypes = ['void', 'group', 'card', 'collapse', 'tabs', 'divider', 'alert']
 
     for (const [key, field] of Object.entries(properties)) {
-      // If this is a container type, search in its children
+      // 如果是容器类型，递归搜索子字段
       if (containerTypes.includes(field.type)) {
-        // Search in properties
+        // 在 properties 中搜索
         if ('properties' in field && field.properties) {
           const childProps = field.properties as Record<string, FieldConfig>
-          // Check if target is directly in this container
+          // 检查目标是否直接在该容器中
           if (childProps[targetKey]) {
             return childProps[targetKey]
           }
-          // Recursively search in nested containers
+          // 递归搜索嵌套容器
           const found = findFieldInContainer(childProps, targetKey)
           if (found) {
             return found
           }
         }
-        // Search in panels (for collapse)
+        // 在面板中搜索（折叠面板）
         if ('panels' in field) {
           for (const panel of (field as any).panels || []) {
             if (panel.properties) {
-              // Check if target is directly in this panel
+              // 检查目标是否直接在该面板中
               if (panel.properties[targetKey]) {
                 return panel.properties[targetKey]
               }
@@ -99,11 +103,11 @@ export function useFormValidation(options: UseFormValidationOptions): UseFormVal
             }
           }
         }
-        // Search in tabs
+        // 在标签页中搜索
         if ('tabs' in field) {
           for (const tab of (field as any).tabs || []) {
             if (tab.properties) {
-              // Check if target is directly in this tab
+              // 检查目标是否直接在该标签页中
               if (tab.properties[targetKey]) {
                 return tab.properties[targetKey]
               }
@@ -129,13 +133,13 @@ export function useFormValidation(options: UseFormValidationOptions): UseFormVal
 
     for (let i = 0; i < parts.length; i++) {
       const part = parts[i]
-      // Handle array index
+      // 处理数组索引
       const arrayMatch = part.match(/^(\w+)\[(\d+)\]$/)
       const key = arrayMatch ? arrayMatch[1] : part
 
       config = current[key]
 
-      // If not found directly, search in container types
+      // 如果直接找不到，在容器类型中搜索
       if (!config) {
         config = findFieldInContainer(current, key)
         if (!config) {
@@ -143,11 +147,11 @@ export function useFormValidation(options: UseFormValidationOptions): UseFormVal
         }
       }
 
-      // If object type, go deeper
+      // 如果是对象类型，继续深入
       if (config.type === 'object' && 'properties' in config && config.properties && i < parts.length - 1) {
         current = config.properties as Record<string, FieldConfig>
       }
-      // If array type, get items
+      // 如果是数组类型，获取 items
       else if (config.type === 'array' && 'items' in config && arrayMatch) {
         const itemConfig = config.items as FieldConfig
         if (itemConfig.type === 'object' && 'properties' in itemConfig && itemConfig.properties) {
