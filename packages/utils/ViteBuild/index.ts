@@ -22,7 +22,7 @@ import { dynamicImport } from '@moluoxixi/utils/_utils/index.ts'
 import { build, mergeConfig } from 'vite'
 import { getFlagValue, hasFlag, parseBoolean, printUsage } from './_utils/cli.ts'
 import { clearDir, findComponentEntry, getComponentNames, sleep, toKebabCase, toPascalCase } from './_utils/component.ts'
-import { getComponentFormats, getComponentIsNodeEnv } from './_utils/config.ts'
+import { getComponentFormats } from './_utils/config.ts'
 import { analyzeComponentDeps } from './_utils/deps.ts'
 import { ensureVersionPrefix, getCurrentVersions, getNextVersion, writeComponentVersions } from './_utils/version.ts'
 import { createBaseConfig } from './_utils/viteConfig.ts'
@@ -214,12 +214,8 @@ async function bundleComponentModule(ctx: BuildContext, {
             return true
           }
 
-          // 排除外部依赖
-          // Node 环境下强制启用依赖排除，浏览器环境根据 useExternal 配置
-          // 检查组件配置中的 isNodeEnv，或者全局 isNodeEnv
-          const isNodeEnv = getComponentIsNodeEnv(ctx.formatConfig, comp)
-          const isExternal = isNodeEnv || ctx.useExternal
-          if (isExternal && Object.keys(dependencies.external).some(i => id.includes(i))) {
+          // 排除外部依赖（始终启用）
+          if (Object.keys(dependencies.external).some(i => id.includes(i))) {
             return true
           }
         },

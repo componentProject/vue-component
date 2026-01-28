@@ -26,6 +26,7 @@
     <!-- 表单 -->
     <ConfigForm
       ref="formRef"
+      v-model="currentValues"
       :schema="formSchema"
       :adapter="antDesignVueAdapter"
       :initial-values="initialValues"
@@ -38,7 +39,7 @@
     />
 
     <!-- Schema 展示 -->
-    <ACollapse v-if="showSchema" class="example-schema">
+    <ACollapse v-if="showSchema" v-model:activeKey="activeCollapse" class="example-schema">
       <ACollapsePanel key="schema" header="表单 Schema 配置">
         <pre>{{ JSON.stringify(formSchema, null, 2) }}</pre>
       </ACollapsePanel>
@@ -75,7 +76,10 @@ defineExpose({ formRef })
 const formPattern = ref<'editable' | 'disabled' | 'readOnly' | 'readPretty'>('editable')
 
 // 是否显示 Schema
-const showSchema = ref(false)
+const showSchema = ref(true)
+
+// 展开的折叠面板
+const activeCollapse = ref(['schema', 'values'])
 
 // 当前表单值
 const currentValues = ref<Record<string, any>>({})
@@ -104,12 +108,10 @@ const formSchema: FormSchema = {
     // ===== 基础信息 =====
     basicInfo: {
       type: 'card',
-      name: '',
       title: '基础信息',
       properties: {
         username: {
           type: 'input',
-          name: 'username',
           title: '用户名',
           required: true,
           rules: [
@@ -124,7 +126,6 @@ const formSchema: FormSchema = {
         },
         email: {
           type: 'input',
-          name: 'email',
           title: '邮箱',
           required: true,
           rules: [{ format: 'email', message: '请输入正确的邮箱格式' }],
@@ -136,7 +137,6 @@ const formSchema: FormSchema = {
         },
         userType: {
           type: 'select',
-          name: 'userType',
           title: '用户类型',
           required: true,
           dataSource: {
@@ -155,7 +155,6 @@ const formSchema: FormSchema = {
         },
         vipLevel: {
           type: 'select',
-          name: 'vipLevel',
           title: 'VIP等级',
           showWhen: 'userType === "vip"',
           dataSource: {
@@ -170,7 +169,6 @@ const formSchema: FormSchema = {
         },
         gender: {
           type: 'radio',
-          name: 'gender',
           title: '性别',
           dataSource: {
             type: 'static',
@@ -184,7 +182,6 @@ const formSchema: FormSchema = {
         },
         isActive: {
           type: 'switch',
-          name: 'isActive',
           title: '启用状态',
           default: true,
           componentProps: {
@@ -195,7 +192,6 @@ const formSchema: FormSchema = {
         },
         age: {
           type: 'number',
-          name: 'age',
           title: '年龄',
           componentProps: {
             min: 0,
@@ -206,7 +202,6 @@ const formSchema: FormSchema = {
         },
         birthday: {
           type: 'date',
-          name: 'birthday',
           title: '生日',
           componentProps: {
             style: { width: '100%' },
@@ -215,7 +210,6 @@ const formSchema: FormSchema = {
         },
         score: {
           type: 'slider',
-          name: 'score',
           title: '评分',
           default: 60,
           componentProps: {
@@ -226,7 +220,6 @@ const formSchema: FormSchema = {
         },
         satisfaction: {
           type: 'rate',
-          name: 'satisfaction',
           title: '满意度',
           default: 3,
           col: { span: 12 },
@@ -237,7 +230,6 @@ const formSchema: FormSchema = {
     // ===== 通知设置 =====
     notificationSettings: {
       type: 'collapse',
-      name: '',
       title: '通知设置',
       panels: [
         {
@@ -246,7 +238,6 @@ const formSchema: FormSchema = {
           properties: {
             notifyMethod: {
               type: 'radio',
-              name: 'notifyMethod',
               title: '通知方式',
               default: 'email',
               dataSource: {
@@ -261,7 +252,6 @@ const formSchema: FormSchema = {
             },
             notifyEmail: {
               type: 'input',
-              name: 'notifyEmail',
               title: '通知邮箱',
               requiredWhen: 'notifyMethod === "email"',
               disabledWhen: 'notifyMethod !== "email"',
@@ -271,7 +261,6 @@ const formSchema: FormSchema = {
             },
             notifyPhone: {
               type: 'input',
-              name: 'notifyPhone',
               title: '通知手机',
               showWhen: 'notifyMethod === "sms"',
               requiredWhen: 'notifyMethod === "sms"',
@@ -288,12 +277,10 @@ const formSchema: FormSchema = {
     // ===== 高级设置 =====
     advancedSettings: {
       type: 'card',
-      name: '',
       title: '高级设置',
       properties: {
         introduction: {
           type: 'richText',
-          name: 'introduction',
           title: '个人简介',
           description: '支持富文本格式的个人简介',
           componentProps: {
@@ -303,7 +290,6 @@ const formSchema: FormSchema = {
         },
         customScript: {
           type: 'codeEditor',
-          name: 'customScript',
           title: '自定义脚本',
           description: '支持 JavaScript 代码编辑',
           componentProps: {
@@ -318,7 +304,6 @@ const formSchema: FormSchema = {
     // ===== 工作经历 =====
     workExperience: {
       type: 'array',
-      name: 'workExperience',
       title: '工作经历',
       minItems: 1,
       maxItems: 5,
@@ -330,11 +315,9 @@ const formSchema: FormSchema = {
       },
       items: {
         type: 'object',
-        name: '',
         properties: {
           company: {
             type: 'input',
-            name: 'company',
             title: '公司名称',
             required: true,
             componentProps: { placeholder: '请输入公司名称' },
@@ -342,7 +325,6 @@ const formSchema: FormSchema = {
           },
           position: {
             type: 'input',
-            name: 'position',
             title: '职位',
             required: true,
             componentProps: { placeholder: '请输入职位名称' },
@@ -350,7 +332,6 @@ const formSchema: FormSchema = {
           },
           isCurrent: {
             type: 'switch',
-            name: 'isCurrent',
             title: '至今',
             default: false,
             componentProps: { activeText: '是', inactiveText: '否' },
@@ -358,7 +339,6 @@ const formSchema: FormSchema = {
           },
           leaveDate: {
             type: 'date',
-            name: 'leaveDate',
             title: '离职日期',
             display: '{{$record?.isCurrent ? "none" : "visible"}}',
             componentProps: { style: { width: '100%' } },
@@ -371,12 +351,10 @@ const formSchema: FormSchema = {
     // ===== 其他信息 =====
     otherInfo: {
       type: 'group',
-      name: '',
       title: '其他信息',
       properties: {
         remark: {
           type: 'textarea',
-          name: 'remark',
           title: '备注',
           componentProps: {
             placeholder: '请输入备注信息',
@@ -387,7 +365,6 @@ const formSchema: FormSchema = {
         },
         highlightInput: {
           type: 'input',
-          name: 'highlightInput',
           title: '高亮样式',
           description: '测试 Ant Design Vue readPretty 模式下的自定义样式',
           componentProps: {
@@ -403,7 +380,6 @@ const formSchema: FormSchema = {
         },
         agreement: {
           type: 'checkbox',
-          name: 'agreement',
           required: true,
           rules: [
             {
@@ -491,8 +467,9 @@ const initialValues = {
 /**
  * 处理表单值变化
  */
-function handleChange(values: Record<string, any>) {
-  currentValues.value = values
+function handleChange(values: Record<string, any>, changedField: string, changedValue: any) {
+  // 仅用于调试输出，实际值已通过 v-model 同步
+  console.log('[Ant Design Vue] 表单变化:', changedField, '=', changedValue)
 }
 
 /**

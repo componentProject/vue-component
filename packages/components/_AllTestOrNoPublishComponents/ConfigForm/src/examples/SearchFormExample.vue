@@ -75,7 +75,6 @@ const searchFormSchema: FormSchema = {
   properties: {
     keyword: {
       type: 'input',
-      name: 'keyword',
       title: '关键词',
       componentProps: {
         placeholder: '请输入关键词',
@@ -85,7 +84,6 @@ const searchFormSchema: FormSchema = {
     },
     status: {
       type: 'select',
-      name: 'status',
       title: '状态',
       dataSource: {
         type: 'static',
@@ -104,7 +102,6 @@ const searchFormSchema: FormSchema = {
     },
     dateRange: {
       type: 'dateRange',
-      name: 'dateRange',
       title: '时间',
       componentProps: {
         startPlaceholder: '开始日期',

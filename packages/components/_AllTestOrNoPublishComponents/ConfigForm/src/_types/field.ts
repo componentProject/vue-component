@@ -71,8 +71,12 @@ export type FieldType = BasicFieldType | ComplexFieldType | VoidFieldType
 export interface BaseFieldConfig {
   /** 字段类型 */
   type: FieldType
-  /** 字段路径（支持点语法，如 'user.name'） */
-  name: string
+  /**
+   * 字段名称（可选）
+   * 如不指定，默认使用 properties 的 key
+   * 仅在需要自定义插槽命名等场景时使用
+   */
+  name?: string
   /** 标签文本 */
   title?: string | Expression
   /** 帮助说明 */

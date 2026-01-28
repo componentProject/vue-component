@@ -317,14 +317,7 @@ export async function analyzeComponentDeps(ctx: BuildContext, comp: string): Pro
         newExternalDeps.set(dep, version)
       }
     }
-    // Node 环境下强制启用依赖排除，浏览器环境根据 useExternal 配置
-    // 检查组件配置中的 isNodeEnv，或者全局 isNodeEnv
-    const { getComponentIsNodeEnv } = await import('./config.ts')
-    const isNodeEnv = getComponentIsNodeEnv(ctx.formatConfig, comp)
-    const isExternal = isNodeEnv || ctx.useExternal
-    if (!isExternal) {
-      newExternalDeps.clear()
-    }
+    // 外部依赖始终排除
 
     // 转换结果
     const result: ComponentDependencies = {

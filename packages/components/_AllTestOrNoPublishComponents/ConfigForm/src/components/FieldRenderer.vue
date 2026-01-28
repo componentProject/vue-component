@@ -54,17 +54,17 @@
         v-bind="computedFormItemProps"
       >
         <!-- 标签插槽 -->
-        <template v-if="$slots[`field-label-${field.name}`]" #label>
-          <slot :name="`field-label-${field.name}`" :field="field" :path="path" :value="fieldValue" :context="context" />
+        <template v-if="$slots[`field-label-${fieldName}`]" #label>
+          <slot :name="`field-label-${fieldName}`" :field="field" :path="path" :value="fieldValue" :context="context" />
         </template>
 
         <div class="config-form-field">
           <!-- 前缀插槽 -->
-          <slot :name="`field-prefix-${field.name}`" :field="field" :path="path" :value="fieldValue" :context="context" />
+          <slot :name="`field-prefix-${fieldName}`" :field="field" :path="path" :value="fieldValue" :context="context" />
 
           <!-- 自定义字段插槽 -->
-          <template v-if="$slots[`field-${field.name}`]">
-            <slot :name="`field-${field.name}`" :field="field" :path="path" :value="fieldValue" :context="context" :disabled="isDisabled" :readonly="isReadonly" :read-pretty="isReadPretty" />
+          <template v-if="$slots[`field-${fieldName}`]">
+            <slot :name="`field-${fieldName}`" :field="field" :path="path" :value="fieldValue" :context="context" :disabled="isDisabled" :readonly="isReadonly" :read-pretty="isReadPretty" />
           </template>
 
           <!-- ReadPretty 模式 - 纯文本展示（业界标准做法） -->
@@ -140,12 +140,12 @@
           </template>
 
           <!-- 后缀插槽 -->
-          <slot :name="`field-suffix-${field.name}`" :field="field" :path="path" :value="fieldValue" :context="context" />
+          <slot :name="`field-suffix-${fieldName}`" :field="field" :path="path" :value="fieldValue" :context="context" />
         </div>
 
         <!-- 额外内容插槽 -->
-        <template v-if="$slots[`field-extra-${field.name}`]" #extra>
-          <slot :name="`field-extra-${field.name}`" :field="field" :path="path" :value="fieldValue" :context="context" />
+        <template v-if="$slots[`field-extra-${fieldName}`]" #extra>
+          <slot :name="`field-extra-${fieldName}`" :field="field" :path="path" :value="fieldValue" :context="context" />
         </template>
 
         <!-- 描述信息 -->
@@ -256,6 +256,12 @@ const useOptionsAsProps = computed(() => adapterFeatures.value.optionsAsProps ==
 
 // 选项组件（用于子组件渲染方式）
 const optionComponents = computed(() => adapterFeatures.value.optionComponents || {})
+
+/**
+ * 字段名称（用于插槽命名等）
+ * 如果 field.name 未指定，使用 path 作为默认值
+ */
+const fieldName = computed(() => props.field.name || props.path)
 
 // 注入字段状态 Map
 const fieldStates = inject<Map<string, FieldState>>('configFormFieldStates', new Map())
@@ -562,7 +568,7 @@ const computedRules = computed<FormItemRule[]>(() => {
   if (computedRequired.value) {
     rules.push({
       required: true,
-      message: `${computedLabel.value || props.field.name}不能为空`,
+      message: `${computedLabel.value || fieldName.value}不能为空`,
       trigger: props.field.validateTrigger || 'blur',
     })
   }
@@ -573,7 +579,7 @@ const computedRules = computed<FormItemRule[]>(() => {
       if ('required' in rule && rule.required) {
         rules.push({
           required: true,
-          message: rule.message || `${computedLabel.value || props.field.name}不能为空`,
+          message: rule.message || `${computedLabel.value || fieldName.value}不能为空`,
           trigger: rule.trigger || 'blur',
         })
       }

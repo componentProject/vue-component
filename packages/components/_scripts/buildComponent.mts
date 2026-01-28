@@ -26,16 +26,11 @@ const alias = {
 }
 
 /**
- * 格式配置：浏览器环境打 ES 和 UMD 格式
- * 新格式：使用 format 字段，根据 isNodeEnv 自动决定默认值
- * 注意：如果不提供 formatConfig，默认就是浏览器环境，只打 ES 格式
+ * 格式配置
+ * - 默认格式：{ es: true }
  */
 const formatConfig: GlobalFormatConfig = {
-  // isNodeEnv 默认为 false（浏览器环境），可省略
-  format: {
-    es: true, // 浏览器环境默认值
-    umd: true, // 添加 UMD 格式
-  },
+  format: { es: true, umd: true },
 }
 
 runBuildCliAndExit(

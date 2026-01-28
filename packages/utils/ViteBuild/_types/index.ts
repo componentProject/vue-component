@@ -106,8 +106,6 @@ export interface BuildOptions extends Partial<BuildConfigBase> {
 
 // 重新导出配置类型
 export type {
-  ComponentFormatConfig,
-  ComponentFormatConfigWithFormat,
   FormatConfig,
   GlobalFormatConfig,
 } from '../_utils/config.ts'
