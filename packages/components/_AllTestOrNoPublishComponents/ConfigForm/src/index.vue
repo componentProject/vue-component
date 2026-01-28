@@ -19,8 +19,8 @@
         :is="layoutComponents.form"
         ref="formRef"
         :model="values"
-        :label-width="labelWidth"
-        :label-position="labelPosition"
+        :label-width="isAntdLayoutStyle ? undefined : labelWidth"
+        :label-position="isAntdLayoutStyle ? undefined : labelPosition"
         :size="formSize"
         :disabled="formDisabled"
         :scroll-to-error="props.scrollToFirstError"
@@ -56,8 +56,26 @@
             </slot>
           </div>
 
-          <!-- 字段渲染 -->
-          <component :is="layoutComponents.row" :gutter="16">
+          <!-- 字段渲染 - inline 布局时不使用 Row/Col -->
+          <template v-if="isInlineLayout">
+            <template v-for="(field, fieldName) in schema.properties" :key="fieldName">
+              <FieldRenderer
+                :field="field"
+                :path="fieldName as string"
+                :context="formContext"
+                @change="handleFieldChange(fieldName as string, $event)"
+                @focus="handleFieldFocus(fieldName as string)"
+                @blur="handleFieldBlur(fieldName as string)"
+              >
+                <template v-for="(_, slotName) in $slots" #[slotName]="slotProps">
+                  <slot :name="slotName" v-bind="slotProps" />
+                </template>
+              </FieldRenderer>
+            </template>
+          </template>
+
+          <!-- 字段渲染 - 非 inline 布局使用 Row/Col -->
+          <component :is="layoutComponents.row" v-else :gutter="16">
             <template v-for="(field, fieldName) in schema.properties" :key="fieldName">
               <component :is="layoutComponents.col" v-bind="getColProps(field)">
                 <FieldRenderer
@@ -321,7 +339,15 @@ provide('configFormAdapter', adapter)
 provide('configFormPattern', computed(() => props.pattern))
 
 // 布局相关计算属性
+const isAntdLayoutStyle = computed(() => {
+  return adapter.value?.features?.formLayoutStyle === 'antd'
+})
+
 const labelWidth = computed(() => {
+  // Ant Design Vue 不使用 label-width，使用 labelCol
+  if (isAntdLayoutStyle.value) {
+    return undefined
+  }
   const layout = props.layout || schema.value.layout
   // 优先使用明确指定的 labelWidth
   if (layout?.labelWidth) {
@@ -335,6 +361,10 @@ const labelWidth = computed(() => {
 })
 
 const labelPosition = computed(() => {
+  // Ant Design Vue 不使用 label-position，使用 layout 属性
+  if (isAntdLayoutStyle.value) {
+    return undefined
+  }
   const layout = props.layout || schema.value.layout
   return layout?.type === 'vertical' ? 'top' : 'right'
 })
@@ -344,12 +374,44 @@ const formSize = computed(() => {
   return layout?.size || 'default'
 })
 
+const isInlineLayout = computed(() => {
+  const layout = props.layout || schema.value.layout
+  return layout?.type === 'inline'
+})
+
 const formDisabled = computed(() => {
   return props.disabled || props.pattern === 'disabled'
 })
 
+/**
+ * 将 labelWidth 字符串转换为 labelCol 数值
+ * @param labelWidth - 标签宽度字符串，如 '70px', '100px'
+ * @returns labelCol 对象，用于 Ant Design Vue
+ */
+function parseLabelWidthToCol(labelWidth: string | undefined): { style: { width: string } } | undefined {
+  if (!labelWidth) {
+    return undefined
+  }
+  return { style: { width: labelWidth } }
+}
+
 const formProps = computed(() => {
   const layout = props.layout || schema.value.layout
+
+  // Ant Design Vue 布局属性
+  if (isAntdLayoutStyle.value) {
+    const antdLayout = layout?.type === 'vertical' ? 'vertical' : layout?.type === 'inline' ? 'inline' : 'horizontal'
+    const labelCol = layout?.labelCol || parseLabelWidthToCol(layout?.labelWidth)
+    return {
+      layout: antdLayout,
+      labelCol,
+      labelAlign: layout?.labelAlign,
+      colon: layout?.colon,
+      requiredMark: layout?.requiredMark,
+    }
+  }
+
+  // Element Plus 布局属性
   return {
     labelAlign: layout?.labelAlign,
     colon: layout?.colon,

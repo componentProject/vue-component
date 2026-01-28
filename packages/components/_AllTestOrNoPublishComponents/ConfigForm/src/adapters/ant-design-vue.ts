@@ -450,6 +450,8 @@ export function createAntDesignVueAdapter(): UIAdapter {
       optionsAsProps: true,
       // Ant Design Vue FormItem 使用 'name' 作为字段名属性
       formItemNameProp: 'name',
+      // Ant Design Vue 使用 layout + labelCol 布局属性
+      formLayoutStyle: 'antd',
     },
     // Ant Design Vue 表单方法
     formMethods: {

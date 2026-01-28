@@ -294,6 +294,13 @@ export interface AdapterFeatures {
    */
   formItemNameProp?: 'prop' | 'name'
   /**
+   * 表单布局属性风格
+   * - 'element-plus': 使用 label-width + label-position
+   * - 'antd': 使用 layout + labelCol
+   * @default 'element-plus'
+   */
+  formLayoutStyle?: 'element-plus' | 'antd'
+  /**
    * 选项组件（当 optionsAsProps 为 false 时使用）
    */
   optionComponents?: {
