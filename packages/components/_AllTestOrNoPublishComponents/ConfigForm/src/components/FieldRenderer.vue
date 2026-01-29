@@ -242,10 +242,10 @@ const ObjectFieldRenderer = defineAsyncComponent(() => import('./ObjectFieldRend
 const adapter = inject<ComputedRef<UIAdapter>>('configFormAdapter')
 
 // 布局组件快捷访问
-const layoutComponents = computed(() => adapter?.value.components.layout || {})
+const layoutComponents = computed(() => adapter?.value.layout || {})
 
 // 字段组件快捷访问
-const fieldComponents = computed(() => adapter?.value.components.fields || {})
+const fieldComponents = computed(() => adapter?.value.fields || {})
 
 // 适配器功能配置
 const adapterFeatures = computed(() => adapter?.value.features || {})

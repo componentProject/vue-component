@@ -173,7 +173,7 @@ const modelValue = defineModel<Record<string, any>>('modelValue', { default: () 
 const adapter = computed<UIAdapter>(() => props.adapter || elementPlusAdapter)
 
 // 布局组件快捷访问
-const layoutComponents = computed(() => adapter.value.components.layout)
+const layoutComponents = computed(() => adapter.value.layout)
 
 // 表单引用（使用 useTemplateRef 获取动态组件实例）
 const formRef = useTemplateRef<ComponentPublicInstance>('formRef')
@@ -294,21 +294,21 @@ const formContext = computed<FormContext>(() => {
     },
     message: {
       success: (content) => {
-        adapter.value.components.feedback.message?.success(content)
+        adapter.value.feedback.message?.success(content)
       },
       error: (content) => {
-        adapter.value.components.feedback.message?.error(content)
+        adapter.value.feedback.message?.error(content)
       },
       warning: (content) => {
-        adapter.value.components.feedback.message?.warning(content)
+        adapter.value.feedback.message?.warning(content)
       },
       info: (content) => {
-        adapter.value.components.feedback.message?.info(content)
+        adapter.value.feedback.message?.info(content)
       },
     },
     confirm: async ({ title, content }) => {
-      if (adapter.value.components.feedback.messageBox?.confirm) {
-        return adapter.value.components.feedback.messageBox.confirm({
+      if (adapter.value.feedback.messageBox?.confirm) {
+        return adapter.value.feedback.messageBox.confirm({
           title,
           message: content || '',
         })

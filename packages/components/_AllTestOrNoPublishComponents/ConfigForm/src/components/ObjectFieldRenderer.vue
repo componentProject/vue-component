@@ -57,7 +57,7 @@ const formHandlers = inject<Record<string, (...args: any[]) => any>>('configForm
 const adapter = inject<ComputedRef<UIAdapter>>('configFormAdapter')
 
 // 布局组件快捷访问
-const layoutComponents = computed(() => adapter?.value.components.layout || {})
+const layoutComponents = computed(() => adapter?.value.layout || {})
 
 // 子字段配置
 const childFields = computed<Record<string, FieldConfig>>(() => {

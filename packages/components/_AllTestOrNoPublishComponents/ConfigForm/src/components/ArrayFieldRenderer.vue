@@ -163,10 +163,10 @@ const formPattern = inject<ComputedRef<string> | undefined>('configFormPattern')
 const isReadPretty = computed(() => formPattern?.value === 'readPretty')
 
 // 布局组件快捷访问
-const layoutComponents = computed(() => adapter?.value.components.layout || {})
+const layoutComponents = computed(() => adapter?.value.layout || {})
 
 // 图标组件快捷访问
-const iconComponents = computed(() => adapter?.value.components.icons || {})
+const iconComponents = computed(() => adapter?.value.icons || {})
 
 // 数组项字段配置
 const itemField = computed<FieldConfig>(() => {
@@ -346,7 +346,7 @@ async function removeItem(index: number) {
 
   // 确认删除
   if (removeConfirm.value.enabled) {
-    const feedback = adapter?.value.components.feedback
+    const feedback = adapter?.value.feedback
     if (feedback?.messageBox?.confirm) {
       const confirmed = await feedback.messageBox.confirm({
         title: '提示',

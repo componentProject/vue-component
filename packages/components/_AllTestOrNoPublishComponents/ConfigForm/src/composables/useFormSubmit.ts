@@ -99,7 +99,7 @@ export function useFormSubmit(options: UseFormSubmitOptions): UseFormSubmitRetur
   const submitting = ref(false)
 
   // 从 adapter 获取反馈组件，或使用控制台作为备选
-  const feedback = adapter?.components.feedback || {
+  const feedback = adapter?.feedback || {
     message: {
       success: (msg: string) => console.log('[Success]', msg),
       error: (msg: string) => console.error('[Error]', msg),

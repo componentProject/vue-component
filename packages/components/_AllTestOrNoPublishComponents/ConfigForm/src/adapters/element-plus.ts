@@ -164,100 +164,106 @@ const CodeEditorPlaceholder = defineComponent({
 })
 
 /**
- * Create Element Plus UI adapter
  * 创建 Element Plus UI 适配器
- * @returns UIAdapter instance
+ * @returns UIAdapter 实例
  */
 export function createElementPlusAdapter(): UIAdapter {
   return {
     name: 'element-plus',
-    components: {
-      fields: {
-        input: ElInput,
-        textarea: TextareaComponent,
-        password: PasswordComponent,
-        number: ElInputNumber,
-        select: ElSelect,
-        multiSelect: ElSelect, // 使用 multiple 属性
-        cascader: ElCascader,
-        treeSelect: ElTreeSelect,
-        radio: ElRadioGroup,
-        checkbox: ElCheckboxGroup,
-        switch: ElSwitch,
-        slider: ElSlider,
-        rate: ElRate,
-        color: ElColorPicker,
-        date: ElDatePicker,
-        dateRange: DateRangeComponent,
-        time: ElTimePicker,
-        datetime: DatetimeComponent,
-        datetimeRange: DatetimeRangeComponent,
-        upload: ElUpload,
-        richText: RichTextPlaceholder,
-        codeEditor: CodeEditorPlaceholder,
+
+    // 字段组件 - key 就是 type
+    fields: {
+      input: ElInput,
+      textarea: TextareaComponent,
+      password: PasswordComponent,
+      number: ElInputNumber,
+      select: ElSelect,
+      multiSelect: ElSelect, // 使用 multiple 属性
+      cascader: ElCascader,
+      treeSelect: ElTreeSelect,
+      radio: ElRadioGroup,
+      checkbox: ElCheckboxGroup,
+      switch: ElSwitch,
+      slider: ElSlider,
+      rate: ElRate,
+      color: ElColorPicker,
+      date: ElDatePicker,
+      dateRange: DateRangeComponent,
+      time: ElTimePicker,
+      datetime: DatetimeComponent,
+      datetimeRange: DatetimeRangeComponent,
+      upload: ElUpload,
+      richText: RichTextPlaceholder,
+      codeEditor: CodeEditorPlaceholder,
+    },
+
+    // 布局组件
+    layout: {
+      form: ElForm,
+      formItem: ElFormItem,
+      row: ElRow,
+      col: ElCol,
+      card: ElCard,
+      collapse: ElCollapse,
+      collapseItem: ElCollapseItem,
+      tabs: ElTabs,
+      tabPane: ElTabPane,
+      divider: ElDivider,
+      button: ElButton,
+      empty: ElEmpty,
+      tooltip: ElTooltip,
+      skeleton: ElSkeleton,
+      alert: ElAlert,
+    },
+
+    // 图标组件
+    icons: {
+      plus: Plus,
+      delete: Delete,
+      arrowUp: ArrowUp,
+      arrowDown: ArrowDown,
+      copy: CopyDocument,
+      drag: Rank,
+    },
+
+    // 反馈组件
+    feedback: {
+      message: {
+        success: (msg: string) => ElMessage.success(msg),
+        error: (msg: string) => ElMessage.error(msg),
+        warning: (msg: string) => ElMessage.warning(msg),
+        info: (msg: string) => ElMessage.info(msg),
       },
-      layout: {
-        form: ElForm,
-        formItem: ElFormItem,
-        row: ElRow,
-        col: ElCol,
-        card: ElCard,
-        collapse: ElCollapse,
-        collapseItem: ElCollapseItem,
-        tabs: ElTabs,
-        tabPane: ElTabPane,
-        divider: ElDivider,
-        button: ElButton,
-        empty: ElEmpty,
-        tooltip: ElTooltip,
-        skeleton: ElSkeleton,
-        alert: ElAlert,
-      },
-      icons: {
-        plus: Plus,
-        delete: Delete,
-        arrowUp: ArrowUp,
-        arrowDown: ArrowDown,
-        copy: CopyDocument,
-        drag: Rank,
-      },
-      feedback: {
-        message: {
-          success: (msg: string) => ElMessage.success(msg),
-          error: (msg: string) => ElMessage.error(msg),
-          warning: (msg: string) => ElMessage.warning(msg),
-          info: (msg: string) => ElMessage.info(msg),
-        },
-        messageBox: {
-          confirm: async (options) => {
-            try {
-              await ElMessageBox.confirm(
-                options.message,
-                options.title || '提示',
-                {
-                  confirmButtonText: options.confirmText || '确定',
-                  cancelButtonText: options.cancelText || '取消',
-                  type: 'warning',
-                },
-              )
-              return true
-            }
-            catch {
-              return false
-            }
-          },
-          alert: async (options) => {
-            await ElMessageBox.alert(
+      messageBox: {
+        confirm: async (options) => {
+          try {
+            await ElMessageBox.confirm(
               options.message,
               options.title || '提示',
               {
                 confirmButtonText: options.confirmText || '确定',
+                cancelButtonText: options.cancelText || '取消',
+                type: 'warning',
               },
             )
-          },
+            return true
+          }
+          catch {
+            return false
+          }
+        },
+        alert: async (options) => {
+          await ElMessageBox.alert(
+            options.message,
+            options.title || '提示',
+            {
+              confirmButtonText: options.confirmText || '确定',
+            },
+          )
         },
       },
     },
+
     // Element Plus 属性转换器
     transformer: {
       field: (type, props) => {
@@ -285,6 +291,7 @@ export function createElementPlusAdapter(): UIAdapter {
         return componentProps.style || {}
       },
     },
+
     // Element Plus 功能配置
     features: {
       // Element Plus 使用子组件渲染选项 (ElOption, ElRadio, ElCheckbox)
@@ -298,6 +305,7 @@ export function createElementPlusAdapter(): UIAdapter {
         checkbox: ElCheckbox,
       },
     },
+
     // Element Plus 表单方法
     formMethods: {
       validate: async (formRef) => {
@@ -323,7 +331,6 @@ export function createElementPlusAdapter(): UIAdapter {
 }
 
 /**
- * Default Element Plus adapter instance
  * 默认 Element Plus 适配器实例
  */
 export const elementPlusAdapter = createElementPlusAdapter()

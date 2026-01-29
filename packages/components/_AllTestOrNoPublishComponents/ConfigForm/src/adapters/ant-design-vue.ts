@@ -275,86 +275,92 @@ const CodeEditorPlaceholder = defineComponent({
 export function createAntDesignVueAdapter(): UIAdapter {
   return {
     name: 'ant-design-vue',
-    components: {
-      fields: {
-        input: WrappedInput,
-        textarea: WrappedTextarea,
-        password: WrappedInputPassword,
-        number: WrappedInputNumber,
-        select: WrappedSelect,
-        multiSelect: WrappedSelect, // 使用 mode="multiple" 属性
-        cascader: WrappedCascader,
-        treeSelect: WrappedTreeSelect,
-        radio: WrappedRadioGroup,
-        checkbox: WrappedCheckboxGroup,
-        switch: WrappedSwitch,
-        slider: WrappedSlider,
-        rate: WrappedRate,
-        color: ColorPickerComponent,
-        date: WrappedDatePicker,
-        dateRange: WrappedRangePicker,
-        time: WrappedTimePicker,
-        datetime: DatetimeComponent,
-        datetimeRange: DatetimeRangeComponent,
-        upload: AUpload,
-        richText: RichTextPlaceholder,
-        codeEditor: CodeEditorPlaceholder,
+
+    // 字段组件 - key 就是 type
+    fields: {
+      input: WrappedInput,
+      textarea: WrappedTextarea,
+      password: WrappedInputPassword,
+      number: WrappedInputNumber,
+      select: WrappedSelect,
+      multiSelect: WrappedSelect, // 使用 mode="multiple" 属性
+      cascader: WrappedCascader,
+      treeSelect: WrappedTreeSelect,
+      radio: WrappedRadioGroup,
+      checkbox: WrappedCheckboxGroup,
+      switch: WrappedSwitch,
+      slider: WrappedSlider,
+      rate: WrappedRate,
+      color: ColorPickerComponent,
+      date: WrappedDatePicker,
+      dateRange: WrappedRangePicker,
+      time: WrappedTimePicker,
+      datetime: DatetimeComponent,
+      datetimeRange: DatetimeRangeComponent,
+      upload: AUpload,
+      richText: RichTextPlaceholder,
+      codeEditor: CodeEditorPlaceholder,
+    },
+
+    // 布局组件
+    layout: {
+      form: AForm,
+      formItem: AFormItem,
+      row: ARow,
+      col: ACol,
+      card: ACard,
+      collapse: ACollapse,
+      collapseItem: ACollapsePanel,
+      tabs: ATabs,
+      tabPane: ATabPane,
+      divider: ADivider,
+      button: AButton,
+      empty: AEmpty,
+      tooltip: ATooltip,
+      skeleton: ASkeleton,
+      alert: AAlert,
+    },
+
+    // 图标组件
+    icons: {
+      plus: PlusOutlined,
+      delete: DeleteOutlined,
+      arrowUp: ArrowUpOutlined,
+      arrowDown: ArrowDownOutlined,
+      copy: CopyOutlined,
+      drag: HolderOutlined,
+    },
+
+    // 反馈组件
+    feedback: {
+      message: {
+        success: (msg: string) => AMessage.success(msg),
+        error: (msg: string) => AMessage.error(msg),
+        warning: (msg: string) => AMessage.warning(msg),
+        info: (msg: string) => AMessage.info(msg),
       },
-      layout: {
-        form: AForm,
-        formItem: AFormItem,
-        row: ARow,
-        col: ACol,
-        card: ACard,
-        collapse: ACollapse,
-        collapseItem: ACollapsePanel,
-        tabs: ATabs,
-        tabPane: ATabPane,
-        divider: ADivider,
-        button: AButton,
-        empty: AEmpty,
-        tooltip: ATooltip,
-        skeleton: ASkeleton,
-        alert: AAlert,
-      },
-      icons: {
-        plus: PlusOutlined,
-        delete: DeleteOutlined,
-        arrowUp: ArrowUpOutlined,
-        arrowDown: ArrowDownOutlined,
-        copy: CopyOutlined,
-        drag: HolderOutlined,
-      },
-      feedback: {
-        message: {
-          success: (msg: string) => AMessage.success(msg),
-          error: (msg: string) => AMessage.error(msg),
-          warning: (msg: string) => AMessage.warning(msg),
-          info: (msg: string) => AMessage.info(msg),
+      messageBox: {
+        confirm: async (options) => {
+          return new Promise((resolve) => {
+            AModal.confirm({
+              title: options.title || '提示',
+              content: options.message,
+              okText: options.confirmText || '确定',
+              cancelText: options.cancelText || '取消',
+              onOk: () => resolve(true),
+              onCancel: () => resolve(false),
+            })
+          })
         },
-        messageBox: {
-          confirm: async (options) => {
-            return new Promise((resolve) => {
-              AModal.confirm({
-                title: options.title || '提示',
-                content: options.message,
-                okText: options.confirmText || '确定',
-                cancelText: options.cancelText || '取消',
-                onOk: () => resolve(true),
-                onCancel: () => resolve(false),
-              })
+        alert: async (options) => {
+          return new Promise((resolve) => {
+            AModal.info({
+              title: options.title || '提示',
+              content: options.message,
+              okText: options.confirmText || '确定',
+              onOk: () => resolve(),
             })
-          },
-          alert: async (options) => {
-            return new Promise((resolve) => {
-              AModal.info({
-                title: options.title || '提示',
-                content: options.message,
-                okText: options.confirmText || '确定',
-                onOk: () => resolve(),
-              })
-            })
-          },
+          })
         },
       },
     },

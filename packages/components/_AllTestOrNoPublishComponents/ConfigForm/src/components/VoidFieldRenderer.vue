@@ -225,7 +225,7 @@ const formHandlers = inject<Record<string, (...args: any[]) => any>>('configForm
 const adapter = inject<ComputedRef<UIAdapter>>('configFormAdapter')
 
 // 布局组件快捷访问
-const layoutComponents = computed(() => adapter?.value.components.layout || {})
+const layoutComponents = computed(() => adapter?.value.layout || {})
 
 // 卡片展开状态
 const isExpanded = ref(

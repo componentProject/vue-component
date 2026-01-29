@@ -7,55 +7,36 @@ import type { Component } from 'vue'
 
 /**
  * 字段组件注册表
+ * key 就是 Schema 中的 type 值
  */
-export interface FieldComponents {
-  /** 单行文本输入 */
-  input?: Component
-  /** 多行文本输入 */
-  textarea?: Component
-  /** 密码输入 */
-  password?: Component
-  /** 数字输入 */
-  number?: Component
-  /** 单选下拉 */
-  select?: Component
-  /** 多选下拉 */
-  multiSelect?: Component
-  /** 级联选择 */
-  cascader?: Component
-  /** 树形选择 */
-  treeSelect?: Component
-  /** 单选组 */
-  radio?: Component
-  /** 复选组 */
-  checkbox?: Component
-  /** 开关 */
-  switch?: Component
-  /** 滑块 */
-  slider?: Component
-  /** 评分 */
-  rate?: Component
-  /** 颜色选择 */
-  color?: Component
-  /** 日期选择 */
-  date?: Component
-  /** 日期范围 */
-  dateRange?: Component
-  /** 时间选择 */
-  time?: Component
-  /** 日期时间 */
-  datetime?: Component
-  /** 日期时间范围 */
-  datetimeRange?: Component
-  /** 文件上传 */
-  upload?: Component
-  /** 富文本编辑器 */
-  richText?: Component
-  /** 代码编辑器 */
-  codeEditor?: Component
-  /** 自定义扩展组件 */
-  [key: string]: Component | undefined
-}
+export type FieldComponents = Record<string, Component | undefined>
+
+/**
+ * 内置字段类型（用于类型提示）
+ */
+export type BuiltinFieldType =
+  | 'input'
+  | 'textarea'
+  | 'password'
+  | 'number'
+  | 'select'
+  | 'multiSelect'
+  | 'cascader'
+  | 'treeSelect'
+  | 'radio'
+  | 'checkbox'
+  | 'switch'
+  | 'slider'
+  | 'rate'
+  | 'color'
+  | 'date'
+  | 'dateRange'
+  | 'time'
+  | 'datetime'
+  | 'datetimeRange'
+  | 'upload'
+  | 'richText'
+  | 'codeEditor'
 
 /**
  * 布局组件注册表
@@ -186,20 +167,6 @@ export interface FormMethods {
 }
 
 /**
- * 组件注册表
- */
-export interface ComponentRegistry {
-  /** 字段组件 */
-  fields: FieldComponents
-  /** 布局组件 */
-  layout: LayoutComponents
-  /** 图标组件 */
-  icons: IconComponents
-  /** 反馈组件 */
-  feedback: FeedbackComponents
-}
-
-/**
  * Props 转换函数
  */
 export type PropsTransformFn = (
@@ -312,18 +279,36 @@ export interface AdapterFeatures {
 
 /**
  * UI 适配器接口
+ * 扁平化结构：fields/layout/icons/feedback 作为顶层属性
  */
 export interface UIAdapter {
-  /** 组件注册表 */
-  components: ComponentRegistry
+  /**
+   * 字段组件注册表
+   * key 就是 Schema 中的 type 值，可直接通过 fields[type] 访问
+   */
+  fields: FieldComponents
+
+  /** 布局组件注册表 */
+  layout: LayoutComponents
+
+  /** 图标组件注册表 */
+  icons: IconComponents
+
+  /** 反馈组件注册表 */
+  feedback: FeedbackComponents
+
   /** Props 转换器 */
   transformer?: PropsTransformer
+
   /** 选项渲染器 */
   optionsRenderer?: OptionsRenderer
+
   /** 适配器功能配置 */
   features?: AdapterFeatures
+
   /** 表单方法 */
   formMethods?: FormMethods
+
   /** 适配器名称（可选，用于调试） */
   name?: string
 }
@@ -332,8 +317,14 @@ export interface UIAdapter {
  * 创建适配器选项
  */
 export interface CreateAdapterOptions {
-  /** 组件注册表（部分覆盖） */
-  components?: Partial<ComponentRegistry>
+  /** 字段组件注册表（部分覆盖） */
+  fields?: Partial<FieldComponents>
+  /** 布局组件注册表（部分覆盖） */
+  layout?: Partial<LayoutComponents>
+  /** 图标组件注册表（部分覆盖） */
+  icons?: Partial<IconComponents>
+  /** 反馈组件注册表（部分覆盖） */
+  feedback?: Partial<FeedbackComponents>
   /** Props 转换器 */
   transformer?: PropsTransformer
   /** 选项渲染器 */
