@@ -24,6 +24,21 @@ export {
   validateValueType,
 } from './adapter'
 
+// 导出 Schema 转换工具
+export {
+  denormalizeField,
+  denormalizeProperties,
+  getDecoratorComponent,
+  getDecoratorProps,
+  isCanonicalField,
+  isSugarField,
+  needsFormItem,
+  normalizeField,
+  normalizeProperties,
+  transformSchema,
+} from './schemaTransformer'
+export type { CanonicalFieldConfig, CanonicalSchema } from './schemaTransformer'
+
 // ==================== 对象操作工具 ====================
 
 /**

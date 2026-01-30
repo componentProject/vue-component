@@ -46,8 +46,10 @@
 
     <!-- 基础类型字段 -->
     <template v-else>
+      <!-- 有装饰器（FormItem）的情况 -->
       <component
-        :is="layoutComponents.formItem"
+        v-if="hasDecorator"
+        :is="decoratorComponent"
         :label="computedLabel"
         :rules="computedRules"
         :required="computedRequired"
@@ -58,90 +60,35 @@
           <slot :name="`field-label-${fieldName}`" :field="field" :path="path" :value="fieldValue" :context="context" />
         </template>
 
-        <div class="config-form-field">
-          <!-- 前缀插槽 -->
-          <slot :name="`field-prefix-${fieldName}`" :field="field" :path="path" :value="fieldValue" :context="context" />
-
-          <!-- 自定义字段插槽 -->
-          <template v-if="$slots[`field-${fieldName}`]">
-            <slot :name="`field-${fieldName}`" :field="field" :path="path" :value="fieldValue" :context="context" :disabled="isDisabled" :readonly="isReadonly" :read-pretty="isReadPretty" />
+        <!-- 字段内容 -->
+        <FieldContent
+          :field="field"
+          :field-name="fieldName"
+          :path="path"
+          :context="context"
+          :field-value="fieldValue"
+          :is-disabled="isDisabled"
+          :is-readonly="isReadonly"
+          :is-read-pretty="isReadPretty"
+          :formatted-value="formattedValue"
+          :read-pretty-class="readPrettyClass"
+          :read-pretty-style="readPrettyStyle"
+          :field-component="fieldComponent"
+          :computed-component-props="computedComponentProps"
+          :has-options="hasOptions"
+          :use-options-as-props="useOptionsAsProps"
+          :computed-options="computedOptions"
+          :needs-option-content="needsOptionContent"
+          :get-option-component="getOptionComponent"
+          :get-option-label="getOptionLabel"
+          @change="handleChange"
+          @focus="handleFocus"
+          @blur="handleBlur"
+        >
+          <template v-for="(_, slotName) in $slots" :key="slotName" #[slotName]="slotScope">
+            <slot :name="slotName" v-bind="slotScope || {}" />
           </template>
-
-          <!-- ReadPretty 模式 - 纯文本展示（业界标准做法） -->
-          <template v-else-if="isReadPretty">
-            <div
-              class="config-form-field__read-pretty"
-              :class="readPrettyClass"
-              :style="readPrettyStyle"
-            >
-              <!-- 颜色字段特殊展示 -->
-              <template v-if="field.type === 'color' && fieldValue">
-                <span class="config-form-field__color-preview" :style="{ backgroundColor: fieldValue }" />
-                <span class="config-form-field__text">{{ fieldValue }}</span>
-              </template>
-              <!-- 上传字段特殊展示 -->
-              <template v-else-if="field.type === 'upload' && Array.isArray(fieldValue)">
-                <div class="config-form-field__files">
-                  <span v-for="(file, index) in fieldValue" :key="index" class="config-form-field__file">
-                    {{ file.name || file.url || file }}
-                  </span>
-                </div>
-              </template>
-              <!-- 文本域多行展示 -->
-              <template v-else-if="field.type === 'textarea'">
-                <div class="config-form-field__textarea-preview">
-                  {{ formattedValue }}
-                </div>
-              </template>
-              <!-- 富文本预览 -->
-              <template v-else-if="field.type === 'richText'">
-                <div class="config-form-field__rich-text-preview" v-html="formattedValue" />
-              </template>
-              <!-- 代码预览 -->
-              <template v-else-if="field.type === 'codeEditor'">
-                <pre class="config-form-field__code-preview"><code>{{ formattedValue }}</code></pre>
-              </template>
-              <!-- 默认文本展示 -->
-              <template v-else>
-                <span class="config-form-field__text">{{ formattedValue }}</span>
-              </template>
-            </div>
-          </template>
-
-          <!-- 标准字段组件 -->
-          <template v-else>
-            <!-- 使用动态组件渲染所有字段 -->
-            <component
-              :is="fieldComponent"
-              v-model="fieldValue"
-              :disabled="isDisabled"
-              :readonly="isReadonly"
-              v-bind="computedComponentProps"
-              @change="handleChange"
-              @focus="handleFocus"
-              @blur="handleBlur"
-            >
-              <!-- Select/Radio/Checkbox 的选项渲染 (通过子组件方式，如 Element Plus) -->
-              <template v-if="hasOptions && !useOptionsAsProps">
-                <component
-                  :is="getOptionComponent(field.type)"
-                  v-for="opt in computedOptions"
-                  :key="opt.value"
-                  :label="getOptionLabel(field.type, opt)"
-                  :value="opt.value"
-                  :disabled="opt.disabled"
-                >
-                  <template v-if="needsOptionContent">
-                    {{ opt.label }}
-                  </template>
-                </component>
-              </template>
-            </component>
-          </template>
-
-          <!-- 后缀插槽 -->
-          <slot :name="`field-suffix-${fieldName}`" :field="field" :path="path" :value="fieldValue" :context="context" />
-        </div>
+        </FieldContent>
 
         <!-- 额外内容插槽 -->
         <template v-if="$slots[`field-extra-${fieldName}`]" #extra>
@@ -153,6 +100,37 @@
           <span class="config-form-field__description">{{ computedDescription }}</span>
         </template>
       </component>
+
+      <!-- 无装饰器（decorator: false）直接渲染字段 -->
+      <FieldContent
+        v-else
+        :field="field"
+        :field-name="fieldName"
+        :path="path"
+        :context="context"
+        :field-value="fieldValue"
+        :is-disabled="isDisabled"
+        :is-readonly="isReadonly"
+        :is-read-pretty="isReadPretty"
+        :formatted-value="formattedValue"
+        :read-pretty-class="readPrettyClass"
+        :read-pretty-style="readPrettyStyle"
+        :field-component="fieldComponent"
+        :computed-component-props="computedComponentProps"
+        :has-options="hasOptions"
+        :use-options-as-props="useOptionsAsProps"
+        :computed-options="computedOptions"
+        :needs-option-content="needsOptionContent"
+        :get-option-component="getOptionComponent"
+        :get-option-label="getOptionLabel"
+        @change="handleChange"
+        @focus="handleFocus"
+        @blur="handleBlur"
+      >
+        <template v-for="(_, slotName) in $slots" :key="slotName" #[slotName]="slotScope">
+          <slot :name="slotName" v-bind="slotScope || {}" />
+        </template>
+      </FieldContent>
     </template>
   </template>
 </template>
@@ -237,6 +215,7 @@ function formatDateByPattern(date: Date, pattern: string): string {
 const VoidFieldRenderer = defineAsyncComponent(() => import('./VoidFieldRenderer.vue'))
 const ArrayFieldRenderer = defineAsyncComponent(() => import('./ArrayFieldRenderer.vue'))
 const ObjectFieldRenderer = defineAsyncComponent(() => import('./ObjectFieldRenderer.vue'))
+const FieldContent = defineAsyncComponent(() => import('./FieldContent.vue'))
 
 // 注入 adapter
 const adapter = inject<ComputedRef<UIAdapter>>('configFormAdapter')
@@ -807,7 +786,50 @@ const computedFormItemProps = computed(() => {
 })
 
 // 是否有选项（select/radio/checkbox）
-const hasOptions = computed(() => ['select', 'multiSelect', 'radio', 'checkbox'].includes(props.field.type))
+const hasOptions = computed(() => ['select', 'multiSelect', 'radio', 'checkbox'].includes(props.field.type!))
+
+// ==================== Decorator（装饰器）配置 ====================
+
+/**
+ * 是否需要装饰器（FormItem）包装
+ *
+ * 参考 Formily x-decorator 设计：
+ * - 默认使用 FormItem 包装
+ * - decorator: false 时不包装（低代码场景/自定义组件完全自包含）
+ * - decorator: 'CustomFormItem' 时使用自定义装饰器
+ */
+const hasDecorator = computed(() => {
+  // 显式设置 decorator: false 时不包装
+  if (props.field.decorator === false) {
+    return false
+  }
+
+  // 默认需要包装
+  return true
+})
+
+/**
+ * 装饰器组件
+ *
+ * 优先级：
+ * 1. field.decorator 指定的自定义组件
+ * 2. adapter.layout.formItem 默认组件
+ */
+const decoratorComponent = computed(() => {
+  const decorator = props.field.decorator
+
+  // 自定义装饰器
+  if (decorator && decorator !== false) {
+    // 元组形式：[组件, 默认props]
+    if (Array.isArray(decorator)) {
+      return decorator[0]
+    }
+    return decorator
+  }
+
+  // 使用 adapter 默认的 FormItem
+  return layoutComponents.value.formItem
+})
 
 // 是否需要选项内容（radio/checkbox 需要显示 label 文本）
 const needsOptionContent = computed(() => ['radio', 'checkbox'].includes(props.field.type))

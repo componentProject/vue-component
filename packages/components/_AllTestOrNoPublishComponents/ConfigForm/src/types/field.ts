@@ -250,8 +250,29 @@ export interface BaseFieldConfig {
   componentProps?: Record<string, any | Expression>
 
   // ===== 装饰器配置（FormItem） =====
-  /** 装饰器名称或 [装饰器名, 默认props] */
-  decorator?: string | [string, Record<string, any>]
+  /**
+   * 装饰器配置（参考 Formily x-decorator）
+   *
+   * 装饰器用于包裹字段组件，默认为 FormItem。
+   * 大多数情况下无需配置，仅在需要自定义时使用：
+   * - false：不使用装饰器，字段直接渲染（低代码场景）
+   * - 字符串：指定装饰器组件名称
+   * - [组件名, 默认props]：指定组件和默认属性
+   *
+   * @example
+   * ```typescript
+   * // 默认：使用 FormItem（无需配置）
+   * { type: 'input', title: '姓名' }
+   *
+   * // 不使用装饰器（字段直接渲染）
+   * { type: 'input', decorator: false }
+   *
+   * // 自定义装饰器组件
+   * { type: 'input', decorator: 'MyFormItem' }
+   * { type: 'input', decorator: ['MyFormItem', { bordered: true }] }
+   * ```
+   */
+  decorator?: false | string | [string, Record<string, any>]
   /** 装饰器属性（支持表达式） */
   decoratorProps?: Record<string, any | Expression>
 
