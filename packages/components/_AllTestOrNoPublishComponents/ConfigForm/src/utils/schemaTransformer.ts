@@ -115,150 +115,97 @@ export function isSugarField(field: any): field is FieldConfig {
 
 /**
  * 将简化格式字段转换为标准格式
+ *
+ * 设计原则：
+ * - 保留所有原始属性（透传）
+ * - 仅添加/标准化必要的属性（dataType、decorator、decoratorProps）
+ * - 递归处理子字段（properties、items、tabs、panels）
+ *
  * @param sugar - 简化格式字段配置
  * @param fieldName - 字段名称
  * @param adapter - UI 适配器
- * @returns 标准格式字段配置
+ * @returns 标准格式字段配置（包含所有原始属性）
  */
 export function normalizeField(
   sugar: FieldConfig,
   fieldName: string,
   adapter?: UIAdapter,
 ): CanonicalFieldConfig {
+  // 关键：先复制所有原始属性，然后添加/覆盖标准化属性
   const canonical: CanonicalFieldConfig = {
+    ...sugar, // 保留所有原始属性
     _original: sugar,
   }
 
   // 1. 处理名称
-  canonical.name = sugar.name || fieldName
+  if (!canonical.name) {
+    canonical.name = fieldName
+  }
 
   // 2. 处理布局字段（void 类型）
   if ('layout' in sugar && sugar.layout) {
     canonical.dataType = 'void'
     canonical.decorator = false // 布局字段不需要 FormItem
-    // 保留原始 layout 相关配置
-    canonical._original = sugar
+
+    // 递归处理布局字段中的子字段
+    if ('properties' in sugar && sugar.properties) {
+      canonical.properties = normalizeProperties(sugar.properties, adapter)
+    }
+    if ('tabs' in sugar && sugar.tabs) {
+      canonical.tabs = sugar.tabs.map((tab: any) => ({
+        ...tab,
+        properties: tab.properties ? normalizeProperties(tab.properties, adapter) : undefined,
+      }))
+    }
+    if ('panels' in sugar && sugar.panels) {
+      canonical.panels = sugar.panels.map((panel: any) => ({
+        ...panel,
+        properties: panel.properties ? normalizeProperties(panel.properties, adapter) : undefined,
+      }))
+    }
+
     return canonical
   }
 
-  // 3. 推断数据类型
-  if (sugar.dataType) {
-    canonical.dataType = sugar.dataType
-  }
-  else if (sugar.type === 'array' || ('items' in sugar && sugar.items)) {
-    canonical.dataType = 'array'
-  }
-  else if (sugar.type === 'object' || ('properties' in sugar && sugar.properties && !('layout' in sugar))) {
-    canonical.dataType = 'object'
-  }
-  else {
-    // 从 adapter 的 dataTypeMap 推断
-    const dataTypeMap = adapter?.dataTypeMap || {}
-    canonical.dataType = dataTypeMap[sugar.type!] || 'any'
-  }
-
-  // 4. 处理组件
-  if (sugar.component) {
-    canonical.component = sugar.component
-  }
-  else if (sugar.type) {
-    // 从 adapter.fields 获取默认组件
-    canonical.component = sugar.type // 保留 type 作为组件标识
+  // 3. 推断数据类型（如果未显式指定）
+  if (!canonical.dataType) {
+    if (sugar.type === 'array' || ('items' in sugar && sugar.items)) {
+      canonical.dataType = 'array'
+    }
+    else if (sugar.type === 'object' || ('properties' in sugar && sugar.properties)) {
+      canonical.dataType = 'object'
+    }
+    else {
+      // 从 adapter 的 dataTypeMap 推断
+      const dataTypeMap = adapter?.dataTypeMap || {}
+      canonical.dataType = dataTypeMap[sugar.type!] || 'any'
+    }
   }
 
-  // 5. 处理组件属性
-  if (sugar.componentProps) {
-    canonical.componentProps = sugar.componentProps
+  // 4. 标准化 decoratorProps（将 title/required/rules 同步到 decoratorProps）
+  if (sugar.title || sugar.required !== undefined || sugar.rules) {
+    canonical.decoratorProps = {
+      ...(sugar.decoratorProps || {}),
+    }
+    if (sugar.title) {
+      canonical.decoratorProps.label = sugar.title
+    }
+    if (sugar.required !== undefined) {
+      canonical.decoratorProps.required = sugar.required
+    }
+    if (sugar.rules) {
+      canonical.decoratorProps.rules = sugar.rules
+    }
   }
 
-  // 6. 处理装饰器（关键改动）
-  if (sugar.decorator === false) {
-    canonical.decorator = false
-  }
-  else if (sugar.decorator) {
-    canonical.decorator = sugar.decorator
-  }
-  // 未指定时不设置，使用默认 FormItem
-
-  // 7. 处理装饰器属性
-  canonical.decoratorProps = {
-    ...(sugar.decoratorProps || {}),
-  }
-
-  // 将 title 移到 decoratorProps.label
-  if (sugar.title) {
-    canonical.decoratorProps.label = sugar.title
-    canonical.title = sugar.title // 保留用于兼容
-  }
-
-  // 将 required 移到 decoratorProps
-  if (sugar.required !== undefined) {
-    canonical.decoratorProps.required = sugar.required
-  }
-
-  // 将 rules 移到 decoratorProps
-  if (sugar.rules) {
-    canonical.decoratorProps.rules = sugar.rules
-  }
-
-  // 8. 递归处理子字段
-  if ('properties' in sugar && sugar.properties) {
+  // 5. 递归处理子字段（object 类型的 properties）
+  if ('properties' in sugar && sugar.properties && sugar.type === 'object') {
     canonical.properties = normalizeProperties(sugar.properties, adapter)
   }
 
+  // 6. 递归处理数组项（array 类型的 items）
   if ('items' in sugar && sugar.items) {
     canonical.items = normalizeField(sugar.items as FieldConfig, 'items', adapter)
-  }
-
-  // 9. 透传其他属性
-  const preserveKeys = [
-    'default',
-    'display',
-    'pattern',
-    'showWhen',
-    'disabledWhen',
-    'requiredWhen',
-    'reactions',
-    'col',
-    'onInit',
-    'onMount',
-    'onUnmount',
-    'onChange',
-    'onFocus',
-    'onBlur',
-    'viewPermission',
-    'editPermission',
-    'extra',
-    'validateFirst',
-    'validateTrigger',
-    // Array 特有
-    'minItems',
-    'maxItems',
-    'operations',
-    // Select 特有
-    'dataSource',
-    'multiple',
-    'showSearch',
-    'allowClear',
-    'remoteSearch',
-    // Upload 特有
-    'upload',
-    // Tabs/Collapse 特有
-    'tabs',
-    'panels',
-    'accordion',
-    'defaultActiveKey',
-    'tabPosition',
-    // Card 特有
-    'cardTitle',
-    'collapsible',
-    'defaultExpanded',
-  ]
-
-  for (const key of preserveKeys) {
-    if (key in sugar && (sugar as any)[key] !== undefined) {
-      canonical[key] = (sugar as any)[key]
-    }
   }
 
   return canonical

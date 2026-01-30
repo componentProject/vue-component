@@ -56,9 +56,10 @@
             </slot>
           </div>
 
+          <!-- 处理流程第 4 步：渲染层 - 使用标准化后的 Schema -->
           <!-- 字段渲染 - inline 布局时不使用 Row/Col -->
           <template v-if="isInlineLayout">
-            <template v-for="(field, fieldName) in schema.properties" :key="fieldName">
+            <template v-for="(field, fieldName) in canonicalSchema.properties" :key="fieldName">
               <FieldRenderer
                 :field="field"
                 :path="fieldName as string"
@@ -76,7 +77,7 @@
 
           <!-- 字段渲染 - 非 inline 布局使用 Row/Col -->
           <component :is="layoutComponents.row" v-else :gutter="16">
-            <template v-for="(field, fieldName) in schema.properties" :key="fieldName">
+            <template v-for="(field, fieldName) in canonicalSchema.properties" :key="fieldName">
               <component :is="layoutComponents.col" v-bind="getColProps(field)">
                 <FieldRenderer
                   :field="field"
@@ -137,7 +138,7 @@ import { computed, onMounted, onUnmounted, provide, toRaw, useTemplateRef } from
 import { elementPlusAdapter } from './adapters'
 import { FieldRenderer } from './components'
 import { useFormState, useFormSubmit, useFormValidation } from './composables'
-import { validateSchemaInDev } from './utils'
+import { transformSchema, validateSchemaInDev } from './utils'
 
 defineOptions({
   name: 'ConfigForm',
@@ -179,8 +180,21 @@ const layoutComponents = computed(() => adapter.value.layout)
 // 表单引用（使用 useTemplateRef 获取动态组件实例）
 const formRef = useTemplateRef<ComponentPublicInstance>('formRef')
 
-// Schema 计算属性
+// Schema 计算属性（原始用户配置）
 const schema = computed<FormSchema>(() => props.schema)
+
+/**
+ * 标准化 Schema（Canonical Schema）
+ *
+ * 处理流程第 1 步：转换层
+ * - 将用户传入的简化格式（Sugar）转换为标准格式（Canonical）
+ * - 处理 decorator 配置（默认/false/自定义）
+ * - 推断 dataType
+ * - 标准化 decoratorProps
+ */
+const canonicalSchema = computed<FormSchema>(() => {
+  return transformSchema(props.schema, adapter.value) as FormSchema
+})
 
 // 初始化表单状态
 const formStateManager = useFormState({
@@ -590,10 +604,18 @@ defineExpose(formInstance)
 
 // 生命周期
 onMounted(() => {
-  // Schema 配置校验（仅开发模式）
-  validateSchemaInDev(props.schema, 'ConfigForm')
+  /**
+   * 处理流程第 2 步：校验层
+   * - 验证 Schema 配置的正确性（仅开发模式）
+   * - 使用转换后的标准 Schema 进行校验
+   */
+  validateSchemaInDev(canonicalSchema.value, 'ConfigForm')
 
-  // 初始化 v-model 值
+  /**
+   * 处理流程第 3 步：初始化层
+   * - 初始化 v-model 值
+   * - 合并 initialValues + default
+   */
   modelValue.value = { ...getFieldsValue() }
   emit('initialized')
 })

@@ -235,7 +235,142 @@ validateSchemaInDev(schema, 'ConfigForm')
 
 ---
 
-## 三、架构图
+## 三、完整处理流程
+
+ConfigForm 的数据处理遵循严格的 5 层流水线架构：
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    用户传入 Schema                              │
+│              (简化格式 Sugar / 标准格式 Canonical)              │
+└───────────────────────────┬─────────────────────────────────────┘
+                            ↓
+┌─────────────────────────────────────────────────────────────────┐
+│  1. 转换层 (Schema Transformer)                                 │
+│  ┌─────────────────────────────────────────────────────────┐   │
+│  │  detectSchemaType()   - 检测格式类型                     │   │
+│  │  transformSchema()    - 统一转换为标准格式               │   │
+│  │  normalizeField()     - 递归处理字段                     │   │
+│  │  - 推断 dataType                                        │   │
+│  │  - 处理 decorator（默认/false/自定义）                   │   │
+│  │  - 标准化 decoratorProps                                │   │
+│  └─────────────────────────────────────────────────────────┘   │
+│                            ↓                                    │
+│                   Canonical Schema                              │
+└───────────────────────────┬─────────────────────────────────────┘
+                            ↓
+┌─────────────────────────────────────────────────────────────────┐
+│  2. 校验层 (Schema Validator)                                   │
+│  ┌─────────────────────────────────────────────────────────┐   │
+│  │  validateSchema()     - 结构校验                         │   │
+│  │  - 必填字段检查                                         │   │
+│  │  - 类型匹配（array 必须有 items）                       │   │
+│  │  - 数据源配置（select 必须有 dataSource）               │   │
+│  │  - dataType 与实际值类型校验                            │   │
+│  └─────────────────────────────────────────────────────────┘   │
+│                            ↓                                    │
+│              开发模式: console.warn 警告                        │
+│              生产模式: 静默跳过                                  │
+└───────────────────────────┬─────────────────────────────────────┘
+                            ↓
+┌─────────────────────────────────────────────────────────────────┐
+│  3. 初始化层 (Form Initialization)                              │
+│  ┌─────────────────────────────────────────────────────────┐   │
+│  │  初始化表单值                                            │   │
+│  │  - 合并 initialValues + default                         │   │
+│  │  - 根据 dataType 推断默认值                             │   │
+│  │  注册字段状态 (fieldStates Map)                         │   │
+│  │  设置表单上下文 (formContext)                           │   │
+│  └─────────────────────────────────────────────────────────┘   │
+└───────────────────────────┬─────────────────────────────────────┘
+                            ↓
+┌─────────────────────────────────────────────────────────────────┐
+│  4. 渲染层 (Field Rendering)                                    │
+│  ┌─────────────────────────────────────────────────────────┐   │
+│  │  遍历 canonicalSchema.properties                        │   │
+│  │  ↓                                                      │   │
+│  │  FieldRenderer                                          │   │
+│  │  ├─ isVoidField   → VoidFieldRenderer (布局)           │   │
+│  │  ├─ isArrayField  → ArrayFieldRenderer (数组)          │   │
+│  │  ├─ isObjectField → ObjectFieldRenderer (对象)         │   │
+│  │  └─ 基础字段:                                           │   │
+│  │      hasDecorator?                                      │   │
+│  │      ├─ true  → DecoratorComponent + FieldContent      │   │
+│  │      └─ false → FieldContent (直接渲染)                │   │
+│  └─────────────────────────────────────────────────────────┘   │
+└───────────────────────────┬─────────────────────────────────────┘
+                            ↓
+┌─────────────────────────────────────────────────────────────────┐
+│  5. 交互层 (User Interaction)                                   │
+│  ┌─────────────────────────────────────────────────────────┐   │
+│  │  值变更                                                  │   │
+│  │  ├─ 执行表达式联动 (reactions/showWhen/disabledWhen)    │   │
+│  │  ├─ 触发校验 (validateTrigger: change/blur)            │   │
+│  │  └─ 更新 v-model                                        │   │
+│  │                                                         │   │
+│  │  提交流程                                                │   │
+│  │  ├─ 表单校验 (全量)                                     │   │
+│  │  ├─ 值转换 (序列化)                                     │   │
+│  │  └─ 触发 submit 事件                                    │   │
+│  └─────────────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### 3.1 转换层详解
+
+转换层实现"语法糖 + 标准内核"架构，支持两种配置格式：
+
+| 格式 | 说明 | 适用场景 |
+|------|------|---------|
+| **Sugar（简化格式）** | 用户友好，省略 decorator 等配置 | 常规开发 |
+| **Canonical（标准格式）** | 完整配置，与 Formily 对齐 | 低代码引擎/高级用户 |
+
+```typescript
+// 简化格式 → 标准格式
+transformSchema(userSchema, adapter)
+
+// 转换示例
+// 输入（简化）
+{ type: 'input', title: '姓名' }
+
+// 输出（标准）
+{
+  dataType: 'string',
+  component: 'input',
+  decorator: 'FormItem',
+  decoratorProps: { label: '姓名' }
+}
+```
+
+### 3.2 核心代码实现
+
+```typescript
+// index.vue
+import { transformSchema } from './utils/schemaTransformer'
+import { validateSchemaInDev } from './utils/schemaValidator'
+
+// 1. 转换层：统一转换为标准格式
+const canonicalSchema = computed(() => {
+  return transformSchema(props.schema, adapter.value)
+})
+
+onMounted(() => {
+  // 2. 校验层：验证配置正确性（仅开发模式）
+  validateSchemaInDev(canonicalSchema.value, 'ConfigForm')
+  
+  // 3. 初始化层：设置表单值
+  modelValue.value = { ...getFieldsValue() }
+  emit('initialized')
+})
+
+// 4. 渲染层：使用标准格式渲染
+// <FieldRenderer :field="field" ... />
+// 遍历 canonicalSchema.properties
+```
+
+---
+
+## 四、架构图
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
