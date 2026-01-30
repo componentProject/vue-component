@@ -77,7 +77,7 @@ import type { FormValidateCallback } from 'element-plus'
 import type { CSSProperties, Ref } from 'vue'
 /** 导入类型定义 */
 import type { ReFormEmits, ReFormProps, ReGridResponsive } from './types'
-import { throttle } from '@moluoxixi/utils/utils/event'
+import { throttle } from '@moluoxixi/utils/_utils/event'
 /** 导入 Element Plus 组件 */
 import { ElButton, ElForm, ElFormItem } from 'element-plus'
 /** 导入 lodash-es 工具函数 */
