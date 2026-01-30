@@ -341,6 +341,7 @@ export function createAntDesignVueAdapter(): UIAdapter {
     },
 
     // 布局组件
+    // 布局组件（辅助组件）
     layout: {
       form: AForm,
       formItem: AFormItem,
@@ -357,6 +358,24 @@ export function createAntDesignVueAdapter(): UIAdapter {
       tooltip: ATooltip,
       skeleton: ASkeleton,
       alert: AAlert,
+    },
+
+    /**
+     * 装饰器组件
+     *
+     * 装饰器用于包装字段组件：
+     * - FormItem：表单项装饰器（label、校验）
+     * - Card：卡片容器装饰器
+     * - Tabs：标签页容器装饰器
+     * - Collapse：折叠面板容器装饰器
+     * - Group：分组装饰器
+     *
+     * 注意：布局装饰器（Card/Tabs/Collapse）由内置组件实现
+     * 这里只需要注册 FormItem 作为默认数据字段装饰器
+     */
+    decorators: {
+      // FormItem 使用 layout.formItem
+      // 布局装饰器（card/tabs/collapse/group）由内置组件实现
     },
 
     // 图标组件

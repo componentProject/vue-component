@@ -19,26 +19,44 @@ import type { UIAdapter } from '../types/adapter'
 /**
  * 标准化字段配置（Canonical）
  * 内部使用的完整格式，与 Formily 对齐
+ *
+ * 核心模型：所有字段 = decorator（包装器）+ component（内容）
+ * - 数据字段：decorator=FormItem, component=Input/Select/...
+ * - 布局字段：decorator=Card/Tabs/..., component=null
+ * - 无装饰器：decorator=false, component=Input/...
  */
 export interface CanonicalFieldConfig {
   /** 字段名称 */
   name?: string
   /** 数据类型 */
   dataType?: 'string' | 'number' | 'boolean' | 'array' | 'object' | 'date' | 'void' | 'any'
-  /** 渲染组件 */
-  component?: string | Component | [string | Component, Record<string, any>]
+  /**
+   * 渲染组件
+   * - 数据字段：Input/Select/Number 等
+   * - 布局字段（VoidField）：null（内容是子字段）
+   */
+  component?: string | Component | [string | Component, Record<string, any>] | null
   /** 组件属性 */
   componentProps?: Record<string, any>
-  /** 装饰器（FormItem）- false 表示不包装 */
+  /**
+   * 装饰器（包装器）
+   * - 数据字段默认：FormItem
+   * - 布局字段：Card/Tabs/Collapse 等（layout 本身就是装饰器）
+   * - false：不包装
+   */
   decorator?: false | string | Component | [string | Component, Record<string, any>]
   /** 装饰器属性 */
   decoratorProps?: Record<string, any>
   /** 标签文本（移到 decoratorProps 中） */
   title?: string
-  /** 子字段配置（object 类型） */
+  /** 子字段配置（object 类型或布局字段） */
   properties?: Record<string, CanonicalFieldConfig>
   /** 数组项配置（array 类型） */
   items?: CanonicalFieldConfig
+  /** 标签页配置（tabs 布局） */
+  tabs?: any[]
+  /** 面板配置（collapse 布局） */
+  panels?: any[]
   /** 原始字段配置（保留用于特殊处理） */
   _original?: FieldConfig
   /** 其他属性透传 */
@@ -142,10 +160,41 @@ export function normalizeField(
     canonical.name = fieldName
   }
 
-  // 2. 处理布局字段（void 类型）
+  // 2. 处理布局字段（VoidField）
+  // 核心理念：layout 本身就是装饰器！Card/Tabs/Collapse 是包装器
   if ('layout' in sugar && sugar.layout) {
     canonical.dataType = 'void'
-    canonical.decorator = false // 布局字段不需要 FormItem
+    canonical.component = null // VoidField 没有内容组件
+    canonical.decorator = sugar.layout // layout 就是装饰器！
+
+    // 将 title 等属性移到 decoratorProps
+    canonical.decoratorProps = {
+      ...(sugar.decoratorProps || {}),
+    }
+    if (sugar.title) {
+      canonical.decoratorProps.title = sugar.title
+    }
+    // Card 特有属性
+    if ('cardTitle' in sugar) {
+      canonical.decoratorProps.title = (sugar as any).cardTitle
+    }
+    if ('collapsible' in sugar) {
+      canonical.decoratorProps.collapsible = (sugar as any).collapsible
+    }
+    if ('defaultExpanded' in sugar) {
+      canonical.decoratorProps.defaultExpanded = (sugar as any).defaultExpanded
+    }
+    // Collapse 特有属性
+    if ('accordion' in sugar) {
+      canonical.decoratorProps.accordion = (sugar as any).accordion
+    }
+    if ('defaultActiveKey' in sugar) {
+      canonical.decoratorProps.defaultActiveKey = (sugar as any).defaultActiveKey
+    }
+    // Tabs 特有属性
+    if ('tabPosition' in sugar) {
+      canonical.decoratorProps.tabPosition = (sugar as any).tabPosition
+    }
 
     // 递归处理布局字段中的子字段
     if ('properties' in sugar && sugar.properties) {
@@ -308,8 +357,14 @@ export function denormalizeProperties(
 
 /**
  * 检查字段是否需要 FormItem 包装
+ *
+ * 注意：在新架构中，所有字段都有 decorator：
+ * - 数据字段默认 decorator = FormItem
+ * - 布局字段的 decorator = Card/Tabs/Collapse 等
+ * - decorator: false 表示不包装
+ *
  * @param field - 字段配置（简化或标准格式）
- * @returns 是否需要 FormItem
+ * @returns 是否需要 FormItem（仅用于数据字段）
  */
 export function needsFormItem(field: FieldConfig | CanonicalFieldConfig): boolean {
   // 显式设置 decorator: false
@@ -317,13 +372,13 @@ export function needsFormItem(field: FieldConfig | CanonicalFieldConfig): boolea
     return false
   }
 
-  // 布局字段不需要 FormItem
+  // 布局字段有自己的装饰器，不需要 FormItem
   if ('layout' in field && field.layout) {
     return false
   }
 
   // 数组类型和对象类型通常由子渲染器处理
-  if (field.type === 'array' || field.type === 'object') {
+  if ((field as any).type === 'array' || (field as any).type === 'object') {
     return false
   }
 

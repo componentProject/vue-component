@@ -8,6 +8,7 @@ export type {
   ComponentRegistry,
   CreateAdapterOptions,
   DataTypeMap,
+  DecoratorComponents,
   FeedbackComponents,
   FieldComponentConfig,
   FieldComponentFullConfig,

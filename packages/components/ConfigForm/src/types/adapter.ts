@@ -52,6 +52,20 @@ export type FieldComponentConfig = Component | FieldComponentFullConfig
 export type FieldComponents = Record<string, FieldComponentConfig | undefined>
 
 /**
+ * 装饰器组件注册表
+ *
+ * 装饰器用于包装字段组件，提供额外的 UI 功能：
+ * - FormItem：表单项包装（label、校验反馈）
+ * - Card：卡片容器
+ * - Tabs：标签页容器
+ * - Collapse：折叠面板容器
+ * - 等等
+ *
+ * key 是装饰器名称（与 schema 中的 decorator 或 layout 对应）
+ */
+export type DecoratorComponents = Record<string, Component | undefined>
+
+/**
  * DataType 默认映射表
  * 用于推断内置字段类型的默认数据类型
  */
@@ -325,7 +339,7 @@ export interface AdapterFeatures {
 
 /**
  * UI 适配器接口
- * 扁平化结构：fields/layout/icons/feedback 作为顶层属性
+ * 扁平化结构：fields/decorators/layout/icons/feedback 作为顶层属性
  */
 export interface UIAdapter {
   /**
@@ -338,7 +352,28 @@ export interface UIAdapter {
    */
   fields: FieldComponents
 
-  /** 布局组件注册表 */
+  /**
+   * 装饰器组件注册表
+   *
+   * 装饰器用于包装字段，提供 UI 增强：
+   * - FormItem：默认装饰器，提供 label、校验反馈
+   * - Card：卡片容器装饰器
+   * - Tabs：标签页容器装饰器
+   * - Collapse：折叠面板容器装饰器
+   *
+   * @example
+   * ```typescript
+   * decorators: {
+   *   FormItem: ElFormItem,
+   *   Card: ElCard,
+   *   Tabs: TabsDecorator,
+   *   Collapse: CollapseDecorator,
+   * }
+   * ```
+   */
+  decorators?: DecoratorComponents
+
+  /** 布局组件注册表（辅助组件） */
   layout: LayoutComponents
 
   /** 图标组件注册表 */

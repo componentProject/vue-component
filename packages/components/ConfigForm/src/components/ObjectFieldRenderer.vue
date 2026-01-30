@@ -10,7 +10,7 @@
     <component :is="layoutComponents.row" :gutter="16">
       <template v-for="(childField, childName) in childFields" :key="childName">
         <component :is="layoutComponents.col" v-bind="getColProps(childField)">
-          <FieldRenderer
+          <RecursionField
             :field="childField"
             :path="getChildPath(childName as string)"
             :context="context"
@@ -18,7 +18,7 @@
             <template v-for="(_, slotName) in $slots" #[slotName]="slotProps">
               <slot :name="slotName" v-bind="slotProps" />
             </template>
-          </FieldRenderer>
+          </RecursionField>
         </component>
       </template>
     </component>
@@ -30,7 +30,7 @@ import type { ComputedRef } from 'vue'
 import type { FieldConfig, FormContext, ObjectFieldConfig, UIAdapter } from '../types'
 import { computed, inject } from 'vue'
 import { executeExpression } from '../utils'
-import FieldRenderer from './FieldRenderer.vue'
+import { RecursionField } from './core'
 
 defineOptions({
   name: 'ObjectFieldRenderer',

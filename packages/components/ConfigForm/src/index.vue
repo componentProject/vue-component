@@ -56,22 +56,22 @@
             </slot>
           </div>
 
-          <!-- 处理流程第 4 步：渲染层 - 使用标准化后的 Schema -->
+          <!--
+            处理流程第 4 步：渲染层
+            使用新的分层架构（对齐 Formily）：
+            RecursionField → Field/VoidField → DecoratorWrapper → FieldComponent
+          -->
           <!-- 字段渲染 - inline 布局时不使用 Row/Col -->
           <template v-if="isInlineLayout">
             <template v-for="(field, fieldName) in canonicalSchema.properties" :key="fieldName">
-              <FieldRenderer
+              <RecursionField
                 :field="field"
                 :path="fieldName as string"
                 :context="formContext"
                 @change="handleFieldChange(fieldName as string, $event)"
                 @focus="handleFieldFocus(fieldName as string)"
                 @blur="handleFieldBlur(fieldName as string)"
-              >
-                <template v-for="(_, slotName) in $slots" #[slotName]="slotProps">
-                  <slot :name="slotName" v-bind="slotProps" />
-                </template>
-              </FieldRenderer>
+              />
             </template>
           </template>
 
@@ -79,18 +79,14 @@
           <component :is="layoutComponents.row" v-else :gutter="16">
             <template v-for="(field, fieldName) in canonicalSchema.properties" :key="fieldName">
               <component :is="layoutComponents.col" v-bind="getColProps(field)">
-                <FieldRenderer
+                <RecursionField
                   :field="field"
                   :path="fieldName as string"
                   :context="formContext"
                   @change="handleFieldChange(fieldName as string, $event)"
                   @focus="handleFieldFocus(fieldName as string)"
                   @blur="handleFieldBlur(fieldName as string)"
-                >
-                  <template v-for="(_, slotName) in $slots" #[slotName]="slotProps">
-                    <slot :name="slotName" v-bind="slotProps" />
-                  </template>
-                </FieldRenderer>
+                />
               </component>
             </template>
           </component>
@@ -136,7 +132,7 @@ import type { ComponentPublicInstance } from 'vue'
 import type { emitsType, FieldConfig, FormContext, FormInstance, FormSchema, propsType, slotsType, UIAdapter } from './types'
 import { computed, onMounted, onUnmounted, provide, toRaw, useTemplateRef } from 'vue'
 import { elementPlusAdapter } from './adapters'
-import { FieldRenderer } from './components'
+import { RecursionField } from './components/core'
 import { useFormState, useFormSubmit, useFormValidation } from './composables'
 import { transformSchema, validateSchemaInDev } from './utils'
 

@@ -28,7 +28,7 @@
 
             <!-- 数组项内容 -->
             <div class="config-form-array__content">
-              <FieldRenderer
+              <RecursionField
                 v-if="itemField"
                 :field="itemField"
                 :path="`${path}.${index}`"
@@ -37,7 +37,7 @@
                 <template v-for="(_, slotName) in $slots" :key="slotName" #[slotName]="slotData">
                   <slot :name="slotName" v-bind="slotData || {}" />
                 </template>
-              </FieldRenderer>
+              </RecursionField>
             </div>
 
             <!-- 数组项操作（阅读态下隐藏） -->
@@ -138,7 +138,7 @@ import type { ComputedRef } from 'vue'
 import type { ArrayFieldConfig, FieldConfig, FormContext, UIAdapter } from '../types'
 import { computed, inject } from 'vue'
 import { executeExpression } from '../utils'
-import FieldRenderer from './FieldRenderer.vue'
+import { RecursionField } from './core'
 
 defineOptions({
   name: 'ArrayFieldRenderer',
