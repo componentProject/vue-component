@@ -110,12 +110,9 @@ import { VxeGrid } from 'vxe-table'
 import CustomConfigDialog from './components/CustomConfigDialog.vue'
 // 导入自定义渲染器，改造了VxeGrid，直接用Grid的VxeUI
 import installFn from './renderers'
-// import VxeGrid from './components/VxeGrid'
-// import cssModules from './components/VxeGrid/styles/modules/all.module.scss'
 import cssModules from './styles/modules/index.module.scss'
 
 import { getCustomType, handleGetRequiredFields } from './utils'
-// import cssModules from './styles/modules/index.module.scss'
 
 defineOptions({
   name: 'DraggableTable',
