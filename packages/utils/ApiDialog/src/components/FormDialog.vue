@@ -39,7 +39,7 @@
 
 <script lang="ts" setup>
 import { ElButton, ElDialog, ElForm, ElFormItem, ElInput, ElMessage } from 'element-plus'
-import { computed, ref } from 'vue'
+import { computed, ref, useTemplateRef } from 'vue'
 
 const props = defineProps({
   modelValue: {
@@ -89,7 +89,7 @@ const rules = {
   ],
 }
 
-const formRef = ref(null)
+const formRef = useTemplateRef('formRef')
 
 // 计算属性用于处理v-model
 const dialogVisible = computed({
@@ -125,7 +125,6 @@ function handleSubmit() {
     }
     else {
       ElMessage.warning('请填写正确的表单信息')
-      return false
     }
   })
 }

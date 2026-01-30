@@ -11,7 +11,7 @@
 
 <script setup lang="ts">
 import type { emitsType, propsType, slotsType } from './types'
-import { getTypeDefault } from '@moluoxixi/utils/utils'
+import { getTypeDefault } from '@moluoxixi/utils/_utils'
 import { ElButton } from 'element-plus'
 import fileSaver from 'file-saver'
 import { computed } from 'vue'

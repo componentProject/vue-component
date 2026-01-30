@@ -1,4 +1,3 @@
-<!-- QrCode组件主文件 -->
 <template>
   <div
     class="qr-code-container"
@@ -29,7 +28,7 @@
 <script setup lang="ts">
 // import type { QRCodeRenderersOptions } from 'qrcode'
 import type { emitsType, propsType, slotsType } from './types'
-import { downloadImage } from '@moluoxixi/utils/utils'
+import { downloadImage } from '@moluoxixi/utils/_utils'
 import QRCode from 'qrcode'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 

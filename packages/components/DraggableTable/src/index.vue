@@ -84,7 +84,7 @@ import {
   getClass,
   getType,
   sleep,
-} from '@moluoxixi/utils/utils'
+} from '@moluoxixi/utils/_utils'
 import {
   debounce,
   dispatchEvents,

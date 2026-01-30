@@ -3,7 +3,7 @@ import type { BuildContext } from '../types/index.ts'
  * 组件相关工具函数
  */
 import fsp from 'node:fs/promises'
-import { dynamicImport } from '@moluoxixi/utils/_utils/index.ts'
+import { dynamicImport } from '@moluoxixi/utils/_utils'
 import glob from 'fast-glob'
 
 /** 必须排除的文件 */

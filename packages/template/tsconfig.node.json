@@ -4,7 +4,7 @@
     "composite": true,
     "allowImportingTsExtensions": true,
     "rewriteRelativeImportExtensions": true,
-    "noEmit": true
+    "noEmit": false
   },
   "include": [
     "_scripts/**/*"
