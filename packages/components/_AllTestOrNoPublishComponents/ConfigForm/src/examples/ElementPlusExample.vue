@@ -100,7 +100,7 @@ const formSchema: FormSchema = {
   properties: {
     // ===== 基础信息 =====
     basicInfo: {
-      type: 'card',
+      layout: 'card',
       title: '基础信息',
       properties: {
         username: {
@@ -222,7 +222,7 @@ const formSchema: FormSchema = {
 
     // ===== 通知设置 =====
     notificationSettings: {
-      type: 'tabs',
+      layout: 'tabs',
       title: '通知设置',
       tabs: [
         {
@@ -352,7 +352,7 @@ const formSchema: FormSchema = {
 
     // ===== 自定义组件示例（参考 Formily x-component 设计） =====
     customComponents: {
-      type: 'card',
+      layout: 'card',
       title: '自定义组件示例（业界标准：component 属性）',
       properties: {
         // 方式一：component 直接传入组件实例（推荐）
@@ -409,7 +409,7 @@ const formSchema: FormSchema = {
 
     // ===== 其他信息 =====
     otherInfo: {
-      type: 'group',
+      layout: 'group',
       title: '其他信息',
       properties: {
         remark: {

@@ -33,6 +33,8 @@ export type {
 export {
   DISPLAY_OPTIONS,
   HANDLER_EVENT_OPTIONS,
+  isLayoutField,
+  LAYOUT_FIELD_TYPES,
   LAYOUT_OPTIONS,
   PATTERN_OPTIONS,
 } from './constants'
@@ -90,6 +92,7 @@ export type {
   FieldConfig,
   FieldType,
   GroupFieldConfig,
+  LayoutFieldType,
   ObjectFieldConfig,
   SelectFieldConfig,
   TabPane,
@@ -97,7 +100,6 @@ export type {
   UploadConfig,
   UploadFieldConfig,
   VoidFieldConfig,
-  VoidFieldType,
 } from './field'
 
 // 表单类型

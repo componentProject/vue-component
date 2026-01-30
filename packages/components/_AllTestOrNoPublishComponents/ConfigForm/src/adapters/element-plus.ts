@@ -231,14 +231,8 @@ export function createElementPlusAdapter(): UIAdapter {
       object: 'object',
       array: 'array',
 
-      // 布局类（不产生数据）
-      void: 'void',
-      group: 'void',
-      card: 'void',
-      tabs: 'void',
-      collapse: 'void',
-      divider: 'void',
-      alert: 'void',
+      // 注意：布局类使用 layout 属性标识，不在此处维护
+      // 通过 field.layout 属性直接判断，更简洁清晰
     },
 
     // 布局组件

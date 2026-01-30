@@ -104,20 +104,21 @@ export type ComplexFieldType
 
 /**
  * 布局字段类型（不产生数据）
+ * 使用 layout 属性指定，而非 type
  */
-export type VoidFieldType
-  = | 'void' // 通用布局容器
-    | 'group' // 字段分组
-    | 'card' // 卡片容器
-    | 'collapse' // 折叠面板
-    | 'tabs' // 标签页
-    | 'divider' // 分割线
-    | 'alert' // 提示信息
+export type LayoutFieldType =
+  | 'void' // 通用布局容器
+  | 'group' // 字段分组
+  | 'card' // 卡片容器
+  | 'collapse' // 折叠面板
+  | 'tabs' // 标签页
+  | 'divider' // 分割线
+  | 'alert' // 提示信息
 
 /**
- * 所有字段类型
+ * 所有数据字段类型（产生数据）
  */
-export type FieldType = BasicFieldType | ComplexFieldType | VoidFieldType
+export type FieldType = BasicFieldType | ComplexFieldType
 
 // ==================== 基础字段配置 ====================
 
@@ -125,16 +126,36 @@ export type FieldType = BasicFieldType | ComplexFieldType | VoidFieldType
  * 字段基础配置
  */
 export interface BaseFieldConfig {
-  /** 字段类型（决定渲染组件） */
-  type: FieldType
+  /**
+   * 字段类型（决定渲染组件）
+   * 用于数据字段，如 input、number、select 等
+   * 布局字段使用 layout 属性代替
+   */
+  type?: FieldType
+  /**
+   * 布局类型（不产生数据）
+   * 有此属性的字段为布局字段，其子字段直接贡献到表单数据，不产生嵌套
+   *
+   * @example
+   * ```typescript
+   * // 标签页布局
+   * { layout: 'tabs', tabs: [...] }
+   *
+   * // 卡片布局
+   * { layout: 'card', properties: {...} }
+   * ```
+   */
+  layout?: LayoutFieldType
   /**
    * 数据类型（用于校验，可选）
    *
    * 如不指定，将按以下优先级自动推断：
-   * 1. 结构推断：有 items → array，有 properties → object
-   * 2. Adapter 中 fields 配置的 dataType
-   * 3. Adapter 中 dataTypeMap 的默认映射
-   * 4. 默认为 'any'
+   * 1. layout 属性存在 → 'void'
+   * 2. 结构推断：有 items → 'array'
+   * 3. type === 'object' → 'object'
+   * 4. Adapter 中 fields 配置的 dataType
+   * 5. Adapter 中 dataTypeMap 的默认映射
+   * 6. 默认为 'any'
    *
    * @example
    * ```typescript
@@ -401,8 +422,8 @@ export interface ArrayOperations {
 /**
  * 通用布局容器配置
  */
-export interface VoidFieldConfig extends BaseFieldConfig {
-  type: 'void'
+export interface VoidFieldConfig extends Omit<BaseFieldConfig, 'type'> {
+  layout: 'void'
   /** 子字段配置 */
   properties?: Record<string, FieldConfig>
 }
@@ -410,8 +431,8 @@ export interface VoidFieldConfig extends BaseFieldConfig {
 /**
  * 分组容器配置
  */
-export interface GroupFieldConfig extends BaseFieldConfig {
-  type: 'group'
+export interface GroupFieldConfig extends Omit<BaseFieldConfig, 'type'> {
+  layout: 'group'
   /** 子字段配置 */
   properties: Record<string, FieldConfig>
 }
@@ -419,8 +440,8 @@ export interface GroupFieldConfig extends BaseFieldConfig {
 /**
  * 卡片容器配置
  */
-export interface CardFieldConfig extends BaseFieldConfig {
-  type: 'card'
+export interface CardFieldConfig extends Omit<BaseFieldConfig, 'type'> {
+  layout: 'card'
   /** 子字段配置 */
   properties?: Record<string, FieldConfig>
   /** 卡片标题 */
@@ -434,8 +455,8 @@ export interface CardFieldConfig extends BaseFieldConfig {
 /**
  * 折叠面板配置
  */
-export interface CollapseFieldConfig extends BaseFieldConfig {
-  type: 'collapse'
+export interface CollapseFieldConfig extends Omit<BaseFieldConfig, 'type'> {
+  layout: 'collapse'
   /** 面板配置 */
   panels: CollapsePanel[]
   /** 是否手风琴模式 */
@@ -461,8 +482,8 @@ export interface CollapsePanel {
 /**
  * 标签页配置
  */
-export interface TabsFieldConfig extends BaseFieldConfig {
-  type: 'tabs'
+export interface TabsFieldConfig extends Omit<BaseFieldConfig, 'type'> {
+  layout: 'tabs'
   /** 标签页配置 */
   tabs: TabPane[]
   /** 标签页位置 */

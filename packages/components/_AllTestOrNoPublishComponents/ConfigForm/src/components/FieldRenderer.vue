@@ -296,8 +296,8 @@ const {
 const formValuesJSON = computed(() => JSON.stringify(formValues))
 
 // 判断字段类型
-// Formily 风格：component 优先于 type 的默认渲染器
-const isVoidField = computed(() => ['void', 'group', 'card', 'collapse', 'tabs', 'divider', 'alert'].includes(props.field.type))
+// 通过 layout 属性判断布局字段，更清晰的语义
+const isVoidField = computed(() => 'layout' in props.field && props.field.layout != null)
 const isArrayField = computed(() => props.field.type === 'array' && !props.field.component)
 const isObjectField = computed(() => props.field.type === 'object' && !props.field.component)
 

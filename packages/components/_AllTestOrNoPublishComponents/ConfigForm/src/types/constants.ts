@@ -60,3 +60,35 @@ export type HandlerEventType = 'init' | 'change' | 'focus' | 'blur'
  * Handler 事件选项列表
  */
 export const HANDLER_EVENT_OPTIONS: readonly HandlerEventType[] = ['init', 'change', 'focus', 'blur'] as const
+
+// ==================== 字段布局常量 ====================
+
+/**
+ * 布局字段类型列表（用于类型提示和文档参考）
+ *
+ * 注意：现在通过 layout 属性判断是否为布局字段，不再需要判断 type。
+ * 有 layout 属性的字段不产生数据，仅用于视觉布局和字段组织。
+ *
+ * 设计理念：
+ * - 数据字段：使用 type 属性指定（input、number、select 等）
+ * - 布局字段：使用 layout 属性指定（tabs、collapse、card 等）
+ * - 这样的分离使语义更清晰，判断更简单
+ */
+export const LAYOUT_FIELD_TYPES = [
+  'void', // 通用布局容器
+  'group', // 字段分组
+  'card', // 卡片容器
+  'collapse', // 折叠面板
+  'tabs', // 标签页
+  'divider', // 分割线
+  'alert', // 提示信息
+] as const
+
+/**
+ * 判断字段是否为布局字段
+ * @param field - 字段配置
+ * @returns 是否为布局字段（有 layout 属性）
+ */
+export function isLayoutField(field: { layout?: string }): boolean {
+  return field.layout != null
+}

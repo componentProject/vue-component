@@ -107,7 +107,7 @@ const formSchema: FormSchema = {
   properties: {
     // ===== 基础信息 =====
     basicInfo: {
-      type: 'card',
+      layout: 'card',
       title: '基础信息',
       properties: {
         username: {
@@ -229,7 +229,7 @@ const formSchema: FormSchema = {
 
     // ===== 通知设置 =====
     notificationSettings: {
-      type: 'collapse',
+      layout: 'collapse',
       title: '通知设置',
       panels: [
         {
@@ -276,7 +276,7 @@ const formSchema: FormSchema = {
 
     // ===== 高级设置 =====
     advancedSettings: {
-      type: 'card',
+      layout: 'card',
       title: '高级设置',
       properties: {
         introduction: {
@@ -350,7 +350,7 @@ const formSchema: FormSchema = {
 
     // ===== 其他信息 =====
     otherInfo: {
-      type: 'group',
+      layout: 'group',
       title: '其他信息',
       properties: {
         remark: {

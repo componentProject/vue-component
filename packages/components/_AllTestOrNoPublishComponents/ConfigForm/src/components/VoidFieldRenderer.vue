@@ -2,7 +2,7 @@
 <template>
   <template v-if="shouldRender">
     <!-- 卡片容器 -->
-    <template v-if="field.type === 'card'">
+    <template v-if="field.layout === 'card'">
       <component
         :is="layoutComponents.card"
         :title="computedTitle"
@@ -61,7 +61,7 @@
     </template>
 
     <!-- 折叠面板 -->
-    <template v-else-if="field.type === 'collapse'">
+    <template v-else-if="field.layout === 'collapse'">
       <component
         :is="layoutComponents.collapse"
         v-model="activeCollapseKeys"
@@ -97,7 +97,7 @@
     </template>
 
     <!-- 标签页 -->
-    <template v-else-if="field.type === 'tabs'">
+    <template v-else-if="field.layout === 'tabs'">
       <component
         :is="layoutComponents.tabs"
         v-model="activeTabKey"
@@ -133,7 +133,7 @@
     </template>
 
     <!-- 分组 -->
-    <template v-else-if="field.type === 'group'">
+    <template v-else-if="field.layout === 'group'">
       <div class="config-form-group" v-bind="componentProps">
         <div v-if="computedTitle" class="config-form-group__title">
           {{ computedTitle }}
@@ -157,7 +157,7 @@
     </template>
 
     <!-- 分割线 -->
-    <template v-else-if="field.type === 'divider'">
+    <template v-else-if="field.layout === 'divider'">
       <component :is="layoutComponents.divider" v-bind="componentProps">
         <template v-if="computedTitle">
           {{ computedTitle }}
@@ -166,7 +166,7 @@
     </template>
 
     <!-- 提示信息 -->
-    <template v-else-if="field.type === 'alert'">
+    <template v-else-if="field.layout === 'alert'">
       <component
         :is="layoutComponents.alert"
         :title="computedTitle || ''"
@@ -331,13 +331,12 @@ function toggleCollapse() {
 
 /**
  * 获取子字段路径
- * 对于布局容器（void/card/collapse/tabs/group），不添加 path 前缀
+ * 对于布局容器（有 layout 属性），不添加 path 前缀
  * 因为它们不产生数据，只是用于布局
  */
 function getChildPath(childName: string): string {
-  const voidTypes = ['void', 'card', 'collapse', 'tabs', 'group', 'divider', 'alert']
-  // 如果当前字段是布局容器，且 name 为空或者是布局类型，则直接使用 childName
-  if (voidTypes.includes(props.field.type) && !props.field.name) {
+  // 如果当前字段是布局容器（有 layout 属性），且 name 为空，则直接使用 childName
+  if (props.field.layout && !props.field.name) {
     return childName
   }
   return props.path ? `${props.path}.${childName}` : childName

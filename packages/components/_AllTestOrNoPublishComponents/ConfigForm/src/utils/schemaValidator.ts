@@ -62,7 +62,7 @@ function validateField(field: FieldConfig, path: string): SchemaValidationError[
   }
 
   // 3. select/radio/checkbox 类型建议有 dataSource
-  if (['select', 'multiSelect', 'radio', 'checkbox'].includes(field.type) && !('dataSource' in field)) {
+  if (field.type && ['select', 'multiSelect', 'radio', 'checkbox'].includes(field.type) && !('dataSource' in field)) {
     errors.push({
       path,
       type: 'warning',
@@ -70,33 +70,53 @@ function validateField(field: FieldConfig, path: string): SchemaValidationError[
     })
   }
 
-  // 4. tabs 类型必须有 tabs 配置
-  if (field.type === 'tabs' && !('tabs' in field)) {
+  // 4. tabs 布局必须有 tabs 配置
+  if ('layout' in field && field.layout === 'tabs' && !('tabs' in field)) {
     errors.push({
       path,
       type: 'error',
-      message: `type="tabs" 需要配置 tabs 属性来定义标签页`,
+      message: `layout="tabs" 需要配置 tabs 属性来定义标签页`,
     })
   }
 
-  // 5. 递归校验子字段
+  // 5. collapse 布局必须有 panels 配置
+  if ('layout' in field && field.layout === 'collapse' && !('panels' in field)) {
+    errors.push({
+      path,
+      type: 'error',
+      message: `layout="collapse" 需要配置 panels 属性来定义折叠面板`,
+    })
+  }
+
+  // 6. 递归校验子字段
   if ('properties' in field && field.properties) {
     for (const [key, subField] of Object.entries(field.properties)) {
       errors.push(...validateField(subField as FieldConfig, `${path}.${key}`))
     }
   }
 
-  // 6. 递归校验数组项
+  // 7. 递归校验数组项
   if ('items' in field && field.items) {
     errors.push(...validateField(field.items as FieldConfig, `${path}[items]`))
   }
 
-  // 7. 递归校验 tabs 内的字段
+  // 8. 递归校验 tabs 内的字段
   if ('tabs' in field && Array.isArray(field.tabs)) {
     for (const tab of field.tabs) {
       if (tab.properties) {
         for (const [key, subField] of Object.entries(tab.properties)) {
           errors.push(...validateField(subField as FieldConfig, `${path}.tabs[${tab.key}].${key}`))
+        }
+      }
+    }
+  }
+
+  // 9. 递归校验 panels 内的字段
+  if ('panels' in field && Array.isArray(field.panels)) {
+    for (const panel of field.panels) {
+      if (panel.properties) {
+        for (const [key, subField] of Object.entries(panel.properties)) {
+          errors.push(...validateField(subField as FieldConfig, `${path}.panels[${panel.key}].${key}`))
         }
       }
     }
