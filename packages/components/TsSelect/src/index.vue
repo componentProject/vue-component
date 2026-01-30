@@ -192,7 +192,7 @@ function setupIntersectionObserver() {
     // 获取当前 Select 元素
     const currentSelect = document.getElementById(selectId)
     if (!currentSelect) {
-      console.warn('找不到当前 Select 元素')
+      console.error('找不到当前 Select 元素')
       return
     }
 
@@ -216,7 +216,7 @@ function setupIntersectionObserver() {
     }
 
     if (!dropdown) {
-      console.warn('无法找到对应的下拉框容器')
+      console.error('无法找到对应的下拉框容器')
       return
     }
 

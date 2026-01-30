@@ -75,7 +75,7 @@ export function detectFramework(config: FrameworkConfig, rootDir?: string): Fram
         devDependencies = packageJson.devDependencies || {}
       }
       catch (error) {
-        console.warn(`无法读取 package.json: ${packageJsonPath}`, error)
+        console.error(`无法读取 package.json: ${packageJsonPath}`, error)
       }
     }
 

@@ -214,7 +214,7 @@ export function withInstall<T extends Component>(component: T): WithInstall<T> {
   (component as any).install = (app: App, _options?: unknown) => {
     const name: string | undefined = (component as any)?.name
     if (!name) {
-      console.warn('[withInstall] 组件缺少 name，已跳过注册。')
+      console.error('[withInstall] 组件缺少 name，已跳过注册。')
     }
     else {
       console.log('🚀 注册组件:', component.name)

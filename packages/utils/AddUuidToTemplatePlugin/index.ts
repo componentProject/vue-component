@@ -278,7 +278,7 @@ export default function AddUuidToTemplatePlugin(): Plugin {
                   }
                 }
                 catch (ruleError) {
-                  console.warn(`uuIdToTemplate: 处理CSS规则失败: ${rule.selector}`, ruleError)
+                  console.error(`uuIdToTemplate: 处理CSS规则失败: ${rule.selector}`, ruleError)
                 }
               })
             }

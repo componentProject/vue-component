@@ -146,7 +146,7 @@ export class IndexedDBManager {
       }
 
       req.onblocked = () => {
-        console.warn('IndexedDB 升级被阻止，请关闭其他打开此数据库的标签页')
+        console.error('IndexedDB 升级被阻止，请关闭其他打开此数据库的标签页')
       }
     })
 

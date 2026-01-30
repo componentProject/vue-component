@@ -21,7 +21,7 @@ export function scanFolder(folderName: string): SidebarGroup[] {
   console.log(`🚀 开始扫描 ${folderName} 文件夹...`)
   const targetDir = path.resolve(docsPath, folderName)
   if (!fs.existsSync(targetDir)) {
-    console.warn(`❌ ${folderName} 目录不存在，路径:`, targetDir)
+    console.error(`❌ ${folderName} 目录不存在，路径:`, targetDir)
     return []
   }
 

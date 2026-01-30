@@ -143,8 +143,8 @@ async function bundleComponentModule(ctx: BuildContext, {
       rollupPlugins.push(externalGlobals(globals))
     }
     catch (error) {
-      console.warn('Failed to load rollup-plugin-external-globals:', error)
-      console.warn('Please install rollup-plugin-external-globals: npm install -D rollup-plugin-external-globals')
+      console.error('Failed to load rollup-plugin-external-globals:', error)
+      console.error('Please install rollup-plugin-external-globals: npm install -D rollup-plugin-external-globals')
     }
   }
   if (ctx.useObfuscator) {
@@ -288,7 +288,7 @@ async function getComponentConfig(ctx: BuildContext, comp: string): Promise<Comp
     }
   }
   catch (error) {
-    console.warn(`分析组件 ${comp} 依赖失败: ${(error as Error).message}`)
+    console.error(`分析组件 ${comp} 依赖失败: ${(error as Error).message}`)
   }
 
   return { entry, outputDir, dependencies }

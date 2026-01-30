@@ -42,7 +42,7 @@ export function getPackageDependencies(rootDir?: string): Record<string, string>
     return allDependencies
   }
   catch (error) {
-    console.warn(`无法读取 package.json: ${packageJsonPath}`, error)
+    console.error(`无法读取 package.json: ${packageJsonPath}`, error)
     return {}
   }
 }

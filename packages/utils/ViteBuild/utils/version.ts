@@ -25,7 +25,7 @@ export async function getCurrentVersions(ctx: BuildContext): Promise<Record<stri
     return JSON.parse(content)
   }
   catch (error) {
-    console.warn(`获取版本号对象失败: ${(error as Error).message}`)
+    console.error(`获取版本号对象失败: ${(error as Error).message}`)
     return {}
   }
 }

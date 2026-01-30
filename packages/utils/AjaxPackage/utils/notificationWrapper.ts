@@ -49,7 +49,7 @@ export function createNotificationWrapper(hasDocument: boolean, container?: HTML
         console.error(logMessage)
         break
       case 'warning':
-        console.warn(logMessage)
+        console.error(logMessage)
         break
       default:
         console.info(logMessage)

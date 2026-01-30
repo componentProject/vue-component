@@ -55,7 +55,7 @@ export function useOptions(props: UseOptionsProps): UseOptionsReturn {
           data: props.responseDataPath || 'data', // 使用responseDataPath作为数据路径
         },
         onTimeout: () => {
-          console.warn('请求超时')
+          console.error('请求超时')
         },
         addSign: props.addSign,
         // 将自定义请求头传给BaseApi
@@ -92,7 +92,7 @@ export function useOptions(props: UseOptionsProps): UseOptionsReturn {
             data: props.responseDataPath || 'data',
           },
           onTimeout: () => {
-            console.warn('请求超时')
+            console.error('请求超时')
           },
           addSign: props.addSign,
           headers: {

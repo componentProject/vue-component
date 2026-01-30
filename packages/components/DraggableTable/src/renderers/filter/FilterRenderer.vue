@@ -107,7 +107,7 @@ function getFormattedValue(obj: any) {
     return formatter.value(obj)
   }
   catch (error) {
-    console.warn('Filter format function error:', error)
+    console.error('Filter format function error:', error)
     return obj.value
   }
 }

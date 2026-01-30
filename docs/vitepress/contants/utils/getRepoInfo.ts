@@ -25,7 +25,7 @@ export function getRepoInfo(): RepoInfo | null {
     const pkgPath = path.resolve(docsPath, './package.json')
 
     if (!pkgPath) {
-      console.warn('❌ 未找到 package.json 文件')
+      console.error('❌ 未找到 package.json 文件')
       return null
     }
 
@@ -34,7 +34,7 @@ export function getRepoInfo(): RepoInfo | null {
     const pkg = JSON.parse(pkgContent)
 
     if (!pkg.repository || !pkg.repository.url) {
-      console.warn('❌ package.json 中没有 repository 字段')
+      console.error('❌ package.json 中没有 repository 字段')
       return null
     }
 
@@ -57,14 +57,14 @@ export function getRepoInfo(): RepoInfo | null {
       httpsUrl = repoUrl.replace('git://', 'https://').replace('.git', '')
     }
     else {
-      console.warn('❌ 不支持的 repository URL 格式:', repoUrl)
+      console.error('❌ 不支持的 repository URL 格式:', repoUrl)
       return null
     }
 
     // 提取 owner 和 repo 名称
     const urlMatch = httpsUrl.match(/https:\/\/github\.com\/([^/]+)\/([^/]+)/)
     if (!urlMatch) {
-      console.warn('❌ 无法解析 GitHub URL:', httpsUrl)
+      console.error('❌ 无法解析 GitHub URL:', httpsUrl)
       return null
     }
 

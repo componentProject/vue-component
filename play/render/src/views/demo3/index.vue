@@ -60,7 +60,7 @@ function getComponentProps(item: any) {
       // 容错处理：分割绑定字符串，处理可能的空格
       const parts = binding.split(/\s*=\s*/)
       if (parts.length !== 2) {
-        console.warn('Invalid binding format:', binding)
+        console.error('Invalid binding format:', binding)
         return
       }
       const type = parts[0].trim()

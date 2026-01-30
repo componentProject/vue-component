@@ -299,7 +299,7 @@ export function savePositionToStorage(options: {
     localStorage.setItem(key, JSON.stringify(position))
   }
   catch (error) {
-    console.warn('Failed to save position to localStorage:', error)
+    console.error('Failed to save position to localStorage:', error)
   }
 }
 
@@ -348,7 +348,7 @@ export function loadPositionFromStorage(options: {
     }
   }
   catch (error) {
-    console.warn('Failed to load position from localStorage:', error)
+    console.error('Failed to load position from localStorage:', error)
   }
   return null
 }
@@ -364,6 +364,6 @@ export function clearPositionFromStorage(key: string): void {
     localStorage.removeItem(key)
   }
   catch (error) {
-    console.warn('Failed to clear position from localStorage:', error)
+    console.error('Failed to clear position from localStorage:', error)
   }
 }

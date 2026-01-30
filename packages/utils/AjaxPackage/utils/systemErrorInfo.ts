@@ -67,7 +67,7 @@ export function getUserInfoFromLocalStorage(): Record<string, any> {
     return userInfo || {}
   }
   catch (error) {
-    console.warn('Failed to parse userInfo from localStorage:', error)
+    console.error('Failed to parse userInfo from localStorage:', error)
     return {}
   }
 }
@@ -86,7 +86,7 @@ export function getCurrentMenuLocalStorage(): Record<string, any> {
     return currentMenu || {}
   }
   catch (error) {
-    console.warn('Failed to parse currentMenu from localStorage:', error)
+    console.error('Failed to parse currentMenu from localStorage:', error)
     return {}
   }
 }

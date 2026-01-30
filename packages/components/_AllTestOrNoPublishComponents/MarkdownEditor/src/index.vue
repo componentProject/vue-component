@@ -362,7 +362,7 @@ async function uploadImagesToIndexedDB(files: File[]): Promise<string[]> {
     for (const file of files) {
       // 检查文件类型
       if (!file.type.startsWith('image/')) {
-        console.warn(`文件 ${file.name} 不是图片类型`)
+        console.error(`文件 ${file.name} 不是图片类型`)
         continue
       }
 

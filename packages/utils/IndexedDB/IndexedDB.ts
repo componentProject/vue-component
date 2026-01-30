@@ -104,7 +104,7 @@ export class IndexDBStorage {
       return result
     }
     catch (error) {
-      console.warn('存储操作失败，正在重新初始化环境:', error)
+      console.error('存储操作失败，正在重新初始化环境:', error)
       // Worker 失败时，清理 Worker
       if (this.worker) {
         try {
@@ -298,7 +298,7 @@ export class IndexDBStorage {
       return this.createWorkerBackend()
     }
     catch (error) {
-      console.warn('创建 Web Worker 失败，将回退到其他后端:', error)
+      console.error('创建 Web Worker 失败，将回退到其他后端:', error)
       try {
         this.worker?.terminate()
       }
@@ -535,7 +535,7 @@ export class IndexDBStorage {
         await this.backend.close()
       }
       catch (error) {
-        console.warn('Close operation failed:', error)
+        console.error('Close operation failed:', error)
       }
     }
     // 清空 backend

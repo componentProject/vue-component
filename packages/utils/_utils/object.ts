@@ -74,7 +74,7 @@ export function validateMutuallyExclusive<T extends Record<string, boolean | und
     const selectedKey = (defaultKey && enabledKeys.includes(defaultKey))
       ? defaultKey
       : enabledKeys[0]
-    console.warn(
+    console.error(
       `[validateMutuallyExclusive] ${allKeysStr} 只能启用一个，但当前启用了：${keysStr}。已自动选择：${String(selectedKey)}`,
     )
     // 只保留选中的键，其他的设置为 false

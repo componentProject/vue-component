@@ -221,7 +221,7 @@ export function executeExpression<T = any>(
       case 'function': {
         const handler = handlers[parsed.functionName!]
         if (!handler) {
-          console.warn(`[ConfigForm] Handler not found: ${parsed.functionName}`)
+          console.error(`[ConfigForm] Handler not found: ${parsed.functionName}`)
           return undefined as T
         }
         // 解析参数中的表达式

@@ -80,7 +80,7 @@ export default class BaseApi extends BaseHttpClient {
   private async openSystemErrorDialog(errorId: string): Promise<void> {
     const errorInfo = this.systemErrorInfoMap.get(errorId)
     if (!errorInfo) {
-      console.warn('未找到错误信息，ID:', errorId)
+      console.error('未找到错误信息，ID:', errorId)
       return
     }
 
@@ -198,7 +198,7 @@ export default class BaseApi extends BaseHttpClient {
       this.systemErrorDialogInstance = createApiDialog(SystemErrorDialog, popoverContainer)
     }
     catch (error) {
-      console.warn('Failed to load SystemErrorDialog:', error)
+      console.error('Failed to load SystemErrorDialog:', error)
       // 初始化失败不影响其他功能，只是无法显示系统错误弹窗
       throw error
     }

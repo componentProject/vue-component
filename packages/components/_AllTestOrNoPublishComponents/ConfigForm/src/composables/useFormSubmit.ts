@@ -103,7 +103,7 @@ export function useFormSubmit(options: UseFormSubmitOptions): UseFormSubmitRetur
     message: {
       success: (msg: string) => console.log('[Success]', msg),
       error: (msg: string) => console.error('[Error]', msg),
-      warning: (msg: string) => console.warn('[Warning]', msg),
+      warning: (msg: string) => console.error('[Warning]', msg),
       info: (msg: string) => console.info('[Info]', msg),
     },
     messageBox: {

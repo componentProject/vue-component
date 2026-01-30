@@ -89,7 +89,7 @@ const computedKeys = computed(() => {
  */
 function handleExport() {
   if (computedColumn.value.length !== getTypeDefault(props.columns, 'array').length) {
-    console.warn(`部分列未找到字段(${getTypeDefault(props.fields, 'array').join('/')})，已被忽略`)
+    console.error(`部分列未找到字段(${getTypeDefault(props.fields, 'array').join('/')})，已被忽略`)
   }
   // 检查数据是否为空
   if (!props.tableData || props.tableData.length === 0) {

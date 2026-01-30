@@ -113,7 +113,7 @@ export async function formatWithPrettier(
     })
   }
   catch (error) {
-    console.warn('[formatWithPrettier] 格式化失败，返回原文。', error)
+    console.error('[formatWithPrettier] 格式化失败，返回原文。', error)
     return code
   }
 }

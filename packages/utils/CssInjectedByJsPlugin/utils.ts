@@ -152,7 +152,7 @@ export function removeLinkStyleSheets(html: string, cssFileName: string): string
 
 /* istanbul ignore next -- @preserve */
 export function warnLog(msg: string) {
-  console.warn(`\x1B[33m \n${msg} \x1B[39m`)
+  console.error(`\x1B[33m \n${msg} \x1B[39m`)
 }
 
 /* istanbul ignore next -- @preserve */

@@ -42,7 +42,7 @@ export function createMessageWrapper(hasDocument: boolean, container?: HTMLEleme
         console.error(logMessage)
         break
       case 'warning':
-        console.warn(logMessage)
+        console.error(logMessage)
         break
       default:
         console.info(logMessage)

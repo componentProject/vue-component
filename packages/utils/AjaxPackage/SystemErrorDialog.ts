@@ -186,7 +186,7 @@ export default defineComponent({
     function openSkyWalkingDetail() {
       // 检查是否存在 traceId
       if (!props.traceId) {
-        console.warn('TraceId 不存在，无法打开 SkyWalking 详情')
+        console.error('TraceId 不存在，无法打开 SkyWalking 详情')
         return
       }
 

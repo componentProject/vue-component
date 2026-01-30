@@ -5,7 +5,7 @@
  */
 export async function copyToClipboard(text: string): Promise<boolean> {
   if (!text) {
-    console.warn('复制文本为空')
+    console.error('复制文本为空')
     return false
   }
 

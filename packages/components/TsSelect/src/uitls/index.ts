@@ -59,7 +59,7 @@ export default async function getServerOptions(
 
   // 如果没有找到URL，返回空数组
   if (!url) {
-    console.warn(`未找到服务类型: ${serverType}`)
+    console.error(`未找到服务类型: ${serverType}`)
     return []
   }
 

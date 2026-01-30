@@ -1156,7 +1156,7 @@ async function handleSaveColumnsToStorage() {
     }
   }
   catch (error) {
-    console.warn('保存列配置到本地存储失败:', error)
+    console.error('保存列配置到本地存储失败:', error)
   }
 }
 

@@ -137,7 +137,7 @@ export default class BaseHttpClient {
       // 如果查询不到元素，根据 appendToFallback 配置处理
       if (this.appendToFallback === null) {
         // null 时返回 null，不降级，保障后续能正确添加到指定元素里
-        console.warn(`appendTo 选择器 "${this.appendTo}" 未找到元素，appendToFallback 为 null，返回 null`)
+        console.error(`appendTo 选择器 "${this.appendTo}" 未找到元素，appendToFallback 为 null，返回 null`)
         return null
       }
       else if (this.appendToFallback === 'body') {
@@ -151,7 +151,7 @@ export default class BaseHttpClient {
           return fallbackElement
         }
         // 后备元素也找不到，返回 null，不降级到 body
-        console.warn(`appendTo 选择器 "${this.appendTo}" 和 appendToFallback 选择器 "${this.appendToFallback}" 都未找到元素，返回 null`)
+        console.error(`appendTo 选择器 "${this.appendTo}" 和 appendToFallback 选择器 "${this.appendToFallback}" 都未找到元素，返回 null`)
         return null
       }
     }
@@ -595,7 +595,7 @@ export default class BaseHttpClient {
   public downloadFile(blob: Blob, filename?: string): void {
     // 非浏览器环境，无法下载
     if (typeof window === 'undefined') {
-      console.warn('downloadFile: 非浏览器环境，无法下载文件')
+      console.error('downloadFile: 非浏览器环境，无法下载文件')
       return
     }
 
