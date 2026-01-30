@@ -314,8 +314,8 @@ const formContext = computed<FormContext>(() => {
           message: content || '',
         })
       }
-      // eslint-disable-next-line no-alert
-      return window.confirm(content || '')
+      // 如果 Adapter 未提供 confirm 方法，默认返回 true（允许操作）
+      return true
     },
     request: async (config) => {
       if (props.requestAdapter) {

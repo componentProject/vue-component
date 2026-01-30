@@ -360,7 +360,7 @@ async function removeItem(index: number) {
   if (isMinReached.value)
     return
 
-  // 确认删除
+  // 确认删除（需要 Adapter 提供 messageBox.confirm 方法）
   if (removeConfirm.value.enabled) {
     const feedback = adapter?.value.feedback
     if (feedback?.messageBox?.confirm) {
@@ -374,10 +374,7 @@ async function removeItem(index: number) {
         return
       }
     }
-    // eslint-disable-next-line no-alert
-    else if (!window.confirm(removeConfirm.value.text)) {
-      return
-    }
+    // 如果 Adapter 未提供 confirm 方法，跳过确认直接删除
   }
 
   const newValue = [...(modelValue.value || [])]

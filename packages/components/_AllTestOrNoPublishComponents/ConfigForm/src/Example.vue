@@ -13,22 +13,7 @@
             <img src="https://element-plus.org/images/element-plus-logo-small.svg" alt="Element Plus">
             <span>Element Plus</span>
           </div>
-
-          <!-- 搜索栏示例 -->
-          <div class="example-block">
-            <h3 class="example-title">
-              🔍 搜索栏示例
-            </h3>
-            <ElementPlusSearchExample />
-          </div>
-
-          <!-- 完整表单示例 -->
-          <div class="example-block">
-            <h3 class="example-title">
-              📋 完整表单示例
-            </h3>
-            <ElementPlusExample />
-          </div>
+          <ElementPlusExample />
         </div>
       </ElTabPane>
 
@@ -38,22 +23,7 @@
             <img src="https://aliyuncdn.antdv.com/v2/assets/logo.1ef800a8.svg" alt="Ant Design Vue">
             <span>Ant Design Vue</span>
           </div>
-
-          <!-- 搜索栏示例 -->
-          <div class="example-block">
-            <h3 class="example-title">
-              🔍 搜索栏示例
-            </h3>
-            <AntDesignVueSearchExample />
-          </div>
-
-          <!-- 完整表单示例 -->
-          <div class="example-block">
-            <h3 class="example-title">
-              📋 完整表单示例
-            </h3>
-            <AntDesignVueExample />
-          </div>
+          <AntDesignVueExample />
         </div>
       </ElTabPane>
     </ElTabs>
@@ -65,9 +35,7 @@ import { ElTabPane, ElTabs } from 'element-plus'
 import { ref } from 'vue'
 import {
   AntDesignVueExample,
-  AntDesignVueSearchExample,
   ElementPlusExample,
-  ElementPlusSearchExample,
 } from './examples'
 
 defineOptions({
@@ -156,26 +124,5 @@ const activeTab = ref('element-plus')
   background: linear-gradient(135deg, #e6f7ff 0%, #f0f5ff 100%);
   color: #1890ff;
   border: 1px solid #91d5ff;
-}
-
-.example-block {
-  margin-bottom: 32px;
-  padding: 20px;
-  background: #fff;
-  border-radius: 8px;
-  border: 1px solid #ebeef5;
-}
-
-.example-block:last-child {
-  margin-bottom: 0;
-}
-
-.example-title {
-  margin: 0 0 16px;
-  padding-bottom: 12px;
-  font-size: 16px;
-  font-weight: 600;
-  color: #303133;
-  border-bottom: 1px solid #ebeef5;
 }
 </style>
