@@ -105,7 +105,7 @@ export function getComponentFormats(ctx: BuildContext, comp: string): ModuleForm
 
   // 如果没有任何格式，使用默认值
   if (formats.length === 0) {
-      formats.push('es')
+    formats.push('es')
   }
 
   return formats

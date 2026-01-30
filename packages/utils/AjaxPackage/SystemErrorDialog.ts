@@ -1,9 +1,9 @@
 import { ElButton, ElDialog, ElMessage } from 'element-plus'
 import { computed, defineComponent, h, ref } from 'vue'
 import { copyToClipboard } from '../_utils/index.ts'
-import { getCurrentMenuLocalStorage, getUserInfoFromLocalStorage } from './utils/systemErrorInfo.ts'
 import BaseApi from './class.ts'
 import cssModules from './styles/modules/index.module.css'
+import { getCurrentMenuLocalStorage, getUserInfoFromLocalStorage } from './utils/systemErrorInfo.ts'
 
 /**
  * SystemErrorDialog 组件

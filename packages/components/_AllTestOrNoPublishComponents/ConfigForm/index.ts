@@ -8,15 +8,14 @@ import ConfigForm from './src/index.vue'
 export { ConfigForm }
 export default ConfigForm
 
+// 导出子组件
+export * from './src/components'
+
+// 导出 Composables
+export * from './src/composables'
+
 // 导出类型
 export * from './src/types'
 
 // 导出工具函数
 export * from './src/utils'
-
-// 导出 Composables
-export * from './src/composables'
-
-// 导出子组件
-export * from './src/components'
-

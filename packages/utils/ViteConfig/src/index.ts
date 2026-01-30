@@ -23,8 +23,8 @@ import { defineConfig, mergeConfig } from 'vite'
 
 import { createHtmlPlugin } from 'vite-plugin-html'
 import { deepMerge, dynamicImport, validateMutuallyExclusive } from '../../_utils/index.ts'
-import { detectFramework } from './utils/detectFramework.ts'
 import scopedCssPrefixPlugin from './plugins/addScopedAndReplacePrefix.ts'
+import { detectFramework } from './utils/detectFramework.ts'
 
 // // workbox urlPattern 参数类型
 // interface UrlPatternContext {

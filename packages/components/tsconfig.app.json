@@ -10,6 +10,10 @@
       "vite/client"
     ]
   },
+  "include": [
+    "**/*.ts",
+    "**/*.vue"
+  ],
   "vueCompilerOptions": {
     "plugins": [
       "@vue-macros/volar/define-models",
