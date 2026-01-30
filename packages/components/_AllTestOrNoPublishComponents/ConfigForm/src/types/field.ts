@@ -3,16 +3,72 @@
  * 字段配置类型定义
  */
 
+import type { Component, DefineComponent } from 'vue'
 import type { DisplayType, LayoutType, PatternType } from './constants'
 import type { DataSourceConfig } from './dataSource'
 import type { Expression, MaybeExpression } from './expression'
 import type { FieldReaction, TargetReaction } from './reaction'
 import type { ValidationRule } from './validation'
 
+// ==================== 数据类型定义 ====================
+
+/**
+ * 数据类型 - 用于校验和类型推断
+ *
+ * 与 type（渲染组件类型）不同，dataType 表示字段值的实际数据类型，
+ * 主要用于：
+ * - 数据校验（类型检查）
+ * - 初始值推断
+ * - 表单序列化/反序列化
+ *
+ * @example
+ * ```typescript
+ * // TagInput 组件，值是数组
+ * { type: 'tagInput', dataType: 'array' }
+ *
+ * // 评分组件，值是数字
+ * { type: 'rate', dataType: 'number' }
+ *
+ * // 静态布局，不产生数据
+ * { type: 'tabs', dataType: 'void' }
+ * ```
+ */
+export type DataType =
+  | 'string' // 字符串
+  | 'number' // 数字
+  | 'boolean' // 布尔值
+  | 'array' // 数组
+  | 'object' // 对象
+  | 'date' // 日期（Date 对象或日期字符串）
+  | 'void' // 无数据（纯布局）
+  | 'any' // 任意类型（不校验）
+
+// ==================== 组件类型定义 ====================
+
+/**
+ * Vue 组件类型
+ * 支持以下形式：
+ * - 组件名称字符串（需全局注册）
+ * - 组件定义对象（DefineComponent）
+ * - 函数式组件
+ * - 异步组件
+ */
+export type ComponentType = string | Component | DefineComponent<any, any, any>
+
+/**
+ * 组件配置类型
+ * 支持以下形式：
+ * - 组件名称字符串
+ * - 组件实例
+ * - [组件, 默认props] 元组
+ */
+export type ComponentConfig = ComponentType | [ComponentType, Record<string, any>]
+
 // ==================== 字段类型枚举 ====================
 
 /**
  * 基础字段类型
+ * 注意：自定义组件不再需要特殊的 type，直接使用 component 属性指定即可
  */
 export type BasicFieldType
   = | 'input' // 单行输入
@@ -38,7 +94,6 @@ export type BasicFieldType
     | 'upload' // 文件上传
     | 'richText' // 富文本编辑器
     | 'codeEditor' // 代码编辑器
-    | 'custom' // 自定义组件
 
 /**
  * 复合字段类型
@@ -70,8 +125,28 @@ export type FieldType = BasicFieldType | ComplexFieldType | VoidFieldType
  * 字段基础配置
  */
 export interface BaseFieldConfig {
-  /** 字段类型 */
+  /** 字段类型（决定渲染组件） */
   type: FieldType
+  /**
+   * 数据类型（用于校验，可选）
+   *
+   * 如不指定，将按以下优先级自动推断：
+   * 1. 结构推断：有 items → array，有 properties → object
+   * 2. Adapter 中 fields 配置的 dataType
+   * 3. Adapter 中 dataTypeMap 的默认映射
+   * 4. 默认为 'any'
+   *
+   * @example
+   * ```typescript
+   * // 自定义组件显式指定
+   * { type: 'tagInput', dataType: 'array' }
+   *
+   * // 内置组件通常无需指定，会自动推断
+   * { type: 'input' }  // 自动推断为 string
+   * { type: 'number' } // 自动推断为 number
+   * ```
+   */
+  dataType?: DataType
   /**
    * 字段名称（可选）
    * 如不指定，默认使用 properties 的 key
@@ -125,8 +200,31 @@ export interface BaseFieldConfig {
   reactions?: (FieldReaction | TargetReaction)[]
 
   // ===== 组件配置 =====
-  /** 组件名称或 [组件名, 默认props] */
-  component?: string | [string, Record<string, any>]
+  /**
+   * 自定义渲染组件（参考 Formily x-component 设计）
+   *
+   * 当指定此属性时，将使用指定的组件替代 type 对应的默认组件进行渲染。
+   * 这是使用自定义组件的标准方式，无需特殊的 type 值。
+   *
+   * 支持以下形式：
+   * - 组件名称字符串（需全局注册）
+   * - 组件实例（直接传入 import 的组件）
+   * - [组件, 默认props] 元组
+   *
+   * @example
+   * ```typescript
+   * // 方式1：直接传入组件实例（推荐）
+   * import TagInput from './TagInput.vue'
+   * { type: 'input', component: TagInput }
+   *
+   * // 方式2：带默认 props 的元组形式
+   * { type: 'input', component: [TagInput, { maxTags: 5 }] }
+   *
+   * // 方式3：全局注册的组件名（字符串）
+   * { type: 'input', component: 'MyGlobalInput' }
+   * ```
+   */
+  component?: ComponentConfig
   /** 组件属性（支持表达式） */
   componentProps?: Record<string, any | Expression>
 
@@ -391,21 +489,25 @@ export interface TabPane {
   closable?: boolean
 }
 
-/**
- * 自定义组件字段配置
- */
-export interface CustomFieldConfig extends BaseFieldConfig {
-  type: 'custom'
-  /** 自定义组件名称（需全局注册） */
-  customComponent: string
-  /** 事件映射 */
-  eventHandlers?: Record<string, string>
-}
-
 // ==================== 字段配置联合类型 ====================
 
 /**
  * 所有字段配置的联合类型
+ *
+ * 自定义组件说明：
+ * 不再需要特殊的 type: 'custom'，直接在任意字段类型上使用 component 属性即可。
+ * 这符合 Formily 等业界标准做法：type 表示数据类型/语义，component 决定渲染组件。
+ *
+ * @example
+ * ```typescript
+ * // 使用自定义组件
+ * {
+ *   type: 'input',  // 语义化类型（可选，用于默认校验规则等）
+ *   title: '标签输入',
+ *   component: TagInput,  // 自定义渲染组件
+ *   componentProps: { maxTags: 5 }
+ * }
+ * ```
  */
 export type FieldConfig
   = | BaseFieldConfig
@@ -418,4 +520,3 @@ export type FieldConfig
     | CardFieldConfig
     | CollapseFieldConfig
     | TabsFieldConfig
-    | CustomFieldConfig

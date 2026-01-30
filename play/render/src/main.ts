@@ -5,6 +5,7 @@ import { idbStorage } from '@moluoxixi/utils/IndexedDB'
 import * as Vue from 'vue'
 import { getList } from '@moluoxixi/utils/_api'
 import { registerAllComponent } from '@moluoxixi/utils/_utils/loadComponent'
+import Components from '@moluoxixi/components'
 import {
   browserTracingIntegration,
   init,
@@ -98,10 +99,15 @@ async function render(props: QiankunProps) {
   const { container } = props
   // proxy(container as HTMLElement)
   app = createApp(App)
-  const allComponentList = await getList()
-  await idbStorage.setItem(COMPONENT_SETTING_TYPE, allComponentList, true)
-  const isLongRange = false
-  await registerAllComponent(Vue, app, COMPONENT_SETTING_TYPE, isLongRange)
+  const isLongRange = true
+  if(isLongRange) {
+    app.use(Components)
+  }else{
+    const allComponentList = await getList()
+    await idbStorage.setItem(COMPONENT_SETTING_TYPE, allComponentList, true)
+    const isLongRange = false
+    await registerAllComponent(Vue, app, COMPONENT_SETTING_TYPE, isLongRange)
+  }
   // window.$remoteLoad = load
   // const res = await load(Vue)
   // Object.keys(res).forEach((name) => {

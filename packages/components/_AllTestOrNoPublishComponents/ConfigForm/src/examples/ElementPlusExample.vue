@@ -54,6 +54,8 @@ import type { FormInstance, FormSchema, PatternType } from '../types'
 import { ElButton, ElCollapse, ElCollapseItem, ElMessage, ElRadioButton, ElRadioGroup } from 'element-plus'
 import { reactive, ref } from 'vue'
 import ConfigForm from '../index.vue'
+// 导入自定义组件（用于演示传入组件实例的方式）
+import { StarRating, TagInput } from './components'
 
 defineOptions({
   name: 'ElementPlusExample',
@@ -348,6 +350,63 @@ const formSchema: FormSchema = {
       },
     },
 
+    // ===== 自定义组件示例（参考 Formily x-component 设计） =====
+    customComponents: {
+      type: 'card',
+      title: '自定义组件示例（业界标准：component 属性）',
+      properties: {
+        // 方式一：component 直接传入组件实例（推荐）
+        tags: {
+          type: 'array', // type 表示数据类型/语义，用于校验等
+          title: '标签输入',
+          description: 'component 直接传入组件实例（推荐方式）',
+          component: TagInput, // 自定义渲染组件
+          componentProps: {
+            placeholder: '输入标签后按 Enter 添加',
+            maxTags: 5,
+            separator: ',',
+          },
+          col: { span: 12 },
+        },
+        // 方式二：component 传入另一个自定义组件
+        starRating: {
+          type: 'number', // type 表示数据是数字类型
+          title: '星级评分',
+          description: 'component 传入星级评分组件',
+          component: StarRating,
+          componentProps: {
+            maxStars: 5,
+            showText: true,
+            texts: ['很差', '较差', '一般', '较好', '很好'],
+            activeColor: '#ff9900',
+          },
+          col: { span: 12 },
+        },
+        // 方式三：[组件, 默认props] 元组形式
+        tagInputWithDefaults: {
+          type: 'array',
+          title: '带默认配置的标签输入',
+          description: '[组件, 默认props] 元组形式',
+          component: [TagInput, { maxTags: 3, placeholder: '最多3个标签' }],
+          componentProps: {
+            // componentProps 会与默认 props 合并
+            separator: '，', // 中文逗号分隔
+          },
+          col: { span: 12 },
+        },
+        // 方式四：不指定 component，使用 type 对应的默认组件
+        normalInput: {
+          type: 'input', // 使用 adapter 中 input 对应的默认组件
+          title: '普通输入框（对比）',
+          description: '不指定 component，使用 type 默认组件',
+          componentProps: {
+            placeholder: '这是普通的输入框',
+          },
+          col: { span: 12 },
+        },
+      },
+    },
+
     // ===== 其他信息 =====
     otherInfo: {
       type: 'group',
@@ -498,6 +557,11 @@ const initialValues = {
     { company: '阿里巴巴', position: '高级前端工程师', isCurrent: true, leaveDate: '' },
     { company: '腾讯', position: '前端工程师', isCurrent: false, leaveDate: '2022-06-30' },
   ],
+  // 自定义组件示例字段
+  tags: ['Vue', 'TypeScript', 'ConfigForm'],
+  starRating: 4,
+  tagInputWithDefaults: ['前端', '后端'],
+  normalInput: '普通输入内容',
   remark: '这是一段备注信息，用于测试文本域的展示效果。',
   // 自定义样式测试字段
   customStyleInput: '大号字体输入框',

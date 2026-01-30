@@ -1,127 +1,135 @@
 <!-- ArrayFieldRenderer - 数组字段渲染器 -->
 <template>
   <div class="config-form-array">
-    <!-- 数组标题 -->
-    <div v-if="computedTitle" class="config-form-array__header">
-      <span class="config-form-array__title">{{ computedTitle }}</span>
-      <span class="config-form-array__count">({{ modelValue?.length || 0 }}项)</span>
+    <!-- 配置错误提示：缺少 items -->
+    <div v-if="!hasItems" class="config-form-array__error">
+      ⚠️ 配置错误：type="array" 需要配置 items 属性来定义子项结构
     </div>
 
-    <!-- 数组项列表 -->
-    <div class="config-form-array__list">
-      <TransitionGroup name="array-item">
-        <div
-          v-for="(item, index) in modelValue"
-          :key="getItemKey(item, index)"
-          class="config-form-array__item"
+    <template v-else>
+      <!-- 数组标题 -->
+      <div v-if="computedTitle" class="config-form-array__header">
+        <span class="config-form-array__title">{{ computedTitle }}</span>
+        <span class="config-form-array__count">({{ modelValue?.length || 0 }}项)</span>
+      </div>
+
+      <!-- 数组项列表 -->
+      <div class="config-form-array__list">
+        <TransitionGroup name="array-item">
+          <div
+            v-for="(item, index) in modelValue"
+            :key="getItemKey(item, index)"
+            class="config-form-array__item"
+          >
+            <!-- 排序手柄（阅读态下隐藏） -->
+            <div v-if="canSort && !isReadPretty" class="config-form-array__handle">
+              <component :is="iconComponents.drag" />
+            </div>
+
+            <!-- 数组项内容 -->
+            <div class="config-form-array__content">
+              <FieldRenderer
+                v-if="itemField"
+                :field="itemField"
+                :path="`${path}.${index}`"
+                :context="createItemContext(item, index)"
+              >
+                <template v-for="(_, slotName) in $slots" :key="slotName" #[slotName]="slotData">
+                  <slot :name="slotName" v-bind="slotData || {}" />
+                </template>
+              </FieldRenderer>
+            </div>
+
+            <!-- 数组项操作（阅读态下隐藏） -->
+            <div v-if="!isReadPretty" class="config-form-array__actions">
+              <!-- 复制 -->
+              <component :is="layoutComponents.tooltip" v-if="canCopy" content="复制" title="复制" placement="top">
+                <component
+                  :is="layoutComponents.button"
+                  type="primary"
+                  link
+                  :disabled="isMaxReached"
+                  @click="copyItem(index)"
+                >
+                  <template #icon>
+                    <component :is="iconComponents.copy" />
+                  </template>
+                </component>
+              </component>
+
+              <!-- 上移 -->
+              <component :is="layoutComponents.tooltip" v-if="canMove" content="上移" title="上移" placement="top">
+                <component
+                  :is="layoutComponents.button"
+                  type="primary"
+                  link
+                  :disabled="index === 0"
+                  @click="moveItem(index, index - 1)"
+                >
+                  <template #icon>
+                    <component :is="iconComponents.arrowUp" />
+                  </template>
+                </component>
+              </component>
+
+              <!-- 下移 -->
+              <component :is="layoutComponents.tooltip" v-if="canMove" content="下移" title="下移" placement="top">
+                <component
+                  :is="layoutComponents.button"
+                  type="primary"
+                  link
+                  :disabled="index >= (modelValue?.length || 0) - 1"
+                  @click="moveItem(index, index + 1)"
+                >
+                  <template #icon>
+                    <component :is="iconComponents.arrowDown" />
+                  </template>
+                </component>
+              </component>
+
+              <!-- 删除 -->
+              <component :is="layoutComponents.tooltip" v-if="canRemove" content="删除" title="删除" placement="top">
+                <component
+                  :is="layoutComponents.button"
+                  type="danger"
+                  link
+                  :disabled="isMinReached"
+                  @click="removeItem(index)"
+                >
+                  <template #icon>
+                    <component :is="iconComponents.delete" />
+                  </template>
+                </component>
+              </component>
+            </div>
+          </div>
+        </TransitionGroup>
+      </div>
+
+      <!-- 空状态 -->
+      <div v-if="!modelValue?.length" class="config-form-array__empty">
+        <component :is="layoutComponents.empty" description="暂无数据" :image-size="60" />
+      </div>
+
+      <!-- 添加按钮（阅读态下隐藏） -->
+      <div v-if="canAdd && !isMaxReached && !isReadPretty" class="config-form-array__footer">
+        <component
+          :is="layoutComponents.button"
+          type="primary"
+          @click="addItem"
         >
-          <!-- 排序手柄（阅读态下隐藏） -->
-          <div v-if="canSort && !isReadPretty" class="config-form-array__handle">
-            <component :is="iconComponents.drag" />
-          </div>
+          <template #icon>
+            <component :is="iconComponents.plus" />
+          </template>
+          {{ addButtonText }}
+        </component>
+      </div>
 
-          <!-- 数组项内容 -->
-          <div class="config-form-array__content">
-            <FieldRenderer
-              :field="itemField"
-              :path="`${path}.${index}`"
-              :context="createItemContext(item, index)"
-            >
-              <template v-for="(_, slotName) in $slots" #[slotName]="slotProps">
-                <slot :name="slotName" v-bind="slotProps" />
-              </template>
-            </FieldRenderer>
-          </div>
-
-          <!-- 数组项操作（阅读态下隐藏） -->
-          <div v-if="!isReadPretty" class="config-form-array__actions">
-            <!-- 复制 -->
-            <component :is="layoutComponents.tooltip" v-if="canCopy" content="复制" title="复制" placement="top">
-              <component
-                :is="layoutComponents.button"
-                type="primary"
-                link
-                :disabled="isMaxReached"
-                @click="copyItem(index)"
-              >
-                <template #icon>
-                  <component :is="iconComponents.copy" />
-                </template>
-              </component>
-            </component>
-
-            <!-- 上移 -->
-            <component :is="layoutComponents.tooltip" v-if="canMove" content="上移" title="上移" placement="top">
-              <component
-                :is="layoutComponents.button"
-                type="primary"
-                link
-                :disabled="index === 0"
-                @click="moveItem(index, index - 1)"
-              >
-                <template #icon>
-                  <component :is="iconComponents.arrowUp" />
-                </template>
-              </component>
-            </component>
-
-            <!-- 下移 -->
-            <component :is="layoutComponents.tooltip" v-if="canMove" content="下移" title="下移" placement="top">
-              <component
-                :is="layoutComponents.button"
-                type="primary"
-                link
-                :disabled="index >= (modelValue?.length || 0) - 1"
-                @click="moveItem(index, index + 1)"
-              >
-                <template #icon>
-                  <component :is="iconComponents.arrowDown" />
-                </template>
-              </component>
-            </component>
-
-            <!-- 删除 -->
-            <component :is="layoutComponents.tooltip" v-if="canRemove" content="删除" title="删除" placement="top">
-              <component
-                :is="layoutComponents.button"
-                type="danger"
-                link
-                :disabled="isMinReached"
-                @click="removeItem(index)"
-              >
-                <template #icon>
-                  <component :is="iconComponents.delete" />
-                </template>
-              </component>
-            </component>
-          </div>
-        </div>
-      </TransitionGroup>
-    </div>
-
-    <!-- 空状态 -->
-    <div v-if="!modelValue?.length" class="config-form-array__empty">
-      <component :is="layoutComponents.empty" description="暂无数据" :image-size="60" />
-    </div>
-
-    <!-- 添加按钮（阅读态下隐藏） -->
-    <div v-if="canAdd && !isMaxReached && !isReadPretty" class="config-form-array__footer">
-      <component
-        :is="layoutComponents.button"
-        type="primary"
-        @click="addItem"
-      >
-        <template #icon>
-          <component :is="iconComponents.plus" />
-        </template>
-        {{ addButtonText }}
-      </component>
-    </div>
-
-    <!-- 数量限制提示（仅在配置 showLimitTip 或按钮被禁用时显示） -->
-    <div v-if="showLimitTipText" class="config-form-array__limit">
-      {{ limitTipText }}
-    </div>
+      <!-- 数量限制提示（仅在配置 showLimitTip 或按钮被禁用时显示） -->
+      <div v-if="showLimitTipText" class="config-form-array__limit">
+        {{ limitTipText }}
+      </div>
+    </template>
   </div>
 </template>
 
@@ -168,8 +176,11 @@ const layoutComponents = computed(() => adapter?.value.layout || {})
 // 图标组件快捷访问
 const iconComponents = computed(() => adapter?.value.icons || {})
 
+// 是否有 items 配置（用于校验）
+const hasItems = computed(() => 'items' in props.field && props.field.items != null)
+
 // 数组项字段配置
-const itemField = computed<FieldConfig>(() => {
+const itemField = computed<FieldConfig | undefined>(() => {
   return props.field.items
 })
 
@@ -306,6 +317,11 @@ function createItemContext(item: any, index: number): FormContext {
 function createDefaultValue(): any {
   const itemConfig = itemField.value
 
+  // 安全检查：items 不存在时返回 undefined
+  if (!itemConfig) {
+    return undefined
+  }
+
   // 对象类型
   if (itemConfig.type === 'object' && 'properties' in itemConfig) {
     const obj: Record<string, any> = {}
@@ -405,6 +421,15 @@ function moveItem(fromIndex: number, toIndex: number) {
   border-radius: 4px;
   padding: 16px;
   margin-bottom: 16px;
+}
+
+.config-form-array__error {
+  padding: 12px 16px;
+  background: #fff3cd;
+  border: 1px solid #ffc107;
+  border-radius: 4px;
+  color: #856404;
+  font-size: 14px;
 }
 
 .config-form-array__header {

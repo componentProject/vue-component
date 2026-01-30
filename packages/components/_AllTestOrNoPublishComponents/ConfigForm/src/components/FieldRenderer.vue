@@ -162,7 +162,7 @@ import type { ComputedRef } from 'vue'
 import type { ArrayFieldConfig, FieldConfig, FieldState, FormContext, ObjectFieldConfig, SelectFieldConfig, UIAdapter, VoidFieldConfig } from '../types'
 import { computed, defineAsyncComponent, inject, toRef, watch } from 'vue'
 import { useFieldExpression } from '../composables/useFieldExpression'
-import { executeExpression, getNestedValue, setNestedValue } from '../utils'
+import { executeExpression, getFieldComponent, getFieldDefaultProps, getNestedValue, inferDataType, setNestedValue } from '../utils'
 
 /**
  * 表单项规则接口（跨框架通用）
@@ -296,9 +296,10 @@ const {
 const formValuesJSON = computed(() => JSON.stringify(formValues))
 
 // 判断字段类型
+// Formily 风格：component 优先于 type 的默认渲染器
 const isVoidField = computed(() => ['void', 'group', 'card', 'collapse', 'tabs', 'divider', 'alert'].includes(props.field.type))
-const isArrayField = computed(() => props.field.type === 'array')
-const isObjectField = computed(() => props.field.type === 'object')
+const isArrayField = computed(() => props.field.type === 'array' && !props.field.component)
+const isObjectField = computed(() => props.field.type === 'object' && !props.field.component)
 
 // 类型化的字段（用于子组件）
 const voidField = computed(() => props.field as VoidFieldConfig)
@@ -813,24 +814,60 @@ const needsOptionContent = computed(() => ['radio', 'checkbox'].includes(props.f
 
 /**
  * 获取字段组件（从 adapter 中获取）
+ *
+ * 参考 Formily x-component 设计：
+ * - type 表示数据类型/语义，用于默认校验规则、数据处理等
+ * - component 决定实际渲染的组件，指定后覆盖 type 对应的默认组件
+ *
+ * 支持以下形式：
+ * - component: 组件实例（推荐）
+ * - component: 组件名称字符串（需全局注册）
+ * - component: [组件, 默认props] 元组
+ * - 未指定时从 adapter 的 fields 中根据 type 获取默认组件
+ *
+ * adapter.fields 支持两种格式：
+ * - 简写：`input: ElInput`
+ * - 完整：`number: { component: ElInputNumber, dataType: 'number' }`
  */
 const fieldComponent = computed(() => {
   const field = props.field as any
 
-  // 自定义组件优先
-  if (field.type === 'custom' && field.customComponent) {
-    return field.customComponent
-  }
-
-  // 指定组件名
+  // 1. 通过 component 属性指定自定义组件（业界标准方式）
+  // 支持：组件实例、字符串、[组件, 默认props] 元组
   if (field.component) {
-    return Array.isArray(field.component) ? field.component[0] : field.component
+    // 元组形式：[组件, 默认props]
+    if (Array.isArray(field.component)) {
+      return field.component[0]
+    }
+    // 组件实例或字符串，直接返回
+    return field.component
   }
 
-  // 从 adapter 获取组件
+  // 2. 从 adapter.fields 获取 type 对应的默认组件
+  // 使用 getFieldComponent 工具函数处理简写和完整格式
   const type = field.type as string
-  const components = fieldComponents.value
-  return components[type] || components.input
+  const fieldConfig = fieldComponents.value[type]
+  const component = getFieldComponent(fieldConfig)
+
+  // 如果找到组件则返回，否则使用 input 作为兜底
+  if (component) {
+    return component
+  }
+
+  // 兜底：使用 input 组件
+  const inputConfig = fieldComponents.value.input
+  return getFieldComponent(inputConfig)
+})
+
+/**
+ * 推断字段的数据类型
+ * 用于校验和类型推断
+ */
+const fieldDataType = computed(() => {
+  if (!adapter?.value) {
+    return 'any'
+  }
+  return inferDataType(props.field, adapter.value)
 })
 
 /**
@@ -917,9 +954,13 @@ function handleBlur() {
 // 监听字段初始化
 watch(
   () => props.field,
-  () => {
-    if (props.field.onInit && formHandlers[props.field.onInit]) {
-      formHandlers[props.field.onInit](createHandlerContext(fieldValue.value, 'init'))
+  (field) => {
+    // 安全检查：确保 field 存在
+    if (!field) {
+      return
+    }
+    if (field.onInit && formHandlers[field.onInit]) {
+      formHandlers[field.onInit](createHandlerContext(fieldValue.value, 'init'))
     }
   },
   { immediate: true },

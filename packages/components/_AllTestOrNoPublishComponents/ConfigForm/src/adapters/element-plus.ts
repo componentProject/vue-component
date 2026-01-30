@@ -171,30 +171,74 @@ export function createElementPlusAdapter(): UIAdapter {
   return {
     name: 'element-plus',
 
-    // 字段组件 - key 就是 type
+    // 字段组件 - 支持简写格式和完整格式
+    // 简写：直接传组件（使用 dataTypeMap 的默认值）
+    // 完整：{ component, dataType, defaultProps }
     fields: {
+      // 字符串类
       input: ElInput,
       textarea: TextareaComponent,
       password: PasswordComponent,
-      number: ElInputNumber,
+      richText: RichTextPlaceholder,
+      codeEditor: CodeEditorPlaceholder,
+      color: ElColorPicker,
+
+      // 数字类（完整格式，明确 dataType）
+      number: { component: ElInputNumber, dataType: 'number' },
+      slider: { component: ElSlider, dataType: 'number' },
+      rate: { component: ElRate, dataType: 'number' },
+
+      // 布尔类
+      switch: { component: ElSwitch, dataType: 'boolean' },
+
+      // 选择类（灵活类型）
       select: ElSelect,
-      multiSelect: ElSelect, // 使用 multiple 属性
       cascader: ElCascader,
       treeSelect: ElTreeSelect,
       radio: ElRadioGroup,
-      checkbox: ElCheckboxGroup,
-      switch: ElSwitch,
-      slider: ElSlider,
-      rate: ElRate,
-      color: ElColorPicker,
-      date: ElDatePicker,
-      dateRange: DateRangeComponent,
+
+      // 数组类（完整格式，明确 dataType）
+      multiSelect: { component: ElSelect, dataType: 'array', defaultProps: { multiple: true } },
+      checkbox: { component: ElCheckboxGroup, dataType: 'array' },
+      dateRange: { component: DateRangeComponent, dataType: 'array' },
+      datetimeRange: { component: DatetimeRangeComponent, dataType: 'array' },
+      upload: { component: ElUpload, dataType: 'array' },
+
+      // 日期类
+      date: { component: ElDatePicker, dataType: 'date' },
       time: ElTimePicker,
-      datetime: DatetimeComponent,
-      datetimeRange: DatetimeRangeComponent,
-      upload: ElUpload,
-      richText: RichTextPlaceholder,
-      codeEditor: CodeEditorPlaceholder,
+      datetime: { component: DatetimeComponent, dataType: 'date' },
+    },
+
+    // DataType 默认映射（用于简写格式的兜底）
+    dataTypeMap: {
+      // 字符串类
+      input: 'string',
+      textarea: 'string',
+      password: 'string',
+      richText: 'string',
+      codeEditor: 'string',
+      color: 'string',
+      time: 'string',
+
+      // 选择类（灵活类型，根据具体场景可能不同）
+      select: 'any',
+      cascader: 'any',
+      treeSelect: 'any',
+      radio: 'any',
+
+      // 复合类型
+      object: 'object',
+      array: 'array',
+
+      // 布局类（不产生数据）
+      void: 'void',
+      group: 'void',
+      card: 'void',
+      tabs: 'void',
+      collapse: 'void',
+      divider: 'void',
+      alert: 'void',
     },
 
     // 布局组件

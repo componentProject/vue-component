@@ -137,6 +137,7 @@ import { computed, onMounted, onUnmounted, provide, toRaw, useTemplateRef } from
 import { elementPlusAdapter } from './adapters'
 import { FieldRenderer } from './components'
 import { useFormState, useFormSubmit, useFormValidation } from './composables'
+import { validateSchemaInDev } from './utils'
 
 defineOptions({
   name: 'ConfigForm',
@@ -589,6 +590,9 @@ defineExpose(formInstance)
 
 // 生命周期
 onMounted(() => {
+  // Schema 配置校验（仅开发模式）
+  validateSchemaInDev(props.schema, 'ConfigForm')
+
   // 初始化 v-model 值
   modelValue.value = { ...getFieldsValue() }
   emit('initialized')

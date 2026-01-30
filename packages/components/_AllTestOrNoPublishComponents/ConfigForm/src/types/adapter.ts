@@ -4,12 +4,58 @@
  */
 
 import type { Component } from 'vue'
+import type { DataType, FieldConfig } from './field'
+
+// ==================== 字段组件配置 ====================
+
+/**
+ * 字段组件配置（完整格式）
+ *
+ * 用于在 Adapter 中注册字段组件时，同时指定组件和数据类型
+ */
+export interface FieldComponentFullConfig {
+  /** 渲染组件 */
+  component: Component
+  /** 数据类型（用于校验和推断） */
+  dataType?: DataType
+  /** 默认 props（可选） */
+  defaultProps?: Record<string, any>
+}
+
+/**
+ * 字段组件配置
+ *
+ * 支持两种格式：
+ * - 简写：直接传组件 `ElInput`
+ * - 完整：传对象 `{ component: ElInput, dataType: 'string' }`
+ *
+ * @example
+ * ```typescript
+ * const fields = {
+ *   // 简写格式（使用 dataTypeMap 的默认值）
+ *   input: ElInput,
+ *   textarea: TextareaComponent,
+ *
+ *   // 完整格式（直接指定 dataType）
+ *   number: { component: ElInputNumber, dataType: 'number' },
+ *   switch: { component: ElSwitch, dataType: 'boolean' },
+ *   multiSelect: { component: ElSelect, dataType: 'array', defaultProps: { multiple: true } },
+ * }
+ * ```
+ */
+export type FieldComponentConfig = Component | FieldComponentFullConfig
 
 /**
  * 字段组件注册表
  * key 就是 Schema 中的 type 值
  */
-export type FieldComponents = Record<string, Component | undefined>
+export type FieldComponents = Record<string, FieldComponentConfig | undefined>
+
+/**
+ * DataType 默认映射表
+ * 用于推断内置字段类型的默认数据类型
+ */
+export type DataTypeMap = Partial<Record<string, DataType>>
 
 /**
  * 内置字段类型（用于类型提示）
@@ -285,6 +331,10 @@ export interface UIAdapter {
   /**
    * 字段组件注册表
    * key 就是 Schema 中的 type 值，可直接通过 fields[type] 访问
+   *
+   * 支持两种格式：
+   * - 简写：`input: ElInput`
+   * - 完整：`number: { component: ElInputNumber, dataType: 'number' }`
    */
   fields: FieldComponents
 
@@ -296,6 +346,30 @@ export interface UIAdapter {
 
   /** 反馈组件注册表 */
   feedback: FeedbackComponents
+
+  /**
+   * DataType 默认映射表（兜底）
+   *
+   * 当 fields 中使用简写格式时，从此映射表获取默认 dataType。
+   * 推断优先级：
+   * 1. field.dataType（Schema 中显式指定）
+   * 2. 结构推断（有 items → array，有 properties → object）
+   * 3. fields[type].dataType（完整格式配置）
+   * 4. dataTypeMap[type]（此映射表）
+   * 5. 'any'（最终兜底）
+   */
+  dataTypeMap?: DataTypeMap
+
+  /**
+   * 推断字段的数据类型
+   *
+   * 如果提供此方法，将用于推断字段的 dataType。
+   * 未提供时使用内置的默认推断逻辑。
+   *
+   * @param field - 字段配置
+   * @returns 推断的数据类型
+   */
+  inferDataType?: (field: FieldConfig) => DataType
 
   /** Props 转换器 */
   transformer?: PropsTransformer

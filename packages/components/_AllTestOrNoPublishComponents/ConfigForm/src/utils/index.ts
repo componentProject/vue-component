@@ -7,6 +7,23 @@
 export { createExpressionExecutor, executeExpression } from './expressionExecutor'
 export { parseExpression } from './expressionParser'
 
+// 导出 Schema 校验工具
+export { validateSchema, validateSchemaInDev } from './schemaValidator'
+export type { SchemaValidationError, SchemaValidationResult } from './schemaValidator'
+
+// 导出 Adapter 工具函数
+export {
+  DEFAULT_DATA_TYPE_MAP,
+  getDataTypeName,
+  getDefaultValueByDataType,
+  getFieldComponent,
+  getFieldConfigDataType,
+  getFieldDefaultProps,
+  inferDataType,
+  isFieldComponentFullConfig,
+  validateValueType,
+} from './adapter'
+
 // ==================== 对象操作工具 ====================
 
 /**

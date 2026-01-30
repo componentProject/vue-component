@@ -153,8 +153,13 @@ export function useFieldExpression(
    * @returns 显示模式
    */
   function executeDisplay(): DisplayType {
-    const ctx = createExpressionContext()
     const f = field.value as any
+    // 安全检查：确保 field 存在
+    if (!f) {
+      return 'none'
+    }
+
+    const ctx = createExpressionContext()
 
     // 优先级：showWhen > display
     if (f.showWhen) {
@@ -173,8 +178,13 @@ export function useFieldExpression(
    * @returns 交互模式
    */
   function executePattern(): PatternType {
-    const ctx = createExpressionContext()
     const f = field.value as any
+    // 安全检查：确保 field 存在
+    if (!f) {
+      return 'editable'
+    }
+
+    const ctx = createExpressionContext()
 
     // 最高优先级：disabledWhen 表达式
     if (f.disabledWhen) {
@@ -203,6 +213,10 @@ export function useFieldExpression(
    */
   function executeRequired(): boolean {
     const f = field.value as any
+    // 安全检查：确保 field 存在
+    if (!f) {
+      return false
+    }
 
     // 优先级：requiredWhen > required
     if (f.requiredWhen) {

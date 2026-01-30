@@ -276,30 +276,74 @@ export function createAntDesignVueAdapter(): UIAdapter {
   return {
     name: 'ant-design-vue',
 
-    // 字段组件 - key 就是 type
+    // 字段组件 - 支持简写格式和完整格式
+    // 简写：直接传组件（使用 dataTypeMap 的默认值）
+    // 完整：{ component, dataType, defaultProps }
     fields: {
+      // 字符串类
       input: WrappedInput,
       textarea: WrappedTextarea,
       password: WrappedInputPassword,
-      number: WrappedInputNumber,
+      richText: RichTextPlaceholder,
+      codeEditor: CodeEditorPlaceholder,
+      color: ColorPickerComponent,
+
+      // 数字类（完整格式，明确 dataType）
+      number: { component: WrappedInputNumber, dataType: 'number' },
+      slider: { component: WrappedSlider, dataType: 'number' },
+      rate: { component: WrappedRate, dataType: 'number' },
+
+      // 布尔类
+      switch: { component: WrappedSwitch, dataType: 'boolean' },
+
+      // 选择类（灵活类型）
       select: WrappedSelect,
-      multiSelect: WrappedSelect, // 使用 mode="multiple" 属性
       cascader: WrappedCascader,
       treeSelect: WrappedTreeSelect,
       radio: WrappedRadioGroup,
-      checkbox: WrappedCheckboxGroup,
-      switch: WrappedSwitch,
-      slider: WrappedSlider,
-      rate: WrappedRate,
-      color: ColorPickerComponent,
-      date: WrappedDatePicker,
-      dateRange: WrappedRangePicker,
+
+      // 数组类（完整格式，明确 dataType）
+      multiSelect: { component: WrappedSelect, dataType: 'array', defaultProps: { mode: 'multiple' } },
+      checkbox: { component: WrappedCheckboxGroup, dataType: 'array' },
+      dateRange: { component: WrappedRangePicker, dataType: 'array' },
+      datetimeRange: { component: DatetimeRangeComponent, dataType: 'array' },
+      upload: { component: AUpload, dataType: 'array' },
+
+      // 日期类
+      date: { component: WrappedDatePicker, dataType: 'date' },
       time: WrappedTimePicker,
-      datetime: DatetimeComponent,
-      datetimeRange: DatetimeRangeComponent,
-      upload: AUpload,
-      richText: RichTextPlaceholder,
-      codeEditor: CodeEditorPlaceholder,
+      datetime: { component: DatetimeComponent, dataType: 'date' },
+    },
+
+    // DataType 默认映射（用于简写格式的兜底）
+    dataTypeMap: {
+      // 字符串类
+      input: 'string',
+      textarea: 'string',
+      password: 'string',
+      richText: 'string',
+      codeEditor: 'string',
+      color: 'string',
+      time: 'string',
+
+      // 选择类（灵活类型，根据具体场景可能不同）
+      select: 'any',
+      cascader: 'any',
+      treeSelect: 'any',
+      radio: 'any',
+
+      // 复合类型
+      object: 'object',
+      array: 'array',
+
+      // 布局类（不产生数据）
+      void: 'void',
+      group: 'void',
+      card: 'void',
+      tabs: 'void',
+      collapse: 'void',
+      divider: 'void',
+      alert: 'void',
     },
 
     // 布局组件
