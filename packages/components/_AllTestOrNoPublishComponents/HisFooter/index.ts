@@ -1,6 +1,6 @@
 // HisFooter入口文件
-import { withInstall } from '@moluoxixi/utils/_utils'
+import { withInstall } from '@moluoxixi/utils/utils'
 import HisFooter from './src/index.vue'
 
 export default withInstall(HisFooter)
-export * from './src/_types'
+export * from './src/types'

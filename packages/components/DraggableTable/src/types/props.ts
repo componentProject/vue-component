@@ -1,5 +1,5 @@
 import type { VxeColumnPropTypes, VxeGridPropTypes, VxeTableDefines, VxeTablePropTypes } from 'vxe-table'
-import type { objType } from '../../../_types'
+import type { objType } from '../../../types'
 
 export interface customConfigType {
   pageId: string

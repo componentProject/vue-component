@@ -60,8 +60,8 @@
 </template>
 
 <script setup lang="ts">
-import type { FormSchema } from '../_types'
-import type { LayoutType } from '../_types/constants'
+import type { FormSchema } from '../types'
+import type { LayoutType } from '../types/constants'
 /**
  * Element Plus 搜索栏表单示例
  * 展示三种布局类型：inline、horizontal、vertical

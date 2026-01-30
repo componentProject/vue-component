@@ -48,6 +48,10 @@ export interface BuildConfigBase {
   viteConfig?: ViteConfigType
   /** 打包格式配置 */
   formatConfig?: GlobalFormatConfig
+  /** 组件扫描时忽略的目录模式（支持 glob），例如 ['_*', 'test*'] */
+  excludeDirs: string[]
+  /** 依赖分析时忽略的包前缀，例如 ['_', 'test'] */
+  excludeDepPrefixes: string[]
 }
 
 export interface BuildContext extends BuildConfigBase {

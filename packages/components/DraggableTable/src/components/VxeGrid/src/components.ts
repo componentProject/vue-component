@@ -1,6 +1,6 @@
 // VxeGrid的components组件
 import type { App } from 'vue'
-import type { VxeGlobalConfig } from './_types'
+import type { VxeGlobalConfig } from './types'
 
 import { VxeUI } from '@vxe-ui/core'
 import { VxeColgroup } from './colgroup'

@@ -1,4 +1,4 @@
-import type { createEslintConfigReturnType, optionsType, userConfigType } from './_types/index.ts'
+import type { createEslintConfigReturnType, optionsType, userConfigType } from './types/index.ts'
 
 import antfu from '@antfu/eslint-config'
 import { deepMerge } from '@moluoxixi/utils/_utils/index.ts'

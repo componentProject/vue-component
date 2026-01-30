@@ -1,7 +1,7 @@
 /**
  * 配置相关工具函数
  */
-import type { BuildContext } from '../_types/index.ts'
+import type { BuildContext } from '../types/index.ts'
 
 /**
  * 模块格式类型
@@ -105,7 +105,7 @@ export function getComponentFormats(ctx: BuildContext, comp: string): ModuleForm
 
   // 如果没有任何格式，使用默认值
   if (formats.length === 0) {
-    formats.push('es')
+      formats.push('es')
   }
 
   return formats

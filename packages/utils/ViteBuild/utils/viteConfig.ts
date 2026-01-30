@@ -2,7 +2,7 @@
  * Vite 配置相关工具函数
  */
 import type { InlineConfig } from 'vite'
-import type { BuildContext } from '../_types/index.ts'
+import type { BuildContext } from '../types/index.ts'
 import { resolve } from 'node:path'
 import { dynamicImport } from '@moluoxixi/utils/_utils/index.ts'
 import CssInjectedByJsPlugin from '@moluoxixi/utils/CssInjectedByJsPlugin/index.ts'

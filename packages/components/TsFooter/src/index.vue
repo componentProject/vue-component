@@ -16,7 +16,7 @@
 </template>
 
 <script setup lang="ts">
-import type { NormalizedItem, propsType, slotsType } from './_types'
+import type { NormalizedItem, propsType, slotsType } from './types'
 import { computed } from 'vue'
 
 defineOptions({ name: 'TsFooter' })

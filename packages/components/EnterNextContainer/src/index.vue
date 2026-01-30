@@ -7,7 +7,7 @@
 
 <script setup lang="ts">
 import type { ComponentPublicInstance } from 'vue'
-import type { emitsType, propsType, slotsType } from './_types'
+import type { emitsType, propsType, slotsType } from './types'
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 
 defineOptions({

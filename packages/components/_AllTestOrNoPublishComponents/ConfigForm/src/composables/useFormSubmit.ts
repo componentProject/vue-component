@@ -3,8 +3,8 @@
  * 表单提交 Composable
  */
 
-import type { FormSchema, ReactionAction, UIAdapter } from '../_types'
-import type { RequestAdapter } from '../_types/props'
+import type { FormSchema, ReactionAction, UIAdapter } from '../types'
+import type { RequestAdapter } from '../types/props'
 import type { UseFormStateReturn } from './useFormState'
 import type { UseFormValidationReturn } from './useFormValidation'
 import { ref } from 'vue'

@@ -1,4 +1,4 @@
-import type { BuildContext } from '../_types/index.ts'
+import type { BuildContext } from '../types/index.ts'
 /**
  * 版本管理工具函数
  */

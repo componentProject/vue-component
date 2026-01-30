@@ -30,7 +30,7 @@
 </template>
 
 <script setup lang="ts">
-import type { emitsType, propsType, slotsType } from './_types'
+import type { emitsType, propsType, slotsType } from './types'
 import { ElTabPane, ElTabs } from 'element-plus'
 import { computed } from 'vue'
 import { useOptions } from '../../_hooks'

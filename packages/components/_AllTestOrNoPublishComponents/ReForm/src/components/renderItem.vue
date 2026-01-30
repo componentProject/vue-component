@@ -125,7 +125,7 @@
 <!-- 表单项渲染组件脚本 -->
 <script setup lang="ts">
 /** 导入类型定义 */
-import type { ReFormItem } from '../_types'
+import type { ReFormItem } from '../types'
 /** 导入 Element Plus 图标 */
 import { QuestionFilled } from '@element-plus/icons-vue'
 /** 导入 Element Plus 组件 */
@@ -135,9 +135,9 @@ import { isArray, isUndefined } from 'lodash-es'
 /** 导入 Vue 组合式 API */
 import { inject } from 'vue'
 /** 导入工具函数 */
-import { getComponentName } from '../_utils'
+import { getComponentName } from '../utils'
 /** 导入常量定义 */
-import { HAS_CHILD_COMPONENT_MAP } from '../_utils/constants'
+import { HAS_CHILD_COMPONENT_MAP } from '../utils/constants'
 
 /** 组件选项配置 */
 defineOptions({

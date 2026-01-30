@@ -11,7 +11,7 @@ export type {
   StorageRecord,
   WorkerMessage,
   WorkerResponse,
-} from './_types/index.ts'
+} from './types/index.ts'
 // 导出默认实例（ Web Worker 模式）
 export const idbStorage = new IndexDBStorage({
   dbName: 'DefaultIndexDBStorage',

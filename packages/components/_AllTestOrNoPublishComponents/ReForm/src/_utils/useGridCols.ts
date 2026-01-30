@@ -1,7 +1,7 @@
 /** 导入 Vue 类型定义 */
 import type { ComputedRef, MaybeRef } from 'vue'
 /** 导入表单属性类型 */
-import type { ReFormProps } from '../_types'
+import type { ReFormProps } from '../types'
 /** 导入 lodash-es 工具函数 */
 import { isUndefined } from 'lodash-es'
 /** 导入 Vue 组合式 API */

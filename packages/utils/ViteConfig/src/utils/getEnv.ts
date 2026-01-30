@@ -1,5 +1,5 @@
 // getEnv.ts文件
-import type { objType } from '../../../_types/index.ts'
+import type { objType } from '../../../types/index.ts'
 import fs from 'node:fs'
 import path from 'node:path'
 import process from 'node:process'

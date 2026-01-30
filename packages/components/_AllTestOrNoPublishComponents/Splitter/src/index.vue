@@ -20,8 +20,8 @@
 </template>
 
 <script setup lang="ts">
-import type { slotsType } from '@moluoxixi/components/_types'
-import type { propsType } from './_types'
+import type { slotsType } from '@moluoxixi/components/types'
+import type { propsType } from './types'
 import { ElSplitter, ElSplitterPanel } from 'element-plus'
 import { computed } from 'vue'
 

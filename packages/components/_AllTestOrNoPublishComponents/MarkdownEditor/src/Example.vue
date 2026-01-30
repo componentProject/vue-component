@@ -169,7 +169,7 @@
 </template>
 
 <script setup lang="ts">
-import type { DocumentListItem, ImageData, MessageType, SaveSuccessDataType } from './_types'
+import type { DocumentListItem, ImageData, MessageType, SaveSuccessDataType } from './types'
 import { ElButton, ElCard, ElMessage } from 'element-plus'
 import { computed, onMounted, ref } from 'vue'
 import MarkdownEditor from './index.vue'

@@ -21,7 +21,7 @@ export type {
   vueAxiosPluginOptionsType,
   vueAxiosPluginType,
   vueHttpServiceType,
-} from './_types/index.ts'
+} from './types/index.ts'
 
 // 默认导出插件
 export default getHttpService

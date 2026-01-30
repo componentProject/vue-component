@@ -202,7 +202,7 @@ export function flattenTree(tree: any[] | any, rowKey: string = 'id', parentKey:
  * 用法示例：
  * ```ts
  * import EditorComp from './src/index.vue'
- * import { withInstall } from '@moluoxixi/components/_utils'
+ * import { withInstall } from '@moluoxixi/components/utils'
  * export default withInstall(EditorComp)
  * ```
  */

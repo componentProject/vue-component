@@ -8,7 +8,7 @@ import type {
   ReFormModelValue,
   ReFormRules,
   ReGridResponsive,
-} from '../_types'
+} from '../types'
 /** 导入 lodash-es 工具函数 */
 import { cloneDeep, isArray, isString, isUndefined } from 'lodash-es'
 /** 移除未使用的类型导入 */

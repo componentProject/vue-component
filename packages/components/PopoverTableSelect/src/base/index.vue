@@ -39,10 +39,10 @@
 </template>
 
 <script lang="ts" setup>
-import type { slotsType } from '@moluoxixi/components/_types'
+import type { slotsType } from '@moluoxixi/components/types'
 import type { ComponentPublicInstance } from 'vue'
 import type { VxeTableDefines, VxeTablePropTypes } from 'vxe-table'
-import type { baseEmitsType, basePropsType } from '../_types'
+import type { baseEmitsType, basePropsType } from '../types'
 import { ElPopover } from 'element-plus'
 import { debounce } from 'lodash-es'
 import { computed, nextTick, onUnmounted, ref, useTemplateRef, watch } from 'vue'

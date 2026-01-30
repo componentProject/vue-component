@@ -1,4 +1,4 @@
-import type { BuildContext } from '../_types/index.ts'
+import type { BuildContext } from '../types/index.ts'
 /**
  * 组件相关工具函数
  */
@@ -23,15 +23,25 @@ export function sleep(ms: number): Promise<void> {
  * @returns 组件名集合
  */
 export async function getComponentNames(ctx: BuildContext, enableInteractive = false): Promise<string[]> {
-  const componentDirs = await glob([`.${ctx.entryBaseUrl}*`, `!.${ctx.entryBaseUrl}_*`, ctx.LIB_NAMESPACE, ...mustExcludeDirs.map(i => `!${i}`)], {
+  // 构建排除模式：用户配置的 excludeDirs + 必须排除的目录
+  const userExcludePatterns = ctx.excludeDirs || []
+  const excludePatterns = [
+    ...userExcludePatterns.map(pattern => `!.${ctx.entryBaseUrl}${pattern}`),
+    ...mustExcludeDirs.map(i => `!${i}`),
+  ]
+
+  const componentDirs = await glob([`.${ctx.entryBaseUrl}*`, ctx.LIB_NAMESPACE, ...excludePatterns], {
     cwd: ctx.packDir,
     onlyDirectories: true,
-    ignore: [`${ctx.entryBaseUrl}_*`],
+    ignore: [
+      ...userExcludePatterns.map(pattern => `${ctx.entryBaseUrl}${pattern}`),
+      ...mustExcludeDirs,
+    ],
   })
-  const excludeDirs = [ctx.LIB_NAMESPACE, ...mustExcludeDirs]
+  const excludeDirNames = [ctx.LIB_NAMESPACE, ...mustExcludeDirs]
   const allComponentNames = componentDirs
     .map(dir => dir.split('/').pop() || '')
-    .filter(dirName => !!dirName && !excludeDirs.includes(dirName))
+    .filter(dirName => !!dirName && !excludeDirNames.includes(dirName))
 
   // 如果不需要交互式选择，直接返回组件名列表
   if (!enableInteractive) {

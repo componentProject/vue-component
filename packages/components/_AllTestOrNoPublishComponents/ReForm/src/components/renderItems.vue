@@ -82,7 +82,7 @@
 <!-- 表单项列表渲染组件脚本 -->
 <script setup lang="ts">
 /** 导入类型定义 */
-import type { ReFormItem } from '../_types'
+import type { ReFormItem } from '../types'
 /** 导入 Element Plus 组件 */
 import { ElCollapseTransition } from 'element-plus'
 /** 导入 Vue 组合式 API */

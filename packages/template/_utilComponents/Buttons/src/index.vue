@@ -28,7 +28,7 @@
 </template>
 
 <script setup lang="ts">
-import type { propsType } from './_types'
+import type { propsType } from './types'
 import { Render } from '@moluoxixi/components/_utilComponents'
 import { ElButton, ElIcon, ElTooltip } from 'element-plus'
 

@@ -3,7 +3,7 @@
  * Element Plus UI 适配器
  */
 
-import type { UIAdapter } from '../_types/adapter'
+import type { UIAdapter } from '../types/adapter'
 import {
   ArrowDown,
   ArrowUp,

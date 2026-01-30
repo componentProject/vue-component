@@ -132,7 +132,7 @@
 
 <script setup lang="ts">
 import type { ComponentPublicInstance } from 'vue'
-import type { emitsType, FieldConfig, FormContext, FormInstance, FormSchema, propsType, slotsType, UIAdapter } from './_types'
+import type { emitsType, FieldConfig, FormContext, FormInstance, FormSchema, propsType, slotsType, UIAdapter } from './types'
 import { computed, onMounted, onUnmounted, provide, toRaw, useTemplateRef } from 'vue'
 import { elementPlusAdapter } from './adapters'
 import { FieldRenderer } from './components'

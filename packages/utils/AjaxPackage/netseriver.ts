@@ -4,7 +4,7 @@ import type {
   vueAxiosPluginOptionsType,
   vueAxiosPluginType,
   vueHttpServiceType,
-} from './_types/index.ts'
+} from './types/index.ts'
 import BaseApi from './class.ts'
 
 declare global {

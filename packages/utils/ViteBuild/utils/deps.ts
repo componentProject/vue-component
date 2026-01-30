@@ -1,4 +1,4 @@
-import type { BuildContext, ComponentDependencies } from '../_types/index.ts'
+import type { BuildContext, ComponentDependencies } from '../types/index.ts'
 /**
  * 依赖分析工具函数
  */
@@ -120,7 +120,13 @@ function addInternalDep(
   aliasMappings: Record<string, string>,
 ): void {
   // 检查包名是否有效
-  if (packageName.startsWith('_') || !packageName || packageName === comp) {
+  if (!packageName || packageName === comp) {
+    return
+  }
+
+  // 检查是否匹配排除的包前缀
+  const excludePrefixes = ctx.excludeDepPrefixes || []
+  if (excludePrefixes.some(prefix => packageName.startsWith(prefix))) {
     return
   }
 

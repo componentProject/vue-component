@@ -69,7 +69,7 @@
 </template>
 
 <script lang="ts" setup>
-import type { slotsType } from '@moluoxixi/components/_types'
+import type { slotsType } from '@moluoxixi/components/types'
 import type {
   VxeGridInstance,
   VxeGridProps,
@@ -78,13 +78,13 @@ import type {
   VxeTableDefines,
   VxeTablePropTypes,
 } from 'vxe-table'
-import type { ColumnType, emitsType, propsType } from './_types'
+import type { ColumnType, emitsType, propsType } from './types'
 import { deleteMemoryUpload, getMemoryQuery, setMemoryUpload } from '@moluoxixi/utils/_api/cache'
 import {
   getClass,
   getType,
   sleep,
-} from '@moluoxixi/utils/_utils'
+} from '@moluoxixi/utils/utils'
 import {
   debounce,
   dispatchEvents,
@@ -107,7 +107,7 @@ import {
   watch,
 } from 'vue'
 import { VxeGrid } from 'vxe-table'
-import { getCustomType, handleGetRequiredFields } from './_utils'
+import { getCustomType, handleGetRequiredFields } from './utils'
 import CustomConfigDialog from './components/CustomConfigDialog.vue'
 // 导入自定义渲染器，改造了VxeGrid，直接用Grid的VxeUI
 import installFn from './renderers'

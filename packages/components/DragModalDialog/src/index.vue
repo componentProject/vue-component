@@ -118,8 +118,8 @@
 </template>
 
 <script setup lang="ts">
-import type { PositionData, ResizeDirection, ResizeState } from '@moluoxixi/utils/_utils'
-import type { emitsType, propsType } from './_types'
+import type { PositionData, ResizeDirection, ResizeState } from '@moluoxixi/utils/utils'
+import type { emitsType, propsType } from './types'
 import { Buttons } from '@moluoxixi/components/_utilComponents'
 import {
   calculateContentArea,
@@ -130,7 +130,7 @@ import {
   loadPositionFromStorage,
   parsePositionValue,
   savePositionToStorage,
-} from '@moluoxixi/utils/_utils'
+} from '@moluoxixi/utils/utils'
 import { computed, nextTick, onUnmounted, ref, useTemplateRef, watch } from 'vue'
 
 defineOptions({

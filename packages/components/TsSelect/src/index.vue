@@ -39,8 +39,8 @@
 </template>
 
 <script setup lang="ts">
-import type { emitsType, propsType, slotsType } from './_types'
-import { getType, getTypeDefault } from '@moluoxixi/utils/_utils'
+import type { emitsType, propsType, slotsType } from './types'
+import { getType, getTypeDefault } from '@moluoxixi/utils/utils'
 import { ElOption, ElSelect } from 'element-plus'
 import { computed, nextTick, onUnmounted, ref } from 'vue'
 import { useOptions } from '../../_hooks'

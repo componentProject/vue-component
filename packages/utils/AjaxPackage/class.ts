@@ -10,11 +10,11 @@ import type { AxiosResponse } from 'axios'
  * Copyright (c) 2025 by ${git_name_email}, All Rights Reserved.
  */
 
-import type { BaseApiConfig, ExtendedAxiosRequestConfig, MessageOptions, NotificationOptions } from './_types/index.ts'
+import type { BaseApiConfig, ExtendedAxiosRequestConfig, MessageOptions, NotificationOptions } from './types/index.ts'
 import { h } from 'vue'
 import { dynamicImports } from '../_utils/index.ts'
 import createApiDialog from '../ApiDialog/index.ts'
-import { extractSystemErrorInfo } from './_utils/systemErrorInfo.ts'
+import { extractSystemErrorInfo } from './utils/systemErrorInfo.ts'
 import BaseHttpClient from './BaseHttpClient.ts'
 
 /**

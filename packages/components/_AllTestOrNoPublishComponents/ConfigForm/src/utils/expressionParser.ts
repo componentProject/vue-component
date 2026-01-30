@@ -11,7 +11,7 @@ import type {
   FunctionExpression,
   SimpleExpression,
   TemplateExpression,
-} from '../_types'
+} from '../types'
 
 /**
  * 解析后的表达式信息

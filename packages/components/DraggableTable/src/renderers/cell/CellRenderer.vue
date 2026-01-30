@@ -58,10 +58,10 @@
 </template>
 
 <script setup lang="ts">
-import type { objType } from '@moluoxixi/components/_types'
+import type { objType } from '@moluoxixi/components/types'
 import type { VxeTableDefines } from 'vxe-table'
-import type { customCustomTypes } from '../../_types'
-import type { cellRendererPropsType } from './_types'
+import type { customCustomTypes } from '../../types'
+import type { cellRendererPropsType } from './types'
 import { detectDateFormatByReplace } from '@moluoxixi/utils/_utils/date'
 import { ElInput, ElProgress, ElSwitch, ElTag } from 'element-plus'
 import { computed, onMounted, ref, watch } from 'vue'

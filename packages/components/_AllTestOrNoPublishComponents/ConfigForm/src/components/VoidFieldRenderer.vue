@@ -201,9 +201,9 @@
 
 <script setup lang="ts">
 import type { ComputedRef } from 'vue'
-import type { CardFieldConfig, CollapseFieldConfig, CollapsePanel, FieldConfig, FormContext, TabPane, TabsFieldConfig, UIAdapter } from '../_types'
+import type { CardFieldConfig, CollapseFieldConfig, CollapsePanel, FieldConfig, FormContext, TabPane, TabsFieldConfig, UIAdapter } from '../types'
 import { computed, inject, ref } from 'vue'
-import { executeExpression } from '../_utils'
+import { executeExpression } from '../utils'
 import FieldRenderer from './FieldRenderer.vue'
 
 defineOptions({

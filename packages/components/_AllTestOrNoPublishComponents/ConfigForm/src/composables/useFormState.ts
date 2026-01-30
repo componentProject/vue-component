@@ -3,9 +3,9 @@
  * 表单状态管理 Composable
  */
 
-import type { ExpressionContext, FieldConfig, FieldState, FormSchema, FormState } from '../_types'
+import type { ExpressionContext, FieldConfig, FieldState, FormSchema, FormState } from '../types'
 import { reactive, toRaw } from 'vue'
-import { createExpressionExecutor, getNestedValue, setNestedValue } from '../_utils'
+import { createExpressionExecutor, getNestedValue, setNestedValue } from '../utils'
 
 /**
  * 表单状态管理选项

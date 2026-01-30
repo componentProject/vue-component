@@ -34,7 +34,7 @@
 </template>
 
 <script setup lang="ts">
-import type { emitsType, propsType, slotsType } from './_types'
+import type { emitsType, propsType, slotsType } from './types'
 import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue'
 
 defineOptions({

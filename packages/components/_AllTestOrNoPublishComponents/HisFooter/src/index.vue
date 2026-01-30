@@ -4,7 +4,7 @@
 </template>
 
 <script setup lang="ts">
-import type { propsType } from './_types'
+import type { propsType } from './types'
 import { getQueryMedicaIInsuranceInfoApi } from '@moluoxixi/utils/_api'
 import { onMounted, ref } from 'vue'
 

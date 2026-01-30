@@ -102,10 +102,10 @@
 </template>
 
 <script lang="ts" setup>
-import type { CustomConfigDialogEmitsType, CustomConfigDialogPropsType } from '@moluoxixi/components/DraggableTable/src/_types'
+import type { CustomConfigDialogEmitsType, CustomConfigDialogPropsType } from '@moluoxixi/components/DraggableTable/src/types'
 import type { VxeGridInstance } from 'vxe-table'
-import { getTypeName } from '@moluoxixi/components/DraggableTable/src/_utils'
-import { flattenTree, getClass } from '@moluoxixi/utils/_utils'
+import { getTypeName } from '@moluoxixi/components/DraggableTable/src/utils'
+import { flattenTree, getClass } from '@moluoxixi/utils/utils'
 import { ElButton, ElCheckbox, ElInput, ElPopover, ElSelect, ElSwitch } from 'element-plus'
 import { cloneDeep } from 'lodash-es'
 import Sortable from 'sortablejs'

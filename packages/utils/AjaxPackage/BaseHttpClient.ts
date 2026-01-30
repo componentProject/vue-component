@@ -16,13 +16,13 @@ import type {
  * Copyright (c) 2025 by ${git_name_email}, All Rights Reserved.
  */
 
-import type { BaseHttpClientConfig } from './_types/index.ts'
-import type { MessageInstance, NotificationInstance } from './_utils/index.ts'
+import type { BaseHttpClientConfig } from './types/index.ts'
+import type { MessageInstance, NotificationInstance } from './utils/index.ts'
 import axios from 'axios'
 import {
   createMessageWrapper,
   createNotificationWrapper,
-} from './_utils/index.ts'
+} from './utils/index.ts'
 
 /**
  * 默认登录失效回调，跳转到登录页

@@ -3,7 +3,7 @@
  * 表达式执行器
  */
 
-import type { ExpressionContext, ExpressionUtils } from '../_types'
+import type { ExpressionContext, ExpressionUtils } from '../types'
 import { parseExpression } from './expressionParser'
 
 /** Generic handler function type */

@@ -1,5 +1,5 @@
 // _AllTestOrNoPublishComponents的format组件
-import type { languageType } from '../_types'
+import type { languageType } from '../types'
 import { toMonacoLanguage } from './language'
 
 interface PrettierLike {

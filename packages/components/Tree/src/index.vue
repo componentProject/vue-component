@@ -71,7 +71,7 @@
 <script setup lang="ts">
 import type { TreeNode, TreeNodeData } from 'element-plus'
 import type { Component as VueComponent } from 'vue'
-import type { ButtonsItem, emitsType, propsType, slotsType } from './_types'
+import type { ButtonsItem, emitsType, propsType, slotsType } from './types'
 import { Delete, Edit, Plus } from '@element-plus/icons-vue'
 import { Buttons } from '@moluoxixi/components/_utilComponents'
 import { ElIcon, ElTreeV2 } from 'element-plus'

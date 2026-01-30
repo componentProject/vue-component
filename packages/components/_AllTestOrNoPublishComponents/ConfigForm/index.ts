@@ -9,10 +9,10 @@ export { ConfigForm }
 export default ConfigForm
 
 // 导出类型
-export * from './src/_types'
+export * from './src/types'
 
 // 导出工具函数
-export * from './src/_utils'
+export * from './src/utils'
 
 // 导出 Composables
 export * from './src/composables'

@@ -13,7 +13,7 @@ import type {
   PluginType,
   QiankunPlugin,
   ViteConfigType,
-} from './_types/index.ts'
+} from './types/index.ts'
 import path from 'node:path'
 
 import tailwindcss from '@tailwindcss/postcss'
@@ -23,7 +23,7 @@ import { defineConfig, mergeConfig } from 'vite'
 
 import { createHtmlPlugin } from 'vite-plugin-html'
 import { deepMerge, dynamicImport, validateMutuallyExclusive } from '../../_utils/index.ts'
-import { detectFramework } from './_utils/detectFramework.ts'
+import { detectFramework } from './utils/detectFramework.ts'
 import scopedCssPrefixPlugin from './plugins/addScopedAndReplacePrefix.ts'
 
 // // workbox urlPattern 参数类型

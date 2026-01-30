@@ -1,5 +1,5 @@
 // _AllTestOrNoPublishComponents的language组件
-import type { languageType } from '../_types'
+import type { languageType } from '../types'
 
 export function toMonacoLanguage(
   lang:

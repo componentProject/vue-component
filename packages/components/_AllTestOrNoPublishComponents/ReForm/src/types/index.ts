@@ -6,7 +6,7 @@ import type { ButtonProps, ElForm, ElTooltipProps, FormItemRule } from 'element-
 import type { MaybeRef } from 'vue'
 
 /** 导入响应式栅格类型 */
-import type { ReGridResponsive } from '../_utils/useGridResponsive/types'
+import type { ReGridResponsive } from '../utils/useGridResponsive/types'
 
 /** 导出响应式栅格类型 */
 export { ReGridResponsive }

@@ -242,7 +242,7 @@
 </template>
 
 <script setup lang="ts">
-import type { emitsType, propsType } from './_types'
+import type { emitsType, propsType } from './types'
 import { ElCheckbox, ElCheckboxGroup, ElTooltip } from 'element-plus'
 import { computed, nextTick, onMounted, onUnmounted, onUpdated, ref, watch } from 'vue'
 import { useOptions } from '../../_hooks'

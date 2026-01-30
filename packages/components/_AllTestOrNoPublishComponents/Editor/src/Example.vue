@@ -40,7 +40,7 @@
 </template>
 
 <script setup lang="ts">
-import type { languageType, themeType } from './_types'
+import type { languageType, themeType } from './types'
 import { ElCheckbox, ElOption, ElSelect, ElTabPane, ElTabs } from 'element-plus'
 import { ref } from 'vue'
 import Editor from './index.vue'

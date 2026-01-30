@@ -18,7 +18,7 @@
 </template>
 
 <script setup lang="ts">
-import type { emitsType, propsType, slotsType, ThrottleOrDebounceOptions } from './_types'
+import type { emitsType, propsType, slotsType, ThrottleOrDebounceOptions } from './types'
 import { debounce as wlDebounce, throttle as wlThrottle } from '@moluoxixi/utils/_utils/event'
 import { ElButton, ElPopover } from 'element-plus'
 import { computed } from 'vue'

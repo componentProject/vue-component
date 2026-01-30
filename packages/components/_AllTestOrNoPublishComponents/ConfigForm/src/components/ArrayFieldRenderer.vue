@@ -127,9 +127,9 @@
 
 <script setup lang="ts">
 import type { ComputedRef } from 'vue'
-import type { ArrayFieldConfig, FieldConfig, FormContext, UIAdapter } from '../_types'
+import type { ArrayFieldConfig, FieldConfig, FormContext, UIAdapter } from '../types'
 import { computed, inject } from 'vue'
-import { executeExpression } from '../_utils'
+import { executeExpression } from '../utils'
 import FieldRenderer from './FieldRenderer.vue'
 
 defineOptions({

@@ -8,7 +8,7 @@
 </template>
 
 <script lang="ts" setup>
-import type { emitsType, propsType, slotsType } from './_types'
+import type { emitsType, propsType, slotsType } from './types'
 import { h, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 

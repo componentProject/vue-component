@@ -2,7 +2,7 @@
  * 系统错误信息提取工具函数
  */
 import type { AxiosResponse } from 'axios'
-import type { SystemErrorDialogPropsType } from '../_types/index.ts'
+import type { SystemErrorDialogPropsType } from '../types/index.ts'
 
 /**
  * 规范化请求参数对象

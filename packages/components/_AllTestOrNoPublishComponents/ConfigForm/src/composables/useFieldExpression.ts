@@ -4,9 +4,9 @@
  */
 
 import type { ComputedRef, Ref } from 'vue'
-import type { DisplayType, FieldConfig, FieldState, FormContext, PatternType } from '../_types'
+import type { DisplayType, FieldConfig, FieldState, FormContext, PatternType } from '../types'
 import { inject, unref } from 'vue'
-import { executeExpression } from '../_utils'
+import { executeExpression } from '../utils'
 
 /**
  * 表达式关键字集合（提取为常量，避免重复创建）

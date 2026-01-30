@@ -51,7 +51,7 @@
 </template>
 
 <script setup lang="ts">
-import type { FormInstance, FormSchema, PatternType } from '../_types'
+import type { FormInstance, FormSchema, PatternType } from '../types'
 import {
   Button as AButton,
   Collapse as ACollapse,

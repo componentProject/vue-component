@@ -19,7 +19,7 @@
 </template>
 
 <script setup lang="ts">
-import type { propsType, slotsType } from './_types'
+import type { propsType, slotsType } from './types'
 
 defineOptions({
   // eslint-disable-next-line vue/no-reserved-component-names

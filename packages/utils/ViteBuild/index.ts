@@ -10,7 +10,7 @@ import type {
   ModuleFormat,
   RunBuildCliOptions,
   RunBuildCliParams,
-} from './_types/index.ts'
+} from './types/index.ts'
 
 import { execSync } from 'node:child_process'
 import fs from 'node:fs'
@@ -20,12 +20,12 @@ import { resolve } from 'node:path'
 import { dynamicImport } from '@moluoxixi/utils/_utils/index.ts'
 
 import { build, mergeConfig } from 'vite'
-import { getFlagValue, hasFlag, parseBoolean, printUsage } from './_utils/cli.ts'
-import { clearDir, findComponentEntry, getComponentNames, sleep, toKebabCase, toPascalCase } from './_utils/component.ts'
-import { getComponentFormats } from './_utils/config.ts'
-import { analyzeComponentDeps } from './_utils/deps.ts'
-import { ensureVersionPrefix, getCurrentVersions, getNextVersion, writeComponentVersions } from './_utils/version.ts'
-import { createBaseConfig } from './_utils/viteConfig.ts'
+import { getFlagValue, hasFlag, parseBoolean, printUsage } from './utils/cli.ts'
+import { clearDir, findComponentEntry, getComponentNames, sleep, toKebabCase, toPascalCase } from './utils/component.ts'
+import { getComponentFormats } from './utils/config.ts'
+import { analyzeComponentDeps } from './utils/deps.ts'
+import { ensureVersionPrefix, getCurrentVersions, getNextVersion, writeComponentVersions } from './utils/version.ts'
+import { createBaseConfig } from './utils/viteConfig.ts'
 
 // 重新导出类型
 export type {
@@ -35,7 +35,7 @@ export type {
   FormatConfig,
   GlobalFormatConfig,
   ViteConfigType,
-} from './_types/index.ts'
+} from './types/index.ts'
 
 //#region CLI 运行器
 /**
@@ -605,7 +605,7 @@ async function buildComponent(
       }
       // 有 uploadType，使用 UploadEvent 上传（动态导入避免 SCSS 依赖问题）
       else if (ctx.uploadType) {
-        const UploadEvent = await dynamicImport(import('./_utils/UploadComponent.ts'), 'UploadEvent' as const)
+        const UploadEvent = await dynamicImport(import('./utils/UploadComponent.ts'), 'UploadEvent' as const)
         const res = await UploadEvent(outputDir, buildName, ctx.uploadType)
         console.log('res', res)
       }
@@ -774,6 +774,8 @@ export async function buildComponentsWithOptions(options: BuildOptions): Promise
     },
     aliasPacks: [],
     excludeInternalPacks: rest.excludeInternalPacks || [],
+    excludeDirs: rest.excludeDirs || [],
+    excludeDepPrefixes: rest.excludeDepPrefixes || [],
     ...rest,
   }
   ctx.aliasPacks = Object.keys(ctx.alias).filter((i: string) => !i.endsWith('*'))

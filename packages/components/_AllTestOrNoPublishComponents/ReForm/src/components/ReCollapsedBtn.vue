@@ -29,7 +29,7 @@ import { ElButton } from 'element-plus'
 /** 导入 Vue 组合式 API */
 import { computed } from 'vue'
 /** 导入工具函数 */
-import { normalizeCollapsedText } from '../_utils'
+import { normalizeCollapsedText } from '../utils'
 
 /** 组件选项配置 */
 defineOptions({

@@ -4,7 +4,7 @@
  */
 
 import type { Component, PropType } from 'vue'
-import type { UIAdapter } from '../_types/adapter'
+import type { UIAdapter } from '../types/adapter'
 import {
   ArrowDownOutlined,
   ArrowUpOutlined,

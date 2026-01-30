@@ -1,12 +1,12 @@
 /** 导入组件安装工具函数 */
-import { withInstall } from '@moluoxixi/utils/_utils'
+import { withInstall } from '@moluoxixi/utils/utils'
 /** 导入 useForm 组合式函数 */
-import useForm from './src/_utils/useForm'
+import useForm from './src/utils/useForm'
 /** 导入 ReForm 主组件 */
 import ReForm from './src/index.vue'
 
 /** 更新类型导入路径 - 导出所有类型定义 */
-export * from './src/_types'
+export * from './src/types'
 
 /** 导出 useForm 组合式函数供外部使用 */
 export { useForm }

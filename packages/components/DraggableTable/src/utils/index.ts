@@ -1,4 +1,4 @@
-import type { ColumnType, types } from '@moluoxixi/components/DraggableTable/src/_types'
+import type { ColumnType, types } from '@moluoxixi/components/DraggableTable/src/types'
 
 /** 自定义的列模板 */
 const customTypeMap = {

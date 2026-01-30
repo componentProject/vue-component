@@ -28,6 +28,10 @@ runBuildCliAndExit(
     packDir,
     presetGlobals: {
     },
+    // 组件扫描时忽略的目录模式
+    excludeDirs: ['_*'],
+    // 依赖分析时忽略的包前缀
+    excludeDepPrefixes: ['_'],
   },
   { command: 'build-publish', uploadType: UTIL_SETTING_TYPE },
 )

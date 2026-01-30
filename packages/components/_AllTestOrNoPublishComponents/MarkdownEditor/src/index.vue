@@ -41,7 +41,7 @@
 </template>
 
 <script setup lang="ts">
-import type { DocumentListItem, emitsType, ImageData, propsType, SavedDocumentData, slotsType } from './_types'
+import type { DocumentListItem, emitsType, ImageData, propsType, SavedDocumentData, slotsType } from './types'
 import { foldGutter } from '@codemirror/language'
 import { lineNumbers } from '@codemirror/view'
 import { idbStorage } from '@moluoxixi/utils/IndexedDB'

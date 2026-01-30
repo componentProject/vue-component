@@ -31,7 +31,7 @@
 
 <script setup lang="ts">
 import type KeyController from 'keycon'
-import type { emitsType, propsType } from './_types'
+import type { emitsType, propsType } from './types'
 import type { Controls } from './type'
 // 静态导入外部组件 ConfigForm
 import ConfigForm from '@moluoxixi/components/ConfigForm'

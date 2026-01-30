@@ -3,7 +3,7 @@
 </template>
 
 <script setup lang="ts">
-import type { propsType } from './_types'
+import type { propsType } from './types'
 // 等同extend(Runtime, stdlib())
 // import { Chart } from '@antv/g2'
 import { corelib, extend, Runtime } from '@antv/g2'

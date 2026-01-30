@@ -3,9 +3,9 @@
  * 表单校验 Composable
  */
 
-import type { FieldConfig, FieldValidationResult, FormSchema, FormValidationResult, ValidationRule, ValidatorContext } from '../_types'
+import type { FieldConfig, FieldValidationResult, FormSchema, FormValidationResult, ValidationRule, ValidatorContext } from '../types'
 import type { UseFormStateReturn } from './useFormState'
-import { getNestedValue } from '../_utils'
+import { getNestedValue } from '../utils'
 
 /**
  * 表单校验选项
