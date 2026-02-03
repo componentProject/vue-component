@@ -2,6 +2,8 @@ gitChecks: false
 registry: https://registry.npmjs.org/
 packages:
   - packages/*
+  - formily
+  - formily/packages/*
   - play/*
   - docs/*
 

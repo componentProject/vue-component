@@ -1,0 +1,43 @@
+{
+  "compilerOptions": {
+    "composite": true,
+    "target": "ESNext",
+    "jsx": "preserve",
+    "lib": ["ESNext", "DOM"],
+    "baseUrl": ".",
+    "rootDir": ".",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "paths": {
+      "@moluoxixi/formily-shared": ["./packages/shared/src"],
+      "@moluoxixi/formily-shared/*": ["./packages/shared/src/*"],
+      "@moluoxixi/formily-reactive": ["./packages/reactive/src"],
+      "@moluoxixi/formily-reactive/*": ["./packages/reactive/src/*"],
+      "@moluoxixi/formily-path": ["./packages/path/src"],
+      "@moluoxixi/formily-path/*": ["./packages/path/src/*"],
+      "@moluoxixi/formily-validator": ["./packages/validator/src"],
+      "@moluoxixi/formily-validator/*": ["./packages/validator/src/*"],
+      "@moluoxixi/formily-core": ["./packages/core/src"],
+      "@moluoxixi/formily-core/*": ["./packages/core/src/*"],
+      "@moluoxixi/formily-json-schema": ["./packages/json-schema/src"],
+      "@moluoxixi/formily-json-schema/*": ["./packages/json-schema/src/*"],
+      "@moluoxixi/formily-reactive-vue": ["./packages/reactive-vue/src"],
+      "@moluoxixi/formily-reactive-vue/*": ["./packages/reactive-vue/src/*"],
+      "@moluoxixi/formily-vue": ["./packages/vue/src"],
+      "@moluoxixi/formily-vue/*": ["./packages/vue/src/*"]
+    },
+    "resolveJsonModule": true,
+    "allowImportingTsExtensions": false,
+    "allowJs": true,
+    "strict": true,
+    "strictNullChecks": true,
+    "noUnusedLocals": false,
+    "declaration": true,
+    "noEmit": false,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "isolatedModules": true,
+    "skipLibCheck": true
+  }
+}
+

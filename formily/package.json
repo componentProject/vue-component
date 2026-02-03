@@ -1,0 +1,44 @@
+{
+  "name": "@moluoxixi/formily",
+  "type": "module",
+  "version": "0.0.1",
+  "description": "基于 Alibaba Formily 的 Vue 3 配置化表单解决方案（Fork 优化版）",
+  "main": "index.ts",
+  "module": "index.ts",
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
+  },
+  "scripts": {
+    "build": "tsx _scripts/buildFormily.mts build",
+    "publish": "tsx _scripts/buildFormily.mts build-publish",
+    "eslint": "eslint . --ext .vue,.js,.jsx,.ts,.tsx --fix"
+  },
+  "dependencies": {
+    "@moluoxixi/formily-shared": "workspace:*",
+    "@moluoxixi/formily-reactive": "workspace:*",
+    "@moluoxixi/formily-path": "workspace:*",
+    "@moluoxixi/formily-validator": "workspace:*",
+    "@moluoxixi/formily-core": "workspace:*",
+    "@moluoxixi/formily-json-schema": "workspace:*",
+    "@moluoxixi/formily-reactive-vue": "workspace:*",
+    "@moluoxixi/formily-vue": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:type",
+    "tsx": "catalog:dev",
+    "typescript": "catalog:dev",
+    "vite": "catalog:dev",
+    "vite-plugin-dts": "catalog:dev"
+  },
+  "keywords": [
+    "formily",
+    "vue3",
+    "form",
+    "json-schema",
+    "low-code",
+    "configuration"
+  ],
+  "author": "moluoxixi (based on Alibaba Formily)",
+  "license": "MIT"
+}
+
