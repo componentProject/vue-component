@@ -29,7 +29,7 @@
 
 <script setup>
 import { reactive, ref } from 'vue'
-import ConfigTable from '@moluoxixi/components/ConfigTable'
+import ConfigTable from '@moluoxixi/config-table'
 
 const loading = ref(false)
 const tableData = ref([

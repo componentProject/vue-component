@@ -11,7 +11,7 @@
 ## 安装与导入
 
 ```ts
-import TsFooter from '@moluoxixi/components/Footer'
+import TsFooter from '@moluoxixi/footer'
 ```
 
 ## 基本用法
@@ -53,7 +53,7 @@ import TsFooter from '@moluoxixi/components/Footer'
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import TsFooter from '@moluoxixi/components/Footer'
+import TsFooter from '@moluoxixi/footer'
 
 const items = ref([
   '© 2025 Trasen',

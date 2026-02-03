@@ -26,7 +26,7 @@
 </template>
 
 <script setup lang="ts">
-import Editor from '@moluoxixi/components/Editor'
+import Editor from '@moluoxixi/editor'
 
 const source = ref(`function hello() {\n  console.log('hello')\n}`)
 </script>
@@ -42,7 +42,7 @@ const source = ref(`function hello() {\n  console.log('hello')\n}`)
 </template>
 
 <script setup lang="ts">
-import Editor from '@moluoxixi/components/Editor'
+import Editor from '@moluoxixi/editor'
 
 const source = ref('SELECT * FROM table_name')
 </script>
