@@ -1,6 +1,6 @@
-import { createForm, Field } from '@moluoxixi/formily-core'
-import { observer } from '@moluoxixi/formily-reactive-vue'
-import { Schema } from '@moluoxixi/formily-json-schema'
+import { createForm, Field } from '@formily/core'
+import { observer } from '@formily/reactive-vue'
+import { Schema } from '@formily/json-schema'
 import { fireEvent, render, waitFor } from '@testing-library/vue'
 import { mount } from '@vue/test-utils'
 import Vue, { FunctionalComponentOptions } from 'vue'
@@ -10,7 +10,7 @@ import {
   RecursionField,
 } from '../vue2-components'
 import { connect, mapProps, mapReadPretty, useField, useFieldSchema } from '../'
-import { defineComponent, h } from 'vue'
+import { defineComponent, h } from 'vue-demi'
 
 Vue.component('FormProvider', FormProvider)
 

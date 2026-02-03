@@ -1,4 +1,4 @@
-import { createForm } from '@moluoxixi/formily-core'
+import { createForm } from '@formily/core'
 import { useFieldSchema, useField, Schema } from '../'
 import {
   FormProvider,

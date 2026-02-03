@@ -1,5 +1,5 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils'
-import { observable, autorun } from '@moluoxixi/formily-reactive'
+import { observable, autorun } from '@formily/reactive'
 import { CreateElement } from 'vue'
 import CompositionAPI, { defineComponent, h } from '@vue/composition-api'
 import { observer } from '../'

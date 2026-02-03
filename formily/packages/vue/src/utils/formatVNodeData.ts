@@ -1,4 +1,4 @@
-import { each } from '@moluoxixi/formily-shared'
+import { each } from '@formily/shared'
 
 type VNodeData = Record<string, any>
 

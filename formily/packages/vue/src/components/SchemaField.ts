@@ -1,5 +1,5 @@
-import { inject, provide, computed, shallowRef, watch } from 'vue'
-import { ISchema, Schema, SchemaTypes } from '@moluoxixi/formily-json-schema'
+import { inject, provide, computed, shallowRef, watch } from 'vue-demi'
+import { ISchema, Schema, SchemaTypes } from '@formily/json-schema'
 import { RecursionField } from '../components'
 import {
   SchemaMarkupSymbol,
@@ -17,7 +17,7 @@ import { resolveSchemaProps } from '../utils/resolveSchemaProps'
 import { h } from '../shared/h'
 import { Fragment } from '../shared/fragment'
 import type { DefineComponent } from '../types'
-import { lazyMerge } from '@moluoxixi/formily-shared'
+import { lazyMerge } from '@formily/shared'
 
 type SchemaFieldComponents = {
   SchemaField: DefineComponent<ISchemaFieldProps>

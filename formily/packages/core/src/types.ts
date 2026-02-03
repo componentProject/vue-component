@@ -2,8 +2,8 @@ import {
   IValidatorRules,
   Validator,
   ValidatorTriggerType,
-} from '@moluoxixi/formily-validator'
-import { FormPath } from '@moluoxixi/formily-shared'
+} from '@formily/validator'
+import { FormPath } from '@formily/shared'
 import {
   Form,
   Field,

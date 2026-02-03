@@ -1,6 +1,6 @@
-import { onBeforeUnmount, watchEffect } from 'vue'
-import { Form } from '@moluoxixi/formily-core'
-import { uid } from '@moluoxixi/formily-shared'
+import { onBeforeUnmount, watchEffect } from 'vue-demi'
+import { Form } from '@formily/core'
+import { uid } from '@formily/shared'
 import { useForm } from './useForm'
 
 export const useFormEffects = (effects?: (form: Form) => void): void => {

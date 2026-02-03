@@ -1,5 +1,5 @@
-/// <reference types="@moluoxixi/formily-core" />
-/// <reference types="@moluoxixi/formily-json-schema" />
+/// <reference types="@formily/core" />
+/// <reference types="@formily/json-schema" />
 import * as Types from './types'
 declare global {
   namespace Formily.Vue {

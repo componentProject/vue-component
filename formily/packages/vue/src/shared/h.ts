@@ -1,4 +1,4 @@
-import { h, isVue2 } from 'vue'
+import { h, isVue2 } from 'vue-demi'
 import { Fragment, FragmentComponent } from './fragment'
 import { formatVue3VNodeData } from '../utils/formatVNodeData'
 

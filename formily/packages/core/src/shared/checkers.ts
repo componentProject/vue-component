@@ -1,4 +1,4 @@
-import { isFn } from '@moluoxixi/formily-shared'
+import { isFn } from '@formily/shared'
 import { DataField, JSXComponent } from '..'
 import {
   Form,

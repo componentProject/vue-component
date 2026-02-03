@@ -1,5 +1,5 @@
 import { Component } from 'vue'
-import * as VueDemi from 'vue'
+import * as VueDemi from 'vue-demi'
 import {
   Form,
   IFieldFactoryProps,
@@ -10,9 +10,9 @@ import {
   FormPatternTypes,
   FieldDisplayTypes,
   FieldValidator,
-} from '@moluoxixi/formily-core'
-import type { FormPathPattern } from '@moluoxixi/formily-shared'
-import type { ISchema, Schema, SchemaKey } from '@moluoxixi/formily-json-schema'
+} from '@formily/core'
+import type { FormPathPattern } from '@formily/shared'
+import type { ISchema, Schema, SchemaKey } from '@formily/json-schema'
 
 class Helper<Props> {
   Return = VueDemi.defineComponent({} as { props: Record<keyof Props, any> })

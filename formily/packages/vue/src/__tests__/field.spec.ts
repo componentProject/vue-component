@@ -7,7 +7,7 @@ import {
   isField,
   isVoidField,
   onFieldChange,
-} from '@moluoxixi/formily-core'
+} from '@formily/core'
 import { useField, useFormEffects, connect, mapProps, mapReadPretty } from '../'
 import {
   FormProvider,

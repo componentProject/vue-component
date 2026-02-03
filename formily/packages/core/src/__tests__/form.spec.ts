@@ -7,7 +7,7 @@ import {
 } from '../effects'
 import { attach, sleep } from './shared'
 import { LifeCycleTypes } from '../types'
-import { observable, batch } from '@moluoxixi/formily-reactive'
+import { observable, batch } from '@formily/reactive'
 
 test('create form', () => {
   const form = attach(createForm())

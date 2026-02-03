@@ -1,4 +1,4 @@
-import { inject, ref } from 'vue'
+import { inject, ref } from 'vue-demi'
 import { SchemaSymbol } from '../shared/context'
 
 export const useFieldSchema = () => {

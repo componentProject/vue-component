@@ -1,4 +1,4 @@
-import { isVue2, h as _h } from 'vue'
+import { isVue2, h as _h } from 'vue-demi'
 import ReactiveField from './ReactiveField'
 import { getRawComponent } from '../utils/getRawComponent'
 

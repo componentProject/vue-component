@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import { render, fireEvent } from '@testing-library/vue'
 import { mount } from '@vue/test-utils'
-import { createForm } from '@moluoxixi/formily-core'
+import { createForm } from '@formily/core'
 import {
   FormProvider,
   FormConsumer,
@@ -9,9 +9,9 @@ import {
   ObjectField,
   VoidField,
 } from '../vue2-components'
-import { defineComponent } from 'vue'
+import { defineComponent } from 'vue-demi'
 import { useParentForm, useField } from '../hooks'
-import { h } from 'vue'
+import { h } from 'vue-demi'
 
 Vue.component('FormProvider', FormProvider)
 Vue.component('FormConsumer', FormConsumer)

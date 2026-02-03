@@ -1,4 +1,4 @@
-import { onMounted, watch, Ref, onUnmounted, nextTick } from 'vue'
+import { onMounted, watch, Ref, onUnmounted, nextTick } from 'vue-demi'
 
 interface IRecycleTarget {
   onMount: () => void

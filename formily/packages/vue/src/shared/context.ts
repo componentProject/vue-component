@@ -1,6 +1,6 @@
-import { InjectionKey, Ref } from 'vue'
-import { Form, GeneralField } from '@moluoxixi/formily-core'
-import { Schema } from '@moluoxixi/formily-json-schema'
+import { InjectionKey, Ref } from 'vue-demi'
+import { Form, GeneralField } from '@formily/core'
+import { Schema } from '@formily/json-schema'
 import { ISchemaFieldVueFactoryOptions } from '../types'
 export const FormSymbol: InjectionKey<Ref<Form>> = Symbol('form')
 export const FieldSymbol: InjectionKey<Ref<GeneralField>> = Symbol('field')

@@ -10,7 +10,7 @@ import {
   isNum,
   isEqual,
   each,
-} from '@moluoxixi/formily-shared'
+} from '@formily/shared'
 import { getValidateFormats } from './registry'
 import { IRegistryRules } from './types'
 

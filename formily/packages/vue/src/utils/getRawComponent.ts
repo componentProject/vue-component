@@ -1,5 +1,5 @@
 import { IFieldProps, VueComponent } from '../types'
-import { toRaw } from 'vue'
+import { toRaw } from 'vue-demi'
 
 export const getRawComponent = (
   props: IFieldProps<VueComponent, VueComponent>

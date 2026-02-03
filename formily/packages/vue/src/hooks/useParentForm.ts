@@ -1,5 +1,5 @@
-import { isObjectField, GeneralField, Form, ObjectField } from '@moluoxixi/formily-core'
-import { computed, Ref } from 'vue'
+import { isObjectField, GeneralField, Form, ObjectField } from '@formily/core'
+import { computed, Ref } from 'vue-demi'
 import { useField } from './useField'
 import { useForm } from './useForm'
 

@@ -6,7 +6,7 @@
  * @since 2018-06-08 10:16
  */
 
-import { isObservable } from '@moluoxixi/formily-reactive'
+import { isObservable } from '@formily/reactive'
 
 export default function collectData(vm: any, data?: any) {
   const dataDefinition =

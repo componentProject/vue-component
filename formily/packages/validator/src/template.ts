@@ -1,4 +1,4 @@
-import { isFn, isStr, FormPath } from '@moluoxixi/formily-shared'
+import { isFn, isStr, FormPath } from '@formily/shared'
 import { IValidateResult, IValidatorRules } from './types'
 import { getValidateMessageTemplateEngine } from './registry'
 

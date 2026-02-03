@@ -1,4 +1,4 @@
-import { Tracker } from '@moluoxixi/formily-reactive'
+import { Tracker } from '@formily/reactive'
 import { getCurrentInstance, onBeforeUnmount, isVue3 } from 'vue-demi'
 import { IObserverOptions } from '../types'
 

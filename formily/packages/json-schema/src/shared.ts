@@ -1,5 +1,5 @@
-import { isFn, each, isPlainObj, isArr, toArr, FormPath } from '@moluoxixi/formily-shared'
-import { isObservable, untracked } from '@moluoxixi/formily-reactive'
+import { isFn, each, isPlainObj, isArr, toArr, FormPath } from '@formily/shared'
+import { isObservable, untracked } from '@formily/reactive'
 import { Schema } from './schema'
 import { ISchema } from './types'
 
