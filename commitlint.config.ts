@@ -1,5 +1,4 @@
 import type { Rule, UserConfig } from '@commitlint/types'
-import type { Commit } from 'conventional-commits-parser'
 
 // 自定义错误提示信息 - 使用模板字符串，与之前的格式保持一致
 const COMMIT_ERROR_MESSAGE = `您的提交信息不符合规范！正确的格式为(示例)：
@@ -33,7 +32,7 @@ const VALID_TYPES = [
 
 // 创建一个包装规则，复用 Angular 规范的验证逻辑但返回自定义错误消息
 // 这个规则会检查所有关键验证点，并在失败时返回友好的中文提示
-const customCommitRule: Rule = (parsed: Commit) => {
+const customCommitRule: Rule = (parsed) => {
   const header = parsed.header || ''
 
   // 1. 检查是否为空
